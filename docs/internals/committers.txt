@@ -191,14 +191,19 @@ Karen Tracey
 `Jannis Leidel`_
     Jannis graduated in media design from `Bauhaus-University Weimar`_,
     is the author of a number of pluggable Django apps and likes to
-    contribute to Open Source projects like Pinax_. He currently works as
-    a freelance Web developer and designer.
+    contribute to Open Source projects like virtualenv_ and pip_.
+
+    He has worked on Django's auth, admin and staticfiles apps as well as
+    the form, core, internationalization and test systems. He currently works
+    as the lead engineer at Gidsy_.
 
     Jannis lives in Berlin, Germany.
 
 .. _Jannis Leidel: http://jezdez.com/
 .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-.. _pinax: http://pinaxproject.com/
+.. _virtualenv: http://www.virtualenv.org/
+.. _pip: http://www.pip-installer.org/
+.. _Gidsy: http://gidsy.com/
 
 `James Tauber`_
     James is the lead developer of Pinax_ and the CEO and founder of
