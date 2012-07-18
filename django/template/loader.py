@@ -78,18 +78,9 @@ class LoaderOrigin(Origin):
     def reload(self):
         return self.loader(self.loadname, self.dirs)[0]
 
-class LoaderOriginLite(object):
-
-    def __init__(self, display_name, loader, name, dirs):
-        self.name = display_name
-        self.loader, self.loadname, self.dirs = loader, name, dirs
-
 def make_origin(display_name, loader, name, dirs):
     if display_name:
-        if settings.TEMPLATE_DEBUG:
-            return LoaderOrigin(display_name, loader, name, dirs)
-        else:
-            return LoaderOrigin(display_name, loader, name, dirs) 
+        return LoaderOrigin(display_name, loader, name, dirs)
     return None
 
 def find_template_loader(loader):
