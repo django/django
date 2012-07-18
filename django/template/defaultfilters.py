@@ -827,17 +827,23 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
-    if bytes < 1024:
+    KB = 1<<10
+    MB = 1<<20
+    GB = 1<<30
+    TB = 1<<40
+    PB = 1<<50
+
+    if bytes < KB:
         return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    if bytes < 1024 * 1024:
-        return ugettext("%s KB") % filesize_number_format(bytes / 1024)
-    if bytes < 1024 * 1024 * 1024:
-        return ugettext("%s MB") % filesize_number_format(bytes / (1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s GB") % filesize_number_format(bytes / (1024 * 1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s TB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024))
-    return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
+    if bytes < MB:
+        return ugettext("%s KB") % filesize_number_format(bytes / KB)
+    if bytes < GB:
+        return ugettext("%s MB") % filesize_number_format(bytes / MB)
+    if bytes < TB:
+        return ugettext("%s GB") % filesize_number_format(bytes / GB)
+    if bytes < PB:
+        return ugettext("%s TB") % filesize_number_format(bytes / TB)
+    return ugettext("%s PB") % filesize_number_format(bytes / PB)
 
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
