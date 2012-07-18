@@ -17,7 +17,6 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 
-import hashlib
 import re
 import time
 
@@ -176,17 +175,15 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
-    ctx = hashlib.md5()
-    # TODO: Rohan, move this to token system so that tests pass
-    #ctx = HashToken()
+    ctx = HashToken()
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(value)
-    path = hashlib.md5(iri_to_uri(request.get_full_path()))
+    path = HashToken(iri_to_uri(request.get_full_path()))
     #path = HashToken(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
-        key_prefix, method, path.hexdigest(), ctx.hexdigest())
+        key_prefix, method, path.hex(), ctx.hex())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):

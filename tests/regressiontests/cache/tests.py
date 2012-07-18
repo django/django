@@ -1148,13 +1148,13 @@ class CacheUtils(TestCase):
                                     self.query_hash, self.base_hash] ))
 
     def test_learn_cache_key(self):
-        request = self._get_request(self.path, 'HEAD')
+        request = self._get_request(self.path, 'GET')
         response = HttpResponse()
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
         self.assertEqual(get_cache_key(request), # md5 example: a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e
-                         '.'.join( ['views.decorators.cache.cache_page.settingsprefix.HEAD',
+                         '.'.join( ['views.decorators.cache.cache_page.settingsprefix.GET',
                                     self.path_hash, self.base_hash] ))
 
     def test_patch_cache_control(self):
