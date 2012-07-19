@@ -8,6 +8,7 @@ from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
+from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
 
@@ -205,6 +206,7 @@ class DateQuery(Query):
         self.select = [select]
         self.select_fields = [None]
         self.select_related = False # See #7097.
+        self.aggregates = SortedDict() # See 18056.
         self.set_extra_mask([])
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]

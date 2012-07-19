@@ -126,7 +126,7 @@ class Options(object):
             if self.parents:
                 # Promote the first parent link in lieu of adding yet another
                 # field.
-                field = self.parents.value_for_index(0)
+                field = next(self.parents.itervalues())
                 # Look for a local field with the same name as the
                 # first parent link. If a local field has already been
                 # created, use it instead of promoting the parent

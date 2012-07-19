@@ -19,7 +19,7 @@ Sample usage:
 ...     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
-http://diveintomark.org/archives/2004/02/04/incompatible-rss
+http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 from __future__ import unicode_literals
 
@@ -65,7 +65,7 @@ def get_tag_uri(url, date):
     """
     Creates a TagURI.
 
-    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
     bits = urlparse.urlparse(url)
     d = ''

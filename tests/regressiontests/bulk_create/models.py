@@ -19,3 +19,7 @@ class Pizzeria(Restaurant):
 
 class State(models.Model):
     two_letter_code = models.CharField(max_length=2, primary_key=True)
+
+class TwoFields(models.Model):
+    f1 = models.IntegerField(unique=True)
+    f2 = models.IntegerField(unique=True)

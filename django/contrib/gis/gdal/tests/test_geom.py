@@ -6,7 +6,6 @@ except ImportError:
 
 from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType, OGRException,
     OGRIndexError, SpatialReference, CoordTransform, GDAL_VERSION)
-from django.contrib.gis.gdal.prototypes.geom import GEOJSON
 from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils import unittest
 
@@ -108,7 +107,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test01e_json(self):
         "Testing GeoJSON input/output."
-        if not GEOJSON: return
         for g in self.geometries.json_geoms:
             geom = OGRGeometry(g.wkt)
             if not hasattr(g, 'not_equal'):
@@ -244,9 +242,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.fail('Should have raised an OGRException!')
         print("\nEND - expecting IllegalArgumentException; safe to ignore.\n")
 
-        # Closing the rings -- doesn't work on GDAL versions 1.4.1 and below:
-        # http://trac.osgeo.org/gdal/ticket/1673
-        if GDAL_VERSION <= (1, 4, 1): return
         poly.close_rings()
         self.assertEqual(10, poly.point_count) # Two closing points should've been added
         self.assertEqual(OGRGeometry('POINT(2.5 2.5)'), poly.centroid)
