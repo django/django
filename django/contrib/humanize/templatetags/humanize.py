@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import re
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from django import template
 from django.conf import settings
@@ -143,7 +143,9 @@ def apnumber(value):
         return value
     return (_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine'))[value-1]
 
-@register.filter
+# Perform the comparison in the default time zone when USE_TZ = True
+# (unless a specific time zone has been applied with the |timezone filter).
+@register.filter(expects_localtime=True)
 def naturalday(value, arg=None):
     """
     For date values that are tomorrow, today or yesterday compared to
@@ -169,6 +171,8 @@ def naturalday(value, arg=None):
         return _('yesterday')
     return defaultfilters.date(value, arg)
 
+# This filter doesn't require expects_localtime=True because it deals properly
+# with both naive and aware datetimes. Therefore avoid the cost of conversion.
 @register.filter
 def naturaltime(value):
     """
