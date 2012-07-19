@@ -137,7 +137,7 @@ def find_template(name, dirs=None, skip_template=None):
     for loader in template_source_loaders:
         try:
             source, display_name = loader(name, dirs)
-            if skip_template:
+            if skip_template and skip_template.endswith(name):
                 extends_tags = source.nodelist[0]
                 extends_tags_origin, extends_tags_source = extends_tags.source
                 if extends_tags_origin.name == skip_template:
