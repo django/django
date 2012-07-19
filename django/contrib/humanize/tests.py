@@ -130,7 +130,7 @@ class HumanizeTests(TestCase):
             def utcoffset(self, dt):
                 return None
         # we're going to mock datetime.datetime, so use a fixed datetime
-        now = datetime.datetime(2011, 8, 15)
+        now = datetime.datetime(2011, 8, 15, 1, 23)
         test_list = [
             now,
             now - datetime.timedelta(seconds=1),
@@ -185,17 +185,11 @@ class HumanizeTests(TestCase):
                     # equals now.replace(tzinfo=utc)
                     return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
-        # naturaltime also calls timesince/timeuntil
         from django.contrib.humanize.templatetags import humanize
-        from django.utils import timesince
         orig_humanize_datetime = humanize.datetime
-        orig_timesince_datetime = timesince.datetime
         humanize.datetime = MockDateTime
-        timesince.datetime = new.module(b"mock_datetime")
-        timesince.datetime.datetime = MockDateTime
 
         try:
             self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime
-            timesince.datetime = orig_timesince_datetime
