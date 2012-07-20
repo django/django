@@ -21,6 +21,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
+from django.utils import six
 from django.utils import timezone
 
 try:
@@ -348,18 +349,18 @@ class SQLiteCursorWrapper(Database.Cursor):
         try:
             return Database.Cursor.execute(self, query, params)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         try:
             return Database.Cursor.executemany(self, query, param_list)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
 
     def convert_query(self, query):
         return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')

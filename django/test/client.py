@@ -20,6 +20,7 @@ from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
+from django.utils import six
 from django.db import close_connection
 from django.test.utils import ContextList
 
@@ -381,7 +382,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                raise exc_info[1], None, exc_info[2]
+                six.reraise(exc_info[1], None, exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self

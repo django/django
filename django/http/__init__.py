@@ -84,6 +84,7 @@ from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import cookie_date
+from django.utils import six
 from django.utils import timezone
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
@@ -290,7 +291,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                raise UnreadablePostError, e, sys.exc_traceback
+                six.reraise(UnreadablePostError, e, sys.exc_traceback)
             self._stream = BytesIO(self._body)
         return self._body
 
