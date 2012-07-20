@@ -3,7 +3,7 @@ from django.db.utils import DatabaseError
 try:
     import thread
 except ImportError:
-    import dummy_thread as thread
+    from django.utils.six.moves import _dummy_thread as thread
 from contextlib import contextmanager
 
 from django.conf import settings

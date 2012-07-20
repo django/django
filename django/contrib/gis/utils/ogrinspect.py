@@ -5,7 +5,7 @@ models for GeoDjango and/or mapping dictionaries for use with the
 
 Author: Travis Pinney, Dane Springmeyer, & Justin Bronn
 """
-from future_builtins import zip
+from django.utils.six.moves import zip
 # Requires GDAL to use.
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime

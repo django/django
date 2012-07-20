@@ -16,23 +16,23 @@ except ImportError:     # Python 2
     from urllib import quote, urlencode
     from urlparse import parse_qsl, urljoin
 
-import Cookie
+from django.utils.six.moves import http_cookies
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
-_cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
+_cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
-_tc = Cookie.SimpleCookie()
+_tc = http_cookies.SimpleCookie()
 try:
     _tc.load(b'foo:bar=1')
     _cookie_allows_colon_in_names = True
-except Cookie.CookieError:
+except http_cookies.CookieError:
     _cookie_allows_colon_in_names = False
 
 if _cookie_encodes_correctly and _cookie_allows_colon_in_names:
-    SimpleCookie = Cookie.SimpleCookie
+    SimpleCookie = http_cookies.SimpleCookie
 else:
-    Morsel = Cookie.Morsel
+    Morsel = http_cookies.Morsel
 
-    class SimpleCookie(Cookie.SimpleCookie):
+    class SimpleCookie(http_cookies.SimpleCookie):
         if not _cookie_encodes_correctly:
             def value_encode(self, val):
                 # Some browsers do not support quoted-string from RFC 2109,
@@ -73,9 +73,9 @@ else:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
                     dict.__setitem__(self, key, M)
-                except Cookie.CookieError:
+                except http_cookies.CookieError:
                     self.bad_cookies.add(key)
-                    dict.__setitem__(self, key, Cookie.Morsel())
+                    dict.__setitem__(self, key, http_cookies.Morsel())
 
 
 from django.conf import settings
@@ -495,11 +495,11 @@ class QueryDict(MultiValueDict):
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    if not isinstance(cookie, Cookie.BaseCookie):
+    if not isinstance(cookie, http_cookies.BaseCookie):
         try:
             c = SimpleCookie()
             c.load(cookie)
-        except Cookie.CookieError:
+        except http_cookies.CookieError:
             # Invalid cookie
             return {}
     else:

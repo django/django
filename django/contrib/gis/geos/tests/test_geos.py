@@ -952,7 +952,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_pickle(self):
         "Testing pickling and unpickling support."
         # Using both pickle and cPickle -- just 'cause.
-        import pickle, cPickle
+        from django.utils.six.moves import cPickle
+        import pickle
 
         # Creating a list of test geometries for pickling,
         # and setting the SRID on some of them.

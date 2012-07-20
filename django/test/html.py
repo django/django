@@ -5,9 +5,8 @@ Comparing two html documents.
 from __future__ import unicode_literals
 
 import re
-from HTMLParser import HTMLParseError
 from django.utils.encoding import force_unicode
-from django.utils.html_parser import HTMLParser
+from django.utils.html_parser import HTMLParser, HTMLParseError
 from django.utils import six
 
 

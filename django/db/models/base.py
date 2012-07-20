@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import copy
 import sys
 from functools import update_wrapper
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings

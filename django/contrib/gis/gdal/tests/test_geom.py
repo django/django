@@ -1,6 +1,6 @@
 from binascii import b2a_hex
 try:
-    import cPickle as pickle
+    from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 

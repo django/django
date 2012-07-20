@@ -351,3 +351,8 @@ _add_doc(reraise, """Reraise an exception.""")
 def with_metaclass(meta, base=object):
     """Create a base class with a metaclass."""
     return meta("NewBase", (base,), {})
+
+
+### Additional customizations for Django ###
+
+add_move(MovedModule("_dummy_thread", "dummy_thread"))

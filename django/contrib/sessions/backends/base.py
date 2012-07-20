@@ -2,7 +2,7 @@ import base64
 import time
 from datetime import datetime, timedelta
 try:
-    import cPickle as pickle
+    from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 

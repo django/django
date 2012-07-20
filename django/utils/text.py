@@ -4,7 +4,7 @@ import re
 import unicodedata
 import warnings
 from gzip import GzipFile
-from htmlentitydefs import name2codepoint
+from django.utils.six.moves import html_entities
 from io import BytesIO
 
 from django.utils.encoding import force_unicode
@@ -349,7 +349,7 @@ def _replace_entity(match):
             return match.group(0)
     else:
         try:
-            return unichr(name2codepoint[text])
+            return unichr(html_entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 
