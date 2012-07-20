@@ -1,11 +1,14 @@
-import urllib
 import sys
 import os
 import re
 import mimetypes
 from copy import copy
 from io import BytesIO
-from urlparse import urlparse, urlsplit
+try:
+    from urllib.parse import unquote, urlparse, urlsplit
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -222,9 +225,9 @@ class RequestFactory(object):
     def _get_path(self, parsed):
         # If there are parameters, add them
         if parsed[3]:
-            return urllib.unquote(parsed[2] + ";" + parsed[3])
+            return unquote(parsed[2] + ";" + parsed[3])
         else:
-            return urllib.unquote(parsed[2])
+            return unquote(parsed[2])
 
     def get(self, path, data={}, **extra):
         "Construct a GET request."

@@ -4,8 +4,11 @@ from __future__ import unicode_literals
 
 import re
 import string
-import urllib
-import urlparse
+try:
+    from urllib.parse import quote, urlsplit, urlunsplit
+except ImportError:     # Python 2
+    from urllib import quote
+    from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import smart_str, force_unicode
@@ -138,19 +141,19 @@ fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     # Handle IDN before quoting.
-    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    scheme, netloc, path, query, fragment = urlsplit(url)
     try:
         netloc = netloc.encode('idna') # IDN -> ACE
     except UnicodeError: # invalid domain part
         pass
     else:
-        url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+        url = urlunsplit((scheme, netloc, path, query, fragment))
 
     # An URL is considered unquoted if it contains no % characters or
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = urllib.quote(smart_str(url), safe=b'!*\'();:@&=+$,/?#[]~')
+        url = quote(smart_str(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_unicode(url)
 

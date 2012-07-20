@@ -8,7 +8,10 @@ import copy
 import datetime
 import os
 import re
-import urlparse
+try:
+    from urllib.parse import urlsplit, urlunsplit
+except ImportError:     # Python 2
+    from urlparse import urlsplit, urlunsplit
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
@@ -599,7 +602,7 @@ class URLField(CharField):
             ``ValidationError`` exception for certain).
             """
             try:
-                return list(urlparse.urlsplit(url))
+                return list(urlsplit(url))
             except ValueError:
                 # urlparse.urlsplit can raise a ValueError with some
                 # misformatted URLs.
@@ -618,11 +621,11 @@ class URLField(CharField):
                 url_fields[2] = ''
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
-                url_fields = split_url(urlparse.urlunsplit(url_fields))
+                url_fields = split_url(urlunsplit(url_fields))
             if not url_fields[2]:
                 # the path portion may need to be added before query params
                 url_fields[2] = '/'
-            value = urlparse.urlunsplit(url_fields)
+            value = urlunsplit(url_fields)
         return value
 
 class BooleanField(Field):

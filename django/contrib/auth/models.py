@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 
-import urllib
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
-from django.utils.encoding import smart_str
+from django.utils.http import urlquote
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -268,7 +266,7 @@ class User(models.Model):
         return (self.username,)
 
     def get_absolute_url(self):
-        return "/users/%s/" % urllib.quote(smart_str(self.username))
+        return "/users/%s/" % urlquote(self.username)
 
     def is_anonymous(self):
         """

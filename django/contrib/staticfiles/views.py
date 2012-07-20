@@ -5,7 +5,10 @@ development, and SHOULD NOT be used in a production setting.
 """
 import os
 import posixpath
-import urllib
+try:
+    from urllib.parse import unquote
+except ImportError:     # Python 2
+    from urllib import unquote
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -31,7 +34,7 @@ def serve(request, path, document_root=None, insecure=False, **kwargs):
         raise ImproperlyConfigured("The staticfiles view can only be used in "
                                    "debug mode or if the the --insecure "
                                    "option of 'runserver' is used")
-    normalized_path = posixpath.normpath(urllib.unquote(path)).lstrip('/')
+    normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
     absolute_path = finders.find(normalized_path)
     if not absolute_path:
         if path.endswith('/') or path == '':

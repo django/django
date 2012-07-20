@@ -7,7 +7,10 @@ import re
 import sys
 from copy import copy
 from functools import wraps
-from urlparse import urlsplit, urlunsplit
+try:
+    from urllib.parse import urlsplit, urlunsplit
+except ImportError:     # Python 2
+    from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 import select
 import socket

@@ -7,7 +7,10 @@ from __future__ import absolute_import, unicode_literals
 import copy
 import datetime
 from itertools import chain
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone

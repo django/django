@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 
 import re
-import urlparse
+try:
+    from urllib.parse import urlsplit, urlunsplit
+except ImportError:     # Python 2
+    from urlparse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -52,12 +55,12 @@ class URLValidator(RegexValidator):
             # Trivial case failed. Try for possible IDN domain
             if value:
                 value = smart_unicode(value)
-                scheme, netloc, path, query, fragment = urlparse.urlsplit(value)
+                scheme, netloc, path, query, fragment = urlsplit(value)
                 try:
                     netloc = netloc.encode('idna') # IDN -> ACE
                 except UnicodeError: # invalid domain part
                     raise e
-                url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+                url = urlunsplit((scheme, netloc, path, query, fragment))
                 super(URLValidator, self).__call__(url)
             else:
                 raise

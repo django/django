@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
-import urllib
-import locale
-import datetime
 import codecs
+import datetime
 from decimal import Decimal
+import locale
+try:
+    from urllib.parse import quote
+except ImportError:     # Python 2
+    from urllib import quote
 
 from django.utils.functional import Promise
 from django.utils import six
@@ -165,7 +168,7 @@ def iri_to_uri(iri):
     # converted.
     if iri is None:
         return iri
-    return urllib.quote(smart_str(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
+    return quote(smart_str(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
     """Convert an file system path to a URI portion that is suitable for
@@ -184,7 +187,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return urllib.quote(smart_str(path).replace("\\", "/"), safe=b"/~!*()'")
+    return quote(smart_str(path).replace("\\", "/"), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could

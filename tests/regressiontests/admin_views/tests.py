@@ -4,7 +4,10 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import datetime
-import urlparse
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django.conf import settings, global_settings
 from django.core import mail
@@ -3199,7 +3202,7 @@ class RawIdFieldsTest(TestCase):
         popup_url = m.groups()[0].replace("&amp;", "&")
 
         # Handle relative links
-        popup_url = urlparse.urljoin(response.request['PATH_INFO'], popup_url)
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
         # Get the popup
         response2 = self.client.get(popup_url)
         self.assertContains(response2, "Spain")

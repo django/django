@@ -14,7 +14,10 @@ cache class.
 
 See docs/topics/cache.txt for information on the public API.
 """
-from urlparse import parse_qsl
+try:
+    from urllib.parse import parse_qsl
+except ImportError:     # Python 2
+    from urlparse import parse_qsl
 
 from django.conf import settings
 from django.core import signals

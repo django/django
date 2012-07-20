@@ -11,8 +11,11 @@ import os
 import socket
 import sys
 import traceback
-import urllib
-import urlparse
+try:
+    from urllib.parse import unquote, urljoin
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urljoin
 from SocketServer import ThreadingMixIn
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
@@ -127,7 +130,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings
-        self.admin_static_prefix = urlparse.urljoin(settings.STATIC_URL, 'admin/')
+        self.admin_static_prefix = urljoin(settings.STATIC_URL, 'admin/')
         # We set self.path to avoid crashes in log_message() on unsupported
         # requests (like "OPTIONS").
         self.path = ''
@@ -143,7 +146,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         else:
             path,query = self.path,''
 
-        env['PATH_INFO'] = urllib.unquote(path)
+        env['PATH_INFO'] = unquote(path)
         env['QUERY_STRING'] = query
         env['REMOTE_ADDR'] = self.client_address[0]
         env['CONTENT_TYPE'] = self.headers.get('content-type', 'text/plain')

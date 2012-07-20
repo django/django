@@ -10,8 +10,11 @@ import warnings
 
 from io import BytesIO
 from pprint import pformat
-from urllib import urlencode, quote
-from urlparse import urljoin, parse_qsl
+try:
+    from urllib.parse import quote, parse_qsl, urlencode, urljoin
+except ImportError:     # Python 2
+    from urllib import quote, urlencode
+    from urlparse import parse_qsl, urljoin
 
 import Cookie
 # Some versions of Python 2.7 and later won't need this encoding bug fix:

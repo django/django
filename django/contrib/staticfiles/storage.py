@@ -3,8 +3,11 @@ import hashlib
 import os
 import posixpath
 import re
-from urllib import unquote
-from urlparse import urlsplit, urlunsplit, urldefrag
+try:
+    from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urlsplit, urlunsplit, urldefrag
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
