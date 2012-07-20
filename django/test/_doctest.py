@@ -105,6 +105,8 @@ import unittest, difflib, pdb, tempfile
 import warnings
 from StringIO import StringIO
 
+from django.utils import six
+
 if sys.platform.startswith('java'):
     # On Jython, isclass() reports some modules as classes. Patch it.
     def patch_isclass(isclass):
@@ -1232,8 +1234,8 @@ class DocTestRunner:
             # keyboard interrupts.)
             try:
                 # Don't blink!  This is where the user's code gets run.
-                exec compile(example.source, filename, "single",
-                             compileflags, 1) in test.globs
+                six.exec_(compile(example.source, filename, "single",
+                             compileflags, 1), test.globs)
                 self.debugger.set_continue() # ==== Example Finished ====
                 exception = None
             except KeyboardInterrupt:
