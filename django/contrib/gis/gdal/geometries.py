@@ -57,6 +57,8 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 # For recognizing geometry input.
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
+from django.utils import six
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -281,7 +283,7 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, (int, long, basestring)):
+        elif isinstance(srs, six.integer_types + (basestring,)):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
         else:
@@ -297,7 +299,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, (int, long)):
+        if isinstance(srid, six.integer_types):
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -410,7 +412,7 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, (int, long, basestring)):
+        elif isinstance(coord_trans, six.integer_types + (basestring,)):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:

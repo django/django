@@ -13,6 +13,7 @@ from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
+from django.utils import six
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 
@@ -349,7 +350,7 @@ def display_for_value(value, boolean=False):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, (decimal.Decimal, float, int, long)):
+    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
         return formats.number_format(value)
     else:
         return smart_unicode(value)

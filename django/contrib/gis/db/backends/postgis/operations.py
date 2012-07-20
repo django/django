@@ -10,6 +10,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
 from django.db.utils import DatabaseError
+from django.utils import six
 
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
@@ -165,7 +166,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             }
 
         # Valid distance types and substitutions
-        dtypes = (Decimal, Distance, float, int, long)
+        dtypes = (Decimal, Distance, float) + six.integer_types
         def get_dist_ops(operator):
             "Returns operations for both regular and spherical distances."
             return {'cartesian' : PostGISDistance(prefix, operator),

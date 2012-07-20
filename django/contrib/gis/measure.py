@@ -39,8 +39,9 @@ __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
 
 from django.utils.functional import total_ordering
+from django.utils import six
 
-NUMERIC_TYPES = (int, float, long, Decimal)
+NUMERIC_TYPES = six.integer_types + (float, Decimal)
 AREA_PREFIX = "sq_"
 
 def pretty_name(obj):

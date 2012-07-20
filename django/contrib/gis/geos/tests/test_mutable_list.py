@@ -4,6 +4,7 @@
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
 from django.contrib.gis.geos.mutable_list import ListMixin
+from django.utils import six
 from django.utils import unittest
 
 
@@ -267,7 +268,7 @@ class ListMixinTest(unittest.TestCase):
     def test07_allowed_types(self):
         'Type-restricted list'
         pl, ul = self.lists_of_len()
-        ul._allowed = (int, long)
+        ul._allowed = six.integer_types
         ul[1] = 50
         ul[:2] = [60, 70, 80]
         def setfcn(x, i, v): x[i] = v

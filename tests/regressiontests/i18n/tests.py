@@ -19,6 +19,7 @@ from django.utils.formats import (get_format, date_format, time_format,
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
+from django.utils.six import PY3
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
     deactivate, gettext_lazy, pgettext, npgettext, to_locale,
     get_language_info, get_language, get_language_from_request)
@@ -309,7 +310,7 @@ class FormattingTests(TestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000L
+        self.l = 10000 if PY3 else long(10000)
         self.ctxt = Context({
             'n': self.n,
             't': self.t,

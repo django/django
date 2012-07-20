@@ -98,7 +98,7 @@ def _bin_to_long(x):
 
     This is a clever optimization for fast xor vector math
     """
-    return long(x.encode('hex'), 16)
+    return int(x.encode('hex'), 16)
 
 
 def _long_to_bin(x, hex_format_string):

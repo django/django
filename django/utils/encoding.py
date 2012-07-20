@@ -7,6 +7,7 @@ import codecs
 from decimal import Decimal
 
 from django.utils.functional import Promise
+from django.utils import six
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -45,12 +46,8 @@ def is_protected_type(obj):
     Objects of protected types are preserved as-is when passed to
     force_unicode(strings_only=True).
     """
-    return isinstance(obj, (
-        type(None),
-        int, long,
-        datetime.datetime, datetime.date, datetime.time,
-        float, Decimal)
-    )
+    return isinstance(obj, six.integer_types + (type(None), float, Decimal,
+        datetime.datetime, datetime.date, datetime.time))
 
 def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     """

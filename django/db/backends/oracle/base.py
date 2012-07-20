@@ -209,7 +209,7 @@ WHEN (new.%(col_name)s IS NULL)
         return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
 
     def fetch_returned_insert_id(self, cursor):
-        return long(cursor._insert_id_var.getvalue())
+        return int(cursor._insert_id_var.getvalue())
 
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
