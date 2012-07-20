@@ -58,6 +58,7 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
 from django.utils import six
+from django.utils.six.moves import xrange
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html

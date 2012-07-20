@@ -148,7 +148,7 @@ class MXRFCField(RegexField):
         if len(rfc) == 11:
             rfc = '-' + rfc
 
-        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(xrange(14)), rfc))
+        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(range(14)), rfc))
         checksum = 11 - sum_ % 11
 
         if checksum == 10:
@@ -215,7 +215,7 @@ class MXCURPField(RegexField):
     def _checksum(self, value):
         chars = '0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ'
 
-        s = sum(i * chars.index(c) for i, c in zip(reversed(xrange(19)), value))
+        s = sum(i * chars.index(c) for i, c in zip(reversed(range(19)), value))
         checksum = 10 - s % 10
 
         if checksum == 10:

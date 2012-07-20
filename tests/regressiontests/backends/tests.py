@@ -17,6 +17,7 @@ from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 from . import models
@@ -531,7 +532,7 @@ class ThreadTests(TestCase):
             from django.db import connection
             connection.cursor()
             connections_set.add(connection.connection)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
@@ -558,7 +559,7 @@ class ThreadTests(TestCase):
                 # main thread.
                 conn.allow_thread_sharing = True
                 connections_set.add(conn)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()

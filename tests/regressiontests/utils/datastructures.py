@@ -98,7 +98,7 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(l - len(self.d1), 1)
 
     def test_dict_equality(self):
-        d = SortedDict((i, i) for i in xrange(3))
+        d = SortedDict((i, i) for i in range(3))
         self.assertEqual(d, {0: 0, 1: 1, 2: 2})
 
     def test_tuple_init(self):

@@ -15,6 +15,7 @@ from django.contrib.gis.gdal.srs import SpatialReference
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
 from django.utils import six
+from django.utils.six.moves import xrange
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html

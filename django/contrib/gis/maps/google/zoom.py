@@ -1,5 +1,6 @@
 from django.contrib.gis.geos import GEOSGeometry, LinearRing, Polygon, Point
 from django.contrib.gis.maps.google.gmap import GoogleMapException
+from django.utils.six.moves import xrange
 from math import pi, sin, log, exp, atan
 
 # Constants used for degree to radian conversion, and vice-versa.
@@ -20,21 +21,21 @@ class GoogleZoom(object):
 
     "Google Maps Hacks" may be found at http://safari.oreilly.com/0596101619
     """
-    
+
     def __init__(self, num_zoom=19, tilesize=256):
         "Initializes the Google Zoom object."
         # Google's tilesize is 256x256, square tiles are assumed.
         self._tilesize = tilesize
-        
+
         # The number of zoom levels
         self._nzoom = num_zoom
 
-        # Initializing arrays to hold the parameters for each one of the 
+        # Initializing arrays to hold the parameters for each one of the
         # zoom levels.
         self._degpp = [] # Degrees per pixel
         self._radpp = [] # Radians per pixel
         self._npix  = [] # 1/2 the number of pixels for a tile at the given zoom level
-        
+
         # Incrementing through the zoom levels and populating the parameter arrays.
         z = tilesize # The number of pixels per zoom level.
         for i in xrange(num_zoom):
@@ -70,9 +71,9 @@ class GoogleZoom(object):
         # with with the number of degrees/pixel at the given zoom level.
         px_x = round(npix + (lon * self._degpp[zoom]))
 
-        # Creating the factor, and ensuring that 1 or -1 is not passed in as the 
+        # Creating the factor, and ensuring that 1 or -1 is not passed in as the
         # base to the logarithm.  Here's why:
-        #  if fac = -1, we'll get log(0) which is undefined; 
+        #  if fac = -1, we'll get log(0) which is undefined;
         #  if fac =  1, our logarithm base will be divided by 0, also undefined.
         fac = min(max(sin(DTOR * lat), -0.9999), 0.9999)
 
@@ -98,7 +99,7 @@ class GoogleZoom(object):
 
         # Returning the longitude, latitude coordinate pair.
         return (lon, lat)
-    
+
     def tile(self, lonlat, zoom):
         """
         Returns a Polygon  corresponding to the region represented by a fictional
@@ -119,7 +120,7 @@ class GoogleZoom(object):
 
         # Constructing the Polygon, representing the tile and returning.
         return Polygon(LinearRing(ll, (ll[0], ur[1]), ur, (ur[0], ll[1]), ll), srid=4326)
-        
+
     def get_zoom(self, geom):
         "Returns the optimal Zoom level for the given geometry."
         # Checking the input type.
@@ -139,10 +140,10 @@ class GoogleZoom(object):
             # When we span more than one tile, this is an approximately good
             # zoom level.
             if (env_w > tile_w) or (env_h > tile_h):
-                if z == 0: 
+                if z == 0:
                     raise GoogleMapException('Geometry width and height should not exceed that of the Earth.')
                 return z-1
-        
+
         # Otherwise, we've zoomed in to the max.
         return self._nzoom-1
 

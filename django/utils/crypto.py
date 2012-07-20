@@ -24,6 +24,7 @@ except NotImplementedError:
 
 from django.conf import settings
 from django.utils.encoding import smart_str
+from django.utils.six.moves import xrange
 
 
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])

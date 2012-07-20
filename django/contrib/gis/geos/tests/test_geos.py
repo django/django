@@ -9,6 +9,7 @@ from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
 from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 

@@ -8,6 +8,7 @@ from django.forms.widgets import Media, HiddenInput
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils.translation import ugettext as _
 
 

@@ -7,6 +7,7 @@ except ImportError:
 from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType, OGRException,
     OGRIndexError, SpatialReference, CoordTransform, GDAL_VERSION)
 from django.contrib.gis.geometry.test_data import TestDataMixin
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 class OGRGeomTest(unittest.TestCase, TestDataMixin):
