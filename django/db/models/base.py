@@ -24,6 +24,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
 
@@ -275,8 +276,8 @@ class ModelState(object):
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
 
-class Model(object):
-    __metaclass__ = ModelBase
+
+class ModelWithoutMeta(object):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -369,7 +370,7 @@ class Model(object):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
-        super(Model, self).__init__()
+        super(ModelWithoutMeta, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
@@ -401,7 +402,7 @@ class Model(object):
         only module-level classes can be pickled by the default path.
         """
         if not self._deferred:
-            return super(Model, self).__reduce__()
+            return super(ModelWithoutMeta, self).__reduce__()
         data = self.__dict__
         defers = []
         for field in self._meta.fields:
@@ -874,6 +875,15 @@ class Model(object):
 
         if errors:
             raise ValidationError(errors)
+
+
+# For unknown reasons, six.with_metaclass doesn't work correctly for Model.
+# Fallback to exec'ing the appropriate syntax for each Python version.
+
+if six.PY3:
+    six.exec_("class Model(ModelWithoutMeta, metaclass=ModelBase): pass")
+else:
+    six.exec_("class Model(ModelWithoutMeta): __metaclass__ = ModelBase")
 
 
 ############################################

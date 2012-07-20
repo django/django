@@ -14,6 +14,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils import six
 
 
 __all__ = ('BaseForm', 'Form')
@@ -380,14 +381,13 @@ class BaseForm(StrAndUnicode):
         """
         return [field for field in self if not field.is_hidden]
 
-class Form(BaseForm):
+class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the
     # fancy metaclass stuff purely for the semantic sugar -- it allows one
     # to define a form using declarative syntax.
     # BaseForm itself has no way of designating self.fields.
-    __metaclass__ = DeclarativeFieldsMetaclass
 
 class BoundField(StrAndUnicode):
     "A Field plus data"

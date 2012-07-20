@@ -15,6 +15,7 @@ from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property)
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
+from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -365,8 +366,8 @@ class BaseModelForm(BaseForm):
 
     save.alters_data = True
 
-class ModelForm(BaseModelForm):
-    __metaclass__ = ModelFormMetaclass
+class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
+    pass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       formfield_callback=None,  widgets=None):
@@ -401,6 +402,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
     form_metaclass = ModelFormMetaclass
 
+    # TODO: this doesn't work under Python 3.
     if issubclass(form, BaseModelForm) and hasattr(form, '__metaclass__'):
         form_metaclass = form.__metaclass__
 

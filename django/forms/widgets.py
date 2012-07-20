@@ -17,6 +17,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats
+from django.utils import six
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -153,8 +154,7 @@ class SubWidget(StrAndUnicode):
             args.append(self.choices)
         return self.parent_widget.render(*args)
 
-class Widget(object):
-    __metaclass__ = MediaDefiningClass
+class Widget(six.with_metaclass(MediaDefiningClass)):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False # Determines does this widget need multipart form
     is_localized = False
