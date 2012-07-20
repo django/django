@@ -70,7 +70,7 @@ simple_only_unlimited_args.anything = "Expected simple_only_unlimited_args __dic
 def simple_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])
@@ -221,7 +221,7 @@ inclusion_tag_use_l10n.anything = "Expected inclusion_tag_use_l10n __dict__"
 def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected inclusion_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])
@@ -292,7 +292,7 @@ assignment_only_unlimited_args.anything = "Expected assignment_only_unlimited_ar
 def assignment_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected assignment_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return "assignment_unlimited_args_kwargs - Expected result: %s / %s" % (
         ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])

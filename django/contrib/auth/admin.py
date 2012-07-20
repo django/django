@@ -12,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.utils.html import escape
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -128,7 +129,7 @@ class UserAdmin(admin.ModelAdmin):
         else:
             form = self.change_password_form(user)
 
-        fieldsets = [(None, {'fields': form.base_fields.keys()})]
+        fieldsets = [(None, {'fields': list(six.iterkeys(form.base_fields))})]
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {

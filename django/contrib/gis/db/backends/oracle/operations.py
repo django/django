@@ -128,7 +128,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     geometry_functions.update(distance_functions)
 
     gis_terms = ['isnull']
-    gis_terms += geometry_functions.keys()
+    gis_terms += list(six.iterkeys(geometry_functions))
     gis_terms = dict([(term, None) for term in gis_terms])
 
     truncate_params = {'relate' : None}

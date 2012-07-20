@@ -425,7 +425,7 @@ class ModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_form(request, obj)
-        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        fields = list(six.iterkeys(form.base_fields)) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -608,7 +608,7 @@ class ModelAdmin(BaseModelAdmin):
         tuple (name, description).
         """
         choices = [] + default_choices
-        for func, name, description in self.get_actions(request).itervalues():
+        for func, name, description in six.itervalues(self.get_actions(request)):
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
@@ -1415,7 +1415,7 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_formset(request, obj).form
-        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        fields = list(six.iterkeys(form.base_fields)) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
     def queryset(self, request):

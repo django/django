@@ -9,6 +9,7 @@ from django.contrib.gis.db.models.fields import GeometryField
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import get_model
 from django.utils.encoding import smart_str
+from django.utils import six
 from django.utils.translation import ugettext as _
 
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
@@ -46,7 +47,7 @@ def sitemap(request, sitemaps, section=None):
             raise Http404(_("No sitemap available for section: %r") % section)
         maps.append(sitemaps[section])
     else:
-        maps = sitemaps.values()
+        maps = list(six.itervalues(sitemaps))
 
     page = request.GET.get("p", 1)
     current_site = get_current_site(request)

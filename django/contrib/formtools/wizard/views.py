@@ -44,7 +44,7 @@ class StepsHelper(object):
     @property
     def all(self):
         "Returns the names of all steps/forms."
-        return self._wizard.get_form_list().keys()
+        return list(six.iterkeys(self._wizard.get_form_list()))
 
     @property
     def count(self):
@@ -164,14 +164,14 @@ class WizardView(TemplateView):
                 init_form_list[six.text_type(i)] = form
 
         # walk through the new created list of forms
-        for form in init_form_list.itervalues():
+        for form in six.itervalues(init_form_list):
             if issubclass(form, formsets.BaseFormSet):
                 # if the element is based on BaseFormSet (FormSet/ModelFormSet)
                 # we need to override the form variable.
                 form = form.form
             # check if any form contains a FileField, if yes, we need a
             # file_storage added to the wizardview (by subclassing).
-            for field in form.base_fields.itervalues():
+            for field in six.itervalues(form.base_fields):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured
@@ -196,7 +196,7 @@ class WizardView(TemplateView):
         could use data from other (maybe previous forms).
         """
         form_list = SortedDict()
-        for form_key, form_class in self.form_list.iteritems():
+        for form_key, form_class in six.iteritems(self.form_list):
             # try to fetch the value from condition list, by default, the form
             # gets passed to the new list.
             condition = self.condition_dict.get(form_key, True)

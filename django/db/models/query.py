@@ -245,8 +245,8 @@ class QuerySet(object):
             requested = None
         max_depth = self.query.max_depth
 
-        extra_select = self.query.extra_select.keys()
-        aggregate_select = self.query.aggregate_select.keys()
+        extra_select = list(six.iterkeys(self.query.extra_select))
+        aggregate_select = list(six.iterkeys(self.query.aggregate_select))
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
@@ -593,7 +593,7 @@ class QuerySet(object):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (kwargs.keys(),))
+                    % (list(six.iterkeys(kwargs)),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
@@ -693,7 +693,7 @@ class QuerySet(object):
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (kwargs.keys(),))
+                    % (list(six.iterkeys(kwargs)),))
         obj = self._clone()
         if fields:
             if depth:
@@ -751,7 +751,7 @@ class QuerySet(object):
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(kwargs.keys())
+        obj._setup_aggregate_query(list(six.iterkeys(kwargs)))
 
         # Add the aggregates to the query
         for (alias, aggregate_expr) in kwargs.items():
@@ -966,9 +966,9 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
-        extra_names = self.query.extra_select.keys()
+        extra_names = list(six.iterkeys(self.query.extra_select))
         field_names = self.field_names
-        aggregate_names = self.query.aggregate_select.keys()
+        aggregate_names = list(six.iterkeys(self.query.aggregate_select))
 
         names = extra_names + field_names + aggregate_names
 
@@ -1097,9 +1097,9 @@ class ValuesListQuerySet(ValuesQuerySet):
             # When extra(select=...) or an annotation is involved, the extra
             # cols are always at the start of the row, and we need to reorder
             # the fields to match the order in self._fields.
-            extra_names = self.query.extra_select.keys()
+            extra_names = list(six.iterkeys(self.query.extra_select))
             field_names = self.field_names
-            aggregate_names = self.query.aggregate_select.keys()
+            aggregate_names = list(six.iterkeys(self.query.aggregate_select))
 
             names = extra_names + field_names + aggregate_names
 
@@ -1527,7 +1527,7 @@ class RawQuerySet(object):
             # Associate fields to values
             if skip:
                 model_init_kwargs = {}
-                for attname, pos in model_init_field_names.iteritems():
+                for attname, pos in six.iteritems(model_init_field_names):
                     model_init_kwargs[attname] = values[pos]
                 instance = model_cls(**model_init_kwargs)
             else:

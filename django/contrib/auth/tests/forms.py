@@ -9,6 +9,7 @@ from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_unicode
+from django.utils import six
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
@@ -203,7 +204,7 @@ class PasswordChangeFormTest(TestCase):
     def test_field_order(self):
         # Regression test - check the order of fields:
         user = User.objects.get(username='testclient')
-        self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
+        self.assertEqual(list(six.iterkeys(PasswordChangeForm(user, {}).fields)),
                          ['old_password', 'new_password1', 'new_password2'])
 
 

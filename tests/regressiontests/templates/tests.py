@@ -30,6 +30,7 @@ from django.utils import unittest
 from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.tzinfo import LocalTimezone
 
 from .callables import CallableVariablesTests
@@ -402,7 +403,7 @@ class Templates(unittest.TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in template_tests.iteritems()]),
+            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
             use_cached_loader=True,
         )
 

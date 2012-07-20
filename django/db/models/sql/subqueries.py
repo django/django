@@ -11,6 +11,7 @@ from django.db.models.sql.where import AND, Constraint
 from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
+from django.utils import six
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -87,7 +88,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in values.iteritems():
+        for name, val in six.iteritems(values):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
@@ -129,7 +130,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.iteritems():
+        for model, values in six.iteritems(self.related_updates):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:

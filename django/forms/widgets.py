@@ -63,8 +63,7 @@ class Media(StrAndUnicode):
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
-        media = self._css.keys()
-        media.sort()
+        media = sorted(self._css.keys())
         return chain(*[
                 [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
                     for path in self._css[medium]]

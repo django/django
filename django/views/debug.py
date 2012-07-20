@@ -111,7 +111,7 @@ class ExceptionReporterFilter(object):
             return request.POST
 
     def get_traceback_frame_variables(self, request, tb_frame):
-        return tb_frame.f_locals.items()
+        return list(six.iteritems(tb_frame.f_locals))
 
 class SafeExceptionReporterFilter(ExceptionReporterFilter):
     """

@@ -178,7 +178,7 @@ def allow_lazy(func, *resultclasses):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for arg in list(args) + kwargs.values():
+        for arg in list(args) + list(six.itervalues(kwargs)):
             if isinstance(arg, Promise):
                 break
         else:

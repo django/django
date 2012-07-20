@@ -241,7 +241,7 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        params = {'%s__pk__in' % self.related.field.name: instances_dict.keys()}
+        params = {'%s__pk__in' % self.related.field.name: list(six.iterkeys(instances_dict))}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -335,9 +335,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__pk__in' % self.field.rel.field_name: list(six.iterkeys(instances_dict))}
         else:
-            params = {'%s__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__in' % self.field.rel.field_name: list(six.iterkeys(instances_dict))}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -488,7 +488,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname): instances_dict.keys()}
+                query = {'%s__%s__in' % (rel_field.name, attname): list(six.iterkeys(instances_dict))}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.

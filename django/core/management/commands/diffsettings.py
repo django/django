@@ -22,9 +22,7 @@ class Command(NoArgsCommand):
         default_settings = module_to_dict(global_settings)
 
         output = []
-        keys = user_settings.keys()
-        keys.sort()
-        for key in keys:
+        for key in sorted(user_settings.keys()):
             if key not in default_settings:
                 output.append("%s = %s  ###" % (key, user_settings[key]))
             elif user_settings[key] != default_settings[key]:

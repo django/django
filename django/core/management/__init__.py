@@ -8,6 +8,7 @@ import warnings
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
 from django.utils.importlib import import_module
+from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
 from django import get_version
@@ -228,7 +229,7 @@ class ManagementUtility(object):
                 "Available subcommands:",
             ]
             commands_dict = collections.defaultdict(lambda: [])
-            for name, app in get_commands().iteritems():
+            for name, app in six.iteritems(get_commands()):
                 if app == 'django.core':
                     app = 'django'
                 else:
@@ -294,7 +295,7 @@ class ManagementUtility(object):
         except IndexError:
             curr = ''
 
-        subcommands = get_commands().keys() + ['help']
+        subcommands = list(six.iterkeys(get_commands())) + ['help']
         options = [('--help', None)]
 
         # subcommand

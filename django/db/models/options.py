@@ -127,7 +127,7 @@ class Options(object):
             if self.parents:
                 # Promote the first parent link in lieu of adding yet another
                 # field.
-                field = next(self.parents.itervalues())
+                field = next(six.itervalues(self.parents))
                 # Look for a local field with the same name as the
                 # first parent link. If a local field has already been
                 # created, use it instead of promoting the parent
@@ -147,13 +147,13 @@ class Options(object):
         # self.duplicate_targets will map each duplicate field column to the
         # columns it duplicates.
         collections = {}
-        for column, target in self.duplicate_targets.iteritems():
+        for column, target in six.iteritems(self.duplicate_targets):
             try:
                 collections[target].add(column)
             except KeyError:
                 collections[target] = set([column])
         self.duplicate_targets = {}
-        for elt in collections.itervalues():
+        for elt in six.itervalues(collections):
             if len(elt) == 1:
                 continue
             for column in elt:
@@ -258,7 +258,7 @@ class Options(object):
             self._m2m_cache
         except AttributeError:
             self._fill_m2m_cache()
-        return self._m2m_cache.keys()
+        return list(six.iterkeys(self._m2m_cache))
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
@@ -269,7 +269,7 @@ class Options(object):
             self._m2m_cache
         except AttributeError:
             self._fill_m2m_cache()
-        return self._m2m_cache.items()
+        return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
         cache = SortedDict()
@@ -326,8 +326,7 @@ class Options(object):
             cache = self._name_map
         except AttributeError:
             cache = self.init_name_map()
-        names = cache.keys()
-        names.sort()
+        names = sorted(cache.keys())
         # Internal-only names end with "+" (symmetrical m2m related names being
         # the main example). Trim them.
         return [val for val in names if not val.endswith('+')]
@@ -417,7 +416,7 @@ class Options(object):
             cache = self._fill_related_many_to_many_cache()
         if local_only:
             return [k for k, v in cache.items() if not v]
-        return cache.keys()
+        return list(six.iterkeys(cache))
 
     def get_all_related_m2m_objects_with_model(self):
         """
@@ -428,7 +427,7 @@ class Options(object):
             cache = self._related_many_to_many_cache
         except AttributeError:
             cache = self._fill_related_many_to_many_cache()
-        return cache.items()
+        return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
         cache = SortedDict()

@@ -84,7 +84,7 @@ def format_html(format_string, *args, **kwargs):
     """
     args_safe = map(conditional_escape, args)
     kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        kwargs.iteritems()])
+                        six.iteritems(kwargs)])
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 def format_html_join(sep, format_string, args_generator):

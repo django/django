@@ -17,6 +17,7 @@ from django.template.defaultfilters import date
 from django.utils.encoding import smart_unicode
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils import six
 from django.utils import timezone
 
 register = Library()
@@ -473,7 +474,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
-                       self.extra_context.iteritems()])
+                       six.iteritems(self.extra_context)])
         context.update(values)
         output = self.nodelist.render(context)
         context.pop()
@@ -1188,7 +1189,7 @@ def templatetag(parser, token):
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError("Invalid templatetag argument: '%s'."
                                   " Must be one of: %s" %
-                                  (tag, TemplateTagNode.mapping.keys()))
+                                  (tag, list(six.iterkeys(TemplateTagNode.mapping))))
     return TemplateTagNode(tag)
 
 @register.tag

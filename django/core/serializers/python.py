@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.encoding import smart_unicode, is_protected_type
+from django.utils import six
 
 class Serializer(base.Serializer):
     """
@@ -87,7 +88,7 @@ def Deserializer(object_list, **options):
         m2m_data = {}
 
         # Handle each field
-        for (field_name, field_value) in d["fields"].iteritems():
+        for (field_name, field_value) in six.iteritems(d["fields"]):
             if isinstance(field_value, str):
                 field_value = smart_unicode(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
 

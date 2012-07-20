@@ -376,7 +376,7 @@ class RegexURLResolver(LocaleRegexProvider):
                     unicode_args = [force_unicode(val) for val in args]
                     candidate =  (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
-                    if set(kwargs.keys() + defaults.keys()) != set(params + defaults.keys() + prefix_args):
+                    if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
                     matches = True
                     for k, v in defaults.items():
