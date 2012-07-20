@@ -162,7 +162,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'overlaps' : PostGISFunction(prefix, 'Overlaps'),
             'contains' : PostGISFunction(prefix, 'Contains'),
             'intersects' : PostGISFunction(prefix, 'Intersects'),
-            'relate' : (PostGISRelate, basestring),
+            'relate' : (PostGISRelate, six.string_types),
             }
 
         # Valid distance types and substitutions

@@ -22,6 +22,7 @@ from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
 from django.utils import formats
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # Provide this import for backwards compatibility.
@@ -445,7 +446,7 @@ class RegexField(CharField):
         return self._regex
 
     def _set_regex(self, regex):
-        if isinstance(regex, basestring):
+        if isinstance(regex, six.string_types):
             regex = re.compile(regex, re.UNICODE)
         self._regex = regex
         if hasattr(self, '_regex_validator') and self._regex_validator in self.validators:
@@ -633,7 +634,7 @@ class BooleanField(Field):
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
-        if isinstance(value, basestring) and value.lower() in ('false', '0'):
+        if isinstance(value, six.string_types) and value.lower() in ('false', '0'):
             value = False
         else:
             value = bool(value)

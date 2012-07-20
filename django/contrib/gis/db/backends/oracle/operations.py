@@ -121,7 +121,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'exact' : SDOOperation('SDO_EQUAL'),
         'overlaps' : SDOOperation('SDO_OVERLAPS'),
         'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, basestring), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches' : SDOOperation('SDO_TOUCH'),
         'within' : SDOOperation('SDO_INSIDE'),
         }

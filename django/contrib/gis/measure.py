@@ -58,7 +58,7 @@ class MeasureBase(object):
     def __init__(self, default_unit=None, **kwargs):
         value, self._default_unit = self.default_units(kwargs)
         setattr(self, self.STANDARD_UNIT, value)
-        if default_unit and isinstance(default_unit, basestring):
+        if default_unit and isinstance(default_unit, six.string_types):
             self._default_unit = default_unit
 
     def _get_standard(self):

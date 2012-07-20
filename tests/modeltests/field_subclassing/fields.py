@@ -4,6 +4,7 @@ import json
 
 from django.db import models
 from django.utils.encoding import force_unicode
+from django.utils import six
 
 
 class Small(object):
@@ -66,7 +67,7 @@ class JSONField(models.TextField):
         if not value:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             value = json.loads(value)
         return value
 

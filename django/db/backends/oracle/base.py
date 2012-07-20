@@ -10,6 +10,7 @@ import decimal
 import sys
 import warnings
 
+from django.utils import six
 
 def _setup_environment(environ):
     import platform
@@ -361,7 +362,7 @@ WHEN (new.%(col_name)s IS NULL)
         if value is None:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware times
@@ -596,7 +597,7 @@ class OracleParam(object):
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, basestring) and len(param) > 4000:
+        elif isinstance(param, six.string_types) and len(param) > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
         else:
@@ -824,7 +825,7 @@ def to_unicode(s):
     Convert strings to Unicode objects (and return all other data types
     unchanged).
     """
-    if isinstance(s, basestring):
+    if isinstance(s, six.string_types):
         return force_unicode(s)
     return s
 

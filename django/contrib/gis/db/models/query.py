@@ -8,6 +8,8 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 from django.utils import six
 
+from django.utils import six
+
 class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."
 
@@ -534,7 +536,7 @@ class GeoQuerySet(QuerySet):
             geo_field = settings['geo_field']
 
         # The attribute to attach to the model.
-        if not isinstance(model_att, basestring): model_att = att
+        if not isinstance(model_att, six.string_types): model_att = att
 
         # Special handling for any argument that is a geometry.
         for name in settings['geom_args']:

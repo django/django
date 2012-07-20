@@ -52,7 +52,7 @@ def quote(s):
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, six.string_types):
         return s
     res = list(s)
     for i in range(len(res)):

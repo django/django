@@ -15,6 +15,7 @@ from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
 from django.utils.importlib import import_module
 from django.utils.encoding import smart_unicode, smart_str
+from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
 
@@ -214,7 +215,7 @@ class ExceptionReporter(object):
         self.loader_debug_info = None
 
         # Handle deprecated string exceptions
-        if isinstance(self.exc_type, basestring):
+        if isinstance(self.exc_type, six.string_types):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 

@@ -10,6 +10,7 @@ from django.db.models.loading import get_models, app_cache_ready
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.datastructures import SortedDict
+from django.utils import six
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
@@ -400,7 +401,7 @@ class Options(object):
         proxy_cache = cache.copy()
         for klass in get_models(include_auto_created=True, only_installed=False):
             for f in klass._meta.local_fields:
-                if f.rel and not isinstance(f.rel.to, basestring):
+                if f.rel and not isinstance(f.rel.to, six.string_types):
                     if self == f.rel.to._meta:
                         cache[RelatedObject(f.rel.to, klass, f)] = None
                         proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
@@ -442,7 +443,7 @@ class Options(object):
                     cache[obj] = model
         for klass in get_models(only_installed=False):
             for f in klass._meta.local_many_to_many:
-                if f.rel and not isinstance(f.rel.to, basestring) and self == f.rel.to._meta:
+                if f.rel and not isinstance(f.rel.to, six.string_types) and self == f.rel.to._meta:
                     cache[RelatedObject(f.rel.to, klass, f)] = None
         if app_cache_ready():
             self._related_many_to_many_cache = cache

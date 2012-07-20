@@ -19,6 +19,7 @@ from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
+from django.utils import six
 from django.utils.translation import get_language
 
 
@@ -159,7 +160,7 @@ class LocaleRegexProvider(object):
         """
         language_code = get_language()
         if language_code not in self._regex_dict:
-            if isinstance(self._regex, basestring):
+            if isinstance(self._regex, six.string_types):
                 regex = self._regex
             else:
                 regex = force_unicode(self._regex)
@@ -228,7 +229,7 @@ class RegexURLResolver(LocaleRegexProvider):
         LocaleRegexProvider.__init__(self, regex)
         # urlconf_name is a string representing the module containing URLconfs.
         self.urlconf_name = urlconf_name
-        if not isinstance(urlconf_name, basestring):
+        if not isinstance(urlconf_name, six.string_types):
             self._urlconf_module = self.urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
@@ -434,7 +435,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
     if prefix is None:
         prefix = get_script_prefix()
 
-    if not isinstance(viewname, basestring):
+    if not isinstance(viewname, six.string_types):
         view = viewname
     else:
         parts = viewname.split(':')

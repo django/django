@@ -178,7 +178,7 @@ def sanitize_separators(value):
     """
     if settings.USE_L10N:
         decimal_separator = get_format('DECIMAL_SEPARATOR')
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             parts = []
             if decimal_separator in value:
                 value, decimals = value.split(decimal_separator, 1)

@@ -54,7 +54,7 @@ class SpatialReference(GDALBase):
         buf = c_char_p('')
         srs_type = 'user'
 
-        if isinstance(srs_input, basestring):
+        if isinstance(srs_input, six.string_types):
             # Encoding to ASCII if unicode passed in.
             if isinstance(srs_input, unicode):
                 srs_input = srs_input.encode('ascii')
@@ -135,7 +135,7 @@ class SpatialReference(GDALBase):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, basestring) or not isinstance(index, int):
+        if not isinstance(target, six.string_types) or not isinstance(index, int):
             raise TypeError
         return capi.get_attr_value(self.ptr, target, index)
 

@@ -7,6 +7,8 @@ should be good enough for a large class of URLS, however.
 """
 from __future__ import unicode_literals
 
+from django.utils import six
+
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
 # this sequence. Any missing key is mapped to itself.
@@ -302,7 +304,7 @@ def flatten_result(source):
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
-        if isinstance(elt, basestring):
+        if isinstance(elt, six.string_types):
             continue
         piece = ''.join(source[last:pos])
         if isinstance(elt, Group):

@@ -480,7 +480,7 @@ class DocTest:
         Create a new DocTest containing the given examples.  The
         DocTest's globals are initialized with a copy of `globs`.
         """
-        assert not isinstance(examples, basestring), \
+        assert not isinstance(examples, six.string_types), \
                "DocTest no longer accepts str; use DocTestParser instead"
         self.examples = examples
         self.docstring = docstring
@@ -906,13 +906,13 @@ class DocTestFinder:
         # Look for tests in a module's __test__ dictionary.
         if inspect.ismodule(obj) and self._recurse:
             for valname, val in getattr(obj, '__test__', {}).items():
-                if not isinstance(valname, basestring):
+                if not isinstance(valname, six.string_types):
                     raise ValueError("DocTestFinder.find: __test__ keys "
                                      "must be strings: %r" %
                                      (type(valname),))
                 if not (inspect.isfunction(val) or inspect.isclass(val) or
                         inspect.ismethod(val) or inspect.ismodule(val) or
-                        isinstance(val, basestring)):
+                        isinstance(val, six.string_types)):
                     raise ValueError("DocTestFinder.find: __test__ values "
                                      "must be strings, functions, methods, "
                                      "classes, or modules: %r" %
@@ -945,7 +945,7 @@ class DocTestFinder:
         """
         # Extract the object's docstring.  If it doesn't have one,
         # then return None (no test for this object).
-        if isinstance(obj, basestring):
+        if isinstance(obj, six.string_types):
             docstring = obj
         else:
             try:
@@ -953,7 +953,7 @@ class DocTestFinder:
                     docstring = ''
                 else:
                     docstring = obj.__doc__
-                    if not isinstance(docstring, basestring):
+                    if not isinstance(docstring, six.string_types):
                         docstring = str(docstring)
             except (TypeError, AttributeError):
                 docstring = ''

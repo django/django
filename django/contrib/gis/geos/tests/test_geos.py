@@ -8,6 +8,7 @@ from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
 from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
+from django.utils import six
 from django.utils import unittest
 
 
@@ -1004,7 +1005,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         g = GEOSGeometry("POINT(0 0)")
         self.assertTrue(g.valid)
-        self.assertTrue(isinstance(g.valid_reason, basestring))
+        self.assertTrue(isinstance(g.valid_reason, six.string_types))
         self.assertEqual(g.valid_reason, "Valid Geometry")
 
         print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
@@ -1012,7 +1013,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
         self.assertTrue(not g.valid)
-        self.assertTrue(isinstance(g.valid_reason, basestring))
+        self.assertTrue(isinstance(g.valid_reason, six.string_types))
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
         print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")

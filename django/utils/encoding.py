@@ -64,7 +64,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not isinstance(s, basestring,):
+        if not isinstance(s, six.string_types,):
             if hasattr(s, '__unicode__'):
                 s = unicode(s)
             else:
@@ -109,7 +109,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     if isinstance(s, Promise):
         return unicode(s).encode(encoding, errors)
-    elif not isinstance(s, basestring):
+    elif not isinstance(s, six.string_types):
         try:
             return str(s)
         except UnicodeEncodeError:

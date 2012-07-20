@@ -90,7 +90,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         'overlaps' : SpatiaLiteFunction('Overlaps'),
         'contains' : SpatiaLiteFunction('Contains'),
         'intersects' : SpatiaLiteFunction('Intersects'),
-        'relate' : (SpatiaLiteRelate, basestring),
+        'relate' : (SpatiaLiteRelate, six.string_types),
         # Returns true if B's bounding box completely contains A's bounding box.
         'contained' : SpatiaLiteFunction('MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.

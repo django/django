@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.ipv6 import is_valid_ipv6_address
+from django.utils import six
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -25,7 +26,7 @@ class RegexValidator(object):
             self.code = code
 
         # Compile the regex if it was not passed pre-compiled.
-        if isinstance(self.regex, basestring):
+        if isinstance(self.regex, six.string_types):
             self.regex = re.compile(self.regex)
 
     def __call__(self, value):
