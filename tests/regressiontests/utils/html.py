@@ -36,13 +36,13 @@ class TestUtilsHtml(unittest.TestCase):
 
     def test_format_html(self):
         self.assertEqual(
-            html.format_html(u"{0} {1} {third} {fourth}",
-                             u"< Dangerous >",
-                             html.mark_safe(u"<b>safe</b>"),
+            html.format_html("{0} {1} {third} {fourth}",
+                             "< Dangerous >",
+                             html.mark_safe("<b>safe</b>"),
                              third="< dangerous again",
-                             fourth=html.mark_safe(u"<i>safe again</i>")
+                             fourth=html.mark_safe("<i>safe again</i>")
                              ),
-            u"&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
+            "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
             )
 
     def test_linebreaks(self):
