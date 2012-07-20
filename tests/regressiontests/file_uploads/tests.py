@@ -362,16 +362,16 @@ class DirectoryCreationTests(unittest.TestCase):
         if not os.path.isdir(temp_storage.location):
             os.makedirs(temp_storage.location)
         if os.path.isdir(UPLOAD_TO):
-            os.chmod(UPLOAD_TO, 0700)
+            os.chmod(UPLOAD_TO, 0o700)
             shutil.rmtree(UPLOAD_TO)
 
     def tearDown(self):
-        os.chmod(temp_storage.location, 0700)
+        os.chmod(temp_storage.location, 0o700)
         shutil.rmtree(temp_storage.location)
 
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
-        os.chmod(temp_storage.location, 0500)
+        os.chmod(temp_storage.location, 0o500)
         try:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'))
         except OSError as err:
