@@ -12,7 +12,7 @@ def gqn(val):
     backend quotename function).
     """
     if isinstance(val, six.string_types):
-        if isinstance(val, unicode): val = val.encode('ascii')
+        if isinstance(val, six.text_type): val = val.encode('ascii')
         return "'%s'" % val
     else:
         return str(val)

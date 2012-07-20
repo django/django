@@ -169,7 +169,7 @@ class LocaleRegexProvider(object):
             except re.error as e:
                 raise ImproperlyConfigured(
                     '"%s" is not a valid regular expression: %s' %
-                    (regex, unicode(e)))
+                    (regex, six.text_type(e)))
 
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]

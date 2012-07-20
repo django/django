@@ -265,7 +265,7 @@ class FileField(Field):
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."

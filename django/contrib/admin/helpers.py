@@ -189,7 +189,7 @@ class AdminReadonlyField(object):
                 if value is None:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 elif isinstance(f.rel, ManyToManyRel):
-                    result_repr = ", ".join(map(unicode, value.all()))
+                    result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)

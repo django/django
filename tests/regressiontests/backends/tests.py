@@ -16,6 +16,7 @@ from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import unittest
 
 from . import models
@@ -50,7 +51,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([unicode(x) for x in xrange(4000)])
+        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
         c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()
@@ -154,7 +155,7 @@ class LastExecutedQueryTest(TestCase):
         sql, params = tags.query.sql_with_params()
         cursor = tags.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertTrue(isinstance(last_sql, unicode))
+        self.assertTrue(isinstance(last_sql, six.text_type))
 
 
 class ParameterHandlingTest(TestCase):

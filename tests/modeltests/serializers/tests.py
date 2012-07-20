@@ -296,7 +296,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return unicode(value)
+        return six.text_type(value)
 
     @staticmethod
     def _validate_output(serial_str):

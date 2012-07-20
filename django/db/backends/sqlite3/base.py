@@ -177,7 +177,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -187,7 +187,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def year_lookup_bounds(self, value):
         first = '%s-01-01'

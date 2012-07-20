@@ -125,14 +125,14 @@ class Element(object):
                 output += ' %s' % key
         if self.children:
             output += '>\n'
-            output += ''.join(unicode(c) for c in self.children)
+            output += ''.join(six.text_type(c) for c in self.children)
             output += '\n</%s>' % self.name
         else:
             output += ' />'
         return output
 
     def __repr__(self):
-        return unicode(self)
+        return six.text_type(self)
 
 
 class RootElement(Element):
@@ -140,7 +140,7 @@ class RootElement(Element):
         super(RootElement, self).__init__(None, ())
 
     def __unicode__(self):
-        return ''.join(unicode(c) for c in self.children)
+        return ''.join(six.text_type(c) for c in self.children)
 
 
 class Parser(HTMLParser):

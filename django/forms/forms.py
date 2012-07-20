@@ -151,7 +151,7 @@ class BaseForm(StrAndUnicode):
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
-                hidden_fields.append(unicode(bf))
+                hidden_fields.append(six.text_type(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
                 # CSS classes applied.
@@ -181,7 +181,7 @@ class BaseForm(StrAndUnicode):
                 output.append(normal_row % {
                     'errors': force_unicode(bf_errors),
                     'label': force_unicode(label),
-                    'field': unicode(bf),
+                    'field': six.text_type(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr
                 })

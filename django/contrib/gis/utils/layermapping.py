@@ -330,7 +330,7 @@ class LayerMapping(object):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = unicode(ogr_field.value, self.encoding)
+                val = six.text_type(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
                 if model_field.max_length and len(val) > model_field.max_length:

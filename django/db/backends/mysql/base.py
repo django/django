@@ -297,7 +297,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return six.text_type(value.replace(microsecond=0))
 
     def value_to_db_time(self, value):
         if value is None:
@@ -308,7 +308,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return six.text_type(value.replace(microsecond=0))
 
     def year_lookup_bounds(self, value):
         # Again, no microseconds
@@ -399,8 +399,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             kwargs['client_flag'] = CLIENT.FOUND_ROWS
             kwargs.update(settings_dict['OPTIONS'])
             self.connection = Database.connect(**kwargs)
-            self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
-            self.connection.encoders[SafeString] = self.connection.encoders[str]
+            self.connection.encoders[SafeUnicode] = self.connection.encoders[six.text_type]
+            self.connection.encoders[SafeString] = self.connection.encoders[bytes]
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:

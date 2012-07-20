@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from django.core.exceptions import FieldError
 from django.db.models import F
 from django.test import TestCase
+from django.utils import six
 
 from .models import Company, Employee
 
@@ -156,7 +157,7 @@ class ExpressionsTests(TestCase):
                 "Frank Meyer",
                 "Max Mustermann",
             ],
-            lambda c: unicode(c.point_of_contact),
+            lambda c: six.text_type(c.point_of_contact),
         )
 
         c = Company.objects.all()[0]

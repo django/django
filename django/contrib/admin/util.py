@@ -275,10 +275,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             label = force_unicode(model._meta.verbose_name)
-            attr = unicode
+            attr = six.text_type
         elif name == "__str__":
             label = smart_str(model._meta.verbose_name)
-            attr = str
+            attr = bytes
         else:
             if callable(name):
                 attr = name

@@ -30,6 +30,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils import six
 from django.test.utils import override_settings
 
 # local test models
@@ -2478,7 +2479,7 @@ class AdminCustomQuerysetTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/paper/%s/' % p.pk,
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
-        # Message should contain non-ugly model name. Instance representation is set by unicode() (ugly)
+        # Message should contain non-ugly model name. Instance representation is set by six.text_type() (ugly)
         self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>', html=True)
 
         # defer() is used in ModelAdmin.queryset()
@@ -2530,8 +2531,8 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": "2",
             "pictures-INITIAL_FORMS": "1",
             "pictures-MAX_NUM_FORMS": "0",
-            "pictures-0-id": unicode(self.picture.id),
-            "pictures-0-gallery": unicode(self.gallery.id),
+            "pictures-0-id": six.text_type(self.picture.id),
+            "pictures-0-gallery": six.text_type(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",

@@ -19,7 +19,7 @@ class Small(object):
         return '%s%s' % (force_unicode(self.first), force_unicode(self.second))
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self).encode('utf-8')
 
 class SmallField(models.Field):
     """
@@ -42,7 +42,7 @@ class SmallField(models.Field):
         return Small(value[0], value[1])
 
     def get_db_prep_save(self, value, connection):
-        return unicode(value)
+        return six.text_type(value)
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'exact':

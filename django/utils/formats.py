@@ -89,7 +89,7 @@ def get_format(format_type, lang=None, use_l10n=None):
             _format_cache[cache_key] = None
     return getattr(settings, format_type)
 
-get_format_lazy = lazy(get_format, unicode, list, tuple)
+get_format_lazy = lazy(get_format, six.text_type, list, tuple)
 
 def date_format(value, format=None, use_l10n=None):
     """
@@ -139,7 +139,7 @@ def localize(value, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     if isinstance(value, bool):
-        return mark_safe(unicode(value))
+        return mark_safe(six.text_type(value))
     elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):

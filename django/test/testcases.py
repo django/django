@@ -38,6 +38,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
@@ -421,8 +422,8 @@ class SimpleTestCase(ut2.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                           unicode(dom1).splitlines(),
-                           unicode(dom2).splitlines())))
+                           six.text_type(dom1).splitlines(),
+                           six.text_type(dom2).splitlines())))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
 

@@ -56,7 +56,7 @@ class SpatialReference(GDALBase):
 
         if isinstance(srs_input, six.string_types):
             # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, unicode):
+            if isinstance(srs_input, six.text_type):
                 srs_input = srs_input.encode('ascii')
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable

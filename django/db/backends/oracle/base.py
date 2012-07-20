@@ -356,7 +356,7 @@ WHEN (new.%(col_name)s IS NULL)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:

@@ -55,7 +55,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         (SRID) number for this Geometry.  If not set, the SRID will be None.
         """
         if isinstance(geo_input, six.string_types):
-            if isinstance(geo_input, unicode):
+            if isinstance(geo_input, six.text_type):
                 # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
                 geo_input = geo_input.encode('ascii')
 

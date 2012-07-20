@@ -362,7 +362,7 @@ class ExceptionReporter(object):
             if match:
                 encoding = match.group(1)
                 break
-        source = [unicode(sline, encoding, 'replace') for sline in source]
+        source = [six.text_type(sline, encoding, 'replace') for sline in source]
 
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines

@@ -7,6 +7,7 @@ This demonstrates features of the database API.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import six
 
 
 class Author(models.Model):
@@ -35,7 +36,7 @@ class Season(models.Model):
     gt = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return unicode(self.year)
+        return six.text_type(self.year)
 
 class Game(models.Model):
     season = models.ForeignKey(Season, related_name='games')

@@ -331,10 +331,10 @@ class BaseTemporalField(Field):
     def to_python(self, value):
         # Try to coerce the value to unicode.
         unicode_value = force_unicode(value, strings_only=True)
-        if isinstance(unicode_value, unicode):
+        if isinstance(unicode_value, six.text_type):
             value = unicode_value.strip()
         # If unicode, try to strptime against each input format.
-        if isinstance(value, unicode):
+        if isinstance(value, six.text_type):
             for format in self.input_formats:
                 try:
                     return self.strptime(value, format)

@@ -81,7 +81,7 @@ class OGRGeometry(GDALBase):
         # Constructing the geometry,
         if str_instance:
             # Checking if unicode
-            if isinstance(geom_input, unicode):
+            if isinstance(geom_input, six.text_type):
                 # Encoding to ASCII, WKT or HEX doesn't need any more.
                 geom_input = geom_input.encode('ascii')
 

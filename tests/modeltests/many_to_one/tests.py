@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
 from django.test import TestCase
+from django.utils import six
 from django.utils.translation import ugettext_lazy
 
 from .models import Article, Reporter
@@ -421,7 +422,7 @@ class ManyToOneTests(TestCase):
         lazy = ugettext_lazy('test')
         reporter.article_set.create(headline=lazy,
                                     pub_date=datetime(2011, 6, 10))
-        notlazy = unicode(lazy)
+        notlazy = six.text_type(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)
 
