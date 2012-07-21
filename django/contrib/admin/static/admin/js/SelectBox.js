@@ -76,7 +76,7 @@ var SelectBox = {
         if (!all) {
             if (typeof from_box.selectedOptions !== 'undefined') {
                 // Fast method for browsers that support it (Chrome)
-                num_selected = from_box.selectedOptions;
+                num_selected = from_box.selectedOptions.length;
             } else {
                 for (var i = 0; (option = from_box.options[i]); i++) {
                     if (option.selected) num_selected++;
