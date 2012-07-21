@@ -1143,4 +1143,11 @@ class LiveServerTestCase(TransactionTestCase):
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
             cls.server_thread.join()
+
+        # Restore sqlite connections' non-sharability
+        for conn in connections.all():
+            if (conn.settings_dict['ENGINE'] == 'django.db.backends.sqlite3'
+                and conn.settings_dict['NAME'] == ':memory:'):
+                conn.allow_thread_sharing = False
+
         super(LiveServerTestCase, cls).tearDownClass()
