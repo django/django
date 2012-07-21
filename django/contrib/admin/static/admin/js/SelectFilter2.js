@@ -13,6 +13,7 @@ function findForm(node) {
 }
 
 window.SelectFilter = {
+    typingTimers: new Object(),
     init: function(field_id, field_name, is_stacked, admin_static_prefix) {
         if (field_id.match(/__prefix__/)){
             // Don't intialize on empty forms.
@@ -114,8 +115,8 @@ window.SelectFilter = {
     refresh_icons: function(field_id) {
         var from = $('#' + field_id + '_from');
         var to = $('#' + field_id + '_to');
-        var is_from_selected = from.find('option:selected').length > 0;
-        var is_to_selected = to.find('option:selected').length > 0;
+        var is_from_selected = from.get(0).selectedIndex > -1;
+        var is_to_selected = to.get(0).selectedIndex > -1;
         // Active if at least one item is selected
         $('#' + field_id + '_add_link').toggleClass('active', is_from_selected);
         $('#' + field_id + '_remove_link').toggleClass('active', is_to_selected);
@@ -124,37 +125,28 @@ window.SelectFilter = {
         $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
     },
     filter_key_up: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
-        // don't submit form if user pressed Enter
-        if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)) {
-            from.selectedIndex = 0;
-            SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = 0;
-            return false;
-        }
-        var temp = from.selectedIndex;
-        SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
-        from.selectedIndex = temp;
-        return true;
+        return false; // Let key down handle everything
     },
     filter_key_down: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
-        // right arrow -- move across
-        if ((event.which && event.which == 39) || (event.keyCode && event.keyCode == 39)) {
+        var from = document.getElementById(field_id + '_from'),
+            key = event.keyCode || event.which;
+
+        if ((key == 13) || (key == 39)) { // Enter or right arrow - move across
             var old_index = from.selectedIndex;
             SelectBox.move(field_id + '_from', field_id + '_to');
             from.selectedIndex = (old_index == from.length) ? from.length - 1 : old_index;
-            return false;
-        }
-        // down arrow -- wrap around
-        if ((event.which && event.which == 40) || (event.keyCode && event.keyCode == 40)) {
+        } else if (key == 40) { // Down arrow - wrap around
             from.selectedIndex = (from.length == from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
-        }
-        // up arrow -- wrap around
-        if ((event.which && event.which == 38) || (event.keyCode && event.keyCode == 38)) {
+        } else if (key == 38) { // Up arrow - wrap around
             from.selectedIndex = (from.selectedIndex == 0) ? from.length - 1 : from.selectedIndex - 1;
+        } else {
+            clearTimeout(SelectFilter.typingTimers[field_id]);
+            SelectFilter.typingTimers[field_id] = setTimeout(function() {
+                SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
+            }, 250);
+            return true;
         }
-        return true;
+        event.preventDefault(); // return false still lets Enter bubble up
     }
 }
 
