@@ -167,7 +167,7 @@ class LocaleRegexProvider(object):
                 compiled_regex = re.compile(regex, re.UNICODE)
             except re.error, e:
                 raise ImproperlyConfigured(
-                    u'"%s" is not a valid regular expression: %s' %
+                    '"%s" is not a valid regular expression: %s' %
                     (regex, unicode(e)))
 
             self._regex_dict[language_code] = compiled_regex
