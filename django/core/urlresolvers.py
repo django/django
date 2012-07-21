@@ -14,7 +14,7 @@ from threading import local
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import iri_to_uri, force_unicode, smart_str
+from django.utils.encoding import iri_to_uri, force_text, smart_bytes
 from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
@@ -163,7 +163,7 @@ class LocaleRegexProvider(object):
             if isinstance(self._regex, six.string_types):
                 regex = self._regex
             else:
-                regex = force_unicode(self._regex)
+                regex = force_text(self._regex)
             try:
                 compiled_regex = re.compile(regex, re.UNICODE)
             except re.error as e:
@@ -190,7 +190,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return smart_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return smart_bytes('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -240,7 +240,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
-        return smart_str('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
+        return smart_bytes('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()
@@ -373,7 +373,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 if args:
                     if len(args) != len(params) + len(prefix_args):
                         continue
-                    unicode_args = [force_unicode(val) for val in args]
+                    unicode_args = [force_text(val) for val in args]
                     candidate =  (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
                     if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
@@ -385,7 +385,7 @@ class RegexURLResolver(LocaleRegexProvider):
                             break
                     if not matches:
                         continue
-                    unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
+                    unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
                     candidate = (prefix_norm + result) % unicode_kwargs
                 if re.search('^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
                     return candidate

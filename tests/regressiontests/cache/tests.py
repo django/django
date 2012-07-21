@@ -28,7 +28,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
 from django.utils import timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
@@ -1307,7 +1307,7 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
-        tz = force_unicode(timezone.get_current_timezone_name(), errors='ignore')
+        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
         tz = tz.encode('ascii', 'ignore').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1319,7 +1319,7 @@ class CacheI18nTest(TestCase):
     def test_cache_key_no_i18n (self):
         request = self._get_request()
         lang = translation.get_language()
-        tz = force_unicode(timezone.get_current_timezone_name(), errors='ignore')
+        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
         tz = tz.encode('ascii', 'ignore').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)

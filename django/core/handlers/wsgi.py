@@ -9,7 +9,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, smart_str, iri_to_uri
+from django.utils.encoding import force_text, smart_bytes, iri_to_uri
 from django.utils.log import getLogger
 
 logger = getLogger('django.request')
@@ -127,7 +127,7 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_unicode(environ.get('PATH_INFO', '/'))
+        path_info = force_text(environ.get('PATH_INFO', '/'))
         if not path_info or path_info == script_name:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -246,5 +246,5 @@ class WSGIHandler(base.BaseHandler):
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
-        start_response(smart_str(status), response_headers)
+        start_response(smart_bytes(status), response_headers)
         return response

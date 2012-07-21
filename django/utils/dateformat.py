@@ -20,7 +20,7 @@ import datetime
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.timezone import is_aware, is_naive
 
@@ -30,9 +30,9 @@ re_escaped = re.compile(r'\\(.)')
 class Formatter(object):
     def format(self, formatstr):
         pieces = []
-        for i, piece in enumerate(re_formatchars.split(force_unicode(formatstr))):
+        for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):
             if i % 2:
-                pieces.append(force_unicode(getattr(self, piece)()))
+                pieces.append(force_text(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return ''.join(pieces)

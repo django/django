@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.formats import number_format
 from django.utils.translation import pgettext, ungettext, ugettext as _
 from django.utils.timezone import is_aware, utc
@@ -41,7 +41,7 @@ def intcomma(value, use_l10n=True):
             return intcomma(value, False)
         else:
             return number_format(value, force_grouping=True)
-    orig = force_unicode(value)
+    orig = force_text(value)
     new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
     if orig == new:
         return new

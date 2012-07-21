@@ -29,7 +29,7 @@ try:
 except ImportError:     # Python 2
     from urlparse import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.encoding import force_text, iri_to_uri
 from django.utils import datetime_safe
 from django.utils.timezone import is_aware
 
@@ -81,12 +81,12 @@ class SyndicationFeed(object):
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
             feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
-        to_unicode = lambda s: force_unicode(s, strings_only=True)
+        to_unicode = lambda s: force_text(s, strings_only=True)
         if categories:
-            categories = [force_unicode(c) for c in categories]
+            categories = [force_text(c) for c in categories]
         if ttl is not None:
             # Force ints to unicode
-            ttl = force_unicode(ttl)
+            ttl = force_text(ttl)
         self.feed = {
             'title': to_unicode(title),
             'link': iri_to_uri(link),
@@ -114,12 +114,12 @@ class SyndicationFeed(object):
         objects except pubdate, which is a datetime.datetime object, and
         enclosure, which is an instance of the Enclosure class.
         """
-        to_unicode = lambda s: force_unicode(s, strings_only=True)
+        to_unicode = lambda s: force_text(s, strings_only=True)
         if categories:
             categories = [to_unicode(c) for c in categories]
         if ttl is not None:
             # Force ints to unicode
-            ttl = force_unicode(ttl)
+            ttl = force_text(ttl)
         item = {
             'title': to_unicode(title),
             'link': iri_to_uri(link),

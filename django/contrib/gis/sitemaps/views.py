@@ -8,7 +8,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib.gis.db.models.fields import GeometryField
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import get_model
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_bytes
 from django.utils import six
 from django.utils.translation import ugettext as _
 
@@ -61,7 +61,7 @@ def sitemap(request, sitemaps, section=None):
             raise Http404(_("Page %s empty") % page)
         except PageNotAnInteger:
             raise Http404(_("No page '%s'") % page)
-    xml = smart_str(loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls}))
+    xml = smart_bytes(loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls}))
     return HttpResponse(xml, content_type='application/xml')
 
 def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):

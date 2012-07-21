@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.db.models.fields import BLANK_CHOICE_DASH
 
 class BoundRelatedObject(object):
@@ -34,9 +34,9 @@ class RelatedObject(object):
         if limit_to_currently_related:
             queryset = queryset.complex_filter(
                 {'%s__isnull' % self.parent_model._meta.module_name: False})
-        lst = [(x._get_pk_val(), smart_unicode(x)) for x in queryset]
+        lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
         return first_choice + lst
-        
+
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         # Defer to the actual field definition for db prep
         return self.field.get_db_prep_lookup(lookup_type, value,

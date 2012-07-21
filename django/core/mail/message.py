@@ -15,7 +15,7 @@ from io import BytesIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_bytes, force_text
 from django.utils import six
 
 
@@ -79,7 +79,7 @@ ADDRESS_HEADERS = set([
 def forbid_multi_line_headers(name, val, encoding):
     """Forbids multi-line headers, to prevent header injection."""
     encoding = encoding or settings.DEFAULT_CHARSET
-    val = force_unicode(val)
+    val = force_text(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
     try:
@@ -93,12 +93,12 @@ def forbid_multi_line_headers(name, val, encoding):
     else:
         if name.lower() == 'subject':
             val = Header(val)
-    return smart_str(name), val
+    return smart_bytes(name), val
 
 
 def sanitize_address(addr, encoding):
     if isinstance(addr, six.string_types):
-        addr = parseaddr(force_unicode(addr))
+        addr = parseaddr(force_text(addr))
     nm, addr = addr
     nm = str(Header(nm, encoding))
     try:
@@ -210,7 +210,7 @@ class EmailMessage(object):
 
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(smart_str(self.body, encoding),
+        msg = SafeMIMEText(smart_bytes(self.body, encoding),
                            self.content_subtype, encoding)
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
@@ -293,7 +293,7 @@ class EmailMessage(object):
         basetype, subtype = mimetype.split('/', 1)
         if basetype == 'text':
             encoding = self.encoding or settings.DEFAULT_CHARSET
-            attachment = SafeMIMEText(smart_str(content, encoding), subtype, encoding)
+            attachment = SafeMIMEText(smart_bytes(content, encoding), subtype, encoding)
         else:
             # Encode non-text attachments with base64.
             attachment = MIMEBase(basetype, subtype)

@@ -61,14 +61,14 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(smart_str(rawdata))
+                super(SimpleCookie, self).load(smart_bytes(rawdata))
                 for key in self.bad_cookies:
                     del self[key]
 
             # override private __set() method:
             # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
-                key = smart_str(key)
+                key = smart_bytes(key)
                 try:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
@@ -85,7 +85,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from django.utils.encoding import smart_bytes, iri_to_uri, force_text
 from django.utils.http import cookie_date
 from django.utils import six
 from django.utils import timezone
@@ -137,7 +137,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
     except:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
-    return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+    return smart_bytes('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
                       six.text_type(get),
@@ -385,8 +385,8 @@ class QueryDict(MultiValueDict):
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(force_unicode(key, encoding, errors='replace'),
-                            force_unicode(value, encoding, errors='replace'))
+            self.appendlist(force_text(key, encoding, errors='replace'),
+                            force_text(value, encoding, errors='replace'))
         self._mutable = mutable
 
     def _get_encoding(self):
@@ -481,13 +481,13 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = smart_str(safe, self.encoding)
+            safe = smart_bytes(safe, self.encoding)
             encode = lambda k, v: '%s=%s' % ((quote(k, safe), quote(v, safe)))
         else:
             encode = lambda k, v: urlencode({k: v})
         for k, list_ in self.lists():
-            k = smart_str(k, self.encoding)
-            output.extend([encode(k, smart_str(v, self.encoding))
+            k = smart_bytes(k, self.encoding)
+            output.extend([encode(k, smart_bytes(v, self.encoding))
                            for v in list_])
         return '&'.join(output)
 
@@ -648,7 +648,7 @@ class HttpResponse(object):
     def _get_content(self):
         if self.has_header('Content-Encoding'):
             return b''.join([str(e) for e in self._container])
-        return b''.join([smart_str(e, self._charset) for e in self._container])
+        return b''.join([smart_bytes(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
         if hasattr(value, '__iter__'):
@@ -698,7 +698,7 @@ class HttpResponseRedirectBase(HttpResponse):
             raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__()
         self['Location'] = iri_to_uri(redirect_to)
-    
+
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
 
@@ -735,7 +735,7 @@ def get_host(request):
     return request.get_host()
 
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.smart_unicode for parsing URLs and form inputs. Thus,
+# django.utils.encoding.smart_text for parsing URLs and form inputs. Thus,
 # this slightly more restricted function.
 def str_to_unicode(s, encoding):
     """

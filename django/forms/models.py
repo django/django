@@ -13,7 +13,7 @@ from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property)
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_text, force_text
 from django.utils.datastructures import SortedDict
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
@@ -875,7 +875,7 @@ class InlineForeignKeyField(Field):
             orig = getattr(self.parent_instance, self.to_field)
         else:
             orig = self.parent_instance.pk
-        if force_unicode(value) != force_unicode(orig):
+        if force_text(value) != force_text(orig):
             raise ValidationError(self.error_messages['invalid_choice'])
         return self.parent_instance
 
@@ -953,7 +953,7 @@ class ModelChoiceField(ChoiceField):
         generate the labels for the choices presented by this object. Subclasses
         can override this method to customize the display of the choices.
         """
-        return smart_unicode(obj)
+        return smart_text(obj)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
@@ -1025,9 +1025,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
             except ValueError:
                 raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = set([force_unicode(getattr(o, key)) for o in qs])
+        pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
-            if force_unicode(val) not in pks:
+            if force_text(val) not in pks:
                 raise ValidationError(self.error_messages['invalid_choice'] % val)
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here

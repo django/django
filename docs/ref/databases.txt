@@ -238,7 +238,7 @@ to you, the developer, to handle the fact that you will receive bytestrings if
 you configure your table(s) to use ``utf8_bin`` collation. Django itself should
 mostly work smoothly with such columns (except for the ``contrib.sessions``
 ``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.smart_unicode()`` at
+your code must be prepared to call ``django.utils.encoding.smart_text()`` at
 times if it really wants to work with consistent data -- Django will not do
 this for you (the database backend layer and the model population layer are
 separated internally so the database layer doesn't know it needs to make this

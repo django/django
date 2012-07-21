@@ -1,7 +1,7 @@
 from django.template import Node
 from django.template import TemplateSyntaxError, Library
 from django.utils import formats
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 register = Library()
 
@@ -11,7 +11,7 @@ def localize(value):
     Forces a value to be rendered as a localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_unicode(formats.localize(value, use_l10n=True))
+    return force_text(formats.localize(value, use_l10n=True))
 
 @register.filter(is_safe=False)
 def unlocalize(value):
@@ -19,7 +19,7 @@ def unlocalize(value):
     Forces a value to be rendered as a non-localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_unicode(value)
+    return force_text(value)
 
 class LocalizeNode(Node):
     def __init__(self, nodelist, use_l10n):

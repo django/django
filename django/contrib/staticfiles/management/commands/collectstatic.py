@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.datastructures import SortedDict
 
 from django.contrib.staticfiles import finders, storage
@@ -198,9 +198,9 @@ Type 'yes' to continue, or 'no' to cancel: """
             fpath = os.path.join(path, f)
             if self.dry_run:
                 self.log("Pretending to delete '%s'" %
-                         smart_unicode(fpath), level=1)
+                         smart_text(fpath), level=1)
             else:
-                self.log("Deleting '%s'" % smart_unicode(fpath), level=1)
+                self.log("Deleting '%s'" % smart_text(fpath), level=1)
                 self.storage.delete(fpath)
         for d in dirs:
             self.clear_dir(os.path.join(path, d))

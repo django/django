@@ -14,7 +14,7 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.utils import six
@@ -104,7 +104,7 @@ class FirstOfNode(Node):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return smart_unicode(value)
+                return smart_text(value)
         return ''
 
 class ForNode(Node):
@@ -393,7 +393,7 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_unicode(k, 'ascii'), v.resolve(context))
+        kwargs = dict([(smart_text(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
 
         view_name = self.view_name.resolve(context)

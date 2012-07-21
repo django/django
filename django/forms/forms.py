@@ -12,7 +12,7 @@ from django.forms.util import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
-from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
+from django.utils.encoding import StrAndUnicode, smart_text, force_text
 from django.utils.safestring import mark_safe
 from django.utils import six
 
@@ -150,7 +150,7 @@ class BaseForm(StrAndUnicode):
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
+                    top_errors.extend(['(Hidden field %s) %s' % (name, force_text(e)) for e in bf_errors])
                 hidden_fields.append(six.text_type(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
@@ -160,10 +160,10 @@ class BaseForm(StrAndUnicode):
                     html_class_attr = ' class="%s"' % css_classes
 
                 if errors_on_separate_row and bf_errors:
-                    output.append(error_row % force_unicode(bf_errors))
+                    output.append(error_row % force_text(bf_errors))
 
                 if bf.label:
-                    label = conditional_escape(force_unicode(bf.label))
+                    label = conditional_escape(force_text(bf.label))
                     # Only add the suffix if the label does not end in
                     # punctuation.
                     if self.label_suffix:
@@ -174,20 +174,20 @@ class BaseForm(StrAndUnicode):
                     label = ''
 
                 if field.help_text:
-                    help_text = help_text_html % force_unicode(field.help_text)
+                    help_text = help_text_html % force_text(field.help_text)
                 else:
                     help_text = ''
 
                 output.append(normal_row % {
-                    'errors': force_unicode(bf_errors),
-                    'label': force_unicode(label),
+                    'errors': force_text(bf_errors),
+                    'label': force_text(label),
                     'field': six.text_type(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr
                 })
 
         if top_errors:
-            output.insert(0, error_row % force_unicode(top_errors))
+            output.insert(0, error_row % force_text(top_errors))
 
         if hidden_fields: # Insert any hidden fields in the last row.
             str_hidden = ''.join(hidden_fields)
@@ -535,8 +535,8 @@ class BoundField(StrAndUnicode):
         associated Form has specified auto_id. Returns an empty string otherwise.
         """
         auto_id = self.form.auto_id
-        if auto_id and '%s' in smart_unicode(auto_id):
-            return smart_unicode(auto_id) % self.html_name
+        if auto_id and '%s' in smart_text(auto_id):
+            return smart_text(auto_id) % self.html_name
         elif auto_id:
             return self.html_name
         return ''

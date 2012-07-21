@@ -23,7 +23,7 @@ except NotImplementedError:
     using_sysrandom = False
 
 from django.conf import settings
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_bytes
 from django.utils.six.moves import xrange
 
 
@@ -115,7 +115,7 @@ def _fast_hmac(key, msg, digest):
     A trimmed down version of Python's HMAC implementation
     """
     dig1, dig2 = digest(), digest()
-    key = smart_str(key)
+    key = smart_bytes(key)
     if len(key) > dig1.block_size:
         key = digest(key).digest()
     key += chr(0) * (dig1.block_size - len(key))
@@ -141,8 +141,8 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     assert iterations > 0
     if not digest:
         digest = hashlib.sha256
-    password = smart_str(password)
-    salt = smart_str(salt)
+    password = smart_bytes(password)
+    salt = smart_bytes(salt)
     hlen = digest().digest_size
     if not dklen:
         dklen = hlen

@@ -7,7 +7,7 @@ from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.views.generic import dates
 from django.utils import datetime_safe
 
@@ -66,7 +66,7 @@ class CalendarPlugin(DatabrowsePlugin):
             return ''
         return format_html('<p class="filter"><strong>View calendar by:</strong> {0}</p>',
                            format_html_join(', ', '<a href="calendars/{0}/">{1}</a>',
-                                            ((f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values())))
+                                            ((f.name, force_text(capfirst(f.verbose_name))) for f in fields.values())))
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):

@@ -8,7 +8,7 @@ from django.shortcuts import render_to_response
 from django.utils.html import format_html, format_html_join
 from django.utils.http import urlquote
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 class FieldChoicePlugin(DatabrowsePlugin):
@@ -35,7 +35,7 @@ class FieldChoicePlugin(DatabrowsePlugin):
             return ''
         return format_html('<p class="filter"><strong>View by:</strong> {0}</p>',
                            format_html_join(', ', '<a href="fields/{0}/">{1}</a>',
-                                            ((f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values())))
+                                            ((f.name, force_text(capfirst(f.verbose_name))) for f in fields.values())))
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():

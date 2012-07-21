@@ -10,7 +10,7 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
 from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils import six
 
 
@@ -105,7 +105,7 @@ class UpdateQuery(Query):
         saving models.
         """
         # Check that no Promise object passes to the query. Refs #10498.
-        values_seq = [(value[0], value[1], force_unicode(value[2]))
+        values_seq = [(value[0], value[1], force_text(value[2]))
                       if isinstance(value[2], Promise) else value
                       for value in values_seq]
         self.values.extend(values_seq)
@@ -171,7 +171,7 @@ class InsertQuery(Query):
             for obj in objs:
                 value = getattr(obj, field.attname)
                 if isinstance(value, Promise):
-                    setattr(obj, field.attname, force_unicode(value))
+                    setattr(obj, field.attname, force_text(value))
         self.objs = objs
         self.raw = raw
 

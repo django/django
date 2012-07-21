@@ -9,7 +9,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import RegexField
 from django.forms.widgets import Select
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -58,7 +58,7 @@ class ISIdNumberField(RegexField):
         Takes in the value in canonical form and returns it in the common
         display format.
         """
-        return smart_unicode(value[:6]+'-'+value[6:])
+        return smart_text(value[:6]+'-'+value[6:])
 
 class ISPhoneNumberField(RegexField):
     """

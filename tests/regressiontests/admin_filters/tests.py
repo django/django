@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 from .models import Book, Department, Employee
 
@@ -160,7 +160,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
-        self.assertEqual(force_unicode(filterspec.title), 'date registered')
+        self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "Today")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
@@ -181,7 +181,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
-        self.assertEqual(force_unicode(filterspec.title), 'date registered')
+        self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "This month")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
@@ -202,7 +202,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
-        self.assertEqual(force_unicode(filterspec.title), 'date registered')
+        self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "This year")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
@@ -219,7 +219,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
-        self.assertEqual(force_unicode(filterspec.title), 'date registered')
+        self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "Past 7 days")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
@@ -243,7 +243,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'year')
+        self.assertEqual(force_text(filterspec.title), 'year')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?year__isnull=True')
@@ -253,7 +253,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'year')
+        self.assertEqual(force_text(filterspec.title), 'year')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?year=2002')
@@ -270,7 +270,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'Verbose Author')
+        self.assertEqual(force_text(filterspec.title), 'Verbose Author')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?author__isnull=True')
@@ -280,7 +280,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'Verbose Author')
+        self.assertEqual(force_text(filterspec.title), 'Verbose Author')
         # order of choices depends on User model, which has no order
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertEqual(choice['selected'], True)
@@ -298,7 +298,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(force_unicode(filterspec.title), 'Verbose Contributors')
+        self.assertEqual(force_text(filterspec.title), 'Verbose Contributors')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?contributors__isnull=True')
@@ -308,7 +308,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(force_unicode(filterspec.title), 'Verbose Contributors')
+        self.assertEqual(force_text(filterspec.title), 'Verbose Contributors')
         choice = select_by(filterspec.choices(changelist), "display", "bob")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?contributors__id__exact=%d' % self.bob.pk)
@@ -326,7 +326,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'book')
+        self.assertEqual(force_text(filterspec.title), 'book')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_authored__isnull=True')
@@ -336,7 +336,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'book')
+        self.assertEqual(force_text(filterspec.title), 'book')
         choice = select_by(filterspec.choices(changelist), "display", self.bio_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_authored__id__exact=%d' % self.bio_book.pk)
@@ -351,7 +351,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'book')
+        self.assertEqual(force_text(filterspec.title), 'book')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_contributed__isnull=True')
@@ -361,7 +361,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'book')
+        self.assertEqual(force_text(filterspec.title), 'book')
         choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
@@ -387,7 +387,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(force_unicode(filterspec.title), 'is best seller')
+        self.assertEqual(force_text(filterspec.title), 'is best seller')
         choice = select_by(filterspec.choices(changelist), "display", "No")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?is_best_seller__exact=0')
@@ -401,7 +401,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(force_unicode(filterspec.title), 'is best seller')
+        self.assertEqual(force_text(filterspec.title), 'is best seller')
         choice = select_by(filterspec.choices(changelist), "display", "Yes")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?is_best_seller__exact=1')
@@ -415,7 +415,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(force_unicode(filterspec.title), 'is best seller')
+        self.assertEqual(force_text(filterspec.title), 'is best seller')
         choice = select_by(filterspec.choices(changelist), "display", "Unknown")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?is_best_seller__isnull=True')
@@ -434,7 +434,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[0]['display'], 'All')
         self.assertEqual(choices[0]['selected'], True)
@@ -451,7 +451,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[1]['display'], 'the 1980\'s')
         self.assertEqual(choices[1]['selected'], True)
@@ -468,7 +468,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['display'], 'the 1990\'s')
         self.assertEqual(choices[2]['selected'], True)
@@ -485,7 +485,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]['display'], 'the 2000\'s')
         self.assertEqual(choices[3]['selected'], True)
@@ -502,14 +502,14 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choices are selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]['display'], 'the 2000\'s')
         self.assertEqual(choices[3]['selected'], True)
         self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
 
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'Verbose Author')
+        self.assertEqual(force_text(filterspec.title), 'Verbose Author')
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
@@ -561,7 +561,7 @@ class ListFiltersTests(TestCase):
         changelist = self.get_changelist(request, Book, modeladmin)
 
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(len(choices), 3)
 
@@ -591,7 +591,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(list(queryset), [self.bio_book])
 
         filterspec = changelist.get_filters(request)[0][-1]
-        self.assertEqual(force_unicode(filterspec.title), 'number')
+        self.assertEqual(force_text(filterspec.title), 'number')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?no=207')
@@ -614,7 +614,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['display'], 'the 1990\'s')
         self.assertEqual(choices[2]['selected'], True)
@@ -631,7 +631,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(force_unicode(filterspec.title), 'publication decade')
+        self.assertEqual(force_text(filterspec.title), 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['display'], 'the 1990\'s')
         self.assertEqual(choices[2]['selected'], True)
@@ -657,7 +657,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(list(queryset), [jack, john])
 
         filterspec = changelist.get_filters(request)[0][-1]
-        self.assertEqual(force_unicode(filterspec.title), 'department')
+        self.assertEqual(force_text(filterspec.title), 'department')
         choices = list(filterspec.choices(changelist))
 
         self.assertEqual(choices[0]['display'], 'All')
@@ -682,7 +682,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(list(queryset), [john])
 
         filterspec = changelist.get_filters(request)[0][-1]
-        self.assertEqual(force_unicode(filterspec.title), 'department')
+        self.assertEqual(force_text(filterspec.title), 'department')
         choices = list(filterspec.choices(changelist))
 
         self.assertEqual(choices[0]['display'], 'All')

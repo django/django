@@ -161,7 +161,7 @@ If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
 hashing methods need byte strings, you can use the
-:func:`~django.utils.encoding.smart_str` utility to encode the strings.
+:func:`~django.utils.encoding.smart_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

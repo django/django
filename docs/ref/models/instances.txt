@@ -453,9 +453,9 @@ using ``__str__()`` like this::
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            # Note use of django.utils.encoding.smart_str() here because
+            # Note use of django.utils.encoding.smart_bytes() here because
             # first_name and last_name will be unicode strings.
-            return smart_str('%s %s' % (self.first_name, self.last_name))
+            return smart_bytes('%s %s' % (self.first_name, self.last_name))
 
 ``get_absolute_url``
 --------------------

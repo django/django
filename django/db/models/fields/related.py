@@ -9,7 +9,7 @@ from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.db.models.deletion import CASCADE
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _, string_concat
 from django.utils.functional import curry, cached_property
@@ -999,7 +999,7 @@ class ForeignKey(RelatedField, Field):
             if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
-                    return smart_unicode(choice_list[1][0])
+                    return smart_text(choice_list[1][0])
         return Field.value_to_string(self, obj)
 
     def contribute_to_class(self, cls, name):
@@ -1205,7 +1205,7 @@ class ManyToManyField(RelatedField, Field):
                 choices_list = self.get_choices_default()
                 if len(choices_list) == 1:
                     data = [choices_list[0][0]]
-        return smart_unicode(data)
+        return smart_text(data)
 
     def contribute_to_class(self, cls, name):
         # To support multiple relations to self, it's useful to have a non-None

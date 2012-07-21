@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.utils.html import format_html, format_html_join
-from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.encoding import StrAndUnicode, force_text
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -35,12 +35,12 @@ class ErrorDict(dict, StrAndUnicode):
         if not self: return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}{1}</li>',
-                                            ((k, force_unicode(v))
+                                            ((k, force_text(v))
                                              for k, v in self.items())
                            ))
 
     def as_text(self):
-        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
+        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_text(i) for i in v])) for k, v in self.items()])
 
 class ErrorList(list, StrAndUnicode):
     """
@@ -53,16 +53,16 @@ class ErrorList(list, StrAndUnicode):
         if not self: return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}</li>',
-                                            ((force_unicode(e),) for e in self)
+                                            ((force_text(e),) for e in self)
                                             )
                            )
 
     def as_text(self):
         if not self: return ''
-        return '\n'.join(['* %s' % force_unicode(e) for e in self])
+        return '\n'.join(['* %s' % force_text(e) for e in self])
 
     def __repr__(self):
-        return repr([force_unicode(e) for e in self])
+        return repr([force_text(e) for e in self])
 
 # Utilities for time zone support in DateTimeField et al.
 

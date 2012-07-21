@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.util import flatatt
 from django.template.defaultfilters import capfirst
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -122,7 +122,7 @@ class AdminField(object):
 
     def label_tag(self):
         classes = []
-        contents = conditional_escape(force_unicode(self.field.label))
+        contents = conditional_escape(force_text(self.field.label))
         if self.is_checkbox:
             classes.append('vCheckboxLabel')
         else:
@@ -166,7 +166,7 @@ class AdminReadonlyField(object):
         label = self.field['label']
         return format_html('<label{0}>{1}:</label>',
                            flatatt(attrs),
-                           capfirst(force_unicode(label)))
+                           capfirst(force_text(label)))
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -182,7 +182,7 @@ class AdminReadonlyField(object):
                 if boolean:
                     result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_unicode(value)
+                    result_repr = smart_text(value)
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:

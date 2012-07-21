@@ -7,13 +7,13 @@ from gzip import GzipFile
 from django.utils.six.moves import html_entities
 from io import BytesIO
 
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
 
 # Capitalizes the first letter of a string.
-capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
+capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
 capfirst = allow_lazy(capfirst, six.text_type)
 
 # Set up regular expressions
@@ -26,7 +26,7 @@ def wrap(text, width):
     A word-wrap function that preserves existing line breaks and most spaces in
     the text. Expects that existing line breaks are posix newlines.
     """
-    text = force_unicode(text)
+    text = force_text(text)
     def _generator():
         it = iter(text.split(' '))
         word = next(it)
@@ -55,14 +55,14 @@ class Truncator(SimpleLazyObject):
     An object used to truncate text, either by characters or words.
     """
     def __init__(self, text):
-        super(Truncator, self).__init__(lambda: force_unicode(text))
+        super(Truncator, self).__init__(lambda: force_text(text))
 
     def add_truncation_text(self, text, truncate=None):
         if truncate is None:
             truncate = pgettext(
                 'String to return when truncating text',
                 '%(truncated_text)s...')
-        truncate = force_unicode(truncate)
+        truncate = force_text(truncate)
         if '%(truncated_text)s' in truncate:
             return truncate % {'truncated_text': text}
         # The truncation text didn't contain the %(truncated_text)s string
@@ -226,7 +226,7 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = force_unicode(s).strip().replace(' ', '_')
+    s = force_text(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 get_valid_filename = allow_lazy(get_valid_filename, six.text_type)
 
@@ -244,20 +244,20 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
     ''
     """
     if len(list_) == 0: return ''
-    if len(list_) == 1: return force_unicode(list_[0])
+    if len(list_) == 1: return force_text(list_[0])
     return '%s %s %s' % (
         # Translators: This string is used as a separator between list elements
-        _(', ').join([force_unicode(i) for i in list_][:-1]),
-        force_unicode(last_word), force_unicode(list_[-1]))
+        _(', ').join([force_text(i) for i in list_][:-1]),
+        force_text(last_word), force_text(list_[-1]))
 get_text_list = allow_lazy(get_text_list, six.text_type)
 
 def normalize_newlines(text):
-    return force_unicode(re.sub(r'\r\n|\r|\n', '\n', text))
+    return force_text(re.sub(r'\r\n|\r|\n', '\n', text))
 normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
-    text = force_unicode(text).lower()
+    text = force_text(text).lower()
     capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
     return text
@@ -330,7 +330,7 @@ def smart_split(text):
     >>> list(smart_split(r'A "\"funky\" style" test.'))
     ['A', '"\\"funky\\" style"', 'test.']
     """
-    text = force_unicode(text)
+    text = force_text(text)
     for bit in smart_split_re.finditer(text):
         yield bit.group(0)
 smart_split = allow_lazy(smart_split, six.text_type)

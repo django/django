@@ -19,7 +19,7 @@ from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_bytes
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
@@ -108,7 +108,7 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
     is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
@@ -145,7 +145,7 @@ def encode_multipart(boundary, data):
     return '\r\n'.join(lines)
 
 def encode_file(boundary, key, file):
-    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
     content_type = mimetypes.guess_type(file.name)[0]
     if content_type is None:
         content_type = 'application/octet-stream'
@@ -220,7 +220,7 @@ class RequestFactory(object):
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return smart_str(data, encoding=charset)
+            return smart_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
         # If there are parameters, add them
@@ -291,7 +291,7 @@ class RequestFactory(object):
     def generic(self, method, path,
                 data='', content_type='application/octet-stream', **extra):
         parsed = urlparse(path)
-        data = smart_str(data, settings.DEFAULT_CHARSET)
+        data = smart_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   parsed[4],

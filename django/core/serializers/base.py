@@ -5,7 +5,7 @@ Module for abstract serializer/unserializer base classes.
 from io import BytesIO
 
 from django.db import models
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils import six
 
 class SerializerDoesNotExist(KeyError):

@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_unicode, filepath_to_uri
+from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
@@ -48,7 +48,7 @@ class Storage(object):
         name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
-        return force_unicode(name.replace('\\', '/'))
+        return force_text(name.replace('\\', '/'))
 
     # These methods are part of the public API, with default implementations.
 
