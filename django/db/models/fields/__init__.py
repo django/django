@@ -135,6 +135,8 @@ class Field(object):
             return self.creation_counter < other.creation_counter
         return NotImplemented
 
+    __hash__ = object.__hash__
+
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
         # intended to be altered after initial creation.

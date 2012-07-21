@@ -6,7 +6,6 @@ be executed through ``django-admin.py`` or ``manage.py``).
 import os
 import sys
 
-from io import BytesIO
 from optparse import make_option, OptionParser
 import traceback
 
@@ -14,6 +13,7 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.utils.encoding import smart_str
+from django.utils.six import StringIO
 
 
 class CommandError(Exception):
@@ -273,7 +273,7 @@ class BaseCommand(object):
 
         """
         from django.core.management.validation import get_validation_errors
-        s = BytesIO()
+        s = StringIO()
         num_errors = get_validation_errors(s, app)
         if num_errors:
             s.seek(0)
