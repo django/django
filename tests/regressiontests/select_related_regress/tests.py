@@ -133,7 +133,7 @@ class SelectRelatedRegressTests(TestCase):
         self.assertEqual(troy.state.name, 'Western Australia')
 
         # Also works if you use only, rather than defer
-        troy = SpecialClient.objects.select_related('state').only('name').get(name='Troy Buswell')
+        troy = SpecialClient.objects.select_related('state').only('name', 'state').get(name='Troy Buswell')
 
         self.assertEqual(troy.name, 'Troy Buswell')
         self.assertEqual(troy.value, 42)

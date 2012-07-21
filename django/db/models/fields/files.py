@@ -242,7 +242,11 @@ class FileField(Field):
         # (ie. upload_to='path/to/upload/dir'), the length of the generated
         # name equals the length of the uploaded name plus a constant. Thus
         # we can tell the user how much shorter the name should be (roughly).
-        length = len(self.generate_filename(model_instance, value.name))
+        if value and value._committed:
+            filename = value.name
+        else:
+            filename = self.generate_filename(model_instance, value.name)
+        length = len(filename)
         if self.max_length and length > self.max_length:
             error_values = {'extra': length - self.max_length}
             raise ValidationError(self.error_messages['max_length'] % error_values)

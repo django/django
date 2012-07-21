@@ -65,7 +65,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(geo_input)
-            elif gdal.GEOJSON and json_regex.match(geo_input):
+            elif gdal.HAS_GDAL and json_regex.match(geo_input):
                 # Handling GeoJSON input.
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
@@ -409,13 +409,12 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def json(self):
         """
-        Returns GeoJSON representation of this Geometry if GDAL 1.5+
-        is installed.
+        Returns GeoJSON representation of this Geometry if GDAL is installed.
         """
-        if gdal.GEOJSON:
+        if gdal.HAS_GDAL:
             return self.ogr.json
         else:
-            raise GEOSException('GeoJSON output only supported on GDAL 1.5+.')
+            raise GEOSException('GeoJSON output only supported when GDAL is installed.')
     geojson = json
 
     @property

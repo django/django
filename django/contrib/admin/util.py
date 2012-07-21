@@ -9,8 +9,7 @@ from django.db.models.deletion import Collector
 from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
@@ -124,10 +123,10 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe('%s: <a href="%s">%s</a>' %
-                             (escape(capfirst(opts.verbose_name)),
-                              admin_url,
-                              escape(obj)))
+            return format_html('{0}: <a href="{1}">{2}</a>',
+                               capfirst(opts.verbose_name),
+                               admin_url,
+                               obj)
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.

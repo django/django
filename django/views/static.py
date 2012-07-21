@@ -58,9 +58,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
-        return HttpResponseNotModified(mimetype=mimetype)
+        return HttpResponseNotModified(content_type=mimetype)
     with open(fullpath, 'rb') as f:
-        response = HttpResponse(f.read(), mimetype=mimetype)
+        response = HttpResponse(f.read(), content_type=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size

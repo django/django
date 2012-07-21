@@ -157,7 +157,7 @@ might look like the following::
 That's really all there is to it. All the cool features of generic views come
 from changing the attributes set on the generic view. The
 :doc:`generic views reference</ref/class-based-views/index>` documents all the
-generic views and their options in detail; the rest of this document will 
+generic views and their options in detail; the rest of this document will
 consider some of the common ways you might customize and extend generic views.
 
 
@@ -220,7 +220,7 @@ more::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherDetailView, self).get_context_data(**kwargs)
+            context = super(PublisherDetail, self).get_context_data(**kwargs)
             # Add in a QuerySet of all the books
             context['book_list'] = Book.objects.all()
             return context
@@ -284,7 +284,7 @@ technique::
     from django.views.generic import ListView
     from books.models import Book
 
-    class AcmeBookListView(ListView):
+    class AcmeBookList(ListView):
 
         context_object_name = 'book_list'
         queryset = Book.objects.filter(publisher__name='Acme Publishing')
@@ -361,7 +361,7 @@ use it in the template::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherBookListView, self).get_context_data(**kwargs)
+            context = super(PublisherBookList, self).get_context_data(**kwargs)
             # Add in the publisher
             context['publisher'] = self.publisher
             return context
@@ -397,7 +397,7 @@ custom view::
 
     urlpatterns = patterns('',
         #...
-        url(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
+        url(r'^authors/(?P<pk>\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the

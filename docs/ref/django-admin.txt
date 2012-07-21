@@ -224,8 +224,8 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after syncdb was
-executed. This means that all data will be removed from the database, any
+Returns the database to the state it was in immediately after :djadmin:`syncdb`
+was executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
 
@@ -668,6 +668,7 @@ Example usage::
 
 .. versionadded:: 1.4
 
+Since version 1.4, the development server is multithreaded by default.
 Use the ``--nothreading`` option to disable the use of threading in the
 development server.
 
@@ -741,6 +742,24 @@ rich shell installed but want to force use of the "plain" Python interpreter,
 use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
+
+.. versionchanged:: 1.5
+
+If you would like to specify either IPython or bpython as your interpreter if
+you have both installed you can specify an alternative interpreter interface
+with the ``-i`` or ``--interface`` options like so::
+
+IPython::
+
+    django-admin.py shell -i ipython
+    django-admin.py shell --interface ipython
+
+
+bpython::
+
+    django-admin.py shell -i bpython
+    django-admin.py shell --interface bpython
+
 
 .. _IPython: http://ipython.scipy.org/
 .. _bpython: http://bpython-interpreter.org/
@@ -887,7 +906,8 @@ through the template engine: the files whose extensions match the
 with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
-- Any option passed to the startapp command
+- Any option passed to the startapp command (among the command's supported
+  options)
 - ``app_name`` -- the app name as passed to the command
 - ``app_directory`` -- the full path of the newly created app
 

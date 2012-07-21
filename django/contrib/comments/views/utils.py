@@ -56,7 +56,7 @@ def confirmation_view(template, doc="Display a confirmation view."):
     confirmed.__doc__ = textwrap.dedent("""\
         %s
 
-        Templates: `%s``
+        Templates: :template:`%s``
         Context:
             comment
                 The posted comment

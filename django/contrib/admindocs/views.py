@@ -37,7 +37,7 @@ def bookmarklets(request):
     admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
-        'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
+        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
 
 @staff_member_required

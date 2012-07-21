@@ -63,10 +63,10 @@ def technical_500_response(request, exc_type, exc_value, tb):
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
     if request.is_ajax():
         text = reporter.get_traceback_text()
-        return HttpResponseServerError(text, mimetype='text/plain')
+        return HttpResponseServerError(text, content_type='text/plain')
     else:
         html = reporter.get_traceback_html()
-        return HttpResponseServerError(html, mimetype='text/html')
+        return HttpResponseServerError(html, content_type='text/html')
 
 # Cache for the default exception reporter filter instance.
 default_exception_reporter_filter = None
@@ -443,7 +443,7 @@ def technical_404_response(request, exception):
         'request': request,
         'settings': get_safe_settings(),
     })
-    return HttpResponseNotFound(t.render(c), mimetype='text/html')
+    return HttpResponseNotFound(t.render(c), content_type='text/html')
 
 def empty_urlconf(request):
     "Create an empty URLconf 404 error response."
@@ -451,7 +451,7 @@ def empty_urlconf(request):
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
-    return HttpResponse(t.render(c), mimetype='text/html')
+    return HttpResponse(t.render(c), content_type='text/html')
 
 #
 # Templates are embedded in the file so that we know the error handler will

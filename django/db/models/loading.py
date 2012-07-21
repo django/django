@@ -6,9 +6,9 @@ from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
+import imp
 import sys
 import os
-import threading
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
@@ -39,7 +39,6 @@ class AppCache(object):
         handled = {},
         postponed = [],
         nesting_level = 0,
-        write_lock = threading.RLock(),
         _get_models_cache = {},
     )
 
@@ -54,7 +53,14 @@ class AppCache(object):
         """
         if self.loaded:
             return
-        with self.write_lock:
+        # Note that we want to use the import lock here - the app loading is
+        # in many cases initiated implicitly by importing, and thus it is
+        # possible to end up in deadlock when one thread initiates loading
+        # without holding the importer lock and another thread then tries to
+        # import something which also launches the app loading. For details of
+        # this situation see #18251.
+        imp.acquire_lock()
+        try:
             if self.loaded:
                 return
             for app_name in settings.INSTALLED_APPS:
@@ -65,6 +71,8 @@ class AppCache(object):
                 for app_name in self.postponed:
                     self.load_app(app_name)
                 self.loaded = True
+        finally:
+            imp.release_lock()
 
     def _label_for(self, app_mod):
         """
@@ -135,7 +143,8 @@ class AppCache(object):
         the app has no models in it and 'emptyOK' is True, returns None.
         """
         self._populate()
-        with self.write_lock:
+        imp.acquire_lock()
+        try:
             for app_name in settings.INSTALLED_APPS:
                 if app_label == app_name.split('.')[-1]:
                     mod = self.load_app(app_name, False)
@@ -146,6 +155,8 @@ class AppCache(object):
                     else:
                         return mod
             raise ImproperlyConfigured("App with label %s could not be found" % app_label)
+        finally:
+            imp.release_lock()
 
     def get_app_errors(self):
         "Returns the map of known problems with the INSTALLED_APPS."

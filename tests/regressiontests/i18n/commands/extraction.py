@@ -117,6 +117,14 @@ class BasicExtractorTests(ExtractorTests):
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
 
+    def test_extraction_warning(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./code.sample', './code_sample.py')
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        os.remove('./code_sample.py')
+        self.assertIn("code_sample.py:4", stdout.getvalue())
+
     def test_template_message_context_extractor(self):
         """
         Ensure that message contexts are correctly extracted for the

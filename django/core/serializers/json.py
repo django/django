@@ -52,9 +52,8 @@ class Serializer(PythonSerializer):
         self._current = None
 
     def getvalue(self):
-        # overwrite PythonSerializer.getvalue() with base Serializer.getvalue()
-        if callable(getattr(self.stream, 'getvalue', None)):
-            return self.stream.getvalue()
+        # Grand-parent super
+        return super(PythonSerializer, self).getvalue()
 
 
 def Deserializer(stream_or_string, **options):

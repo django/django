@@ -196,7 +196,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(srid, poly.shell.srid)
                 self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
 
-    @unittest.skipUnless(gdal.HAS_GDAL and gdal.GEOJSON, "gdal >= 1.5 is required")
+    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
     def test_json(self):
         "Testing GeoJSON input/output (via GDAL)."
         for g in self.geometries.json_geoms:

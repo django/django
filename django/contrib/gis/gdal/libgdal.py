@@ -19,7 +19,7 @@ elif os.name == 'nt':
 elif os.name == 'posix':
     # *NIX library names.
     lib_names = ['gdal', 'GDAL', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0',
-        'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
+        'gdal1.6.0', 'gdal1.5.0']
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 
@@ -97,10 +97,3 @@ GDAL_MINOR_VERSION = int(_verinfo['minor'])
 GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
 GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
 del _verinfo
-
-# GeoJSON support is available only in GDAL 1.5+.
-if GDAL_VERSION >= (1, 5):
-    GEOJSON = True
-else:
-    GEOJSON = False
-

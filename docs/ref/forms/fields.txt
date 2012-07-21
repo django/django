@@ -591,7 +591,11 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ImageField requires that the `Python Imaging Library`_ is installed.
+    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
+    is installed and supports the image formats you use. If you encounter a
+    ``corrupt image`` error when you upload an image, it usually means PIL
+    doesn't understand its format. To fix this, install the appropriate
+    library and reinstall PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.

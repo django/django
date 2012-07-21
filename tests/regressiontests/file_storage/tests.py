@@ -424,7 +424,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0666
+        settings.FILE_UPLOAD_PERMISSIONS = 0o666
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
@@ -434,8 +434,8 @@ class FileStoragePermissions(unittest.TestCase):
 
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile(b"data"))
-        actual_mode = os.stat(self.storage.path(name))[0] & 0777
-        self.assertEqual(actual_mode, 0666)
+        actual_mode = os.stat(self.storage.path(name))[0] & 0o777
+        self.assertEqual(actual_mode, 0o666)
 
 
 class FileStoragePathParsing(unittest.TestCase):

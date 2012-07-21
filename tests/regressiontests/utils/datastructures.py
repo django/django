@@ -6,8 +6,8 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
-from django.utils.datastructures import (DictWrapper, DotExpandedDict,
-    ImmutableList, MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
+from django.utils.datastructures import (DictWrapper, ImmutableList,
+    MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 
 
 class SortedDictTests(SimpleTestCase):
@@ -249,20 +249,6 @@ class MultiValueDictTests(SimpleTestCase):
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())
-
-
-class DotExpandedDictTests(SimpleTestCase):
-
-    def test_dotexpandeddict(self):
-
-        d = DotExpandedDict({'person.1.firstname': ['Simon'],
-                             'person.1.lastname': ['Willison'],
-                             'person.2.firstname': ['Adrian'],
-                             'person.2.lastname': ['Holovaty']})
-
-        self.assertEqual(d['person']['1']['lastname'], ['Willison'])
-        self.assertEqual(d['person']['2']['lastname'], ['Holovaty'])
-        self.assertEqual(d['person']['2']['firstname'], ['Adrian'])
 
 
 class ImmutableListTests(SimpleTestCase):

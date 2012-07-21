@@ -276,6 +276,13 @@ these changes.
 * The function ``django.utils.itercompat.product`` will be removed. The Python
   builtin version should be used instead.
 
+* Auto-correction of INSTALLED_APPS and TEMPLATE_DIRS settings when they are
+  specified as a plain string instead of a tuple will be removed and raise an
+  exception.
+
+* The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
+  will be removed (``content_type`` should be used instead).
+
 2.0
 ---
 

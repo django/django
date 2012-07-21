@@ -606,11 +606,10 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200)
 
-    Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The :setting:`DEFAULT_CONTENT_TYPE` is
-    ``'text/html'``.
+    Instantiates an ``HttpResponse`` object with the given page content and
+    content type.
 
     ``content`` should be an iterator or a string. If it's an
     iterator, it should return strings, and those strings will be
@@ -618,15 +617,15 @@ Methods
     an iterator or a string, it will be converted to a string when
     accessed.
 
+    ``content_type`` is the MIME type optionally completed by a character set
+    encoding and is used to fill the HTTP ``Content-Type`` header. If not
+    specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
+    :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
+
+    Historically, this parameter was called ``mimetype`` (now deprecated).
+
     ``status`` is the `HTTP Status code`_ for the response.
 
-    ``content_type`` is an alias for ``mimetype``. Historically, this parameter
-    was only called ``mimetype``, but since this is actually the value included
-    in the HTTP ``Content-Type`` header, it can also include the character set
-    encoding, which makes it more than just a MIME type specification.
-    If ``mimetype`` is specified (not ``None``), that value is used.
-    Otherwise, ``content_type`` is used. If neither is given, the
-    :setting:`DEFAULT_CONTENT_TYPE` setting is used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -684,7 +683,7 @@ Methods
       risk of client side script accessing the protected cookie
       data.
 
-    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 

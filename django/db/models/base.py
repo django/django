@@ -16,7 +16,7 @@ from django.db.models.fields.related import (ManyToOneRel,
 from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
 from django.db.models.query import Q
-from django.db.models.query_utils import DeferredAttribute
+from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
@@ -400,25 +400,16 @@ class Model(object):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
+        if not self._deferred:
+            return super(Model, self).__reduce__()
         data = self.__dict__
-        model = self.__class__
-        # The obvious thing to do here is to invoke super().__reduce__()
-        # for the non-deferred case. Don't do that.
-        # On Python 2.4, there is something weird with __reduce__,
-        # and as a result, the super call will cause an infinite recursion.
-        # See #10547 and #12121.
         defers = []
-        if self._deferred:
-            from django.db.models.query_utils import deferred_class_factory
-            factory = deferred_class_factory
-            for field in self._meta.fields:
-                if isinstance(self.__class__.__dict__.get(field.attname),
-                        DeferredAttribute):
-                    defers.append(field.attname)
-            model = self._meta.proxy_for_model
-        else:
-            factory = simple_class_factory
-        return (model_unpickle, (model, defers, factory), data)
+        for field in self._meta.fields:
+            if isinstance(self.__class__.__dict__.get(field.attname),
+                    DeferredAttribute):
+                defers.append(field.attname)
+        model = self._meta.proxy_for_model
+        return (model_unpickle, (model, defers), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -468,8 +459,15 @@ class Model(object):
                 return
 
             update_fields = frozenset(update_fields)
-            field_names = set([field.name for field in self._meta.fields
-                               if not field.primary_key])
+            field_names = set()
+
+            for field in self._meta.fields:
+                if not field.primary_key:
+                    field_names.add(field.name)
+
+                    if field.name != field.attname:
+                        field_names.add(field.attname)
+
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -534,7 +532,7 @@ class Model(object):
             non_pks = [f for f in meta.local_fields if not f.primary_key]
 
             if update_fields:
-                non_pks = [f for f in non_pks if f.name in update_fields]
+                non_pks = [f for f in non_pks if f.name in update_fields or f.attname in update_fields]
 
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
@@ -919,20 +917,11 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
-def simple_class_factory(model, attrs):
-    """Used to unpickle Models without deferred fields.
-
-    We need to do this the hard way, rather than just using
-    the default __reduce__ implementation, because of a
-    __deepcopy__ problem in Python 2.4
-    """
-    return model
-
-def model_unpickle(model, attrs, factory):
+def model_unpickle(model, attrs):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    cls = factory(model, attrs)
+    cls = deferred_class_factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

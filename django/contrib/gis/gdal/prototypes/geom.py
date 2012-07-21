@@ -1,6 +1,6 @@
 from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal, GEOJSON
+from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, string_output, void_output)
@@ -25,15 +25,10 @@ def topology_func(f):
 
 ### OGR_G ctypes function prototypes ###
 
-# GeoJSON routines, if supported.
-if GEOJSON:
-    from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
-    to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True)
-    to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True) 
-else:
-    from_json = False
-    to_json = False
-    to_kml = False
+# GeoJSON routines.
+from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
+to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True)
+to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True)
 
 # GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)

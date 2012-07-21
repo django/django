@@ -598,6 +598,7 @@ class SQLCompiler(object):
         if avoid_set is None:
             avoid_set = set()
         orig_dupe_set = dupe_set
+        only_load = self.query.get_loaded_field_names()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -609,7 +610,8 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
-            if not select_related_descend(f, restricted, requested):
+            if not select_related_descend(f, restricted, requested,
+                                          only_load.get(model or self.query.model)):
                 continue
             # The "avoid" set is aliases we want to avoid just for this
             # particular branch of the recursion. They aren't permanently
@@ -682,7 +684,8 @@ class SQLCompiler(object):
                 if o.field.unique
             ]
             for f, model in related_fields:
-                if not select_related_descend(f, restricted, requested, reverse=True):
+                if not select_related_descend(f, restricted, requested,
+                                              only_load.get(model), reverse=True):
                     continue
                 # The "avoid" set is aliases we want to avoid just for this
                 # particular branch of the recursion. They aren't permanently

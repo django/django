@@ -1344,15 +1344,20 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
-        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='')
+        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='Changed something')
 
     def tearDown(self):
         self.client.logout()
 
     def test_get_history_view(self):
-        "Retrieving the history for the object using urlencoded form of primary key should work"
+        """
+        Retrieving the history for an object using urlencoded form of primary
+        key should work.
+        Refs #12349, #18550.
+        """
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
         self.assertContains(response, escape(self.pk))
+        self.assertContains(response, 'Changed something')
         self.assertEqual(response.status_code, 200)
 
     def test_get_change_view(self):
@@ -1364,19 +1369,19 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_changelist_to_changeform_link(self):
         "The link from the changelist referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
-        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key" # capitalized in Recent Actions
         self.assertContains(response, should_contain)
@@ -1397,7 +1402,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         # this URL now comes through reverse(), thus iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (iri_to_uri(quote(self.pk)), escape(self.pk))
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):

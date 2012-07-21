@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import copy
 import datetime
 import os
 import re
@@ -360,6 +361,7 @@ class HttpRequest(object):
     def readlines(self):
         return list(iter(self))
 
+
 class QueryDict(MultiValueDict):
     """
     A specialized MultiValueDict that takes a query string when initialized.
@@ -374,7 +376,7 @@ class QueryDict(MultiValueDict):
     _encoding = None
 
     def __init__(self, query_string, mutable=False, encoding=None):
-        MultiValueDict.__init__(self)
+        super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
@@ -401,7 +403,7 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         value = str_to_unicode(value, self.encoding)
-        MultiValueDict.__setitem__(self, key, value)
+        super(QueryDict, self).__setitem__(key, value)
 
     def __delitem__(self, key):
         self._assert_mutable()
@@ -409,64 +411,50 @@ class QueryDict(MultiValueDict):
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in dict.items(self):
-            dict.__setitem__(result, key, value)
+        for key, value in self.iterlists():
+            result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
-        import copy
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in dict.items(self):
-            dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        for key, value in self.iterlists():
+            result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
     def setlist(self, key, list_):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         list_ = [str_to_unicode(elt, self.encoding) for elt in list_]
-        MultiValueDict.setlist(self, key, list_)
+        super(QueryDict, self).setlist(key, list_)
 
-    def setlistdefault(self, key, default_list=()):
+    def setlistdefault(self, key, default_list=None):
         self._assert_mutable()
-        if key not in self:
-            self.setlist(key, default_list)
-        return MultiValueDict.getlist(self, key)
+        return super(QueryDict, self).setlistdefault(key, default_list)
 
     def appendlist(self, key, value):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         value = str_to_unicode(value, self.encoding)
-        MultiValueDict.appendlist(self, key, value)
-
-    def update(self, other_dict):
-        self._assert_mutable()
-        f = lambda s: str_to_unicode(s, self.encoding)
-        if hasattr(other_dict, 'lists'):
-            for key, valuelist in other_dict.lists():
-                for value in valuelist:
-                    MultiValueDict.update(self, {f(key): f(value)})
-        else:
-            d = dict([(f(k), f(v)) for k, v in other_dict.items()])
-            MultiValueDict.update(self, d)
+        super(QueryDict, self).appendlist(key, value)
 
     def pop(self, key, *args):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key, *args)
+        return super(QueryDict, self).pop(key, *args)
 
     def popitem(self):
         self._assert_mutable()
-        return MultiValueDict.popitem(self)
+        return super(QueryDict, self).popitem()
 
     def clear(self):
         self._assert_mutable()
-        MultiValueDict.clear(self)
+        super(QueryDict, self).clear()
 
     def setdefault(self, key, default=None):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         default = str_to_unicode(default, self.encoding)
-        return MultiValueDict.setdefault(self, key, default)
+        return super(QueryDict, self).setdefault(key, default)
 
     def copy(self):
         """Returns a mutable copy of this object."""
@@ -499,6 +487,7 @@ class QueryDict(MultiValueDict):
                            for v in list_])
         return '&'.join(output)
 
+
 def parse_cookie(cookie):
     if cookie == '':
         return {}
@@ -524,14 +513,16 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None, status=None,
-            content_type=None):
+    def __init__(self, content='', content_type=None, status=None,
+            mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
-        if mimetype: # For backwards compatibility.
+        if mimetype:
+            warnings.warn("Using mimetype keyword argument is deprecated, use"
+                          " content_type instead", PendingDeprecationWarning)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
@@ -692,7 +683,7 @@ class HttpResponse(object):
     def tell(self):
         if self._base_content_is_iter:
             raise Exception("This %s instance cannot tell its position" % self.__class__)
-        return sum([len(str(chunk)) for chunk in self._container])
+        return sum([len(chunk) for chunk in self])
 
 class HttpResponseRedirect(HttpResponse):
     status_code = 302

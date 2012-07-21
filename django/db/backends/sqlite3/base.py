@@ -85,7 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    can_combine_inserts_with_and_without_auto_increment_pk = True
+    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     @cached_property
     def supports_stddev(self):
@@ -107,6 +107,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return has_support
 
 class DatabaseOperations(BaseDatabaseOperations):
+    def bulk_batch_size(self, fields, objs):
+        """
+        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
+        999 variables per query.
+        """
+        return (999 // len(fields)) if len(fields) > 0 else len(objs)
+
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
         # function django_extract that's registered in connect(). Note that
@@ -250,7 +257,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
             from django.core.exceptions import ImproperlyConfigured
-            raise ImproperlyConfigured("Please fill out the database NAME in the settings module before using the database.")
+            raise ImproperlyConfigured(
+                "settings.DATABASES is improperly configured. "
+                "Please supply the NAME value.")
         kwargs = {
             'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
