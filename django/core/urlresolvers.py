@@ -165,7 +165,7 @@ class LocaleRegexProvider(object):
                 regex = force_unicode(self._regex)
             try:
                 compiled_regex = re.compile(regex, re.UNICODE)
-            except re.error, e:
+            except re.error as e:
                 raise ImproperlyConfigured(
                     '"%s" is not a valid regular expression: %s' %
                     (regex, unicode(e)))
