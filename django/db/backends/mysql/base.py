@@ -118,29 +118,29 @@ class CursorWrapper(object):
         try:
             return self.cursor.execute(query, args)
         except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
         except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
