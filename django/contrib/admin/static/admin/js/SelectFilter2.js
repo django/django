@@ -138,7 +138,7 @@ window.SelectFilter = {
             reverse = /_to$/.test(box.id);
 
         if (event.shiftKey) {
-            return true; // Prevent Opera's spacial navigation thing from moving options
+            return true; // Prevent Opera's spatial navigation thing from moving options
         }
 
         if (key == 32 || (!reverse && key == 39) || (reverse && key == 37)) { // Enter, space, or left/right arrow - move across
