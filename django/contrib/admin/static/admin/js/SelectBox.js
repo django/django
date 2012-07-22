@@ -1,21 +1,26 @@
 var SelectBox = {
-    cache: new Object(),
-    initialised: new Object(),
+    options: new Object(),
     init: function(id) {
-        var box = document.getElementById(id),
+        var box = document.getElementById(id + '_from'),
             node;
-        SelectBox.cache[id] = new Array();
+        SelectBox.options[id] = new Array();
         for (var i = 0; (node = box.options[i]); i++) {
             node.order = i; // Record the initial order
             if (django.jQuery.browser.msie) node.text_copy = node.text;
             node.displayed = true;
-            SelectBox.add_to_cache(id, node);
+            node.select_boxed = false;
+            SelectBox.add_to_options(id, node);
         }
+        box.selectedIndex = -1;
     },
-    redisplay: function(box, also_wipe) {
-        // Repopulate HTML select box from cache
-        var fragment = document.createDocumentFragment(),
-            node;
+    redisplay: function(id, both) {
+        // Repopulate HTML select box from options
+        var from_fragment = document.createDocumentFragment(),
+            to_fragment = document.createDocumentFragment(),
+            from_box = document.getElementById(id + '_from'),
+            to_box = document.getElementById(id + '_to'),
+            node, add_to;
+
 
         // Setting innerHTML doubles the speed by making it unnecessary for the
         // browser to compliment appendChild with removeChild. For example, in
@@ -25,19 +30,27 @@ var SelectBox = {
         // However it also deletes the text nodes under the option nodes in all
         // versions of IE. Even deep cloning doesn't fix it so we have to
         // recreate them.
-        box.innerHTML = '';
-        if (also_wipe) also_wipe.innerHTML = '';
+        from_box.innerHTML = '';
+        if (both) to_box.innerHTML = '';
 
-        for (var i = 0, j = SelectBox.cache[box.id].length; i < j; i++) {
-            node = SelectBox.cache[box.id][i];
-            if (node && node.displayed) {
-                if (django.jQuery.browser.msie) {
-                    node.appendChild(document.createTextNode(node.text_copy));
+        for (var i = 0, j = SelectBox.options[id].length; i < j; i++) {
+            node = SelectBox.options[id][i];
+            if (node.displayed) {
+                node.selected = false;
+                add_to = (!node.select_boxed) ? from_fragment : (both) ? to_fragment : null;
+                if (add_to) {
+                    if (django.jQuery.browser.msie) {
+                        node.appendChild(document.createTextNode(node.text_copy));
+                    }
+                    add_to.appendChild(node);
                 }
-                fragment.appendChild(node);
             }
         }
-        box.appendChild(fragment); 
+
+        from_box.appendChild(from_fragment); 
+        from_box.selectedIndex = -1;
+        to_box.appendChild(to_fragment); 
+        to_box.selectedIndex = -1;
     },
     is_filter_match: function(tokens, text) {
         var token;
@@ -53,16 +66,16 @@ var SelectBox = {
         // the words in text. (It's an AND search.)
         var tokens = text.toLowerCase().split(/\s+/),
             node;
-        for (var i = 0; i < SelectBox.cache[id].length; i++) {
-            node = SelectBox.cache[id][i];
+        for (var i = 0; i < SelectBox.options[id].length; i++) {
+            node = SelectBox.options[id][i];
             if (node) node.displayed = SelectBox.is_filter_match(tokens, node.text);
         }
         
-        var box = document.getElementById(id);
-        SelectBox.redisplay(box);
+        SelectBox.redisplay(id);
+
         // Sometimes Chrome doesn't scroll up after a filter which makes it look
         // like there's no results even when there are
-        box.scrollTop = 0;
+        document.getElementById(id + '_from').scrollTop = 0;
     },
     add_new: function(id, option) {
         var from_box = document.getElementById(id + '_from'),
@@ -71,35 +84,31 @@ var SelectBox = {
             option.text_copy = option.text;
             option.appendChild(document.createTextNode(option.text));
         }
-        SelectBox.add_to_cache(id + '_to', option);
+        option.displayed = true;
+        option.select_boxed = true;
+        SelectBox.add_to_options(id, option);
         // We could order alphabetically but what if the data isn't meant to be
         // alphabetical? Just adding to the end is more predictable, not to
         // mention it avoids ordering differences between browsers, databases
         // and l10n.
-        option.order = to_box.options.length + from_box.options.length;
+        option.order = SelectBox.options[id].length;
         SelectBox.insert_option(to_box, option, 0, true);
     },
-    delete_from_cache: function(id, option) {
-        delete SelectBox.cache[id][option.cache_key];
-        delete option.cache_key;
-    },
-    swap_cache: function(from, to, option) {
-        SelectBox.delete_from_cache(from, option);
-        SelectBox.add_to_cache(to, option);
-    },
-    add_to_cache: function(id, option) {
-        SelectBox.cache[id].push(option);
-        option.cache_key = SelectBox.cache[id].length - 1;
-    },
-    merge_cache: function(from, to) {
-        SelectBox.cache[to] = SelectBox.cache[to].concat(SelectBox.cache[from]);
-        SelectBox.cache[from] = Array();
+    add_to_options: function(id, option) {
+        SelectBox.options[id].push(option);
     },
     insert_option: function(to_box, option, i, no_search) {
+        var old_index = to_box.selectedIndex;
+
         if (!no_search) {
             for (var i = i; (next_option = to_box.options[i]); i++) {
                 if (next_option.order > option.order) {
                     next_option.parentNode.insertBefore(option, next_option);
+                    if ((to_box.selectedIndex > -1) && (i < to_box.selectedIndex)) {
+                        // Maintains the old index to prevent a jump when the box
+                        // regains focus
+                        to_box.selectedIndex = old_index + 1;
+                    }
                     return i;
                 }
             }
@@ -108,13 +117,11 @@ var SelectBox = {
         to_box.appendChild(option);
         return ++i;
     },
-    move: function(from, to, all) {
-        var from_box = document.getElementById(from),
-            to_box = document.getElementById(to),
+    move: function(id, reverse, all) {
+        var from_box = document.getElementById(id + ((!reverse) ? '_from' : '_to')),
+            to_box = document.getElementById(id + ((reverse) ? '_from' : '_to')),
             num_selected = 0,
             last_compare_position = 0,
-            to_needs_sort = false,
-            initial = typeof SelectBox.initialised[from] === 'undefined',
             old_selected_index = from_box.selectedIndex,
             option, compare_text, large_movement, filter_text, filter_tokens;
 
@@ -131,20 +138,27 @@ var SelectBox = {
             }
         }
 
+        all = all || num_selected == from_box.options.length;
         // Eventually, moving one node at a time becomes slower than a total redisplay
-        large_movement = num_selected > 4000;
+        large_movement = num_selected > 1000;
 
-        if (/_from$/.test(to_box.id)) {
+        if (reverse) {
             filter_text = document.getElementById(to_box.id.slice(0, -5) + '_input').value;
             if (filter_text) filter_tokens = filter_text.toLowerCase().split(/\s+/);
         }
 
         if (all && large_movement) {
-            SelectBox.merge_cache(from, to);
+            for (var i = 0; (option = from_box.options[i]); i++) {
+                option.select_boxed = !reverse;
+            }
+        }
+
+        if (large_movement) {
+            SelectBox.redisplay(id, true);
         } else {
             for (var i = 0; (option = from_box.options[i]); i++) {
                 if (all || option.selected) {
-                    SelectBox.swap_cache(from, to, option);
+                    option.select_boxed = !option.select_boxed;
 
                     // Take the option out of the DOM otherwise setting selected to false
                     // is the slowest thing out of all this code in all browsers except Firefox
@@ -154,33 +168,13 @@ var SelectBox = {
                     // Don't add to to_box if there's a filter applied that doesn't match
                     if (!filter_tokens || SelectBox.is_filter_match(filter_tokens, option.text)) {
                         last_compare_position = SelectBox.insert_option(
-                            to_box, option, last_compare_position, initial
+                            to_box, option, last_compare_position, to_box.options.length == 0
                         );
-                    } else {
-                        // Because we didn't move the option into the sorted HTML
-                        // we will need to sort the cache instead
-                        to_needs_sort = true;
                     }
 
                     i--; // We have to decrement because we're modifying as iterating
                 }
             }
-        }
-
-        SelectBox.sort(to);
-
-        if (large_movement) {
-            if (!initial) {
-                SelectBox.sort(from);
-                SelectBox.sort(to);
-            }
-            SelectBox.redisplay(from_box, to_box);
-            SelectBox.redisplay(to_box);
-        }
-
-        if (initial) {
-            SelectBox.initialised[from] = true;
-            SelectBox.initialised[to] = true;
         }
 
         // This forces the list to scroll to the top of your previous selection
@@ -204,25 +198,8 @@ var SelectBox = {
             }, 10);
         }
     },
-    move_all: function(from, to) {
-        SelectBox.move(from, to, true);
-    },
-    sort: function(id) {
-        SelectBox.cache[id].sort(function(a, b) {
-            try {
-                if (a.order > b.order) {
-                    a.cache_key++;
-                    return 1;
-                } else if (a.order < b.order) {
-                    a.cache_key--;
-                    return -1;
-                }
-            }
-            catch (e) {
-                // silently fail on IE 'unknown' exception
-            }
-            return 0;
-        } );
+    move_all: function(id, reverse) {
+        SelectBox.move(id, reverse, true);
     },
     select_all: function(id) {
         var box = document.getElementById(id);
