@@ -160,10 +160,16 @@ class LocaleRegexProvider(object):
         language_code = get_language()
         if language_code not in self._regex_dict:
             if isinstance(self._regex, basestring):
-                compiled_regex = re.compile(self._regex, re.UNICODE)
+                regex = self._regex
             else:
                 regex = force_unicode(self._regex)
+            try:
                 compiled_regex = re.compile(regex, re.UNICODE)
+            except re.error as e:
+                raise ImproperlyConfigured(
+                    '"%s" is not a valid regular expression: %s' %
+                    (regex, unicode(e)))
+
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
 

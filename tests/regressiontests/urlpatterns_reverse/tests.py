@@ -511,3 +511,11 @@ class ErroneousViewTests(TestCase):
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable/')
 
+    def test_erroneous_reverse(self):
+        """
+        Ensure that a useful exception is raised when a regex is invalid in the
+        URLConf.
+        Refs #6170.
+        """
+        # The regex error will be hit before NoReverseMatch can be raised
+        self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')

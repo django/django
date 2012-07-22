@@ -136,6 +136,20 @@ def sql_all(app, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
 
+def _split_statements(content):
+    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+    statements = []
+    statement = ""
+    for line in content.split("\n"):
+        cleaned_line = comment_re.sub(r"\1", line).strip()
+        if not cleaned_line:
+            continue
+        statement += cleaned_line
+        if statement.endswith(";"):
+            statements.append(statement)
+            statement = ""
+    return statements
+
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
     app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
@@ -149,10 +163,6 @@ def custom_sql_for_model(model, style, connection):
         for f in post_sql_fields:
             output.extend(f.post_create_sql(style, model._meta.db_table))
 
-    # Some backends can't execute more than one SQL statement at a time,
-    # so split into separate statements.
-    statements = re.compile(r";[ \t]*$", re.M)
-
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
     sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
@@ -160,12 +170,9 @@ def custom_sql_for_model(model, style, connection):
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with open(sql_file, 'U') as fp:
-                for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
-                    # Remove any comments from the file
-                    statement = re.sub(r"--.*([\n\Z]|$)", "", statement)
-                    if statement.strip():
-                        output.append(statement + ";")
-
+                # Some backends can't execute more than one SQL statement at a time,
+                # so split into separate statements.
+                output.extend(_split_statements(fp.read().decode(settings.FILE_CHARSET)))
     return output
 
 

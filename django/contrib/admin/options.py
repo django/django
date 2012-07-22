@@ -998,7 +998,6 @@ class ModelAdmin(BaseModelAdmin):
             'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'is_popup': "_popup" in request.REQUEST,
-            'show_delete': False,
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
