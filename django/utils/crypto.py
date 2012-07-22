@@ -27,8 +27,8 @@ from django.utils.encoding import smart_str
 from django.utils.six.moves import xrange
 
 
-_trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
-_trans_36 = b"".join([chr(x ^ 0x36) for x in xrange(256)])
+_trans_5c = bytearray([(x ^ 0x5C) for x in xrange(256)])
+_trans_36 = bytearray([(x ^ 0x36) for x in xrange(256)])
 
 
 def salted_hmac(key_salt, value, secret=None):
