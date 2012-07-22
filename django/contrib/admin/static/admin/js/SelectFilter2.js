@@ -91,7 +91,6 @@ window.SelectFilter = {
         addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
         addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
         SelectBox.init(field_id + '_from');
-        django.jQuery('#' + field_id + '_to').show(); // Fix for Grappelli until official 2.4
         SelectBox.init(field_id + '_to');
         // Move selected from_box options to to_box
         SelectBox.move(field_id + '_from', field_id + '_to');
