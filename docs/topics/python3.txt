@@ -66,8 +66,8 @@ Use :func:`six.reraise`.
 Writing compatible code with six
 ================================
 
-six is the canonical compatibility library for supporting Python 2 and 3 in
-a single codebase. Read its `documentation <six>`_!
+six_ is the canonical compatibility library for supporting Python 2 and 3 in
+a single codebase. Read its documentation!
 
 :mod:`six` is bundled with Django: you can import it as :mod:`django.utils.six`.
 
