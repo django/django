@@ -7,7 +7,7 @@ var SelectBox = {
         SelectBox.cache[id] = new Array();
         for (var i = 0; (node = box.options[i]); i++) {
             node.order = i; // Record the initial order
-            if (django.jQuery.browser.msie) node.text_copy = node.text; // Explained later
+            if (django.jQuery.browser.msie) node.text_copy = node.text;
             node.displayed = true;
             SelectBox.add_to_cache(id, node);
         }
@@ -67,6 +67,10 @@ var SelectBox = {
     add_new: function(id, option) {
         var from_box = document.getElementById(id + '_from'),
             to_box = document.getElementById(id + '_to');
+        if (django.jQuery.browser.msie) {
+            option.text_copy = option.text;
+            option.appendChild(document.createTextNode(option.text));
+        }
         SelectBox.add_to_cache(id + '_to', option);
         // We could order alphabetically but what if the data isn't meant to be
         // alphabetical? Just adding to the end is more predictable, not to
