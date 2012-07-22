@@ -41,7 +41,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
-    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject)
+    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
+    UndeletableObject)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -588,6 +589,16 @@ class AdminViewBasicTest(TestCase):
         self.assertFalse(reverse('admin:password_change') in response.content,
             msg='The "change password" link should not be displayed if a user does not have a usable password.')
 
+    def test_change_view_with_show_delete_extra_context(self):
+        """
+        Ensured that the 'show_delete' context variable in the admin's change
+        view actually controls the display of the delete button.
+        Refs #10057.
+        """
+        instance = UndeletableObject.objects.create(name='foo')
+        response = self.client.get('/test_admin/%s/admin_views/undeletableobject/%d/' %
+                                   (self.urlbit, instance.pk))
+        self.assertNotContains(response, 'deletelink')
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
