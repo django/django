@@ -188,6 +188,16 @@ Session not saved on 500 responses
 Django's session middleware will skip saving the session data if the
 response's status code is 500.
 
+`cleaned_data` dictionary kept for invalid forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
+after form validation. When the form doesn't validate, it contains only the
+fields that passed validation. You should test the success of the validation
+with the :meth:`~django.forms.Form.is_valid()` method and not with the
+presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
+on the form.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
