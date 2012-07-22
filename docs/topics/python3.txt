@@ -2,42 +2,34 @@
 Python 3 compatibility
 ======================
 
-Django 1.5 is the first version of Django to support Python 3.
-
-The same code runs both on Python 2 (≥2.6.5) and Python 3 (≥3.2). To
-achieve this:
-
-- wherever possible, Django uses the six_ compatibility layer,
-- all modules declare ``from __future__ import unicode_literals``.
+Django 1.5 is the first version of Django to support Python 3. The same code
+runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
+compatibility layer and ``unicode_literals``.
 
 .. _six: http://packages.python.org/six/
 
 This document is not meant as a Python 2 to Python 3 migration guide. There
-are many existing resources, including `Python's official porting guide`_. But
-it describes guidelines that apply to Django's code and are recommended for
-pluggable apps that run with both Python 2 and 3.
+are many existing resources, including `Python's official porting guide`_.
+Rather, it describes guidelines that apply to Django's code and are
+recommended for pluggable apps that run with both Python 2 and 3.
 
 .. _Python's official porting guide: http://docs.python.org/py3k/howto/pyporting.html
 
-.. module: django.utils.six
+Syntax requirements
+===================
 
-django.utils.six
-================
+Unicode
+-------
 
-Read the documentation of six_. It's the canonical compatibility library for
-supporting Python 2 and 3 in a single codebase.
+In Python 3, all strings are considered Unicode by default. The ``unicode``
+type from Python 2 is called ``str`` in Python 3, and ``str`` becomes
+``bytes``.
 
-``six`` is bundled with Django: you can import it as :mod:`django.utils.six`.
+You mustn't use the ``u`` prefix before a unicode string literal because it's
+a syntax error in Python 3.2. You must prefix byte strings with ``b``.
 
-.. _string-handling:
-
-String handling
-===============
-
-In Python 3, all strings are considered Unicode strings by default. Byte
-strings must be prefixed with the letter ``b``. In order to enable the same
-behavior in Python 2, every module must import ``unicode_literals`` from
-``__future__``::
+In order to enable the same behavior in Python 2, every module must import
+``unicode_literals`` from ``__future__``::
 
     from __future__ import unicode_literals
 
@@ -47,3 +39,84 @@ behavior in Python 2, every module must import ``unicode_literals`` from
 Be cautious if you have to `slice bytestrings`_.
 
 .. _slice bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
+
+Exceptions
+----------
+
+When you capture exceptions, use the ``as`` keyword::
+
+    try:
+        ...
+    except MyException as exc:
+        ...
+
+This older syntax was removed in Python 3::
+
+    try:
+        ...
+    except MyException, exc:
+        ...
+
+The syntax to reraise an exception with a different traceback also changed.
+Use :func:`six.reraise`.
+
+
+.. module: django.utils.six
+
+Writing compatible code with six
+================================
+
+six is the canonical compatibility library for supporting Python 2 and 3 in
+a single codebase. Read its `documentation <six>`_!
+
+:mod:`six` is bundled with Django: you can import it as :mod:`django.utils.six`.
+
+Here are the most common changes required to write compatible code.
+
+String types
+------------
+
+The ``basestring`` and ``unicode`` types were removed in Python 3, and the
+meaning of ``str`` changed. To test these types, use the following idioms::
+
+    isinstance(myvalue, six.string_types)       # replacement for basestring
+    isinstance(myvalue, six.text_type)          # replacement for unicode
+    isinstance(myvalue, bytes)                  # replacement for str
+
+Python ≥ 2.6 provides ``bytes`` as an alias for ``str``, so you don't need
+:attr:`six.binary_type`.
+
+``long``
+--------
+
+The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
+:data:`six.integer_types` check if a value is an integer or a long::
+
+    isinstance(myvalue, six.integer_types)      # replacement for (int, long)
+
+``xrange``
+----------
+
+Import :func:`six.moves.xrange` wherever you use ``xrange``.
+
+Moved modules
+-------------
+
+Some modules were renamed in Python 3. The :mod:`django.utils.six.moves
+<six.moves>` module provides a compatible location to import them.
+
+In addition to six' defaults, Django's version provides ``dummy_thread`` as
+``_dummy_thread``.
+
+PY3
+---
+
+If you need different code in Python 2 and Python 3, check :data:`six.PY3`::
+
+    if six.PY3:
+        # do stuff Python 3-wise
+    else:
+        # do stuff Python 2-wise
+
+This is a last resort solution when :mod:`six` doesn't provide an appropriate
+function.

@@ -94,6 +94,7 @@ pygments_style = 'trac'
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
     'sphinx': ('http://sphinx.pocoo.org/', None),
+    'six': ('http://packages.python.org/six/', None),
 }
 
 # Python's docs don't change every week.
