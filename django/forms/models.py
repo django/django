@@ -414,7 +414,6 @@ class BaseModelFormSet(BaseFormSet):
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
     model = None
-    _deleted_object_pks = []
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, **kwargs):
@@ -422,6 +421,7 @@ class BaseModelFormSet(BaseFormSet):
         self.initial_extra = kwargs.pop('initial', None)
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         defaults.update(kwargs)
+        self._deleted_object_pks = []
         super(BaseModelFormSet, self).__init__(**defaults)
 
     def initial_form_count(self):
