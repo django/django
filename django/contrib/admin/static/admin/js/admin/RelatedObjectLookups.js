@@ -87,11 +87,7 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
             }
         }
     } else {
-        var toId = name + "_to";
-        elem = document.getElementById(toId);
-        var o = new Option(newRepr, newId);
-        SelectBox.add_to_cache(toId, o);
-        SelectBox.redisplay(toId);
+        SelectBox.add_new(name, new Option(newRepr, newId));
     }
     win.close();
 }

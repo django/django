@@ -84,7 +84,6 @@ window.SelectFilter = {
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
         // Set up the JavaScript event handlers for the select box filter interface
-        addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
         addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
         addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
         addEvent(to_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
@@ -92,6 +91,7 @@ window.SelectFilter = {
         addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
         addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
         SelectBox.init(field_id + '_from');
+        django.jQuery('#' + field_id + '_to').show(); // Fix for Grappelli until official 2.4
         SelectBox.init(field_id + '_to');
         // Move selected from_box options to to_box
         SelectBox.move(field_id + '_from', field_id + '_to');
@@ -124,14 +124,11 @@ window.SelectFilter = {
         $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
         $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
     },
-    filter_key_up: function(event, field_id) {
-        return false; // Let key down handle everything
-    },
     filter_key_down: function(event, field_id) {
         var from = document.getElementById(field_id + '_from'),
             key = event.keyCode || event.which;
 
-        if ((key == 13) || (key == 39)) { // Enter or right arrow - move across
+        if (key == 39) { // Right arrow - move across
             var old_index = from.selectedIndex;
             SelectBox.move(field_id + '_from', field_id + '_to');
             from.selectedIndex = (old_index == from.length) ? from.length - 1 : old_index;
@@ -141,12 +138,20 @@ window.SelectFilter = {
             from.selectedIndex = (from.selectedIndex == 0) ? from.length - 1 : from.selectedIndex - 1;
         } else {
             clearTimeout(SelectFilter.typingTimers[field_id]);
+            var delay = 250,
+                num_options = SelectBox.cache[field_id + '_from'].length;
+            if (key == 13) { // Hitting Enter is instant search
+                delay = 0;
+                // Prevent Enter from bubbling and submitting the form. Also some <= IE8 compatibility
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+            } else if (num_options > 1000) { // Large boxes have added delay for safety
+                delay = 1000;
+            }
             SelectFilter.typingTimers[field_id] = setTimeout(function() {
                 SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
-            }, 250);
-            return true;
+            }, delay);
         }
-        event.preventDefault(); // return false still lets Enter bubble up
+        return false;
     }
 }
 
