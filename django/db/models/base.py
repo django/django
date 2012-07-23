@@ -34,7 +34,10 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
-        parents = [b for b in bases if isinstance(b, ModelBase)]
+        # six.with_metaclass() inserts an extra class called 'NewBase' in the
+        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        parents = [b for b in bases if isinstance(b, ModelBase) and
+                not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
             # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
@@ -276,8 +279,7 @@ class ModelState(object):
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
 
-
-class ModelWithoutMeta(object):
+class Model(six.with_metaclass(ModelBase, object)):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -370,7 +372,7 @@ class ModelWithoutMeta(object):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
-        super(ModelWithoutMeta, self).__init__()
+        super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
@@ -402,7 +404,7 @@ class ModelWithoutMeta(object):
         only module-level classes can be pickled by the default path.
         """
         if not self._deferred:
-            return super(ModelWithoutMeta, self).__reduce__()
+            return super(Model, self).__reduce__()
         data = self.__dict__
         defers = []
         for field in self._meta.fields:
@@ -876,14 +878,6 @@ class ModelWithoutMeta(object):
         if errors:
             raise ValidationError(errors)
 
-
-# For unknown reasons, six.with_metaclass doesn't work correctly for Model.
-# Fallback to exec'ing the appropriate syntax for each Python version.
-
-if six.PY3:
-    six.exec_("class Model(ModelWithoutMeta, metaclass=ModelBase): pass")
-else:
-    six.exec_("class Model(ModelWithoutMeta): __metaclass__ = ModelBase")
 
 
 ############################################
