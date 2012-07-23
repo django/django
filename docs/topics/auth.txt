@@ -875,8 +875,7 @@ Sent when the logout method is called.
 Sent when the user failed to login successfully
 
 ``sender``
-    As above: the class of the user that just logged out or ``None``
-    if the user was not authenticated.
+    The name of the module used for authentication.
 
 ``credentials``
     A dictonary of keyword arguments containing the user credentials that
