@@ -8,6 +8,9 @@ from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
 from django.test import TestCase
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+from django.test.utils import override_settings
+
+settings.DEBUG = True
 
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
@@ -52,16 +55,21 @@ class CsrfViewMiddlewareTest(TestCase):
     _csrf_id = "1"
 
     def _get_GET_no_csrf_cookie_request(self):
+
         return TestingHttpRequest()
 
     def _get_GET_csrf_cookie_request(self):
         req = TestingHttpRequest()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'http://www.example.com'
+
         return req
 
     def _get_POST_csrf_cookie_request(self):
         req = self._get_GET_csrf_cookie_request()
         req.method = "POST"
+
         return req
 
     def _get_POST_no_csrf_cookie_request(self):
@@ -96,6 +104,8 @@ class CsrfViewMiddlewareTest(TestCase):
         patched.
         """
         req = self._get_GET_no_csrf_cookie_request()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'http://www.exmaple.com'
 
         # Put tests for CSRF_COOKIE_* settings here
         with self.settings(CSRF_COOKIE_NAME='myname',
@@ -334,3 +344,106 @@ class CsrfViewMiddlewareTest(TestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['www.example.com'])
+    def test_good_origin_header(self):
+        """
+        Test if a good origin header is accepted for across subdomain settings.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['example.com'])
+    def test_good_origin_header_3(self):
+        """
+        Test if a good origin header is accepted for a no subdomain.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://example.com'
+        req.META['HTTP_REFERER'] = 'http://example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    def test_good_origin_header_4(self):
+        """
+        Test if a good origin header is accepted for no cookie setting.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    def test_bad_origin_header(self):
+        """
+        Test if a bad origin header is rejected for different domain.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.evil.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['example.com'])
+    def test_bad_origin_header_2(self):
+        """
+        Test if a bad origin header is rejected for subdomains.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    def test_bad_origin_header_3(self):
+        """
+        Test if a bad origin header is rejected with no cookie setting.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.evil.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['crossdomain.com'])
+    def test_permitted_domains_cross(self):
+        '''
+        Test if permitted cross domains requests work
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['example.com', '*.crossdomain.com'])
+    def test_permitted_domains_cross_glob(self):
+        '''
+        Test if permitted cross domains specified in glob foramt work
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://test.crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://test.crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(CSRF_PERMITTED_DOMAINS=['example.com', 'valid.crossdomain.com'])
+    def test_permitted_domains_cross_invalid(self):
+        '''
+        Test if permitted cross domains invalid check works
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://invalid.crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://invalid.crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
