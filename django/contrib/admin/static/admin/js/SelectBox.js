@@ -11,6 +11,8 @@ var SelectBox = {
             node.select_boxed = false;
             SelectBox.add_to_options(id, node);
         }
+        SelectBox.move(field_id);
+        // This prevents a jump on focus if options have been moved out
         box.selectedIndex = -1;
     },
     redisplay: function(id, both) {

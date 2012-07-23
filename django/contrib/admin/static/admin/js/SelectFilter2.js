@@ -95,8 +95,6 @@ window.SelectFilter = {
         addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id, true); SelectFilter.refresh_icons(field_id); });
         addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
         SelectBox.init(field_id);
-        // Move selected from_box options to to_box
-        SelectBox.move(field_id);
 
         if (!is_stacked) {
             // In horizontal mode, give the same height to the two boxes.
