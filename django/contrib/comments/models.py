@@ -9,7 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 
+
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH',3000)
+
 
 class BaseCommentAbstractModel(models.Model):
     """
@@ -38,6 +40,7 @@ class BaseCommentAbstractModel(models.Model):
             "comments-url-redirect",
             args=(self.content_type_id, self.object_pk)
         )
+
 
 class Comment(BaseCommentAbstractModel):
     """
@@ -114,16 +117,19 @@ class Comment(BaseCommentAbstractModel):
     userinfo = property(_get_userinfo, doc=_get_userinfo.__doc__)
 
     def _get_name(self):
-        return self.userinfo["name"]
+        return self.userinfo["name"] if self.userinfo["name"] else _("Comment")
+
     def _set_name(self, val):
         if self.user_id:
             raise AttributeError(_("This comment was posted by an authenticated "\
                                    "user and thus the name is read-only."))
         self.user_name = val
+
     name = property(_get_name, _set_name, doc="The name of the user who posted this comment")
 
     def _get_email(self):
         return self.userinfo["email"]
+
     def _set_email(self, val):
         if self.user_id:
             raise AttributeError(_("This comment was posted by an authenticated "\
@@ -133,8 +139,10 @@ class Comment(BaseCommentAbstractModel):
 
     def _get_url(self):
         return self.userinfo["url"]
+
     def _set_url(self, val):
         self.user_url = val
+
     url = property(_get_url, _set_url, doc="The URL given by the user who posted this comment")
 
     def get_absolute_url(self, anchor_pattern="#c%(id)s"):
@@ -152,6 +160,7 @@ class Comment(BaseCommentAbstractModel):
             'url': self.get_absolute_url()
         }
         return _('Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % d
+
 
 class CommentFlag(models.Model):
     """
