@@ -1,5 +1,5 @@
 """
-Django's standard token library and utilities. 
+Django's standard token library and utilities.
 """
 
 import hashlib
@@ -36,31 +36,31 @@ class RandomToken():
         Creates a randomized token consisting of the DIGIT character set.
         """
         return self._build_token(DIGITS, length)
-    
+
     def alphanumeric(self, length=DEFAULT_TOKEN_LENGTH):
         """
         Creates a randomized token consisting of the general ALPHANUMERIC character sets.
         """
         return self._build_token(ALPHANUMERIC, length)
-    
+
     def lower_alphanumeric(self, length=DEFAULT_TOKEN_LENGTH):
         """
         Creates a randomized token consisting of the LOWER_ALPHANUMERIC character sets.
         """
         return self._build_token(LOWER_ALPHANUMERIC, length)
-    
+
     def hex(self, length=DEFAULT_TOKEN_LENGTH):
         """
         Creates a randomized token consisting of the HEX character sets.
         """
         return self._build_token(HEX, length)
-    
+
     def readable_alphabet(self, length=DEFAULT_TOKEN_LENGTH):
         """
         Creates a randomized token consisting of the READABLE_ALPHABET character set.
         """
         return self._build_token(READABLE_ALPHABET, length)
-    
+
     def _build_token(self, character_set, length):
         """
         Builds a random token of the specified length using the characters available in the specified character set.
@@ -139,7 +139,7 @@ class PasswordResetTokenGenerator(object):
 
         try:
             ts = BaseConverter(LOWER_ALPHANUMERIC).decode(ts_b36)
-            
+
         except ValueError:
             return False
 
