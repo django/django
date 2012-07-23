@@ -209,3 +209,13 @@ our own copy of ``simplejson``. You can safely change any use of
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
+
+``django.utils.markup``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Recent security issues and bugs has been a reminder that Django is not a markup
+framework, but a web framework and should continue shedding contrib modules that
+are:
+
+* not core to the usage of the framework
+* poorly tested and/or documented
