@@ -118,8 +118,8 @@ class TemplateResponseMixin(object):
         passed to the constructor of the response class.
         """
         return self.response_class(
-            request = self.request,
-            template = self.get_template_names(),
+            self.request,
+            self.get_template_names(),
             context = context,
             **response_kwargs
         )
