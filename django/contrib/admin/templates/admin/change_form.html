@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_static admin_modify %}
+{% load i18n l10n admin_static admin_modify %}
 {% load admin_urls %}
 
 {% block extrahead %}{{ block.super }}
@@ -30,7 +30,7 @@
   <ul class="object-tools">
     {% block object-tools-items %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-    {% if has_absolute_url %}<li><a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+    {% if has_absolute_url %}<li><a href="{% url 'admin:view_on_site' content_type_id|unlocalize original.pk|unlocalize %}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}
   </ul>
 {% endif %}{% endif %}
