@@ -8,9 +8,9 @@ from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str
+from django.utils.tokens import RandomToken
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.crypto import (
-    pbkdf2, constant_time_compare, get_random_string)
+from django.utils.crypto import (pbkdf2, constant_time_compare)
 from django.utils.translation import ugettext_noop as _
 
 
@@ -173,7 +173,7 @@ class BasePasswordHasher(object):
         """
         Generates a cryptographically secure nonce salt in ascii
         """
-        return get_random_string()
+        return RandomToken().readable_alphabet(length=10)
 
     def verify(self, password, encoded):
         """
@@ -383,7 +383,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     library = "crypt"
 
     def salt(self):
-        return get_random_string(2)
+        return RandomToken().readable_alphabet(2)
 
     def encode(self, password, salt):
         crypt = self._load_library()

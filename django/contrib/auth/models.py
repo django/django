@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils.crypto import get_random_string
+from django.utils.tokens import RandomToken
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -180,7 +180,7 @@ class UserManager(models.Manager):
         have "I" or "O" or letters and digits that look similar -- just to
         avoid confusion.
         """
-        return get_random_string(length, allowed_chars)
+        return RandomToken().readable_alphabet(length=length)
 
     def get_by_natural_key(self, username):
         return self.get(username=username)
