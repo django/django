@@ -52,6 +52,8 @@ class Inner(models.Model):
     dummy = models.IntegerField()
     holder = models.ForeignKey(Holder)
     readonly = models.CharField("Inner readonly label", max_length=1)
+    def get_absolute_url(self):
+        return '/inner/'
 
 
 class Holder2(models.Model):
