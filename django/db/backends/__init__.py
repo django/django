@@ -748,10 +748,23 @@ class BaseDatabaseOperations(object):
         the given database tables (without actually removing the tables
         themselves).
 
+        The returned value also includes SQL statements required to reset DB
+        sequences passed in :param sequences:.
+
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
         raise NotImplementedError()
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        """
+        Returns a list of the SQL statements required to reset sequences
+        passed in :param sequences:.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return []
 
     def sequence_reset_sql(self, style, model_list):
         """

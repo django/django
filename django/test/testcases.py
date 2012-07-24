@@ -23,6 +23,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
+from django.core.management.color import no_style
 from django.core.signals import request_started
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
@@ -444,9 +445,14 @@ class SimpleTestCase(ut2.TestCase):
 
 
 class TransactionTestCase(SimpleTestCase):
+
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+
+    # Subclasses can ask for resetting of auto increment sequence before each
+    # test case
+    reset_sequences = False
 
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
@@ -462,22 +468,36 @@ class TransactionTestCase(SimpleTestCase):
         self._urlconf_setup()
         mail.outbox = []
 
+    def _reset_sequences(self, db_name):
+        conn = connections[db_name]
+        if conn.features.supports_sequence_reset:
+            sql_list = \
+                conn.ops.sequence_reset_by_name_sql(no_style(),
+                                                    conn.introspection.sequence_list())
+            if sql_list:
+                try:
+                    cursor = conn.cursor()
+                    for sql in sql_list:
+                        cursor.execute(sql)
+                except Exception:
+                    transaction.rollback_unless_managed(using=db_name)
+                    raise
+                transaction.commit_unless_managed(using=db_name)
+
     def _fixture_setup(self):
-        # If the test case has a multi_db=True flag, flush all databases.
-        # Otherwise, just flush default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
-        for db in databases:
-            call_command('flush', verbosity=0, interactive=False, database=db,
-                         skip_validation=True)
+        # If the test case has a multi_db=True flag, act on all databases.
+        # Otherwise, just on the default DB.
+        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
+        for db_name in db_names:
+            # Reset sequences
+            if self.reset_sequences:
+                self._reset_sequences(db_name)
 
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db, 'skip_validation': True})
+                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -534,7 +554,12 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        pass
+        # If the test case has a multi_db=True flag, flush all databases.
+        # Otherwise, just flush default.
+        databases = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
+        for db in databases:
+            call_command('flush', verbosity=0, interactive=False, database=db,
+                         skip_validation=True, reset_sequences=False)
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
@@ -808,22 +833,21 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
 
+        assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
+
         # If the test case has a multi_db=True flag, setup all databases.
         # Otherwise, just use default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
+        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
 
-        for db in databases:
-            transaction.enter_transaction_management(using=db)
-            transaction.managed(True, using=db)
+        for db_name in db_names:
+            transaction.enter_transaction_management(using=db_name)
+            transaction.managed(True, using=db_name)
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
         Site.objects.clear_cache()
 
-        for db in databases:
+        for db in db_names:
             if hasattr(self, 'fixtures'):
                 call_command('loaddata', *self.fixtures,
                              **{

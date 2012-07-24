@@ -98,7 +98,7 @@ def sql_delete(app, style, connection):
 
     return output[::-1] # Reverse it, to deal with table dependencies.
 
-def sql_flush(style, connection, only_django=False):
+def sql_flush(style, connection, only_django=False, reset_sequences=True):
     """
     Returns a list of the SQL statements used to flush the database.
 
@@ -109,9 +109,8 @@ def sql_flush(style, connection, only_django=False):
         tables = connection.introspection.django_table_names(only_existing=True)
     else:
         tables = connection.introspection.table_names()
-    statements = connection.ops.sql_flush(
-        style, tables, connection.introspection.sequence_list()
-    )
+    seqs = connection.introspection.sequence_list() if reset_sequences else ()
+    statements = connection.ops.sql_flush(style, tables, seqs)
     return statements
 
 def sql_custom(app, style, connection):

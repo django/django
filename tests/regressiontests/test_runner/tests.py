@@ -267,6 +267,9 @@ class AutoIncrementResetTest(TransactionTestCase):
     and check that both times they get "1" as their PK value. That is, we test
     that AutoField values start from 1 for each transactional test case.
     """
+
+    reset_sequences = True
+
     @skipUnlessDBFeature('supports_sequence_reset')
     def test_autoincrement_reset1(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
