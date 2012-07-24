@@ -4,6 +4,7 @@ Tests for stuff in django.utils.datastructures.
 
 import copy
 import pickle
+import warnings
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (DictWrapper, ImmutableList,
@@ -121,6 +122,21 @@ class SortedDictTests(SimpleTestCase):
         self.d1.clear()
         self.assertEqual(self.d1, {})
         self.assertEqual(self.d1.keyOrder, [])
+
+    def test_insert(self):
+        d = SortedDict()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            d.insert(0, "hello", "world")
+        assert w[0].category is PendingDeprecationWarning
+
+    def test_value_for_index(self):
+        d = SortedDict({"a": 3})
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            self.assertEqual(d.value_for_index(0), 3)
+        assert w[0].category is PendingDeprecationWarning
+
 
 class MergeDictTests(SimpleTestCase):
 
