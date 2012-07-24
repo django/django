@@ -1,8 +1,10 @@
 var SelectBox = {
+    initialised: false,
     options: new Object(),
     init: function(id) {
         var box = document.getElementById(id + '_from'),
             node;
+
         SelectBox.options[id] = new Array();
         for (var i = 0; (node = box.options[i]); i++) {
             node.order = i; // Record the initial order
@@ -11,18 +13,21 @@ var SelectBox = {
             node.select_boxed = false;
             SelectBox.add_to_options(id, node);
         }
-        SelectBox.move(field_id);
+
+        SelectBox.move(id);
         // This prevents a jump on focus if options have been moved out
         box.selectedIndex = -1;
+
+        SelectBox.register_onpopstate();
+        SelectBox.initialised = true;
     },
-    redisplay: function(id, both) {
+    redisplay: function(id, large, all, webkit_repair) {
         // Repopulate HTML select box from options
         var from_fragment = document.createDocumentFragment(),
             to_fragment = document.createDocumentFragment(),
             from_box = document.getElementById(id + '_from'),
             to_box = document.getElementById(id + '_to'),
             node, add_to;
-
 
         // Setting innerHTML doubles the speed by making it unnecessary for the
         // browser to compliment appendChild with removeChild. For example, in
@@ -33,13 +38,18 @@ var SelectBox = {
         // versions of IE. Even deep cloning doesn't fix it so we have to
         // recreate them.
         from_box.innerHTML = '';
-        if (both) to_box.innerHTML = '';
+        if (large) to_box.innerHTML = '';
 
         for (var i = 0, j = SelectBox.options[id].length; i < j; i++) {
             node = SelectBox.options[id][i];
             if (node.displayed) {
+                if (webkit_repair) {
+                    node.select_boxed = node.selected;
+                } else if (!all && node.selected) {
+                    node.select_boxed = !node.select_boxed;
+                }
                 node.selected = false;
-                add_to = (!node.select_boxed) ? from_fragment : (both) ? to_fragment : null;
+                add_to = (!node.select_boxed) ? from_fragment : (large || webkit_repair) ? to_fragment : null;
                 if (add_to) {
                     if (django.jQuery.browser.msie) {
                         node.appendChild(document.createTextNode(node.text_copy));
@@ -95,6 +105,7 @@ var SelectBox = {
         // and l10n.
         option.order = SelectBox.options[id].length;
         SelectBox.insert_option(to_box, option, 0, true);
+        SelectBox.replace_state();
     },
     add_to_options: function(id, option) {
         SelectBox.options[id].push(option);
@@ -156,7 +167,7 @@ var SelectBox = {
         }
 
         if (large_movement) {
-            SelectBox.redisplay(id, true);
+            SelectBox.redisplay(id, large_movement, all);
         } else {
             for (var i = 0; (option = from_box.options[i]); i++) {
                 if (all || option.selected) {
@@ -199,6 +210,8 @@ var SelectBox = {
                 from_box.scrollTop = scroll_position;
             }, 10);
         }
+
+        SelectBox.replace_state();
     },
     move_all: function(id, reverse) {
         SelectBox.move(id, reverse, true);
@@ -208,5 +221,29 @@ var SelectBox = {
         for (var i = 0; i < box.options.length; i++) {
             box.options[i].selected = true;
         }
+    },
+    replace_state: function() {
+        if (!django.jQuery.browser.webkit) return;
+        // Make Webkit fire a distinct onpopstate on back button
+        history.replaceState({}, null);
+    },
+    register_onpopstate: function() {
+        if (SelectBox.initialised || !django.jQuery.browser.webkit) return;
+
+        var initial_state = {content: django.jQuery('#content').html()},
+            popped = ('state' in window.history),
+            state;
+
+        django.jQuery(window).bind('popstate', function(e) {
+            if (!popped) {
+                // Ignore first page loads
+                popped = true;
+            }
+            if (e.originalEvent.state != null) {
+                for (id in SelectBox.options) {
+                    SelectBox.redisplay(id, false, false, true);
+                }
+            }
+        });
     }
 }
