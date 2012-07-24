@@ -111,7 +111,7 @@ outputs a single ``CREATE INDEX`` statement.  However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perfrom
+for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
