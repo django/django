@@ -54,6 +54,9 @@ class BaseStaticFilesTestCase(object):
         # since we're planning on changing that we need to clear out the cache.
         default_storage._wrapped = empty
         storage.staticfiles_storage._wrapped = empty
+        # Clear the cached staticfile finders, so they are reinitialized every
+        # run and pick up changes in settings.STATICFILES_DIRS.
+        finders._finders.clear()
 
         testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
