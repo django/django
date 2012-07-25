@@ -91,6 +91,9 @@ The standard pattern for processing a form in a view looks like this:
 
 .. code-block:: python
 
+   from django.shortcuts import render
+   from django.http import HttpResponseRedirect
+
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
            form = ContactForm(request.POST) # A form bound to the POST data
