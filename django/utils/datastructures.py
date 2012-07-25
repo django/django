@@ -1,6 +1,7 @@
 import copy
 import warnings
 from types import GeneratorType
+from django.utils import six
 
 
 class MergeDict(object):
@@ -31,38 +32,48 @@ class MergeDict(object):
         except KeyError:
             return default
 
+    # This is used by MergeDicts of MultiValueDicts.
     def getlist(self, key):
         for dict_ in self.dicts:
-            if key in dict_.keys():
+            if key in dict_:
                 return dict_.getlist(key)
         return []
 
-    def iteritems(self):
+    def _iteritems(self):
         seen = set()
         for dict_ in self.dicts:
-            for item in dict_.iteritems():
-                k, v = item
+            for item in six.iteritems(dict_):
+                k = item[0]
                 if k in seen:
                     continue
                 seen.add(k)
                 yield item
 
-    def iterkeys(self):
-        for k, v in self.iteritems():
+    def _iterkeys(self):
+        for k, v in self._iteritems():
             yield k
 
-    def itervalues(self):
-        for k, v in self.iteritems():
+    def _itervalues(self):
+        for k, v in self._iteritems():
             yield v
 
-    def items(self):
-        return list(self.iteritems())
+    if six.PY3:
+        items = _iteritems
+        keys = _iterkeys
+        values = _itervalues
+    else:
+        iteritems = _iteritems
+        iterkeys = _iterkeys
+        itervalues = _itervalues
 
-    def keys(self):
-        return list(self.iterkeys())
+        def items(self):
+            return list(self.iteritems())
 
-    def values(self):
-        return list(self.itervalues())
+        def keys(self):
+            return list(self.iterkeys())
+
+        def values(self):
+            return list(self.itervalues())
 
     def has_key(self, key):
         for dict_ in self.dicts:
@@ -71,7 +82,8 @@ class MergeDict(object):
         return False
 
     __contains__ = has_key
-    __iter__ = iterkeys
+
+    __iter__ = _iterkeys
 
     def copy(self):
         """Returns a copy of this object."""
@@ -117,7 +129,7 @@ class SortedDict(dict):
             data = list(data)
         super(SortedDict, self).__init__(data)
         if isinstance(data, dict):
-            self.keyOrder = data.keys()
+            self.keyOrder = list(six.iterkeys(data))
         else:
             self.keyOrder = []
             seen = set()
@@ -128,7 +140,7 @@ class SortedDict(dict):
 
     def __deepcopy__(self, memo):
         return self.__class__([(key, copy.deepcopy(value, memo))
-                               for key, value in self.iteritems()])
+                               for key, value in six.iteritems(self)])
 
     def __copy__(self):
         # The Python's default copy implementation will alter the state
@@ -162,28 +174,38 @@ class SortedDict(dict):
         self.keyOrder.remove(result[0])
         return result
 
-    def items(self):
-        return zip(self.keyOrder, self.values())
-
-    def iteritems(self):
+    def _iteritems(self):
         for key in self.keyOrder:
             yield key, self[key]
 
-    def keys(self):
-        return self.keyOrder[:]
+    def _iterkeys(self):
+        for key in self.keyOrder:
+            yield key
 
-    def iterkeys(self):
-        return iter(self.keyOrder)
-
-    def values(self):
-        return map(self.__getitem__, self.keyOrder)
-
-    def itervalues(self):
+    def _itervalues(self):
         for key in self.keyOrder:
             yield self[key]
 
+    if six.PY3:
+        items = _iteritems
+        keys = _iterkeys
+        values = _itervalues
+    else:
+        iteritems = _iteritems
+        iterkeys = _iterkeys
+        itervalues = _itervalues
+
+        def items(self):
+            return list(self.iteritems())
+
+        def keys(self):
+            return list(self.iterkeys())
+
+        def values(self):
+            return list(self.itervalues())
+
     def update(self, dict_):
-        for k, v in dict_.iteritems():
+        for k, v in six.iteritems(dict_):
             self[k] = v
 
     def setdefault(self, key, default):
@@ -226,7 +248,7 @@ class SortedDict(dict):
         Replaces the normal dict.__repr__ with a version that returns the keys
         in their sorted order.
         """
-        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
+        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in six.iteritems(self)])
 
     def clear(self):
         super(SortedDict, self).clear()
@@ -356,37 +378,40 @@ class MultiValueDict(dict):
         """Appends an item to the internal list associated with key."""
         self.setlistdefault(key).append(value)
 
-    def items(self):
-        """
-        Returns a list of (key, value) pairs, where value is the last item in
-        the list associated with the key.
-        """
-        return [(key, self[key]) for key in self.keys()]
-
-    def iteritems(self):
+    def _iteritems(self):
         """
         Yields (key, value) pairs, where value is the last item in the list
         associated with the key.
         """
-        for key in self.keys():
-            yield (key, self[key])
+        for key in self:
+            yield key, self[key]
 
-    def lists(self):
-        """Returns a list of (key, list) pairs."""
-        return super(MultiValueDict, self).items()
-
-    def iterlists(self):
+    def _iterlists(self):
         """Yields (key, list) pairs."""
-        return super(MultiValueDict, self).iteritems()
+        return six.iteritems(super(MultiValueDict, self))
 
-    def values(self):
-        """Returns a list of the last value on every key list."""
-        return [self[key] for key in self.keys()]
-
-    def itervalues(self):
+    def _itervalues(self):
         """Yield the last value on every key list."""
-        for key in self.iterkeys():
+        for key in self:
             yield self[key]
+
+    if six.PY3:
+        items = _iteritems
+        lists = _iterlists
+        values = _itervalues
+    else:
+        iteritems = _iteritems
+        iterlists = _iterlists
+        itervalues = _itervalues
+
+        def items(self):
+            return list(self.iteritems())
+
+        def lists(self):
+            return list(self.iterlists())
+
+        def values(self):
+            return list(self.itervalues())
 
     def copy(self):
         """Returns a shallow copy of this object."""
@@ -410,7 +435,7 @@ class MultiValueDict(dict):
                         self.setlistdefault(key).append(value)
                 except TypeError:
                     raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             self.setlistdefault(key).append(value)
 
     def dict(self):

@@ -120,3 +120,18 @@ If you need different code in Python 2 and Python 3, check :data:`six.PY3`::
 
 This is a last resort solution when :mod:`six` doesn't provide an appropriate
 function.
+
+.. module:: django.utils.six
+
+Customizations of six
+=====================
+
+The version of six bundled with Django includes a few additional tools:
+
+.. function:: iterlists(MultiValueDict)
+
+    Returns an iterator over the lists of values of a
+    :class:`~django.utils.datastructures.MultiValueDict`. This replaces
+    :meth:`~django.utils.datastructures.MultiValueDict.iterlists()` on Python
+    2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
+    Python 3.

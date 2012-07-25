@@ -355,4 +355,13 @@ def with_metaclass(meta, base=object):
 
 ### Additional customizations for Django ###
 
+if PY3:
+    _iterlists = "lists"
+else:
+    _iterlists = "iterlists"
+
+def iterlists(d):
+    """Return an iterator over the values of a MultiValueDict."""
+    return getattr(d, _iterlists)()
+
 add_move(MovedModule("_dummy_thread", "dummy_thread"))

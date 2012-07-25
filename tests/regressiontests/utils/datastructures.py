@@ -9,6 +9,7 @@ import warnings
 from django.test import SimpleTestCase
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
+from django.utils import six
 
 
 class SortedDictTests(SimpleTestCase):
@@ -25,19 +26,19 @@ class SortedDictTests(SimpleTestCase):
         self.d2[7] = 'seven'
 
     def test_basic_methods(self):
-        self.assertEqual(self.d1.keys(), [7, 1, 9])
-        self.assertEqual(self.d1.values(), ['seven', 'one', 'nine'])
-        self.assertEqual(self.d1.items(), [(7, 'seven'), (1, 'one'), (9, 'nine')])
+        self.assertEqual(list(six.iterkeys(self.d1)), [7, 1, 9])
+        self.assertEqual(list(six.itervalues(self.d1)), ['seven', 'one', 'nine'])
+        self.assertEqual(list(six.iteritems(self.d1)), [(7, 'seven'), (1, 'one'), (9, 'nine')])
 
     def test_overwrite_ordering(self):
-        """ Overwriting an item keeps it's place. """
+        """ Overwriting an item keeps its place. """
         self.d1[1] = 'ONE'
-        self.assertEqual(self.d1.values(), ['seven', 'ONE', 'nine'])
+        self.assertEqual(list(six.itervalues(self.d1)), ['seven', 'ONE', 'nine'])
 
     def test_append_items(self):
         """ New items go to the end. """
         self.d1[0] = 'nil'
-        self.assertEqual(self.d1.keys(), [7, 1, 9, 0])
+        self.assertEqual(list(six.iterkeys(self.d1)), [7, 1, 9, 0])
 
     def test_delete_and_insert(self):
         """
@@ -45,18 +46,22 @@ class SortedDictTests(SimpleTestCase):
         at the end.
         """
         del self.d2[7]
-        self.assertEqual(self.d2.keys(), [1, 9, 0])
+        self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0])
         self.d2[7] = 'lucky number 7'
-        self.assertEqual(self.d2.keys(), [1, 9, 0, 7])
+        self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0, 7])
 
-    def test_change_keys(self):
-        """
-        Changing the keys won't do anything, it's only a copy of the
-        keys dict.
-        """
-        k = self.d2.keys()
-        k.remove(9)
-        self.assertEqual(self.d2.keys(), [1, 9, 0, 7])
+    if not six.PY3:
+        def test_change_keys(self):
+            """
+            Changing the keys won't do anything, it's only a copy of the
+            keys dict.
+
+            This test doesn't make sense under Python 3 because keys is
+            an iterator.
+            """
+            k = self.d2.keys()
+            k.remove(9)
+            self.assertEqual(self.d2.keys(), [1, 9, 0, 7])
 
     def test_init_keys(self):
         """
@@ -68,18 +73,18 @@ class SortedDictTests(SimpleTestCase):
         tuples = ((2, 'two'), (1, 'one'), (2, 'second-two'))
         d = SortedDict(tuples)
 
-        self.assertEqual(d.keys(), [2, 1])
+        self.assertEqual(list(six.iterkeys(d)), [2, 1])
 
         real_dict = dict(tuples)
-        self.assertEqual(sorted(real_dict.values()), ['one', 'second-two'])
+        self.assertEqual(sorted(six.itervalues(real_dict)), ['one', 'second-two'])
 
         # Here the order of SortedDict values *is* what we are testing
-        self.assertEqual(d.values(), ['second-two', 'one'])
+        self.assertEqual(list(six.itervalues(d)), ['second-two', 'one'])
 
     def test_overwrite(self):
         self.d1[1] = 'not one'
         self.assertEqual(self.d1[1], 'not one')
-        self.assertEqual(self.d1.keys(), self.d1.copy().keys())
+        self.assertEqual(list(six.iterkeys(self.d1)), list(six.iterkeys(self.d1.copy())))
 
     def test_append(self):
         self.d1[13] = 'thirteen'
@@ -115,8 +120,8 @@ class SortedDictTests(SimpleTestCase):
     def test_copy(self):
         orig = SortedDict(((1, "one"), (0, "zero"), (2, "two")))
         copied = copy.copy(orig)
-        self.assertEqual(orig.keys(), [1, 0, 2])
-        self.assertEqual(copied.keys(), [1, 0, 2])
+        self.assertEqual(list(six.iterkeys(orig)), [1, 0, 2])
+        self.assertEqual(list(six.iterkeys(copied)), [1, 0, 2])
 
     def test_clear(self):
         self.d1.clear()
@@ -178,12 +183,12 @@ class MergeDictTests(SimpleTestCase):
         self.assertEqual(mm.getlist('key4'), ['value5', 'value6'])
         self.assertEqual(mm.getlist('undefined'), [])
 
-        self.assertEqual(sorted(mm.keys()), ['key1', 'key2', 'key4'])
-        self.assertEqual(len(mm.values()), 3)
+        self.assertEqual(sorted(six.iterkeys(mm)), ['key1', 'key2', 'key4'])
+        self.assertEqual(len(list(six.itervalues(mm))), 3)
 
-        self.assertTrue('value1' in mm.values())
+        self.assertTrue('value1' in six.itervalues(mm))
 
-        self.assertEqual(sorted(mm.items(), key=lambda k: k[0]),
+        self.assertEqual(sorted(six.iteritems(mm), key=lambda k: k[0]),
                           [('key1', 'value1'), ('key2', 'value3'),
                            ('key4', 'value6')])
 
@@ -201,10 +206,10 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(list(d.iteritems()),
+        self.assertEqual(list(six.iteritems(d)),
                           [('position', 'Developer'), ('name', 'Simon')])
 
-        self.assertEqual(list(d.iterlists()),
+        self.assertEqual(list(six.iterlists(d)),
                           [('position', ['Developer']),
                            ('name', ['Adrian', 'Simon'])])
 
@@ -224,8 +229,7 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(d.values(), ['Developer', 'Simon', 'Willison'])
-        self.assertEqual(list(d.itervalues()),
+        self.assertEqual(list(six.itervalues(d)),
                           ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
@@ -260,8 +264,8 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(d.keys(), mvd.keys())
-        for key in mvd.keys():
+        self.assertEqual(list(six.iterkeys(d)), list(six.iterkeys(mvd)))
+        for key in six.iterkeys(mvd):
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())
