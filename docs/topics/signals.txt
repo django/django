@@ -235,7 +235,7 @@ Remember that you're allowed to change this list of arguments at any time, so ge
 Sending signals
 ---------------
 
-There are two ways to send send signals in Django.
+There are two ways to send signals in Django.
 
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
