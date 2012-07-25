@@ -151,6 +151,7 @@ class WSGIRequest(http.HttpRequest):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
+        self._wsgi_exc_info = None
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -222,19 +223,25 @@ class WSGIHandler(base.BaseHandler):
 
         set_script_prefix(base.get_script_name(environ))
         signals.request_started.send(sender=self.__class__)
+        exc_info = None
         try:
             try:
                 request = self.request_class(environ)
             except UnicodeDecodeError:
+                exc_info = sys.exc_info()
                 logger.warning('Bad Request (UnicodeDecodeError)',
-                    exc_info=sys.exc_info(),
+                    exc_info=exc_info,
                     extra={
                         'status_code': 400,
                     }
                 )
                 response = http.HttpResponseBadRequest()
             else:
-                response = self.get_response(request)
+                try:
+                    response = self.get_response(request)
+                finally:
+                    exc_info = request._wsgi_exc_info
+                    request._wsgi_exc_info = None
         finally:
             signals.request_finished.send(sender=self.__class__)
 
@@ -246,5 +253,17 @@ class WSGIHandler(base.BaseHandler):
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((b'Set-Cookie', str(c.output(header=''))))
-        start_response(smart_str(status), response_headers)
+        try:
+            start_response(smart_str(status), response_headers, exc_info)
+        finally:
+            exc_info = None
         return response
+
+    def handle_uncaught_exception(self, request, resolver, exc_info):
+        # Capture the exception context so we can pass it back to __call__()
+        request._wsgi_exc_info = exc_info
+        try:
+            return super(WSGIHandler, self).handle_uncaught_exception(
+                request, resolver, exc_info)
+        finally:
+            exc_info = None
