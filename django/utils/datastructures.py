@@ -347,6 +347,7 @@ class MultiValueDict(dict):
             if default_list is None:
                 default_list = []
             self.setlist(key, default_list)
+            return default_list
         return self.getlist(key)
 
     def appendlist(self, key, value):
