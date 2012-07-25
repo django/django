@@ -299,7 +299,7 @@ class User(models.Model):
         """
         def setter(raw_password):
             self.set_password(raw_password)
-            self.save()
+            self.save(update_fields=["password"])
         return check_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
