@@ -339,7 +339,8 @@ class MultiValueDict(dict):
     def setdefault(self, key, default=None):
         if key not in self:
             self[key] = default
-            return default
+            # Do not return default here because __setitem__() may store
+            # another value -- QueryDict.__setitem__() does. Look it up.
         return self[key]
 
     def setlistdefault(self, key, default_list=None):
@@ -347,7 +348,8 @@ class MultiValueDict(dict):
             if default_list is None:
                 default_list = []
             self.setlist(key, default_list)
-            return default_list
+            # Do not return default_list here because setlist() may store
+            # another value -- QueryDict.setlist() does. Look it up.
         return self.getlist(key)
 
     def appendlist(self, key, value):
