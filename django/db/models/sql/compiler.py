@@ -88,7 +88,9 @@ class SQLCompiler(object):
         result = ['SELECT']
 
         if self.query.distinct:
-            result.append(self.connection.ops.distinct_sql(distinct_fields))
+            distinct_sql = self.connection.ops.distinct_sql(distinct_fields)
+            if distinct_sql:
+                result.append(distinct_sql)
 
         result.append(', '.join(out_cols + self.query.ordering_aliases))
 
