@@ -8,6 +8,8 @@ from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
 from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 
@@ -196,7 +198,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(srid, poly.shell.srid)
                 self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
 
-    @unittest.skipUnless(gdal.HAS_GDAL and gdal.GEOJSON, "gdal >= 1.5 is required")
+    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
     def test_json(self):
         "Testing GeoJSON input/output (via GDAL)."
         for g in self.geometries.json_geoms:
@@ -951,7 +953,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_pickle(self):
         "Testing pickling and unpickling support."
         # Using both pickle and cPickle -- just 'cause.
-        import pickle, cPickle
+        from django.utils.six.moves import cPickle
+        import pickle
 
         # Creating a list of test geometries for pickling,
         # and setting the SRID on some of them.
@@ -1004,7 +1007,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         g = GEOSGeometry("POINT(0 0)")
         self.assertTrue(g.valid)
-        self.assertTrue(isinstance(g.valid_reason, basestring))
+        self.assertTrue(isinstance(g.valid_reason, six.string_types))
         self.assertEqual(g.valid_reason, "Valid Geometry")
 
         print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
@@ -1012,7 +1015,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
         self.assertTrue(not g.valid)
-        self.assertTrue(isinstance(g.valid_reason, basestring))
+        self.assertTrue(isinstance(g.valid_reason, six.string_types))
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
         print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")

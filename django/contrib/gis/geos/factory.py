@@ -1,12 +1,14 @@
 from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
 
+from django.utils import six
+
 def fromfile(file_h):
     """
     Given a string file name, returns a GEOSGeometry. The file may contain WKB,
     WKT, or HEX.
     """
     # If given a file name, get a real handle.
-    if isinstance(file_h, basestring): 
+    if isinstance(file_h, six.string_types):
         with open(file_h, 'rb') as file_h:
             buf = file_h.read()
     else:

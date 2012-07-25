@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
+from django.utils import six
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
 # spatial database alias. This cache exists so that the database isn't queried
@@ -159,7 +160,7 @@ class GeometryField(Field):
         # from the given string input.
         if isinstance(geom, Geometry):
             pass
-        elif isinstance(geom, basestring) or hasattr(geom, '__geo_interface__'):
+        elif isinstance(geom, six.string_types) or hasattr(geom, '__geo_interface__'):
             try:
                 geom = Geometry(geom)
             except GeometryException:

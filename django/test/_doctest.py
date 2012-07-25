@@ -103,7 +103,9 @@ import __future__
 import sys, traceback, inspect, linecache, os, re
 import unittest, difflib, pdb, tempfile
 import warnings
-from StringIO import StringIO
+
+from django.utils import six
+from django.utils.six import StringIO
 
 if sys.platform.startswith('java'):
     # On Jython, isclass() reports some modules as classes. Patch it.
@@ -209,7 +211,7 @@ def _normalize_module(module, depth=2):
     """
     if inspect.ismodule(module):
         return module
-    elif isinstance(module, (str, unicode)):
+    elif isinstance(module, six.string_types):
         return __import__(module, globals(), locals(), ["*"])
     elif module is None:
         return sys.modules[sys._getframe(depth).f_globals['__name__']]
@@ -478,7 +480,7 @@ class DocTest:
         Create a new DocTest containing the given examples.  The
         DocTest's globals are initialized with a copy of `globs`.
         """
-        assert not isinstance(examples, basestring), \
+        assert not isinstance(examples, six.string_types), \
                "DocTest no longer accepts str; use DocTestParser instead"
         self.examples = examples
         self.docstring = docstring
@@ -861,7 +863,7 @@ class DocTestFinder:
         if module is None:
             return True
         elif inspect.isfunction(object):
-            return module.__dict__ is object.func_globals
+            return module.__dict__ is object.__globals__
         elif inspect.isclass(object):
             return module.__name__ == object.__module__
         elif inspect.getmodule(object) is not None:
@@ -904,13 +906,13 @@ class DocTestFinder:
         # Look for tests in a module's __test__ dictionary.
         if inspect.ismodule(obj) and self._recurse:
             for valname, val in getattr(obj, '__test__', {}).items():
-                if not isinstance(valname, basestring):
+                if not isinstance(valname, six.string_types):
                     raise ValueError("DocTestFinder.find: __test__ keys "
                                      "must be strings: %r" %
                                      (type(valname),))
                 if not (inspect.isfunction(val) or inspect.isclass(val) or
                         inspect.ismethod(val) or inspect.ismodule(val) or
-                        isinstance(val, basestring)):
+                        isinstance(val, six.string_types)):
                     raise ValueError("DocTestFinder.find: __test__ values "
                                      "must be strings, functions, methods, "
                                      "classes, or modules: %r" %
@@ -926,7 +928,7 @@ class DocTestFinder:
                 if isinstance(val, staticmethod):
                     val = getattr(obj, valname)
                 if isinstance(val, classmethod):
-                    val = getattr(obj, valname).im_func
+                    val = getattr(obj, valname).__func__
 
                 # Recurse to methods, properties, and nested classes.
                 if ((inspect.isfunction(val) or inspect.isclass(val) or
@@ -943,7 +945,7 @@ class DocTestFinder:
         """
         # Extract the object's docstring.  If it doesn't have one,
         # then return None (no test for this object).
-        if isinstance(obj, basestring):
+        if isinstance(obj, six.string_types):
             docstring = obj
         else:
             try:
@@ -951,7 +953,7 @@ class DocTestFinder:
                     docstring = ''
                 else:
                     docstring = obj.__doc__
-                    if not isinstance(docstring, basestring):
+                    if not isinstance(docstring, six.string_types):
                         docstring = str(docstring)
             except (TypeError, AttributeError):
                 docstring = ''
@@ -998,8 +1000,8 @@ class DocTestFinder:
                     break
 
         # Find the line number for functions & methods.
-        if inspect.ismethod(obj): obj = obj.im_func
-        if inspect.isfunction(obj): obj = obj.func_code
+        if inspect.ismethod(obj): obj = obj.__func__
+        if inspect.isfunction(obj): obj = obj.__code__
         if inspect.istraceback(obj): obj = obj.tb_frame
         if inspect.isframe(obj): obj = obj.f_code
         if inspect.iscode(obj):
@@ -1232,8 +1234,8 @@ class DocTestRunner:
             # keyboard interrupts.)
             try:
                 # Don't blink!  This is where the user's code gets run.
-                exec compile(example.source, filename, "single",
-                             compileflags, 1) in test.globs
+                six.exec_(compile(example.source, filename, "single",
+                             compileflags, 1), test.globs)
                 self.debugger.set_continue() # ==== Example Finished ====
                 exception = None
             except KeyboardInterrupt:

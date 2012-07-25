@@ -26,7 +26,7 @@ class BaseDatabaseCreation(object):
         Generates a 32-bit digest of a set of arguments that can be used to
         shorten identifying names.
         """
-        return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
+        return '%x' % (abs(hash(args)) % 4294967296)    # 2**32
 
     def sql_create_model(self, model, style, known_models=set()):
         """

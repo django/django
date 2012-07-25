@@ -6,6 +6,7 @@ import os
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import translation
 
 
@@ -24,11 +25,11 @@ class ContentTypeTests(TestCase):
     def test_verbose_name(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')
         with translation.override('en'):
-            self.assertEqual(unicode(company_type), 'Company')
+            self.assertEqual(six.text_type(company_type), 'Company')
         with translation.override('fr'):
-            self.assertEqual(unicode(company_type), 'Société')
+            self.assertEqual(six.text_type(company_type), 'Société')
 
     def test_field_override(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')
         company_type.name = 'Other'
-        self.assertEqual(unicode(company_type), 'Other')
+        self.assertEqual(six.text_type(company_type), 'Other')

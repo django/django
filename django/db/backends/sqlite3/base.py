@@ -21,6 +21,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
+from django.utils import six
 from django.utils import timezone
 
 try:
@@ -85,7 +86,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    can_combine_inserts_with_and_without_auto_increment_pk = True
+    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     @cached_property
     def supports_stddev(self):
@@ -107,6 +108,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return has_support
 
 class DatabaseOperations(BaseDatabaseOperations):
+    def bulk_batch_size(self, fields, objs):
+        """
+        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
+        999 variables per query.
+        """
+        return (999 // len(fields)) if len(fields) > 0 else len(objs)
+
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
         # function django_extract that's registered in connect(). Note that
@@ -169,7 +177,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -179,7 +187,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def year_lookup_bounds(self, value):
         first = '%s-01-01'
@@ -250,7 +258,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
             from django.core.exceptions import ImproperlyConfigured
-            raise ImproperlyConfigured("Please fill out the database NAME in the settings module before using the database.")
+            raise ImproperlyConfigured(
+                "settings.DATABASES is improperly configured. "
+                "Please supply the NAME value.")
         kwargs = {
             'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
@@ -339,18 +349,18 @@ class SQLiteCursorWrapper(Database.Cursor):
         try:
             return Database.Cursor.execute(self, query, params)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         try:
             return Database.Cursor.executemany(self, query, param_list)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def convert_query(self, query):
         return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')

@@ -15,6 +15,7 @@ from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.utils.log import getLogger
 from django.utils.safestring import SafeUnicode, SafeString
+from django.utils import six
 from django.utils.timezone import utc
 
 try:
@@ -51,17 +52,17 @@ class CursorWrapper(object):
         try:
             return self.cursor.execute(query, args)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -157,9 +158,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _cursor(self):
         settings_dict = self.settings_dict
         if self.connection is None:
-            if settings_dict['NAME'] == '':
+            if not settings_dict['NAME']:
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
+                raise ImproperlyConfigured(
+                    "settings.DATABASES is improperly configured. "
+                    "Please supply the NAME value.")
             conn_params = {
                 'database': settings_dict['NAME'],
             }
@@ -234,4 +237,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             try:
                 return self.connection.commit()
             except Database.IntegrityError as e:
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])

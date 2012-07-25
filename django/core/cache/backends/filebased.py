@@ -5,7 +5,7 @@ import os
 import shutil
 import time
 try:
-    import cPickle as pickle
+    from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 

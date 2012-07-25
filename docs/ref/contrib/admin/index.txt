@@ -115,7 +115,7 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    Controls whether a selection counter is display next to the action dropdown.
+    Controls whether a selection counter is displayed next to the action dropdown.
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
@@ -370,12 +370,6 @@ subclass::
         fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
         because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
         their own.
-
-.. attribute:: ModelAdmin.get_changelist
-
-    Returns the Changelist class to be used for listing. By default,
-    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
-    class you can change the behavior of the listing.
 
 .. attribute:: ModelAdmin.inlines
 
@@ -1167,6 +1161,12 @@ templates used by the :class:`ModelAdmin` views:
                     if request.user.is_superuser:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+.. method:: ModelAdmin.get_changelist(self, request, **kwargs)
+
+    Returns the Changelist class to be used for listing. By default,
+    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
+    class you can change the behavior of the listing.
 
 .. method:: ModelAdmin.has_add_permission(self, request)
 

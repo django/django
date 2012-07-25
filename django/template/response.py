@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader, Context, RequestContext
+from django.utils import six
 
 
 class ContentNotRenderedError(Exception):
@@ -53,7 +54,7 @@ class SimpleTemplateResponse(HttpResponse):
         "Accepts a template object, path-to-template or list of paths"
         if isinstance(template, (list, tuple)):
             return loader.select_template(template)
-        elif isinstance(template, basestring):
+        elif isinstance(template, six.string_types):
             return loader.get_template(template)
         else:
             return template

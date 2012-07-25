@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import copy
 import datetime
 import os
 import re
@@ -9,26 +10,29 @@ import warnings
 
 from io import BytesIO
 from pprint import pformat
-from urllib import urlencode, quote
-from urlparse import urljoin, parse_qsl
+try:
+    from urllib.parse import quote, parse_qsl, urlencode, urljoin
+except ImportError:     # Python 2
+    from urllib import quote, urlencode
+    from urlparse import parse_qsl, urljoin
 
-import Cookie
+from django.utils.six.moves import http_cookies
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
-_cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
+_cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
-_tc = Cookie.SimpleCookie()
+_tc = http_cookies.SimpleCookie()
 try:
     _tc.load(b'foo:bar=1')
     _cookie_allows_colon_in_names = True
-except Cookie.CookieError:
+except http_cookies.CookieError:
     _cookie_allows_colon_in_names = False
 
 if _cookie_encodes_correctly and _cookie_allows_colon_in_names:
-    SimpleCookie = Cookie.SimpleCookie
+    SimpleCookie = http_cookies.SimpleCookie
 else:
-    Morsel = Cookie.Morsel
+    Morsel = http_cookies.Morsel
 
-    class SimpleCookie(Cookie.SimpleCookie):
+    class SimpleCookie(http_cookies.SimpleCookie):
         if not _cookie_encodes_correctly:
             def value_encode(self, val):
                 # Some browsers do not support quoted-string from RFC 2109,
@@ -69,9 +73,9 @@ else:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
                     dict.__setitem__(self, key, M)
-                except Cookie.CookieError:
+                except http_cookies.CookieError:
                     self.bad_cookies.add(key)
-                    dict.__setitem__(self, key, Cookie.Morsel())
+                    dict.__setitem__(self, key, http_cookies.Morsel())
 
 
 from django.conf import settings
@@ -83,6 +87,7 @@ from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import cookie_date
+from django.utils import six
 from django.utils import timezone
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
@@ -135,10 +140,10 @@ def build_request_repr(request, path_override=None, GET_override=None,
     return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
-                      unicode(get),
-                      unicode(post),
-                      unicode(cookies),
-                      unicode(meta)))
+                      six.text_type(get),
+                      six.text_type(post),
+                      six.text_type(cookies),
+                      six.text_type(meta)))
 
 class UnreadablePostError(IOError):
     pass
@@ -289,7 +294,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                raise UnreadablePostError, e, sys.exc_traceback
+                six.reraise(UnreadablePostError, e, sys.exc_traceback)
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -360,6 +365,7 @@ class HttpRequest(object):
     def readlines(self):
         return list(iter(self))
 
+
 class QueryDict(MultiValueDict):
     """
     A specialized MultiValueDict that takes a query string when initialized.
@@ -374,7 +380,7 @@ class QueryDict(MultiValueDict):
     _encoding = None
 
     def __init__(self, query_string, mutable=False, encoding=None):
-        MultiValueDict.__init__(self)
+        super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
@@ -401,7 +407,7 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         value = str_to_unicode(value, self.encoding)
-        MultiValueDict.__setitem__(self, key, value)
+        super(QueryDict, self).__setitem__(key, value)
 
     def __delitem__(self, key):
         self._assert_mutable()
@@ -409,64 +415,50 @@ class QueryDict(MultiValueDict):
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in dict.items(self):
-            dict.__setitem__(result, key, value)
+        for key, value in self.iterlists():
+            result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
-        import copy
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in dict.items(self):
-            dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        for key, value in self.iterlists():
+            result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
     def setlist(self, key, list_):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         list_ = [str_to_unicode(elt, self.encoding) for elt in list_]
-        MultiValueDict.setlist(self, key, list_)
+        super(QueryDict, self).setlist(key, list_)
 
-    def setlistdefault(self, key, default_list=()):
+    def setlistdefault(self, key, default_list=None):
         self._assert_mutable()
-        if key not in self:
-            self.setlist(key, default_list)
-        return MultiValueDict.getlist(self, key)
+        return super(QueryDict, self).setlistdefault(key, default_list)
 
     def appendlist(self, key, value):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         value = str_to_unicode(value, self.encoding)
-        MultiValueDict.appendlist(self, key, value)
-
-    def update(self, other_dict):
-        self._assert_mutable()
-        f = lambda s: str_to_unicode(s, self.encoding)
-        if hasattr(other_dict, 'lists'):
-            for key, valuelist in other_dict.lists():
-                for value in valuelist:
-                    MultiValueDict.update(self, {f(key): f(value)})
-        else:
-            d = dict([(f(k), f(v)) for k, v in other_dict.items()])
-            MultiValueDict.update(self, d)
+        super(QueryDict, self).appendlist(key, value)
 
     def pop(self, key, *args):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key, *args)
+        return super(QueryDict, self).pop(key, *args)
 
     def popitem(self):
         self._assert_mutable()
-        return MultiValueDict.popitem(self)
+        return super(QueryDict, self).popitem()
 
     def clear(self):
         self._assert_mutable()
-        MultiValueDict.clear(self)
+        super(QueryDict, self).clear()
 
     def setdefault(self, key, default=None):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
         default = str_to_unicode(default, self.encoding)
-        return MultiValueDict.setdefault(self, key, default)
+        return super(QueryDict, self).setdefault(key, default)
 
     def copy(self):
         """Returns a mutable copy of this object."""
@@ -499,14 +491,15 @@ class QueryDict(MultiValueDict):
                            for v in list_])
         return '&'.join(output)
 
+
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    if not isinstance(cookie, Cookie.BaseCookie):
+    if not isinstance(cookie, http_cookies.BaseCookie):
         try:
             c = SimpleCookie()
             c.load(cookie)
-        except Cookie.CookieError:
+        except http_cookies.CookieError:
             # Invalid cookie
             return {}
     else:
@@ -554,7 +547,7 @@ class HttpResponse(object):
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 try:
                     value = value.encode('us-ascii')
                 except UnicodeError as e:
@@ -673,7 +666,7 @@ class HttpResponse(object):
 
     def next(self):
         chunk = next(self._iterator)
-        if isinstance(chunk, unicode):
+        if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
         return str(chunk)
 
@@ -694,7 +687,7 @@ class HttpResponse(object):
     def tell(self):
         if self._base_content_is_iter:
             raise Exception("This %s instance cannot tell its position" % self.__class__)
-        return sum([len(str(chunk)) for chunk in self._container])
+        return sum([len(chunk) for chunk in self])
 
 class HttpResponseRedirect(HttpResponse):
     status_code = 302
@@ -750,8 +743,8 @@ def str_to_unicode(s, encoding):
 
     Returns any non-basestring objects without change.
     """
-    if isinstance(s, str):
-        return unicode(s, encoding, 'replace')
+    if isinstance(s, bytes):
+        return six.text_type(s, encoding, 'replace')
     else:
         return s
 

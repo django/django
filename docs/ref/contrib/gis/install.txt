@@ -81,7 +81,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  ==========================
 :ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.3, 3.2, 3.1, 3.0
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
-:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.8, 1.7, 1.6, 1.5, 1.4
+:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.9, 1.8, 1.7, 1.6, 1.5
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 3.0, 2.4, 2.3
@@ -270,9 +270,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.8.1.tar.gz
-    $ tar xzf gdal-1.8.1.tar.gz
-    $ cd gdal-1.8.1
+    $ wget http://download.osgeo.org/gdal/gdal-1.9.1.tar.gz
+    $ tar xzf gdal-1.9.1.tar.gz
+    $ cd gdal-1.9.1
 
 Configure, make and install::
 
@@ -762,13 +762,13 @@ Python
 ^^^^^^
 
 Although OS X comes with Python installed, users can use framework
-installers (`2.5`__ and `2.6`__ are available) provided by
+installers (`2.6`__ and `2.7`__ are available) provided by
 the Python Software Foundation.  An advantage to using the installer is
 that OS X's Python will remain "pristine" for internal operating system
 use.
 
-__ http://python.org/ftp/python/2.5.4/python-2.5.4-macosx.dmg
-__ http://python.org/ftp/python/2.6.2/python-2.6.2-macosx2009-04-16.dmg
+__ http://python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
+__ http://python.org/ftp/python/2.7.3/
 
 .. note::
 
@@ -1034,60 +1034,10 @@ Optional packages to consider:
     do not plan on doing any database transformation of geometries to the
     Google projection (900913).
 
-.. _heron:
-
-8.04 and lower
-~~~~~~~~~~~~~~
-
-The 8.04 (and lower) versions of Ubuntu use GEOS v2.2.3 in their binary packages,
-which is incompatible with GeoDjango.  Thus, do *not* use the binary packages
-for GEOS or PostGIS and build some prerequisites from source, per the instructions
-in this document; however, it is okay to use the PostgreSQL binary packages.
-
-For more details, please see the Debian instructions for :ref:`etch` below.
-
 .. _debian:
 
 Debian
 ------
-
-.. _etch:
-
-4.0 (Etch)
-^^^^^^^^^^
-
-The situation here is the same as that of Ubuntu :ref:`heron` -- in other words,
-some packages must be built from source to work properly with GeoDjango.
-
-Binary packages
-~~~~~~~~~~~~~~~
-The following command will install acceptable binary packages, as well as
-the development tools necessary to build the rest of the requirements:
-
-.. code-block:: bash
-
-    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 \
-        postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
-
-Required package information:
-
-* ``binutils``: for ctypes to find libraries
-* ``bzip2``: for decompressing the source packages
-* ``gcc``, ``g++``, ``make``: GNU developer tools used to compile the libraries
-* ``flex``: required to build PostGIS
-* ``postgresql-8.1``
-* ``postgresql-server-dev-8.1``: for ``pg_config``
-* ``python-psycopg2``
-
-Optional packages:
-
-* ``libgeoip``: for :ref:`GeoIP <ref-geoip>` support
-
-Source packages
-~~~~~~~~~~~~~~~
-You will still have to install :ref:`geosbuild`, :ref:`proj4`,
-:ref:`postgis`, and :ref:`gdalbuild` from source.  Please follow the
-directions carefully.
 
 .. _lenny:
 

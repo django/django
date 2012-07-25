@@ -7,7 +7,10 @@ from __future__ import absolute_import, unicode_literals
 import copy
 import datetime
 from itertools import chain
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
@@ -16,7 +19,9 @@ from django.utils.html import conditional_escape, format_html, format_html_join
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils import datetime_safe, formats
+from django.utils import six
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -153,8 +158,7 @@ class SubWidget(StrAndUnicode):
             args.append(self.choices)
         return self.parent_widget.render(*args)
 
-class Widget(object):
-    __metaclass__ = MediaDefiningClass
+class Widget(six.with_metaclass(MediaDefiningClass)):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False # Determines does this widget need multipart form
     is_localized = False
@@ -522,7 +526,7 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values =  {'true': True, 'false': False}
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
         return value
 

@@ -10,6 +10,7 @@ import decimal
 import sys
 import warnings
 
+from django.utils import six
 
 def _setup_environment(environ):
     import platform
@@ -53,6 +54,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 from django.utils import timezone
 
 DatabaseError = Database.DatabaseError
@@ -208,7 +210,7 @@ WHEN (new.%(col_name)s IS NULL)
         return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
 
     def fetch_returned_insert_id(self, cursor):
-        return long(cursor._insert_id_var.getvalue())
+        return int(cursor._insert_id_var.getvalue())
 
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
@@ -296,17 +298,22 @@ WHEN (new.%(col_name)s IS NULL)
                     for table in tables]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
-            for sequence_info in sequences:
-                sequence_name = self._get_sequence_name(sequence_info['table'])
-                table_name = self.quote_name(sequence_info['table'])
-                column_name = self.quote_name(sequence_info['column'] or 'id')
-                query = _get_sequence_reset_sql() % {'sequence': sequence_name,
-                                                     'table': table_name,
-                                                     'column': column_name}
-                sql.append(query)
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
             return sql
         else:
             return []
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        sql = []
+        for sequence_info in sequences:
+            sequence_name = self._get_sequence_name(sequence_info['table'])
+            table_name = self.quote_name(sequence_info['table'])
+            column_name = self.quote_name(sequence_info['column'] or 'id')
+            query = _get_sequence_reset_sql() % {'sequence': sequence_name,
+                                                    'table': table_name,
+                                                    'column': column_name}
+            sql.append(query)
+        return sql
 
     def sequence_reset_sql(self, style, model_list):
         from django.db import models
@@ -354,13 +361,13 @@ WHEN (new.%(col_name)s IS NULL)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware times
@@ -549,7 +556,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             except Database.IntegrityError as e:
                 # In case cx_Oracle implements (now or in a future version)
                 # raising this specific exception
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             except Database.DatabaseError as e:
                 # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
                 # with the following attributes and values:
@@ -561,8 +568,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 x = e.args[0]
                 if hasattr(x, 'code') and hasattr(x, 'message') \
                    and x.code == 2091 and 'ORA-02291' in x.message:
-                    raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-                raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                    six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
 
 class OracleParam(object):
@@ -595,7 +602,7 @@ class OracleParam(object):
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, basestring) and len(param) > 4000:
+        elif isinstance(param, six.string_types) and len(param) > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
         else:
@@ -688,12 +695,12 @@ class FormatStylePlaceholderCursor(object):
         try:
             return self.cursor.execute(query, self._param_generator(params))
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, params=None):
         # cx_Oracle doesn't support iterators, convert them to lists
@@ -717,12 +724,12 @@ class FormatStylePlaceholderCursor(object):
             return self.cursor.executemany(query,
                                 [self._param_generator(p) for p in formatted])
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def fetchone(self):
         row = self.cursor.fetchone()
@@ -823,7 +830,7 @@ def to_unicode(s):
     Convert strings to Unicode objects (and return all other data types
     unchanged).
     """
-    if isinstance(s, basestring):
+    if isinstance(s, six.string_types):
         return force_unicode(s)
     return s
 

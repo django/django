@@ -1,5 +1,7 @@
 import copy
+import warnings
 from types import GeneratorType
+
 
 class MergeDict(object):
     """
@@ -191,10 +193,21 @@ class SortedDict(dict):
 
     def value_for_index(self, index):
         """Returns the value of the item at the given zero-based index."""
+        # This, and insert() are deprecated because they cannot be implemented
+        # using collections.OrderedDict (Python 2.7 and up), which we'll
+        # eventually switch to
+        warnings.warn(
+            "SortedDict.value_for_index is deprecated", PendingDeprecationWarning,
+            stacklevel=2
+        )
         return self[self.keyOrder[index]]
 
     def insert(self, index, key, value):
         """Inserts the key, value pair before the item with the given index."""
+        warnings.warn(
+            "SortedDict.insert is deprecated", PendingDeprecationWarning,
+            stacklevel=2
+        )
         if key in self.keyOrder:
             n = self.keyOrder.index(key)
             del self.keyOrder[n]
@@ -404,38 +417,6 @@ class MultiValueDict(dict):
         """
         return dict((key, self[key]) for key in self)
 
-class DotExpandedDict(dict):
-    """
-    A special dictionary constructor that takes a dictionary in which the keys
-    may contain dots to specify inner dictionaries. It's confusing, but this
-    example should make sense.
-
-    >>> d = DotExpandedDict({'person.1.firstname': ['Simon'], \
-            'person.1.lastname': ['Willison'], \
-            'person.2.firstname': ['Adrian'], \
-            'person.2.lastname': ['Holovaty']})
-    >>> d
-    {'person': {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}}
-    >>> d['person']
-    {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}
-    >>> d['person']['1']
-    {'lastname': ['Willison'], 'firstname': ['Simon']}
-
-    # Gotcha: Results are unpredictable if the dots are "uneven":
-    >>> DotExpandedDict({'c.1': 2, 'c.2': 3, 'c': 1})
-    {'c': 1}
-    """
-    def __init__(self, key_to_list_mapping):
-        for k, v in key_to_list_mapping.items():
-            current = self
-            bits = k.split('.')
-            for bit in bits[:-1]:
-                current = current.setdefault(bit, {})
-            # Now assign value to current position
-            try:
-                current[bits[-1]] = v
-            except TypeError: # Special-case if current isn't a dict.
-                current = {bits[-1]: v}
 
 class ImmutableList(tuple):
     """

@@ -4,10 +4,11 @@ Tests for stuff in django.utils.datastructures.
 
 import copy
 import pickle
+import warnings
 
 from django.test import SimpleTestCase
-from django.utils.datastructures import (DictWrapper, DotExpandedDict,
-    ImmutableList, MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
+from django.utils.datastructures import (DictWrapper, ImmutableList,
+    MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 
 
 class SortedDictTests(SimpleTestCase):
@@ -98,7 +99,7 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(l - len(self.d1), 1)
 
     def test_dict_equality(self):
-        d = SortedDict((i, i) for i in xrange(3))
+        d = SortedDict((i, i) for i in range(3))
         self.assertEqual(d, {0: 0, 1: 1, 2: 2})
 
     def test_tuple_init(self):
@@ -121,6 +122,21 @@ class SortedDictTests(SimpleTestCase):
         self.d1.clear()
         self.assertEqual(self.d1, {})
         self.assertEqual(self.d1.keyOrder, [])
+
+    def test_insert(self):
+        d = SortedDict()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            d.insert(0, "hello", "world")
+        assert w[0].category is PendingDeprecationWarning
+
+    def test_value_for_index(self):
+        d = SortedDict({"a": 3})
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            self.assertEqual(d.value_for_index(0), 3)
+        assert w[0].category is PendingDeprecationWarning
+
 
 class MergeDictTests(SimpleTestCase):
 
@@ -249,20 +265,6 @@ class MultiValueDictTests(SimpleTestCase):
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())
-
-
-class DotExpandedDictTests(SimpleTestCase):
-
-    def test_dotexpandeddict(self):
-
-        d = DotExpandedDict({'person.1.firstname': ['Simon'],
-                             'person.1.lastname': ['Willison'],
-                             'person.2.firstname': ['Adrian'],
-                             'person.2.lastname': ['Holovaty']})
-
-        self.assertEqual(d['person']['1']['lastname'], ['Willison'])
-        self.assertEqual(d['person']['2']['lastname'], ['Holovaty'])
-        self.assertEqual(d['person']['2']['firstname'], ['Adrian'])
 
 
 class ImmutableListTests(SimpleTestCase):

@@ -6,11 +6,11 @@ import os
 import re
 import sys
 import gettext as gettext_module
-from io import StringIO
 from threading import local
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
+from django.utils.six import StringIO
 
 
 # Translations are cached in a dictionary for every language+app tuple.

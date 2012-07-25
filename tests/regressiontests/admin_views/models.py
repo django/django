@@ -611,3 +611,10 @@ class UnorderedObject(models.Model):
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
+
+class UndeletableObject(models.Model):
+    """
+    Model whose show_delete in admin change_view has been disabled
+    Refs #10057.
+    """
+    name = models.CharField(max_length=255)

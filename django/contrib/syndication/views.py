@@ -60,14 +60,14 @@ class Feed(object):
         except AttributeError:
             return default
         if callable(attr):
-            # Check func_code.co_argcount rather than try/excepting the
+            # Check __code__.co_argcount rather than try/excepting the
             # function and catching the TypeError, because something inside
             # the function may raise the TypeError. This technique is more
             # accurate.
-            if hasattr(attr, 'func_code'):
-                argcount = attr.func_code.co_argcount
+            if hasattr(attr, '__code__'):
+                argcount = attr.__code__.co_argcount
             else:
-                argcount = attr.__call__.func_code.co_argcount
+                argcount = attr.__call__.__code__.co_argcount
             if argcount == 2: # one argument is 'self'
                 return attr(obj)
             else:

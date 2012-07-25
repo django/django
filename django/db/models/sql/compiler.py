@@ -1,4 +1,4 @@
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 from django.core.exceptions import FieldError
 from django.db import transaction

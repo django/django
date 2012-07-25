@@ -16,7 +16,7 @@ features`_.
 Python compatibility
 ====================
 
-Django 1.5 has dropped support for Python 2.5. Python 2.6 is now the minimum
+Django 1.5 has dropped support for Python 2.5. Python 2.6.5 is now the minimum
 required Python version. Django is tested and supported on Python 2.6 and
 2.7.
 
@@ -106,6 +106,11 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :ref:`receiver <connecting-receiver-functions>` decorator is now able to
   connect to more than one signal by supplying a list of signals.
 
+* :meth:`QuerySet.bulk_create()
+  <django.db.models.query.QuerySet.bulk_create>` has now a batch_size
+  argument. By default the batch_size is unlimited except for SQLite where
+  single batch is limited so that 999 parameters per query isn't exceeded.
+
 Backwards incompatible changes in 1.5
 =====================================
 
@@ -176,6 +181,68 @@ work for single transaction block, but after the first block was left the
 autocommit behavior was never restored. This bug is now fixed in 1.5. While
 this is only a bug fix, it is worth checking your applications behavior if
 you are using PostgreSQL together with the autocommit option.
+
+Session not saved on 500 responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's session middleware will skip saving the session data if the
+response's status code is 500.
+
+Changes in tests execution
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some changes have been introduced in the execution of tests that might be
+backward-incompatible for some testing setups:
+
+Database flushing in ``django.test.TransactionTestCase``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Previously, the test database was truncated *before* each test run in a
+:class:`~django.test.TransactionTestCase`.
+
+In order to be able to run unit tests in any order and to make sure they are
+always isolated from each other, :class:`~django.test.TransactionTestCase` will
+now reset the database *after* each test run instead.
+
+No more implict DB sequences reset
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:class:`~django.test.TransactionTestCase` tests used to reset primary key
+sequences automatically together with the database flushing actions described
+above.
+
+This has been changed so no sequences are implicitly reset. This can cause
+:class:`~django.test.TransactionTestCase` tests that depend on hard-coded
+primary key values to break.
+
+The new :attr:`~django.test.TransactionTestCase.reset_sequences` attribute can
+be used to force the old behavior for :class:`~django.test.TransactionTestCase`
+that might need it.
+
+Ordering of tests
+^^^^^^^^^^^^^^^^^
+
+In order to make sure all ``TestCase`` code starts with a clean database,
+tests are now executed in the following order:
+
+* First, all unittests (including :class:`unittest.TestCase`,
+  :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
+  :class:`~django.test.TransactionTestCase`) are run with no particular ordering
+  guaranteed nor enforced among them.
+
+* Then any other tests (e.g. doctests) that may alter the database without
+  restoring it to its original state are run.
+
+This should not cause any problems unless you have existing doctests which
+assume a :class:`~django.test.TransactionTestCase` executed earlier left some
+database state behind or unit tests that rely on some form of state being
+preserved after the execution of other tests. Such tests are already very
+fragile, and must now be changed to be able to run independently.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* GeoDjango dropped support for GDAL < 1.5
 
 Features deprecated in 1.5
 ==========================

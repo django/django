@@ -123,7 +123,7 @@ class CookieTest(BaseTest):
             {
                 'message': Message(constants.INFO, 'Test message'),
                 'message_list': [Message(constants.INFO, 'message %s') \
-                                 for x in xrange(5)] + [{'another-message': \
+                                 for x in range(5)] + [{'another-message': \
                                  Message(constants.ERROR, 'error')}],
             },
             Message(constants.INFO, 'message %s'),
