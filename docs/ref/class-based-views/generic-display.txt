@@ -54,7 +54,7 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleDetailView
 
         urlpatterns = patterns('',
-            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), 'article-detail'),
+            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
         )    
 
 .. class:: django.views.generic.list.ListView
