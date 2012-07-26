@@ -370,6 +370,7 @@ and return a dictionary of items to be merged into the context. By default,
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.static",
+    "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages")
 
 In addition to these, ``RequestContext`` always uses
@@ -648,14 +649,24 @@ class. Here are the template loaders that come with Django:
 
         INSTALLED_APPS = ('myproject.polls', 'myproject.music')
 
-    ...then ``get_template('foo.html')`` will look for templates in these
+    ...then ``get_template('foo.html')`` will look for ``foo.html`` in these
     directories, in this order:
 
-    * ``/path/to/myproject/polls/templates/foo.html``
-    * ``/path/to/myproject/music/templates/foo.html``
+    * ``/path/to/myproject/polls/templates/``
+    * ``/path/to/myproject/music/templates/``
 
-    Note that the loader performs an optimization when it is first imported: It
-    caches a list of which :setting:`INSTALLED_APPS` packages have a
+    ... and will use the one it finds first.
+
+    The order of :setting:`INSTALLED_APPS` is significant! For example, if you
+    want to customize the Django admin, you might choose to override the
+    standard ``admin/base_site.html`` template, from ``django.contrib.admin``,
+    with your own ``admin/base_site.html`` in ``myproject.polls``. You must
+    then make sure that your ``myproject.polls`` comes *before*
+    ``django.contrib.admin`` in :setting:`INSTALLED_APPS`, otherwise
+    ``django.contrib.admin``'s will be loaded first and yours will be ignored.
+
+    Note that the loader performs an optimization when it is first imported:
+    it caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
 
     This loader is enabled by default.
@@ -773,7 +784,7 @@ Using an alternative template language
 The Django ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that
 implement this API we can use third party template systems like `Jinja2
-<http://jinja.pocoo.org/2/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
+<http://jinja.pocoo.org/docs/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
 allows us to use third-party template libraries without giving up useful Django
 features like the Django ``Context`` object and handy shortcuts like
 :func:`~django.shortcuts.render_to_response()`.

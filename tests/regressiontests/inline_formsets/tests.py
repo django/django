@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.forms.models import inlineformset_factory
 from django.test import TestCase
+from django.utils import six
 
 from .models import Poet, Poem, School, Parent, Child
 
@@ -66,8 +67,8 @@ class DeletionTests(TestCase):
             'poem_set-TOTAL_FORMS': '1',
             'poem_set-INITIAL_FORMS': '1',
             'poem_set-MAX_NUM_FORMS': '0',
-            'poem_set-0-id': unicode(poem.id),
-            'poem_set-0-poem': unicode(poem.id),
+            'poem_set-0-id': six.text_type(poem.id),
+            'poem_set-0-poem': six.text_type(poem.id),
             'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)

@@ -15,6 +15,7 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils.six.moves import xrange
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):

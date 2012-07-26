@@ -3,7 +3,7 @@ from django.db.utils import DatabaseError
 try:
     import thread
 except ImportError:
-    import dummy_thread as thread
+    from django.utils.six.moves import _dummy_thread as thread
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -12,6 +12,7 @@ from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
+from django.utils import six
 from django.utils.timezone import is_aware
 
 
@@ -109,16 +110,18 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
-        self._leave_transaction_management(self.is_managed())
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
         if self._dirty:
             self.rollback()
-            raise TransactionManagementError("Transaction managed block ended with "
-                "pending COMMIT/ROLLBACK")
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
         self._dirty = False
 
     def validate_thread_sharing(self):
@@ -176,6 +179,8 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
+        # Note that this setting isn't documented, and is only used here, and
+        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
@@ -428,15 +433,24 @@ class BaseDatabaseFeatures(object):
     @cached_property
     def supports_transactions(self):
         "Confirm support for transactions"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-        self.connection._commit()
-        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-        self.connection._rollback()
-        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-        count, = cursor.fetchone()
-        cursor.execute('DROP TABLE ROLLBACK_TEST')
-        self.connection._commit()
+        try:
+            # Make sure to run inside a managed transaction block,
+            # otherwise autocommit will cause the confimation to
+            # fail.
+            self.connection.enter_transaction_management()
+            self.connection.managed(True)
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection._commit()
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection._rollback()
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            self.connection._commit()
+            self.connection._dirty = False
+        finally:
+            self.connection.leave_transaction_management()
         return count == 0
 
     @cached_property
@@ -472,6 +486,24 @@ class BaseDatabaseOperations(object):
         This SQL is executed when a table is created.
         """
         return None
+
+    def bulk_batch_size(self, fields, objs):
+        """
+        Returns the maximum allowed batch size for the backend. The fields
+        are the fields going to be inserted in the batch, the objs contains
+        all the objects to be inserted.
+        """
+        return len(objs)
+
+    def cache_key_culling_sql(self):
+        """
+        Returns a SQL query that retrieves the first cache key greater than the
+        n smallest.
+
+        This is used by the 'db' cache backend to determine where to start
+        culling.
+        """
+        return "SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s"
 
     def date_extract_sql(self, lookup_type, field_name):
         """
@@ -509,6 +541,17 @@ class BaseDatabaseOperations(object):
         during a CREATE TABLE statement.
         """
         return ''
+
+    def distinct_sql(self, fields):
+        """
+        Returns an SQL DISTINCT clause which removes duplicate rows from the
+        result set. If any fields are given, only the given fields are being
+        checked for duplicates.
+        """
+        if fields:
+            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+        else:
+            return 'DISTINCT'
 
     def drop_foreignkey_sql(self):
         """
@@ -564,17 +607,6 @@ class BaseDatabaseOperations(object):
         contain a '%s' placeholder for the value being searched against.
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
-
-    def distinct_sql(self, fields):
-        """
-        Returns an SQL DISTINCT clause which removes duplicate rows from the
-        result set. If any fields are given, only the given fields are being
-        checked for duplicates.
-        """
-        if fields:
-            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
-        else:
-            return 'DISTINCT'
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -727,10 +759,23 @@ class BaseDatabaseOperations(object):
         the given database tables (without actually removing the tables
         themselves).
 
+        The returned value also includes SQL statements required to reset DB
+        sequences passed in :param sequences:.
+
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
         raise NotImplementedError()
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        """
+        Returns a list of the SQL statements required to reset sequences
+        passed in :param sequences:.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return []
 
     def sequence_reset_sql(self, style, model_list):
         """
@@ -788,7 +833,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_datetime(self, value):
         """
@@ -797,7 +842,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         """
@@ -808,7 +853,7 @@ class BaseDatabaseOperations(object):
             return None
         if is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):
         """

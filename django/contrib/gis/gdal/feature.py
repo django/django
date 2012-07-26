@@ -7,6 +7,9 @@ from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
 
+from django.utils import six
+from django.utils.six.moves import xrange
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -30,17 +33,17 @@ class Feature(GDALBase):
         """
         Gets the Field object at the specified index, which may be either
         an integer or the Field's string label.  Note that the Field object
-        is not the field's _value_ -- use the `get` method instead to 
+        is not the field's _value_ -- use the `get` method instead to
         retrieve the value (e.g. an integer) instead of a Field instance.
         """
-        if isinstance(index, basestring):
+        if isinstance(index, six.string_types):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:
                 raise OGRIndexError('index out of range')
             i = index
         return Field(self.ptr, i)
-    
+
     def __iter__(self):
         "Iterates over each field in the Feature."
         for i in xrange(self.num_fields):
@@ -49,7 +52,7 @@ class Feature(GDALBase):
     def __len__(self):
         "Returns the count of fields in this feature."
         return self.num_fields
-        
+
     def __str__(self):
         "The string name of the feature."
         return 'Feature FID %d in Layer<%s>' % (self.fid, self.layer_name)
@@ -63,7 +66,7 @@ class Feature(GDALBase):
     def fid(self):
         "Returns the feature identifier."
         return capi.get_fid(self.ptr)
-        
+
     @property
     def layer_name(self):
         "Returns the name of the layer for the feature."
@@ -77,7 +80,7 @@ class Feature(GDALBase):
     @property
     def fields(self):
         "Returns a list of fields in the Feature."
-        return [capi.get_field_name(capi.get_field_defn(self._fdefn, i)) 
+        return [capi.get_field_name(capi.get_field_defn(self._fdefn, i))
                 for i in xrange(self.num_fields)]
 
     @property
@@ -91,7 +94,7 @@ class Feature(GDALBase):
     def geom_type(self):
         "Returns the OGR Geometry Type for this Feture."
         return OGRGeomType(capi.get_fd_geom_type(self._fdefn))
-    
+
     #### Feature Methods ####
     def get(self, field):
         """

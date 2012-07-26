@@ -27,7 +27,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated)
+    RelatedPrepopulated, UndeletableObject)
 
 
 def callable_year(dt_value):
@@ -569,6 +569,11 @@ class UnorderedObjectAdmin(admin.ModelAdmin):
     list_per_page = 2
 
 
+class UndeletableObjectAdmin(admin.ModelAdmin):
+    def change_view(self, *args, **kwargs):
+        kwargs['extra_context'] = {'show_delete': False}
+        return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
+
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -616,6 +621,7 @@ site.register(OtherStory, OtherStoryAdmin)
 site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
+site.register(UndeletableObject, UndeletableObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

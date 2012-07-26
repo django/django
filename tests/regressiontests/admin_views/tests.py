@@ -4,7 +4,10 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import datetime
-import urlparse
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django.conf import settings, global_settings
 from django.core import mail
@@ -30,6 +33,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils import six
 from django.test.utils import override_settings
 
 # local test models
@@ -41,7 +45,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
-    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject)
+    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
+    UndeletableObject)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -588,6 +593,16 @@ class AdminViewBasicTest(TestCase):
         self.assertFalse(reverse('admin:password_change') in response.content,
             msg='The "change password" link should not be displayed if a user does not have a usable password.')
 
+    def test_change_view_with_show_delete_extra_context(self):
+        """
+        Ensured that the 'show_delete' context variable in the admin's change
+        view actually controls the display of the delete button.
+        Refs #10057.
+        """
+        instance = UndeletableObject.objects.create(name='foo')
+        response = self.client.get('/test_admin/%s/admin_views/undeletableobject/%d/' %
+                                   (self.urlbit, instance.pk))
+        self.assertNotContains(response, 'deletelink')
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
@@ -1344,15 +1359,20 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
-        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='')
+        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='Changed something')
 
     def tearDown(self):
         self.client.logout()
 
     def test_get_history_view(self):
-        "Retrieving the history for the object using urlencoded form of primary key should work"
+        """
+        Retrieving the history for an object using urlencoded form of primary
+        key should work.
+        Refs #12349, #18550.
+        """
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
         self.assertContains(response, escape(self.pk))
+        self.assertContains(response, 'Changed something')
         self.assertEqual(response.status_code, 200)
 
     def test_get_change_view(self):
@@ -1364,19 +1384,19 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_changelist_to_changeform_link(self):
         "The link from the changelist referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
-        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key" # capitalized in Recent Actions
         self.assertContains(response, should_contain)
@@ -1397,7 +1417,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         # this URL now comes through reverse(), thus iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (iri_to_uri(quote(self.pk)), escape(self.pk))
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
@@ -2462,7 +2482,7 @@ class AdminCustomQuerysetTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/paper/%s/' % p.pk,
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
-        # Message should contain non-ugly model name. Instance representation is set by unicode() (ugly)
+        # Message should contain non-ugly model name. Instance representation is set by six.text_type() (ugly)
         self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>', html=True)
 
         # defer() is used in ModelAdmin.queryset()
@@ -2514,8 +2534,8 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": "2",
             "pictures-INITIAL_FORMS": "1",
             "pictures-MAX_NUM_FORMS": "0",
-            "pictures-0-id": unicode(self.picture.id),
-            "pictures-0-gallery": unicode(self.gallery.id),
+            "pictures-0-id": six.text_type(self.picture.id),
+            "pictures-0-gallery": six.text_type(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",
@@ -3182,7 +3202,7 @@ class RawIdFieldsTest(TestCase):
         popup_url = m.groups()[0].replace("&amp;", "&")
 
         # Handle relative links
-        popup_url = urlparse.urljoin(response.request['PATH_INFO'], popup_url)
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
         # Get the popup
         response2 = self.client.get(popup_url)
         self.assertContains(response2, "Spain")

@@ -6,6 +6,8 @@ from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
+from django.utils import six
+
 ### The WKB/WKT Reader/Writer structures and pointers ###
 class WKTReader_st(Structure): pass
 class WKTWriter_st(Structure): pass
@@ -118,7 +120,7 @@ class _WKTReader(IOBase):
     ptr_type = WKT_READ_PTR
 
     def read(self, wkt):
-        if not isinstance(wkt, basestring): raise TypeError
+        if not isinstance(wkt, six.string_types): raise TypeError
         return wkt_reader_read(self.ptr, wkt)
 
 class _WKBReader(IOBase):
@@ -131,7 +133,7 @@ class _WKBReader(IOBase):
         if isinstance(wkb, buffer):
             wkb_s = str(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, basestring):
+        elif isinstance(wkb, six.string_types):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         else:
             raise TypeError
@@ -195,7 +197,7 @@ class WKBWriter(IOBase):
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
 # objects that are local to the thread.  The `GEOSGeometry` internals
 # access these instances by calling the module-level functions, defined
-# below. 
+# below.
 class ThreadLocalIO(threading.local):
     wkt_r = None
     wkt_w = None

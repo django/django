@@ -9,7 +9,10 @@ import os
 import stat
 import posixpath
 import re
-import urllib
+try:
+    from urllib.parse import unquote
+except ImportError:     # Python 2
+    from urllib import unquote
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import loader, Template, Context, TemplateDoesNotExist
@@ -30,7 +33,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(urllib.unquote(path))
+    path = posixpath.normpath(unquote(path))
     path = path.lstrip('/')
     newpath = ''
     for part in path.split('/'):
@@ -58,9 +61,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
-        return HttpResponseNotModified(mimetype=mimetype)
+        return HttpResponseNotModified(content_type=mimetype)
     with open(fullpath, 'rb') as f:
-        response = HttpResponse(f.read(), mimetype=mimetype)
+        response = HttpResponse(f.read(), content_type=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size

@@ -478,6 +478,32 @@ If there are any circular dependencies in the
 :setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
 exception will be raised.
 
+Order in which tests are executed
+---------------------------------
+
+In order to guarantee that all ``TestCase`` code starts with a clean database,
+the Django test runner reorders tests in the following way:
+
+* First, all unittests (including :class:`unittest.TestCase`,
+  :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
+  :class:`~django.test.TransactionTestCase`) are run with no particular ordering
+  guaranteed nor enforced among them.
+
+* Then any other tests (e.g. doctests) that may alter the database without
+  restoring it to its original state are run.
+
+.. versionchanged:: 1.5
+    Before Django 1.5, the only guarantee was that
+    :class:`~django.test.TestCase` tests were always ran first, before any other
+    tests.
+
+.. note::
+
+    The new ordering of tests may reveal unexpected dependencies on test case
+    ordering. This is the case with doctests that relied on state left in the
+    database by a given :class:`~django.test.TransactionTestCase` test, they
+    must be updated to be able to run independently.
+
 Other test conditions
 ---------------------
 
@@ -1109,8 +1135,11 @@ The following is a simple unit test using the request factory::
             response = my_view(request)
             self.assertEqual(response.status_code, 200)
 
-TestCase
---------
+Test cases
+----------
+
+Provided test case classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.test
 
@@ -1124,16 +1153,19 @@ Normal Python unit test classes extend a base class of
 
    Hierarchy of Django unit testing classes
 
+TestCase
+^^^^^^^^
+
 .. class:: TestCase()
 
 This class provides some additional capabilities that can be useful for testing
 Web sites.
 
 Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
-easy: just change the base class of your test from :class:`unittest.TestCase` to
-:class:`django.test.TestCase`. All of the standard Python unit test
-functionality will continue to be available, but it will be augmented with some
-useful additions, including:
+easy: Just change the base class of your test from `'unittest.TestCase'` to
+`'django.test.TestCase'`. All of the standard Python unit test functionality
+will continue to be available, but it will be augmented with some useful
+additions, including:
 
 * Automatic loading of fixtures.
 
@@ -1141,10 +1173,17 @@ useful additions, including:
 
 * Creates a TestClient instance.
 
-* Django-specific assertions for testing for things
-  like redirection and form errors.
+* Django-specific assertions for testing for things like redirection and form
+  errors.
+
+.. versionchanged:: 1.5
+    The order in which tests are run has changed. See `Order in which tests are
+    executed`_.
 
 ``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
+
+TransactionTestCase
+^^^^^^^^^^^^^^^^^^^
 
 .. class:: TransactionTestCase()
 
@@ -1157,38 +1196,66 @@ behavior, you should use a Django ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
-to test the effects of commit and rollback. A ``TransactionTestCase`` resets
-the database before the test runs by truncating all tables and reloading
-initial data. A ``TransactionTestCase`` may call commit and rollback and
-observe the effects of these calls on the database.
+to test the effects of commit and rollback:
 
-A ``TestCase``, on the other hand, does not truncate tables and reload initial
-data at the beginning of a test. Instead, it encloses the test code in a
-database transaction that is rolled back at the end of the test.  It also
-prevents the code under test from issuing any commit or rollback operations
-on the database, to ensure that the rollback at the end of the test restores
-the database to its initial state. In order to guarantee that all ``TestCase``
-code starts with a clean database, the Django test runner runs all ``TestCase``
-tests first, before any other tests (e.g. doctests) that may alter the
-database without restoring it to its original state.
+* A ``TransactionTestCase`` resets the database after the test runs by
+  truncating all tables. A ``TransactionTestCase`` may call commit and rollback
+  and observe the effects of these calls on the database.
 
-When running on a database that does not support rollback (e.g. MySQL with the
-MyISAM storage engine), ``TestCase`` falls back to initializing the database
-by truncating tables and reloading initial data.
+* A ``TestCase``, on the other hand, does not truncate tables after a test.
+  Instead, it encloses the test code in a database transaction that is rolled
+  back at the end of the test.  It also prevents the code under test from
+  issuing any commit or rollback operations on the database, to ensure that the
+  rollback at the end of the test restores the database to its initial state.
+
+  When running on a database that does not support rollback (e.g. MySQL with the
+  MyISAM storage engine), ``TestCase`` falls back to initializing the database
+  by truncating tables and reloading initial data.
+
+.. note::
+
+    .. versionchanged:: 1.5
+
+    Prior to 1.5, ``TransactionTestCase`` flushed the database tables *before*
+    each test. In Django 1.5, this is instead done *after* the test has been run.
+
+    When the flush took place before the test, it was guaranteed that primary
+    key values started at one in :class:`~django.test.TransactionTestCase`
+    tests.
+
+    Tests should not depend on this behaviour, but for legacy tests that do, the
+    :attr:`~TransactionTestCase.reset_sequences` attribute can be used until
+    the test has been properly updated.
+
+.. versionchanged:: 1.5
+    The order in which tests are run has changed. See `Order in which tests are
+    executed`_.
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
-.. note::
-    The ``TestCase`` use of rollback to un-do the effects of the test code
-    may reveal previously-undetected errors in test code.  For example,
-    test code that assumes primary keys values will be assigned starting at
-    one may find that assumption no longer holds true when rollbacks instead
-    of table truncation are being used to reset the database.  Similarly,
-    the reordering of tests so that all ``TestCase`` classes run first may
-    reveal unexpected dependencies on test case ordering.  In such cases a
-    quick fix is to switch the ``TestCase`` to a ``TransactionTestCase``.
-    A better long-term fix, that allows the test to take advantage of the
-    speed benefit of ``TestCase``, is to fix the underlying test problem.
+.. attribute:: TransactionTestCase.reset_sequences
+
+    .. versionadded:: 1.5
+
+    Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
+    sure sequences are always reset before the test run::
+
+        class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
+            reset_sequences = True
+
+            def test_animal_pk(self):
+                lion = Animal.objects.create(name="lion", sound="roar")
+                # lion.pk is guaranteed to always be 1
+                self.assertEqual(lion.pk, 1)
+
+    Unless you are explicitly testing primary keys sequence numbers, it is
+    recommended that you do not hard code primary key values in tests.
+
+    Using ``reset_sequences = True`` will slow down the test, since the primary
+    key reset is an relatively expensive database operation.
+
+SimpleTestCase
+^^^^^^^^^^^^^^
 
 .. class:: SimpleTestCase()
 
@@ -1940,7 +2007,7 @@ out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: http://pypi.python.org/pypi/selenium
-.. _full reference: http://readthedocs.org/docs/selenium-python/en/latest/api.html
+.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
 
 .. note::

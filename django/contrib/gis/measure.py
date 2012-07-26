@@ -39,8 +39,9 @@ __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
 
 from django.utils.functional import total_ordering
+from django.utils import six
 
-NUMERIC_TYPES = (int, float, long, Decimal)
+NUMERIC_TYPES = six.integer_types + (float, Decimal)
 AREA_PREFIX = "sq_"
 
 def pretty_name(obj):
@@ -57,7 +58,7 @@ class MeasureBase(object):
     def __init__(self, default_unit=None, **kwargs):
         value, self._default_unit = self.default_units(kwargs)
         setattr(self, self.STANDARD_UNIT, value)
-        if default_unit and isinstance(default_unit, basestring):
+        if default_unit and isinstance(default_unit, six.string_types):
             self._default_unit = default_unit
 
     def _get_standard(self):

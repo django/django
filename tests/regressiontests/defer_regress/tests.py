@@ -9,7 +9,7 @@ from django.db.models.loading import cache
 from django.test import TestCase
 
 from .models import (ResolveThis, Item, RelatedItem, Child, Leaf, Proxy,
-    SimpleItem, Feature)
+    SimpleItem, Feature, ItemAndSimpleItem)
 
 
 class DeferRegressionTest(TestCase):
@@ -109,6 +109,7 @@ class DeferRegressionTest(TestCase):
                 Child,
                 Feature,
                 Item,
+                ItemAndSimpleItem,
                 Leaf,
                 Proxy,
                 RelatedItem,
@@ -125,12 +126,16 @@ class DeferRegressionTest(TestCase):
                 ),
             )
         )
+        # FIXME: This is dependent on the order in which tests are run --
+        # this test case has to be the first, otherwise a LOT more classes
+        # appear.
         self.assertEqual(
             klasses, [
                 "Child",
                 "Child_Deferred_value",
                 "Feature",
                 "Item",
+                "ItemAndSimpleItem",
                 "Item_Deferred_name",
                 "Item_Deferred_name_other_value_text",
                 "Item_Deferred_name_other_value_value",
@@ -139,7 +144,7 @@ class DeferRegressionTest(TestCase):
                 "Leaf",
                 "Leaf_Deferred_child_id_second_child_id_value",
                 "Leaf_Deferred_name_value",
-                "Leaf_Deferred_second_child_value",
+                "Leaf_Deferred_second_child_id_value",
                 "Leaf_Deferred_value",
                 "Proxy",
                 "RelatedItem",
@@ -174,6 +179,23 @@ class DeferRegressionTest(TestCase):
         qs = ResolveThis.objects.defer('num')
         self.assertEqual(1, qs.count())
         self.assertEqual('Foobar', qs[0].name)
+
+    def test_defer_with_select_related(self):
+        item1 = Item.objects.create(name="first", value=47)
+        item2 = Item.objects.create(name="second", value=42)
+        simple = SimpleItem.objects.create(name="simple", value="23")
+        related = ItemAndSimpleItem.objects.create(item=item1, simple=simple)
+
+        obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
+        self.assertEqual(obj.item, item1)
+        self.assertEqual(obj.item_id, item1.id)
+
+        obj.item = item2
+        obj.save()
+
+        obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
+        self.assertEqual(obj.item, item2)
+        self.assertEqual(obj.item_id, item2.id)
 
     def test_deferred_class_factory(self):
         from django.db.models.query_utils import deferred_class_factory

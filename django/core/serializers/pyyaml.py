@@ -13,6 +13,7 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.encoding import smart_str
+from django.utils import six
 
 
 class DjangoSafeDumper(yaml.SafeDumper):
@@ -44,7 +45,8 @@ class Serializer(PythonSerializer):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        return self.stream.getvalue()
+        # Grand-parent super
+        return super(PythonSerializer, self).getvalue()
 
 def Deserializer(stream_or_string, **options):
     """
@@ -52,7 +54,7 @@ def Deserializer(stream_or_string, **options):
     """
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
-    if isinstance(stream_or_string, basestring):
+    if isinstance(stream_or_string, six.string_types):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string

@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
-from django.utils.safestring import mark_safe
 
 ADDITION = 1
 CHANGE = 2
@@ -66,5 +65,5 @@ class LogEntry(models.Model):
         This is relative to the Django admin index page.
         """
         if self.content_type and self.object_id:
-            return mark_safe("%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, quote(self.object_id)))
+            return "%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, quote(self.object_id))
         return None

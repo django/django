@@ -81,6 +81,7 @@ class ARCUITField(RegexField):
     default_error_messages = {
         'invalid': _('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
         'checksum': _("Invalid CUIT."),
+        'legal_type': _('Invalid legal type. Type must be 27, 20, 23 or 30.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -96,6 +97,8 @@ class ARCUITField(RegexField):
         if value in EMPTY_VALUES:
             return ''
         value, cd = self._canon(value)
+        if not value[:2] in ['27', '20', '23', '30']:
+            raise ValidationError(self.error_messages['legal_type'])
         if self._calc_cd(value) != cd:
             raise ValidationError(self.error_messages['checksum'])
         return self._format(value, cd)
@@ -105,9 +108,16 @@ class ARCUITField(RegexField):
         return cuit[:-1], cuit[-1]
 
     def _calc_cd(self, cuit):
+        # Calculation code based on:
+        # http://es.wikipedia.org/wiki/C%C3%B3digo_%C3%9Anico_de_Identificaci%C3%B3n_Tributaria
         mults = (5, 4, 3, 2, 7, 6, 5, 4, 3, 2)
         tmp = sum([m * int(cuit[idx]) for idx, m in enumerate(mults)])
-        return str(11 - tmp % 11)
+        result = 11 - (tmp % 11)
+        if result == 11:
+            result = 0
+        elif result == 10:
+            result = 9
+        return str(result)
 
     def _format(self, cuit, check_digit=None):
         if check_digit == None:

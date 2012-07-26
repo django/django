@@ -80,8 +80,7 @@ class EmailBackend(BaseEmailBackend):
         """
         if not email_messages:
             return
-        self._lock.acquire()
-        try:
+        with self._lock:
             new_conn_created = self.open()
             if not self.connection:
                 # We failed silently on open().
@@ -94,8 +93,6 @@ class EmailBackend(BaseEmailBackend):
                     num_sent += 1
             if new_conn_created:
                 self.close()
-        finally:
-            self._lock.release()
         return num_sent
 
     def _send(self, email_message):

@@ -1,13 +1,31 @@
 from __future__ import unicode_literals
 import datetime
-import new
 
+from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase
-from django.utils import translation, tzinfo
-from django.utils.translation import ugettext as _
+from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import utc
+from django.utils import translation
+from django.utils.translation import ugettext as _
+from django.utils import tzinfo
+
+
+# Mock out datetime in some tests so they don't fail occasionally when they
+# run too slow. Use a fixed datetime for datetime.now(). DST change in
+# America/Chicago (the default time zone) happened on March 11th in 2012.
+
+now = datetime.datetime(2012, 3, 9, 22, 30)
+
+class MockDateTime(datetime.datetime):
+    @classmethod
+    def now(self, tz=None):
+        if tz is None or tz.utcoffset(now) is None:
+            return now
+        else:
+            # equals now.replace(tzinfo=utc)
+            return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
 class HumanizeTests(TestCase):
@@ -109,28 +127,36 @@ class HumanizeTests(TestCase):
         self.humanize_tester(test_list, result_list, 'naturalday')
 
     def test_naturalday_tz(self):
-        from django.contrib.humanize.templatetags.humanize import naturalday
-
         today = datetime.date.today()
         tz_one = tzinfo.FixedOffset(datetime.timedelta(hours=-12))
         tz_two = tzinfo.FixedOffset(datetime.timedelta(hours=12))
 
         # Can be today or yesterday
         date_one = datetime.datetime(today.year, today.month, today.day, tzinfo=tz_one)
-        naturalday_one = naturalday(date_one)
+        naturalday_one = humanize.naturalday(date_one)
         # Can be today or tomorrow
         date_two = datetime.datetime(today.year, today.month, today.day, tzinfo=tz_two)
-        naturalday_two = naturalday(date_two)
+        naturalday_two = humanize.naturalday(date_two)
 
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
+
+    def test_naturalday_uses_localtime(self):
+        # Regression for #18504
+        # This is 2012-03-08HT19:30:00-06:00 in Ameria/Chicago
+        dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
+
+        orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
+        try:
+            with override_settings(USE_TZ=True):
+                self.humanize_tester([dt], ['yesterday'], 'naturalday')
+        finally:
+            humanize.datetime = orig_humanize_datetime
 
     def test_naturaltime(self):
         class naive(datetime.tzinfo):
             def utcoffset(self, dt):
                 return None
-        # we're going to mock datetime.datetime, so use a fixed datetime
-        now = datetime.datetime(2011, 8, 15)
         test_list = [
             now,
             now - datetime.timedelta(seconds=1),
@@ -148,6 +174,7 @@ class HumanizeTests(TestCase):
             now + datetime.timedelta(hours=1, minutes=30, seconds=30),
             now + datetime.timedelta(hours=23, minutes=50, seconds=50),
             now + datetime.timedelta(days=1),
+            now + datetime.timedelta(days=2, hours=6),
             now + datetime.timedelta(days=500),
             now.replace(tzinfo=naive()),
             now.replace(tzinfo=utc),
@@ -169,33 +196,22 @@ class HumanizeTests(TestCase):
             'an hour from now',
             '23 hours from now',
             '1 day from now',
+            '2 days, 6 hours from now',
             '1 year, 4 months from now',
             'now',
             'now',
         ]
+        # Because of the DST change, 2 days and 6 hours after the chosen
+        # date in naive arithmetic is only 2 days and 5 hours after in
+        # aware arithmetic.
+        result_list_with_tz_support = result_list[:]
+        assert result_list_with_tz_support[-4] == '2 days, 6 hours from now'
+        result_list_with_tz_support[-4] == '2 days, 5 hours from now'
 
-        # mock out datetime so these tests don't fail occasionally when the
-        # test runs too slow
-        class MockDateTime(datetime.datetime):
-            @classmethod
-            def now(self, tz=None):
-                if tz is None or tz.utcoffset(now) is None:
-                    return now
-                else:
-                    # equals now.replace(tzinfo=utc)
-                    return now.replace(tzinfo=tz) + tz.utcoffset(now)
-
-        # naturaltime also calls timesince/timeuntil
-        from django.contrib.humanize.templatetags import humanize
-        from django.utils import timesince
-        orig_humanize_datetime = humanize.datetime
-        orig_timesince_datetime = timesince.datetime
-        humanize.datetime = MockDateTime
-        timesince.datetime = new.module(b"mock_datetime")
-        timesince.datetime.datetime = MockDateTime
-
+        orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
             self.humanize_tester(test_list, result_list, 'naturaltime')
+            with override_settings(USE_TZ=True):
+                self.humanize_tester(test_list, result_list_with_tz_support, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime
-            timesince.datetime = orig_timesince_datetime

@@ -54,7 +54,7 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleDetailView
 
         urlpatterns = patterns('',
-            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), 'article-detail'),
+            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
         )    
 
 .. class:: django.views.generic.list.ListView
@@ -76,11 +76,11 @@ many projects they are typically the most commonly used views.
 
     **Method Flowchart**
 
-    1. :meth:`dispatch():`
-    2. :meth:`http_method_not_allowed():`
-    3. :meth:`get_template_names():`
-    4. :meth:`get_queryset():`
-    5. :meth:`get_objects():`
-    6. :meth:`get_context_data():`
-    7. :meth:`get():`
-    8. :meth:`render_to_response():`
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`get_template_names()`
+    4. :meth:`get_queryset()`
+    5. :meth:`get_objects()`
+    6. :meth:`get_context_data()`
+    7. :meth:`get()`
+    8. :meth:`render_to_response()`

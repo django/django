@@ -10,8 +10,9 @@ from django.db.models.fields.related import ManyToManyRel
 from django.forms.util import flatatt
 from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_unicode, smart_unicode
-from django.utils.html import escape, conditional_escape
+from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -49,7 +50,7 @@ class AdminForm(object):
         try:
             fieldset_name, fieldset_options = self.fieldsets[0]
             field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, basestring):
+            if not isinstance(field_name, six.string_types):
                 field_name = field_name[0]
             return self.form[field_name]
         except (KeyError, IndexError):
@@ -163,11 +164,9 @@ class AdminReadonlyField(object):
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        contents = capfirst(force_unicode(escape(label))) + ":"
-        return mark_safe('<label%(attrs)s>%(contents)s</label>' % {
-            "attrs": flatatt(attrs),
-            "contents": contents,
-        })
+        return format_html('<label{0}>{1}:</label>',
+                           flatatt(attrs),
+                           capfirst(force_unicode(label)))
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -190,7 +189,7 @@ class AdminReadonlyField(object):
                 if value is None:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 elif isinstance(f.rel, ManyToManyRel):
-                    result_repr = ", ".join(map(unicode, value.all()))
+                    result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)

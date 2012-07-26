@@ -10,11 +10,12 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt
-from django.utils.html import escape
+from django.utils.html import escape, format_html, format_html_join
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
+from django.utils import six
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -85,16 +86,17 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return mark_safe('<p class="datetime">%s %s<br />%s %s</p>' % \
-            (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1]))
+        return format_html('<p class="datetime">{0} {1}<br />{2} {3}</p>',
+                           _('Date:'), rendered_widgets[0],
+                           _('Time:'), rendered_widgets[1])
 
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return mark_safe('<ul%s>\n%s\n</ul>' % (
-            flatatt(self.attrs),
-            '\n'.join(['<li>%s</li>' % force_unicode(w) for w in self]))
-        )
+        return format_html('<ul{0}>\n{1}\n</ul>',
+                           flatatt(self.attrs),
+                           format_html_join('\n', '<li>{0}</li>',
+                                            ((force_unicode(w),) for w in self)))
 
 class AdminRadioSelect(forms.RadioSelect):
     renderer = AdminRadioFieldRenderer
@@ -120,7 +122,7 @@ def url_params_from_lookup_dict(lookups):
                 # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
             else:
-                v = unicode(v)
+                v = six.text_type(v)
             items.append((k, v))
         params.update(dict(items))
     return params

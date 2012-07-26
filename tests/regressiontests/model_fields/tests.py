@@ -8,17 +8,16 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields.files import FieldFile
+from django.utils import six
 from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, Document, RenamedField)
 
-# If PIL available, do these tests.
-if Image:
-    from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-        TwoImageFieldTests, ImageFieldNoDimensionsTests,
-        ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-        ImageFieldUsingFileTests)
+from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+    TwoImageFieldTests, ImageFieldNoDimensionsTests,
+    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
+    ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
@@ -305,11 +304,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')
@@ -365,15 +364,3 @@ class FileFieldTests(unittest.TestCase):
         field = d._meta.get_field('myfile')
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
-
-    def test_max_length(self):
-        """
-        Test that FileField validates the length of the generated file name
-        that will be stored in the database. Regression for #9893.
-
-        """
-        # upload_to = 'unused', so file names are saved as 'unused/xxxxx'.
-        # max_length = 100, so names longer than 93 characters are rejected.
-        Document(myfile=93 * 'x').full_clean()
-        with self.assertRaises(ValidationError):
-            Document(myfile=94 * 'x').full_clean()

@@ -1,6 +1,9 @@
 import os
 import errno
-import urlparse
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 import itertools
 from datetime import datetime
 
@@ -252,7 +255,7 @@ class FileSystemStorage(Storage):
     def url(self, name):
         if self.base_url is None:
             raise ValueError("This file is not accessible via a URL.")
-        return urlparse.urljoin(self.base_url, filepath_to_uri(name))
+        return urljoin(self.base_url, filepath_to_uri(name))
 
     def accessed_time(self, name):
         return datetime.fromtimestamp(os.path.getatime(self.path(name)))

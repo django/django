@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import copy
 import sys
 from functools import update_wrapper
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings
@@ -16,7 +16,7 @@ from django.db.models.fields.related import (ManyToOneRel,
 from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
 from django.db.models.query import Q
-from django.db.models.query_utils import DeferredAttribute
+from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
@@ -24,6 +24,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
 
@@ -33,7 +34,10 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
-        parents = [b for b in bases if isinstance(b, ModelBase)]
+        # six.with_metaclass() inserts an extra class called 'NewBase' in the
+        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        parents = [b for b in bases if isinstance(b, ModelBase) and
+                not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
             # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
@@ -61,12 +65,14 @@ class ModelBase(type):
         if not abstract:
             new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
                     tuple(x.DoesNotExist
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (ObjectDoesNotExist,), module))
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (ObjectDoesNotExist,),
+                    module, attached_to=new_class))
             new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
                     tuple(x.MultipleObjectsReturned
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (MultipleObjectsReturned,), module))
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (MultipleObjectsReturned,),
+                    module, attached_to=new_class))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -273,8 +279,7 @@ class ModelState(object):
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
 
-class Model(object):
-    __metaclass__ = ModelBase
+class Model(six.with_metaclass(ModelBase, object)):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -372,7 +377,7 @@ class Model(object):
 
     def __repr__(self):
         try:
-            u = unicode(self)
+            u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
         return smart_str('<%s: %s>' % (self.__class__.__name__, u))
@@ -398,25 +403,16 @@ class Model(object):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
+        if not self._deferred:
+            return super(Model, self).__reduce__()
         data = self.__dict__
-        model = self.__class__
-        # The obvious thing to do here is to invoke super().__reduce__()
-        # for the non-deferred case. Don't do that.
-        # On Python 2.4, there is something weird with __reduce__,
-        # and as a result, the super call will cause an infinite recursion.
-        # See #10547 and #12121.
         defers = []
-        if self._deferred:
-            from django.db.models.query_utils import deferred_class_factory
-            factory = deferred_class_factory
-            for field in self._meta.fields:
-                if isinstance(self.__class__.__dict__.get(field.attname),
-                        DeferredAttribute):
-                    defers.append(field.attname)
-            model = self._meta.proxy_for_model
-        else:
-            factory = simple_class_factory
-        return (model_unpickle, (model, defers, factory), data)
+        for field in self._meta.fields:
+            if isinstance(self.__class__.__dict__.get(field.attname),
+                    DeferredAttribute):
+                defers.append(field.attname)
+        model = self._meta.proxy_for_model
+        return (model_unpickle, (model, defers), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -466,8 +462,15 @@ class Model(object):
                 return
 
             update_fields = frozenset(update_fields)
-            field_names = set([field.name for field in self._meta.fields
-                               if not field.primary_key])
+            field_names = set()
+
+            for field in self._meta.fields:
+                if not field.primary_key:
+                    field_names.add(field.name)
+
+                    if field.name != field.attname:
+                        field_names.add(field.attname)
+
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -532,7 +535,7 @@ class Model(object):
             non_pks = [f for f in meta.local_fields if not f.primary_key]
 
             if update_fields:
-                non_pks = [f for f in non_pks if f.name in update_fields]
+                non_pks = [f for f in non_pks if f.name in update_fields or f.attname in update_fields]
 
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
@@ -789,8 +792,8 @@ class Model(object):
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
         return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
-            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
+            'field_name': six.text_type(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
         }
 
@@ -805,16 +808,16 @@ class Model(object):
             field_label = capfirst(field.verbose_name)
             # Insert the error into the error dict, very sneaky
             return field.error_messages['unique'] %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_label)
+                'model_name': six.text_type(model_name),
+                'field_label': six.text_type(field_label)
             }
         # unique_together
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
             return _("%(model_name)s with this %(field_label)s already exists.") %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_labels)
+                'model_name': six.text_type(model_name),
+                'field_label': six.text_type(field_labels)
             }
 
     def full_clean(self, exclude=None):
@@ -876,6 +879,7 @@ class Model(object):
             raise ValidationError(errors)
 
 
+
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################
@@ -917,22 +921,38 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
-def simple_class_factory(model, attrs):
-    """Used to unpickle Models without deferred fields.
-
-    We need to do this the hard way, rather than just using
-    the default __reduce__ implementation, because of a
-    __deepcopy__ problem in Python 2.4
-    """
-    return model
-
-def model_unpickle(model, attrs, factory):
+def model_unpickle(model, attrs):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    cls = factory(model, attrs)
+    cls = deferred_class_factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 
-def subclass_exception(name, parents, module):
-    return type(name, parents, {'__module__': module})
+def subclass_exception(name, parents, module, attached_to=None):
+    """
+    Create exception subclass.
+
+    If 'attached_to' is supplied, the exception will be created in a way that
+    allows it to be pickled, assuming the returned exception class will be added
+    as an attribute to the 'attached_to' class.
+    """
+    class_dict = {'__module__': module}
+    if attached_to is not None:
+        def __reduce__(self):
+            # Exceptions are special - they've got state that isn't
+            # in self.__dict__. We assume it is all in self.args.
+            return (unpickle_inner_exception, (attached_to, name), self.args)
+
+        def __setstate__(self, args):
+            self.args = args
+
+        class_dict['__reduce__'] = __reduce__
+        class_dict['__setstate__'] = __setstate__
+
+    return type(name, parents, class_dict)
+
+def unpickle_inner_exception(klass, exception_name):
+    # Get the exception class from the class it is attached to:
+    exception = getattr(klass, exception_name)
+    return exception.__new__(exception)

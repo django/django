@@ -16,7 +16,8 @@ class FRLocalFlavorTests(SimpleTestCase):
         }
         invalid = {
             '2A200': error_format,
-            '980001': error_format,
+            '980001': ['Ensure this value has at most 5 characters (it has 6).'
+                      ] + error_format,
         }
         self.assertFieldOutput(FRZipCodeField, valid, invalid)
 

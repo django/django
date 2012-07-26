@@ -16,6 +16,7 @@ from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_unicode
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils import timezone
 
 register = Library()
@@ -44,9 +45,9 @@ class CsrfTokenNode(Node):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
-                return mark_safe("")
+                return format_html("")
             else:
-                return mark_safe("<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % csrf_token)
+                return format_html("<div><input type='hidden' name='csrfmiddlewaretoken' value='{0}' /></div>", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -1291,18 +1292,14 @@ def verbatim(parser, token):
             {% don't process this %}
         {% endverbatim %}
 
-    You can also specify an alternate closing tag::
+    You can also designate a specific closing tag block (allowing the
+    unrendered use of ``{% endverbatim %}``)::
 
-        {% verbatim -- %}
+        {% verbatim myblock %}
             ...
-        {% -- %}
+        {% endverbatim myblock %}
     """
-    bits = token.contents.split(' ', 1)
-    if len(bits) > 1:
-        closing_tag = bits[1]
-    else:
-        closing_tag = 'endverbatim'
-    nodelist = parser.parse((closing_tag,))
+    nodelist = parser.parse(('endverbatim',))
     parser.delete_first_token()
     return VerbatimNode(nodelist.render(Context()))
 

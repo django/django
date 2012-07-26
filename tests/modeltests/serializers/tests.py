@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
+from django.utils import six
 from django.utils import unittest
 
 from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
@@ -295,7 +296,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return unicode(value)
+        return six.text_type(value)
 
     @staticmethod
     def _validate_output(serial_str):
@@ -461,7 +462,7 @@ else:
                     # yaml.safe_load will return non-string objects for some
                     # of the fields we are interested in, this ensures that
                     # everything comes back as a string
-                    if isinstance(field_value, basestring):
+                    if isinstance(field_value, six.string_types):
                         ret_list.append(field_value)
                     else:
                         ret_list.append(str(field_value))

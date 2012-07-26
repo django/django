@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, transaction
+from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
-from django.utils.unittest import skipIf
+from django.utils.unittest import skipIf, skipUnless
 
 from .models import Mod, M2mA, M2mB
 
@@ -173,6 +173,59 @@ class TestTransactionClosing(TransactionTestCase):
         Regression for #6669. Same test as above, with DEBUG=True.
         """
         self.test_failing_query_transaction_closed()
+
+
+@skipUnless(connection.vendor == 'postgresql',
+            "This test only valid for PostgreSQL")
+class TestPostgresAutocommit(TransactionTestCase):
+    """
+    Tests to make sure psycopg2's autocommit mode is restored after entering
+    and leaving transaction management. Refs #16047.
+    """
+    def setUp(self):
+        from psycopg2.extensions import (ISOLATION_LEVEL_AUTOCOMMIT,
+                                         ISOLATION_LEVEL_READ_COMMITTED)
+        self._autocommit = ISOLATION_LEVEL_AUTOCOMMIT
+        self._read_committed = ISOLATION_LEVEL_READ_COMMITTED
+
+        # We want a clean backend with autocommit = True, so
+        # first we need to do a bit of work to have that.
+        self._old_backend = connections[DEFAULT_DB_ALIAS]
+        settings = self._old_backend.settings_dict.copy()
+        opts = settings['OPTIONS'].copy()
+        opts['autocommit'] = True
+        settings['OPTIONS'] = opts
+        new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
+        connections[DEFAULT_DB_ALIAS] = new_backend
+
+    def tearDown(self):
+        connections[DEFAULT_DB_ALIAS] = self._old_backend
+
+    def test_initial_autocommit_state(self):
+        self.assertTrue(connection.features.uses_autocommit)
+        self.assertEqual(connection.isolation_level, self._autocommit)
+
+    def test_transaction_management(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._autocommit)
+
+    def test_transaction_stacking(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.enter_transaction_management()
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._autocommit)
 
 
 class TestManyToManyAddTransaction(TransactionTestCase):

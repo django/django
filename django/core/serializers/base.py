@@ -6,6 +6,7 @@ from io import BytesIO
 
 from django.db import models
 from django.utils.encoding import smart_unicode
+from django.utils import six
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
@@ -123,7 +124,7 @@ class Deserializer(object):
         Init this serializer given a stream or a string
         """
         self.options = options
-        if isinstance(stream_or_string, basestring):
+        if isinstance(stream_or_string, six.string_types):
             self.stream = BytesIO(stream_or_string)
         else:
             self.stream = stream_or_string

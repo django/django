@@ -19,12 +19,15 @@ Sample usage:
 ...     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
-http://diveintomark.org/archives/2004/02/04/incompatible-rss
+http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 from __future__ import unicode_literals
 
 import datetime
-import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:     # Python 2
+    from urlparse import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils import datetime_safe
@@ -65,9 +68,9 @@ def get_tag_uri(url, date):
     """
     Creates a TagURI.
 
-    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
-    bits = urlparse.urlparse(url)
+    bits = urlparse(url)
     d = ''
     if date is not None:
         d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')

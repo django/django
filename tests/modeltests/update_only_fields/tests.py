@@ -55,6 +55,14 @@ class UpdateOnlyFieldsTests(TestCase):
         self.assertEqual(e3.name, 'Ian')
         self.assertEqual(e3.profile, profile_receptionist)
 
+        with self.assertNumQueries(1):
+            e3.profile = profile_boss
+            e3.save(update_fields=['profile_id'])
+
+        e4 = Employee.objects.get(pk=e3.pk)
+        self.assertEqual(e4.profile, profile_boss)
+        self.assertEqual(e4.profile_id, profile_boss.pk)
+
     def test_update_fields_inheritance_with_proxy_model(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
         profile_receptionist = Profile.objects.create(name='Receptionist', salary=1000)

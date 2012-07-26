@@ -159,7 +159,7 @@ associated tests will be skipped.
 .. _Textile: http://pypi.python.org/pypi/textile
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
-.. _memcached: http://www.danga.com/memcached/
+.. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: http://pypi.python.org/pypi/selenium
 

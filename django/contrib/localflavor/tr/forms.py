@@ -80,10 +80,10 @@ class TRIdentificationNumberField(Field):
             raise ValidationError(self.error_messages['invalid'])
         if int(value[0]) == 0:
             raise ValidationError(self.error_messages['invalid'])
-        chksum = (sum([int(value[i]) for i in xrange(0,9,2)])*7-
-                          sum([int(value[i]) for i in xrange(1,9,2)])) % 10
+        chksum = (sum([int(value[i]) for i in range(0, 9, 2)]) * 7 -
+                          sum([int(value[i]) for i in range(1, 9, 2)])) % 10
         if chksum != int(value[9]) or \
-           (sum([int(value[i]) for i in xrange(10)]) % 10) != int(value[10]):
+           (sum([int(value[i]) for i in range(10)]) % 10) != int(value[10]):
             raise ValidationError(self.error_messages['invalid'])
         return value
 

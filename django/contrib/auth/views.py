@@ -1,4 +1,7 @@
-import urlparse
+try:
+    from urllib.parse import urlparse, urlunparse
+except ImportError:     # Python 2
+    from urlparse import urlparse, urlunparse
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -34,7 +37,7 @@ def login(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
-            netloc = urlparse.urlparse(redirect_to)[1]
+            netloc = urlparse(redirect_to)[1]
 
             # Use default setting if redirect_to is empty
             if not redirect_to:
@@ -80,7 +83,7 @@ def logout(request, next_page=None,
     auth_logout(request)
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to:
-        netloc = urlparse.urlparse(redirect_to)[1]
+        netloc = urlparse(redirect_to)[1]
         # Security check -- don't allow redirection to a different host.
         if not (netloc and netloc != request.get_host()):
             return HttpResponseRedirect(redirect_to)
@@ -116,13 +119,13 @@ def redirect_to_login(next, login_url=None,
     if not login_url:
         login_url = settings.LOGIN_URL
 
-    login_url_parts = list(urlparse.urlparse(login_url))
+    login_url_parts = list(urlparse(login_url))
     if redirect_field_name:
         querystring = QueryDict(login_url_parts[4], mutable=True)
         querystring[redirect_field_name] = next
         login_url_parts[4] = querystring.urlencode(safe='/')
 
-    return HttpResponseRedirect(urlparse.urlunparse(login_url_parts))
+    return HttpResponseRedirect(urlunparse(login_url_parts))
 
 # 4 views for password reset:
 # - password_reset sends the mail

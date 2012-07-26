@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-from StringIO import StringIO
-
 from django.contrib.auth import models, management
 from django.contrib.auth.management.commands import changepassword
 from django.core.management.base import CommandError
 from django.test import TestCase
+from django.utils.six import StringIO
 
 
 class GetDefaultUsernameTestCase(TestCase):

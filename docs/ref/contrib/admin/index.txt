@@ -115,7 +115,7 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    Controls whether a selection counter is display next to the action dropdown.
+    Controls whether a selection counter is displayed next to the action dropdown.
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
@@ -370,12 +370,6 @@ subclass::
         fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
         because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
         their own.
-
-.. attribute:: ModelAdmin.get_changelist
-
-    Returns the Changelist class to be used for listing. By default,
-    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
-    class you can change the behavior of the listing.
 
 .. attribute:: ModelAdmin.inlines
 
@@ -1168,6 +1162,12 @@ templates used by the :class:`ModelAdmin` views:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
+.. method:: ModelAdmin.get_changelist(self, request, **kwargs)
+
+    Returns the Changelist class to be used for listing. By default,
+    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
+    class you can change the behavior of the listing.
+
 .. method:: ModelAdmin.has_add_permission(self, request)
 
     Should return ``True`` if adding an object is permitted, ``False``
@@ -1948,16 +1948,17 @@ accessible using Django's :ref:`URL reversing system <naming-url-patterns>`.
 
 The :class:`AdminSite` provides the following named URL patterns:
 
-======================  ========================  =============
-Page                    URL name                  Parameters
-======================  ========================  =============
-Index                   ``index``
-Logout                  ``logout``
-Password change         ``password_change``
-Password change done    ``password_change_done``
-i18n javascript         ``jsi18n``
-Application index page  ``app_list``              ``app_label``
-======================  ========================  =============
+=========================  ========================  ==================================
+Page                       URL name                  Parameters
+=========================  ========================  ==================================
+Index                      ``index``
+Logout                     ``logout``
+Password change            ``password_change``
+Password change done       ``password_change_done``
+i18n javascript            ``jsi18n``
+Application index page     ``app_list``              ``app_label``
+Redirect to object's page  ``view_on_site``          ``content_type_id``, ``object_id``
+=========================  ========================  ==================================
 
 Each :class:`ModelAdmin` instance provides an additional set of named URLs:
 

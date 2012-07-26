@@ -1,11 +1,14 @@
-import urllib
 import sys
 import os
 import re
 import mimetypes
 from copy import copy
 from io import BytesIO
-from urlparse import urlparse, urlsplit
+try:
+    from urllib.parse import unquote, urlparse, urlsplit
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -20,6 +23,7 @@ from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
+from django.utils import six
 from django.db import close_connection
 from django.test.utils import ContextList
 
@@ -115,7 +119,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, basestring) and is_iterable(value):
+        elif not isinstance(value, six.string_types) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -221,9 +225,9 @@ class RequestFactory(object):
     def _get_path(self, parsed):
         # If there are parameters, add them
         if parsed[3]:
-            return urllib.unquote(parsed[2] + ";" + parsed[3])
+            return unquote(parsed[2] + ";" + parsed[3])
         else:
-            return urllib.unquote(parsed[2])
+            return unquote(parsed[2])
 
     def get(self, path, data={}, **extra):
         "Construct a GET request."
@@ -381,7 +385,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                raise exc_info[1], None, exc_info[2]
+                six.reraise(exc_info[1], None, exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self

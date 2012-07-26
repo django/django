@@ -6,6 +6,7 @@ from django.core.wsgi import get_wsgi_application
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import unittest
 
 
@@ -39,7 +40,7 @@ class WSGITest(TestCase):
             response_data["headers"],
             [('Content-Type', 'text/html; charset=utf-8')])
         self.assertEqual(
-            unicode(response),
+            six.text_type(response),
             "Content-Type: text/html; charset=utf-8\n\nHello World!")
 
 

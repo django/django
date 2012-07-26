@@ -509,7 +509,7 @@ Setup
    Finally, our calendar system contains interesting traps for computers::
 
        >>> import datetime
-       >>> def substract_one_year(value):       # DON'T DO THAT!
+       >>> def one_year_before(value):       # DON'T DO THAT!
        ...     return value.replace(year=value.year - 1)
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)

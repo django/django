@@ -877,7 +877,8 @@ of a model. Here's how you can do that::
             formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
             if formset.is_valid():
                 formset.save()
-                # Do something.
+                # Do something. Should generally end with a redirect. For example:
+                return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
         return render_to_response("manage_books.html", {

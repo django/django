@@ -596,7 +596,7 @@ apply.
 Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
 be retrieved (and stored) beforehand::
 
-    {% url path.to.view arg arg2 as the_url %}
+    {% url 'path.to.view' arg arg2 as the_url %}
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
@@ -790,7 +790,7 @@ To use the catalog, just pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
-    <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the standard
@@ -890,7 +890,7 @@ prepend the current active language code to all url patterns defined within
 
     urlpatterns += i18n_patterns('',
         url(r'^about/$', 'about.view', name='about'),
-        url(r'^news/$', include(news_patterns, namespace='news')),
+        url(r'^news/', include(news_patterns, namespace='news')),
     )
 
 
@@ -945,7 +945,7 @@ URL patterns can also be marked translatable using the
 
     urlpatterns += i18n_patterns('',
         url(_(r'^about/$'), 'about.view', name='about'),
-        url(_(r'^news/$'), include(news_patterns, namespace='news')),
+        url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
 
@@ -992,7 +992,7 @@ template tag. It enables the given language in the enclosed template section:
     {% trans "View this category in:" %}
     {% for lang_code, lang_name in languages %}
         {% language lang_code %}
-        <a href="{% url category slug=category.slug %}">{{ lang_name }}</a>
+        <a href="{% url 'category' slug=category.slug %}">{{ lang_name }}</a>
         {% endlanguage %}
     {% endfor %}
 

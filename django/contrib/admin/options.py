@@ -24,6 +24,7 @@ from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -57,9 +58,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 
 csrf_protect_m = method_decorator(csrf_protect)
 
-class BaseModelAdmin(object):
+class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
-    __metaclass__ = forms.MediaDefiningClass
 
     raw_id_fields = ()
     fields = None
@@ -745,7 +745,7 @@ class ModelAdmin(BaseModelAdmin):
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
             'ordered_objects': ordered_objects,
-            'form_url': mark_safe(form_url),
+            'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
@@ -998,7 +998,6 @@ class ModelAdmin(BaseModelAdmin):
             'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'is_popup': "_popup" in request.REQUEST,
-            'show_delete': False,
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
@@ -1321,7 +1320,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = model._meta
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
-            object_id = object_id,
+            object_id = unquote(object_id),
             content_type__id__exact = ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
         # If no history was found, see whether this object even exists.

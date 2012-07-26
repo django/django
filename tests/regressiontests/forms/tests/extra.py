@@ -554,7 +554,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
     def test_smart_unicode(self):
         class Test:
             def __str__(self):
-               return b'ŠĐĆŽćžšđ'
+               return 'ŠĐĆŽćžšđ'.encode('utf-8')
 
         class TestU:
             def __str__(self):

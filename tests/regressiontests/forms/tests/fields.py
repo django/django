@@ -35,10 +35,11 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
+from django.utils import six
 
 
 def fix_os_paths(x):
-    if isinstance(x, basestring):
+    if isinstance(x, six.string_types):
         return x.replace('\\', '/')
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))
@@ -486,7 +487,7 @@ class FieldsTests(SimpleTestCase):
         Refs #.
         """
         f = RegexField('^\w+$')
-        self.assertEqual(u'éèøçÎÎ你好', f.clean(u'éèøçÎÎ你好'))
+        self.assertEqual('éèøçÎÎ你好', f.clean('éèøçÎÎ你好'))
 
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')

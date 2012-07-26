@@ -603,21 +603,16 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         maddr = email.Utils.parseaddr(m.get('from'))[1]
         if mailfrom != maddr:
             return "553 '%s' != '%s'" % (mailfrom, maddr)
-        self.sink_lock.acquire()
-        self._sink.append(m)
-        self.sink_lock.release()
+        with self.sink_lock:
+            self._sink.append(m)
 
     def get_sink(self):
-        self.sink_lock.acquire()
-        try:
+        with self.sink_lock:
             return self._sink[:]
-        finally:
-            self.sink_lock.release()
 
     def flush_sink(self):
-        self.sink_lock.acquire()
-        self._sink[:] = []
-        self.sink_lock.release()
+        with self.sink_lock:
+            self._sink[:] = []
 
     def start(self):
         assert not self.active
@@ -629,9 +624,8 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active = True
         self.__flag.set()
         while self.active and asyncore.socket_map:
-            self.active_lock.acquire()
-            asyncore.loop(timeout=0.1, count=1)
-            self.active_lock.release()
+            with self.active_lock:
+                asyncore.loop(timeout=0.1, count=1)
         asyncore.close_all()
 
     def stop(self):

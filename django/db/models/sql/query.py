@@ -1655,10 +1655,15 @@ class Query(object):
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
-            names = opts.get_all_field_names() + self.extra.keys() + self.aggregate_select.keys()
-            names.sort()
-            raise FieldError("Cannot resolve keyword %r into field. "
-                    "Choices are: %s" % (name, ", ".join(names)))
+            if LOOKUP_SEP in name:
+                # For lookups spanning over relationships, show the error
+                # from the model on which the lookup failed.
+                raise
+            else:
+                names = sorted(opts.get_all_field_names() + self.extra.keys()
+                               + self.aggregate_select.keys())
+                raise FieldError("Cannot resolve keyword %r into field. "
+                                 "Choices are: %s" % (name, ", ".join(names)))
         self.remove_inherited_models()
 
     def add_ordering(self, *ordering):
@@ -1845,9 +1850,15 @@ class Query(object):
 
         If no fields are marked for deferral, returns an empty dictionary.
         """
-        collection = {}
-        self.deferred_to_data(collection, self.get_loaded_field_names_cb)
-        return collection
+        # We cache this because we call this function multiple times
+        # (compiler.fill_related_selections, query.iterator)
+        try:
+            return self._loaded_field_names_cache
+        except AttributeError:
+            collection = {}
+            self.deferred_to_data(collection, self.get_loaded_field_names_cb)
+            self._loaded_field_names_cache = collection
+            return collection
 
     def get_loaded_field_names_cb(self, target, model, fields):
         """

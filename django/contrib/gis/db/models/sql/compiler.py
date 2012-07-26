@@ -1,4 +1,4 @@
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler

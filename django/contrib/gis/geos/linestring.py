@@ -4,6 +4,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos import prototypes as capi
+from django.utils.six.moves import xrange
 
 class LineString(GEOSGeometry):
     _init_func = capi.create_linestring
@@ -128,7 +129,7 @@ class LineString(GEOSGeometry):
     @property
     def merged(self):
         "Returns the line merge of this LineString."
-        return self._topology(capi.geos_linemerge(self.ptr))   
+        return self._topology(capi.geos_linemerge(self.ptr))
 
     @property
     def x(self):

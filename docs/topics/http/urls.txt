@@ -704,8 +704,8 @@ target each pattern individually by using its name:
 
 .. code-block:: html+django
 
-    {% url arch-summary 1945 %}
-    {% url full-archive 2007 %}
+    {% url 'arch-summary' 1945 %}
+    {% url 'full-archive' 2007 %}
 
 Even though both URL patterns refer to the ``archive`` view here, using the
 ``name`` parameter to ``url()`` allows you to tell them apart in templates.

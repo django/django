@@ -419,7 +419,7 @@ will be interpreted like:
 
     if (athlete_list and coach_list) or cheerleader_list
 
-Use of actual brackets in the :ttag:`if` tag is invalid syntax.  If you need
+Use of actual parentheses in the :ttag:`if` tag is invalid syntax.  If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
@@ -1047,12 +1047,12 @@ Django's syntax. For example::
         {{if dying}}Still alive.{{/if}}
     {% endverbatim %}
 
-You can also specify an alternate closing tag::
+You can also designate a specific closing tag, allowing the use of
+``{% endverbatim %}`` as part of the unrendered contents::
 
-    {% verbatim finished %}
-        The verbatim tag looks like this:
-        {% verbatim %}{% endverbatim %}
-    {% finished %}
+    {% verbatim myblock %}
+        Avoid template rendering via the {% verbatim %}{% endverbatim %} block.
+    {% endverbatim myblock %}
 
 .. templatetag:: widthratio
 
@@ -2353,6 +2353,17 @@ It is also able to consume standard context variables, e.g. assuming a
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+
+If you'd like to retrieve a static URL without displaying it, you can use a
+slightly different call::
+
+.. versionadded:: 1.5
+
+.. code-block:: html+django
+
+    {% load static %}
+    {% static "images/hi.jpg" as myphoto %}
+    <img src="{{ myphoto }}"></img>
 
 .. note::
 

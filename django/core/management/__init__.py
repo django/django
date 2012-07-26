@@ -324,7 +324,7 @@ class ManagementUtility(object):
                         subcommand_cls.option_list]
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword-1]]
-            options = filter(lambda (x, v): x not in prev_opts, options)
+            options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input
             options = sorted([(k, v) for k, v in options if k.startswith(curr)])

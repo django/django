@@ -447,7 +447,7 @@ systems and coordinate transformation::
 
    This object is a wrapper for the `OGR Geometry`__ class.
    These objects are instantiated directly from the given ``geom_input`` 
-   parameter, which may be a string containing WKT or HEX, a ``buffer``
+   parameter, which may be a string containing WKT, HEX, GeoJSON, a ``buffer``
    containing WKB data, or an :class:`OGRGeomType` object. These objects
    are also returned from the :class:`Feature.geom` attribute, when 
    reading vector data from :class:`Layer` (which is in turn a part of

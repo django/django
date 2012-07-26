@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
 from django.db.models import signals
 from django.utils.encoding import force_unicode, smart_str
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 class FieldFile(File):
@@ -176,7 +177,7 @@ class FileDescriptor(object):
         # subclasses might also want to subclass the attribute class]. This
         # object understands how to convert a path to a file, and also how to
         # handle None.
-        if isinstance(file, basestring) or file is None:
+        if isinstance(file, six.string_types) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
             instance.__dict__[self.field.name] = attr
 
@@ -242,7 +243,11 @@ class FileField(Field):
         # (ie. upload_to='path/to/upload/dir'), the length of the generated
         # name equals the length of the uploaded name plus a constant. Thus
         # we can tell the user how much shorter the name should be (roughly).
-        length = len(self.generate_filename(model_instance, value.name))
+        if value and value._committed:
+            filename = value.name
+        else:
+            filename = self.generate_filename(model_instance, value.name)
+        length = len(filename)
         if self.max_length and length > self.max_length:
             error_values = {'extra': length - self.max_length}
             raise ValidationError(self.error_messages['max_length'] % error_values)
@@ -260,7 +265,7 @@ class FileField(Field):
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."

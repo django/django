@@ -434,10 +434,14 @@ database, so we need to be able to process strings and ``Hand`` instances in
             p1 = re.compile('.{26}')
             p2 = re.compile('..')
             args = [p2.findall(x) for x in p1.findall(value)]
+            if len(args) != 4:
+                raise ValidationError("Invalid input for a Hand instance")
             return Hand(*args)
 
 Notice that we always return a ``Hand`` instance from this method. That's the
-Python object type we want to store in the model's attribute.
+Python object type we want to store in the model's attribute. If anything is
+going wrong during value conversion, you should raise a
+:exc:`~django.core.exceptions.ValidationError` exception.
 
 **Remember:** If your custom field needs the :meth:`to_python` method to be
 called when it is created, you should be using `The SubfieldBase metaclass`_
@@ -666,7 +670,7 @@ data storage anyway, we can reuse some existing conversion code::
 
         def value_to_string(self, obj):
             value = self._get_val_from_obj(obj)
-            return self.get_db_prep_value(value)
+            return self.get_prep_value(value)
 
 Some general advice
 --------------------
