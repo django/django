@@ -4,14 +4,16 @@ Tests for django test runner
 from __future__ import absolute_import, unicode_literals
 
 import sys
+import os
 from optparse import make_option
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
 from django.test import simple, TransactionTestCase, skipUnlessDBFeature
-from django.test.simple import DjangoTestSuiteRunner, get_tests
+from django.test.simple import DjangoTestSuiteRunner, get_tests, build_test
 from django.test.testcases import connections_support_transactions
+from django.test.utils import override_settings
 from django.utils import unittest
 from django.utils.importlib import import_module
 
@@ -236,6 +238,15 @@ class ModulesTestsPackages(unittest.TestCase):
         "Test for #12658 - Tests with ImportError's shouldn't fail silently"
         module = import_module(TEST_APP_ERROR)
         self.assertRaises(ImportError, get_tests, module)
+
+    @override_settings(INSTALLED_APPS=('valid_app',))
+    def test_get_tests_before_models(self):
+        # regression test for #18670
+        sys.path.append(os.path.dirname(__file__))
+        tests = build_test('valid_app.foo')
+        self.assertEqual(1, tests.countTestCases())
+        sys.path.remove(os.path.dirname(__file__))
+
 
 
 class Sqlite3InMemoryTestDbs(unittest.TestCase):
