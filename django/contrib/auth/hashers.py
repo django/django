@@ -173,7 +173,7 @@ class BasePasswordHasher(object):
         """
         Generates a cryptographically secure nonce salt in ascii
         """
-        return RandomToken().readable_alphabet(length=10)
+        return RandomToken(length=10).readable_alphabet()
 
     def verify(self, password, encoded):
         """
@@ -383,7 +383,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     library = "crypt"
 
     def salt(self):
-        return RandomToken().readable_alphabet(2)
+        return RandomToken(2).readable_alphabet()
 
     def encode(self, password, salt):
         crypt = self._load_library()

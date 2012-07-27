@@ -147,7 +147,7 @@ class SessionBase(object):
             # No getpid() in Jython, for example
             pid = 1
         while 1:
-            session_key = RandomToken().lower_alphanumeric(length=39)
+            session_key = RandomToken(length=39).lower_alphanumeric()
             if not self.exists(session_key):
                 break
         return session_key

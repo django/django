@@ -31,41 +31,44 @@ class RandomToken():
     """
     Object that creates randomized token.
     """
-    def digits(self, length=DEFAULT_TOKEN_LENGTH):
+    def __init__(self, length=DEFAULT_TOKEN_LENGTH):
+        self.length = length
+
+    def digits(self):
         """
         Creates a randomized token consisting of the DIGIT character set.
         """
-        return self._build_token(DIGITS, length)
+        return self._build_token(DIGITS)
 
-    def alphanumeric(self, length=DEFAULT_TOKEN_LENGTH):
+    def alphanumeric(self):
         """
         Creates a randomized token consisting of the general ALPHANUMERIC character sets.
         """
-        return self._build_token(ALPHANUMERIC, length)
+        return self._build_token(ALPHANUMERIC)
 
-    def lower_alphanumeric(self, length=DEFAULT_TOKEN_LENGTH):
+    def lower_alphanumeric(self):
         """
         Creates a randomized token consisting of the LOWER_ALPHANUMERIC character sets.
         """
-        return self._build_token(LOWER_ALPHANUMERIC, length)
+        return self._build_token(LOWER_ALPHANUMERIC)
 
-    def hex(self, length=DEFAULT_TOKEN_LENGTH):
+    def hex(self):
         """
         Creates a randomized token consisting of the HEX character sets.
         """
-        return self._build_token(HEX, length)
+        return self._build_token(HEX)
 
-    def readable_alphabet(self, length=DEFAULT_TOKEN_LENGTH):
+    def readable_alphabet(self):
         """
         Creates a randomized token consisting of the READABLE_ALPHABET character set.
         """
-        return self._build_token(READABLE_ALPHABET, length)
+        return self._build_token(READABLE_ALPHABET)
 
-    def _build_token(self, character_set, length):
+    def _build_token(self, character_set):
         """
         Builds a random token of the specified length using the characters available in the specified character set.
         """
-        return ''.join([random.choice(character_set) for i in xrange(length)])
+        return ''.join([random.choice(character_set) for i in xrange(self.length)])
 
 
 class HashToken():
