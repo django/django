@@ -5,7 +5,13 @@ Django's standard token library and utilities.
 import hashlib
 import string
 import random
+
+from datetime import date
+
+from django.conf import settings
 from django.utils.baseconv import BaseConverter
+from django.utils.http import int_to_base36, base36_to_int
+from django.utils.crypto import constant_time_compare, salted_hmac
 
 try:
     random = random.SystemRandom()
@@ -117,7 +123,6 @@ class HashToken():
 # Migrated from contrib.auth.tokens:
 ###
 
-
 class PasswordResetTokenGenerator(object):
     """
     Strategy object used to generate and check tokens for the password
@@ -141,8 +146,7 @@ class PasswordResetTokenGenerator(object):
             return False
 
         try:
-            ts = BaseConverter(LOWER_ALPHANUMERIC).decode(ts_b36)
-
+            ts = base36_to_int(ts_b36)
         except ValueError:
             return False
 
@@ -159,7 +163,7 @@ class PasswordResetTokenGenerator(object):
     def _make_token_with_timestamp(self, user, timestamp):
         # timestamp is number of days since 2001-1-1.  Converted to
         # base 36, this gives us a 3 digit string until about 2121
-        ts_b36 = BaseConverter(LOWER_ALPHANUMERIC).encode(timestamp)
+        ts_b36 = int_to_base36(timestamp)
 
         # By hashing on the internal state of the user and using state
         # that is sure to change (the password salt will change as soon as
@@ -168,14 +172,17 @@ class PasswordResetTokenGenerator(object):
         # invalid as soon as it is used.
         # We limit the hash to 20 chars to keep URL short
         key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
-        value = unicode(user.id) + \
-            user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') + \
-            unicode(timestamp)
+
+        # Ensure results are consistent across DB backends
+        login_timestamp = user.last_login.replace(microsecond=0, tzinfo=None)
+
+        value = (unicode(user.id) + user.password +
+                unicode(login_timestamp) + unicode(timestamp))
         hash = salted_hmac(key_salt, value).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
     def _num_days(self, dt):
-        return (dt - date(2001,1,1)).days
+        return (dt - date(2001, 1, 1)).days
 
     def _today(self):
         # Used for mocking in tests
