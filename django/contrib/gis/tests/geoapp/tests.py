@@ -737,6 +737,13 @@ class GeoModelTest(TestCase):
         self.assertEqual(ref_hash, h1.geohash)
         self.assertEqual(ref_hash[:5], h2.geohash)
 
+    def test31_raw_sql_query(self):
+        "Testing raw SQL query."
+        cities1 = City.objects.all()
+        cities2 = City.objects.raw('select * from geoapp_city')
+        if len(cities1) > 0:
+            self.assertEqual(cities1[0], cities2[0])
+
 from .test_feeds import GeoFeedTest
 from .test_regress import GeoRegressionTests
 from .test_sitemaps import GeoSitemapTest
