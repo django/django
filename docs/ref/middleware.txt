@@ -146,7 +146,7 @@ Locale middleware
 
 Enables language selection based on data from the request. It customizes
 content for each user. See the :doc:`internationalization documentation
-</topics/i18n/index>`.
+</topics/i18n/translation>`.
 
 Message middleware
 ------------------
