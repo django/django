@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 from __future__ import with_statement
-import hashlib
 import os
 import posixpath
 import re
@@ -78,7 +77,7 @@ class CachedFilesMixin(object):
         """
         if content is None:
             return None
-        md5 = hashlib.md5()
+        md5 = HashToken(algorithm='md5').digestmod()
         for chunk in content.chunks():
             md5.update(chunk)
         return md5.hexdigest()[:12]
@@ -105,7 +104,7 @@ class CachedFilesMixin(object):
         return os.path.join(path, u"%s.%s%s" % (root, token_sum, ext))
 
     def cache_key(self, name):
-        return 'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
+        return 'staticfiles:%s' % HashToken(smart_str(name), 'md5').hex()
 
     def url(self, name, force=False):
         """

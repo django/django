@@ -1,14 +1,12 @@
 from __future__ import unicode_literals
 
-import hashlib
-
 from django.dispatch import receiver
 from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str
-from django.utils.tokens import RandomToken
+from django.utils.tokens import RandomToken, HashToken
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (pbkdf2, constant_time_compare)
 from django.utils.translation import ugettext_noop as _
@@ -210,7 +208,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
     algorithm = "pbkdf2_sha256"
     iterations = 10000
-    digest = hashlib.sha256
+    digest = HashToken(algorithm='sha256').digestmod
 
     def encode(self, password, salt, iterations=None):
         assert password
@@ -246,7 +244,7 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     PKCS5_PBKDF2_HMAC_SHA1().
     """
     algorithm = "pbkdf2_sha1"
-    digest = hashlib.sha1
+    digest = HashToken(algorithm='sha1').digestmod
 
 
 class BCryptPasswordHasher(BasePasswordHasher):
@@ -298,7 +296,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.sha1(smart_str(salt + password)).hexdigest()
+        hash = HashToken(smart_str(salt + password), 'sha1').hex()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -326,7 +324,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.md5(smart_str(salt + password)).hexdigest()
+        hash = HashToken(smart_str(salt + password), 'md5').hex()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -360,7 +358,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        return hashlib.md5(smart_str(password)).hexdigest()
+        return HashToken(smart_str(password), 'md5').hex()
 
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')

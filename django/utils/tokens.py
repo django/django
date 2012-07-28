@@ -81,8 +81,14 @@ class HashToken():
     """
     Return a token useful for a hash (that is, a token whose generation is repeatable)
     """
-    def __init__(self, value=''):
-        self._hash = hashlib.sha256(value)
+    def __init__(self, value='', algorithm='sha256'):
+        digestmod = {
+            'md5': hashlib.md5,
+            'sha1': hashlib.sha1,
+            'sha256': hashlib.sha256
+        }[algorithm]
+        self._hash = digestmod(value)
+        self.digestmod = digestmod
 
     def digits(self):
         return self._build_token(DIGITS)
