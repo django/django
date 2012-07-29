@@ -174,7 +174,7 @@ Justin Bronn
     implementing GeoDjango, Justin obtained a deep knowledge of Django's
     internals including the ORM, the admin, and Oracle support.
 
-    Justin lives in Houston, Texas.
+    Justin lives in San Francisco, CA.
 
 .. _GeoDjango: http://geodjango.org/
 
