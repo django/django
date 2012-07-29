@@ -533,5 +533,22 @@ under "/content/polls/", or any other path root, and the app will still work.
 
 All the poll app cares about is its relative path, not its absolute path.
 
+Removing hardcoded URLs in templates
+------------------------------------
+
+Remember, when we wrote the link to a poll in our template, the link was
+partially hardcoded like this:
+
+.. code-block:: html+django
+
+    <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a></li>
+
+To use the decoupled URLs we've just introduced, replace the hardcoded link
+with the :ttag:`url` template tag:
+
+.. code-block:: html+django
+
+    <li><a href="{% url 'polls.views.detail' poll.id %}">{{ poll.question }}</a></li>
+
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
 </intro/tutorial04>` to learn about simple form processing and generic views.
