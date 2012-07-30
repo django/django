@@ -538,20 +538,10 @@ class ImageField(FileField):
                 file = StringIO(data['content'])
 
         try:
-            # load() is the only method that can spot a truncated JPEG,
-            #  but it cannot be called sanely after verify()
-            trial_image = Image.open(file)
-            trial_image.load()
-
-            # Since we're about to use the file again we have to reset the
-            # file object if possible.
-            if hasattr(file, 'reset'):
-                file.reset()
-
-            # verify() is the only method that can spot a corrupt PNG,
-            #  but it must be called immediately after the constructor
-            trial_image = Image.open(file)
-            trial_image.verify()
+            # load() could spot a truncated JPEG, but it loads the entire
+            # image in memory, which is a DoS vector. See #3848 and #18520.
+            # verify() must be called immediately after the constructor.
+            Image.open(file).verify()
         except ImportError:
             # Under PyPy, it is possible to import PIL. However, the underlying
             # _imaging C module isn't available, so an ImportError will be
