@@ -11,10 +11,10 @@ import warnings
 from io import BytesIO
 from pprint import pformat
 try:
-    from urllib.parse import quote, parse_qsl, urlencode, urljoin
+    from urllib.parse import quote, parse_qsl, urlencode, urljoin, urlparse
 except ImportError:     # Python 2
     from urllib import quote, urlencode
-    from urlparse import parse_qsl, urljoin
+    from urlparse import parse_qsl, urljoin, urlparse
 
 from django.utils.six.moves import http_cookies
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
@@ -80,7 +80,7 @@ else:
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
@@ -689,19 +689,21 @@ class HttpResponse(object):
             raise Exception("This %s instance cannot tell its position" % self.__class__)
         return sum([len(chunk) for chunk in self])
 
-class HttpResponseRedirect(HttpResponse):
+class HttpResponseRedirectBase(HttpResponse):
+    allowed_schemes = ['http', 'https', 'ftp']
+
+    def __init__(self, redirect_to):
+        parsed = urlparse(redirect_to)
+        if parsed.scheme and parsed.scheme not in self.allowed_schemes:
+            raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+        super(HttpResponseRedirectBase, self).__init__()
+        self['Location'] = iri_to_uri(redirect_to)
+    
+class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
 
-    def __init__(self, redirect_to):
-        super(HttpResponseRedirect, self).__init__()
-        self['Location'] = iri_to_uri(redirect_to)
-
-class HttpResponsePermanentRedirect(HttpResponse):
+class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
-
-    def __init__(self, redirect_to):
-        super(HttpResponsePermanentRedirect, self).__init__()
-        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseNotModified(HttpResponse):
     status_code = 304
