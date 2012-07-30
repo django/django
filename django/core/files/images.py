@@ -47,13 +47,18 @@ def get_image_dimensions(file_or_path, close=False):
         file = open(file_or_path, 'rb')
         close = True
     try:
+        # Most of the time PIL only needs a small chunk to parse the image and
+        # get the dimensions, but with some TIFF files PIL needs to parse the
+        # whole file.
+        chunk_size = 1024
         while 1:
-            data = file.read(1024)
+            data = file.read(chunk_size)
             if not data:
                 break
             p.feed(data)
             if p.image:
                 return p.image.size
+            chunk_size = chunk_size*2
         return None
     finally:
         if close:
