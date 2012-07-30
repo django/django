@@ -1450,7 +1450,7 @@ The permission_required decorator
 Limiting access to generic views
 --------------------------------
 
-To limit access to a :doc:`class-based generic view 
+To limit access to a :doc:`class-based generic view
 </ref/class-based-views/index>`, decorate the :meth:`View.dispatch
 <django.views.generic.base.View.dispatch>` method on the class. See
 :ref:`decorating-class-based-views` for details.
@@ -1476,12 +1476,13 @@ The Django admin site uses permissions as follows:
 * Access to delete an object is limited to users with the "delete"
   permission for that type of object.
 
-Permissions are set globally per type of object, not per specific object
-instance. For example, it's possible to say "Mary may change news stories," but
-it's not currently possible to say "Mary may change news stories, but only the
-ones she created herself" or "Mary may only change news stories that have a
-certain status, publication date or ID." The latter functionality is something
-Django developers are currently discussing.
+Permissions can be set not only per type of object, but also per specific
+object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
+:meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
+by the :class:`~django.contrib.admin.ModelAdmin` class, it is possible to
+customize permissions for different object instances of the same type.
 
 Default permissions
 -------------------
