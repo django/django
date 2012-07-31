@@ -10,6 +10,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import site
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -17,6 +18,7 @@ from django.db import connection
 from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest
 from django.test import LiveServerTestCase
+from django.core.management import find_management_module
 
 test_dir = os.path.dirname(os.path.dirname(__file__))
 
@@ -1094,6 +1096,25 @@ class ManageTestCommand(AdminScriptTestCase):
         else:
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
+class FindCommandTest(AdminScriptTestCase):
+    def setUp(self):
+        self.old_path = sys.path
+        #Add the package directories to the sys path, like setuptools would do,
+        #when running the 'develop' command via an egg-link
+        site.addsitedir(os.path.join(os.path.dirname(__file__), "find_command_submodules/site-packages"))
+
+    def test_modules_from_different_setuptools_packages(self):
+        """Test for ticket 18685. Check that multiple modules in the same package,
+        installed from different setuptools packages, load their management commands
+        correctly.
+        """
+        module_A_path = find_management_module("mypackage.A")
+        self.assertTrue(module_A_path.endswith("project-A/mypackage/A/management"), module_A_path)
+        module_B_path = find_management_module("mypackage.B")
+        self.assertTrue(module_B_path.endswith("project-B/mypackage/B/management"), module_B_path)
+
+    def tearDown(self):
+        sys.path = self.old_path
 
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
