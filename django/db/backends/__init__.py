@@ -959,7 +959,7 @@ class BaseDatabaseIntrospection(object):
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
                     if f.rel.through is None:
-                        sequence_list.append({'table': f.m2m_db_table(), 'column': None})
+                        sequence_list.append({'table': f.m2m_db_table(), 'column': f.m2m_reverse_name()})
 
         return sequence_list
 
