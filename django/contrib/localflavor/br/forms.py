@@ -28,7 +28,7 @@ class BRZipCodeField(RegexField):
 
 class BRPhoneNumberField(Field):
     default_error_messages = {
-        'invalid': _('Phone numbers must be in XX-XXXXX-XXXX format.'),
+        'invalid': _('Phone numbers must be in XX-XXXXX-XXXX or XX-XXXX-XXXX format.'),
     }
 
     def clean(self, value):
