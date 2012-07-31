@@ -1467,12 +1467,13 @@ The permission_required decorator
 
 .. currentmodule:: django.contrib.auth
 
-Limiting access to generic views
---------------------------------
+Applying permissions to generic views
+-------------------------------------
 
-To limit access to a :doc:`class-based generic view </ref/class-based-views>`,
-decorate the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
-method on the class. See :ref:`decorating-class-based-views` for details.
+To apply a permission to a :doc:`class-based generic view
+</ref/class-based-views/index>`, decorate the :meth:`View.dispatch
+<django.views.generic.base.View.dispatch>` method on the class. See
+:ref:`decorating-class-based-views` for details.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
