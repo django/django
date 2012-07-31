@@ -2,7 +2,7 @@ import collections
 import os
 import sys
 from optparse import OptionParser, NO_DEFAULT
-import imp
+import pkgutil
 import warnings
 
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
@@ -37,11 +37,8 @@ def find_management_module(app_name):
 
     Raises ImportError if the management module cannot be found for any reason.
     """
-    parts = app_name.split('.')
-    parts.append('management')
-    parts.reverse()
-    part = parts.pop()
-    path = None
+    module_name = app_name + ".management"
+    loader = pkgutil.find_loader(module_name)
 
     # When using manage.py, the project module is added to the path,
     # loaded, then removed from the path. This means that
@@ -49,16 +46,13 @@ def find_management_module(app_name):
     # testproject isn't in the path. When looking for the management
     # module, we need look for the case where the project name is part
     # of the app_name but the project directory itself isn't on the path.
-    try:
-        f, path, descr = imp.find_module(part,path)
-    except ImportError as e:
-        if os.path.basename(os.getcwd()) != part:
-            raise e
+    if not loader and os.path.basename(os.getcwd()) == module_name.split('.')[0]:
+        loader = pkgutil.find_loader(".".join(module_name.split(".")[1:]))
 
-    while parts:
-        part = parts.pop()
-        f, path, descr = imp.find_module(part, path and [path] or None)
-    return path
+    if loader:
+        return loader.filename
+    else:
+        return ''
 
 def load_command_class(app_name, name):
     """
