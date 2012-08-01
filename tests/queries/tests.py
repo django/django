@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
-from django.db.models.query import ITER_CHUNK_SIZE
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
@@ -1211,16 +1210,6 @@ class Queries2Tests(TestCase):
             ordered=False
         )
 
-    def test_ticket7411(self):
-        # Saving to db must work even with partially read result set in another
-        # cursor.
-        for num in range(2 * ITER_CHUNK_SIZE + 1):
-            _ = Number.objects.create(num=num)
-
-        for i, obj in enumerate(Number.objects.all()):
-            obj.save()
-            if i > 10: break
-
     def test_ticket7759(self):
         # Count should work with a partially read result set.
         count = Number.objects.count()
@@ -1699,31 +1688,6 @@ class Queries6Tests(TestCase):
         ann1 = Annotation.objects.create(name='a1', tag=t1)
         ann1.notes.add(n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
-
-    # This next test used to cause really weird PostgreSQL behavior, but it was
-    # only apparent much later when the full test suite ran.
-    #  - Yeah, it leaves global ITER_CHUNK_SIZE to 2 instead of 100...
-    #@unittest.expectedFailure
-    def test_slicing_and_cache_interaction(self):
-        # We can do slicing beyond what is currently in the result cache,
-        # too.
-
-        # We need to mess with the implementation internals a bit here to decrease the
-        # cache fill size so that we don't read all the results at once.
-        from django.db.models import query
-        query.ITER_CHUNK_SIZE = 2
-        qs = Tag.objects.all()
-
-        # Fill the cache with the first chunk.
-        self.assertTrue(bool(qs))
-        self.assertEqual(len(qs._result_cache), 2)
-
-        # Query beyond the end of the cache and check that it is filled out as required.
-        self.assertEqual(repr(qs[4]), '<Tag: t5>')
-        self.assertEqual(len(qs._result_cache), 5)
-
-        # But querying beyond the end of the result set will fail.
-        self.assertRaises(IndexError, lambda: qs[100])
 
     def test_parallel_iterators(self):
         # Test that parallel iterators work.
@@ -2532,6 +2496,14 @@ class WhereNodeTest(TestCase):
         self.assertEqual(w.as_sql(qn, connection), (None, []))
         w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+
+
+class IteratorExceptionsTest(TestCase):
+    def test_iter_exceptions(self):
+        qs = ExtraInfo.objects.only('author')
+        with self.assertRaises(AttributeError):
+            list(qs)
+
 
 class NullJoinPromotionOrTest(TestCase):
     def setUp(self):

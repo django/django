@@ -20,11 +20,6 @@ from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
 
-# Used to control how many objects are worked with at once in some cases (e.g.
-# when deleting objects).
-CHUNK_SIZE = 100
-ITER_CHUNK_SIZE = CHUNK_SIZE
-
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -41,7 +36,6 @@ class QuerySet(object):
         self._db = using
         self.query = query or sql.Query(self.model)
         self._result_cache = None
-        self._iter = None
         self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = []
@@ -57,8 +51,8 @@ class QuerySet(object):
         Deep copy of a QuerySet doesn't populate the cache
         """
         obj = self.__class__()
-        for k,v in self.__dict__.items():
-            if k in ('_iter','_result_cache'):
+        for k, v in self.__dict__.items():
+            if k == '_result_cache':
                 obj.__dict__[k] = None
             else:
                 obj.__dict__[k] = copy.deepcopy(v, memo)
@@ -69,10 +63,8 @@ class QuerySet(object):
         Allows the QuerySet to be pickled.
         """
         # Force the cache to be fully populated.
-        len(self)
-
+        self._fetch_all()
         obj_dict = self.__dict__.copy()
-        obj_dict['_iter'] = None
         return obj_dict
 
     def __repr__(self):
@@ -82,95 +74,31 @@ class QuerySet(object):
         return repr(data)
 
     def __len__(self):
-        # Since __len__ is called quite frequently (for example, as part of
-        # list(qs), we make some effort here to be as efficient as possible
-        # whilst not messing up any existing iterators against the QuerySet.
-        if self._result_cache is None:
-            if self._iter:
-                self._result_cache = list(self._iter)
-            else:
-                self._result_cache = list(self.iterator())
-        elif self._iter:
-            self._result_cache.extend(self._iter)
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            self._prefetch_related_objects()
+        self._fetch_all()
         return len(self._result_cache)
 
     def __iter__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is None:
-            self._iter = self.iterator()
-            self._result_cache = []
-        if self._iter:
-            return self._result_iter()
-        # Python's list iterator is better than our version when we're just
-        # iterating over the cache.
+        """
+        The queryset iterator protocol uses three nested iterators in the
+        default case:
+            1. sql.compiler:execute_sql()
+               - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
+                 using cursor.fetchmany(). This part is responsible for
+                 doing some column masking, and returning the rows in chunks.
+            2. sql/compiler.results_iter()
+               - Returns one row at time. At this point the rows are still just
+                 tuples. In some cases the return values are converted to
+                 Python values at this location (see resolve_columns(),
+                 resolve_aggregate()).
+            3. self.iterator()
+               - Responsible for turning the rows into model objects.
+        """
+        self._fetch_all()
         return iter(self._result_cache)
 
-    def _result_iter(self):
-        pos = 0
-        while 1:
-            upper = len(self._result_cache)
-            while pos < upper:
-                yield self._result_cache[pos]
-                pos = pos + 1
-            if not self._iter:
-                raise StopIteration
-            if len(self._result_cache) <= pos:
-                self._fill_cache()
-
-    def __bool__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is not None:
-            return bool(self._result_cache)
-        try:
-            next(iter(self))
-        except StopIteration:
-            return False
-        return True
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
-    def __contains__(self, val):
-        # The 'in' operator works without this method, due to __iter__. This
-        # implementation exists only to shortcut the creation of Model
-        # instances, by bailing out early if we find a matching element.
-        pos = 0
-        if self._result_cache is not None:
-            if val in self._result_cache:
-                return True
-            elif self._iter is None:
-                # iterator is exhausted, so we have our answer
-                return False
-            # remember not to check these again:
-            pos = len(self._result_cache)
-        else:
-            # We need to start filling the result cache out. The following
-            # ensures that self._iter is not None and self._result_cache is not
-            # None
-            it = iter(self)
-
-        # Carry on, one result at a time.
-        while True:
-            if len(self._result_cache) <= pos:
-                self._fill_cache(num=1)
-            if self._iter is None:
-                # we ran out of items
-                return False
-            if self._result_cache[pos] == val:
-                return True
-            pos += 1
+    def __nonzero__(self):
+        self._fetch_all()
+        return bool(self._result_cache)
 
     def __getitem__(self, k):
         """
@@ -184,19 +112,6 @@ class QuerySet(object):
                 "Negative indexing is not supported."
 
         if self._result_cache is not None:
-            if self._iter is not None:
-                # The result cache has only been partially populated, so we may
-                # need to fill it out a bit more.
-                if isinstance(k, slice):
-                    if k.stop is not None:
-                        # Some people insist on passing in strings here.
-                        bound = int(k.stop)
-                    else:
-                        bound = None
-                else:
-                    bound = k + 1
-                if len(self._result_cache) < bound:
-                    self._fill_cache(bound - len(self._result_cache))
             return self._result_cache[k]
 
         if isinstance(k, slice):
@@ -370,7 +285,7 @@ class QuerySet(object):
         If the QuerySet is already fully cached this simply returns the length
         of the cached results set to avoid multiple SELECT COUNT(*) calls.
         """
-        if self._result_cache is not None and not self._iter:
+        if self._result_cache is not None:
             return len(self._result_cache)
 
         return self.query.get_count(using=self.db)
@@ -933,17 +848,11 @@ class QuerySet(object):
             c._setup_query()
         return c
 
-    def _fill_cache(self, num=None):
-        """
-        Fills the result cache with 'num' more entries (or until the results
-        iterator is exhausted).
-        """
-        if self._iter:
-            try:
-                for i in range(num or ITER_CHUNK_SIZE):
-                    self._result_cache.append(next(self._iter))
-            except StopIteration:
-                self._iter = None
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
 
     def _next_is_sticky(self):
         """
