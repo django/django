@@ -642,8 +642,8 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to):
         super(HttpResponseRedirectBase, self).__init__()
         parsed = urlparse(redirect_to)
-        if parsed.scheme and parsed.scheme not in self.allowed_schemes:
-            raise SuspiciousOperation("Unsafe redirect to URL with scheme '%s'" % parsed.scheme)
+        if parsed[0] and parsed[0] not in self.allowed_schemes:
+            raise SuspiciousOperation("Unsafe redirect to URL with scheme '%s'" % parsed[0])
         self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseRedirect(HttpResponseRedirectBase):

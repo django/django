@@ -76,7 +76,7 @@ def fix_IE_for_vary(request, response):
 
     # The first part of the Content-Type field will be the MIME type,
     # everything after ';', such as character-set, can be ignored.
-    mime_type = response.get('Content-Type', '').partition(';')[0]
+    mime_type = response.get('Content-Type', '').split(';', 1)[0]
     if mime_type not in safe_mime_types:
         try:
             del response['Vary']
