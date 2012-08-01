@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 from unittest import expectedFailure, skipUnless
+import warnings
 
 try:
     import yaml
@@ -476,9 +477,12 @@ def naturalKeySerializerTest(format, self):
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
 
-    # Serialize the test database
-    serialized_data = serializers.serialize(format, objects, indent=2,
-        use_natural_keys=True)
+    # use_natural_keys is deprecated and to be removed in Django 1.9
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        # Serialize the test database
+        serialized_data = serializers.serialize(format, objects, indent=2,
+            use_natural_keys=True)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
@@ -523,6 +527,35 @@ def streamTest(format, self):
         else:
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
+
+def naturalKeyTest(format, self):
+    book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
+             'Django: Web Development Done Right'}
+    book2 = {'data':'978-1590599969', 'title': 'Practical Django Projects'}
+
+    # Create the books.
+    adrian = NaturalKeyAnchor.objects.create(**book1)
+    james = NaturalKeyAnchor.objects.create(**book2)
+
+    # Serialize the books.
+    string_data = serializers.serialize(format, NaturalKeyAnchor.objects.all(),
+                                        indent=2, use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
+
+    # Delete one book (to prove that the natural key generation will only
+    # restore the primary keys of books found in the database via the
+    # get_natural_key manager method).
+    james.delete()
+
+    # Deserialize and test.
+    books = list(serializers.deserialize(format, string_data))
+    self.assertEqual(len(books), 2)
+    self.assertEqual(books[0].object.title, book1['title'])
+    self.assertEqual(books[0].object.pk, adrian.pk)
+    self.assertEqual(books[1].object.title, book2['title'])
+    self.assertEqual(books[1].object.pk, None)
+
+
 for format in [
             f for f in serializers.get_serializer_formats()
             if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)
@@ -530,6 +563,7 @@ for format in [
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
+    setattr(SerializerTests, 'test_' + format + '_serializer_natural_keys', curry(naturalKeyTest, format))
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 

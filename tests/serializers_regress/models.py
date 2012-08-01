@@ -118,6 +118,7 @@ class NaturalKeyAnchor(models.Model):
     objects = NaturalKeyAnchorManager()
 
     data = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=100, null=True)
 
     def natural_key(self):
         return (self.data,)

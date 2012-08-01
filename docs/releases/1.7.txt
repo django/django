@@ -294,6 +294,11 @@ Management Commands
 * The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
   disable the colorization of management command output.
 
+* The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
+  options for :djadmin:`dumpdata`, and the new ``use_natural_foreign_keys`` and
+  ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
+  the use of natural primary keys when serializing.
+
 Models
 ^^^^^^
 
@@ -588,3 +593,12 @@ The :class:`django.db.models.IPAddressField` and
 The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
 ``get_backend_timeout()``. Despite being a private API, it will go through the
 normal deprecation.
+
+Natural key serialization options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` have been
+deprecated. Use :djadminopt:`--natural-foreign` instead.
+
+Similarly, the ``use_natural_keys`` argument for ``serializers.serialize()``
+has been deprecated. Use ``use_natural_foreign_keys`` instead.

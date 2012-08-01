@@ -461,6 +461,12 @@ these changes.
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
   ``get_backend_timeout()``.
 
+* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
+  Use :djadminopt:`--natural-foreign` instead.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
+  removed. Use ``use_natural_foreign_keys`` instead.
+
 2.0
 ---
 

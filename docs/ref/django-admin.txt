@@ -220,13 +220,34 @@ also mix application names and model names.
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
 
+.. django-admin-option:: --natural-foreign
+
+.. versionadded:: 1.7
+
+When this option is specified, Django will use the ``natural_key()`` model
+method to serialize any foreign key and many-to-many relationship to objects of
+the type that defines the method. If you are dumping ``contrib.auth``
+``Permission`` objects or ``contrib.contenttypes`` ``ContentType`` objects, you
+should probably be using this flag. See the :ref:`natural keys
+<topics-serialization-natural-keys>` documentation for more details on this
+and the next option.
+
+.. django-admin-option:: --natural-primary
+
+.. versionadded:: 1.7
+
+When this option is specified, Django will not provide the primary key in the
+serialized data of this object since it can be calculated during
+deserialization.
+
 .. django-admin-option:: --natural
+
+.. deprecated:: 1.7
+    Equivalent to the :djadminopt:`--natural-foreign` option; use that instead.
 
 Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
 any foreign key and many-to-many relationship with a model that provides
-a natural key definition. If you are dumping ``contrib.auth`` ``Permission``
-objects or ``contrib.contenttypes`` ``ContentType`` objects, you should
-probably be using this flag.
+a natural key definition.
 
 .. versionadded:: 1.6
 
