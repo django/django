@@ -41,7 +41,7 @@ from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, 
     AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
     ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel,
     ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel,
-    NaturalKeyAnchor, FKDataNaturalKey)
+    NaturalKeyAnchor, FKDataNaturalKey, Book)
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -523,10 +523,38 @@ def streamTest(format, self):
         else:
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
+def naturalKeyTest(format, self):
+    book1 = {'isbn13': '978-1590597255', 'title': 'The Definitive Guide to '
+             'Django: Web Development Done Right'}
+    book2 = {'isbn13':'978-1590599969', 'title': 'Practical Django Projects'}
+
+    # Create the books.
+    adrian = Book.objects.create(**book1)
+    james = Book.objects.create(**book2)
+
+    # Serialize the books.
+    string_data = serializers.serialize(format, Book.objects.all(), indent=2,
+                                        use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
+
+    # Delete one book (to prove that the natural key generation will only
+    # restore the primary keys of books found in the database via the
+    # get_natural_key manager method).
+    james.delete()
+
+    # Deserialize and test.
+    books = list(serializers.deserialize(format, string_data))
+    self.assertEqual(len(books), 2)
+    self.assertEqual(books[0].object.title, book1['title'])
+    self.assertEqual(books[0].object.pk, adrian.pk)
+    self.assertEqual(books[1].object.title, book2['title'])
+    self.assertEqual(books[1].object.pk, None)
+
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
+    setattr(SerializerTests, 'test_' + format + '_serializer_natural_keys', curry(naturalKeyTest, format))
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 

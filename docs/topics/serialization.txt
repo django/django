@@ -407,6 +407,12 @@ into the primary key of an actual ``Person`` object.
     fields will be effectively unique, you can still use those fields
     as a natural key.
 
+.. versionadded:: 1.6
+
+Deserialization of objects with no primary key will always check whether the
+model's manager has a ``get_by_natural_key()`` method and if so, use it to
+populate the deserialized object's primary key.
+
 Serialization of natural keys
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -429,17 +435,38 @@ Firstly, you need to add another method -- this time to the model itself::
 
 That method should always return a natural key tuple -- in this
 example, ``(first name, last name)``. Then, when you call
-``serializers.serialize()``, you provide a ``use_natural_keys=True``
-argument::
+``serializers.serialize()``, you provide ``use_natural_foreign_keys=True``
+or ``use_natural_primary_keys=True`` arguments::
 
-    >>> serializers.serialize('json', [book1, book2], indent=2, use_natural_keys=True)
+    >>> serializers.serialize('json', [book1, book2], indent=2, use_natural_foreign_keys=True, use_natural_primary_keys=True)
 
-When ``use_natural_keys=True`` is specified, Django will use the
-``natural_key()`` method to serialize any reference to objects of the
-type that defines the method.
+When ``use_natural_foreign_keys=True`` is specified, Django will use the
+``natural_key()`` method to serialize any foreign key reference to objects
+of the type that defines the method.
+
+When ``use_natural_primary_keys=True``is specified, Django will not provide the
+primary key in the serialized data of this object since it can be calculated
+during deserialization::
+
+	...
+	{
+	    "model": "store.person",
+	    "fields": {
+	        "first_name": "Douglas",
+	        "last_name": "Adams",
+	        "birth_date": "1952-03-11",
+	    }
+	}
+	...
+
+This can be useful when you need to load serialized data into an existing
+database and you cannot guarantee that the serialized primary key value is not
+already in use, and do not need to ensure that deserialized objects retain the
+same primary keys.
 
 If you are using :djadmin:`dumpdata` to generate serialized data, you
-use the :djadminopt:`--natural` command line flag to generate natural keys.
+use the :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
+command line flags to generate natural keys.
 
 .. note::
 
@@ -452,6 +479,18 @@ use the :djadminopt:`--natural` command line flag to generate natural keys.
     Conversely, if (for some strange reason) you want Django to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
+
+.. versionchanged:: 1.6
+
+Previously there was only a ``use_natural_keys`` argument for
+``serializers.serialize()`` and the `-n` or `--natural` command line flags.
+These have been deprecated in favor of the ``use_natural_foreign_keys`` and
+``use_natural_primary_keys`` arguments, and the corresponding
+`--natural-foreign` and `--natural-primary` command line flags.
+
+The original argument and command line flags remain for backwards
+compatibility, and map to the new ``use_natural_foreign_keys`` argument and
+`--natural-foreign` command line flag.
 
 Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
