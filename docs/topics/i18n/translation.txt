@@ -1249,6 +1249,12 @@ Activate this view by adding the following line to your URLconf::
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
+.. warning::
+
+    Make sure that you don't include the above URL within
+    :func:`~django.conf.urls.i18n.i18n_patterns` - it needs to be
+    language-independent itself to work correctly.
+
 The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view
 saves the language choice in the user's session. Otherwise, it saves the
