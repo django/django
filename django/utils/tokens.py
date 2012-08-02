@@ -70,6 +70,13 @@ class RandomToken():
         """
         return self._build_token(READABLE_ALPHABET)
 
+    def custom_chars(self, chars):
+        """
+        Creates a randomized token consisting based on the set of custom
+        characters supplied.
+        """
+        return self._build_token(chars)
+
     def _build_token(self, character_set):
         """
         Builds a random token of the specified length using the characters available in the specified character set.
