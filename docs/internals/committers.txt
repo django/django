@@ -149,6 +149,7 @@ Joseph Kocherhans
 .. _brian rosner: http://brosner.com/
 .. _eldarion: http://eldarion.com/
 .. _django dose: http://djangodose.com/
+.. _pinax: http://pinaxproject.com/
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
