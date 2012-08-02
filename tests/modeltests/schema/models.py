@@ -12,10 +12,23 @@ class Author(models.Model):
         managed = False
 
 
+class AuthorWithM2M(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+
+
 class Book(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    #tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
         managed = False
+
+
+class Tag(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)

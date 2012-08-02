@@ -427,6 +427,9 @@ class BaseDatabaseFeatures(object):
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
+    # What's the maximum length for index names?
+    max_index_name_length = 63
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -1055,6 +1058,15 @@ class BaseDatabaseIntrospection(object):
         Only single-column indexes are introspected.
         """
         raise NotImplementedError
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool}}
+        
+        Both single- and multi-column constraints are introspected.
+        """
+        raise NotImplementedError
+
 
 class BaseDatabaseClient(object):
     """

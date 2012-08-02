@@ -4,6 +4,8 @@ import time
 from django.conf import settings
 from django.db import transaction
 from django.db.utils import load_backend
+from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.util import truncate_name
 from django.utils.log import getLogger
 from django.db.models.fields.related import ManyToManyField
 
@@ -294,7 +296,23 @@ class BaseDatabaseSchemaEditor(object):
                     old_field,
                     new_field,
                 ))
-        # First, have they renamed the column?
+        # Has unique been removed?
+        if old_field.unique and not new_field.unique:
+            # Find the unique constraint for this field
+            constraint_names = self._constraint_names(model, [old_field.column], unique=True)
+            if len(constraint_names) != 1:
+                raise ValueError("Found wrong number (%s) of constraints for %s.%s" % (
+                    len(constraint_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            self.execute(
+                self.sql_delete_unique % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "name": constraint_names[0],
+                },
+            )
+        # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self.sql_rename_column % {
                 "table": self.quote_name(model._meta.db_table),
@@ -347,16 +365,58 @@ class BaseDatabaseSchemaEditor(object):
                     },
                     [],
                 ))
-        # Combine actions together if we can (e.g. postgres)
-        if self.connection.features.supports_combined_alters:
-            sql, params = tuple(zip(*actions))
-            actions = [(", ".join(sql), params)]
-        # Apply those actions
-        for sql, params in actions:
+        if actions:
+            # Combine actions together if we can (e.g. postgres)
+            if self.connection.features.supports_combined_alters:
+                sql, params = tuple(zip(*actions))
+                actions = [(", ".join(sql), params)]
+            # Apply those actions
+            for sql, params in actions:
+                self.execute(
+                    self.sql_alter_column % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "changes": sql,
+                    },
+                    params,
+                )
+        # Added a unique?
+        if not old_field.unique and new_field.unique:
             self.execute(
-                self.sql_alter_column % {
+                self.sql_create_unique % {
                     "table": self.quote_name(model._meta.db_table),
-                    "changes": sql,
-                },
-                params,
+                    "name": self._create_index_name(model, [new_field.column], suffix="_uniq"),
+                    "columns": self.quote_name(new_field.column),
+                }
             )
+
+    def _create_index_name(self, model, column_names, suffix=""):
+        "Generates a unique name for an index/unique constraint."
+        # If there is just one column in the index, use a default algorithm from Django
+        if len(column_names) == 1 and not suffix:
+            return truncate_name(
+                '%s_%s' % (model._meta.db_table, BaseDatabaseCreation._digest(column_names[0])),
+                self.connection.ops.max_name_length()
+            )
+        # Else generate the name for the index by South
+        table_name = model._meta.db_table.replace('"', '').replace('.', '_')
+        index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
+        # If the index name is too long, truncate it
+        index_name = ('%s_%s%s%s' % (table_name, column_names[0], index_unique_name, suffix)).replace('"', '').replace('.', '_')
+        if len(index_name) > self.connection.features.max_index_name_length:
+            part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
+            index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
+        return index_name
+
+    def _constraint_names(self, model, column_names, unique=None, primary_key=None):
+        "Returns all constraint names matching the columns and conditions"
+        column_names = set(column_names)
+        constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
+        result = []
+        for name, infodict in constraints.items():
+            if column_names == infodict['columns']:
+                if unique is not None and infodict['unique'] != unique:
+                    continue
+                if primary_key is not None and infodict['primary_key'] != unique:
+                    continue
+                result.append(name)
+        return result

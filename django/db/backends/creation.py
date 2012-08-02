@@ -21,7 +21,8 @@ class BaseDatabaseCreation(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def _digest(self, *args):
+    @classmethod
+    def _digest(cls, *args):
         """
         Generates a 32-bit digest of a set of arguments that can be used to
         shorten identifying names.

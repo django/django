@@ -3,9 +3,10 @@ import copy
 import datetime
 from django.test import TestCase
 from django.db import connection, DatabaseError, IntegrityError
-from django.db.models.fields import IntegerField, TextField
+from django.db.models.fields import IntegerField, TextField, CharField, SlugField
+from django.db.models.fields.related import ManyToManyField
 from django.db.models.loading import cache
-from .models import Author, Book
+from .models import Author, Book, AuthorWithM2M, Tag
 
 
 class SchemaTests(TestCase):
@@ -17,7 +18,7 @@ class SchemaTests(TestCase):
     as the code it is testing.
     """
 
-    models = [Author, Book]
+    models = [Author, Book, AuthorWithM2M, Tag]
 
     # Utility functions
 
@@ -39,6 +40,17 @@ class SchemaTests(TestCase):
         # Delete any tables made for our models
         cursor = connection.cursor()
         for model in self.models:
+            # Remove any M2M tables first
+            for field in model._meta.local_many_to_many:
+                try:
+                    cursor.execute("DROP TABLE %s CASCADE" % (
+                        connection.ops.quote_name(field.rel.through._meta.db_table),
+                    ))
+                except DatabaseError:
+                    connection.rollback()
+                else:
+                    connection.commit()
+            # Then remove the main tables
             try:
                 cursor.execute("DROP TABLE %s CASCADE" % (
                     connection.ops.quote_name(model._meta.db_table),
@@ -172,3 +184,117 @@ class SchemaTests(TestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(columns['name'][1][6], True)
+
+    def test_rename(self):
+        """
+        Tests simple altering of fields
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.commit()
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['name'][0], "CharField")
+        self.assertEqual(columns['name'][1][3], 255)
+        self.assertNotIn("display_name", columns)
+        # Alter the name field's name
+        new_field = CharField(max_length=254)
+        new_field.set_attributes_from_name("display_name")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Author,
+            Author._meta.get_field_by_name("name")[0],
+            new_field,
+        )
+        editor.commit()
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['display_name'][0], "CharField")
+        self.assertEqual(columns['display_name'][1][3], 254)
+        self.assertNotIn("name", columns)
+
+    def test_m2m(self):
+        """
+        Tests adding/removing M2M fields on models
+        """
+        # Create the tables
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(AuthorWithM2M)
+        editor.create_model(Tag)
+        editor.commit()
+        # Create an M2M field
+        new_field = ManyToManyField("schema.Tag", related_name="authors")
+        new_field.contribute_to_class(AuthorWithM2M, "tags")
+        # Ensure there's no m2m table there
+        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        connection.rollback()
+        # Add the field
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_field(
+            Author,
+            new_field,
+        )
+        editor.commit()
+        # Ensure there is now an m2m table there
+        columns = self.column_classes(new_field.rel.through)
+        self.assertEqual(columns['tag_id'][0], "IntegerField")
+        # Remove the M2M table again
+        editor = connection.schema_editor()
+        editor.start()
+        editor.delete_field(
+            Author,
+            new_field,
+        )
+        editor.commit()
+        # Ensure there's no m2m table there
+        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        connection.rollback()
+
+    def test_unique(self):
+        """
+        Tests removing and adding unique constraints to a single column.
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Tag)
+        editor.commit()
+        # Ensure the field is unique to begin with
+        Tag.objects.create(title="foo", slug="foo")
+        self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        connection.rollback()
+        # Alter the slug field to be non-unique
+        new_field = SlugField(unique=False)
+        new_field.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Tag,
+            Tag._meta.get_field_by_name("slug")[0],
+            new_field,
+        )
+        editor.commit()
+        # Ensure the field is no longer unique
+        Tag.objects.create(title="foo", slug="foo")
+        Tag.objects.create(title="bar", slug="foo")
+        connection.rollback()
+        # Alter the slug field to be non-unique
+        new_new_field = SlugField(unique=True)
+        new_new_field.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Tag,
+            new_field,
+            new_new_field,
+        )
+        editor.commit()
+        # Ensure the field is unique again
+        Tag.objects.create(title="foo", slug="foo")
+        self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        connection.rollback()

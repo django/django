@@ -88,3 +88,35 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             indexes[row[0]] = {'primary_key': row[3], 'unique': row[2]}
         return indexes
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints (unique, pk, check) across one or more columns.
+        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool}}
+        """
+        constraints = {}
+        # Loop over the constraint tables, collecting things as constraints
+        ifsc_tables = ["constraint_column_usage", "key_column_usage"]
+        for ifsc_table in ifsc_tables:
+            cursor.execute("""
+                SELECT kc.constraint_name, kc.column_name, c.constraint_type
+                FROM information_schema.%s AS kc
+                JOIN information_schema.table_constraints AS c ON
+                    kc.table_schema = c.table_schema AND
+                    kc.table_name = c.table_name AND
+                    kc.constraint_name = c.constraint_name
+                WHERE
+                    kc.table_schema = %%s AND
+                    kc.table_name = %%s
+            """ % ifsc_table, ["public", table_name])
+            for constraint, column, kind in cursor.fetchall():
+                # If we're the first column, make the record
+                if constraint not in constraints:
+                    constraints[constraint] = {
+                        "columns": set(),
+                        "primary_key": kind.lower() == "primary key",
+                        "unique": kind.lower() in ["primary key", "unique"],
+                    }
+                # Record the details
+                constraints[constraint]['columns'].add(column)
+        return constraints
