@@ -8,6 +8,8 @@ import shutil
 import stat
 import sys
 import tempfile
+import codecs
+
 try:
     from urllib.request import urlretrieve
 except ImportError:     # Python 2
@@ -159,7 +161,7 @@ class TemplateCommand(BaseCommand):
                 if filename.endswith(extensions) or filename in extra_files:
                     template = Template(content)
                     content = template.render(context)
-                with open(new_path, 'w') as new_file:
+                with codecs.open(new_path, 'w', "utf-8") as new_file:
                     new_file.write(content)
 
                 if self.verbosity >= 2:
