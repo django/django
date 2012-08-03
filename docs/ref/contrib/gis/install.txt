@@ -191,6 +191,8 @@ GEOS C library.  For example:
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
 
+See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-logfile>`.
+
 .. _proj4:
 
 PROJ.4
