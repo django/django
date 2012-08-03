@@ -549,7 +549,12 @@ class HttpResponse(object):
         for value in values:
             if isinstance(value, six.text_type):
                 try:
-                    value = value.encode('us-ascii')
+                    if not six.PY3:
+                        value = value.encode('us-ascii')
+                    else:
+                        # In Python 3, use a string in headers,
+                        # but ensure in only contains ASCII characters.
+                        value.encode('us-ascii')
                 except UnicodeError as e:
                     e.reason += ', HTTP response headers must be in US-ASCII format'
                     raise
