@@ -365,7 +365,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num}
-    return type(form.__name__ + b'FormSet', (formset,), attrs)
+    return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

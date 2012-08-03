@@ -63,12 +63,12 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
+            new_class.add_to_class('DoesNotExist', subclass_exception(str('DoesNotExist'),
                     tuple(x.DoesNotExist
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (ObjectDoesNotExist,),
                     module, attached_to=new_class))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
+            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(str('MultipleObjectsReturned'),
                     tuple(x.MultipleObjectsReturned
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (MultipleObjectsReturned,),

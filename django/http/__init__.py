@@ -22,7 +22,7 @@ _cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
 _tc = http_cookies.SimpleCookie()
 try:
-    _tc.load(b'foo:bar=1')
+    _tc.load(str('foo:bar=1'))
     _cookie_allows_colon_in_names = True
 except http_cookies.CookieError:
     _cookie_allows_colon_in_names = False

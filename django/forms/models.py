@@ -389,10 +389,10 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     parent = (object,)
     if hasattr(form, 'Meta'):
         parent = (form.Meta, object)
-    Meta = type(b'Meta', parent, attrs)
+    Meta = type(str('Meta'), parent, attrs)
 
     # Give this new form class a reasonable name.
-    class_name = model.__name__ + b'Form'
+    class_name = model.__name__ + str('Form')
 
     # Class attributes for the new form class.
     form_class_attrs = {
