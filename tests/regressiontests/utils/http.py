@@ -1,10 +1,11 @@
 import sys
 
-from django.utils import http
-from django.utils import unittest
-from django.utils.datastructures import MultiValueDict
 from django.http import HttpResponse, utils
 from django.test import RequestFactory
+from django.utils.datastructures import MultiValueDict
+from django.utils import http
+from django.utils import six
+from django.utils import unittest
 
 class TestUtilsHttp(unittest.TestCase):
 
@@ -110,22 +111,23 @@ class TestUtilsHttp(unittest.TestCase):
 
     def test_base36(self):
         # reciprocity works
-        for n in [0, 1, 1000, 1000000, sys.maxint]:
+        for n in [0, 1, 1000, 1000000]:
             self.assertEqual(n, http.base36_to_int(http.int_to_base36(n)))
+        if not six.PY3:
+            self.assertEqual(sys.maxint, http.base36_to_int(http.int_to_base36(sys.maxint)))
 
         # bad input
-        for n in [-1, sys.maxint+1, '1', 'foo', {1:2}, (1,2,3)]:
-            self.assertRaises(ValueError, http.int_to_base36, n)
-        
+        self.assertRaises(ValueError, http.int_to_base36, -1)
+        if not six.PY3:
+            self.assertRaises(ValueError, http.int_to_base36, sys.maxint + 1)
+        for n in ['1', 'foo', {1: 2}, (1, 2, 3), 3.141]:
+            self.assertRaises(TypeError, http.int_to_base36, n)
+
         for n in ['#', ' ']:
             self.assertRaises(ValueError, http.base36_to_int, n)
-
-        for n in [123, {1:2}, (1,2,3)]:
+        for n in [123, {1: 2}, (1, 2, 3), 3.141]:
             self.assertRaises(TypeError, http.base36_to_int, n)
 
-        # non-integer input
-        self.assertRaises(TypeError, http.int_to_base36, 3.141)
-        
         # more explicit output testing
         for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'django')]:
             self.assertEqual(http.int_to_base36(n), b36)
