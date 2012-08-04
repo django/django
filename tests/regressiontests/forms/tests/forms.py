@@ -82,11 +82,7 @@ class FormsTestCase(TestCase):
         self.assertEqual(p.errors['last_name'], ['This field is required.'])
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertFalse(p.is_valid())
-        try:
-            p.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+        self.assertEqual(p.cleaned_data, {})
         self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
@@ -145,11 +141,7 @@ class FormsTestCase(TestCase):
   * This field is required.
 * birthday
   * This field is required.""")
-        try:
-            p.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+        self.assertEqual(p.cleaned_data, {'last_name': 'Lennon'})
         self.assertEqual(p['first_name'].errors, ['This field is required.'])
         self.assertHTMLEqual(p['first_name'].errors.as_ul(), '<ul class="errorlist"><li>This field is required.</li></ul>')
         self.assertEqual(p['first_name'].errors.as_text(), '* This field is required.')
@@ -1678,11 +1670,7 @@ class FormsTestCase(TestCase):
         form = SongForm(data, empty_permitted=False)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['This field is required.'], 'artist': ['This field is required.']})
-        try:
-            form.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+        self.assertEqual(form.cleaned_data, {})
 
         # Now let's show what happens when empty_permitted=True and the form is empty.
         form = SongForm(data, empty_permitted=True)
@@ -1696,11 +1684,7 @@ class FormsTestCase(TestCase):
         form = SongForm(data, empty_permitted=False)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'name': ['This field is required.']})
-        try:
-            form.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+        self.assertEqual(form.cleaned_data, {'artist': 'The Doors'})
 
         # If a field is not given in the data then None is returned for its data. Lets
         # make sure that when checking for empty_permitted that None is treated

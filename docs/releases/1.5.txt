@@ -239,6 +239,16 @@ database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
 
+`cleaned_data` dictionary kept for invalid forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
+after form validation. When the form doesn't validate, it contains only the
+fields that passed validation. You should test the success of the validation
+with the :meth:`~django.forms.Form.is_valid()` method and not with the
+presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
+on the form.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

@@ -506,7 +506,7 @@ class BaseModelFormSet(BaseFormSet):
         all_unique_checks = set()
         all_date_checks = set()
         for form in self.forms:
-            if not hasattr(form, 'cleaned_data'):
+            if not form.is_valid():
                 continue
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
@@ -518,21 +518,21 @@ class BaseModelFormSet(BaseFormSet):
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
             for form in self.forms:
-                # if the form doesn't have cleaned_data then we ignore it,
-                # it's already invalid
-                if not hasattr(form, "cleaned_data"):
+                if not form.is_valid():
                     continue
                 # get data for each field of each of unique_check
                 row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
                 if row_data and not None in row_data:
-                    # if we've aready seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_unique_error_message(unique_check))
                         form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
-                        del form.cleaned_data
-                        break
+                        # remove the data from the cleaned_data dict since it was invalid
+                        for field in unique_check:
+                            if field in form.cleaned_data:
+                                del form.cleaned_data[field]
                     # mark the data as seen
                     seen_data.add(row_data)
         # iterate over each of the date checks now
@@ -540,9 +540,7 @@ class BaseModelFormSet(BaseFormSet):
             seen_data = set()
             uclass, lookup, field, unique_for = date_check
             for form in self.forms:
-                # if the form doesn't have cleaned_data then we ignore it,
-                # it's already invalid
-                if not hasattr(self, 'cleaned_data'):
+                if not form.is_valid():
                     continue
                 # see if we have data for both fields
                 if (form.cleaned_data and form.cleaned_data[field] is not None
@@ -556,14 +554,15 @@ class BaseModelFormSet(BaseFormSet):
                     else:
                         date_data = (getattr(form.cleaned_data[unique_for], lookup),)
                     data = (form.cleaned_data[field],) + date_data
-                    # if we've aready seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness failure
                     if data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_date_error_message(date_check))
                         form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
-                        del form.cleaned_data
-                        break
+                        # remove the data from the cleaned_data dict since it was invalid
+                        del form.cleaned_data[field]
+                    # mark the data as seen
                     seen_data.add(data)
         if errors:
             raise ValidationError(errors)
