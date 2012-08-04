@@ -10,7 +10,9 @@ editing content:
 * :class:`django.views.generic.edit.UpdateView`
 * :class:`django.views.generic.edit.DeleteView`
 
-.. note:: Some of the examples on this page assume that a model titled 'authors'
+.. note::
+
+    Some of the examples on this page assume that a model titled 'Author'
     has been defined. For these cases we assume the following has been defined 
     in `myapp/models.py`::
 
@@ -92,7 +94,10 @@ editing content:
     .. attribute:: template_name_suffix
 
         The CreateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form'``.
+        ``template_name_suffix`` of ``'_form.html'``. For 
+        example, changing this attribute to ``'_create_form.html'`` for a view
+        creating objects for the the example `Author` model would cause the the
+        default `template_name` to be ``'myapp/author_create_form.html'``.
 
     **Example views.py**::
 
@@ -127,8 +132,11 @@ editing content:
 
     .. attribute:: template_name_suffix
 
-        The CreateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form'``.
+        The UpdateView page displayed to a GET request uses a
+        ``template_name_suffix`` of ``'_form.html'``. For 
+        example, changing this attribute to ``'_update_form.html'`` for a view
+        updating objects for the the example `Author` model would cause the the
+        default `template_name` to be ``'myapp/author_update_form.html'``.        
 
     **Example views.py**::
 
@@ -162,8 +170,12 @@ editing content:
 
     .. attribute:: template_name_suffix
 
-        The CreateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_confirm_delete'``.
+        The DeleteView page displayed to a GET request uses a
+        ``template_name_suffix`` of ``'_confirm_delete.html'``. For 
+        example, changing this attribute to ``'_check_delete.html'`` for a view
+        deleting objects for the the example `Author` model would cause the the
+        default `template_name` to be ``'myapp/author_check_delete.html'``.        
+
 
     **Example views.py**::
 

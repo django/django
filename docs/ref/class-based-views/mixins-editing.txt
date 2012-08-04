@@ -9,7 +9,9 @@ The following mixins are used to construct Django's editing views:
 * :class:`django.views.generic.edit.ProcessFormView`
 * :class:`django.views.generic.edit.DeletionMixin`
 
-.. note:: Examples of how these are combined into editing views can be found at
+.. note::
+
+    Examples of how these are combined into editing views can be found at
     the documentation on ``Generic editing views``.
 
 .. class:: django.views.generic.edit.FormMixin
