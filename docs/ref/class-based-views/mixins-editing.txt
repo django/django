@@ -2,6 +2,18 @@
 Editing mixins
 ==============
 
+The following mixins are used to construct Django's editing views:
+
+* :class:`django.views.generic.edit.FormMixin`
+* :class:`django.views.generic.edit.ModelFormMixin`
+* :class:`django.views.generic.edit.ProcessFormView`
+* :class:`django.views.generic.edit.DeletionMixin`
+
+.. note::
+
+    Examples of how these are combined into editing views can be found at
+    the documentation on ``Generic editing views``.
+
 .. class:: django.views.generic.edit.FormMixin
 
     A mixin class that provides facilities for creating and displaying forms.
