@@ -145,10 +145,10 @@ Wire these news views into the polls/urls.py module by adding the following
             name='index'),
 
         # call the detail view
-        url(regex=r'^(?P<poll_id>\d+)$',
+        url(regex=r'^(?P<poll_id>\d+)/$',
             view=views.detail,
             kwargs={},
-            name='index'),
+            name='detail'),
 
         # call the results view
         url(regex=r'^(?P<poll_id>\d+)/results/$',
@@ -456,7 +456,9 @@ Removing hardcoded URLs in templates
 ====================================
 
 Remember, when we wrote the link to a poll in the polls/index.html template, 
-the link was partially hardcoded like this::
+the link was partially hardcoded like this:
+
+.. code-block:: html+django
 
     <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a></li>
 
@@ -464,9 +466,35 @@ The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
 you defined the name argument in the :func:`~django.conf.urls.url` functions in 
 the ``polls/urls.py`` module, you can decouple the URLs via the ``{% url %}`` 
-templatetag::
+templatetag:
 
-    <li><a href="{% url 'polls.views.detail' poll.id %}">{{ poll.question }}</a></li>
+.. code-block:: html+django
+
+    <li><a href="{% url 'detail' poll.id %}">{{ poll.question }}</a></li>
+
+The way this works is by calling the URL definition as specified in the
+``polls/urls.py`` file:. You can see exactly where the URL name of 'detail' is
+defined below::
+
+    ...
+    # call the detail view
+    url(regex=r'^(?P<poll_id>\d+)/$',
+        view=views.detail,
+        kwargs={},
+        name='detail'), # the 'name' value as called by the {% url %} template tag
+    ...
+
+If you want to change the URL of the polls detail view to something else, 
+perhaps to something like ``polls/specifics/12/`` instead of doing it in the template
+(or templates) you would change it in ``polls/urls.py``::
+
+    ...
+    # call the detail view
+    url(regex=r'^specifics/(?P<poll_id>\d+)/$', # added the word 'specifics'
+        view=views.detail,
+        kwargs={},
+        name='detail'), # the 'name' value as called by the {% url %} template tag
+    ...
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 
