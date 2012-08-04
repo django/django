@@ -33,49 +33,59 @@ READABLE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz'
 
 DEFAULT_TOKEN_LENGTH = 32
 
-class RandomToken():
-    """
-    Object that creates randomized token.
-    """
-    def __init__(self, length=DEFAULT_TOKEN_LENGTH):
-        self.length = length
+class Token():
+    '''
+    Base token for the tokenization library
+    '''
 
     def digits(self):
         """
-        Creates a randomized token consisting of the DIGIT character set.
+        Creates a token consisting of the DIGIT character set.
         """
         return self._build_token(DIGITS)
 
-    def alphanumeric(self):
+    def hex(self):
         """
-        Creates a randomized token consisting of the general ALPHANUMERIC character sets.
+        Creates a token consisting of the HEX character sets.
         """
+        return self._build_token(HEX)
+
+    def alphanumeric(self, casesensitive=True):
         return self._build_token(ALPHANUMERIC)
 
     def lower_alphanumeric(self):
         """
-        Creates a randomized token consisting of the LOWER_ALPHANUMERIC character sets.
+        Creates a token consisting of the LOWER_ALPHANUMERIC character sets.
         """
         return self._build_token(LOWER_ALPHANUMERIC)
 
-    def hex(self):
-        """
-        Creates a randomized token consisting of the HEX character sets.
-        """
-        return self._build_token(HEX)
-
     def readable_alphabet(self):
         """
-        Creates a randomized token consisting of the READABLE_ALPHABET character set.
+        Creates a token consisting of the READABLE_ALPHABET character set.
         """
         return self._build_token(READABLE_ALPHABET)
 
     def custom_chars(self, chars):
         """
-        Creates a randomized token consisting based on the set of custom
-        characters supplied.
+        Creates a token consisting based on the set of custom characters
+        supplied.
         """
         return self._build_token(chars)
+
+    def _build_token(self, character_set):
+        """
+        Builds the token sting. To be overridden by subclasses and implemented.
+        """
+        raise NotImplementedError
+
+
+class RandomToken(Token):
+    """
+    Object that creates randomized token.
+    """
+
+    def __init__(self, length=DEFAULT_TOKEN_LENGTH):
+        self.length = length
 
     def _build_token(self, character_set):
         """
@@ -84,7 +94,7 @@ class RandomToken():
         return ''.join([random.choice(character_set) for i in xrange(self.length)])
 
 
-class HashToken():
+class HashToken(Token):
     """
     Return a token useful for a hash (that is, a token whose generation is repeatable)
     """
@@ -97,9 +107,6 @@ class HashToken():
         self._hash = digestmod(value)
         self.digestmod = digestmod
 
-    def digits(self):
-        return self._build_token(DIGITS)
-
     def hex(self):
         """ Outputs a base 16 string. """
         return self._hash.hexdigest()
@@ -107,21 +114,6 @@ class HashToken():
     def digest(self):
         """ Returns the string digest. """
         return self._hash.digest()
-
-    def alphanumeric(self, casesensitive=True):
-        return self._build_token(ALPHANUMERIC)
-
-    def lower_alphanumeric(self):
-        """
-        Creates a randomized token consisting of the LOWER_ALPHANUMERIC character sets.
-        """
-        return self._build_token(LOWER_ALPHANUMERIC)
-
-    def readable_alphabet(self):
-        """
-        Creates a randomized token consisting of the READABLE_ALPHABET character set.
-        """
-        return self._build_token(READABLE_ALPHABET)
 
     def _build_token(self, alphabet):
         """ Outputs our hash to an alphabet specified string. """
