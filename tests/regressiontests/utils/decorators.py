@@ -105,4 +105,4 @@ class DecoratorFromMiddlewareTests(TestCase):
         response.render()
         self.assertTrue(getattr(request, 'process_response_reached', False))
         # Check that process_response saw the rendered content
-        self.assertEqual(request.process_response_content, "Hello world")
+        self.assertEqual(request.process_response_content, b"Hello world")
