@@ -10,7 +10,7 @@ Philosophy
 ==========
 
 A view is a "type" of Web page in your Django application that generally serves
-a specific function and has a specific template. For example, in a Weblog
+a specific function and has a specific template. For example, in a Blog
 application, you might have the following views:
 
 * Blog homepage -- displays the latest few entries.
@@ -251,38 +251,14 @@ commas, according to publication date::
 
 There's a problem here, though: The page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
-So let's use Django's template system to separate the design from Python::
+So let's use Django's template system to separate the design from Python. 
 
-    from __future__ import absolute_import
-
-    from django.http import HttpResponse
-    from django.template import Context, loader
-
-    from .models import Poll
-
-    def index(request):
-        latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
-        t = loader.get_template('polls/index.html')
-        c = Context({
-            'latest_poll_list': latest_poll_list,
-        })
-        return HttpResponse(t.render(c))
-
-That code loads the template called "polls/index.html" and passes it a context.
-The context is a dictionary mapping template variable names to Python objects.
-
-Reload the page. Now you'll see an error::
-
-    TemplateDoesNotExist at /polls/
-    polls/index.html
-
-Ah. There's no template yet. First, create a directory, somewhere on your
-filesystem, whose contents Django can access. (Django runs as whatever user your
-server runs.) Don't put them under your document root, though. You probably
-shouldn't make them public, just for security's sake.
-Then edit :setting:`TEMPLATE_DIRS` in your ``settings.py`` to tell Django where
-it can find templates -- just as you did in the "Customize the admin look and
-feel" section of Tutorial 2.
+First, create a directory, somewhere on your filesystem, whose contents Django
+can access. (Django runs as whatever user your server runs.) Don't put them 
+under your document root, though. You probably shouldn't make them public, just
+for security's sake. Then edit :setting:`TEMPLATE_DIRS` in your ``settings.py``
+to tell Django where it can find templates -- just as you did in the "Customize
+the admin look and feel" section of Tutorial 2.
 
 When you've done that, create a directory ``polls`` in your template directory.
 Within that, create a file called ``index.html``. Note that our
@@ -302,6 +278,26 @@ Put the following code in that template:
     {% else %}
         <p>No polls are available.</p>
     {% endif %}
+
+Now let's call that html template from the index view::
+
+    from __future__ import absolute_import
+
+    from django.http import HttpResponse
+    from django.template import Context, loader
+
+    from .models import Poll
+
+    def index(request):
+        latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
+        t = loader.get_template('polls/index.html')
+        c = Context({
+            'latest_poll_list': latest_poll_list,
+        })
+        return HttpResponse(t.render(c))
+
+That code loads the template called "polls/index.html" and passes it a context.
+The context is a dictionary mapping template variable names to Python objects.
 
 Load the page in your Web browser, and you should see a bulleted-list
 containing the "What's up" poll from Tutorial 1. The link points to the poll's
@@ -455,6 +451,22 @@ Method-calling happens in the :ttag:`{% for %}<for>` loop:
 ``poll.choice_set.all`` is interpreted as the Python code
 ``poll.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
 suitable for use in the :ttag:`{% for %}<for>` tag.
+
+Removing hardcoded URLs in templates
+====================================
+
+Remember, when we wrote the link to a poll in the polls/index.html template, 
+the link was partially hardcoded like this::
+
+    <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a></li>
+
+The problem with this hardcoded, tightly-coupled approach is that it becomes
+challenging to change URLs on projects with a lot of templates. However, since
+you defined the name argument in the :func:`~django.conf.urls.url` functions in 
+the ``polls/urls.py`` module, you can decouple the URLs via the ``{% url %}`` 
+templatetag::
+
+    <li><a href="{% url 'polls.views.detail' poll.id %}">{{ poll.question }}</a></li>
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 
