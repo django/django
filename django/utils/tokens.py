@@ -99,11 +99,7 @@ class HashToken(Token):
     Return a token useful for a hash (that is, a token whose generation is repeatable)
     """
     def __init__(self, value='', algorithm='sha256'):
-        digestmod = {
-            'md5': hashlib.md5,
-            'sha1': hashlib.sha1,
-            'sha256': hashlib.sha256
-        }[algorithm]
+        digestmod = getattr(hashlib, algorithm)
         self._hash = digestmod(value)
         self.digestmod = digestmod
 
