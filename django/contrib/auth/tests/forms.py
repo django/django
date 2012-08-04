@@ -65,6 +65,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors, required_error)
+        self.assertEqual(form['password2'].errors, [])
 
     def test_success(self):
         # The success case.
