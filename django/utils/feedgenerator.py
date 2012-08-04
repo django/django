@@ -31,6 +31,8 @@ except ImportError:     # Python 2
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils import datetime_safe
+from django.utils import six
+from django.utils.six import StringIO
 from django.utils.timezone import is_aware
 
 def rfc2822_date(date):
@@ -44,25 +46,29 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
+    if not six.PY3:             # strftime returns a byte string in Python 2
+        time_str = time_str.decode('utf-8')
     if is_aware(date):
         offset = date.tzinfo.utcoffset(date)
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
-        return time_str + "%+03d%02d" % (hour, minute)
+        return time_str + '%+03d%02d' % (hour, minute)
     else:
         return time_str + '-0000'
 
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
+    time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
+    if not six.PY3:             # strftime returns a byte string in Python 2
+        time_str = time_str.decode('utf-8')
     if is_aware(date):
-        time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
         offset = date.tzinfo.utcoffset(date)
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
-        return time_str + "%+03d:%02d" % (hour, minute)
+        return time_str + '%+03d:%02d' % (hour, minute)
     else:
-        return date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return time_str + 'Z'
 
 def get_tag_uri(url, date):
     """
@@ -178,8 +184,7 @@ class SyndicationFeed(object):
         """
         Returns the feed in the given encoding as a string.
         """
-        from io import BytesIO
-        s = BytesIO()
+        s = StringIO()
         self.write(s, encoding)
         return s.getvalue()
 
@@ -237,7 +242,7 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement("category", cat)
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement("copyright", self.feed['feed_copyright'])
-        handler.addQuickElement("lastBuildDate", rfc2822_date(self.latest_post_date()).decode('utf-8'))
+        handler.addQuickElement("lastBuildDate", rfc2822_date(self.latest_post_date()))
         if self.feed['ttl'] is not None:
             handler.addQuickElement("ttl", self.feed['ttl'])
 
@@ -271,7 +276,7 @@ class Rss201rev2Feed(RssFeed):
             handler.addQuickElement("dc:creator", item["author_name"], {"xmlns:dc": "http://purl.org/dc/elements/1.1/"})
 
         if item['pubdate'] is not None:
-            handler.addQuickElement("pubDate", rfc2822_date(item['pubdate']).decode('utf-8'))
+            handler.addQuickElement("pubDate", rfc2822_date(item['pubdate']))
         if item['comments'] is not None:
             handler.addQuickElement("comments", item['comments'])
         if item['unique_id'] is not None:
@@ -314,7 +319,7 @@ class Atom1Feed(SyndicationFeed):
         if self.feed['feed_url'] is not None:
             handler.addQuickElement("link", "", {"rel": "self", "href": self.feed['feed_url']})
         handler.addQuickElement("id", self.feed['id'])
-        handler.addQuickElement("updated", rfc3339_date(self.latest_post_date()).decode('utf-8'))
+        handler.addQuickElement("updated", rfc3339_date(self.latest_post_date()))
         if self.feed['author_name'] is not None:
             handler.startElement("author", {})
             handler.addQuickElement("name", self.feed['author_name'])
@@ -340,7 +345,7 @@ class Atom1Feed(SyndicationFeed):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
         if item['pubdate'] is not None:
-            handler.addQuickElement("updated", rfc3339_date(item['pubdate']).decode('utf-8'))
+            handler.addQuickElement("updated", rfc3339_date(item['pubdate']))
 
         # Author information.
         if item['author_name'] is not None:
