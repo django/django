@@ -50,7 +50,7 @@ def salted_hmac(key_salt, value, secret=None):
     # line is redundant and could be replaced by key = key_salt + secret, since
     # the hmac module does the same thing for keys longer than the block size.
     # However, we need to ensure that we *always* do this.
-    return hmac.new(key, msg=value, digestmod=hashlib.sha1)
+    return hmac.new(key, msg=smart_bytes(value), digestmod=hashlib.sha1)
 
 
 def get_random_string(length=12,
@@ -99,7 +99,7 @@ def _bin_to_long(x):
 
     This is a clever optimization for fast xor vector math
     """
-    return int(x.encode('hex'), 16)
+    return int(binascii.hexlify(x), 16)
 
 
 def _long_to_bin(x, hex_format_string):
@@ -112,13 +112,14 @@ def _long_to_bin(x, hex_format_string):
 
 def _fast_hmac(key, msg, digest):
     """
-    A trimmed down version of Python's HMAC implementation
+    A trimmed down version of Python's HMAC implementation.
+
+    This function operates on bytes.
     """
     dig1, dig2 = digest(), digest()
-    key = smart_bytes(key)
     if len(key) > dig1.block_size:
         key = digest(key).digest()
-    key += chr(0) * (dig1.block_size - len(key))
+    key += b'\x00' * (dig1.block_size - len(key))
     dig1.update(key.translate(_trans_36))
     dig1.update(msg)
     dig2.update(key.translate(_trans_5c))
