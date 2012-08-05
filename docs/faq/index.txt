@@ -12,3 +12,4 @@ Django FAQ
    models
    admin
    contributing
+   troubleshooting
