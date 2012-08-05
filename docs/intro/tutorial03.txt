@@ -499,7 +499,7 @@ that Django knows which app view to create for a url when using the ``{% url %}`
 template tag?
 
 The answer to add namespaces to your root URLconf. In the mysite/urls.py file,
-go ahead and change it to include name spacing::
+go ahead and change it to include namespacing::
 
     from django.conf.urls import patterns, include, url
 
@@ -521,7 +521,7 @@ to point at the namespaced detail view:
 
 .. code-block:: html+django
 
-    <li><a href="{% url 'polls.detail' poll.id %}">{{ poll.question }}</a></li>
+    <li><a href="{% url 'polls:detail' poll.id %}">{{ poll.question }}</a></li>
 
 
 About the root URLconf
