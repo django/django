@@ -52,9 +52,11 @@ and put the following Python code in it::
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
 
-This is the simplest view possible in Django. All you have to do is wire it into
-URLconf. In the polls directory create a file called 'urls.py'. Your app
-directory should now look like::
+This is the simplest view possible in Django.  Now we have a problem, how do we
+call the view? For that we need to map it to a URL, 
+in Django this is done in a confirguration file called a URLconf. In the polls
+directory create a file called 'urls.py'. Your app directory should now look
+like::
 
     polls/
         __init__.py
@@ -93,26 +95,59 @@ The next step is to point the root URLconf at the polls/urls.py module. In the
         url(r'^admin/', include(admin.site.urls)),
     )
 
-You have now wired the `index` view into the URLconf. Go to "/polls/" in your 
+You have now wired an `index` view into the URLconf. Go to "/polls/" in your 
 browser, and you should see the text "*Hello, world. You're at the poll index.*", 
 which you defined in the ``index`` view.
 
-.. note:: 
+The :func:`~django.conf.urls.url` function is being passed four arguments:
+``regex``, ``view``, ``kwargs``, and ``name``. At this point, it's worth 
+reviewing what the arguments passed into :func:`~django.conf.urls.url` are for:
 
-    :func:`~django.conf.urls.include` simply references another URLconf.
-    Note that the regular expression doesn't have a ``$`` (end-of-string match
-    character) but has the trailing slash. Whenever Django encounters
-    :func:`~django.conf.urls.include`, it chops off whatever part of the
-    URL matched up to that point and sends the remaining string to the included
-    URLconf for further processing.
+:func:`~django.conf.urls.url` argument: regex
+---------------------------------------------
 
-    The idea behind :func:`~django.conf.urls.include` is to make it easy to 
-    plug-and-play URLs. Since polls are in their own URLconf
-    (``polls/urls.py``), they can be placed under "/polls/", or under 
-    "/fun_polls/", or under "/content/polls/", or any other path root, and the
-    app will still work.
+The term `regex` is a commonly used psuedonym for regular expressions, which is
+a syntax for matching patterns in strings, or in this case, url patterns. Django
+starts at the first regular expression and makes its way down the list, 
+comparing the requested URL against each regular expression until it finds one
+that matches.
 
-    All the poll app cares about is its relative path, not its absolute path.
+Note that these regular expressions do not search GET and POST parameters, or
+the domain name. For example, in a request to ``http://www.example.com/myapp/``,
+the URLconf will look for ``myapp/``. In a request to
+``http://www.example.com/myapp/?page=3``, the URLconf will look for ``myapp/``.
+
+If you need help with regular expressions, see `Wikipedia's entry`_ and the
+documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
+Regular Expressions" by Jeffrey Friedl is fantastic.
+
+Finally, a performance note: these regular expressions are compiled the first
+time the URLconf module is loaded. They're super fast.
+
+.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
+
+:func:`~django.conf.urls.url` argument: view
+--------------------------------------------
+
+When Django finds a regex match, Django calls the Python specified view 
+function, with an HttpRequest object as the first argument, any “captured” 
+values from the regular expression as keyword arguments. Using the tutorial
+example, calling ``/polls/12/`` will match the ``detail`` view and pass an 
+integer argument of ``12`` to the detail view.
+
+:func:`~django.conf.urls.url` argument: kwargs
+----------------------------------------------
+
+Arbitrary keyword arguments can be passed in a dictionary to the target view. We
+aren't going to use this feature of Django in the tutorial.
+
+:func:`~django.conf.urls.url` argument: name
+---------------------------------------------
+
+Naming URL patterns allows you to fully utilize a number of Django's reverse URL
+matching to distinguish between views. This powerful feature allows you to make 
+global changes to the url patterns of your project while only touching a single
+file.
 
 Writing more views
 ==================
@@ -167,56 +202,6 @@ Take a look in your browser, at "/polls/34/". It'll run the `detail()` method
 and display whatever ID you provide in the URL. Try "/polls/34/results/" and
 "/polls/34/vote/" too -- these will display the placeholder results and voting
 pages.
-
-Each :func:`~django.conf.urls.url` function is being passed four arguments:
-``regex``, ``view``, ``kwargs``, and ``name``. At this point, it's worth 
-reviewing what they are doing:
-
-:func:`~django.conf.urls.url` argument: regex
----------------------------------------------
-
-The term `regex` is a commonly used psuedonym for regular expressions, which is
-a syntax for matching patterns in strings, or in this case, url patterns. Django
-starts at the first regular expression and makes its way down the list, 
-comparing the requested URL against each regular expression until it finds one
-that matches.
-
-Note that these regular expressions do not search GET and POST parameters, or
-the domain name. For example, in a request to ``http://www.example.com/myapp/``,
-the URLconf will look for ``myapp/``. In a request to
-``http://www.example.com/myapp/?page=3``, the URLconf will look for ``myapp/``.
-
-If you need help with regular expressions, see `Wikipedia's entry`_ and the
-documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
-Regular Expressions" by Jeffrey Friedl is fantastic.
-
-Finally, a performance note: these regular expressions are compiled the first
-time the URLconf module is loaded. They're super fast.
-
-.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
-
-:func:`~django.conf.urls.url` argument: view
---------------------------------------------
-
-When Django finds a regex match, Django calls the Python specified view 
-function, with an HttpRequest object as the first argument, any “captured” 
-values from the regular expression as keyword arguments. Using the tutorial
-example, calling ``/polls/12/`` will match the ``detail`` view and pass an 
-integer argument of ``12`` to the detail view.
-
-:func:`~django.conf.urls.url` argument: kwargs
-----------------------------------------------
-
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
-
-:func:`~django.conf.urls.url` argument: name
----------------------------------------------
-
-Naming URL patterns allows you to fully utilize a number of Django's reverse URL
-matching to distinguish between views. This powerful feature allows you to make 
-global changes to the url patterns of your project while only touching a single
-file.
 
 Write views that actually do something
 ======================================
@@ -318,7 +303,11 @@ rewritten::
 
     def index(request):
         latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
-        return render(request, 'polls/index.html', {'latest_poll_list': latest_poll_list})
+        return render(
+            request, 
+            'polls/index.html', 
+            {'latest_poll_list': latest_poll_list}
+        )
 
 Note that once we've done this in all these views, we no longer need to import
 :mod:`~django.template.loader`, :class:`~django.template.Context` and
@@ -485,8 +474,8 @@ defined below::
     ...
 
 If you want to change the URL of the polls detail view to something else, 
-perhaps to something like ``polls/specifics/12/`` instead of doing it in the template
-(or templates) you would change it in ``polls/urls.py``::
+perhaps to something like ``polls/specifics/12/`` instead of doing it in the
+template (or templates) you would change it in ``polls/urls.py``::
 
     ...
     # call the detail view
@@ -497,6 +486,65 @@ perhaps to something like ``polls/specifics/12/`` instead of doing it in the tem
     ...
 
 See the :doc:`template guide </topics/templates>` for more about templates.
+
+
+Namespacing URL names
+======================
+
+The tutorial project has just one app, ``polls``. In real Django projects, there
+might be five, ten, eighty apps or more. How does Django differentiate the URL
+names between them? For example, the ``polls`` app has a ``detail`` view, and so
+might an app on the same project that is for a blog. How does one make it so
+that Django knows which app view to create for a url when using the ``{% url %}``
+template tag?
+
+The answer to add namespaces to your root URLconf. In the mysite/urls.py file,
+go ahead and change it to include name spacing::
+
+    from django.conf.urls import patterns, include, url
+
+    from django.contrib import admin
+    admin.autodiscover()
+
+    urlpatterns = patterns('',
+        url(r'^polls/', include('polls.urls', namespace="polls")),
+        url(r'^admin/', include(admin.site.urls)),
+    )
+
+Now change your ``polls/index.html`` template from:
+
+.. code-block:: html+django
+
+    <li><a href="{% url 'detail' poll.id %}">{{ poll.question }}</a></li>
+
+to point at the namespaced detail view:
+
+.. code-block:: html+django
+
+    <li><a href="{% url 'polls.detail' poll.id %}">{{ poll.question }}</a></li>
+
+
+About the root URLconf
+=================================================================
+
+You've probably noticed by now that ``mysite/urls.py`` calls both the polls app
+and the admin app. It's what is called the root URLconf, and is important when
+building Django projects.
+
+The :func:`~django.conf.urls.include` functions we are using in the tutorial
+simply references another URLconf. Note that the regular expression doesn't have
+a ``$`` (end-of-string match character) but has the trailing slash. Whenever
+Django encounters :func:`~django.conf.urls.include`, it chops off whatever part
+of the URL matched up to that point and sends the remaining string to the
+included URLconf for further processing.
+
+The idea behind :func:`~django.conf.urls.include` is to make it easy to 
+plug-and-play URLs. Since polls are in their own URLconf
+(``polls/urls.py``), they can be placed under "/polls/", or under 
+"/fun_polls/", or under "/content/polls/", or any other path root, and the
+app will still work.
+
+All the poll app cares about is its relative path, not its absolute path.
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
 </intro/tutorial04>` to learn about simple form processing and generic views.
