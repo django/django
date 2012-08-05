@@ -49,7 +49,7 @@ Are you new to Django or to programming? This is the place to start!
 The model layer
 ===============
 
-Django provides an abstration layer (the "models") for structuring and
+Django provides an abstraction layer (the "models") for structuring and
 manipulating the data of your Web application. Learn more about it below:
 
 * **Models:**
@@ -82,7 +82,7 @@ manipulating the data of your Web application. Learn more about it below:
 The view layer
 ==============
 
-Django offers the concept of "views" to encapsulate the logic reponsible for
+Django has the concept of "views" to encapsulate the logic responsible for
 processing a user's request and for returning the response. Find all you need
 to know about views via the links below:
 
