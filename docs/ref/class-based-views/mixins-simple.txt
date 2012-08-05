@@ -8,7 +8,7 @@ Simple mixins
 
     **Methods**
 
-    .. method:: get_context_data( **kwargs):
+    .. method:: get_context_data(**kwargs):
 
         Returns a dictionary representing the template context. The keyword
         arguments provided will make up the returned context. Example usage::

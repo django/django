@@ -8,6 +8,11 @@ themselves or inherited from. They may not provide all the capabilities
 required for projects, in which case there are Mixins and Generic class-based
 views.
 
+Many of Django's built-in class-based views inherit from other class-based views
+or various mixins. Because this inheritence chain is very important, the ancestor
+classes are  documented under the section title of **Ancestors (MRO)**. MRO 
+is an acronym for Method Resolution Order.
+
 .. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
@@ -47,7 +52,7 @@ views.
 
     **Methods**
 
-    .. method:: as_view(cls, **initkwargs)
+    .. classmethod:: as_view(cls, **initkwargs)
 
         Main entry point for a request-response process.
 
