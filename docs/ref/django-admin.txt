@@ -747,7 +747,7 @@ use the ``--plain`` option, like so::
 
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
-with the ``-i`` or ``--interface`` options like so::
+with the ``-i`` or ``--interface`` options like so:
 
 IPython::
 
