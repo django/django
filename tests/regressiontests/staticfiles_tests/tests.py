@@ -20,6 +20,7 @@ from django.test.utils import override_settings
 from django.utils.encoding import smart_unicode
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler
+from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
 
@@ -53,6 +54,9 @@ class BaseStaticFilesTestCase(object):
         # since we're planning on changing that we need to clear out the cache.
         default_storage._wrapped = empty
         storage.staticfiles_storage._wrapped = empty
+        # Clear the cached staticfile finders, so they are reinitialized every
+        # run and pick up changes in settings.STATICFILES_DIRS.
+        finders._finders.clear()
 
         testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
@@ -83,7 +87,7 @@ class BaseStaticFilesTestCase(object):
         self.assertRaises(IOError, self._get_file, filepath)
 
     def render_template(self, template, **kwargs):
-        if isinstance(template, basestring):
+        if isinstance(template, six.string_types):
             template = loader.get_template_from_string(template)
         return template.render(Context(kwargs)).strip()
 

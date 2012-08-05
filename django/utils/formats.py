@@ -7,6 +7,7 @@ from django.utils.importlib import import_module
 from django.utils.encoding import smart_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import get_language, to_locale, check_for_language
 
 # format_cache is a mapping from (format_type, lang) to the format string.
@@ -88,7 +89,7 @@ def get_format(format_type, lang=None, use_l10n=None):
             _format_cache[cache_key] = None
     return getattr(settings, format_type)
 
-get_format_lazy = lazy(get_format, unicode, list, tuple)
+get_format_lazy = lazy(get_format, six.text_type, list, tuple)
 
 def date_format(value, format=None, use_l10n=None):
     """
@@ -138,8 +139,8 @@ def localize(value, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     if isinstance(value, bool):
-        return mark_safe(unicode(value))
-    elif isinstance(value, (decimal.Decimal, float, int, long)):
+        return mark_safe(six.text_type(value))
+    elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
@@ -155,7 +156,7 @@ def localize_input(value, default=None):
     Checks if an input value is a localizable type and returns it
     formatted with the appropriate formatting string of the current locale.
     """
-    if isinstance(value, (decimal.Decimal, float, int, long)):
+    if isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
@@ -177,7 +178,7 @@ def sanitize_separators(value):
     """
     if settings.USE_L10N:
         decimal_separator = get_format('DECIMAL_SEPARATOR')
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             parts = []
             if decimal_separator in value:
                 value, decimals = value.split(decimal_separator, 1)

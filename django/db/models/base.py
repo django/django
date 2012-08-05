@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import copy
 import sys
 from functools import update_wrapper
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings
@@ -24,6 +24,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
 
@@ -33,7 +34,10 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
-        parents = [b for b in bases if isinstance(b, ModelBase)]
+        # six.with_metaclass() inserts an extra class called 'NewBase' in the
+        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        parents = [b for b in bases if isinstance(b, ModelBase) and
+                not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
             # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
@@ -59,12 +63,12 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
+            new_class.add_to_class('DoesNotExist', subclass_exception(str('DoesNotExist'),
                     tuple(x.DoesNotExist
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (ObjectDoesNotExist,),
                     module, attached_to=new_class))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
+            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(str('MultipleObjectsReturned'),
                     tuple(x.MultipleObjectsReturned
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (MultipleObjectsReturned,),
@@ -275,8 +279,7 @@ class ModelState(object):
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
 
-class Model(object):
-    __metaclass__ = ModelBase
+class Model(six.with_metaclass(ModelBase, object)):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -374,7 +377,7 @@ class Model(object):
 
     def __repr__(self):
         try:
-            u = unicode(self)
+            u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
         return smart_str('<%s: %s>' % (self.__class__.__name__, u))
@@ -789,8 +792,8 @@ class Model(object):
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
         return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
-            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
+            'field_name': six.text_type(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
         }
 
@@ -805,16 +808,16 @@ class Model(object):
             field_label = capfirst(field.verbose_name)
             # Insert the error into the error dict, very sneaky
             return field.error_messages['unique'] %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_label)
+                'model_name': six.text_type(model_name),
+                'field_label': six.text_type(field_label)
             }
         # unique_together
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
             return _("%(model_name)s with this %(field_label)s already exists.") %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_labels)
+                'model_name': six.text_type(model_name),
+                'field_label': six.text_type(field_labels)
             }
 
     def full_clean(self, exclude=None):
@@ -874,6 +877,7 @@ class Model(object):
 
         if errors:
             raise ValidationError(errors)
+
 
 
 ############################################

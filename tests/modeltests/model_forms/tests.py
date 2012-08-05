@@ -11,6 +11,7 @@ from django.db import connection
 from django.forms.models import model_to_dict
 from django.utils.unittest import skipUnless
 from django.test import TestCase
+from django.utils import six
 
 from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
@@ -637,8 +638,7 @@ class OldFormForXTests(TestCase):
         f = BaseCategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
         self.assertEqual(f.errors['name'], ['This field is required.'])
         self.assertEqual(f.errors['slug'], ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."])
-        with self.assertRaises(AttributeError):
-            f.cleaned_data
+        self.assertEqual(f.cleaned_data, {'url': 'foo'})
         with self.assertRaises(ValueError):
             f.save()
         f = BaseCategoryForm({'name': '', 'slug': '', 'url': 'foo'})
@@ -653,7 +653,7 @@ class OldFormForXTests(TestCase):
         # ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
         # fields with the 'choices' attribute are represented by a ChoiceField.
         f = ArticleForm(auto_id=False)
-        self.assertHTMLEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
@@ -681,14 +681,14 @@ class OldFormForXTests(TestCase):
         # a value of None. If a field isn't specified on a form, the object created
         # from the form can't provide a value for that field!
         f = PartialArticleForm(auto_id=False)
-        self.assertHTMLEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>''')
 
         # When the ModelForm is passed an instance, that instance's current values are
         # inserted as 'initial' data in each Field.
         w = Writer.objects.get(name='Mike Royko')
         f = RoykoForm(auto_id=False, instance=w)
-        self.assertHTMLEqual(unicode(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
+        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
                     headline='Test article',
@@ -725,7 +725,7 @@ class OldFormForXTests(TestCase):
                 'headline': 'Test headline',
                 'slug': 'test-headline',
                 'pub_date': '1984-02-06',
-                'writer': unicode(w_royko.pk),
+                'writer': six.text_type(w_royko.pk),
                 'article': 'Hello.'
             }, instance=art)
         self.assertEqual(f.errors, {})
@@ -808,9 +808,9 @@ class OldFormForXTests(TestCase):
                 'headline': 'New headline',
                 'slug': 'new-headline',
                 'pub_date': '1988-01-04',
-                'writer': unicode(w_royko.pk),
+                'writer': six.text_type(w_royko.pk),
                 'article': 'Hello.',
-                'categories': [unicode(c1.id), unicode(c2.id)]
+                'categories': [six.text_type(c1.id), six.text_type(c2.id)]
             }, instance=new_art)
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
@@ -820,7 +820,7 @@ class OldFormForXTests(TestCase):
 
         # Now, submit form data with no categories. This deletes the existing categories.
         f = TestArticleForm({'headline': 'New headline', 'slug': 'new-headline', 'pub_date': '1988-01-04',
-            'writer': unicode(w_royko.pk), 'article': 'Hello.'}, instance=new_art)
+            'writer': six.text_type(w_royko.pk), 'article': 'Hello.'}, instance=new_art)
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
         new_art = Article.objects.get(id=art_id_1)
@@ -828,7 +828,7 @@ class OldFormForXTests(TestCase):
 
         # Create a new article, with categories, via the form.
         f = ArticleForm({'headline': 'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': '1967-11-01',
-            'writer': unicode(w_royko.pk), 'article': 'Test.', 'categories': [unicode(c1.id), unicode(c2.id)]})
+            'writer': six.text_type(w_royko.pk), 'article': 'Test.', 'categories': [six.text_type(c1.id), six.text_type(c2.id)]})
         new_art = f.save()
         art_id_2 = new_art.id
         self.assertEqual(art_id_2 not in (None, art_id_1), True)
@@ -837,7 +837,7 @@ class OldFormForXTests(TestCase):
 
         # Create a new article, with no categories, via the form.
         f = ArticleForm({'headline': 'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': '1967-11-01',
-            'writer': unicode(w_royko.pk), 'article': 'Test.'})
+            'writer': six.text_type(w_royko.pk), 'article': 'Test.'})
         new_art = f.save()
         art_id_3 = new_art.id
         self.assertEqual(art_id_3 not in (None, art_id_1, art_id_2), True)
@@ -847,7 +847,7 @@ class OldFormForXTests(TestCase):
         # Create a new article, with categories, via the form, but use commit=False.
         # The m2m data won't be saved until save_m2m() is invoked on the form.
         f = ArticleForm({'headline': 'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': '1967-11-01',
-            'writer': unicode(w_royko.pk), 'article': 'Test.', 'categories': [unicode(c1.id), unicode(c2.id)]})
+            'writer': six.text_type(w_royko.pk), 'article': 'Test.', 'categories': [six.text_type(c1.id), six.text_type(c2.id)]})
         new_art = f.save(commit=False)
 
         # Manually save the instance
@@ -1091,12 +1091,12 @@ class OldFormForXTests(TestCase):
 <p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
         data = {
-            'writer': unicode(w_woodward.pk),
+            'writer': six.text_type(w_woodward.pk),
             'age': '65',
         }
         form = WriterProfileForm(data)
         instance = form.save()
-        self.assertEqual(unicode(instance), 'Bob Woodward is 65')
+        self.assertEqual(six.text_type(instance), 'Bob Woodward is 65')
 
         form = WriterProfileForm(instance=instance)
         self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
@@ -1376,7 +1376,7 @@ class OldFormForXTests(TestCase):
         # Similar to a regular Form class you can define custom media to be used on
         # the ModelForm.
         f = ModelFormWithMedia()
-        self.assertHTMLEqual(unicode(f.media), '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
+        self.assertHTMLEqual(six.text_type(f.media), '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/some/form/javascript"></script>''')
 
         f = CommaSeparatedIntegerForm({'field': '1,2,3'})
@@ -1445,7 +1445,7 @@ class OldFormForXTests(TestCase):
             (22, 'Pear')))
 
         form = InventoryForm(instance=core)
-        self.assertHTMLEqual(unicode(form['parent']), '''<select name="parent" id="id_parent">
+        self.assertHTMLEqual(six.text_type(form['parent']), '''<select name="parent" id="id_parent">
 <option value="">---------</option>
 <option value="86" selected="selected">Apple</option>
 <option value="87">Core</option>
@@ -1466,7 +1466,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(CategoryForm.base_fields.keys(),
                          ['description', 'url'])
 
-        self.assertHTMLEqual(unicode(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
+        self.assertHTMLEqual(six.text_type(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>''')
         # to_field_name should also work on ModelMultipleChoiceField ##################
 
@@ -1481,5 +1481,5 @@ class OldFormForXTests(TestCase):
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
         self.assertEqual(CustomFieldForExclusionForm.base_fields.keys(), ['name'])
-        self.assertHTMLEqual(unicode(CustomFieldForExclusionForm()),
+        self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')

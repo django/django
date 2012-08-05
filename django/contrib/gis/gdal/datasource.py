@@ -45,6 +45,9 @@ from django.contrib.gis.gdal.layer import Layer
 # Getting the ctypes prototypes for the DataSource.
 from django.contrib.gis.gdal.prototypes import ds as capi
 
+from django.utils import six
+from django.utils.six.moves import xrange
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -65,7 +68,7 @@ class DataSource(GDALBase):
         if not capi.get_driver_count():
             capi.register_all()
 
-        if isinstance(ds_input, basestring):
+        if isinstance(ds_input, six.string_types):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -84,7 +87,7 @@ class DataSource(GDALBase):
             self.ptr = ds
             self.driver = Driver(ds_driver)
         else:
-            # Raise an exception if the returned pointer is NULL 
+            # Raise an exception if the returned pointer is NULL
             raise OGRException('Invalid data source file "%s"' % ds_input)
 
     def __del__(self):
@@ -98,7 +101,7 @@ class DataSource(GDALBase):
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, basestring):
+        if isinstance(index, six.string_types):
             l = capi.get_layer_by_name(self.ptr, index)
             if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
@@ -108,7 +111,7 @@ class DataSource(GDALBase):
         else:
             raise TypeError('Invalid index type: %s' % type(index))
         return Layer(l, self)
-        
+
     def __len__(self):
         "Returns the number of layers within the data source."
         return self.layer_count

@@ -7,6 +7,7 @@ from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
+from django.utils import six
 
 from django.contrib.formtools.wizard.storage import get_storage
 from django.contrib.formtools.wizard.storage.exceptions import NoFileStorageConfigured
@@ -157,10 +158,10 @@ class WizardView(TemplateView):
             if isinstance(form, (list, tuple)):
                 # if the element is a tuple, add the tuple to the new created
                 # sorted dictionary.
-                init_form_list[unicode(form[0])] = form[1]
+                init_form_list[six.text_type(form[0])] = form[1]
             else:
                 # if not, add the form with a zero based counter as unicode
-                init_form_list[unicode(i)] = form
+                init_form_list[six.text_type(i)] = form
 
         # walk through the new created list of forms
         for form in init_form_list.itervalues():

@@ -206,7 +206,7 @@ class SelectForUpdateTests(TransactionTestCase):
             sanity_count += 1
             time.sleep(1)
         if sanity_count >= 10:
-            raise ValueError, 'Thread did not run and block'
+            raise ValueError('Thread did not run and block')
 
         # Check the person hasn't been updated. Since this isn't
         # using FOR UPDATE, it won't block.

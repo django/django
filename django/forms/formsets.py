@@ -7,6 +7,8 @@ from django.forms.util import ErrorList
 from django.forms.widgets import Media, HiddenInput
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils.translation import ugettext as _
 
 
@@ -345,17 +347,17 @@ class BaseFormSet(StrAndUnicode):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join([form.as_table() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
         forms = ' '.join([form.as_p() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
         forms = ' '.join([form.as_ul() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
@@ -363,7 +365,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num}
-    return type(form.__name__ + b'FormSet', (formset,), attrs)
+    return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

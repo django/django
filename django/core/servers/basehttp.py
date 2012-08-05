@@ -11,9 +11,12 @@ import os
 import socket
 import sys
 import traceback
-import urllib
-import urlparse
-from SocketServer import ThreadingMixIn
+try:
+    from urllib.parse import unquote, urljoin
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urljoin
+from django.utils.six.moves import socketserver
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -127,7 +130,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings
-        self.admin_static_prefix = urlparse.urljoin(settings.STATIC_URL, 'admin/')
+        self.admin_static_prefix = urljoin(settings.STATIC_URL, 'admin/')
         # We set self.path to avoid crashes in log_message() on unsupported
         # requests (like "OPTIONS").
         self.path = ''
@@ -143,7 +146,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         else:
             path,query = self.path,''
 
-        env['PATH_INFO'] = urllib.unquote(path)
+        env['PATH_INFO'] = unquote(path)
         env['QUERY_STRING'] = query
         env['REMOTE_ADDR'] = self.client_address[0]
         env['CONTENT_TYPE'] = self.headers.get('content-type', 'text/plain')
@@ -197,7 +200,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type('WSGIServer', (ThreadingMixIn, WSGIServer), {})
+        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, WSGIServer), {})
     else:
         httpd_cls = WSGIServer
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)

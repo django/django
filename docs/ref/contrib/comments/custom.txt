@@ -51,9 +51,9 @@ To make this kind of customization, we'll need to do three things:
    custom :setting:`COMMENTS_APP`.
 
 So, carrying on the example above, we're dealing with a typical app structure in
-the ``my_custom_app`` directory::
+the ``my_comment_app`` directory::
 
-    my_custom_app/
+    my_comment_app/
         __init__.py
         models.py
         forms.py
@@ -98,11 +98,11 @@ Django provides a couple of "helper" classes to make writing certain types of
 custom comment forms easier; see :mod:`django.contrib.comments.forms` for
 more.
 
-Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to
+Finally, we'll define a couple of methods in ``my_comment_app/__init__.py`` to
 point Django at these classes we've created::
 
-    from my_comments_app.models import CommentWithTitle
-    from my_comments_app.forms import CommentFormWithTitle
+    from my_comment_app.models import CommentWithTitle
+    from my_comment_app.forms import CommentFormWithTitle
 
     def get_model():
         return CommentWithTitle

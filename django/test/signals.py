@@ -11,6 +11,9 @@ template_rendered = Signal(providing_args=["template", "context"])
 
 setting_changed = Signal(providing_args=["setting", "value"])
 
+# Most setting_changed receivers are supposed to be added below,
+# except for cases where the receiver is related to a contrib app.
+
 
 @receiver(setting_changed)
 def update_connections_time_zone(**kwargs):
@@ -46,3 +49,12 @@ def update_connections_time_zone(**kwargs):
 def clear_context_processors_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
         context._standard_context_processors = None
+
+
+@receiver(setting_changed)
+def language_changed(**kwargs):
+    if kwargs['setting'] in ('LOCALE_PATHS', 'LANGUAGE_CODE'):
+        from django.utils.translation import trans_real
+        trans_real._default = None
+        if kwargs['setting'] == 'LOCALE_PATHS':
+            trans_real._translations = {}

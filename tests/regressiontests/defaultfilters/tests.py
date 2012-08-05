@@ -6,6 +6,7 @@ import decimal
 
 from django.template.defaultfilters import *
 from django.test import TestCase
+from django.utils import six
 from django.utils import unittest, translation
 from django.utils.safestring import SafeData
 
@@ -48,13 +49,13 @@ class DefaultFiltersTests(TestCase):
                                      '0.00000000000000000002')
 
         pos_inf = float(1e30000)
-        self.assertEqual(floatformat(pos_inf), unicode(pos_inf))
+        self.assertEqual(floatformat(pos_inf), six.text_type(pos_inf))
 
         neg_inf = float(-1e30000)
-        self.assertEqual(floatformat(neg_inf), unicode(neg_inf))
+        self.assertEqual(floatformat(neg_inf), six.text_type(neg_inf))
 
         nan = pos_inf / pos_inf
-        self.assertEqual(floatformat(nan), unicode(nan))
+        self.assertEqual(floatformat(nan), six.text_type(nan))
 
         class FloatWrapper(object):
             def __init__(self, value):
@@ -296,6 +297,10 @@ class DefaultFiltersTests(TestCase):
         # Check urlize accepts uppercased URL schemes - see #18071
         self.assertEqual(urlize('HTTPS://github.com/'),
             '<a href="https://github.com/" rel="nofollow">HTTPS://github.com/</a>')
+
+        # Check urlize trims trailing period when followed by parenthesis - see #18644
+        self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
+                         '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)

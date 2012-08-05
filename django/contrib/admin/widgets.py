@@ -15,6 +15,7 @@ from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
+from django.utils import six
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -121,7 +122,7 @@ def url_params_from_lookup_dict(lookups):
                 # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
             else:
-                v = unicode(v)
+                v = six.text_type(v)
             items.append((k, v))
         params.update(dict(items))
     return params

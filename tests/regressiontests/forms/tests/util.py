@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms.util import flatatt, ErrorDict, ErrorList
 from django.test import TestCase
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import ugettext_lazy
 
 
@@ -30,7 +31,7 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>There was an error.</li></ul>')
 
         # Can take a unicode string.
-        self.assertHTMLEqual(unicode(ErrorList(ValidationError("Not \u03C0.").messages)),
+        self.assertHTMLEqual(six.text_type(ErrorList(ValidationError("Not \u03C0.").messages)),
                          '<ul class="errorlist"><li>Not π.</li></ul>')
 
         # Can take a lazy string.

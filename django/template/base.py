@@ -18,6 +18,7 @@ from django.utils.safestring import (SafeData, EscapeData, mark_safe,
 from django.utils.formats import localize
 from django.utils.html import escape
 from django.utils.module_loading import module_has_submodule
+from django.utils import six
 from django.utils.timezone import template_localtime
 
 
@@ -85,7 +86,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self).encode('utf-8')
 
     def __unicode__(self):
         return self.msg % tuple([force_unicode(p, errors='replace')
@@ -1188,7 +1189,7 @@ class Library(object):
                         from django.template.loader import get_template, select_template
                         if isinstance(file_name, Template):
                             t = file_name
-                        elif not isinstance(file_name, basestring) and is_iterable(file_name):
+                        elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
                             t = select_template(file_name)
                         else:
                             t = get_template(file_name)

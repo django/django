@@ -84,8 +84,9 @@ Then at the Python prompt, try to import Django::
 
     >>> import django
     >>> print(django.get_version())
-    1.4
+    1.5
 
+You may have another version of Django installed.
 
 That's it!
 ----------

@@ -2,13 +2,20 @@ import calendar
 import datetime
 import re
 import sys
-import urllib
-import urlparse
+try:
+    from urllib import parse as urllib_parse
+except ImportError:     # Python 2
+    import urllib as urllib_parse
+    import urlparse
+    urllib_parse.urlparse = urlparse.urlparse
+
+
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
+from django.utils import six
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
@@ -30,8 +37,8 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
-urlquote = allow_lazy(urlquote, unicode)
+    return force_unicode(urllib_parse.quote(smart_str(url), smart_str(safe)))
+urlquote = allow_lazy(urlquote, six.text_type)
 
 def urlquote_plus(url, safe=''):
     """
@@ -40,24 +47,24 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, unicode)
+    return force_unicode(urllib_parse.quote_plus(smart_str(url), smart_str(safe)))
+urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 def urlunquote(quoted_url):
     """
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
-    return force_unicode(urllib.unquote(smart_str(quoted_url)))
-urlunquote = allow_lazy(urlunquote, unicode)
+    return force_unicode(urllib_parse.unquote(smart_str(quoted_url)))
+urlunquote = allow_lazy(urlunquote, six.text_type)
 
 def urlunquote_plus(quoted_url):
     """
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
-    return force_unicode(urllib.unquote_plus(smart_str(quoted_url)))
-urlunquote_plus = allow_lazy(urlunquote_plus, unicode)
+    return force_unicode(urllib_parse.unquote_plus(smart_str(quoted_url)))
+urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 def urlencode(query, doseq=0):
     """
@@ -69,7 +76,7 @@ def urlencode(query, doseq=0):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return urllib.urlencode(
+    return urllib_parse.urlencode(
         [(smart_str(k),
          [smart_str(i) for i in v] if isinstance(v, (list,tuple)) else smart_str(v))
             for k, v in query],
@@ -160,8 +167,9 @@ def base36_to_int(s):
     if len(s) > 13:
         raise ValueError("Base36 input too large")
     value = int(s, 36)
-    # ... then do a final check that the value will fit into an int.
-    if value > sys.maxint:
+    # ... then do a final check that the value will fit into an int to avoid
+    # returning a long (#15067). The long type was removed in Python 3.
+    if not six.PY3 and value > sys.maxint:
         raise ValueError("Base36 input too large")
     return value
 
@@ -171,8 +179,13 @@ def int_to_base36(i):
     """
     digits = "0123456789abcdefghijklmnopqrstuvwxyz"
     factor = 0
-    if not 0 <= i <= sys.maxint:
-        raise ValueError("Base36 conversion input too large or incorrect type.")
+    if i < 0:
+        raise ValueError("Negative base36 conversion input.")
+    if not six.PY3:
+        if not isinstance(i, six.integer_types):
+            raise TypeError("Non-integer base36 conversion input.")
+        if i > sys.maxint:
+            raise ValueError("Base36 conversion input too large.")
     # Find starting factor
     while True:
         factor += 1
@@ -211,5 +224,5 @@ def same_origin(url1, url2):
     """
     Checks if two URLs are 'same-origin'
     """
-    p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
+    p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
     return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)

@@ -13,7 +13,10 @@ import time
 import os
 import sys
 import traceback
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django import template
 from django.template import base as template_base, RequestContext, Template, Context

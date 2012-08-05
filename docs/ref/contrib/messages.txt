@@ -5,12 +5,14 @@ The messages framework
 .. module:: django.contrib.messages
    :synopsis: Provides cookie- and session-based temporary message storage.
 
-Django provides full support for cookie- and session-based messaging, for
-both anonymous and authenticated clients. The messages framework allows you
-to temporarily store messages in one request and retrieve them for display
-in a subsequent request (usually the next one). Every message is tagged
-with a specific ``level`` that determines its priority (e.g., ``info``,
-``warning``, or ``error``).
+Quite commonly in web applications, you may need to display a one-time
+notification message (also know as "flash message") to the user after
+processing a form or some other types of user input. For this, Django provides
+full support for cookie- and session-based messaging, for both anonymous and
+authenticated users. The messages framework allows you to temporarily store
+messages in one request and retrieve them for display in a subsequent request
+(usually the next one). Every message is tagged with a specific ``level`` that
+determines its priority (e.g., ``info``, ``warning``, or ``error``).
 
 Enabling messages
 =================

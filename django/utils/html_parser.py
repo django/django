@@ -1,26 +1,28 @@
-import HTMLParser as _HTMLParser
+from django.utils.six.moves import html_parser as _html_parser
 import re
 
 tagfind = re.compile('([a-zA-Z][-.a-zA-Z0-9:_]*)(?:\s|/(?!>))*')
 
-class HTMLParser(_HTMLParser.HTMLParser):
+HTMLParseError = _html_parser.HTMLParseError
+
+class HTMLParser(_html_parser.HTMLParser):
     """
     Patched version of stdlib's HTMLParser with patch from:
     http://bugs.python.org/issue670664
     """
     def __init__(self):
-        _HTMLParser.HTMLParser.__init__(self)
+        _html_parser.HTMLParser.__init__(self)
         self.cdata_tag = None
 
     def set_cdata_mode(self, tag):
         try:
-            self.interesting = _HTMLParser.interesting_cdata
+            self.interesting = _html_parser.interesting_cdata
         except AttributeError:
             self.interesting = re.compile(r'</\s*%s\s*>' % tag.lower(), re.I)
         self.cdata_tag = tag.lower()
 
     def clear_cdata_mode(self):
-        self.interesting = _HTMLParser.interesting_normal
+        self.interesting = _html_parser.interesting_normal
         self.cdata_tag = None
 
     # Internal -- handle starttag, return end or -1 if not terminated
@@ -40,7 +42,7 @@ class HTMLParser(_HTMLParser.HTMLParser):
         self.lasttag = tag = match.group(1).lower()
 
         while k < endpos:
-            m = _HTMLParser.attrfind.match(rawdata, k)
+            m = _html_parser.attrfind.match(rawdata, k)
             if not m:
                 break
             attrname, rest, attrvalue = m.group(1, 2, 3)
@@ -78,11 +80,11 @@ class HTMLParser(_HTMLParser.HTMLParser):
     def parse_endtag(self, i):
         rawdata = self.rawdata
         assert rawdata[i:i + 2] == "</", "unexpected call to parse_endtag"
-        match = _HTMLParser.endendtag.search(rawdata, i + 1) # >
+        match = _html_parser.endendtag.search(rawdata, i + 1) # >
         if not match:
             return -1
         j = match.end()
-        match = _HTMLParser.endtagfind.match(rawdata, i) # </ + tag + >
+        match = _html_parser.endtagfind.match(rawdata, i) # </ + tag + >
         if not match:
             if self.cdata_tag is not None: # *** add ***
                 self.handle_data(rawdata[i:j]) # *** add ***

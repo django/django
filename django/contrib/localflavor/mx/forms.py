@@ -7,6 +7,7 @@ import re
 
 from django.forms import ValidationError
 from django.forms.fields import Select, RegexField
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import EMPTY_VALUES
 from django.contrib.localflavor.mx.mx_states import STATE_CHOICES
@@ -147,7 +148,7 @@ class MXRFCField(RegexField):
         if len(rfc) == 11:
             rfc = '-' + rfc
 
-        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(xrange(14)), rfc))
+        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(range(14)), rfc))
         checksum = 11 - sum_ % 11
 
         if checksum == 10:
@@ -155,7 +156,7 @@ class MXRFCField(RegexField):
         elif checksum == 11:
             return '0'
 
-        return unicode(checksum)
+        return six.text_type(checksum)
 
     def _has_inconvenient_word(self, rfc):
         first_four = rfc[:4]
@@ -214,12 +215,12 @@ class MXCURPField(RegexField):
     def _checksum(self, value):
         chars = '0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ'
 
-        s = sum(i * chars.index(c) for i, c in zip(reversed(xrange(19)), value))
+        s = sum(i * chars.index(c) for i, c in zip(reversed(range(19)), value))
         checksum = 10 - s % 10
 
         if checksum == 10:
             return '0'
-        return unicode(checksum)
+        return six.text_type(checksum)
 
     def _has_inconvenient_word(self, curp):
         first_four = curp[:4]

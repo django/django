@@ -437,6 +437,10 @@ parameter when declaring the form field::
             class Meta:
                 model = Article
 
+    You must ensure that the type of the form field can be used to set the
+    contents of the corresponding model field. When they are not compatible,
+    you will get a ``ValueError`` as no implicit conversion takes place.
+
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 

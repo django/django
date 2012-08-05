@@ -18,6 +18,7 @@ from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
 from django.utils.http import urlquote
 from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
+from django.utils import six
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
 from django.utils.text import normalize_newlines
@@ -176,7 +177,7 @@ def floatformat(text, arg=-1):
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
             Context(prec=prec)).as_tuple()
-        digits = [unicode(digit) for digit in reversed(digits)]
+        digits = [six.text_type(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
         digits.insert(-exponent, '.')
@@ -200,7 +201,7 @@ def linenumbers(value, autoescape=None):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = unicode(len(unicode(len(lines))))
+    width = six.text_type(len(six.text_type(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width  + "d. %s") % (i + 1, line)
@@ -234,7 +235,7 @@ def slugify(value):
     and converts spaces to hyphens.
     """
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = six.text_type(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
 
 @register.filter(is_safe=True)
@@ -249,7 +250,7 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return ("%" + unicode(arg)) % value
+        return ("%" + six.text_type(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -827,17 +828,23 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
-    if bytes < 1024:
+    KB = 1<<10
+    MB = 1<<20
+    GB = 1<<30
+    TB = 1<<40
+    PB = 1<<50
+
+    if bytes < KB:
         return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    if bytes < 1024 * 1024:
-        return ugettext("%s KB") % filesize_number_format(bytes / 1024)
-    if bytes < 1024 * 1024 * 1024:
-        return ugettext("%s MB") % filesize_number_format(bytes / (1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s GB") % filesize_number_format(bytes / (1024 * 1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s TB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024))
-    return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
+    if bytes < MB:
+        return ugettext("%s KB") % filesize_number_format(bytes / KB)
+    if bytes < GB:
+        return ugettext("%s MB") % filesize_number_format(bytes / MB)
+    if bytes < TB:
+        return ugettext("%s GB") % filesize_number_format(bytes / GB)
+    if bytes < PB:
+        return ugettext("%s TB") % filesize_number_format(bytes / TB)
+    return ugettext("%s PB") % filesize_number_format(bytes / PB)
 
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):

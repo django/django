@@ -16,6 +16,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import six
 
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -96,7 +97,7 @@ def forbid_multi_line_headers(name, val, encoding):
 
 
 def sanitize_address(addr, encoding):
-    if isinstance(addr, basestring):
+    if isinstance(addr, six.string_types):
         addr = parseaddr(force_unicode(addr))
     nm, addr = addr
     nm = str(Header(nm, encoding))
@@ -180,17 +181,17 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            assert not isinstance(to, basestring), '"to" argument must be a list or tuple'
+            assert not isinstance(to, six.string_types), '"to" argument must be a list or tuple'
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            assert not isinstance(cc, basestring), '"cc" argument must be a list or tuple'
+            assert not isinstance(cc, six.string_types), '"cc" argument must be a list or tuple'
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
+            assert not isinstance(bcc, six.string_types), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
         else:
             self.bcc = []

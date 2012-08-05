@@ -35,10 +35,11 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
+from django.utils import six
 
 
 def fix_os_paths(x):
-    if isinstance(x, basestring):
+    if isinstance(x, six.string_types):
         return x.replace('\\', '/')
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))

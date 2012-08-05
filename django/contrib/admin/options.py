@@ -24,6 +24,7 @@ from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -57,9 +58,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 
 csrf_protect_m = method_decorator(csrf_protect)
 
-class BaseModelAdmin(object):
+class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
-    __metaclass__ = forms.MediaDefiningClass
 
     raw_id_fields = ()
     fields = None
@@ -998,7 +998,6 @@ class ModelAdmin(BaseModelAdmin):
             'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
             'is_popup': "_popup" in request.REQUEST,
-            'show_delete': False,
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),

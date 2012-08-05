@@ -10,26 +10,29 @@ import warnings
 
 from io import BytesIO
 from pprint import pformat
-from urllib import urlencode, quote
-from urlparse import urljoin, parse_qsl
-
-import Cookie
-# Some versions of Python 2.7 and later won't need this encoding bug fix:
-_cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
-# See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
-_tc = Cookie.SimpleCookie()
 try:
-    _tc.load(b'foo:bar=1')
+    from urllib.parse import quote, parse_qsl, urlencode, urljoin, urlparse
+except ImportError:     # Python 2
+    from urllib import quote, urlencode
+    from urlparse import parse_qsl, urljoin, urlparse
+
+from django.utils.six.moves import http_cookies
+# Some versions of Python 2.7 and later won't need this encoding bug fix:
+_cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')
+# See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
+_tc = http_cookies.SimpleCookie()
+try:
+    _tc.load(str('foo:bar=1'))
     _cookie_allows_colon_in_names = True
-except Cookie.CookieError:
+except http_cookies.CookieError:
     _cookie_allows_colon_in_names = False
 
 if _cookie_encodes_correctly and _cookie_allows_colon_in_names:
-    SimpleCookie = Cookie.SimpleCookie
+    SimpleCookie = http_cookies.SimpleCookie
 else:
-    Morsel = Cookie.Morsel
+    Morsel = http_cookies.Morsel
 
-    class SimpleCookie(Cookie.SimpleCookie):
+    class SimpleCookie(http_cookies.SimpleCookie):
         if not _cookie_encodes_correctly:
             def value_encode(self, val):
                 # Some browsers do not support quoted-string from RFC 2109,
@@ -70,20 +73,21 @@ else:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
                     dict.__setitem__(self, key, M)
-                except Cookie.CookieError:
+                except http_cookies.CookieError:
                     self.bad_cookies.add(key)
-                    dict.__setitem__(self, key, Cookie.Morsel())
+                    dict.__setitem__(self, key, http_cookies.Morsel())
 
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import cookie_date
+from django.utils import six
 from django.utils import timezone
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
@@ -136,10 +140,10 @@ def build_request_repr(request, path_override=None, GET_override=None,
     return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
-                      unicode(get),
-                      unicode(post),
-                      unicode(cookies),
-                      unicode(meta)))
+                      six.text_type(get),
+                      six.text_type(post),
+                      six.text_type(cookies),
+                      six.text_type(meta)))
 
 class UnreadablePostError(IOError):
     pass
@@ -290,7 +294,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                raise UnreadablePostError, e, sys.exc_traceback
+                six.reraise(UnreadablePostError, e, sys.exc_traceback)
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -491,11 +495,11 @@ class QueryDict(MultiValueDict):
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    if not isinstance(cookie, Cookie.BaseCookie):
+    if not isinstance(cookie, http_cookies.BaseCookie):
         try:
             c = SimpleCookie()
             c.load(cookie)
-        except Cookie.CookieError:
+        except http_cookies.CookieError:
             # Invalid cookie
             return {}
     else:
@@ -543,7 +547,7 @@ class HttpResponse(object):
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 try:
                     value = value.encode('us-ascii')
                 except UnicodeError as e:
@@ -662,7 +666,7 @@ class HttpResponse(object):
 
     def next(self):
         chunk = next(self._iterator)
-        if isinstance(chunk, unicode):
+        if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
         return str(chunk)
 
@@ -683,21 +687,23 @@ class HttpResponse(object):
     def tell(self):
         if self._base_content_is_iter:
             raise Exception("This %s instance cannot tell its position" % self.__class__)
-        return sum([len(str(chunk)) for chunk in self._container])
+        return sum([len(chunk) for chunk in self])
 
-class HttpResponseRedirect(HttpResponse):
+class HttpResponseRedirectBase(HttpResponse):
+    allowed_schemes = ['http', 'https', 'ftp']
+
+    def __init__(self, redirect_to):
+        parsed = urlparse(redirect_to)
+        if parsed.scheme and parsed.scheme not in self.allowed_schemes:
+            raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+        super(HttpResponseRedirectBase, self).__init__()
+        self['Location'] = iri_to_uri(redirect_to)
+    
+class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
 
-    def __init__(self, redirect_to):
-        super(HttpResponseRedirect, self).__init__()
-        self['Location'] = iri_to_uri(redirect_to)
-
-class HttpResponsePermanentRedirect(HttpResponse):
+class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
-
-    def __init__(self, redirect_to):
-        super(HttpResponsePermanentRedirect, self).__init__()
-        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseNotModified(HttpResponse):
     status_code = 304
@@ -739,8 +745,8 @@ def str_to_unicode(s, encoding):
 
     Returns any non-basestring objects without change.
     """
-    if isinstance(s, str):
-        return unicode(s, encoding, 'replace')
+    if isinstance(s, bytes):
+        return six.text_type(s, encoding, 'replace')
     else:
         return s
 

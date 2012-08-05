@@ -39,6 +39,7 @@ from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString, SafeUnicode
+from django.utils import six
 from django.utils import timezone
 
 # Raise exceptions for database warnings if DEBUG is on
@@ -117,29 +118,29 @@ class CursorWrapper(object):
         try:
             return self.cursor.execute(query, args)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -242,7 +243,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
-        return 18446744073709551615L
+        return 18446744073709551615
 
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
@@ -261,19 +262,22 @@ class DatabaseOperations(BaseDatabaseOperations):
             for table in tables:
                 sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(self.quote_name(table))))
             sql.append('SET FOREIGN_KEY_CHECKS = 1;')
-
-            # Truncate already resets the AUTO_INCREMENT field from
-            # MySQL version 5.0.13 onwards. Refs #16961.
-            if self.connection.mysql_version < (5,0,13):
-                sql.extend(
-                    ["%s %s %s %s %s;" % \
-                     (style.SQL_KEYWORD('ALTER'),
-                      style.SQL_KEYWORD('TABLE'),
-                      style.SQL_TABLE(self.quote_name(sequence['table'])),
-                      style.SQL_KEYWORD('AUTO_INCREMENT'),
-                      style.SQL_FIELD('= 1'),
-                     ) for sequence in sequences])
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
             return sql
+        else:
+            return []
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        # Truncate already resets the AUTO_INCREMENT field from
+        # MySQL version 5.0.13 onwards. Refs #16961.
+        if self.connection.mysql_version < (5, 0, 13):
+            return ["%s %s %s %s %s;" % \
+                    (style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('TABLE'),
+                    style.SQL_TABLE(self.quote_name(sequence['table'])),
+                    style.SQL_KEYWORD('AUTO_INCREMENT'),
+                    style.SQL_FIELD('= 1'),
+                    ) for sequence in sequences]
         else:
             return []
 
@@ -296,7 +300,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return six.text_type(value.replace(microsecond=0))
 
     def value_to_db_time(self, value):
         if value is None:
@@ -307,7 +311,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return six.text_type(value.replace(microsecond=0))
 
     def year_lookup_bounds(self, value):
         # Again, no microseconds
@@ -398,8 +402,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             kwargs['client_flag'] = CLIENT.FOUND_ROWS
             kwargs.update(settings_dict['OPTIONS'])
             self.connection = Database.connect(**kwargs)
-            self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
-            self.connection.encoders[SafeString] = self.connection.encoders[str]
+            self.connection.encoders[SafeUnicode] = self.connection.encoders[six.text_type]
+            self.connection.encoders[SafeString] = self.connection.encoders[bytes]
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:

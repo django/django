@@ -6,9 +6,10 @@ from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.html import format_html, format_html_join
+from django.utils.http import urlquote
 from django.utils.text import capfirst
-from django.utils.encoding import smart_str, force_unicode
-import urllib
+from django.utils.encoding import force_unicode
+
 
 class FieldChoicePlugin(DatabrowsePlugin):
     def __init__(self, field_filter=None):
@@ -38,11 +39,10 @@ class FieldChoicePlugin(DatabrowsePlugin):
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():
-            field_value = smart_str(easy_instance_field.raw_value)
             return ['%s%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                urllib.quote(field_value, safe=''))]
+                urlquote(easy_instance_field.raw_value, safe=''))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

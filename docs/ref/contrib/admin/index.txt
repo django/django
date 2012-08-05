@@ -115,7 +115,7 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    Controls whether a selection counter is display next to the action dropdown.
+    Controls whether a selection counter is displayed next to the action dropdown.
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 

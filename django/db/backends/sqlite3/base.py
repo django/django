@@ -21,6 +21,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
+from django.utils import six
 from django.utils import timezone
 
 try:
@@ -53,15 +54,15 @@ def adapt_datetime_with_timezone_support(value):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return value.isoformat(b" ")
+    return value.isoformat(str(" "))
 
-Database.register_converter(b"bool", lambda s: str(s) == '1')
-Database.register_converter(b"time", parse_time)
-Database.register_converter(b"date", parse_date)
-Database.register_converter(b"datetime", parse_datetime_with_timezone_support)
-Database.register_converter(b"timestamp", parse_datetime_with_timezone_support)
-Database.register_converter(b"TIMESTAMP", parse_datetime_with_timezone_support)
-Database.register_converter(b"decimal", util.typecast_decimal)
+Database.register_converter(str("bool"), lambda s: str(s) == '1')
+Database.register_converter(str("time"), parse_time)
+Database.register_converter(str("date"), parse_date)
+Database.register_converter(str("datetime"), parse_datetime_with_timezone_support)
+Database.register_converter(str("timestamp"), parse_datetime_with_timezone_support)
+Database.register_converter(str("TIMESTAMP"), parse_datetime_with_timezone_support)
+Database.register_converter(str("decimal"), util.typecast_decimal)
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 if Database.version_info >= (2, 4, 1):
@@ -85,7 +86,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    can_combine_inserts_with_and_without_auto_increment_pk = True
+    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     @cached_property
     def supports_stddev(self):
@@ -107,6 +108,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return has_support
 
 class DatabaseOperations(BaseDatabaseOperations):
+    def bulk_batch_size(self, fields, objs):
+        """
+        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
+        999 variables per query.
+        """
+        return (999 // len(fields)) if len(fields) > 0 else len(objs)
+
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
         # function django_extract that's registered in connect(). Note that
@@ -169,7 +177,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -179,7 +187,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
-        return unicode(value)
+        return six.text_type(value)
 
     def year_lookup_bounds(self, value):
         first = '%s-01-01'
@@ -341,18 +349,18 @@ class SQLiteCursorWrapper(Database.Cursor):
         try:
             return Database.Cursor.execute(self, query, params)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         try:
             return Database.Cursor.executemany(self, query, param_list)
         except Database.IntegrityError as e:
-            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
-            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
+            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def convert_query(self, query):
         return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')
