@@ -274,6 +274,10 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, None, None)
         self.assertRaises(ValidationError, f.clean, '', None)
 
+    def test_integerfield_validates_zero_against_choices(self):
+        f = models.IntegerField(choices=((1, 1),))
+        self.assertRaises(ValidationError, f.clean, '0', None)
+
     def test_charfield_raises_error_on_empty_input(self):
         f = models.CharField(null=False)
         self.assertRaises(ValidationError, f.clean, None, None)
