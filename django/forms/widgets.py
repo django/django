@@ -110,9 +110,10 @@ class Media(StrAndUnicode):
 def media_property(cls):
     def _media(self):
         # Get the media property of the superclass, if it exists
-        if hasattr(super(cls, self), 'media'):
-            base = super(cls, self).media
-        else:
+        sup_cls = super(cls, self)
+        try:
+            base = sup_cls.media
+        except AttributeError:
             base = Media()
 
         # Get the media definition for this class
