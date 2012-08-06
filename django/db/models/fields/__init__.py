@@ -179,7 +179,8 @@ class Field(object):
         if not self.editable:
             # Skip validation for non-editable fields.
             return
-        if self._choices and value:
+
+        if self._choices and value not in validators.EMPTY_VALUES:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
