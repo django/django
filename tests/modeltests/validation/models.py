@@ -101,6 +101,6 @@ try:
     class MultipleAutoFields(models.Model):
         auto1 = models.AutoField(primary_key=True)
         auto2 = models.AutoField(primary_key=True)
-except AssertionError as assertion_error:
-    pass # Fail silently
+except AssertionError as exc:
+    assertion_error = exc
 assert str(assertion_error) == "A model can't have more than one AutoField."
