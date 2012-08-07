@@ -31,10 +31,14 @@ Since version 1.0, Django's release numbering works as follows:
   These are of the form ``A.B alpha/beta/rc N``, which means the ``Nth``
   alpha/beta/release candidate of version ``A.B``.
 
-In Subversion, each Django release will be tagged under ``tags/releases``.  If
-it's necessary to release a bug fix release or a security release that doesn't
-come from the trunk, we'll copy that tag to ``branches/releases`` to make the
-bug fix release.
+In git, each Django release will have a tag indicating its version
+number, signed with the Django release key. Additionally, each release
+series (X.Y) has its own branch, and bugfix/security releases will be
+issued from those branches.
+
+For more information about how the Django project issues new releases
+for security purposes, please see :doc:`our security policies
+<security>`.
 
 Major releases
 --------------
