@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import pickle
-from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,6 +10,7 @@ from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase
+from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 

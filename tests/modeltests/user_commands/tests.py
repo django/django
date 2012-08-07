@@ -1,10 +1,10 @@
 import sys
-from StringIO import StringIO
 
 from django.core import management
 from django.core.management.base import CommandError
 from django.test import TestCase
 from django.utils import translation
+from django.utils.six import StringIO
 
 
 class CommandTests(TestCase):
