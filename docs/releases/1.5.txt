@@ -107,7 +107,7 @@ Django 1.5 also includes several smaller improvements worth noting:
   connect to more than one signal by supplying a list of signals.
 
 * :meth:`QuerySet.bulk_create()
-  <django.db.models.query.QuerySet.bulk_create>` has now a batch_size
+  <django.db.models.query.QuerySet.bulk_create>` now has a batch_size
   argument. By default the batch_size is unlimited except for SQLite where
   single batch is limited so that 999 parameters per query isn't exceeded.
 
