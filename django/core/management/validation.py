@@ -3,6 +3,7 @@ import sys
 from django.core.management.color import color_style
 from django.utils.encoding import smart_str
 from django.utils.itercompat import is_iterable
+from django.utils import six
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -93,7 +94,7 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
                 e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
             if f.choices:
-                if isinstance(f.choices, basestring) or not is_iterable(f.choices):
+                if isinstance(f.choices, six.string_types) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
@@ -119,7 +120,7 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
-                if isinstance(f.rel.to, (str, unicode)):
+                if isinstance(f.rel.to, six.string_types):
                     continue
 
                 # Make sure the related field specified by a ForeignKey is unique
@@ -161,14 +162,14 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
-                if isinstance(f.rel.to, (str, unicode)):
+                if isinstance(f.rel.to, six.string_types):
                     continue
 
             # Check that the field is not set to unique.  ManyToManyFields do not support unique.
             if f.unique:
                 e.add(opts, "ManyToManyFields cannot be unique.  Remove the unique argument on '%s'." % f.name)
 
-            if f.rel.through is not None and not isinstance(f.rel.through, basestring):
+            if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
                 from_model, to_model = cls, f.rel.to
                 if from_model == to_model and f.rel.symmetrical and not f.rel.through._meta.auto_created:
                     e.add(opts, "Many-to-many fields with intermediate tables cannot be symmetrical.")
@@ -239,7 +240,7 @@ def get_validation_errors(outfile, app=None):
                             "to %s and %s" % (f.name, f.rel.through._meta.object_name,
                                 f.rel.to._meta.object_name, cls._meta.object_name)
                         )
-            elif isinstance(f.rel.through, basestring):
+            elif isinstance(f.rel.through, six.string_types):
                 e.add(opts, "'%s' specifies an m2m relation through model %s, "
                     "which has not been installed" % (f.name, f.rel.through)
                 )

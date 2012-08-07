@@ -10,7 +10,8 @@ import cgi
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
@@ -77,7 +78,7 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, unicode):
+        if isinstance(boundary, six.text_type):
             boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data
@@ -150,7 +151,7 @@ class MultiPartParser(object):
                 transfer_encoding = meta_data.get('content-transfer-encoding')
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
-                field_name = force_unicode(field_name, encoding, errors='replace')
+                field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
                     # This is a post field, we can just set it in the post
@@ -164,13 +165,13 @@ class MultiPartParser(object):
                         data = field_stream.read()
 
                     self._post.appendlist(field_name,
-                                          force_unicode(data, encoding, errors='replace'))
+                                          force_text(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if not file_name:
                         continue
-                    file_name = force_unicode(file_name, encoding, errors='replace')
+                    file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
                     content_type = meta_data.get('content-type', ('',))[0].strip()
@@ -244,7 +245,7 @@ class MultiPartParser(object):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_unicode(old_field_name,
+                self._files.appendlist(force_text(old_field_name,
                                                      self._encoding,
                                                      errors='replace'),
                                        file_obj)

@@ -8,7 +8,10 @@ import shutil
 import stat
 import sys
 import tempfile
-import urllib
+try:
+    from urllib.request import urlretrieve
+except ImportError:     # Python 2
+    from urllib import urlretrieve
 
 from optparse import make_option
 from os import path
@@ -112,7 +115,7 @@ class TemplateCommand(BaseCommand):
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
-        }))
+        }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
         from django.conf import settings
@@ -227,8 +230,7 @@ class TemplateCommand(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Downloading %s\n" % display_url)
         try:
-            the_path, info = urllib.urlretrieve(url,
-                                                path.join(tempdir, filename))
+            the_path, info = urlretrieve(url, path.join(tempdir, filename))
         except IOError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))

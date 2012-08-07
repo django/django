@@ -1002,9 +1002,10 @@ define the details of how the relation works.
     <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django didn't create a backwards relation, set ``related_name``
-    to ``'+'``. For example, this will ensure that the ``User`` model won't get a
-    backwards relation to this model::
+    If you'd prefer Django not to create a backwards relation, set
+    ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
+    ensure that the ``User`` model won't have a backwards relation to this
+    model::
 
         user = models.ForeignKey(User, related_name='+')
 
@@ -1074,15 +1075,14 @@ the model is related. This works exactly the same as it does for
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to
-represent the many-to-many relationship. By default, this table name
-is generated using the name of the many-to-many field and the model
-that contains it. Since some databases don't support table names above
-a certain length, these table names will be automatically truncated to
-64 characters and a uniqueness hash will be used. This means you might
-see table names like ``author_books_9cdf4``; this is perfectly normal.
-You can manually provide the name of the join table using the
-:attr:`~ManyToManyField.db_table` option.
+Behind the scenes, Django creates an intermediary join table to represent the
+many-to-many relationship. By default, this table name is generated using the
+name of the many-to-many field and the name of the table for the model that
+contains it. Since some databases don't support table names above a certain
+length, these table names will be automatically truncated to 64 characters and a
+uniqueness hash will be used. This means you might see table names like
+``author_books_9cdf4``; this is perfectly normal.  You can manually provide the
+name of the join table using the :attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
 
@@ -1095,6 +1095,13 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.related_name
 
     Same as :attr:`ForeignKey.related_name`.
+
+    If you have more than one ``ManyToManyField`` pointing to the same model
+    and want to suppress the backwards relations, set each ``related_name``
+    to a unique value ending with ``'+'``::
+
+        users = models.ManyToManyField(User, related_name='u+')
+        referents = models.ManyToManyField(User, related_name='ref+')
 
 .. attribute:: ManyToManyField.limit_choices_to
 
@@ -1138,8 +1145,9 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of
-    the two tables being joined.
+    is not provided, Django will assume a default name based upon the names of:
+    the table for the model defining the relationship and the name of the field
+    itself.
 
 .. _ref-onetoone:
 

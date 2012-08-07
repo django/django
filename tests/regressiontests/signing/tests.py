@@ -4,7 +4,7 @@ import time
 
 from django.core import signing
 from django.test import TestCase
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 class TestSigner(TestCase):
@@ -48,7 +48,7 @@ class TestSigner(TestCase):
         )
         for example in examples:
             self.assertNotEqual(
-                force_unicode(example), force_unicode(signer.sign(example)))
+                force_text(example), force_text(signer.sign(example)))
             self.assertEqual(example, signer.unsign(signer.sign(example)))
 
     def unsign_detects_tampering(self):

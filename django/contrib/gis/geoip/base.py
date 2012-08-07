@@ -10,6 +10,8 @@ from django.contrib.gis.geoip.prototypes import (
     GeoIP_country_code_by_addr, GeoIP_country_code_by_name,
     GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
 
+from django.utils import six
+
 # Regular expressions for recognizing the GeoIP free database editions.
 free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
@@ -86,7 +88,7 @@ class GeoIP(object):
         if not path:
             path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
             if not path: raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
-        if not isinstance(path, basestring):
+        if not isinstance(path, six.string_types):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
         if os.path.isdir(path):
@@ -129,7 +131,7 @@ class GeoIP(object):
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
         # Making sure a string was passed in for the query.
-        if not isinstance(query, basestring):
+        if not isinstance(query, six.string_types):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
 
         # GeoIP only takes ASCII-encoded strings.

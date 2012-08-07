@@ -12,6 +12,7 @@ from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.aggregates import Aggregate
+from django.utils.six.moves import xrange
 
 # Connection types
 AND = 'AND'

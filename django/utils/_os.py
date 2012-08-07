@@ -1,7 +1,7 @@
 import os
 import stat
 from os.path import join, normcase, normpath, abspath, isabs, sep
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 try:
     WindowsError = WindowsError
@@ -37,8 +37,8 @@ def safe_join(base, *paths):
     The final path must be located inside of the base path component (otherwise
     a ValueError is raised).
     """
-    base = force_unicode(base)
-    paths = [force_unicode(p) for p in paths]
+    base = force_text(base)
+    paths = [force_text(p) for p in paths]
     final_path = abspathu(join(base, *paths))
     base_path = abspathu(base)
     base_path_len = len(base_path)

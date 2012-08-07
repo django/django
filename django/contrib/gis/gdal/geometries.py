@@ -40,7 +40,7 @@
 """
 # Python library requisites.
 import sys
-from binascii import a2b_hex
+from binascii import a2b_hex, b2a_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 
 # Getting GDAL prerequisites
@@ -57,6 +57,9 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 # For recognizing geometry input.
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
+from django.utils import six
+from django.utils.six.moves import xrange
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -69,7 +72,7 @@ class OGRGeometry(GDALBase):
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        str_instance = isinstance(geom_input, basestring)
+        str_instance = isinstance(geom_input, six.string_types)
 
         # If HEX, unpack input to to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
@@ -79,7 +82,7 @@ class OGRGeometry(GDALBase):
         # Constructing the geometry,
         if str_instance:
             # Checking if unicode
-            if isinstance(geom_input, unicode):
+            if isinstance(geom_input, six.text_type):
                 # Encoding to ASCII, WKT or HEX doesn't need any more.
                 geom_input = geom_input.encode('ascii')
 
@@ -281,7 +284,7 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, (int, long, basestring)):
+        elif isinstance(srs, six.integer_types + six.string_types):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
         else:
@@ -297,7 +300,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, (int, long)):
+        if isinstance(srid, six.integer_types):
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -319,8 +322,7 @@ class OGRGeometry(GDALBase):
     @property
     def hex(self):
         "Returns the hexadecimal representation of the WKB (a string)."
-        return str(self.wkb).encode('hex').upper()
-        #return b2a_hex(self.wkb).upper()
+        return b2a_hex(self.wkb).upper()
 
     @property
     def json(self):
@@ -410,7 +412,7 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, (int, long, basestring)):
+        elif isinstance(coord_trans, six.integer_types + six.string_types):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
@@ -685,7 +687,7 @@ class GeometryCollection(OGRGeometry):
                 for g in geom: capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
-        elif isinstance(geom, basestring):
+        elif isinstance(geom, six.string_types):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:

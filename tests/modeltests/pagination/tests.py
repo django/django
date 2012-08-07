@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.test import TestCase
+from django.utils import six
 
 from .models import Article
 
@@ -32,7 +33,7 @@ class PaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(1)
-        self.assertEqual("<Page 1 of 2>", unicode(p))
+        self.assertEqual("<Page 1 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 1>",
                 "<Article: Article 2>",
@@ -52,7 +53,7 @@ class PaginationTests(TestCase):
     def test_last_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 2>", unicode(p))
+        self.assertEqual("<Page 2 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 6>",
                 "<Article: Article 7>",
@@ -109,7 +110,7 @@ class PaginationTests(TestCase):
         self.assertEqual(3, paginator.num_pages)
         self.assertEqual([1, 2, 3], paginator.page_range)
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 3>", unicode(p))
+        self.assertEqual("<Page 2 of 3>", six.text_type(p))
         self.assertEqual([4, 5, 6], p.object_list)
         self.assertTrue(p.has_next())
         self.assertTrue(p.has_previous())

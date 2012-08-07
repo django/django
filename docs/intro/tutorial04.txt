@@ -18,7 +18,7 @@ tutorial, so that the template contains an HTML ``<form>`` element:
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <form action="/polls/{{ poll.id }}/vote/" method="post">
+    <form action="{% url 'polls.views.vote' poll.id %}" method="post">
     {% csrf_token %}
     {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
@@ -35,7 +35,7 @@ A quick rundown:
   selects one of the radio buttons and submits the form, it'll send the
   POST data ``choice=3``. This is HTML Forms 101.
 
-* We set the form's ``action`` to ``/polls/{{ poll.id }}/vote/``, and we
+* We set the form's ``action`` to ``{% url 'polls.views.vote' poll.id %}``, and we
   set ``method="post"``. Using ``method="post"`` (as opposed to
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
@@ -172,7 +172,7 @@ Now, create a ``results.html`` template:
     {% endfor %}
     </ul>
 
-    <a href="/polls/{{ poll.id }}/">Vote again?</a>
+    <a href="{% url 'polls.views.detail' poll.id %}">Vote again?</a>
 
 Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
 results page that gets updated each time you vote. If you submit the form
@@ -238,11 +238,13 @@ Change it like so::
             ListView.as_view(
                 queryset=Poll.objects.order_by('-pub_date')[:5],
                 context_object_name='latest_poll_list',
-                template_name='polls/index.html')),
+                template_name='polls/index.html'),
+            name='poll_index'),
         url(r'^(?P<pk>\d+)/$',
             DetailView.as_view(
                 model=Poll,
-                template_name='polls/detail.html')),
+                template_name='polls/detail.html'),
+            name='poll_detail'),
         url(r'^(?P<pk>\d+)/results/$',
             DetailView.as_view(
                 model=Poll,
@@ -265,8 +267,8 @@ two views abstract the concepts of "display a list of objects" and
   ``"pk"``, so we've changed ``poll_id`` to ``pk`` for the generic
   views.
 
-* We've added a name, ``poll_results``, to the results view so
-  that we have a way to refer to its URL later on (see the
+* We've added the ``name`` argument to the views (e.g. ``name='poll_results'``)
+  so that we have a way to refer to their URL later on (see the
   documentation about :ref:`naming URL patterns
   <naming-url-patterns>` for information). We're also using the
   :func:`~django.conf.urls.url` function from
@@ -316,6 +318,13 @@ function anymore -- generic views can be (and are) used multiple times
 -- but we can use the name we've given::
 
     return HttpResponseRedirect(reverse('poll_results', args=(p.id,)))
+
+The same rule apply for the :ttag:`url` template tag. For example in the
+``results.html`` template:
+
+.. code-block:: html+django
+
+    <a href="{% url 'poll_detail' poll.id %}">Vote again?</a>
 
 Run the server, and use your new polling app based on generic views.
 

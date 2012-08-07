@@ -23,9 +23,10 @@ THE SOFTWARE.
 """
 import os
 import shutil
-import sys
 import tarfile
 import zipfile
+
+from django.utils import six
 
 
 class ArchiveException(Exception):
@@ -58,7 +59,7 @@ class Archive(object):
     @staticmethod
     def _archive_cls(file):
         cls = None
-        if isinstance(file, basestring):
+        if isinstance(file, six.string_types):
             filename = file
         else:
             try:
@@ -145,11 +146,11 @@ class TarArchive(BaseArchive):
             else:
                 try:
                     extracted = self._archive.extractfile(member)
-                except (KeyError, AttributeError):
+                except (KeyError, AttributeError) as exc:
                     # Some corrupt tar files seem to produce this
                     # (specifically bad symlinks)
-                    print ("In the tar file %s the member %s is invalid: %s" %
-                           (name, member.name, sys.exc_info()[1]))
+                    print("In the tar file %s the member %s is invalid: %s" %
+                            (name, member.name, exc))
                 else:
                     dirname = os.path.dirname(filename)
                     if dirname and not os.path.exists(dirname):

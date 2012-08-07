@@ -12,7 +12,7 @@ from .models import City, PennsylvaniaCity, State, Truth
 
 class GeoRegressionTests(TestCase):
 
-    def test01_update(self):
+    def test_update(self):
         "Testing GeoQuerySet.update(). See #10411."
         pnt = City.objects.get(name='Pueblo').point
         bak = pnt.clone()
@@ -24,7 +24,7 @@ class GeoRegressionTests(TestCase):
         City.objects.filter(name='Pueblo').update(point=bak)
         self.assertEqual(bak, City.objects.get(name='Pueblo').point)
 
-    def test02_kmz(self):
+    def test_kmz(self):
         "Testing `render_to_kmz` with non-ASCII data. See #11624."
         name = '\xc3\x85land Islands'.decode('iso-8859-1')
         places = [{'name' : name,
@@ -35,7 +35,7 @@ class GeoRegressionTests(TestCase):
 
     @no_spatialite
     @no_mysql
-    def test03_extent(self):
+    def test_extent(self):
         "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
@@ -43,14 +43,14 @@ class GeoRegressionTests(TestCase):
         for ref_val, val in zip(ref_ext, extent):
             self.assertAlmostEqual(ref_val, val, 4)
 
-    def test04_unicode_date(self):
+    def test_unicode_date(self):
         "Testing dates are converted properly, even on SpatiaLite. See #16408."
         founded = datetime(1857, 5, 23)
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
 
-    def test05_empty_count(self):
+    def test_empty_count(self):
          "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
          # contrived example, but need a geo lookup paired with an id__in lookup
          pueblo = City.objects.get(name='Pueblo')
@@ -60,12 +60,12 @@ class GeoRegressionTests(TestCase):
          # .count() should not throw TypeError in __eq__
          self.assertEqual(cities_within_state.count(), 1)
 
-    def test06_defer_or_only_with_annotate(self):
+    def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
         self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)
 
-    def test07_boolean_conversion(self):
+    def test_boolean_conversion(self):
         "Testing Boolean value conversion with the spatial backend, see #15169."
         t1 = Truth.objects.create(val=True)
         t2 = Truth.objects.create(val=False)

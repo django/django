@@ -14,7 +14,8 @@ from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
 from django.utils.importlib import import_module
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_text, smart_bytes
+from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
 
@@ -110,7 +111,7 @@ class ExceptionReporterFilter(object):
             return request.POST
 
     def get_traceback_frame_variables(self, request, tb_frame):
-        return tb_frame.f_locals.items()
+        return list(six.iteritems(tb_frame.f_locals))
 
 class SafeExceptionReporterFilter(ExceptionReporterFilter):
     """
@@ -214,7 +215,7 @@ class ExceptionReporter(object):
         self.loader_debug_info = None
 
         # Handle deprecated string exceptions
-        if isinstance(self.exc_type, basestring):
+        if isinstance(self.exc_type, six.string_types):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
@@ -255,7 +256,7 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+                unicode_hint = smart_text(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
         from django import get_version
         c = {
             'is_email': self.is_email,
@@ -277,7 +278,7 @@ class ExceptionReporter(object):
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
         if self.exc_value:
-            c['exception_value'] = smart_unicode(self.exc_value, errors='replace')
+            c['exception_value'] = smart_text(self.exc_value, errors='replace')
         if frames:
             c['lastframe'] = frames[-1]
         return c
@@ -361,7 +362,7 @@ class ExceptionReporter(object):
             if match:
                 encoding = match.group(1)
                 break
-        source = [unicode(sline, encoding, 'replace') for sline in source]
+        source = [six.text_type(sline, encoding, 'replace') for sline in source]
 
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
@@ -439,7 +440,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': request.path_info[1:], # Trim leading slash
         'urlpatterns': tried,
-        'reason': smart_str(exception, errors='replace'),
+        'reason': smart_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
     })

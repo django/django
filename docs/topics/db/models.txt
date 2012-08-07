@@ -384,7 +384,8 @@ Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
+mixing and matching pizzas and toppings, a standard
+:class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
 
 For example, consider the case of an application tracking the musical groups

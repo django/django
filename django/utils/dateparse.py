@@ -7,6 +7,7 @@
 
 import datetime
 import re
+from django.utils import six
 from django.utils.timezone import utc
 from django.utils.tzinfo import FixedOffset
 
@@ -34,7 +35,7 @@ def parse_date(value):
     """
     match = date_re.match(value)
     if match:
-        kw = dict((k, int(v)) for k, v in match.groupdict().iteritems())
+        kw = dict((k, int(v)) for k, v in six.iteritems(match.groupdict()))
         return datetime.date(**kw)
 
 def parse_time(value):
@@ -53,7 +54,7 @@ def parse_time(value):
         kw = match.groupdict()
         if kw['microsecond']:
             kw['microsecond'] = kw['microsecond'].ljust(6, '0')
-        kw = dict((k, int(v)) for k, v in kw.iteritems() if v is not None)
+        kw = dict((k, int(v)) for k, v in six.iteritems(kw) if v is not None)
         return datetime.time(**kw)
 
 def parse_datetime(value):
@@ -80,6 +81,6 @@ def parse_datetime(value):
             if tzinfo[0] == '-':
                 offset = -offset
             tzinfo = FixedOffset(offset)
-        kw = dict((k, int(v)) for k, v in kw.iteritems() if v is not None)
+        kw = dict((k, int(v)) for k, v in six.iteritems(kw) if v is not None)
         kw['tzinfo'] = tzinfo
         return datetime.datetime(**kw)

@@ -5,6 +5,7 @@ import gettext
 from os import path
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.translation import override, activate, get_language
 from django.utils.text import javascript_quote
@@ -22,6 +23,9 @@ class I18NTests(TestCase):
             response = self.client.post('/views/i18n/setlang/', data=post_data)
             self.assertRedirects(response, 'http://testserver/views/')
             self.assertEqual(self.client.session['django_language'], lang_code)
+
+    def test_setlang_reversal(self):
+        self.assertEqual(reverse('set_language'), '/views/i18n/setlang/')
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""

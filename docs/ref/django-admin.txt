@@ -743,6 +743,24 @@ use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
 
+.. versionchanged:: 1.5
+
+If you would like to specify either IPython or bpython as your interpreter if
+you have both installed you can specify an alternative interpreter interface
+with the ``-i`` or ``--interface`` options like so:
+
+IPython::
+
+    django-admin.py shell -i ipython
+    django-admin.py shell --interface ipython
+
+
+bpython::
+
+    django-admin.py shell -i bpython
+    django-admin.py shell --interface bpython
+
+
 .. _IPython: http://ipython.scipy.org/
 .. _bpython: http://bpython-interpreter.org/
 

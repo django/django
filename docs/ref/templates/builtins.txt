@@ -419,7 +419,7 @@ will be interpreted like:
 
     if (athlete_list and coach_list) or cheerleader_list
 
-Use of actual brackets in the :ttag:`if` tag is invalid syntax.  If you need
+Use of actual parentheses in the :ttag:`if` tag is invalid syntax.  If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
@@ -1184,7 +1184,7 @@ Removes all values of arg from the given string.
 
 For example::
 
-    {{ value|cut:" "}}
+    {{ value|cut:" " }}
 
 If ``value`` is ``"String with spaces"``, the output will be
 ``"Stringwithspaces"``.

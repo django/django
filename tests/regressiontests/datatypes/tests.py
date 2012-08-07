@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 
 from django.test import TestCase, skipIfDBFeature
+from django.utils import six
 from django.utils.timezone import utc
 
 from .models import Donut, RumBaba
@@ -73,7 +74,7 @@ class DataTypesTestCase(TestCase):
         database should be unicode."""
         d = Donut.objects.create(name='Jelly Donut', review='Outstanding')
         newd = Donut.objects.get(id=d.id)
-        self.assertTrue(isinstance(newd.review, unicode))
+        self.assertTrue(isinstance(newd.review, six.text_type))
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):

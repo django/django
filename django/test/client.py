@@ -1,11 +1,14 @@
-import urllib
 import sys
 import os
 import re
 import mimetypes
 from copy import copy
 from io import BytesIO
-from urlparse import urlparse, urlsplit
+try:
+    from urllib.parse import unquote, urlparse, urlsplit
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -16,10 +19,11 @@ from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_bytes
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
+from django.utils import six
 from django.db import close_connection
 from django.test.utils import ContextList
 
@@ -104,7 +108,7 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
     is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
@@ -115,7 +119,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, basestring) and is_iterable(value):
+        elif not isinstance(value, six.string_types) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -141,7 +145,7 @@ def encode_multipart(boundary, data):
     return '\r\n'.join(lines)
 
 def encode_file(boundary, key, file):
-    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
     content_type = mimetypes.guess_type(file.name)[0]
     if content_type is None:
         content_type = 'application/octet-stream'
@@ -190,9 +194,9 @@ class RequestFactory(object):
             'SERVER_NAME':       'testserver',
             'SERVER_PORT':       '80',
             'SERVER_PROTOCOL':   'HTTP/1.1',
-            'wsgi.version':      (1,0),
+            'wsgi.version':      (1, 0),
             'wsgi.url_scheme':   'http',
-            'wsgi.input':        FakePayload(''),
+            'wsgi.input':        FakePayload(b''),
             'wsgi.errors':       self.errors,
             'wsgi.multiprocess': True,
             'wsgi.multithread':  False,
@@ -216,14 +220,14 @@ class RequestFactory(object):
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return smart_str(data, encoding=charset)
+            return smart_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
         # If there are parameters, add them
         if parsed[3]:
-            return urllib.unquote(parsed[2] + ";" + parsed[3])
+            return unquote(parsed[2] + ";" + parsed[3])
         else:
-            return urllib.unquote(parsed[2])
+            return unquote(parsed[2])
 
     def get(self, path, data={}, **extra):
         "Construct a GET request."
@@ -287,7 +291,7 @@ class RequestFactory(object):
     def generic(self, method, path,
                 data='', content_type='application/octet-stream', **extra):
         parsed = urlparse(path)
-        data = smart_str(data, settings.DEFAULT_CHARSET)
+        data = smart_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   parsed[4],
@@ -381,7 +385,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                raise exc_info[1], None, exc_info[2]
+                six.reraise(exc_info[1], None, exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self

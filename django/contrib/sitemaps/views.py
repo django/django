@@ -3,6 +3,7 @@ from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.utils import six
 
 def index(request, sitemaps,
           template_name='sitemap_index.xml', mimetype='application/xml',
@@ -35,7 +36,7 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("No sitemap available for section: %r" % section)
         maps = [sitemaps[section]]
     else:
-        maps = sitemaps.values()
+        maps = list(six.itervalues(sitemaps))
     page = request.GET.get("p", 1)
 
     urls = []

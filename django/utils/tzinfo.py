@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import time
 from datetime import timedelta, tzinfo
 
-from django.utils.encoding import smart_unicode, smart_str, DEFAULT_LOCALE_ENCODING
+from django.utils.encoding import smart_text, smart_str, DEFAULT_LOCALE_ENCODING
 
 # Python's doc say: "A tzinfo subclass must have an __init__() method that can
 # be called with no arguments". FixedOffset and LocalTimezone don't honor this
@@ -72,7 +72,7 @@ class LocalTimezone(tzinfo):
 
     def tzname(self, dt):
         try:
-            return smart_unicode(time.tzname[self._isdst(dt)],
+            return smart_text(time.tzname[self._isdst(dt)],
                                  DEFAULT_LOCALE_ENCODING)
         except UnicodeDecodeError:
             return None

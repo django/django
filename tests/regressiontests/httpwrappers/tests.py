@@ -1,10 +1,14 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import copy
 import pickle
 
-from django.http import (QueryDict, HttpResponse, SimpleCookie, BadHeaderError,
-        parse_cookie)
+from django.core.exceptions import SuspiciousOperation
+from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
+                         HttpResponsePermanentRedirect,
+                         SimpleCookie, BadHeaderError,
+                         parse_cookie)
 from django.utils import unittest
 
 
@@ -297,6 +301,29 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [unichr(1950),]
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
+
+    def test_file_interface(self):
+        r = HttpResponse()
+        r.write(b"hello")
+        self.assertEqual(r.tell(), 5)
+        r.write("привет")
+        self.assertEqual(r.tell(), 17)
+
+        r = HttpResponse(['abc'])
+        self.assertRaises(Exception, r.write, 'def')
+
+    def test_unsafe_redirect(self):
+        bad_urls = [
+            'data:text/html,<script>window.alert("xss")</script>',
+            'mailto:test@example.com',
+            'file:///etc/passwd',
+        ]
+        for url in bad_urls:
+            self.assertRaises(SuspiciousOperation,
+                              HttpResponseRedirect, url)
+            self.assertRaises(SuspiciousOperation,
+                              HttpResponsePermanentRedirect, url)
+
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):

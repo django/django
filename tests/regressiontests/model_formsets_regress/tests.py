@@ -5,6 +5,7 @@ from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
 from django.forms.util import ErrorDict, ErrorList
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
+from django.utils import six
 
 from .models import User, UserSite, Restaurant, Manager, Network, Host
 
@@ -51,7 +52,7 @@ class InlineFormsetTests(TestCase):
             'usersite_set-TOTAL_FORMS': '1',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '0',
-            'usersite_set-0-id': unicode(usersite[0]['id']),
+            'usersite_set-0-id': six.text_type(usersite[0]['id']),
             'usersite_set-0-data': '11',
             'usersite_set-0-user': 'apollo13'
         }
@@ -69,7 +70,7 @@ class InlineFormsetTests(TestCase):
             'usersite_set-TOTAL_FORMS': '2',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '0',
-            'usersite_set-0-id': unicode(usersite[0]['id']),
+            'usersite_set-0-id': six.text_type(usersite[0]['id']),
             'usersite_set-0-data': '11',
             'usersite_set-0-user': 'apollo13',
             'usersite_set-1-data': '42',
@@ -124,7 +125,7 @@ class InlineFormsetTests(TestCase):
             'manager_set-TOTAL_FORMS': '1',
             'manager_set-INITIAL_FORMS': '1',
             'manager_set-MAX_NUM_FORMS': '0',
-            'manager_set-0-id': unicode(manager[0]['id']),
+            'manager_set-0-id': six.text_type(manager[0]['id']),
             'manager_set-0-name': 'Terry Gilliam'
         }
         form_set = FormSet(data, instance=restaurant)
@@ -140,7 +141,7 @@ class InlineFormsetTests(TestCase):
             'manager_set-TOTAL_FORMS': '2',
             'manager_set-INITIAL_FORMS': '1',
             'manager_set-MAX_NUM_FORMS': '0',
-            'manager_set-0-id': unicode(manager[0]['id']),
+            'manager_set-0-id': six.text_type(manager[0]['id']),
             'manager_set-0-name': 'Terry Gilliam',
             'manager_set-1-name': 'John Cleese'
         }
@@ -188,7 +189,7 @@ class InlineFormsetTests(TestCase):
             'host_set-TOTAL_FORMS': '2',
             'host_set-INITIAL_FORMS': '1',
             'host_set-MAX_NUM_FORMS': '0',
-            'host_set-0-id': unicode(host1.id),
+            'host_set-0-id': six.text_type(host1.id),
             'host_set-0-hostname': 'tranquility.hub.dal.net',
             'host_set-1-hostname': 'matrix.de.eu.dal.net'
         }

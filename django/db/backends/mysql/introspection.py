@@ -1,4 +1,5 @@
 from django.db.backends import BaseDatabaseIntrospection
+from django.utils import six
 from MySQLdb import ProgrammingError, OperationalError
 from MySQLdb.constants import FIELD_TYPE
 import re
@@ -79,7 +80,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         Returns the name of the primary key column for the given table
         """
-        for column in self.get_indexes(cursor, table_name).iteritems():
+        for column in six.iteritems(self.get_indexes(cursor, table_name)):
             if column[1]['primary_key']:
                 return column[0]
         return None

@@ -9,7 +9,7 @@ from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
 from django.test import TestCase
 from django.utils import translation
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text
 
 from .error_messages import AssertFormErrorsMixin
 
@@ -551,10 +551,10 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         f = GenericIPAddressField(unpack_ipv4=True)
         self.assertEqual(f.clean('::ffff:0a0a:0a0a'), '10.10.10.10')
 
-    def test_smart_unicode(self):
+    def test_smart_text(self):
         class Test:
             def __str__(self):
-               return b'ŠĐĆŽćžšđ'
+               return 'ŠĐĆŽćžšđ'.encode('utf-8')
 
         class TestU:
             def __str__(self):
@@ -562,10 +562,10 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
             def __unicode__(self):
                return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 
-        self.assertEqual(smart_unicode(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(1), '1')
-        self.assertEqual(smart_unicode('foo'), 'foo')
+        self.assertEqual(smart_text(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_text(1), '1')
+        self.assertEqual(smart_text('foo'), 'foo')
 
     def test_accessing_clean(self):
         class UserForm(Form):
@@ -591,7 +591,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
             def as_divs(self):
                 if not self: return ''
-                return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % force_unicode(e) for e in self])
+                return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % force_text(e) for e in self])
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)

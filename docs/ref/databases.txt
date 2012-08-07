@@ -111,7 +111,7 @@ outputs a single ``CREATE INDEX`` statement.  However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perfrom
+for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
@@ -238,7 +238,7 @@ to you, the developer, to handle the fact that you will receive bytestrings if
 you configure your table(s) to use ``utf8_bin`` collation. Django itself should
 mostly work smoothly with such columns (except for the ``contrib.sessions``
 ``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.smart_unicode()`` at
+your code must be prepared to call ``django.utils.encoding.smart_text()`` at
 times if it really wants to work with consistent data -- Django will not do
 this for you (the database backend layer and the model population layer are
 separated internally so the database layer doesn't know it needs to make this

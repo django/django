@@ -6,11 +6,13 @@ import os
 import re
 import sys
 import gettext as gettext_module
-from io import StringIO
 from threading import local
 
 from django.utils.importlib import import_module
+from django.utils.encoding import smart_str, smart_text
 from django.utils.safestring import mark_safe, SafeData
+from django.utils import six
+from django.utils.six import StringIO
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -259,12 +261,14 @@ def do_translate(message, translation_function):
 def gettext(message):
     return do_translate(message, 'gettext')
 
-def ugettext(message):
-    return do_translate(message, 'ugettext')
+if six.PY3:
+    ugettext = gettext
+else:
+    def ugettext(message):
+        return do_translate(message, 'ugettext')
 
 def pgettext(context, message):
-    result = do_translate(
-        "%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+    result = ugettext("%s%s%s" % (context, CONTEXT_SEPARATOR, message))
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -297,20 +301,23 @@ def ngettext(singular, plural, number):
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 
-def ungettext(singular, plural, number):
-    """
-    Returns a unicode strings of the translation of either the singular or
-    plural, based on the number.
-    """
-    return do_ntranslate(singular, plural, number, 'ungettext')
+if six.PY3:
+    ungettext = ngettext
+else:
+    def ungettext(singular, plural, number):
+        """
+        Returns a unicode strings of the translation of either the singular or
+        plural, based on the number.
+        """
+        return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = do_ntranslate("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                           "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
-                           number, 'ungettext')
+    result = ungettext("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                        number)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = do_ntranslate(singular, plural, number, 'ungettext')
+        result = ungettext(singular, plural, number)
     return result
 
 def all_locale_paths():
@@ -440,7 +447,7 @@ def templatize(src, origin=None):
     from django.conf import settings
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
-    src = src.decode(settings.FILE_CHARSET)
+    src = smart_text(src, settings.FILE_CHARSET)
     out = StringIO()
     message_context = None
     intrans = False
@@ -455,7 +462,7 @@ def templatize(src, origin=None):
                 content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
-                    if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                    if line.lstrip().startswith(smart_text(TRANSLATOR_COMMENT_MARK)):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
                     if translators_comment_start is not None and lineno >= translators_comment_start:
@@ -570,7 +577,7 @@ def templatize(src, origin=None):
                 out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
-    return out.getvalue().encode('utf-8')
+    return smart_str(out.getvalue())
 
 def parse_accept_lang_header(lang_string):
     """

@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_apps, get_models, signals
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
+from django.utils import six
 
 def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     """
@@ -24,17 +25,17 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     )
     to_remove = [
         ct
-        for (model_name, ct) in content_types.iteritems()
+        for (model_name, ct) in six.iteritems(content_types)
         if model_name not in app_models
     ]
 
     cts = ContentType.objects.bulk_create([
         ContentType(
-            name=smart_unicode(model._meta.verbose_name_raw),
+            name=smart_text(model._meta.verbose_name_raw),
             app_label=app_label,
             model=model_name,
         )
-        for (model_name, model) in app_models.iteritems()
+        for (model_name, model) in six.iteritems(app_models)
         if model_name not in content_types
     ])
     if verbosity >= 2:

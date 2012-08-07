@@ -103,7 +103,9 @@ import __future__
 import sys, traceback, inspect, linecache, os, re
 import unittest, difflib, pdb, tempfile
 import warnings
-from StringIO import StringIO
+
+from django.utils import six
+from django.utils.six.moves import StringIO, xrange
 
 if sys.platform.startswith('java'):
     # On Jython, isclass() reports some modules as classes. Patch it.
@@ -209,7 +211,7 @@ def _normalize_module(module, depth=2):
     """
     if inspect.ismodule(module):
         return module
-    elif isinstance(module, (str, unicode)):
+    elif isinstance(module, six.string_types):
         return __import__(module, globals(), locals(), ["*"])
     elif module is None:
         return sys.modules[sys._getframe(depth).f_globals['__name__']]
@@ -478,7 +480,7 @@ class DocTest:
         Create a new DocTest containing the given examples.  The
         DocTest's globals are initialized with a copy of `globs`.
         """
-        assert not isinstance(examples, basestring), \
+        assert not isinstance(examples, six.string_types), \
                "DocTest no longer accepts str; use DocTestParser instead"
         self.examples = examples
         self.docstring = docstring
@@ -499,11 +501,31 @@ class DocTest:
 
 
     # This lets us sort tests by name:
+    def _cmpkey(self):
+        return (self.name, self.filename, self.lineno, id(self))
     def __cmp__(self, other):
         if not isinstance(other, DocTest):
             return -1
-        return cmp((self.name, self.filename, self.lineno, id(self)),
-                   (other.name, other.filename, other.lineno, id(other)))
+        return cmp(self._cmpkey(), other._cmpkey())
+
+    def __lt__(self, other):
+        return self._cmpkey() < other._cmpkey()
+
+    def __le__(self, other):
+        return self._cmpkey() <= other._cmpkey()
+
+    def __gt__(self, other):
+        return self._cmpkey() > other._cmpkey()
+
+    def __ge__(self, other):
+        return self._cmpkey() >= other._cmpkey()
+
+    def __eq__(self, other):
+        return self._cmpkey() == other._cmpkey()
+
+    def __ne__(self, other):
+        return self._cmpkey() != other._cmpkey()
+
 
 ######################################################################
 ## 3. DocTestParser
@@ -861,7 +883,7 @@ class DocTestFinder:
         if module is None:
             return True
         elif inspect.isfunction(object):
-            return module.__dict__ is object.func_globals
+            return module.__dict__ is object.__globals__
         elif inspect.isclass(object):
             return module.__name__ == object.__module__
         elif inspect.getmodule(object) is not None:
@@ -904,13 +926,13 @@ class DocTestFinder:
         # Look for tests in a module's __test__ dictionary.
         if inspect.ismodule(obj) and self._recurse:
             for valname, val in getattr(obj, '__test__', {}).items():
-                if not isinstance(valname, basestring):
+                if not isinstance(valname, six.string_types):
                     raise ValueError("DocTestFinder.find: __test__ keys "
                                      "must be strings: %r" %
                                      (type(valname),))
                 if not (inspect.isfunction(val) or inspect.isclass(val) or
                         inspect.ismethod(val) or inspect.ismodule(val) or
-                        isinstance(val, basestring)):
+                        isinstance(val, six.string_types)):
                     raise ValueError("DocTestFinder.find: __test__ values "
                                      "must be strings, functions, methods, "
                                      "classes, or modules: %r" %
@@ -926,7 +948,7 @@ class DocTestFinder:
                 if isinstance(val, staticmethod):
                     val = getattr(obj, valname)
                 if isinstance(val, classmethod):
-                    val = getattr(obj, valname).im_func
+                    val = getattr(obj, valname).__func__
 
                 # Recurse to methods, properties, and nested classes.
                 if ((inspect.isfunction(val) or inspect.isclass(val) or
@@ -943,7 +965,7 @@ class DocTestFinder:
         """
         # Extract the object's docstring.  If it doesn't have one,
         # then return None (no test for this object).
-        if isinstance(obj, basestring):
+        if isinstance(obj, six.string_types):
             docstring = obj
         else:
             try:
@@ -951,7 +973,7 @@ class DocTestFinder:
                     docstring = ''
                 else:
                     docstring = obj.__doc__
-                    if not isinstance(docstring, basestring):
+                    if not isinstance(docstring, six.string_types):
                         docstring = str(docstring)
             except (TypeError, AttributeError):
                 docstring = ''
@@ -998,8 +1020,8 @@ class DocTestFinder:
                     break
 
         # Find the line number for functions & methods.
-        if inspect.ismethod(obj): obj = obj.im_func
-        if inspect.isfunction(obj): obj = obj.func_code
+        if inspect.ismethod(obj): obj = obj.__func__
+        if inspect.isfunction(obj): obj = obj.__code__
         if inspect.istraceback(obj): obj = obj.tb_frame
         if inspect.isframe(obj): obj = obj.f_code
         if inspect.iscode(obj):
@@ -1227,13 +1249,64 @@ class DocTestRunner:
             # __patched_linecache_getlines).
             filename = '<doctest %s[%d]>' % (test.name, examplenum)
 
+            # Doctest and Py3 issue:
+            # If the current example that we wish to run is going to fail
+            # because it expects a leading u"", then use an alternate displayhook
+            original_displayhook = sys.displayhook
+
+            if six.PY3:
+                 # only set alternate displayhook if Python 3.x or after
+                lines = []
+                def py3_displayhook(value):
+                    if value is None:
+                        # None should not be considered at all
+                        return original_displayhook(value)
+
+                    # Collect the repr output in one variable
+                    s = repr(value)
+                    # Strip b"" and u"" prefixes from the repr and expected output
+                    # TODO: better way of stripping the prefixes?
+                    expected = example.want
+                    expected = expected.strip() # be wary of newlines
+                    s = s.replace("u", "")
+                    s = s.replace("b", "")
+                    expected = expected.replace("u", "")
+                    expected = expected.replace("b", "")
+                    # single quote vs. double quote should not matter
+                    # default all quote marks to double quote
+                    s = s.replace("'", '"')
+                    expected = expected.replace("'", '"')
+
+                    # In case of multi-line expected result
+                    lines.append(s)
+
+                    # let them match
+                    if s == expected: # be wary of false positives here
+                        # they should be the same, print expected value
+                        sys.stdout.write("%s\n" % example.want.strip())
+
+                    # multi-line expected output, doctest uses loop
+                    elif len(expected.split("\n")) == len(lines):
+                        if "\n".join(lines) == expected:
+                            sys.stdout.write("%s\n" % example.want.strip())
+                        else:
+                            sys.stdout.write("%s\n" % repr(value))
+                    elif len(expected.split("\n")) != len(lines):
+                        # we are not done looping yet, do not print anything!
+                        pass
+
+                    else:
+                        sys.stdout.write("%s\n" % repr(value))
+
+                sys.displayhook = py3_displayhook
+
             # Run the example in the given context (globs), and record
             # any exception that gets raised.  (But don't intercept
             # keyboard interrupts.)
             try:
                 # Don't blink!  This is where the user's code gets run.
-                exec compile(example.source, filename, "single",
-                             compileflags, 1) in test.globs
+                six.exec_(compile(example.source, filename, "single",
+                             compileflags, 1), test.globs)
                 self.debugger.set_continue() # ==== Example Finished ====
                 exception = None
             except KeyboardInterrupt:
@@ -1241,9 +1314,14 @@ class DocTestRunner:
             except:
                 exception = sys.exc_info()
                 self.debugger.set_continue() # ==== Example Finished ====
+            finally:
+                # restore the original displayhook
+                sys.displayhook = original_displayhook
 
             got = self._fakeout.getvalue()  # the actual output
             self._fakeout.truncate(0)
+            # Python 3.1 requires seek after truncate
+            self._fakeout.seek(0)
             outcome = FAILURE   # guilty until proved innocent or insane
 
             # If the example executed without raising any exceptions,
@@ -1254,10 +1332,21 @@ class DocTestRunner:
 
             # The example raised an exception:  check if it was expected.
             else:
-                exc_info = sys.exc_info()
-                exc_msg = traceback.format_exception_only(*exc_info[:2])[-1]
+                exc_msg = traceback.format_exception_only(*exception[:2])[-1]
+                if six.PY3:
+                    # module name will be in group(1) and the expected
+                    # exception message will be in group(2)
+                    m = re.match(r'(.*)\.(\w+:.+\s)', exc_msg)
+                    # make sure there's a match
+                    if m != None:
+                        f_name = m.group(1)
+                        # check to see if m.group(1) contains the module name
+                        if f_name == exception[0].__module__:
+                            # strip the module name from exc_msg
+                            exc_msg = m.group(2)
+
                 if not quiet:
-                    got += _exception_traceback(exc_info)
+                    got += _exception_traceback(exception)
 
                 # If `example.exc_msg` is None, then we weren't expecting
                 # an exception.
@@ -1287,7 +1376,7 @@ class DocTestRunner:
             elif outcome is BOOM:
                 if not quiet:
                     self.report_unexpected_exception(out, test, example,
-                                                     exc_info)
+                                                     exception)
                 failures += 1
             else:
                 assert False, ("unknown outcome", outcome)
@@ -1627,8 +1716,8 @@ class DebugRunner(DocTestRunner):
          ...                                    {}, 'foo', 'foo.py', 0)
          >>> try:
          ...     runner.run(test)
-         ... except UnexpectedException as failure:
-         ...     pass
+         ... except UnexpectedException as e:
+         ...     failure = e
 
          >>> failure.test is test
          True
@@ -1655,8 +1744,8 @@ class DebugRunner(DocTestRunner):
 
          >>> try:
          ...    runner.run(test)
-         ... except DocTestFailure as failure:
-         ...    pass
+         ... except DocTestFailure as e:
+         ...    failure = e
 
        DocTestFailure objects provide access to the test:
 
@@ -2165,8 +2254,8 @@ class DocTestCase(unittest.TestCase):
              >>> case = DocTestCase(test)
              >>> try:
              ...     case.debug()
-             ... except UnexpectedException as failure:
-             ...     pass
+             ... except UnexpectedException as e:
+             ...     failure = e
 
            The UnexpectedException contains the test, the example, and
            the original exception:
@@ -2194,8 +2283,8 @@ class DocTestCase(unittest.TestCase):
 
              >>> try:
              ...    case.debug()
-             ... except DocTestFailure as failure:
-             ...    pass
+             ... except DocTestFailure as e:
+             ...    failure = e
 
            DocTestFailure objects provide access to the test:
 
@@ -2644,7 +2733,7 @@ __test__ = {"_TestClass": _TestClass,
             "whitespace normalization": r"""
                 If the whitespace normalization flag is used, then
                 differences in whitespace are ignored.
-                    >>> print(range(30)) #doctest: +NORMALIZE_WHITESPACE
+                    >>> print(list(xrange(30))) #doctest: +NORMALIZE_WHITESPACE
                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
                      15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
                      27, 28, 29]

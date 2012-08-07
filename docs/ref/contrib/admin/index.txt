@@ -115,7 +115,7 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    Controls whether a selection counter is display next to the action dropdown.
+    Controls whether a selection counter is displayed next to the action dropdown.
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
@@ -1266,11 +1266,11 @@ provided some extra mapping data that would not otherwise be available::
             # ...
             pass
 
-        def change_view(self, request, object_id, extra_context=None):
+        def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
             return super(MyModelAdmin, self).change_view(request, object_id,
-                extra_context=extra_context)
+                form_url, extra_context=extra_context)
 
 .. versionadded:: 1.4
 

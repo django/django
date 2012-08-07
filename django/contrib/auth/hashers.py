@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_bytes
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
@@ -298,7 +298,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.sha1(smart_str(salt + password)).hexdigest()
+        hash = hashlib.sha1(smart_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -326,7 +326,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.md5(smart_str(salt + password)).hexdigest()
+        hash = hashlib.md5(smart_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -360,7 +360,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        return hashlib.md5(smart_str(password)).hexdigest()
+        return hashlib.md5(smart_bytes(password)).hexdigest()
 
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')

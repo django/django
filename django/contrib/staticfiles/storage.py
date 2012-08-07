@@ -3,8 +3,11 @@ import hashlib
 import os
 import posixpath
 import re
-from urllib import unquote
-from urlparse import urlsplit, urlunsplit, urldefrag
+try:
+    from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
+except ImportError:     # Python 2
+    from urllib import unquote
+    from urlparse import urlsplit, urlunsplit, urldefrag
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
@@ -13,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import force_text, smart_bytes
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 
@@ -109,7 +112,7 @@ class CachedFilesMixin(object):
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
-        return 'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
+        return 'staticfiles:%s' % hashlib.md5(smart_bytes(name)).hexdigest()
 
     def url(self, name, force=False):
         """
@@ -245,9 +248,9 @@ class CachedFilesMixin(object):
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(smart_str(content))
+                    content_file = ContentFile(smart_bytes(content))
                     saved_name = self._save(hashed_name, content_file)
-                    hashed_name = force_unicode(saved_name.replace('\\', '/'))
+                    hashed_name = force_text(saved_name.replace('\\', '/'))
                     processed = True
                 else:
                     # or handle the case in which neither processing nor
@@ -255,7 +258,7 @@ class CachedFilesMixin(object):
                     if not hashed_file_exists:
                         processed = True
                         saved_name = self._save(hashed_name, original_file)
-                        hashed_name = force_unicode(saved_name.replace('\\', '/'))
+                        hashed_name = force_text(saved_name.replace('\\', '/'))
 
                 # and then set the cache accordingly
                 hashed_paths[self.cache_key(name)] = hashed_name

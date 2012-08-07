@@ -8,6 +8,7 @@ circular import difficulties.
 from __future__ import unicode_literals
 
 from django.db.backends import util
+from django.utils import six
 from django.utils import tree
 
 
@@ -40,7 +41,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + kwargs.items())
+        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -114,7 +115,7 @@ class DeferredAttribute(object):
 
     def _check_parent_chain(self, instance, name):
         """
-        Check if the field value can be fetched from a parent field already 
+        Check if the field value can be fetched from a parent field already
         loaded in the instance. This can be done if the to-be fetched
         field is a primary key field.
         """

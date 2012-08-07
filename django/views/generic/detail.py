@@ -66,7 +66,7 @@ class SingleObjectMixin(ContextMixin):
             else:
                 raise ImproperlyConfigured("%(cls)s is missing a queryset. Define "
                                            "%(cls)s.model, %(cls)s.queryset, or override "
-                                           "%(cls)s.get_object()." % {
+                                           "%(cls)s.get_queryset()." % {
                                                 'cls': self.__class__.__name__
                                         })
         return self.queryset._clone()

@@ -2,9 +2,11 @@
  Utilities for manipulating Geometry WKT.
 """
 
+from django.utils import six
+
 def precision_wkt(geom, prec):
     """
-    Returns WKT text of the geometry according to the given precision (an 
+    Returns WKT text of the geometry according to the given precision (an
     integer or a string).  If the precision is an integer, then the decimal
     places of coordinates WKT will be truncated to that number:
 
@@ -14,12 +16,12 @@ def precision_wkt(geom, prec):
      >>> precision(geom, 1)
      'POINT (5.0 23.0)'
 
-    If the precision is a string, it must be valid Python format string 
+    If the precision is a string, it must be valid Python format string
     (e.g., '%20.7f') -- thus, you should know what you're doing.
     """
     if isinstance(prec, int):
         num_fmt = '%%.%df' % prec
-    elif isinstance(prec, basestring):
+    elif isinstance(prec, six.string_types):
         num_fmt = prec
     else:
         raise TypeError

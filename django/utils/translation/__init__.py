@@ -3,8 +3,9 @@ Internationalization support.
 """
 from __future__ import unicode_literals
 
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.functional import lazy
+from django.utils import six
 
 
 __all__ = [
@@ -78,12 +79,12 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
-ngettext_lazy = lazy(ngettext, str)
-gettext_lazy = lazy(gettext, str)
-ungettext_lazy = lazy(ungettext, unicode)
-ugettext_lazy = lazy(ugettext, unicode)
-pgettext_lazy = lazy(pgettext, unicode)
-npgettext_lazy = lazy(npgettext, unicode)
+ngettext_lazy = lazy(ngettext, bytes)
+gettext_lazy = lazy(gettext, bytes)
+ungettext_lazy = lazy(ungettext, six.text_type)
+ugettext_lazy = lazy(ugettext, six.text_type)
+pgettext_lazy = lazy(pgettext, six.text_type)
+npgettext_lazy = lazy(npgettext, six.text_type)
 
 def activate(language):
     return _trans.activate(language)
@@ -138,8 +139,8 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
-    return ''.join([force_unicode(s) for s in strings])
-string_concat = lazy(_string_concat, unicode)
+    return ''.join([force_text(s) for s in strings])
+string_concat = lazy(_string_concat, six.text_type)
 
 def get_language_info(lang_code):
     from django.conf.locale import LANG_INFO

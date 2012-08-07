@@ -1,6 +1,7 @@
 import binascii
 import unittest
 from django.contrib.gis.geos import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
+from django.utils import six
 
 class GEOSIOTest(unittest.TestCase):
 
@@ -12,12 +13,12 @@ class GEOSIOTest(unittest.TestCase):
         # read() should return a GEOSGeometry
         ref = GEOSGeometry(wkt)
         g1 = wkt_r.read(wkt)
-        g2 = wkt_r.read(unicode(wkt))
+        g2 = wkt_r.read(six.text_type(wkt))
 
         for geom in (g1, g2):
             self.assertEqual(ref, geom)
 
-        # Should only accept basestring objects.
+        # Should only accept six.string_types objects.
         self.assertRaises(TypeError, wkt_r.read, 1)
         self.assertRaises(TypeError, wkt_r.read, buffer('foo'))
 
@@ -48,7 +49,7 @@ class GEOSIOTest(unittest.TestCase):
         bad_input = (1, 5.23, None, False)
         for bad_wkb in bad_input:
             self.assertRaises(TypeError, wkb_r.read, bad_wkb)
-        
+
     def test04_wkbwriter(self):
         wkb_w = WKBWriter()
 
@@ -67,7 +68,7 @@ class GEOSIOTest(unittest.TestCase):
         for bad_byteorder in (-1, 2, 523, 'foo', None):
             # Equivalent of `wkb_w.byteorder = bad_byteorder`
             self.assertRaises(ValueError, wkb_w._set_byteorder, bad_byteorder)
-            
+
         # Setting the byteorder to 0 (for Big Endian)
         wkb_w.byteorder = 0
         self.assertEqual(hex2, wkb_w.write_hex(g))
@@ -79,7 +80,7 @@ class GEOSIOTest(unittest.TestCase):
         # Now, trying out the 3D and SRID flags.
         g = GEOSGeometry('POINT (5 23 17)')
         g.srid = 4326
-        
+
         hex3d = '0101000080000000000000144000000000000037400000000000003140'
         wkb3d = buffer(binascii.a2b_hex(hex3d))
         hex3d_srid = '01010000A0E6100000000000000000144000000000000037400000000000003140'

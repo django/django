@@ -75,6 +75,17 @@ return a :class:`GEOSGeometry` object from an input string or a file::
     >>> pnt = fromfile('/path/to/pnt.wkt')
     >>> pnt = fromfile(open('/path/to/pnt.wkt'))
 
+.. _geos-exceptions-in-logfile:
+
+.. admonition:: My logs are filled with GEOS-related errors
+
+    You find many ``TypeError`` or ``AttributeError`` exceptions filling your
+    Web server's log files. This generally means that you are creating GEOS
+    objects at the top level of some of your Python modules. Then, due to a race
+    condition in the garbage collector, your module is garbage collected before
+    the GEOS object. To prevent this, create :class:`GEOSGeometry` objects
+    inside the local scope of your functions/methods.
+
 Geometries are Pythonic
 -----------------------
 :class:`GEOSGeometry` objects are 'Pythonic', in other words components may

@@ -317,7 +317,7 @@ class WizardTests(TestCase):
 
         class WizardWithProcessStep(TestWizardClass):
             def process_step(self, request, form, step):
-                that.assertTrue(hasattr(form, 'cleaned_data'))
+                that.assertTrue(form.is_valid())
                 reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm,

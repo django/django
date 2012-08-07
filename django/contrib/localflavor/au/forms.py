@@ -10,7 +10,7 @@ from django.contrib.localflavor.au.au_states import STATE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -44,7 +44,7 @@ class AUPhoneNumberField(Field):
         super(AUPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
             return ''
-        value = re.sub('(\(|\)|\s+|-)', '', smart_unicode(value))
+        value = re.sub('(\(|\)|\s+|-)', '', smart_text(value))
         phone_match = PHONE_DIGITS_RE.search(value)
         if phone_match:
             return '%s' % phone_match.group(1)

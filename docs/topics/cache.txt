@@ -595,7 +595,8 @@ the ``cache`` template tag. To give your template access to this tag, put
 
 The ``{% cache %}`` template tag caches the contents of the block for a given
 amount of time. It takes at least two arguments: the cache timeout, in seconds,
-and the name to give the cache fragment. For example:
+and the name to give the cache fragment. The name will be taken as is, do not
+use a variable. For example:
 
 .. code-block:: html+django
 
@@ -863,7 +864,7 @@ key version to provide a final cache key. By default, the three parts
 are joined using colons to produce a final string::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), smart_str(key)])
+        return ':'.join([key_prefix, str(version), smart_bytes(key)])
 
 If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key

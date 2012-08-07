@@ -9,9 +9,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.util import flatatt
 from django.template.defaultfilters import capfirst
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -49,7 +50,7 @@ class AdminForm(object):
         try:
             fieldset_name, fieldset_options = self.fieldsets[0]
             field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, basestring):
+            if not isinstance(field_name, six.string_types):
                 field_name = field_name[0]
             return self.form[field_name]
         except (KeyError, IndexError):
@@ -121,7 +122,7 @@ class AdminField(object):
 
     def label_tag(self):
         classes = []
-        contents = conditional_escape(force_unicode(self.field.label))
+        contents = conditional_escape(force_text(self.field.label))
         if self.is_checkbox:
             classes.append('vCheckboxLabel')
         else:
@@ -165,7 +166,7 @@ class AdminReadonlyField(object):
         label = self.field['label']
         return format_html('<label{0}>{1}:</label>',
                            flatatt(attrs),
-                           capfirst(force_unicode(label)))
+                           capfirst(force_text(label)))
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -181,14 +182,14 @@ class AdminReadonlyField(object):
                 if boolean:
                     result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_unicode(value)
+                    result_repr = smart_text(value)
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:
                 if value is None:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 elif isinstance(f.rel, ManyToManyRel):
-                    result_repr = ", ".join(map(unicode, value.all()))
+                    result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)
@@ -324,11 +325,11 @@ class AdminErrorList(forms.util.ErrorList):
     """
     def __init__(self, form, inline_formsets):
         if form.is_bound:
-            self.extend(form.errors.values())
+            self.extend(list(six.itervalues(form.errors)))
             for inline_formset in inline_formsets:
                 self.extend(inline_formset.non_form_errors())
                 for errors_in_inline_form in inline_formset.errors:
-                    self.extend(errors_in_inline_form.values())
+                    self.extend(list(six.itervalues(errors_in_inline_form)))
 
 def normalize_fieldsets(fieldsets):
     """

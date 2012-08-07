@@ -9,7 +9,10 @@ import os
 import stat
 import posixpath
 import re
-import urllib
+try:
+    from urllib.parse import unquote
+except ImportError:     # Python 2
+    from urllib import unquote
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import loader, Template, Context, TemplateDoesNotExist
@@ -30,7 +33,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(urllib.unquote(path))
+    path = posixpath.normpath(unquote(path))
     path = path.lstrip('/')
     newpath = ''
     for part in path.split('/'):

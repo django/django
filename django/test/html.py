@@ -5,9 +5,9 @@ Comparing two html documents.
 from __future__ import unicode_literals
 
 import re
-from HTMLParser import HTMLParseError
-from django.utils.encoding import force_unicode
-from django.utils.html_parser import HTMLParser
+from django.utils.encoding import force_text
+from django.utils.html_parser import HTMLParser, HTMLParseError
+from django.utils import six
 
 
 WHITESPACE = re.compile('\s+')
@@ -24,11 +24,11 @@ class Element(object):
         self.children = []
 
     def append(self, element):
-        if isinstance(element, basestring):
-            element = force_unicode(element)
+        if isinstance(element, six.string_types):
+            element = force_text(element)
             element = normalize_whitespace(element)
             if self.children:
-                if isinstance(self.children[-1], basestring):
+                if isinstance(self.children[-1], six.string_types):
                     self.children[-1] += element
                     self.children[-1] = normalize_whitespace(self.children[-1])
                     return
@@ -36,7 +36,7 @@ class Element(object):
             # removing last children if it is only whitespace
             # this can result in incorrect dom representations since
             # whitespace between inline tags like <span> is significant
-            if isinstance(self.children[-1], basestring):
+            if isinstance(self.children[-1], six.string_types):
                 if self.children[-1].isspace():
                     self.children.pop()
         if element:
@@ -45,7 +45,7 @@ class Element(object):
     def finalize(self):
         def rstrip_last_element(children):
             if children:
-                if isinstance(children[-1], basestring):
+                if isinstance(children[-1], six.string_types):
                     children[-1] = children[-1].rstrip()
                     if not children[-1]:
                         children.pop()
@@ -54,7 +54,7 @@ class Element(object):
 
         rstrip_last_element(self.children)
         for i, child in enumerate(self.children):
-            if isinstance(child, basestring):
+            if isinstance(child, six.string_types):
                 self.children[i] = child.strip()
             elif hasattr(child, 'finalize'):
                 child.finalize()
@@ -87,15 +87,15 @@ class Element(object):
         return not self.__eq__(element)
 
     def _count(self, element, count=True):
-        if not isinstance(element, basestring):
+        if not isinstance(element, six.string_types):
             if self == element:
                 return 1
         i = 0
         for child in self.children:
             # child is text content and element is also text content, then
             # make a simple "text" in "text"
-            if isinstance(child, basestring):
-                if isinstance(element, basestring):
+            if isinstance(child, six.string_types):
+                if isinstance(element, six.string_types):
                     if count:
                         i += child.count(element)
                     elif element in child:
@@ -124,14 +124,14 @@ class Element(object):
                 output += ' %s' % key
         if self.children:
             output += '>\n'
-            output += ''.join(unicode(c) for c in self.children)
+            output += ''.join(six.text_type(c) for c in self.children)
             output += '\n</%s>' % self.name
         else:
             output += ' />'
         return output
 
     def __repr__(self):
-        return unicode(self)
+        return six.text_type(self)
 
 
 class RootElement(Element):
@@ -139,7 +139,7 @@ class RootElement(Element):
         super(RootElement, self).__init__(None, ())
 
     def __unicode__(self):
-        return ''.join(unicode(c) for c in self.children)
+        return ''.join(six.text_type(c) for c in self.children)
 
 
 class Parser(HTMLParser):
@@ -219,6 +219,6 @@ def parse_html(html):
     document.finalize()
     # Removing ROOT element if it's not necessary
     if len(document.children) == 1:
-        if not isinstance(document.children[0], basestring):
+        if not isinstance(document.children[0], six.string_types):
             document = document.children[0]
     return document

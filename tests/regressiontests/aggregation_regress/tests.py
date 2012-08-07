@@ -8,6 +8,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.utils import six
 
 from .models import Author, Book, Publisher, Clues, Entries, HardbackBook
 
@@ -16,7 +17,7 @@ class AggregationTests(TestCase):
     fixtures = ["aggregation_regress.json"]
 
     def assertObjectAttrs(self, obj, **kwargs):
-        for attr, value in kwargs.iteritems():
+        for attr, value in six.iteritems(kwargs):
             self.assertEqual(getattr(obj, attr), value)
 
     def test_aggregates_in_where_clause(self):

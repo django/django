@@ -12,12 +12,13 @@ from django.template.base import Variable, Library, VariableDoesNotExist
 from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
     escape, urlize as urlize_impl, linebreaks, strip_tags)
 from django.utils.http import urlquote
 from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
+from django.utils import six
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
 from django.utils.text import normalize_newlines
@@ -37,7 +38,7 @@ def stringfilter(func):
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = force_unicode(args[0])
+            args[0] = force_text(args[0])
             if (isinstance(args[0], SafeData) and
                 getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
@@ -138,7 +139,7 @@ def floatformat(text, arg=-1):
     """
 
     try:
-        input_val = force_unicode(text)
+        input_val = force_text(text)
         d = Decimal(input_val)
     except UnicodeEncodeError:
         return ''
@@ -146,7 +147,7 @@ def floatformat(text, arg=-1):
         if input_val in special_floats:
             return input_val
         try:
-            d = Decimal(force_unicode(float(text)))
+            d = Decimal(force_text(float(text)))
         except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
             return ''
     try:
@@ -176,7 +177,7 @@ def floatformat(text, arg=-1):
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
             Context(prec=prec)).as_tuple()
-        digits = [unicode(digit) for digit in reversed(digits)]
+        digits = [six.text_type(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
         digits.insert(-exponent, '.')
@@ -191,7 +192,7 @@ def floatformat(text, arg=-1):
 @stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
-    return force_unicode(iri_to_uri(value))
+    return force_text(iri_to_uri(value))
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
@@ -200,7 +201,7 @@ def linenumbers(value, autoescape=None):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = unicode(len(unicode(len(lines))))
+    width = six.text_type(len(six.text_type(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width  + "d. %s") % (i + 1, line)
@@ -234,7 +235,7 @@ def slugify(value):
     and converts spaces to hyphens.
     """
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = six.text_type(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
 
 @register.filter(is_safe=True)
@@ -249,7 +250,7 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return ("%" + unicode(arg)) % value
+        return ("%" + six.text_type(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -461,7 +462,7 @@ def safeseq(value):
     individually, as safe, after converting them to unicode. Returns a list
     with the results.
     """
-    return [mark_safe(force_unicode(obj)) for obj in value]
+    return [mark_safe(force_text(obj)) for obj in value]
 
 @register.filter(is_safe=True)
 @stringfilter
@@ -520,7 +521,7 @@ def join(value, arg, autoescape=None):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
-    value = map(force_unicode, value)
+    value = map(force_text, value)
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -660,7 +661,7 @@ def unordered_list(value, autoescape=None):
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
                                                          indent, indent)
             output.append('%s<li>%s%s</li>' % (indent,
-                    escaper(force_unicode(title)), sublist))
+                    escaper(force_text(title)), sublist))
             i += 1
         return '\n'.join(output)
     value, converted = convert_old_style_list(value)
@@ -827,17 +828,23 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
-    if bytes < 1024:
+    KB = 1<<10
+    MB = 1<<20
+    GB = 1<<30
+    TB = 1<<40
+    PB = 1<<50
+
+    if bytes < KB:
         return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    if bytes < 1024 * 1024:
-        return ugettext("%s KB") % filesize_number_format(bytes / 1024)
-    if bytes < 1024 * 1024 * 1024:
-        return ugettext("%s MB") % filesize_number_format(bytes / (1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s GB") % filesize_number_format(bytes / (1024 * 1024 * 1024))
-    if bytes < 1024 * 1024 * 1024 * 1024 * 1024:
-        return ugettext("%s TB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024))
-    return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
+    if bytes < MB:
+        return ugettext("%s KB") % filesize_number_format(bytes / KB)
+    if bytes < GB:
+        return ugettext("%s MB") % filesize_number_format(bytes / MB)
+    if bytes < TB:
+        return ugettext("%s GB") % filesize_number_format(bytes / GB)
+    if bytes < PB:
+        return ugettext("%s TB") % filesize_number_format(bytes / TB)
+    return ugettext("%s PB") % filesize_number_format(bytes / PB)
 
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
@@ -894,4 +901,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s" % force_unicode(e, errors="replace")
+        return "Error in formatting: %s" % force_text(e, errors="replace")

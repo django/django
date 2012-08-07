@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.test import TestCase
+from django.utils import six
 
 from .models import (Building, Child, Device, Port, Item, Country, Connection,
     ClientStatus, State, Client, SpecialClient, TUser, Person, Student,
@@ -33,11 +34,11 @@ class SelectRelatedRegressTests(TestCase):
         c2=Connection.objects.create(start=port2, end=port3)
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).order_by('id')
-        self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
+        self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).select_related().order_by('id')
-        self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
+        self.assertEqual([(c.id, six.text_type(c.start), six.text_type(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')])
 
         # This final query should only have seven tables (port, device and building

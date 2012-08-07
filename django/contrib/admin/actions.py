@@ -7,7 +7,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.util import get_deleted_objects, model_ngettext
 from django.db import router
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy, ugettext as _
 
 def delete_selected(modeladmin, request, queryset):
@@ -42,7 +42,7 @@ def delete_selected(modeladmin, request, queryset):
         n = queryset.count()
         if n:
             for obj in queryset:
-                obj_display = force_unicode(obj)
+                obj_display = force_text(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
             queryset.delete()
             modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
@@ -52,9 +52,9 @@ def delete_selected(modeladmin, request, queryset):
         return None
 
     if len(queryset) == 1:
-        objects_name = force_unicode(opts.verbose_name)
+        objects_name = force_text(opts.verbose_name)
     else:
-        objects_name = force_unicode(opts.verbose_name_plural)
+        objects_name = force_text(opts.verbose_name_plural)
 
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}
