@@ -519,7 +519,7 @@ spatial functionality.
 Creating a spatial database template for PostGIS
 ------------------------------------------------
 
-If you have an earlier version of PistGIS or PostgreSQL, you will need to create
+If you have an earlier version of PostGIS or PostgreSQL, you will need to create
 a spatial database.
 
 Creating a spatial database with PostGIS is different than normal because
