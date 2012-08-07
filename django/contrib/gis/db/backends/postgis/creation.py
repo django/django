@@ -38,11 +38,11 @@ class PostGISCreation(DatabaseCreation):
                                   style.SQL_FIELD(qn(f.column)) +
                                   style.SQL_KEYWORD(' SET NOT NULL') + ';')
 
-
             if f.spatial_index:
                 # Spatial indexes created the same way for both Geometry and
                 # Geography columns
-                if f.geography:
+                # PostGIS 2.0 does not support GIST_GEOMETRY_OPS
+                if f.geography or self.connection.ops.spatial_version >= (2, 0):
                     index_opts = ''
                 else:
                     index_opts = ' ' + style.SQL_KEYWORD(self.geom_index_opts)
