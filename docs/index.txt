@@ -273,7 +273,8 @@ you can contribute:
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
-  :doc:`The Django source code repository <internals/git>`
+  :doc:`The Django source code repository <internals/git>` |
+  :doc:`Security policies <internals/security>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`
