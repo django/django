@@ -42,8 +42,13 @@ class PostGISCreation(DatabaseCreation):
                 # Spatial indexes created the same way for both Geometry and
                 # Geography columns
                 # PostGIS 2.0 does not support GIST_GEOMETRY_OPS
-                if f.geography or self.connection.ops.spatial_version >= (2, 0):
+                if f.geography:
                     index_opts = ''
+                elif self.connection.ops.spatial_version >= (2, 0):
+                    if f.dim > 2:
+                        index_opts = ' ' + style.SQL_KEYWORD('gist_geometry_ops_nd')
+                    else:
+                        index_opts = ''
                 else:
                     index_opts = ' ' + style.SQL_KEYWORD(self.geom_index_opts)
                 output.append(style.SQL_KEYWORD('CREATE INDEX ') +
