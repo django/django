@@ -86,42 +86,43 @@ field.
 If this is given, Django's admin will use a select box instead of the standard
 text field and will limit choices to the choices given.
 
-A choices list looks like this::
+A choices list is an iterable of 2-tuples; the first element in each
+tuple is the actual value to be stored, and the second element is the
+human-readable name. For example::
 
     YEAR_IN_SCHOOL_CHOICES = (
         ('FR', 'Freshman'),
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
-        ('GR', 'Graduate'),
     )
 
-The first element in each tuple is the actual value to be stored. The second
-element is the human-readable name for the option.
+Generally, it's best to define choices inside a model class, and to
+define a suitably-named constant for each value::
 
-The choices list can be defined either as part of your model class::
-
-    class Foo(models.Model):
+    class Student(models.Model):
+        FRESHMAN = 'FR'
+        SOPHOMORE = 'SO'
+        JUNIOR = 'JR'
+        SENIOR = 'SR'
         YEAR_IN_SCHOOL_CHOICES = (
-            ('FR', 'Freshman'),
-            ('SO', 'Sophomore'),
-            ('JR', 'Junior'),
-            ('SR', 'Senior'),
-            ('GR', 'Graduate'),
+            (FRESHMAN, 'Freshman'),
+            (SOPHOMORE, 'Sophomore'),
+            (JUNIOR, 'Junior'),
+            (SENIOR, 'Senior'),
         )
-        year_in_school = models.CharField(max_length=2, choices=YEAR_IN_SCHOOL_CHOICES)
+        year_in_school = models.CharField(max_length=2,
+                                          choices=YEAR_IN_SCHOOL_CHOICES,
+                                          default=FRESHMAN)
 
-or outside your model class altogether::
+        def is_upperclass(self):
+	    return self.year_in_school in (self.JUNIOR, self.SENIOR)
 
-    YEAR_IN_SCHOOL_CHOICES = (
-        ('FR', 'Freshman'),
-        ('SO', 'Sophomore'),
-        ('JR', 'Junior'),
-        ('SR', 'Senior'),
-        ('GR', 'Graduate'),
-    )
-    class Foo(models.Model):
-        year_in_school = models.CharField(max_length=2, choices=YEAR_IN_SCHOOL_CHOICES)
+Though you can define a choices list outside of a model class and then
+refer to it, defining the choices and names for each choice inside the
+model class keeps all of that information with the class that uses it,
+and makes the choices easy to reference (e.g, ``Student.SOPHOMORE``
+will work anywhere that the ``Student`` model has been imported).
 
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
