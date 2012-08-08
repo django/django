@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import pickle
+from operator import attrgetter
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -873,10 +874,10 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
             published=datetime.date(2009, 5, 4))
         val = Book.objects.db_manager("other").raw('SELECT id FROM multiple_database_book')
-        self.assertEqual(map(lambda o: o.pk, val), [dive.pk])
+        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
         val = Book.objects.raw('SELECT id FROM multiple_database_book').using('other')
-        self.assertEqual(map(lambda o: o.pk, val), [dive.pk])
+        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
         "Database assignment is retained if an object is retrieved with select_related()"
