@@ -32,7 +32,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         'within' : 'MBRWithin',
         }
 
-    gis_terms = dict([(term, None) for term in list(six.iterkeys(geometry_functions)) + ['isnull']])
+    gis_terms = dict([(term, None) for term in list(geometry_functions) + ['isnull']])
 
     def geo_db_type(self, f):
         return f.geom_type

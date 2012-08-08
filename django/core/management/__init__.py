@@ -295,7 +295,7 @@ class ManagementUtility(object):
         except IndexError:
             curr = ''
 
-        subcommands = list(six.iterkeys(get_commands())) + ['help']
+        subcommands = list(get_commands()) + ['help']
         options = [('--help', None)]
 
         # subcommand

@@ -44,7 +44,7 @@ class StepsHelper(object):
     @property
     def all(self):
         "Returns the names of all steps/forms."
-        return list(six.iterkeys(self._wizard.get_form_list()))
+        return list(self._wizard.get_form_list())
 
     @property
     def count(self):

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import time
 import warnings
 from datetime import datetime, timedelta
-from StringIO import StringIO
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
@@ -11,6 +10,7 @@ from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_r
 from django.test.utils import str_prefix
 from django.utils import unittest
 from django.utils.http import cookie_date
+from django.utils.six import StringIO
 from django.utils.timezone import utc
 
 

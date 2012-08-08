@@ -3,6 +3,7 @@ import time
 
 from django.conf import settings
 from django.db.utils import load_backend
+from django.utils.six.moves import input
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -330,7 +331,7 @@ class BaseDatabaseCreation(object):
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
             if not autoclobber:
-                confirm = raw_input(
+                confirm = input(
                     "Type 'yes' if you would like to try deleting the test "
                     "database '%s', or 'no' to cancel: " % test_database_name)
             if autoclobber or confirm == 'yes':

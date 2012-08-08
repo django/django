@@ -493,7 +493,7 @@ __test__ = {"API_TEST": r"""
 # Standard doctests do fairly
 >>> import json
 >>> from django.utils.xmlutils import SimplerXMLGenerator
->>> from StringIO import StringIO
+>>> from django.utils.six import StringIO
 
 >>> def produce_long():
 ...     return 42L

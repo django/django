@@ -12,13 +12,13 @@ if __name__ == '__main__':
 import sys
 import pkg_resources
 import imp
-import StringIO
 import os.path
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
 from django.utils import unittest
+from django.utils.six import StringIO
 
 
 # Mock classes and objects for pkg_resources functions.
@@ -61,8 +61,8 @@ class EggLoaderTest(unittest.TestCase):
 
         self.empty_egg = create_egg("egg_empty", {})
         self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
+            os.path.normcase('templates/y.html') : StringIO("y"),
+            os.path.normcase('templates/x.txt') : StringIO("x"),
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []

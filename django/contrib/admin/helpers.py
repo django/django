@@ -94,7 +94,7 @@ class Fieldset(object):
 class Fieldline(object):
     def __init__(self, form, field, readonly_fields=None, model_admin=None):
         self.form = form # A django.forms.Form instance
-        if not hasattr(field, "__iter__"):
+        if not hasattr(field, "__iter__") or isinstance(field, six.text_type):
             self.fields = [field]
         else:
             self.fields = field

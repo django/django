@@ -7,7 +7,6 @@ import os
 import shutil
 import smtpd
 import sys
-from StringIO import StringIO
 import tempfile
 import threading
 
@@ -18,6 +17,7 @@ from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.six import StringIO
 from django.utils.translation import ugettext_lazy
 
 

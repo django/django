@@ -7,6 +7,7 @@ from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import sql_flush, emit_post_sync_signal
 from django.utils.importlib import import_module
+from django.utils.six.moves import input
 
 
 class Command(NoArgsCommand):
@@ -45,7 +46,7 @@ class Command(NoArgsCommand):
         sql_list = sql_flush(self.style, connection, only_django=True, reset_sequences=reset_sequences)
 
         if interactive:
-            confirm = raw_input("""You have requested a flush of the database.
+            confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the %r database,
 and return each table to the state it was in after syncdb.
 Are you sure you want to do this?

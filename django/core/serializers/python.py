@@ -98,7 +98,7 @@ def Deserializer(object_list, **options):
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
-                        if hasattr(value, '__iter__'):
+                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
                             return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
                             return smart_text(field.rel.to._meta.pk.to_python(value))
@@ -110,7 +110,7 @@ def Deserializer(object_list, **options):
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                        if hasattr(field_value, '__iter__'):
+                        if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
                             obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
                             value = getattr(obj, field.rel.field_name)
                             # If this is a natural foreign key to an object that

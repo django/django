@@ -126,7 +126,7 @@ def result_headers(cl):
         if i in ordering_field_columns:
             sorted = True
             order_type = ordering_field_columns.get(i).lower()
-            sort_priority = list(six.iterkeys(ordering_field_columns)).index(i) + 1
+            sort_priority = list(ordering_field_columns).index(i) + 1
             th_classes.append('sorted %sending' % order_type)
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
