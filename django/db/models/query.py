@@ -120,7 +120,7 @@ class QuerySet(object):
             if len(self._result_cache) <= pos:
                 self._fill_cache()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._prefetch_related_lookups and not self._prefetch_done:
             # We need all the results in order to be able to do the prefetch
             # in one go. To minimize code duplication, we use the __len__
@@ -134,6 +134,7 @@ class QuerySet(object):
         except StopIteration:
             return False
         return True
+    __nonzero__ = __bool__ # Python 2
 
     def __contains__(self, val):
         # The 'in' operator works without this method, due to __iter__. This
