@@ -52,7 +52,7 @@ and put the following Python code in it::
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
 
-This is the simplest view possible in Django.  Now we have a problem, how does
+This is the simplest view possible in Django. Now we have a problem, how does
 this view get called? For that we need to map it to a URL, in Django this is 
 done in a configuration file called a URLconf. To create a URLconf in the
 polls directory create a file called 'urls.py'. Your app directory should now 
@@ -237,7 +237,7 @@ like this::
 
     (r'^polls/latest\.php$', 'polls.views.index'),
 
-But, don't do that. It's silly.    
+But, don't do that. It's silly.
 
 Write views that actually do something
 ======================================
@@ -491,7 +491,7 @@ The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
 you defined the name argument in the :func:`~django.conf.urls.url` functions in 
 the ``polls/urls.py`` module, you can remove a reliance on specific URL paths 
-defined in your url configurations by using the ``{% url %}`` templatetag:
+defined in your url configurations by using the ``{% url %}`` template tag:
 
 .. code-block:: html+django
 
