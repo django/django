@@ -27,7 +27,7 @@ from django.core.management.color import no_style
 from django.core.signals import request_started
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
-from django.core.urlresolvers import clear_url_caches
+from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.core.validators import EMPTY_VALUES
 from django.db import (transaction, connection, connections, DEFAULT_DB_ALIAS,
     reset_queries)
@@ -503,6 +503,7 @@ class TransactionTestCase(SimpleTestCase):
         if hasattr(self, 'urls'):
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
+            set_urlconf(self.urls)
             clear_url_caches()
 
     def __call__(self, result=None):
@@ -564,6 +565,7 @@ class TransactionTestCase(SimpleTestCase):
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
+            set_urlconf(self._old_root_urlconf)
             clear_url_caches()
 
     def assertRedirects(self, response, expected_url, status_code=302,
