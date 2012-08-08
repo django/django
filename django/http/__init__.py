@@ -656,7 +656,7 @@ class HttpResponse(object):
         return b''.join([smart_bytes(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
-        if hasattr(value, '__iter__'):
+        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.text_type)):
             self._container = value
             self._base_content_is_iter = True
         else:
