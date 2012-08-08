@@ -1303,7 +1303,7 @@ class Query(object):
                         field, model, direct, m2m = opts.get_field_by_name(f.name)
                         break
                 else:
-                    names = opts.get_all_field_names() + list(six.iterkeys(self.aggregate_select))
+                    names = opts.get_all_field_names() + list(self.aggregate_select)
                     raise FieldError("Cannot resolve keyword %r into field. "
                             "Choices are: %s" % (name, ", ".join(names)))
 
@@ -1661,8 +1661,8 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(opts.get_all_field_names() + list(six.iterkeys(self.extra))
-                               + list(six.iterkeys(self.aggregate_select)))
+                names = sorted(opts.get_all_field_names() + list(self.extra)
+                               + list(self.aggregate_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
         self.remove_inherited_models()

@@ -258,7 +258,7 @@ class Options(object):
             self._m2m_cache
         except AttributeError:
             self._fill_m2m_cache()
-        return list(six.iterkeys(self._m2m_cache))
+        return list(self._m2m_cache)
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
@@ -416,7 +416,7 @@ class Options(object):
             cache = self._fill_related_many_to_many_cache()
         if local_only:
             return [k for k, v in cache.items() if not v]
-        return list(six.iterkeys(cache))
+        return list(cache)
 
     def get_all_related_m2m_objects_with_model(self):
         """

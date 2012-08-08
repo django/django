@@ -76,7 +76,7 @@ def get_serializer(format):
 def get_serializer_formats():
     if not _serializers:
         _load_serializers()
-    return list(six.iterkeys(_serializers))
+    return list(_serializers)
 
 def get_public_serializer_formats():
     if not _serializers:

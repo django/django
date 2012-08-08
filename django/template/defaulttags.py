@@ -1189,7 +1189,7 @@ def templatetag(parser, token):
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError("Invalid templatetag argument: '%s'."
                                   " Must be one of: %s" %
-                                  (tag, list(six.iterkeys(TemplateTagNode.mapping))))
+                                  (tag, list(TemplateTagNode.mapping)))
     return TemplateTagNode(tag)
 
 @register.tag
