@@ -32,9 +32,9 @@ A class-based view is deployed into a URL pattern using the
 
     Arguments passed to a view are shared between every instance of a view.
     This means that you shoudn't use a list, dictionary, or any other
-    variable object as an argument to a view. If you did, the actions of
-    one user visiting your view could have an effect on subsequent users
-    visiting the same view.
+    mutable object as an argument to a view. If you do and the shared object
+    is modified, the actions of one user visiting your view could have an
+    effect on subsequent users visiting the same view.
 
 Any argument passed into :meth:`~View.as_view()` will be assigned onto the
 instance that is used to service a request. Using the previous example,
