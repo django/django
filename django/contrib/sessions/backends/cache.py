@@ -2,7 +2,7 @@ from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.cache import cache
 
 KEY_PREFIX = "django.contrib.sessions.cache"
-
+RETRIES = 10000
 
 class SessionStore(SessionBase):
     """
@@ -34,7 +34,7 @@ class SessionStore(SessionBase):
         # because the cache is missing. So we try for a (large) number of times
         # and then raise an exception. That's the risk you shoulder if using
         # cache backing.
-        for i in xrange(10000):
+        for i in xrange(RETRIES):
             self._session_key = self._get_new_session_key()
             try:
                 self.save(must_create=True)
