@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import base64
 import hashlib
 
 from django.dispatch import receiver
@@ -218,7 +219,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         if not iterations:
             iterations = self.iterations
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
-        hash = hash.encode('base64').strip()
+        hash = base64.b64encode(hash).strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
     def verify(self, password, encoded):
