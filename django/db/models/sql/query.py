@@ -1550,7 +1550,7 @@ class Query(object):
         N-to-many relation field.
         """
         query = Query(self.model)
-        query.add_filter(filter_expr, can_reuse=can_reuse)
+        query.add_filter(filter_expr)
         query.bump_prefix()
         query.clear_ordering(True)
         query.set_start(prefix)
