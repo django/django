@@ -669,11 +669,13 @@ class HttpResponse(object):
         self._iterator = iter(self._container)
         return self
 
-    def next(self):
+    def __next__(self):
         chunk = next(self._iterator)
         if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
         return str(chunk)
+
+    next = __next__             # Python 2 compatibility
 
     def close(self):
         if hasattr(self._container, 'close'):

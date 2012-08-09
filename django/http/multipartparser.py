@@ -305,7 +305,7 @@ class LazyStream(object):
         out = b''.join(parts())
         return out
 
-    def next(self):
+    def __next__(self):
         """
         Used when the exact number of bytes to read is unimportant.
 
@@ -321,6 +321,8 @@ class LazyStream(object):
             self._unget_history = []
         self.position += len(output)
         return output
+
+    next = __next__             # Python 2 compatibility
 
     def close(self):
         """
@@ -376,7 +378,7 @@ class ChunkIter(object):
         self.flo = flo
         self.chunk_size = chunk_size
 
-    def next(self):
+    def __next__(self):
         try:
             data = self.flo.read(self.chunk_size)
         except InputStreamExhausted:
@@ -385,6 +387,8 @@ class ChunkIter(object):
             return data
         else:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
     def __iter__(self):
         return self
@@ -400,11 +404,13 @@ class InterBoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
 class BoundaryIter(object):
     """
@@ -441,7 +447,7 @@ class BoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._done:
             raise StopIteration()
 
@@ -481,6 +487,8 @@ class BoundaryIter(object):
             else:
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
+
+    next = __next__             # Python 2 compatibility
 
     def _find_boundary(self, data, eof = False):
         """
