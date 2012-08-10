@@ -32,3 +32,15 @@ class Book(models.Model):
 class Tag(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        managed = False
+
+
+class UniqueTest(models.Model):
+    year = models.IntegerField()
+    slug = models.SlugField(unique=False)
+
+    class Meta:
+        managed = False
+        unique_together = ["year", "slug"]

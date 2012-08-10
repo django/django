@@ -6,7 +6,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.loading import cache
-from .models import Author, Book, AuthorWithM2M, Tag
+from .models import Author, Book, AuthorWithM2M, Tag, UniqueTest
 
 
 class SchemaTests(TestCase):
@@ -18,7 +18,7 @@ class SchemaTests(TestCase):
     as the code it is testing.
     """
 
-    models = [Author, Book, AuthorWithM2M, Tag]
+    models = [Author, Book, AuthorWithM2M, Tag, UniqueTest]
 
     # Utility functions
 
@@ -297,4 +297,48 @@ class SchemaTests(TestCase):
         # Ensure the field is unique again
         Tag.objects.create(title="foo", slug="foo")
         self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        connection.rollback()
+
+    def test_unique_together(self):
+        """
+        Tests removing and adding unique_together constraints on a model.
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(UniqueTest)
+        editor.commit()
+        # Ensure the fields are unique to begin with
+        UniqueTest.objects.create(year=2012, slug="foo")
+        UniqueTest.objects.create(year=2011, slug="foo")
+        UniqueTest.objects.create(year=2011, slug="bar")
+        self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
+        connection.rollback()
+        # Alter the model to it's non-unique-together companion
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_unique_together(
+            UniqueTest,
+            UniqueTest._meta.unique_together,
+            [],
+        )
+        editor.commit()
+        # Ensure the fields are no longer unique
+        UniqueTest.objects.create(year=2012, slug="foo")
+        UniqueTest.objects.create(year=2012, slug="foo")
+        connection.rollback()
+        # Alter it back
+        new_new_field = SlugField(unique=True)
+        new_new_field.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_unique_together(
+            UniqueTest,
+            [],
+            UniqueTest._meta.unique_together,
+        )
+        editor.commit()
+        # Ensure the fields are unique again
+        UniqueTest.objects.create(year=2012, slug="foo")
+        self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         connection.rollback()
