@@ -219,7 +219,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         if not iterations:
             iterations = self.iterations
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
-        hash = base64.b64encode(hash).strip()
+        hash = base64.b64encode(hash).decode('ascii').strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
     def verify(self, password, encoded):
