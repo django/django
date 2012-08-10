@@ -549,6 +549,10 @@ instance namespace. For example, the ``urls`` attribute of Django's
 all the patterns in an admin site, plus the name of the admin instance, and the
 application namespace ``admin``.
 
+Requests objects passed to your application views carry an additional
+``current_app`` attribute conaining the instance namespace for the URL pattern
+that matched the requested URL.
+
 Once you have defined namespaced URLs, you can reverse them. For details on
 reversing namespaced urls, see the documentation on :ref:`reversing namespaced
 URLs <topics-http-reversing-url-namespaces>`.

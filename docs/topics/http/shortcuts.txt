@@ -58,7 +58,8 @@ Optional arguments
 ``current_app``
     A hint indicating which application contains the current view. See the
     :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
-    for more information.
+    for more information. This value defaults to the ``current_app`` attribute
+    of the ``request`` argument.
 
 Example
 -------

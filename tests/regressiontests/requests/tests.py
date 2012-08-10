@@ -21,6 +21,7 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.POST.keys(), [])
         self.assertEqual(request.COOKIES.keys(), [])
         self.assertEqual(request.META.keys(), [])
+        self.assertEqual(request.current_app, None)
 
     def test_httprequest_repr(self):
         request = HttpRequest()
