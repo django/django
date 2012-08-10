@@ -9,7 +9,7 @@ from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.db.models.deletion import CASCADE
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _, string_concat
 from django.utils.functional import curry, cached_property
@@ -241,7 +241,7 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        params = {'%s__pk__in' % self.related.field.name: instances_dict.keys()}
+        params = {'%s__pk__in' % self.related.field.name: list(instances_dict)}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -335,9 +335,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__pk__in' % self.field.rel.field_name: list(instances_dict)}
         else:
-            params = {'%s__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__in' % self.field.rel.field_name: list(instances_dict)}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -488,7 +488,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname): instances_dict.keys()}
+                query = {'%s__%s__in' % (rel_field.name, attname): list(instances_dict)}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.
@@ -999,7 +999,7 @@ class ForeignKey(RelatedField, Field):
             if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
-                    return smart_unicode(choice_list[1][0])
+                    return smart_text(choice_list[1][0])
         return Field.value_to_string(self, obj)
 
     def contribute_to_class(self, cls, name):
@@ -1205,7 +1205,7 @@ class ManyToManyField(RelatedField, Field):
                 choices_list = self.get_choices_default()
                 if len(choices_list) == 1:
                     data = [choices_list[0][0]]
-        return smart_unicode(data)
+        return smart_text(data)
 
     def contribute_to_class(self, cls, name):
         # To support multiple relations to self, it's useful to have a non-None

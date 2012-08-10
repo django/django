@@ -199,8 +199,8 @@ Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
 always cleans the input into a Unicode string. We'll cover the encoding
 implications later in this document.
 
-If your data does *not* validate, your ``Form`` instance will not have a
-``cleaned_data`` attribute::
+If your data does *not* validate, the ``cleaned_data`` dictionary contains
+only the valid fields::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -210,9 +210,12 @@ If your data does *not* validate, your ``Form`` instance will not have a
     >>> f.is_valid()
     False
     >>> f.cleaned_data
-    Traceback (most recent call last):
-    ...
-    AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
+    {'cc_myself': True, 'message': u'Hi there'}
+
+.. versionchanged:: 1.5
+
+Until Django 1.5, the ``cleaned_data`` attribute wasn't defined at all when
+the ``Form`` didn't validate.
 
 ``cleaned_data`` will always *only* contain a key for fields defined in the
 ``Form``, even if you pass extra data when you define the ``Form``. In this
@@ -232,9 +235,9 @@ but ``cleaned_data`` contains only the form's fields::
     >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
-``cleaned_data`` will include a key and value for *all* fields defined in the
-``Form``, even if the data didn't include a value for fields that are not
-required. In this example, the data dictionary doesn't include a value for the
+When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
+*all* its fields, even if the data didn't include a value for some optional
+fields. In this example, the data dictionary doesn't include a value for the
 ``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
 
     >>> class OptionalPersonForm(Form):
@@ -583,7 +586,7 @@ lazy developers -- they're not the only way a form object can be displayed.
 
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
-   
+
    The :meth:`__unicode__` and :meth:`__str__` methods of this object displays
    the HTML for this field.
 

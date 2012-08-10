@@ -14,7 +14,7 @@ from django.utils.html import escape, format_html, format_html_join
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils import six
 
 
@@ -96,7 +96,7 @@ class AdminRadioFieldRenderer(RadioFieldRenderer):
         return format_html('<ul{0}>\n{1}\n</ul>',
                            flatatt(self.attrs),
                            format_html_join('\n', '<li>{0}</li>',
-                                            ((force_unicode(w),) for w in self)))
+                                            ((force_text(w),) for w in self)))
 
 class AdminRadioSelect(forms.RadioSelect):
     renderer = AdminRadioFieldRenderer
@@ -197,7 +197,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
-            value = ','.join([force_unicode(v) for v in value])
+            value = ','.join([force_text(v) for v in value])
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
@@ -221,7 +221,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         if len(initial) != len(data):
             return True
         for pk1, pk2 in zip(initial, data):
-            if force_unicode(pk1) != force_unicode(pk2):
+            if force_text(pk1) != force_text(pk2):
                 return True
         return False
 

@@ -1,5 +1,5 @@
 from django.template.base import Lexer, Parser, tag_re, NodeList, VariableNode, TemplateSyntaxError
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.safestring import SafeData, EscapeData
 from django.utils.formats import localize
@@ -84,7 +84,7 @@ class DebugVariableNode(VariableNode):
             output = self.filter_expression.resolve(context)
             output = template_localtime(output, use_tz=context.use_tz)
             output = localize(output, use_l10n=context.use_l10n)
-            output = force_unicode(output)
+            output = force_text(output)
         except UnicodeDecodeError:
             return ''
         except Exception as e:

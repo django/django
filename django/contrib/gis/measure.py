@@ -143,7 +143,7 @@ class MeasureBase(object):
     def __rmul__(self, other):
         return self * other
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, self.__class__):
             return self.standard / other.standard
         if isinstance(other, NUMERIC_TYPES):
@@ -151,16 +151,19 @@ class MeasureBase(object):
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
             raise TypeError('%(class)s must be divided with number or %(class)s' % {"class":pretty_name(self)})
+    __div__ = __truediv__ # Python 2 compatibility
 
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):
             self.standard /= float(other)
             return self
         else:
             raise TypeError('%(class)s must be divided with number' % {"class":pretty_name(self)})
+    __idiv__ = __itruediv__ # Python 2 compatibility
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.standard)
+    __nonzero__ = __bool__ # Python 2 compatibility
 
     def default_units(self, kwargs):
         """
@@ -169,7 +172,7 @@ class MeasureBase(object):
         """
         val = 0.0
         default_unit = self.STANDARD_UNIT
-        for unit, value in kwargs.iteritems():
+        for unit, value in six.iteritems(kwargs):
             if not isinstance(value, float): value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
@@ -305,12 +308,13 @@ class Area(MeasureBase):
     ALIAS = dict([(k, '%s%s' % (AREA_PREFIX, v)) for k, v in Distance.ALIAS.items()])
     LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):
             return self.__class__(default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
             raise TypeError('%(class)s must be divided by a number' % {"class":pretty_name(self)})
+    __div__ = __truediv__ # Python 2 compatibility
 
 
 # Shortcuts

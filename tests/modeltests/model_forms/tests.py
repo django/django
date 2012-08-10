@@ -638,8 +638,7 @@ class OldFormForXTests(TestCase):
         f = BaseCategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
         self.assertEqual(f.errors['name'], ['This field is required.'])
         self.assertEqual(f.errors['slug'], ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."])
-        with self.assertRaises(AttributeError):
-            f.cleaned_data
+        self.assertEqual(f.cleaned_data, {'url': 'foo'})
         with self.assertRaises(ValueError):
             f.save()
         f = BaseCategoryForm({'name': '', 'slug': '', 'url': 'foo'})

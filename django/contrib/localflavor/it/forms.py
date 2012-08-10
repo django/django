@@ -13,7 +13,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 
 class ITZipCodeField(RegexField):
@@ -85,4 +85,4 @@ class ITVatNumberField(Field):
         check_digit = vat_number_check_digit(vat_number[0:10])
         if not vat_number[10] == check_digit:
             raise ValidationError(self.error_messages['invalid'])
-        return smart_unicode(vat_number)
+        return smart_text(vat_number)

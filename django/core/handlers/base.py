@@ -4,7 +4,7 @@ import sys
 
 from django import http
 from django.core import signals
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 from django.utils.log import getLogger
 from django.utils import six
@@ -250,7 +250,7 @@ def get_script_name(environ):
     """
     from django.conf import settings
     if settings.FORCE_SCRIPT_NAME is not None:
-        return force_unicode(settings.FORCE_SCRIPT_NAME)
+        return force_text(settings.FORCE_SCRIPT_NAME)
 
     # If Apache's mod_rewrite had a whack at the URL, Apache set either
     # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
@@ -261,5 +261,5 @@ def get_script_name(environ):
     if not script_url:
         script_url = environ.get('REDIRECT_URL', '')
     if script_url:
-        return force_unicode(script_url[:-len(environ.get('PATH_INFO', ''))])
-    return force_unicode(environ.get('SCRIPT_NAME', ''))
+        return force_text(script_url[:-len(environ.get('PATH_INFO', ''))])
+    return force_text(environ.get('SCRIPT_NAME', ''))

@@ -96,7 +96,7 @@ def mark_safe(s):
     """
     if isinstance(s, SafeData):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_str):
+    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return SafeString(s)
     if isinstance(s, (six.text_type, Promise)):
         return SafeUnicode(s)
@@ -112,7 +112,7 @@ def mark_for_escaping(s):
     """
     if isinstance(s, (SafeData, EscapeData)):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_str):
+    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return EscapeString(s)
     if isinstance(s, (six.text_type, Promise)):
         return EscapeUnicode(s)

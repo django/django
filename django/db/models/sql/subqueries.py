@@ -10,7 +10,8 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
 from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -87,7 +88,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in values.iteritems():
+        for name, val in six.iteritems(values):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
@@ -104,7 +105,7 @@ class UpdateQuery(Query):
         saving models.
         """
         # Check that no Promise object passes to the query. Refs #10498.
-        values_seq = [(value[0], value[1], force_unicode(value[2]))
+        values_seq = [(value[0], value[1], force_text(value[2]))
                       if isinstance(value[2], Promise) else value
                       for value in values_seq]
         self.values.extend(values_seq)
@@ -129,7 +130,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.iteritems():
+        for model, values in six.iteritems(self.related_updates):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -170,7 +171,7 @@ class InsertQuery(Query):
             for obj in objs:
                 value = getattr(obj, field.attname)
                 if isinstance(value, Promise):
-                    setattr(obj, field.attname, force_unicode(value))
+                    setattr(obj, field.attname, force_text(value))
         self.objs = objs
         self.raw = raw
 

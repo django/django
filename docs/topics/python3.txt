@@ -36,6 +36,11 @@ In order to enable the same behavior in Python 2, every module must import
     my_string = "This is an unicode literal"
     my_bytestring = b"This is a bytestring"
 
+If you need a byte string under Python 2 and a unicode string under Python 3,
+use the :func:`str` builtin::
+
+    str('my string')
+
 Be cautious if you have to `slice bytestrings`_.
 
 .. _slice bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals

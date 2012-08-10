@@ -11,7 +11,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 
 postcode_re = re.compile(r'^[1-9]\d{4}$')
@@ -77,10 +77,10 @@ class IDPhoneNumberField(Field):
         if value in EMPTY_VALUES:
             return ''
 
-        phone_number = re.sub(r'[\-\s\(\)]', '', smart_unicode(value))
+        phone_number = re.sub(r'[\-\s\(\)]', '', smart_text(value))
 
         if phone_re.search(phone_number):
-            return smart_unicode(value)
+            return smart_text(value)
 
         raise ValidationError(self.error_messages['invalid'])
 
@@ -120,7 +120,7 @@ class IDLicensePlateField(Field):
             return ''
 
         plate_number = re.sub(r'\s+', ' ',
-            smart_unicode(value.strip())).upper()
+            smart_text(value.strip())).upper()
 
         matches = plate_re.search(plate_number)
         if matches is None:
@@ -181,7 +181,7 @@ class IDNationalIdentityNumberField(Field):
         if value in EMPTY_VALUES:
             return ''
 
-        value = re.sub(r'[\s.]', '', smart_unicode(value))
+        value = re.sub(r'[\s.]', '', smart_text(value))
 
         if not nik_re.search(value):
             raise ValidationError(self.error_messages['invalid'])

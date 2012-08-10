@@ -40,7 +40,7 @@
 """
 # Python library requisites.
 import sys
-from binascii import a2b_hex
+from binascii import a2b_hex, b2a_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 
 # Getting GDAL prerequisites
@@ -322,8 +322,7 @@ class OGRGeometry(GDALBase):
     @property
     def hex(self):
         "Returns the hexadecimal representation of the WKB (a string)."
-        return str(self.wkb).encode('hex').upper()
-        #return b2a_hex(self.wkb).upper()
+        return b2a_hex(self.wkb).upper()
 
     @property
     def json(self):

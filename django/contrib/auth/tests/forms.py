@@ -8,7 +8,8 @@ from django.core import mail
 from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
@@ -27,7 +28,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [force_unicode(form.error_messages['duplicate_username'])])
+                         [force_text(form.error_messages['duplicate_username'])])
 
     def test_invalid_data(self):
         data = {
@@ -38,7 +39,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [force_unicode(form.fields['username'].error_messages['invalid'])])
+                         [force_text(form.fields['username'].error_messages['invalid'])])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -50,13 +51,13 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
-                         [force_unicode(form.error_messages['password_mismatch'])])
+                         [force_text(form.error_messages['password_mismatch'])])
 
     def test_both_passwords(self):
         # One (or both) passwords weren't given
         data = {'username': 'jsmith'}
         form = UserCreationForm(data)
-        required_error = [force_unicode(Field.default_error_messages['required'])]
+        required_error = [force_text(Field.default_error_messages['required'])]
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, required_error)
@@ -65,6 +66,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors, required_error)
+        self.assertEqual(form['password2'].errors, [])
 
     def test_success(self):
         # The success case.
@@ -94,7 +96,7 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [force_unicode(form.error_messages['invalid_login'])])
+                         [force_text(form.error_messages['invalid_login'])])
 
     def test_inactive_user(self):
         # The user is inactive.
@@ -105,7 +107,7 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [force_unicode(form.error_messages['inactive'])])
+                         [force_text(form.error_messages['inactive'])])
 
     def test_inactive_user_i18n(self):
         with self.settings(USE_I18N=True):
@@ -118,7 +120,7 @@ class AuthenticationFormTest(TestCase):
                 form = AuthenticationForm(None, data)
                 self.assertFalse(form.is_valid())
                 self.assertEqual(form.non_field_errors(),
-                                 [force_unicode(form.error_messages['inactive'])])
+                                 [force_text(form.error_messages['inactive'])])
 
     def test_success(self):
         # The success case
@@ -146,7 +148,7 @@ class SetPasswordFormTest(TestCase):
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [force_unicode(form.error_messages['password_mismatch'])])
+                         [force_text(form.error_messages['password_mismatch'])])
 
     def test_success(self):
         user = User.objects.get(username='testclient')
@@ -173,7 +175,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["old_password"].errors,
-                         [force_unicode(form.error_messages['password_incorrect'])])
+                         [force_text(form.error_messages['password_incorrect'])])
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -186,7 +188,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [force_unicode(form.error_messages['password_mismatch'])])
+                         [force_text(form.error_messages['password_mismatch'])])
 
     def test_success(self):
         # The success case.
@@ -202,7 +204,7 @@ class PasswordChangeFormTest(TestCase):
     def test_field_order(self):
         # Regression test - check the order of fields:
         user = User.objects.get(username='testclient')
-        self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
+        self.assertEqual(list(PasswordChangeForm(user, {}).fields),
                          ['old_password', 'new_password1', 'new_password2'])
 
 
@@ -217,7 +219,7 @@ class UserChangeFormTest(TestCase):
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['username'].errors,
-                         [force_unicode(form.fields['username'].error_messages['invalid'])])
+                         [force_text(form.fields['username'].error_messages['invalid'])])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
@@ -272,7 +274,7 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors,
-                         [force_unicode(EmailField.default_error_messages['invalid'])])
+                         [force_text(EmailField.default_error_messages['invalid'])])
 
     def test_nonexistant_email(self):
         # Test nonexistant email address
@@ -280,7 +282,7 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors,
-                         {'email': [force_unicode(form.error_messages['unknown'])]})
+                         {'email': [force_text(form.error_messages['unknown'])]})
 
     def test_cleaned_data(self):
         # Regression test

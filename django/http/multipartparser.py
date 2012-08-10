@@ -10,7 +10,7 @@ import cgi
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
@@ -151,7 +151,7 @@ class MultiPartParser(object):
                 transfer_encoding = meta_data.get('content-transfer-encoding')
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
-                field_name = force_unicode(field_name, encoding, errors='replace')
+                field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
                     # This is a post field, we can just set it in the post
@@ -165,13 +165,13 @@ class MultiPartParser(object):
                         data = field_stream.read()
 
                     self._post.appendlist(field_name,
-                                          force_unicode(data, encoding, errors='replace'))
+                                          force_text(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if not file_name:
                         continue
-                    file_name = force_unicode(file_name, encoding, errors='replace')
+                    file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
                     content_type = meta_data.get('content-type', ('',))[0].strip()
@@ -245,7 +245,7 @@ class MultiPartParser(object):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_unicode(old_field_name,
+                self._files.appendlist(force_text(old_field_name,
                                                      self._encoding,
                                                      errors='replace'),
                                        file_obj)
@@ -305,7 +305,7 @@ class LazyStream(object):
         out = b''.join(parts())
         return out
 
-    def next(self):
+    def __next__(self):
         """
         Used when the exact number of bytes to read is unimportant.
 
@@ -321,6 +321,8 @@ class LazyStream(object):
             self._unget_history = []
         self.position += len(output)
         return output
+
+    next = __next__             # Python 2 compatibility
 
     def close(self):
         """
@@ -376,7 +378,7 @@ class ChunkIter(object):
         self.flo = flo
         self.chunk_size = chunk_size
 
-    def next(self):
+    def __next__(self):
         try:
             data = self.flo.read(self.chunk_size)
         except InputStreamExhausted:
@@ -385,6 +387,8 @@ class ChunkIter(object):
             return data
         else:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
     def __iter__(self):
         return self
@@ -400,11 +404,13 @@ class InterBoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
 class BoundaryIter(object):
     """
@@ -441,7 +447,7 @@ class BoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._done:
             raise StopIteration()
 
@@ -481,6 +487,8 @@ class BoundaryIter(object):
             else:
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
+
+    next = __next__             # Python 2 compatibility
 
     def _find_boundary(self, data, eof = False):
         """

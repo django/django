@@ -11,7 +11,7 @@ from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
-from django.utils.encoding import smart_unicode, force_unicode, smart_str
+from django.utils.encoding import smart_text, force_text, smart_bytes
 from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
@@ -89,7 +89,7 @@ class VariableDoesNotExist(Exception):
         return six.text_type(self).encode('utf-8')
 
     def __unicode__(self):
-        return self.msg % tuple([force_unicode(p, errors='replace')
+        return self.msg % tuple([force_text(p, errors='replace')
                                  for p in self.params])
 
 class InvalidTemplateLibrary(Exception):
@@ -117,7 +117,7 @@ class Template(object):
     def __init__(self, template_string, origin=None,
                  name='<Unknown Template>'):
         try:
-            template_string = smart_unicode(template_string)
+            template_string = smart_text(template_string)
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
@@ -831,7 +831,7 @@ class NodeList(list):
                 bit = self.render_node(node, context)
             else:
                 bit = node
-            bits.append(force_unicode(bit))
+            bits.append(force_text(bit))
         return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
@@ -849,7 +849,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<Text Node: '%s'>" % smart_str(self.s[:25], 'ascii',
+        return "<Text Node: '%s'>" % smart_bytes(self.s[:25], 'ascii',
                 errors='replace')
 
     def render(self, context):
@@ -863,7 +863,7 @@ def _render_value_in_context(value, context):
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
-    value = force_unicode(value)
+    value = force_text(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
             isinstance(value, EscapeData)):
         return escape(value)
@@ -961,7 +961,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         kwarg = token_kwargs([bit], parser)
         if kwarg:
             # The kwarg was successfully extracted
-            param, value = kwarg.items()[0]
+            param, value = list(six.iteritems(kwarg))[0]
             if param not in params and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(

@@ -107,7 +107,7 @@ Django 1.5 also includes several smaller improvements worth noting:
   connect to more than one signal by supplying a list of signals.
 
 * :meth:`QuerySet.bulk_create()
-  <django.db.models.query.QuerySet.bulk_create>` has now a batch_size
+  <django.db.models.query.QuerySet.bulk_create>` now has a batch_size
   argument. By default the batch_size is unlimited except for SQLite where
   single batch is limited so that 999 parameters per query isn't exceeded.
 
@@ -161,7 +161,7 @@ If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
 hashing methods need byte strings, you can use the
-:func:`~django.utils.encoding.smart_str` utility to encode the strings.
+:func:`~django.utils.encoding.smart_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -239,10 +239,23 @@ database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
 
+`cleaned_data` dictionary kept for invalid forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
+after form validation. When the form doesn't validate, it contains only the
+fields that passed validation. You should test the success of the validation
+with the :meth:`~django.forms.Form.is_valid()` method and not with the
+presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
+on the form.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
 * GeoDjango dropped support for GDAL < 1.5
+
+* :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
+  instead of :exc:`ValueError` for non-integer inputs.
 
 Features deprecated in 1.5
 ==========================

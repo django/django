@@ -12,7 +12,7 @@ from django.template.base import Variable, Library, VariableDoesNotExist
 from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
     escape, urlize as urlize_impl, linebreaks, strip_tags)
 from django.utils.http import urlquote
@@ -38,7 +38,7 @@ def stringfilter(func):
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = force_unicode(args[0])
+            args[0] = force_text(args[0])
             if (isinstance(args[0], SafeData) and
                 getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
@@ -139,7 +139,7 @@ def floatformat(text, arg=-1):
     """
 
     try:
-        input_val = force_unicode(text)
+        input_val = force_text(text)
         d = Decimal(input_val)
     except UnicodeEncodeError:
         return ''
@@ -147,7 +147,7 @@ def floatformat(text, arg=-1):
         if input_val in special_floats:
             return input_val
         try:
-            d = Decimal(force_unicode(float(text)))
+            d = Decimal(force_text(float(text)))
         except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
             return ''
     try:
@@ -192,7 +192,7 @@ def floatformat(text, arg=-1):
 @stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
-    return force_unicode(iri_to_uri(value))
+    return force_text(iri_to_uri(value))
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
@@ -462,7 +462,7 @@ def safeseq(value):
     individually, as safe, after converting them to unicode. Returns a list
     with the results.
     """
-    return [mark_safe(force_unicode(obj)) for obj in value]
+    return [mark_safe(force_text(obj)) for obj in value]
 
 @register.filter(is_safe=True)
 @stringfilter
@@ -521,7 +521,7 @@ def join(value, arg, autoescape=None):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
-    value = map(force_unicode, value)
+    value = map(force_text, value)
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -661,7 +661,7 @@ def unordered_list(value, autoescape=None):
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
                                                          indent, indent)
             output.append('%s<li>%s%s</li>' % (indent,
-                    escaper(force_unicode(title)), sublist))
+                    escaper(force_text(title)), sublist))
             i += 1
         return '\n'.join(output)
     value, converted = convert_old_style_list(value)
@@ -901,4 +901,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s" % force_unicode(e, errors="replace")
+        return "Error in formatting: %s" % force_text(e, errors="replace")

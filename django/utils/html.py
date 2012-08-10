@@ -11,7 +11,7 @@ except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_bytes, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
@@ -33,13 +33,13 @@ link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
-del x # Temporary variable
+
 
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
     """
-    return mark_safe(force_unicode(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, six.text_type)
 
 _base_js_escapes = (
@@ -63,7 +63,7 @@ _js_escapes = (_base_js_escapes +
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     for bad, good in _js_escapes:
-        value = mark_safe(force_unicode(value).replace(bad, good))
+        value = mark_safe(force_text(value).replace(bad, good))
     return value
 escapejs = allow_lazy(escapejs, six.text_type)
 
@@ -84,7 +84,7 @@ def format_html(format_string, *args, **kwargs):
     """
     args_safe = map(conditional_escape, args)
     kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        kwargs.iteritems()])
+                        six.iteritems(kwargs)])
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 def format_html_join(sep, format_string, args_generator):
@@ -120,22 +120,22 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return re.sub(r'<[^>]*?>', '', force_unicode(value))
+    return re.sub(r'<[^>]*?>', '', force_text(value))
 strip_tags = allow_lazy(strip_tags)
 
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
-    return re.sub(r'>\s+<', '><', force_unicode(value))
+    return re.sub(r'>\s+<', '><', force_text(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
-    return re.sub(r'&(?:\w+|#\d+);', '', force_unicode(value))
+    return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
-    return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
+    return unencoded_ampersands_re.sub('&amp;', force_text(value))
 fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 
 def smart_urlquote(url):
@@ -153,9 +153,9 @@ def smart_urlquote(url):
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = quote(smart_str(url), safe=b'!*\'();:@&=+$,/?#[]~')
+        url = quote(smart_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
-    return force_unicode(url)
+    return force_text(url)
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -176,7 +176,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     safe_input = isinstance(text, SafeData)
-    words = word_split_re.split(force_unicode(text))
+    words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
         match = None
         if '.' in word or '@' in word or ':' in word:
@@ -245,7 +245,7 @@ def clean_html(text):
           bottom of the text.
     """
     from django.utils.text import normalize_newlines
-    text = normalize_newlines(force_unicode(text))
+    text = normalize_newlines(force_text(text))
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)

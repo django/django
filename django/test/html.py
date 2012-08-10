@@ -5,7 +5,7 @@ Comparing two html documents.
 from __future__ import unicode_literals
 
 import re
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html_parser import HTMLParser, HTMLParseError
 from django.utils import six
 
@@ -25,7 +25,7 @@ class Element(object):
 
     def append(self, element):
         if isinstance(element, six.string_types):
-            element = force_unicode(element)
+            element = force_text(element)
             element = normalize_whitespace(element)
             if self.children:
                 if isinstance(self.children[-1], six.string_types):
@@ -82,6 +82,8 @@ class Element(object):
         if self.children != element.children:
             return False
         return True
+
+    __hash__ = object.__hash__
 
     def __ne__(self, element):
         return not self.__eq__(element)

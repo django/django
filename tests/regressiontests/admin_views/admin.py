@@ -630,7 +630,7 @@ site.register(UndeletableObject, UndeletableObjectAdmin)
 #     related OneToOne object registered in admin
 #     related OneToOne object not registered in admin
 # when deleting Book so as exercise all four troublesome (w.r.t escaping
-# and calling force_unicode to avoid problems on Python 2.3) paths through
+# and calling force_text to avoid problems on Python 2.3) paths through
 # contrib.admin.util's get_deleted_objects function.
 site.register(Book, inlines=[ChapterInline])
 site.register(Promo)

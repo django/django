@@ -10,6 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
@@ -133,7 +134,7 @@ class AdminSite(object):
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return self._actions.iteritems()
+        return six.iteritems(self._actions)
 
     def has_permission(self, request):
         """
@@ -239,7 +240,7 @@ class AdminSite(object):
         )
 
         # Add in each model's views.
-        for model, model_admin in self._registry.iteritems():
+        for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.module_name),
                     include(model_admin.urls))
@@ -370,7 +371,7 @@ class AdminSite(object):
                         }
 
         # Sort the apps alphabetically.
-        app_list = app_dict.values()
+        app_list = list(six.itervalues(app_dict))
         app_list.sort(key=lambda x: x['name'])
 
         # Sort the models alphabetically within each app.

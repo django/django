@@ -17,7 +17,7 @@ from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler
 from django.utils import six
@@ -80,7 +80,7 @@ class BaseStaticFilesTestCase(object):
         os.unlink(self._backup_filepath)
 
     def assertFileContains(self, filepath, text):
-        self.assertIn(text, self._get_file(smart_unicode(filepath)),
+        self.assertIn(text, self._get_file(smart_text(filepath)),
                         "'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
@@ -199,7 +199,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         out.seek(0)
         lines = [l.strip() for l in out.readlines()]
         contents = codecs.open(
-            smart_unicode(lines[1].strip()), "r", "utf-8").read()
+            smart_text(lines[1].strip()), "r", "utf-8").read()
         return contents
 
     def test_all_files(self):

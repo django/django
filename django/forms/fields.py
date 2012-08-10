@@ -23,7 +23,7 @@ from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 from django.utils import formats
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_text, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -78,13 +78,13 @@ class Field(object):
         # validators -- List of addtional validators to use
         # localize -- Boolean that specifies if the field should be localized.
         if label is not None:
-            label = smart_unicode(label)
+            label = smart_text(label)
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         if help_text is None:
             self.help_text = ''
         else:
-            self.help_text = smart_unicode(help_text)
+            self.help_text = smart_text(help_text)
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -195,7 +195,7 @@ class CharField(Field):
         "Returns a Unicode object."
         if value in validators.EMPTY_VALUES:
             return ''
-        return smart_unicode(value)
+        return smart_text(value)
 
     def widget_attrs(self, widget):
         attrs = super(CharField, self).widget_attrs(widget)
@@ -288,7 +288,7 @@ class DecimalField(Field):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
-        value = smart_unicode(value).strip()
+        value = smart_text(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
@@ -333,7 +333,7 @@ class BaseTemporalField(Field):
 
     def to_python(self, value):
         # Try to coerce the value to unicode.
-        unicode_value = force_unicode(value, strings_only=True)
+        unicode_value = force_text(value, strings_only=True)
         if isinstance(unicode_value, six.text_type):
             value = unicode_value.strip()
         # If unicode, try to strptime against each input format.
@@ -560,20 +560,10 @@ class ImageField(FileField):
                 file = BytesIO(data['content'])
 
         try:
-            # load() is the only method that can spot a truncated JPEG,
-            #  but it cannot be called sanely after verify()
-            trial_image = Image.open(file)
-            trial_image.load()
-
-            # Since we're about to use the file again we have to reset the
-            # file object if possible.
-            if hasattr(file, 'seek') and callable(file.seek):
-                file.seek(0)
-
-            # verify() is the only method that can spot a corrupt PNG,
-            #  but it must be called immediately after the constructor
-            trial_image = Image.open(file)
-            trial_image.verify()
+            # load() could spot a truncated JPEG, but it loads the entire
+            # image in memory, which is a DoS vector. See #3848 and #18520.
+            # verify() must be called immediately after the constructor.
+            Image.open(file).verify()
         except ImportError:
             # Under PyPy, it is possible to import PIL. However, the underlying
             # _imaging C module isn't available, so an ImportError will be
@@ -702,7 +692,7 @@ class ChoiceField(Field):
         "Returns a Unicode object."
         if value in validators.EMPTY_VALUES:
             return ''
-        return smart_unicode(value)
+        return smart_text(value)
 
     def validate(self, value):
         """
@@ -718,10 +708,10 @@ class ChoiceField(Field):
             if isinstance(v, (list, tuple)):
                 # This is an optgroup, so look inside the group for options
                 for k2, v2 in v:
-                    if value == smart_unicode(k2):
+                    if value == smart_text(k2):
                         return True
             else:
-                if value == smart_unicode(k):
+                if value == smart_text(k):
                     return True
         return False
 
@@ -762,7 +752,7 @@ class MultipleChoiceField(ChoiceField):
             return []
         elif not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['invalid_list'])
-        return [smart_unicode(val) for val in value]
+        return [smart_text(val) for val in value]
 
     def validate(self, value):
         """

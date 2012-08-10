@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils import six
 
@@ -54,9 +54,9 @@ def get_formats():
     src = []
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
-            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
+            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_text(v))))
         elif isinstance(v, (tuple, list)):
-            v = [javascript_quote(smart_unicode(value)) for value in v]
+            v = [javascript_quote(smart_text(value)) for value in v]
             src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
     return ''.join(src)
 

@@ -41,7 +41,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_bytes, force_text
 from django.utils import six
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
@@ -398,7 +398,7 @@ class SimpleTestCase(ut2.TestCase):
                 optional.clean(input)
             self.assertEqual(context_manager.exception.messages, errors)
         # test required inputs
-        error_required = [force_unicode(required.error_messages['required'])]
+        error_required = [force_text(required.error_messages['required'])]
         for e in EMPTY_VALUES:
             with self.assertRaises(ValidationError) as context_manager:
                 required.clean(e)
@@ -647,7 +647,7 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_str(text, response._charset)
+        enc_text = smart_bytes(text, response._charset)
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
@@ -683,7 +683,7 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_str(text, response._charset)
+        enc_text = smart_bytes(text, response._charset)
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
@@ -796,9 +796,10 @@ class TransactionTestCase(SimpleTestCase):
             " the response" % template_name)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
+        items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(map(transform, qs)), set(values))
-        return self.assertEqual(map(transform, qs), values)
+            return self.assertEqual(set(items), set(values))
+        return self.assertEqual(list(items), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)

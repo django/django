@@ -12,6 +12,7 @@ from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.six.moves import input
 from django.utils.translation import ugettext as _
 
 RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
@@ -76,7 +77,7 @@ class Command(BaseCommand):
                         input_msg = 'Username'
                         if default_username:
                             input_msg += ' (leave blank to use %r)' % default_username
-                        username = raw_input(input_msg + ': ')
+                        username = input(input_msg + ': ')
                     if default_username and username == '':
                         username = default_username
                     if not RE_VALID_USERNAME.match(username):
@@ -94,7 +95,7 @@ class Command(BaseCommand):
                 # Get an email
                 while 1:
                     if not email:
-                        email = raw_input('E-mail address: ')
+                        email = input('E-mail address: ')
                     try:
                         is_valid_email(email)
                     except exceptions.ValidationError:

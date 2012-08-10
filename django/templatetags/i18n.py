@@ -425,7 +425,7 @@ def do_block_translate(parser, token):
         options[option] = value
 
     if 'count' in options:
-        countervar, counter = options['count'].items()[0]
+        countervar, counter = list(six.iteritems(options['count']))[0]
     else:
         countervar, counter = None, None
     if 'context' in options:

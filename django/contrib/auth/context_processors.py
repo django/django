@@ -11,8 +11,9 @@ class PermLookupDict(object):
     def __getitem__(self, perm_name):
         return self.user.has_perm("%s.%s" % (self.module_name, perm_name))
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.user.has_module_perms(self.module_name)
+    __nonzero__ = __bool__ # Python 2
 
 
 class PermWrapper(object):

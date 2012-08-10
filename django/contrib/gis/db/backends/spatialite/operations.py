@@ -131,7 +131,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Creating the GIS terms dictionary.
         gis_terms = ['isnull']
-        gis_terms += self.geometry_functions.keys()
+        gis_terms += list(self.geometry_functions)
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
         if version >= (2, 4, 0):

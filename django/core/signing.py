@@ -41,7 +41,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import force_text, smart_bytes
 from django.utils.importlib import import_module
 
 
@@ -135,7 +135,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     Reverse of dumps(), raises BadSignature if signature fails
     """
-    base64d = smart_str(
+    base64d = smart_bytes(
         TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
     decompress = False
     if base64d[0] == '.':
@@ -159,16 +159,16 @@ class Signer(object):
         return base64_hmac(self.salt + 'signer', value, self.key)
 
     def sign(self, value):
-        value = smart_str(value)
+        value = smart_bytes(value)
         return '%s%s%s' % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
-        signed_value = smart_str(signed_value)
+        signed_value = smart_bytes(signed_value)
         if not self.sep in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):
-            return force_unicode(value)
+            return force_text(value)
         raise BadSignature('Signature "%s" does not match' % sig)
 
 
@@ -178,7 +178,7 @@ class TimestampSigner(Signer):
         return baseconv.base62.encode(int(time.time()))
 
     def sign(self, value):
-        value = smart_str('%s%s%s' % (value, self.sep, self.timestamp()))
+        value = smart_bytes('%s%s%s' % (value, self.sep, self.timestamp()))
         return '%s%s%s' % (value, self.sep, self.signature(value))
 
     def unsign(self, value, max_age=None):

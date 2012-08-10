@@ -23,9 +23,33 @@ from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_bytes, force_text
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
+
+
+def subclass_exception(name, parents, module, attached_to=None):
+    """
+    Create exception subclass. Used by ModelBase below.
+
+    If 'attached_to' is supplied, the exception will be created in a way that
+    allows it to be pickled, assuming the returned exception class will be added
+    as an attribute to the 'attached_to' class.
+    """
+    class_dict = {'__module__': module}
+    if attached_to is not None:
+        def __reduce__(self):
+            # Exceptions are special - they've got state that isn't
+            # in self.__dict__. We assume it is all in self.args.
+            return (unpickle_inner_exception, (attached_to, name), self.args)
+
+        def __setstate__(self, args):
+            self.args = args
+
+        class_dict['__reduce__'] = __reduce__
+        class_dict['__setstate__'] = __setstate__
+
+    return type(name, parents, class_dict)
 
 
 class ModelBase(type):
@@ -63,12 +87,12 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
+            new_class.add_to_class('DoesNotExist', subclass_exception(str('DoesNotExist'),
                     tuple(x.DoesNotExist
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (ObjectDoesNotExist,),
                     module, attached_to=new_class))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
+            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(str('MultipleObjectsReturned'),
                     tuple(x.MultipleObjectsReturned
                           for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
                     or (MultipleObjectsReturned,),
@@ -364,14 +388,14 @@ class Model(six.with_metaclass(ModelBase, object)):
                 setattr(self, field.attname, val)
 
         if kwargs:
-            for prop in kwargs.keys():
+            for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
                         setattr(self, prop, kwargs.pop(prop))
                 except AttributeError:
                     pass
             if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
+                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
@@ -380,11 +404,11 @@ class Model(six.with_metaclass(ModelBase, object)):
             u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
+        return smart_bytes('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
-            return force_unicode(self).encode('utf-8')
+            return force_text(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
@@ -605,14 +629,14 @@ class Model(six.with_metaclass(ModelBase, object)):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return force_unicode(dict(field.flatchoices).get(value, value), strings_only=True)
+        return force_text(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = is_next and 'gt' or 'lt'
         order = not is_next and '-' or ''
-        param = smart_str(getattr(self, field.attname))
+        param = smart_bytes(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
@@ -928,29 +952,6 @@ def model_unpickle(model, attrs):
     cls = deferred_class_factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
-
-def subclass_exception(name, parents, module, attached_to=None):
-    """
-    Create exception subclass.
-
-    If 'attached_to' is supplied, the exception will be created in a way that
-    allows it to be pickled, assuming the returned exception class will be added
-    as an attribute to the 'attached_to' class.
-    """
-    class_dict = {'__module__': module}
-    if attached_to is not None:
-        def __reduce__(self):
-            # Exceptions are special - they've got state that isn't
-            # in self.__dict__. We assume it is all in self.args.
-            return (unpickle_inner_exception, (attached_to, name), self.args)
-
-        def __setstate__(self, args):
-            self.args = args
-
-        class_dict['__reduce__'] = __reduce__
-        class_dict['__setstate__'] = __setstate__
-
-    return type(name, parents, class_dict)
 
 def unpickle_inner_exception(klass, exception_name):
     # Get the exception class from the class it is attached to:

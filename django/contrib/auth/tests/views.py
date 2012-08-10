@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
 from django.test import TestCase
@@ -46,7 +46,7 @@ class AuthViewsTestCase(TestCase):
         self.assertTrue(SESSION_KEY in self.client.session)
 
     def assertContainsEscaped(self, response, text, **kwargs):
-        return self.assertContains(response, escape(force_unicode(text)), **kwargs)
+        return self.assertContains(response, escape(force_text(text)), **kwargs)
 
 
 class AuthViewNamedURLTests(AuthViewsTestCase):

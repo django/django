@@ -34,6 +34,8 @@ Having trouble? We'd like to help!
 First steps
 ===========
 
+Are you new to Django or to programming? This is the place to start!
+
 * **From scratch:**
   :doc:`Overview <intro/overview>` |
   :doc:`Installation <intro/install>`
@@ -46,6 +48,9 @@ First steps
 
 The model layer
 ===============
+
+Django provides an abstraction layer (the "models") for structuring and
+manipulating the data of your Web application. Learn more about it below:
 
 * **Models:**
   :doc:`Model syntax <topics/db/models>` |
@@ -74,19 +79,12 @@ The model layer
   :doc:`Providing initial data <howto/initial-data>` |
   :doc:`Optimize database access <topics/db/optimization>`
 
-The template layer
-==================
-
-* **For designers:**
-  :doc:`Syntax overview <topics/templates>` |
-  :doc:`Built-in tags and filters <ref/templates/builtins>`
-
-* **For programmers:**
-  :doc:`Template API <ref/templates/api>` |
-  :doc:`Custom tags and filters <howto/custom-template-tags>`
-
 The view layer
 ==============
+
+Django has the concept of "views" to encapsulate the logic responsible for
+processing a user's request and for returning the response. Find all you need
+to know about views via the links below:
 
 * **The basics:**
   :doc:`URLconfs <topics/http/urls>` |
@@ -118,8 +116,28 @@ The view layer
   :doc:`Overview <topics/http/middleware>` |
   :doc:`Built-in middleware classes <ref/middleware>`
 
+The template layer
+==================
+
+The template layer provides a designer-friendly syntax for rendering the
+information to be presented to the user. Learn how this syntax can be used by
+designers and how it can be extended by programmers:
+
+* **For designers:**
+  :doc:`Syntax overview <topics/templates>` |
+  :doc:`Built-in tags and filters <ref/templates/builtins>` |
+  :doc:`Web design helpers <ref/contrib/webdesign>` |
+  :doc:`Humanization <ref/contrib/humanize>`
+
+* **For programmers:**
+  :doc:`Template API <ref/templates/api>` |
+  :doc:`Custom tags and filters <howto/custom-template-tags>`
+
 Forms
 =====
+
+Django provides a rich framework to facilitate the creation of forms and the
+manipulation of form data.
 
 * **The basics:**
   :doc:`Overview <topics/forms/index>` |
@@ -139,6 +157,9 @@ Forms
 
 The development process
 =======================
+
+Learn about the various components and tools to help you in the development and
+testing of Django applications:
 
 * **Settings:**
   :doc:`Overview <topics/settings>` |
@@ -161,51 +182,99 @@ The development process
   :doc:`Handling static files <howto/static-files>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
-Other batteries included
-========================
+The admin
+=========
 
-* :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>` | :doc:`Admin documentation generator<ref/contrib/admin/admindocs>`
-* :doc:`Authentication <topics/auth>`
-* :doc:`Cache system <topics/cache>`
+Find all you need to know about the automated admin interface, one of Django's
+most popular features:
+
+* :doc:`Admin site <ref/contrib/admin/index>`
+* :doc:`Admin actions <ref/contrib/admin/actions>`
+* :doc:`Admin documentation generator<ref/contrib/admin/admindocs>`
+
+Security
+========
+
+Security is a topic of paramount importance in the development of Web
+applications and Django provides multiple protection tools and mechanisms:
+
+* :doc:`Security overview <topics/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
-* :doc:`Comments <ref/contrib/comments/index>` | :doc:`Moderation <ref/contrib/comments/moderation>` | :doc:`Custom comments <ref/contrib/comments/custom>`
-* :doc:`Conditional content processing <topics/conditional-view-processing>`
-* :doc:`Content types and generic relations <ref/contrib/contenttypes>`
 * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
-* :doc:`Databrowse <ref/contrib/databrowse>`
-* :doc:`E-mail (sending) <topics/email>`
-* :doc:`Flatpages <ref/contrib/flatpages>`
-* :doc:`GeoDjango <ref/contrib/gis/index>`
-* :doc:`Humanize <ref/contrib/humanize>`
+
+Internationalization and localization
+=====================================
+
+Django offers a robust internationalization and localization framework to
+assist you in the development of applications for multiple languages and world
+regions:
+
 * :doc:`Internationalization <topics/i18n/index>`
-* :doc:`Jython support <howto/jython>`
 * :doc:`"Local flavor" <ref/contrib/localflavor>`
-* :doc:`Logging <topics/logging>`
-* :doc:`Messages <ref/contrib/messages>`
-* :doc:`Pagination <topics/pagination>`
+
+Python compatibility
+====================
+
+Django aims to be compatible with multiple different flavors and versions of
+Python:
+
+* :doc:`Jython support <howto/jython>`
 * :doc:`Python 3 compatibility <topics/python3>`
-* :doc:`Redirects <ref/contrib/redirects>`
-* :doc:`Security <topics/security>`
+
+Geographic framework
+====================
+
+:doc:`GeoDjango <ref/contrib/gis/index>` intends to be a world-class geographic
+Web framework. Its goal is to make it as easy as possible to build GIS Web
+applications and harness the power of spatially enabled data.
+
+Common Web application tools
+============================
+
+Django offers multiple tools commonly needed in the development of Web
+applications:
+
+* :doc:`Authentication <topics/auth>`
+* :doc:`Caching <topics/cache>`
+* :doc:`Logging <topics/logging>`
+* :doc:`Sending e-mails <topics/email>`
+* :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
+* :doc:`Comments <ref/contrib/comments/index>`, :doc:`comment moderation <ref/contrib/comments/moderation>` and :doc:`custom comments <ref/contrib/comments/custom>`
+* :doc:`Pagination <topics/pagination>`
+* :doc:`Messages framework <ref/contrib/messages>`
 * :doc:`Serialization <topics/serialization>`
 * :doc:`Sessions <topics/http/sessions>`
-* :doc:`Signals <topics/signals>`
 * :doc:`Sitemaps <ref/contrib/sitemaps>`
-* :doc:`Sites <ref/contrib/sites>`
-* :doc:`Static Files <ref/contrib/staticfiles>`
-* :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
+* :doc:`Static files management <ref/contrib/staticfiles>`
+* :doc:`Data validation <ref/validators>`
+
+Other core functionalities
+==========================
+
+Learn about some other core functionalities of the Django framework:
+
+* :doc:`Conditional content processing <topics/conditional-view-processing>`
+* :doc:`Content types and generic relations <ref/contrib/contenttypes>`
+* :doc:`Databrowse <ref/contrib/databrowse>`
+* :doc:`Flatpages <ref/contrib/flatpages>`
+* :doc:`Redirects <ref/contrib/redirects>`
+* :doc:`Signals <topics/signals>`
+* :doc:`The sites framework <ref/contrib/sites>`
 * :doc:`Unicode in Django <ref/unicode>`
-* :doc:`Web design helpers <ref/contrib/webdesign>`
-* :doc:`Validators <ref/validators>`
 
 The Django open-source project
 ==============================
+
+Learn about the development process for the Django project itself and about how
+you can contribute:
 
 * **Community:**
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
-  :doc:`The Django source code repository <internals/git>`
+  :doc:`The Django source code repository <internals/git>` |
+  :doc:`Security policies <internals/security>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

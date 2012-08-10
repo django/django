@@ -87,7 +87,7 @@ Where class based views shine is when you want to do the same thing many times.
 Suppose you're writing an API, and every view should return JSON instead of
 rendered HTML.
 
-We can use create a mixin class to use in all of our views, handling the
+We can create a mixin class to use in all of our views, handling the
 conversion to JSON once.
 
 For example, a simple JSON mixin might look something like this::
