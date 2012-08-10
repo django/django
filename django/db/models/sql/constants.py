@@ -37,3 +37,6 @@ ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC'),
 }
+
+# A marker for join-reusability.
+REUSE_ALL = object()

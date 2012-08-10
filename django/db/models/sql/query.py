@@ -20,7 +20,7 @@ from django.db.models.expressions import ExpressionNode
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
-        ORDER_PATTERN, JoinInfo, SelectInfo)
+        ORDER_PATTERN, REUSE_ALL, JoinInfo, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
@@ -115,7 +115,6 @@ class Query(object):
         self.default_ordering = True
         self.standard_ordering = True
         self.ordering_aliases = []
-        self.dupe_avoidance = {}
         self.used_aliases = set()
         self.filter_is_sticky = False
         self.included_inherited_models = {}
@@ -257,7 +256,6 @@ class Query(object):
         obj.standard_ordering = self.standard_ordering
         obj.included_inherited_models = self.included_inherited_models.copy()
         obj.ordering_aliases = []
-        obj.dupe_avoidance = self.dupe_avoidance.copy()
         obj.select = self.select[:]
         obj.related_select_cols = []
         obj.tables = self.tables[:]
@@ -460,24 +458,42 @@ class Query(object):
         self.remove_inherited_models()
         # Work out how to relabel the rhs aliases, if necessary.
         change_map = {}
-        used = set()
         conjunction = (connector == AND)
-        # Add the joins in the rhs query into the new query.
-        first = True
-        for alias in rhs.tables:
+
+        # Determine which existing joins can be reused. When combining the
+        # query with AND we must recreate all joins for m2m filters. When
+        # combining with OR we can reuse joins. The reason is that in AND
+        # case a single row can't fulfill a condition like:
+        #     revrel__col=1 & revrel__col=2
+        # But, there might be two different related rows matching this
+        # condition. In OR case a single True is enough, so single row is
+        # enough, too.
+        #
+        # Note that we will be creating duplicate joins for non-m2m joins in
+        # the AND case. The results will be correct but this creates too many
+        # joins. This is something that could be fixed later on.
+        reuse = set() if conjunction else set(self.tables)
+        # Base table must be present in the query - this is the same
+        # table on both sides.
+        self.get_initial_alias()
+        # Now, add the joins from rhs query into the new query (skipping base
+        # table).
+        for alias in rhs.tables[1:]:
             if not rhs.alias_refcount[alias]:
-                # An unused alias.
                 continue
-            table, _, join_type, lhs, lhs_col, col, _ = rhs.alias_map[alias]
-            promote = join_type == self.LOUTER
+            table, _, join_type, lhs, lhs_col, col, nullable = rhs.alias_map[alias]
+            promote = (join_type == self.LOUTER)
             # If the left side of the join was already relabeled, use the
             # updated alias.
             lhs = change_map.get(lhs, lhs)
-            new_alias = self.join((lhs, table, lhs_col, col),
-                    conjunction and not first, used, promote, not conjunction)
-            used.add(new_alias)
+            new_alias = self.join(
+                (lhs, table, lhs_col, col), reuse=reuse, promote=promote,
+                outer_if_first=not conjunction, nullable=nullable)
+            # We can't reuse the same join again in the query. If we have two
+            # distinct joins for the same connection in rhs query, then the
+            # combined query must have two joins, too.
+            reuse.discard(new_alias)
             change_map[alias] = new_alias
-            first = False
 
         # So that we don't exclude valid results in an "or" query combination,
         # all joins exclusive to either the lhs or the rhs must be converted
@@ -767,9 +783,11 @@ class Query(object):
             (key, relabel_column(col)) for key, col in self.aggregates.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for k, aliases in self.join_map.items():
+        for ident, aliases in self.join_map.items():
+            del self.join_map[ident]
             aliases = tuple([change_map.get(a, a) for a in aliases])
-            self.join_map[k] = aliases
+            ident = (change_map.get(ident[0], ident[0]),) + ident[1:]
+            self.join_map[ident] = aliases
         for old_alias, new_alias in six.iteritems(change_map):
             alias_data = self.alias_map[old_alias]
             alias_data = alias_data._replace(rhs_alias=new_alias)
@@ -844,8 +862,8 @@ class Query(object):
         """
         return len([1 for count in six.itervalues(self.alias_refcount) if count])
 
-    def join(self, connection, always_create=False, exclusions=(),
-            promote=False, outer_if_first=False, nullable=False, reuse=None):
+    def join(self, connection, reuse=REUSE_ALL, promote=False,
+             outer_if_first=False, nullable=False):
         """
         Returns an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -855,56 +873,40 @@ class Query(object):
 
             lhs.lhs_col = table.col
 
-        If 'always_create' is True and 'reuse' is None, a new alias is always
-        created, regardless of whether one already exists or not. If
-        'always_create' is True and 'reuse' is a set, an alias in 'reuse' that
-        matches the connection will be returned, if possible.  If
-        'always_create' is False, the first existing alias that matches the
-        'connection' is returned, if any. Otherwise a new join is created.
-
-        If 'exclusions' is specified, it is something satisfying the container
-        protocol ("foo in exclusions" must work) and specifies a list of
-        aliases that should not be returned, even if they satisfy the join.
+        The 'reuse' parameter can be used in three ways: it can be REUSE_ALL
+        which means all joins (matching the connection) are reusable, it can
+        be a set containing the aliases that can be reused, or it can be None
+        which means a new join is always created.
 
         If 'promote' is True, the join type for the alias will be LOUTER (if
         the alias previously existed, the join type will be promoted from INNER
         to LOUTER, if necessary).
 
         If 'outer_if_first' is True and a new join is created, it will have the
-        LOUTER join type. This is used when joining certain types of querysets
-        and Q-objects together.
+        LOUTER join type. Used for example when adding ORed filters, where we
+        want to use LOUTER joins except if some other join already restricts
+        the join to INNER join.
 
         A join is always created as LOUTER if the lhs alias is LOUTER to make
-        sure we do not generate chains like a LOUTER b INNER c.
+        sure we do not generate chains like t1 LOUTER t2 INNER t3.
 
         If 'nullable' is True, the join can potentially involve NULL values and
         is a candidate for promotion (to "left outer") when combining querysets.
         """
         lhs, table, lhs_col, col = connection
-        if lhs in self.alias_map:
-            lhs_table = self.alias_map[lhs].table_name
+        existing = self.join_map.get(connection, ())
+        if reuse == REUSE_ALL:
+            reuse = existing
+        elif reuse is None:
+            reuse = set()
         else:
-            lhs_table = lhs
-
-        if reuse and always_create and table in self.table_map:
-            # Convert the 'reuse' to case to be "exclude everything but the
-            # reusable set, minus exclusions, for this table".
-            exclusions = set(self.table_map[table]).difference(reuse).union(set(exclusions))
-            always_create = False
-        t_ident = (lhs_table, table, lhs_col, col)
-        if not always_create:
-            for alias in self.join_map.get(t_ident, ()):
-                if alias not in exclusions:
-                    if lhs_table and not self.alias_refcount[self.alias_map[alias].lhs_alias]:
-                        # The LHS of this join tuple is no longer part of the
-                        # query, so skip this possibility.
-                        continue
-                    if self.alias_map[alias].lhs_alias != lhs:
-                        continue
-                    self.ref_alias(alias)
-                    if promote or (lhs and self.alias_map[lhs].join_type == self.LOUTER):
-                        self.promote_joins([alias])
-                    return alias
+            reuse = [a for a in existing if a in reuse]
+        if reuse:
+            alias = reuse[0]
+            self.ref_alias(alias)
+            if promote or (lhs and self.alias_map[lhs].join_type == self.LOUTER):
+                self.promote_joins([alias])
+            return alias
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(table, True)
@@ -915,18 +917,16 @@ class Query(object):
         elif (promote or outer_if_first
               or self.alias_map[lhs].join_type == self.LOUTER):
             # We need to use LOUTER join if asked by promote or outer_if_first,
-            # or if the LHS table is left-joined in the query. Adding inner join
-            # to an existing outer join effectively cancels the effect of the
-            # outer join.
+            # or if the LHS table is left-joined in the query.
             join_type = self.LOUTER
         else:
             join_type = self.INNER
         join = JoinInfo(table, alias, join_type, lhs, lhs_col, col, nullable)
         self.alias_map[alias] = join
-        if t_ident in self.join_map:
-            self.join_map[t_ident] += (alias,)
+        if connection in self.join_map:
+            self.join_map[connection] += (alias,)
         else:
-            self.join_map[t_ident] = (alias,)
+            self.join_map[connection] = (alias,)
         return alias
 
     def setup_inherited_models(self):
@@ -1003,7 +1003,7 @@ class Query(object):
             # then we need to explore the joins that are required.
 
             field, source, opts, join_list, last, _ = self.setup_joins(
-                field_list, opts, self.get_initial_alias(), False)
+                field_list, opts, self.get_initial_alias(), REUSE_ALL)
 
             # Process the join chain to see if it can be trimmed
             col, _, join_list = self.trim_joins(source, join_list, last, False)
@@ -1114,8 +1114,8 @@ class Query(object):
 
         try:
             field, target, opts, join_list, last, extra_filters = self.setup_joins(
-                    parts, opts, alias, True, allow_many, allow_explicit_fk=True,
-                    can_reuse=can_reuse, negate=negate,
+                    parts, opts, alias, can_reuse, allow_many,
+                    allow_explicit_fk=True, negate=negate,
                     process_extras=process_extras)
         except MultiJoin as e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
@@ -1268,9 +1268,8 @@ class Query(object):
         if self.filter_is_sticky:
             self.used_aliases = used_aliases
 
-    def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True,
-            allow_explicit_fk=False, can_reuse=None, negate=False,
-            process_extras=True):
+    def setup_joins(self, names, opts, alias, can_reuse, allow_many=True,
+            allow_explicit_fk=False, negate=False, process_extras=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1290,14 +1289,9 @@ class Query(object):
         """
         joins = [alias]
         last = [0]
-        dupe_set = set()
-        exclusions = set()
         extra_filters = []
         int_alias = None
         for pos, name in enumerate(names):
-            if int_alias is not None:
-                exclusions.add(int_alias)
-            exclusions.add(alias)
             last.append(len(joins))
             if name == 'pk':
                 name = opts.pk.name
@@ -1330,28 +1324,12 @@ class Query(object):
                         opts = int_model._meta
                     else:
                         lhs_col = opts.parents[int_model].column
-                        dedupe = lhs_col in opts.duplicate_targets
-                        if dedupe:
-                            exclusions.update(self.dupe_avoidance.get(
-                                    (id(opts), lhs_col), ()))
-                            dupe_set.add((opts, lhs_col))
                         opts = int_model._meta
                         alias = self.join((alias, opts.db_table, lhs_col,
-                                opts.pk.column), exclusions=exclusions)
+                                opts.pk.column))
                         joins.append(alias)
-                        exclusions.add(alias)
-                        for (dupe_opts, dupe_col) in dupe_set:
-                            self.update_dupe_avoidance(dupe_opts, dupe_col,
-                                    alias)
             cached_data = opts._join_cache.get(name)
             orig_opts = opts
-            dupe_col = direct and field.column or field.field.column
-            dedupe = dupe_col in opts.duplicate_targets
-            if dupe_set or dedupe:
-                if dedupe:
-                    dupe_set.add((opts, dupe_col))
-                exclusions.update(self.dupe_avoidance.get((id(opts), dupe_col),
-                        ()))
 
             if process_extras and hasattr(field, 'extra_filters'):
                 extra_filters.extend(field.extra_filters(names, pos, negate))
@@ -1377,16 +1355,14 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, exclusions, nullable=True,
-                            reuse=can_reuse)
+                            reuse=can_reuse, nullable=True)
                     if int_alias == table2 and from_col2 == to_col2:
                         joins.append(int_alias)
                         alias = int_alias
                     else:
                         alias = self.join(
                                 (int_alias, table2, from_col2, to_col2),
-                                dupe_multis, exclusions, nullable=True,
-                                reuse=can_reuse)
+                                reuse=can_reuse, nullable=True)
                         joins.extend([int_alias, alias])
                 elif field.rel:
                     # One-to-one or many-to-one field
@@ -1402,7 +1378,6 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                                      exclusions=exclusions,
                                       nullable=self.is_nullable(field))
                     joins.append(alias)
                 else:
@@ -1433,11 +1408,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, exclusions, nullable=True,
-                            reuse=can_reuse)
+                            reuse=can_reuse, nullable=True)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, exclusions, nullable=True,
-                            reuse=can_reuse)
+                            reuse=can_reuse, nullable=True)
                     joins.extend([int_alias, alias])
                 else:
                     # One-to-many field (ForeignKey defined on the target model)
@@ -1461,16 +1434,8 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                            dupe_multis, exclusions, nullable=True,
-                            reuse=can_reuse)
+                            reuse=can_reuse, nullable=True)
                     joins.append(alias)
-
-            for (dupe_opts, dupe_col) in dupe_set:
-                if int_alias is None:
-                    to_avoid = alias
-                else:
-                    to_avoid = int_alias
-                self.update_dupe_avoidance(dupe_opts, dupe_col, to_avoid)
 
         if pos != len(names) - 1:
             if pos == len(names) - 2:
@@ -1537,19 +1502,6 @@ class Query(object):
             if final == penultimate:
                 penultimate = last.pop()
         return col, alias, join_list
-
-    def update_dupe_avoidance(self, opts, col, alias):
-        """
-        For a column that is one of multiple pointing to the same table, update
-        the internal data structures to note that this alias shouldn't be used
-        for those other columns.
-        """
-        ident = id(opts)
-        for name in opts.duplicate_targets[col]:
-            try:
-                self.dupe_avoidance[ident, name].add(alias)
-            except KeyError:
-                self.dupe_avoidance[ident, name] = set([alias])
 
     def split_exclude(self, filter_expr, prefix, can_reuse):
         """
@@ -1657,8 +1609,8 @@ class Query(object):
         try:
             for name in field_names:
                 field, target, u2, joins, u3, u4 = self.setup_joins(
-                        name.split(LOOKUP_SEP), opts, alias, False, allow_m2m,
-                        True)
+                        name.split(LOOKUP_SEP), opts, alias, REUSE_ALL,
+                        allow_m2m, True)
                 final_alias = joins[-1]
                 col = target.column
                 if len(joins) > 1:
@@ -1948,7 +1900,7 @@ class Query(object):
         opts = self.model._meta
         alias = self.get_initial_alias()
         field, col, opts, joins, last, extra = self.setup_joins(
-                start.split(LOOKUP_SEP), opts, alias, False)
+                start.split(LOOKUP_SEP), opts, alias, REUSE_ALL)
         select_col = self.alias_map[joins[1]].lhs_join_col
         select_alias = alias
 

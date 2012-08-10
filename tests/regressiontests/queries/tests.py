@@ -1046,6 +1046,18 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(q1, ["<Item: i1>"])
         self.assertEqual(str(q1.query), str(q2.query))
 
+    def test_combine_join_reuse(self):
+        # Test that we correctly recreate joins having identical connections
+        # in the rhs query, in case the query is ORed together. Related to
+        # ticket #18748
+        Report.objects.create(name='r4', creator=self.a1)
+        q1 = Author.objects.filter(report__name='r5')
+        q2 = Author.objects.filter(report__name='r4').filter(report__name='r1')
+        combined = q1|q2
+        self.assertEquals(str(combined.query).count('JOIN'), 2)
+        self.assertEquals(len(combined), 1)
+        self.assertEquals(combined[0].name, 'a1')
+
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
         # tricky in MySQL. This exercises that case.
