@@ -160,6 +160,7 @@ class HttpRequest(object):
         self.path = ''
         self.path_info = ''
         self.method = None
+        self.current_app = None
         self._post_parse_error = False
 
     def __repr__(self):
@@ -756,4 +757,3 @@ def str_to_unicode(s, encoding):
         return six.text_type(s, encoding, 'replace')
     else:
         return s
-
