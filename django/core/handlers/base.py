@@ -100,8 +100,9 @@ class BaseHandler(object):
                         urlresolvers.set_urlconf(urlconf)
                         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
-                    callback, callback_args, callback_kwargs = resolver.resolve(
-                            request.path_info)
+                    match = resolver.resolve(request.path_info)
+                    callback, callback_args, callback_kwargs = match
+                    request.current_app = match.namespace if match.namespace else None
 
                     # Apply view middleware
                     for middleware_method in self._view_middleware:
