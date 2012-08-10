@@ -1,9 +1,3 @@
-import sys
-import time
-
-from django.conf import settings
-from django.db import transaction
-from django.db.utils import load_backend
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 from django.utils.log import getLogger
@@ -25,12 +19,19 @@ class BaseDatabaseSchemaEditor(object):
     then the relevant actions, and then commit(). This is necessary to allow
     things like circular foreign key references - FKs will only be created once
     commit() is called.
+
+    TODO:
+        - Repointing of FKs
+        - Repointing of M2Ms
+        - Check constraints (PosIntField)
+        - PK changing
     """
 
     # Overrideable SQL templates
     sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
     sql_create_table_unique = "UNIQUE (%(columns)s)"
     sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
+    sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE"
 
     sql_create_column = "ALTER TABLE %(table)s ADD COLUMN %(column)s %(definition)s"
@@ -260,6 +261,25 @@ class BaseDatabaseSchemaEditor(object):
                 "name": self._create_index_name(model, columns, suffix="_uniq"),
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
+
+    def alter_db_table(self, model, old_db_table, new_db_table):
+        """
+        Renames the table a model points to.
+        """
+        self.execute(self.sql_rename_table % {
+            "old_table": self.quote_name(old_db_table),
+            "new_table": self.quote_name(new_db_table),
+        })
+
+    def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
+        """
+        Moves a model's table between tablespaces
+        """
+        self.execute(self.sql_rename_table % {
+            "table": self.quote_name(model._meta.db_table),
+            "old_tablespace": self.quote_name(old_db_tablespace),
+            "new_tablespace": self.quote_name(new_db_tablespace),
+        })
 
     def create_field(self, model, field, keep_default=False):
         """

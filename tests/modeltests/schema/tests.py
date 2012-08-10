@@ -342,3 +342,42 @@ class SchemaTests(TestCase):
         UniqueTest.objects.create(year=2012, slug="foo")
         self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         connection.rollback()
+
+    def test_db_table(self):
+        """
+        Tests renaming of the table
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.commit()
+        # Ensure the table is there to begin with
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['name'][0], "CharField")
+        # Alter the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_db_table(
+            Author,
+            "schema_author",
+            "schema_otherauthor",
+        )
+        editor.commit()
+        # Ensure the table is there afterwards
+        Author._meta.db_table = "schema_otherauthor"
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['name'][0], "CharField")
+        # Alter the table again
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_db_table(
+            Author,
+            "schema_otherauthor",
+            "schema_author",
+        )
+        editor.commit()
+        # Ensure the table is still there
+        Author._meta.db_table = "schema_author"
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['name'][0], "CharField")
