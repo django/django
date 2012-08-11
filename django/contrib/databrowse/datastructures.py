@@ -97,9 +97,6 @@ class EasyInstance(object):
             return val[:DISPLAY_SIZE] + '...'
         return val
 
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
-
     def pk(self):
         return self.instance._get_pk_val()
 

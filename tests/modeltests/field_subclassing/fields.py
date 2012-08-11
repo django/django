@@ -18,9 +18,6 @@ class Small(object):
     def __unicode__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
-    def __str__(self):
-        return six.text_type(self).encode('utf-8')
-
 class SmallField(models.Field):
     """
     Turns the "Small" class into a Django field. Because of the similarities

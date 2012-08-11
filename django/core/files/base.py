@@ -17,9 +17,6 @@ class File(FileProxyMixin):
         if hasattr(file, 'mode'):
             self.mode = file.mode
 
-    def __str__(self):
-        return smart_bytes(self.name or '')
-
     def __unicode__(self):
         return smart_text(self.name or '')
 

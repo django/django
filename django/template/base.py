@@ -85,9 +85,6 @@ class VariableDoesNotExist(Exception):
         self.msg = msg
         self.params = params
 
-    def __str__(self):
-        return six.text_type(self).encode('utf-8')
-
     def __unicode__(self):
         return self.msg % tuple([force_text(p, errors='replace')
                                  for p in self.params])

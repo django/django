@@ -87,9 +87,6 @@ class Team(object):
     def __unicode__(self):
         raise NotImplementedError("Not so simple")
 
-    def __str__(self):
-        raise NotImplementedError("Not so simple")
-
     def to_string(self):
         return "%s" % self.title
 
