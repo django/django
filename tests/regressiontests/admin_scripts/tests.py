@@ -1572,3 +1572,16 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "Destination directory '%s' does not exist, please create it first." % testproject_dir)
         self.assertFalse(os.path.exists(testproject_dir))
 
+
+    def test_custom_project_template_with_non_ascii_templates(self):
+        "Ticket 18091: Make sure the startproject management command is able to render templates with non-ASCII content"
+        template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template')
+        args = ['startproject', '--template', template_path, '--extension=txt', 'customtestproject']
+        testproject_dir = os.path.join(test_dir, 'customtestproject')
+
+        out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        self.assertEqual(open(os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')).read(),
+                         'Some non-ASCII text for testing ticket #18091:\n\xc3\xbc\xc3\xa4\xc3\xb6 \xe2\x82\xac\n')
