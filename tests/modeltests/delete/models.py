@@ -1,10 +1,12 @@
+from __future__ import unicode_literals
+
 from django.db import models
 
 
 class R(models.Model):
     is_default = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return "%s" % self.pk
 
 

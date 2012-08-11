@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import re
 from bisect import bisect
 
@@ -8,7 +10,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
-from django.utils.encoding import force_text, smart_bytes
+from django.utils.encoding import force_text, smart_text
 from django.utils.datastructures import SortedDict
 from django.utils import six
 
@@ -198,8 +200,8 @@ class Options(object):
     def __repr__(self):
         return '<Options for %s>' % self.object_name
 
-    def __str__(self):
-        return "%s.%s" % (smart_bytes(self.app_label), smart_bytes(self.module_name))
+    def __unicode__(self):
+        return "%s.%s" % (smart_text(self.app_label), smart_text(self.module_name))
 
     def verbose_name_raw(self):
         """

@@ -18,7 +18,7 @@ class Donut(models.Model):
     class Meta:
         ordering = ('consumed_at',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class RumBaba(models.Model):

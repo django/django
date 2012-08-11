@@ -130,7 +130,7 @@ class ContentFile(File):
         super(ContentFile, self).__init__(BytesIO(content), name=name)
         self.size = len(content)
 
-    def __str__(self):
+    def __unicode__(self):
         return 'Raw content'
 
     def __bool__(self):

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -42,5 +44,5 @@ class Article(models.Model):
     text = models.TextField()
     submitted_from = models.IPAddressField(blank=True, null=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return "Article %s" % self.name
