@@ -774,8 +774,10 @@ class CursorIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         return _rowfactory(next(self.iter), self.cursor)
+
+    next = __next__             # Python 2 compatibility
 
 
 def _rowfactory(row, cursor):

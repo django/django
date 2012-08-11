@@ -796,9 +796,10 @@ class TransactionTestCase(SimpleTestCase):
             " the response" % template_name)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
+        items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(map(transform, qs)), set(values))
-        return self.assertEqual(map(transform, qs), values)
+            return self.assertEqual(set(items), set(values))
+        return self.assertEqual(list(items), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)

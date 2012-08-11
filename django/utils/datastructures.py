@@ -129,7 +129,7 @@ class SortedDict(dict):
             data = list(data)
         super(SortedDict, self).__init__(data)
         if isinstance(data, dict):
-            self.keyOrder = list(six.iterkeys(data))
+            self.keyOrder = list(data)
         else:
             self.keyOrder = []
             seen = set()

@@ -26,7 +26,7 @@ class GeoQuerySet(QuerySet):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (list(six.iterkeys(kwargs)),))
+                    % (list(kwargs),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=GeoValuesListQuerySet, setup=True, flat=flat,

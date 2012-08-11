@@ -2,6 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_apps, get_models, signals
 from django.utils.encoding import smart_text
 from django.utils import six
+from django.utils.six.moves import input
 
 def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     """
@@ -49,7 +50,7 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
                 '    %s | %s' % (ct.app_label, ct.model)
                 for ct in to_remove
             ])
-            ok_to_delete = raw_input("""The following content types are stale and need to be deleted:
+            ok_to_delete = input("""The following content types are stale and need to be deleted:
 
 %s
 

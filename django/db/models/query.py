@@ -120,7 +120,7 @@ class QuerySet(object):
             if len(self._result_cache) <= pos:
                 self._fill_cache()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._prefetch_related_lookups and not self._prefetch_done:
             # We need all the results in order to be able to do the prefetch
             # in one go. To minimize code duplication, we use the __len__
@@ -134,6 +134,7 @@ class QuerySet(object):
         except StopIteration:
             return False
         return True
+    __nonzero__ = __bool__ # Python 2
 
     def __contains__(self, val):
         # The 'in' operator works without this method, due to __iter__. This
@@ -245,8 +246,8 @@ class QuerySet(object):
             requested = None
         max_depth = self.query.max_depth
 
-        extra_select = list(six.iterkeys(self.query.extra_select))
-        aggregate_select = list(six.iterkeys(self.query.aggregate_select))
+        extra_select = list(self.query.extra_select)
+        aggregate_select = list(self.query.aggregate_select)
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
@@ -593,7 +594,7 @@ class QuerySet(object):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (list(six.iterkeys(kwargs)),))
+                    % (list(kwargs),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
@@ -693,7 +694,7 @@ class QuerySet(object):
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (list(six.iterkeys(kwargs)),))
+                    % (list(kwargs),))
         obj = self._clone()
         if fields:
             if depth:
@@ -751,7 +752,7 @@ class QuerySet(object):
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(list(six.iterkeys(kwargs)))
+        obj._setup_aggregate_query(list(kwargs))
 
         # Add the aggregates to the query
         for (alias, aggregate_expr) in kwargs.items():
@@ -966,9 +967,9 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
-        extra_names = list(six.iterkeys(self.query.extra_select))
+        extra_names = list(self.query.extra_select)
         field_names = self.field_names
-        aggregate_names = list(six.iterkeys(self.query.aggregate_select))
+        aggregate_names = list(self.query.aggregate_select)
 
         names = extra_names + field_names + aggregate_names
 
@@ -1097,9 +1098,9 @@ class ValuesListQuerySet(ValuesQuerySet):
             # When extra(select=...) or an annotation is involved, the extra
             # cols are always at the start of the row, and we need to reorder
             # the fields to match the order in self._fields.
-            extra_names = list(six.iterkeys(self.query.extra_select))
+            extra_names = list(self.query.extra_select)
             field_names = self.field_names
-            aggregate_names = list(six.iterkeys(self.query.aggregate_select))
+            aggregate_names = list(self.query.aggregate_select)
 
             names = extra_names + field_names + aggregate_names
 

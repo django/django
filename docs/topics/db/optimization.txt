@@ -230,7 +230,7 @@ It is optimal because:
 #. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable
    for later use, allowing its cache to be re-used.
 
-#. The line ``{% if emails %}`` causes ``QuerySet.__nonzero__()`` to be called,
+#. The line ``{% if emails %}`` causes ``QuerySet.__bool__()`` to be called,
    which causes the ``user.emails.all()`` query to be run on the database, and
    at the least the first line to be turned into an ORM object. If there aren't
    any results, it will return False, otherwise True.

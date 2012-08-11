@@ -207,7 +207,7 @@ class Collector(object):
     def sort(self):
         sorted_models = []
         concrete_models = set()
-        models = list(six.iterkeys(self.data))
+        models = list(self.data)
         while len(sorted_models) < len(models):
             found = False
             for model in models:

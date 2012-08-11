@@ -3,7 +3,6 @@
 import gzip
 import re
 import random
-import StringIO
 
 from django.conf import settings
 from django.core import mail
@@ -16,6 +15,7 @@ from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.six.moves import xrange
+from django.utils.six import StringIO
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):
@@ -526,7 +526,7 @@ class GZipMiddlewareTest(TestCase):
 
     @staticmethod
     def decompress(gzipped_string):
-        return gzip.GzipFile(mode='rb', fileobj=StringIO.StringIO(gzipped_string)).read()
+        return gzip.GzipFile(mode='rb', fileobj=StringIO(gzipped_string)).read()
 
     def test_compress_response(self):
         """

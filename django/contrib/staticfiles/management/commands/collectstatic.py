@@ -8,6 +8,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
 from django.utils.datastructures import SortedDict
+from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
 
@@ -148,7 +149,7 @@ class Command(NoArgsCommand):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = raw_input("""
+            confirm = input("""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 

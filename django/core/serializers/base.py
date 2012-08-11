@@ -136,9 +136,11 @@ class Deserializer(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError
+
+    next = __next__             # Python 2 compatibility
 
 class DeserializedObject(object):
     """

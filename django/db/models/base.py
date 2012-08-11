@@ -388,14 +388,14 @@ class Model(six.with_metaclass(ModelBase, object)):
                 setattr(self, field.attname, val)
 
         if kwargs:
-            for prop in list(six.iterkeys(kwargs)):
+            for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
                         setattr(self, prop, kwargs.pop(prop))
                 except AttributeError:
                     pass
             if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % list(six.iterkeys(kwargs))[0])
+                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 

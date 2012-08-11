@@ -217,8 +217,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         gis_terms = ['isnull']
-        gis_terms += list(six.iterkeys(self.geometry_operators))
-        gis_terms += list(six.iterkeys(self.geometry_functions))
+        gis_terms += list(self.geometry_operators)
+        gis_terms += list(self.geometry_functions)
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
         self.area = prefix + 'Area'

@@ -305,7 +305,7 @@ class LazyStream(object):
         out = b''.join(parts())
         return out
 
-    def next(self):
+    def __next__(self):
         """
         Used when the exact number of bytes to read is unimportant.
 
@@ -321,6 +321,8 @@ class LazyStream(object):
             self._unget_history = []
         self.position += len(output)
         return output
+
+    next = __next__             # Python 2 compatibility
 
     def close(self):
         """
@@ -376,7 +378,7 @@ class ChunkIter(object):
         self.flo = flo
         self.chunk_size = chunk_size
 
-    def next(self):
+    def __next__(self):
         try:
             data = self.flo.read(self.chunk_size)
         except InputStreamExhausted:
@@ -385,6 +387,8 @@ class ChunkIter(object):
             return data
         else:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
     def __iter__(self):
         return self
@@ -400,11 +404,13 @@ class InterBoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
             raise StopIteration()
+
+    next = __next__             # Python 2 compatibility
 
 class BoundaryIter(object):
     """
@@ -441,7 +447,7 @@ class BoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._done:
             raise StopIteration()
 
@@ -482,6 +488,8 @@ class BoundaryIter(object):
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
 
+    next = __next__             # Python 2 compatibility
+
     def _find_boundary(self, data, eof = False):
         """
         Finds a multipart boundary in data.
@@ -499,9 +507,11 @@ class BoundaryIter(object):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            if data[max(0,end-1)] == b'\n':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\n':
                 end -= 1
-            if data[max(0,end-1)] == b'\r':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\r':
                 end -= 1
             return end, next
 
@@ -605,7 +615,7 @@ def parse_header(line):
         if i >= 0:
             name = p[:i].strip().lower().decode('ascii')
             value = p[i+1:].strip()
-            if len(value) >= 2 and value[0] == value[-1] == b'"':
+            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
             pdict[name] = value

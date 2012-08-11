@@ -3,10 +3,10 @@
 import os
 import re
 import shutil
-from StringIO import StringIO
 
 from django.core import management
 from django.test import TestCase
+from django.utils.six import StringIO
 
 
 LOCALE='de'

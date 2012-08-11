@@ -221,4 +221,4 @@ class override_settings(object):
                                  setting=key, value=new_value)
 
 def str_prefix(s):
-    return s % {'_': 'u'}
+    return s % {'_': '' if six.PY3 else 'u'}

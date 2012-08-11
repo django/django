@@ -61,14 +61,14 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(smart_bytes(rawdata))
+                super(SimpleCookie, self).load(smart_str(rawdata))
                 for key in self.bad_cookies:
                     del self[key]
 
             # override private __set() method:
             # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
-                key = smart_bytes(key)
+                key = smart_str(key)
                 try:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
@@ -85,7 +85,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_bytes, iri_to_uri, force_text
+from django.utils.encoding import smart_bytes, smart_str, iri_to_uri, force_text
 from django.utils.http import cookie_date
 from django.utils import six
 from django.utils import timezone
@@ -137,7 +137,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
     except:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
-    return smart_bytes('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+    return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
                       six.text_type(get),
@@ -294,7 +294,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, e, sys.exc_traceback)
+                six.reraise(UnreadablePostError, UnreadablePostError(*tuple(e.args)), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -656,7 +656,7 @@ class HttpResponse(object):
         return b''.join([smart_bytes(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
-        if hasattr(value, '__iter__'):
+        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.text_type)):
             self._container = value
             self._base_content_is_iter = True
         else:
@@ -669,11 +669,13 @@ class HttpResponse(object):
         self._iterator = iter(self._container)
         return self
 
-    def next(self):
+    def __next__(self):
         chunk = next(self._iterator)
         if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
         return str(chunk)
+
+    next = __next__             # Python 2 compatibility
 
     def close(self):
         if hasattr(self._container, 'close'):

@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
-from io import BytesIO
 
 from django.core import management
 from django.core.management.base import CommandError
@@ -14,6 +13,7 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
+from django.utils.six import StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
@@ -276,7 +276,7 @@ class TestFixtures(TestCase):
         )
         animal.save()
 
-        stdout = BytesIO()
+        stdout = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.animal',
@@ -305,7 +305,7 @@ class TestFixtures(TestCase):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
         """
-        stdout = BytesIO()
+        stdout = StringIO()
         # Create an instance of the concrete class
         widget = Widget.objects.create(name='grommet')
         management.call_command(
@@ -380,7 +380,7 @@ class TestFixtures(TestCase):
             )
 
     def test_loaddata_not_existant_fixture_file(self):
-        stdout_output = BytesIO()
+        stdout_output = StringIO()
         management.call_command(
             'loaddata',
             'this_fixture_doesnt_exist',
@@ -465,7 +465,7 @@ class NaturalKeyFixtureTests(TestCase):
             commit=False
             )
 
-        stdout = BytesIO()
+        stdout = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.book',

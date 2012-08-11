@@ -68,11 +68,12 @@ class Node(object):
         """
         return len(self.children)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         For truth value testing.
         """
         return bool(self.children)
+    __nonzero__ = __bool__ # Python 2
 
     def __contains__(self, other):
         """

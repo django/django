@@ -154,12 +154,14 @@ class Deserializer(base.Deserializer):
         self.event_stream = pulldom.parse(self.stream)
         self.db = options.pop('using', DEFAULT_DB_ALIAS)
 
-    def next(self):
+    def __next__(self):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
                 self.event_stream.expandNode(node)
                 return self._handle_object(node)
         raise StopIteration
+
+    next = __next__             # Python 2 compatibility
 
     def _handle_object(self, node):
         """

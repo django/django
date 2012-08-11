@@ -129,7 +129,7 @@ class UserAdmin(admin.ModelAdmin):
         else:
             form = self.change_password_form(user)
 
-        fieldsets = [(None, {'fields': list(six.iterkeys(form.base_fields))})]
+        fieldsets = [(None, {'fields': list(form.base_fields)})]
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {

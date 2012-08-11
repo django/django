@@ -83,6 +83,8 @@ class Element(object):
             return False
         return True
 
+    __hash__ = object.__hash__
+
     def __ne__(self, element):
         return not self.__eq__(element)
 

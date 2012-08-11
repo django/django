@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 
-import StringIO
-
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.six import StringIO
 
 from .models import Article, Book, Spy, Tag, Visa
 
@@ -26,7 +25,7 @@ class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
                          use_base_manager=False, exclude_list=[]):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
         management.call_command('dumpdata', *args, **{'format':format,
                                                       'stdout':new_io,
                                                       'stderr':new_io,
@@ -43,7 +42,7 @@ class FixtureLoadingTests(TestCase):
         ])
 
     def test_loading_and_dumping(self):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
 
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
@@ -293,7 +292,7 @@ class FixtureLoadingTests(TestCase):
 
 class FixtureTransactionTests(TransactionTestCase):
     def _dumpdata_assert(self, args, output, format='json'):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
         management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
