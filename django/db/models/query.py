@@ -472,7 +472,7 @@ class QuerySet(object):
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
                     # Re-raise the IntegrityError with its original traceback.
-                    six.reraise(exc_info[1], None, exc_info[2])
+                    six.reraise(*exc_info)
 
     def latest(self, field_name=None):
         """

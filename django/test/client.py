@@ -385,7 +385,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                six.reraise(exc_info[1], None, exc_info[2])
+                six.reraise(*exc_info)
 
             # Save the client and request that stimulated the response.
             response.client = self
