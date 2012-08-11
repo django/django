@@ -187,6 +187,14 @@ The functions defined in this module share the following properties:
     Useful as a mix-in. If you support Python 2 and 3 with a single code base,
     you can inherit this mix-in and just define ``__unicode__``.
 
+.. function:: python_2_unicode_compatible
+
+    A decorator that defines ``__unicode__`` and ``__str__`` methods under
+    Python 2. Under Python 3 it does nothing.
+
+    To support Python 2 and 3 with a single code base, define a ``__str__``
+    method returning text and apply this decorator to the class.
+
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
     .. versionadded:: 1.5
