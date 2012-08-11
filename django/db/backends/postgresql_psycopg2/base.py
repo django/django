@@ -29,6 +29,7 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedString)
 
