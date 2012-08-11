@@ -1,11 +1,11 @@
 import copy
 import sys
-from io import BytesIO
 
 from django.core.management.validation import get_validation_errors
 from django.db.models.loading import cache, load_app
 
 from django.utils import unittest
+from django.utils.six import StringIO
 
 
 class InvalidModelTestCase(unittest.TestCase):
@@ -16,7 +16,7 @@ class InvalidModelTestCase(unittest.TestCase):
         # coloring attached (makes matching the results easier). We restore
         # sys.stderr afterwards.
         self.old_stdout = sys.stdout
-        self.stdout = BytesIO()
+        self.stdout = StringIO()
         sys.stdout = self.stdout
 
         # This test adds dummy applications to the app cache. These

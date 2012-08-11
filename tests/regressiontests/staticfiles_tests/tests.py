@@ -7,7 +7,6 @@ import posixpath
 import shutil
 import sys
 import tempfile
-from io import BytesIO
 
 from django.template import loader, Context
 from django.conf import settings
@@ -194,7 +193,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
     Test ``findstatic`` management command.
     """
     def _get_file(self, filepath):
-        out = BytesIO()
+        out = six.StringIO()
         call_command('findstatic', filepath, all=False, verbosity=0, stdout=out)
         out.seek(0)
         lines = [l.strip() for l in out.readlines()]
@@ -206,7 +205,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         """
         Test that findstatic returns all candidate files if run without --first.
         """
-        out = BytesIO()
+        out = six.StringIO()
         call_command('findstatic', 'test/file.txt', verbosity=0, stdout=out)
         out.seek(0)
         lines = [l.strip() for l in out.readlines()]
