@@ -407,7 +407,7 @@ class Model(six.with_metaclass(ModelBase, object)):
         return smart_bytes('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if hasattr(self, '__unicode__'):
+        if not six.PY3 and hasattr(self, '__unicode__'):
             return force_text(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
