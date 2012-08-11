@@ -6,16 +6,17 @@ Simple mixins
 
     .. versionadded:: 1.5
 
-    **classpath**
-
-    ``django.views.generic.base.ContextMixin``
-
     **Methods**
 
-    .. method:: get_context_data(**kwargs)
+    .. method:: get_context_data(**kwargs):
 
-        Returns a dictionary representing the template context. The
-        keyword arguments provided will make up the returned context.
+        Returns a dictionary representing the template context. The keyword
+        arguments provided will make up the returned context. Example usage::
+
+            def get_context_data(self, **kwargs):
+                context = super(RandomNumberView, self).get_context_data(**kwargs)
+                context['number'] = random.randrange(1,100)
+                return context
 
 .. class:: django.views.generic.base.TemplateResponseMixin
 
@@ -24,7 +25,13 @@ Simple mixins
     suitable context. The template to use is configurable and can be
     further customized by subclasses.
 
-    **Methods and Attributes**
+    **Attributes**
+
+    .. attribute:: template_name = None
+
+        The full name of a template to use as defined by a string. Not defining a
+        template_name will raise a ``django.core.exceptions.ImproperlyConfigured``
+        exception.
 
     .. attribute:: response_class
 
@@ -39,12 +46,14 @@ Simple mixins
         instantiation, create a ``TemplateResponse`` subclass and assign it to
         ``response_class``.
 
+    **Methods**
+
     .. method:: render_to_response(context, **response_kwargs)
 
         Returns a ``self.response_class`` instance.
 
-        If any keyword arguments are provided, they will be
-        passed to the constructor of the response class.
+        If any keyword arguments are provided, they will be passed to the 
+        constructor of the response class.
 
         Calls :meth:`~TemplateResponseMixin.get_template_names()` to obtain the
         list of template names that will be searched looking for an existent
@@ -52,9 +61,10 @@ Simple mixins
 
     .. method:: get_template_names()
 
-        Returns a list of template names to search for when rendering the
-        template.
+        Returns a list of template names to search for when rendering the template.
 
-        If :attr:`TemplateResponseMixin.template_name` is specified, the
-        default implementation will return a list containing
+        If :attr:`TemplateResponseMixin.template_name` is specified, the default
+        implementation will return a list containing
         :attr:`TemplateResponseMixin.template_name` (if it is specified).
+
+    
