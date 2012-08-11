@@ -261,7 +261,7 @@ class CachedFilesMixin(object):
                         hashed_name = force_text(saved_name.replace('\\', '/'))
 
                 # and then set the cache accordingly
-                hashed_paths[self.cache_key(name)] = hashed_name
+                hashed_paths[self.cache_key(name.replace('\\', '/'))] = hashed_name
                 yield name, hashed_name, processed
 
         # Finally set the cache
