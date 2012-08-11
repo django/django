@@ -3,6 +3,7 @@ import os
 import re
 import mimetypes
 from copy import copy
+from io import BytesIO
 try:
     from urllib.parse import unquote, urlparse, urlsplit
 except ImportError:     # Python 2
@@ -41,7 +42,7 @@ class FakePayload(object):
     that wouldn't work in Real Life.
     """
     def __init__(self, content):
-        self.__content = six.BytesIO(content)
+        self.__content = BytesIO(content)
         self.__len = len(content)
 
     def read(self, num_bytes=None):
@@ -174,7 +175,7 @@ class RequestFactory(object):
     def __init__(self, **defaults):
         self.defaults = defaults
         self.cookies = SimpleCookie()
-        self.errors = six.BytesIO()
+        self.errors = BytesIO()
 
     def _base_environ(self, **request):
         """
