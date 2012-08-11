@@ -178,7 +178,7 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertRaises(ValueError, ModelFormMetaclass, b'Form', (ModelForm,), {'Meta': Meta})
+        self.assertRaises(ValueError, ModelFormMetaclass, str('Form'), (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass
@@ -196,4 +196,4 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertTrue(issubclass(ModelFormMetaclass(b'Form', (ModelForm,), {'Meta': Meta}), ModelForm))
+        self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))

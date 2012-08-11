@@ -69,7 +69,7 @@ class ViewTest(unittest.TestCase):
 
     def _assert_simple(self, response):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'This is a simple view')
+        self.assertEqual(response.content, b'This is a simple view')
 
     def test_no_init_kwargs(self):
         """

@@ -260,29 +260,29 @@ class HttpResponseTests(unittest.TestCase):
     def test_non_string_content(self):
         #Bug 16494: HttpResponse should behave consistently with non-strings
         r = HttpResponse(12345)
-        self.assertEqual(r.content, '12345')
+        self.assertEqual(r.content, b'12345')
 
         #test content via property
         r = HttpResponse()
         r.content = 12345
-        self.assertEqual(r.content, '12345')
+        self.assertEqual(r.content, b'12345')
 
     def test_iter_content(self):
         r = HttpResponse(['abc', 'def', 'ghi'])
-        self.assertEqual(r.content, 'abcdefghi')
+        self.assertEqual(r.content, b'abcdefghi')
 
         #test iter content via property
         r = HttpResponse()
         r.content = ['idan', 'alex', 'jacob']
-        self.assertEqual(r.content, 'idanalexjacob')
+        self.assertEqual(r.content, b'idanalexjacob')
 
         r = HttpResponse()
         r.content = [1, 2, 3]
-        self.assertEqual(r.content, '123')
+        self.assertEqual(r.content, b'123')
 
         #test retrieval explicitly using iter and odd inputs
         r = HttpResponse()
-        r.content = ['1', '2', 3, unichr(1950)]
+        r.content = ['1', '2', 3, '\u079e']
         result = []
         my_iter = r.__iter__()
         while True:
@@ -297,8 +297,8 @@ class HttpResponseTests(unittest.TestCase):
         #with Content-Encoding header
         r = HttpResponse([1,1,2,4,8])
         r['Content-Encoding'] = 'winning'
-        self.assertEqual(r.content, '11248')
-        r.content = [unichr(1950),]
+        self.assertEqual(r.content, b'11248')
+        r.content = ['\u079e',]
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
 

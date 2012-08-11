@@ -480,7 +480,7 @@ class DayArchiveViewTests(TestCase):
 
     def test_next_prev_context(self):
         res = self.client.get('/dates/books/2008/oct/01/')
-        self.assertEqual(res.content, "Archive for Oct. 1, 2008. Previous day is May 1, 2006")
+        self.assertEqual(res.content, b"Archive for Oct. 1, 2008. Previous day is May 1, 2006")
 
     def test_custom_month_format(self):
         res = self.client.get('/dates/books/2008/10/01/')
