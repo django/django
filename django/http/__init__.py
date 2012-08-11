@@ -61,14 +61,14 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(smart_bytes(rawdata))
+                super(SimpleCookie, self).load(str(rawdata))
                 for key in self.bad_cookies:
                     del self[key]
 
             # override private __set() method:
             # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
-                key = smart_bytes(key)
+                key = str(key)
                 try:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
@@ -137,7 +137,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
     except:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
-    return smart_bytes('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+    return str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
                       six.text_type(get),
@@ -294,7 +294,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, e, sys.exc_traceback)
+                six.reraise(UnreadablePostError, UnreadablePostError(*tuple(e.args)), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
 

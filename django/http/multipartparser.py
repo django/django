@@ -507,9 +507,11 @@ class BoundaryIter(object):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            if data[max(0,end-1)] == b'\n':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\n':
                 end -= 1
-            if data[max(0,end-1)] == b'\r':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\r':
                 end -= 1
             return end, next
 
@@ -613,7 +615,7 @@ def parse_header(line):
         if i >= 0:
             name = p[:i].strip().lower().decode('ascii')
             value = p[i+1:].strip()
-            if len(value) >= 2 and value[0] == value[-1] == b'"':
+            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
             pdict[name] = value
