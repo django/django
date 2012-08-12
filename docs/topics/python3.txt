@@ -36,8 +36,20 @@ In order to enable the same behavior in Python 2, every module must import
     my_string = "This is an unicode literal"
     my_bytestring = b"This is a bytestring"
 
-If you need a byte string under Python 2 and a unicode string under Python 3,
-use the :func:`str` builtin::
+In classes, define ``__str__`` methods returning unicode strings and apply the
+:func:`~django.utils.encoding.python_2_unicode_compatible` decorator. It will
+define appropriate ``__unicode__`` and ``__str__`` in Python 2::
+
+    from __future__ import unicode_literals
+    from django.utils.encoding import python_2_unicode_compatible
+
+    @python_2_unicode_compatible
+    class MyClass(object):
+        def __str__(self):
+            return "Instance of my class"
+
+If you need a byte string literal under Python 2 and a unicode string literal
+under Python 3, use the :func:`str` builtin::
 
     str('my string')
 
