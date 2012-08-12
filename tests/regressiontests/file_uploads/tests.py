@@ -87,7 +87,7 @@ class FileUploadTests(TestCase):
         tdir = tempfile.gettempdir()
 
         # This file contains chinese symbols and an accented char in the name.
-        with open(os.path.join(tdir, UNICODE_FILENAME.encode('utf-8')), 'w+b') as file1:
+        with open(os.path.join(tdir, UNICODE_FILENAME), 'w+b') as file1:
             file1.write(b'b' * (2 ** 10))
             file1.seek(0)
 
