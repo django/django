@@ -13,6 +13,7 @@ from django.utils.translation import activate, deactivate_all, get_language, str
 from django.utils.encoding import force_text, smart_text
 from django.utils.datastructures import SortedDict
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
@@ -22,6 +23,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'auto_created')
 
+@python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
         self.local_fields, self.local_many_to_many = [], []
@@ -200,7 +202,7 @@ class Options(object):
     def __repr__(self):
         return '<Options for %s>' % self.object_name
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s.%s" % (smart_text(self.app_label), smart_text(self.module_name))
 
     def verbose_name_raw(self):

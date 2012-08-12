@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import TestCase
 from django.utils.safestring import mark_safe
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class AssertFormErrorsMixin(object):
@@ -213,8 +214,9 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             def clean(self):
                 raise ValidationError("I like to be awkward.")
 
+        @python_2_unicode_compatible
         class CustomErrorList(util.ErrorList):
-            def __unicode__(self):
+            def __str__(self):
                 return self.as_divs()
 
             def as_divs(self):

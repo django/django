@@ -12,7 +12,7 @@ from django.forms.util import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
-from django.utils.encoding import StrAndUnicode, smart_text, force_text
+from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import six
 
@@ -68,7 +68,8 @@ class DeclarativeFieldsMetaclass(type):
             new_class.media = media_property(new_class)
         return new_class
 
-class BaseForm(StrAndUnicode):
+@python_2_unicode_compatible
+class BaseForm(object):
     # This is the main implementation of all the Form logic. Note that this
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
@@ -95,7 +96,7 @@ class BaseForm(StrAndUnicode):
         # self.base_fields.
         self.fields = copy.deepcopy(self.base_fields)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.as_table()
 
     def __iter__(self):
@@ -387,7 +388,8 @@ class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
     # to define a form using declarative syntax.
     # BaseForm itself has no way of designating self.fields.
 
-class BoundField(StrAndUnicode):
+@python_2_unicode_compatible
+class BoundField(object):
     "A Field plus data"
     def __init__(self, form, field, name):
         self.form = form
@@ -402,7 +404,7 @@ class BoundField(StrAndUnicode):
             self.label = self.field.label
         self.help_text = field.help_text or ''
 
-    def __unicode__(self):
+    def __str__(self):
         """Renders this field as an HTML widget."""
         if self.field.show_hidden_initial:
             return self.as_widget() + self.as_hidden(only_initial=True)

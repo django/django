@@ -5,7 +5,7 @@ from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import Media, HiddenInput
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
@@ -33,7 +33,8 @@ class ManagementForm(Form):
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
-class BaseFormSet(StrAndUnicode):
+@python_2_unicode_compatible
+class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
@@ -51,7 +52,7 @@ class BaseFormSet(StrAndUnicode):
         # construct the forms in the formset
         self._construct_forms()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.as_table()
 
     def __iter__(self):

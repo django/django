@@ -7,8 +7,10 @@ the methods.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -17,7 +19,7 @@ class Person(models.Model):
         super(Person, self).__init__(*args, **kwargs)
         self.data = []
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
     def save(self, *args, **kwargs):

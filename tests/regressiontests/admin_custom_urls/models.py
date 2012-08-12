@@ -2,13 +2,15 @@ from functools import update_wrapper
 
 from django.contrib import admin
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

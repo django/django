@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -11,28 +13,31 @@ class Place(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s the place" % self.name
 
+@python_2_unicode_compatible
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s the restaurant" % self.name
 
+@python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s the italian restaurant" % self.name
 
+@python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
     capacity = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s the parking lot" % self.name
 
 class ParkingLot2(Place):
@@ -64,13 +69,14 @@ class SelfRefParent(models.Model):
 class SelfRefChild(SelfRefParent):
     child_data = models.IntegerField()
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
 class ArticleWithAuthor(Article):
@@ -91,17 +97,19 @@ class Evaluation(Article):
 class QualityControl(Evaluation):
     assignee = models.CharField(max_length=50)
 
+@python_2_unicode_compatible
 class BaseM(models.Model):
     base_name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.base_name
 
+@python_2_unicode_compatible
 class DerivedM(BaseM):
     customPK = models.IntegerField(primary_key=True)
     derived_name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return "PK = %d, base_name = %s, derived_name = %s" \
                 % (self.customPK, self.base_name, self.derived_name)
 
@@ -120,15 +128,17 @@ class InternalCertificationAudit(CertificationAudit):
     auditing_dept = models.CharField(max_length=20)
 
 # Check that abstract classes don't get m2m tables autocreated.
+@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class AbstractEvent(models.Model):
     name = models.CharField(max_length=100)
     attendees = models.ManyToManyField(Person, related_name="%(class)s_set")
@@ -137,7 +147,7 @@ class AbstractEvent(models.Model):
         abstract = True
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class BirthdayParty(AbstractEvent):

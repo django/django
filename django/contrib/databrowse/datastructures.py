@@ -9,6 +9,7 @@ from django.utils import formats
 from django.utils.text import capfirst
 from django.utils.encoding import smart_text, smart_bytes, iri_to_uri
 from django.db.models.query import QuerySet
+from django.utils.encoding import python_2_unicode_compatible
 
 EMPTY_VALUE = '(None)'
 DISPLAY_SIZE = 100
@@ -84,6 +85,7 @@ class EasyChoice(object):
     def url(self):
         return '%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value))
 
+@python_2_unicode_compatible
 class EasyInstance(object):
     def __init__(self, easy_model, instance):
         self.model, self.instance = easy_model, instance
@@ -91,7 +93,7 @@ class EasyInstance(object):
     def __repr__(self):
         return smart_bytes('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
 
-    def __unicode__(self):
+    def __str__(self):
         val = smart_text(self.instance)
         if len(val) > DISPLAY_SIZE:
             return val[:DISPLAY_SIZE] + '...'

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import python_2_unicode_compatible
 
 class ContentTypeManager(models.Manager):
 
@@ -122,6 +123,7 @@ class ContentTypeManager(models.Manager):
         self.__class__._cache.setdefault(using, {})[key] = ct
         self.__class__._cache.setdefault(using, {})[ct.id] = ct
 
+@python_2_unicode_compatible
 class ContentType(models.Model):
     name = models.CharField(max_length=100)
     app_label = models.CharField(max_length=100)
@@ -135,7 +137,7 @@ class ContentType(models.Model):
         ordering = ('name',)
         unique_together = (('app_label', 'model'),)
 
-    def __unicode__(self):
+    def __str__(self):
         # self.name is deprecated in favor of using model's verbose_name, which
         # can be translated. Formal deprecation is delayed until we have DB
         # migration to be able to remove the field from the database along with

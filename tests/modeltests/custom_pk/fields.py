@@ -3,8 +3,10 @@ import string
 
 from django.db import models
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class MyWrapper(object):
     def __init__(self, value):
         self.value = value
@@ -12,7 +14,7 @@ class MyWrapper(object):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.value)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
     def __eq__(self, other):

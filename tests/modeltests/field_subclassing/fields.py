@@ -5,8 +5,10 @@ import json
 from django.db import models
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Small(object):
     """
     A simple class to show that non-trivial Python objects can be used as
@@ -15,7 +17,7 @@ class Small(object):
     def __init__(self, first, second):
         self.first, self.second = first, second
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
 class SmallField(models.Field):

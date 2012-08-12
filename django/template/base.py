@@ -20,6 +20,7 @@ from django.utils.html import escape
 from django.utils.module_loading import module_has_submodule
 from django.utils import six
 from django.utils.timezone import template_localtime
+from django.utils.encoding import python_2_unicode_compatible
 
 
 TOKEN_TEXT = 0
@@ -79,13 +80,14 @@ class TemplateDoesNotExist(Exception):
 class TemplateEncodingError(Exception):
     pass
 
+@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
         self.msg = msg
         self.params = params
 
-    def __unicode__(self):
+    def __str__(self):
         return self.msg % tuple([force_text(p, errors='replace')
                                  for p in self.params])
 

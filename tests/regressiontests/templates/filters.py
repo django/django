@@ -13,14 +13,17 @@ from datetime import date, datetime, timedelta
 from django.test.utils import str_prefix
 from django.utils.tzinfo import LocalTimezone, FixedOffset
 from django.utils.safestring import mark_safe
+from django.utils.encoding import python_2_unicode_compatible
 
 # These two classes are used to test auto-escaping of __unicode__ output.
+@python_2_unicode_compatible
 class UnsafeClass:
-    def __unicode__(self):
+    def __str__(self):
         return 'you & me'
 
+@python_2_unicode_compatible
 class SafeClass:
-    def __unicode__(self):
+    def __str__(self):
         return mark_safe('you &gt; me')
 
 # RESULT SYNTAX --
@@ -338,11 +341,11 @@ def get_filter_tests():
         'join04': (r'{% autoescape off %}{{ a|join:" &amp; " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta & me'),
 
         # Test that joining with unsafe joiners don't result in unsafe strings (#11377)
-        'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'), 
-        'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'), 
-        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'), 
-        'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'), 
-        
+        'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
+        'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
+        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'),
+        'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
+
         'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
         #Ticket 9520: Make sure |date doesn't blow up on non-dates
