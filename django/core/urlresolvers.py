@@ -14,7 +14,7 @@ from threading import local
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import iri_to_uri, force_text, smart_bytes
+from django.utils.encoding import iri_to_uri, force_text, smart_str
 from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
@@ -190,7 +190,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return smart_bytes('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return smart_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -240,7 +240,9 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
-        return smart_bytes('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
+        return smart_str('<%s %s (%s:%s) %s>' % (
+            self.__class__.__name__, self.urlconf_name, self.app_name,
+            self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()

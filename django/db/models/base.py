@@ -23,7 +23,7 @@ from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import smart_bytes, smart_str, force_text
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
@@ -404,7 +404,7 @@ class Model(six.with_metaclass(ModelBase, object)):
             u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_bytes('<%s: %s>' % (self.__class__.__name__, u))
+        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if not six.PY3 and hasattr(self, '__unicode__'):
