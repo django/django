@@ -273,6 +273,7 @@ class QuerySet(object):
         aggregate_start = index_start + len(load_fields or self.model._meta.fields)
 
         skip = None
+
         if load_fields and not fill_cache:
             # Some fields have been deferred, so we have to initialise
             # via keyword arguments.
