@@ -15,6 +15,7 @@ class Account(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    pid = models.IntegerField(null=True, default=None)
 
     def __str__(self):
         return self.name
