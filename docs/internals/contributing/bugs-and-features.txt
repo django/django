@@ -62,8 +62,6 @@ To understand the lifecycle of your ticket once you have created it, refer to
 
 .. _django-updates: http://groups.google.com/group/django-updates
 
-.. _reporting-security-issues:
-
 Reporting user interface bugs and features
 ------------------------------------------
 
