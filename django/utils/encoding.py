@@ -8,6 +8,7 @@ try:
     from urllib.parse import quote
 except ImportError:     # Python 2
     from urllib import quote
+import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
@@ -32,6 +33,12 @@ class StrAndUnicode(object):
     Useful as a mix-in. If you support Python 2 and 3 with a single code base,
     you can inherit this mix-in and just define __unicode__.
     """
+    def __init__(self, *args, **kwargs):
+        warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
+                      "and apply the @python_2_unicode_compatible decorator "
+                      "instead.", PendingDeprecationWarning, stacklevel=2)
+        super(StrAndUnicode, self).__init__(*args, **kwargs)
+
     if six.PY3:
         def __str__(self):
             return self.__unicode__()
