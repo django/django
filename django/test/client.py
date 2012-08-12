@@ -108,7 +108,7 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
+    to_bytes = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
     is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
@@ -125,37 +125,37 @@ def encode_multipart(boundary, data):
                     lines.extend(encode_file(boundary, key, item))
                 else:
                     lines.extend([
-                        '--' + boundary,
-                        'Content-Disposition: form-data; name="%s"' % to_str(key),
-                        '',
-                        to_str(item)
+                        to_bytes('--%s' % boundary),
+                        to_bytes('Content-Disposition: form-data; name="%s"' % key),
+                        b'',
+                        to_bytes(item)
                     ])
         else:
             lines.extend([
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % to_str(key),
-                '',
-                to_str(value)
+                to_bytes('--%s' % boundary),
+                to_bytes('Content-Disposition: form-data; name="%s"' % key),
+                b'',
+                to_bytes(value)
             ])
 
     lines.extend([
-        '--' + boundary + '--',
-        '',
+        to_bytes('--%s--' % boundary),
+        b'',
     ])
-    return '\r\n'.join(lines)
+    return b'\r\n'.join(lines)
 
 def encode_file(boundary, key, file):
-    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
+    to_bytes = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
     content_type = mimetypes.guess_type(file.name)[0]
     if content_type is None:
         content_type = 'application/octet-stream'
     return [
-        '--' + to_str(boundary),
-        'Content-Disposition: form-data; name="%s"; filename="%s"' \
-            % (to_str(key), to_str(os.path.basename(file.name))),
-        'Content-Type: %s' % content_type,
-        '',
-        file.read()
+        to_bytes('--%s' % boundary),
+        to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"' \
+            % (key, os.path.basename(file.name))),
+        to_bytes('Content-Type: %s' % content_type),
+        b'',
+        to_bytes(file.read())
     ]
 
 
