@@ -415,14 +415,14 @@ class QueryDict(MultiValueDict):
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in self.iterlists():
+        for key, value in six.iterlists(self):
             result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in self.iterlists():
+        for key, value in six.iterlists(self):
             result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
