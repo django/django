@@ -71,6 +71,10 @@ class AdminScriptTestCase(unittest.TestCase):
                 os.remove(full_name + 'c')
         except OSError:
             pass
+        # Also remove a __pycache__ directory, if it exists
+        cache_name = os.path.join(test_dir, '__pycache__')
+        if os.path.isdir(cache_name):
+            shutil.rmtree(cache_name)
 
     def _ext_backend_paths(self):
         """
@@ -110,14 +114,11 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path.extend(ext_backend_base_dirs)
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
-        # Silence the DeprecationWarning caused by having a locale directory
-        # in the project directory.
-        cmd = [sys.executable, '-Wignore:::django.utils.translation', script]
-
         # Move to the test directory and run
         os.chdir(test_dir)
-        out, err = subprocess.Popen(cmd + args,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        out, err = subprocess.Popen([sys.executable, script] + args,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                universal_newlines=True).communicate()
 
         # Restore the old environment
         if old_django_settings_module:
