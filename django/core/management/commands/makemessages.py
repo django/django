@@ -144,7 +144,7 @@ def write_pot_file(potfile, msgs, file, work_file, is_templatized):
         msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
     else:
         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
-    with open(potfile, 'ab') as fp:
+    with open(potfile, 'a') as fp:
         fp.write(msgs)
 
 def process_file(file, dirpath, potfile, domain, verbosity,
@@ -252,7 +252,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         msgs = copy_plural_forms(msgs, locale, domain, verbosity, stdout)
     msgs = msgs.replace(
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
-    with open(pofile, 'wb') as fp:
+    with open(pofile, 'w') as fp:
         fp.write(msgs)
     os.unlink(potfile)
     if no_obsolete:
