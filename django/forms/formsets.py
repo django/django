@@ -95,10 +95,11 @@ class BaseFormSet(object):
             total_forms = initial_forms + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
-            if initial_forms > self.max_num >= 0:
-                total_forms = initial_forms
-            elif total_forms > self.max_num >= 0:
-                total_forms = self.max_num
+            if self.max_num is not None:
+                if initial_forms > self.max_num >= 0:
+                    total_forms = initial_forms
+                elif total_forms > self.max_num >= 0:
+                    total_forms = self.max_num
         return total_forms
 
     def initial_form_count(self):
@@ -108,7 +109,7 @@ class BaseFormSet(object):
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num >= 0:
+            if self.max_num is not None and (initial_forms > self.max_num >= 0):
                 initial_forms = self.max_num
         return initial_forms
 
