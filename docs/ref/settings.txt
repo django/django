@@ -1537,9 +1537,23 @@ SECRET_KEY
 
 Default: ``''`` (Empty string)
 
-A secret key for this particular Django installation. Used to provide a seed in
-secret-key hashing algorithms. Set this to a random string -- the longer, the
-better. ``django-admin.py startproject`` creates one automatically.
+A secret key for a particular Django installation. This is used to provide
+:doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
+unpredictable value.
+
+:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+randomly-generated ``SECRET_KEY`` to each new project.
+
+.. warning::
+
+    **Keep this value secret.**
+
+    Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
+    security protections, and can lead to privilege escalation and remote code
+    execution vulnerabilities.
+
+.. versionchanged:: 1.5
+    Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
