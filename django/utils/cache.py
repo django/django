@@ -16,6 +16,7 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
+from __future__ import unicode_literals
 
 import hashlib
 import re
@@ -170,7 +171,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         # User-defined tzinfo classes may return absolutely anything.
         # Hence this paranoid conversion to create a valid cache key.
         tz_name = force_text(get_current_timezone_name(), errors='ignore')
-        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').replace(' ', '_')
+        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
 
 def _generate_cache_key(request, method, headerlist, key_prefix):

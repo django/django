@@ -1308,7 +1308,7 @@ class CacheI18nTest(TestCase):
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
         tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
-        tz = tz.encode('ascii', 'ignore').replace(' ', '_')
+        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertIn(tz, key, "Cache keys should include the time zone name when time zones are active")
@@ -1320,7 +1320,7 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         lang = translation.get_language()
         tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
-        tz = tz.encode('ascii', 'ignore').replace(' ', '_')
+        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
