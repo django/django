@@ -1,6 +1,5 @@
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import smart_bytes
 from django.utils.functional import lazy_property
 from django.utils import six
 
@@ -74,8 +73,7 @@ class BaseStorage(object):
 
         files = {}
         for field, field_dict in six.iteritems(wizard_files):
-            field_dict = dict((smart_bytes(k), v)
-                              for k, v in six.iteritems(field_dict))
+            field_dict = field_dict.copy()
             tmp_name = field_dict.pop('tmp_name')
             files[field] = UploadedFile(
                 file=self.file_storage.open(tmp_name), **field_dict)

@@ -17,6 +17,7 @@ from django.contrib.formtools.tests.wizard import *
 from django.contrib.formtools.tests.forms import *
 
 success_string = "Done was called!"
+success_string_encoded = success_string.encode()
 
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
@@ -99,11 +100,11 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
     def test_bool_submit(self):
         """
@@ -123,7 +124,7 @@ class PreviewTests(TestCase):
         self.test_data.update({'hash': hash, 'bool1': 'False'})
         with warnings.catch_warnings(record=True):
             response = self.client.post('/preview/', self.test_data)
-            self.assertEqual(response.content, success_string)
+            self.assertEqual(response.content, success_string_encoded)
 
     def test_form_submit_good_hash(self):
         """
@@ -134,11 +135,11 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
 
     def test_form_submit_bad_hash(self):
@@ -151,11 +152,11 @@ class PreviewTests(TestCase):
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data)) + "bad"
         self.test_data.update({'hash': hash})
         response = self.client.post('/previewpreview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
 
 
 class FormHmacTests(unittest.TestCase):

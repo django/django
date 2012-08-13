@@ -193,7 +193,7 @@ class HttpRequest(object):
         default argument in which case that value will be returned instead.
         """
         try:
-            cookie_value = self.COOKIES[key].encode('utf-8')
+            cookie_value = self.COOKIES[key]
         except KeyError:
             if default is not RAISE_ERROR:
                 return default
