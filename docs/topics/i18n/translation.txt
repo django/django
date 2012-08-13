@@ -317,10 +317,10 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
-        name = models.CharField(help_text=ugettext_lazy('This is the help text'))
+        name = models.CharField(help_text=_('This is the help text'))
 
 You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
 relationship as translatable by using their ``verbose_name`` options::
@@ -344,14 +344,14 @@ It is recommended to always provide explicit
 relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs bu looking at the model's class name::
 
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
-        name = models.CharField(_('name'), help_text=ugettext_lazy('This is the help text'))
+        name = models.CharField(_('name'), help_text=_('This is the help text'))
 
         class Meta:
-            verbose_name = ugettext_lazy('my thing')
-            verbose_name_plural = ugettext_lazy('my things')
+            verbose_name = _('my thing')
+            verbose_name_plural = _('my things')
 
 Model methods ``short_description`` attribute values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
