@@ -89,18 +89,11 @@ def get_callable(lookup_view, can_fail=False):
     """
     if not callable(lookup_view):
         mod_name, func_name = get_mod_func(lookup_view)
+        if func_name == '':
+            return lookup_view
+
         try:
-            if func_name != '':
-                lookup_view = getattr(import_module(mod_name), func_name)
-                if not callable(lookup_view):
-                    raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable." %
-                        (mod_name, func_name))
-        except AttributeError:
-            if not can_fail:
-                raise ViewDoesNotExist(
-                    "Could not import %s. View does not exist in module %s." %
-                    (lookup_view, mod_name))
+            mod = import_module(mod_name)
         except ImportError:
             parentmod, submod = get_mod_func(mod_name)
             if (not can_fail and submod != '' and
@@ -110,6 +103,18 @@ def get_callable(lookup_view, can_fail=False):
                     (lookup_view, mod_name))
             if not can_fail:
                 raise
+        else:
+            try:
+                lookup_view = getattr(mod, func_name)
+                if not callable(lookup_view):
+                    raise ViewDoesNotExist(
+                        "Could not import %s.%s. View is not callable." %
+                        (mod_name, func_name))
+            except AttributeError:
+                if not can_fail:
+                    raise ViewDoesNotExist(
+                        "Could not import %s. View does not exist in module %s." %
+                        (lookup_view, mod_name))
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache, 1)
 

@@ -5,8 +5,9 @@ from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, resolve, NoReverseMatch,
-    Resolver404, ResolverMatch, RegexURLResolver, RegexURLPattern)
+from django.core.urlresolvers import (reverse, resolve, get_callable,
+    NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
+    RegexURLPattern)
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
@@ -519,3 +520,16 @@ class ErroneousViewTests(TestCase):
         """
         # The regex error will be hit before NoReverseMatch can be raised
         self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
+
+class ViewLoadingTests(TestCase):
+    def test_view_loading(self):
+        # A missing view (identified by an AttributeError) should raise
+        # ViewDoesNotExist, ...
+        self.assertRaisesRegexp(ViewDoesNotExist, ".*View does not exist in.*",
+            get_callable,
+            'regressiontests.urlpatterns_reverse.views.i_should_not_exist')
+        # ... but if the AttributeError is caused by something else don't
+        # swallow it.
+        self.assertRaises(AttributeError, get_callable,
+            'regressiontests.urlpatterns_reverse.views_broken.i_am_broken')
+
