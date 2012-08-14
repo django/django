@@ -225,7 +225,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(smart_bytes(path).replace("\\", "/"), safe=b"/~!*()'")
+    return quote(smart_bytes(path).decode('utf-8').replace("\\", "/"), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could
