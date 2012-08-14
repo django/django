@@ -1535,7 +1535,11 @@ object. See :ref:`how-django-processes-a-request` for details.
 SECRET_KEY
 ----------
 
-Default: ``''`` (Empty string)
+Default: Not defined
+
+.. versionchanged:: 1.5
+    This setting no longer defaults to the empty string, and Django will
+    refuse to start if it is not set.
 
 A secret key for this particular Django installation. Used to provide a seed in
 secret-key hashing algorithms. Set this to a random string -- the longer, the
