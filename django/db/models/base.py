@@ -779,7 +779,7 @@ class Model(six.with_metaclass(ModelBase, object)):
                 lookup_kwargs[str(field_name)] = lookup_value
 
             # some fields were skipped, no reason to do the check
-            if len(unique_check) != len(lookup_kwargs.keys()):
+            if len(unique_check) != len(lookup_kwargs):
                 continue
 
             qs = model_class._default_manager.filter(**lookup_kwargs)

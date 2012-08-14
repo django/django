@@ -10,7 +10,7 @@ class SQLCompiler(compiler.SQLCompiler):
             rn_offset = 1
         else:
             rn_offset = 0
-        index_start = rn_offset + len(self.query.extra_select.keys())
+        index_start = rn_offset + len(self.query.extra_select)
         values = [self.query.convert_values(v, None, connection=self.connection)
                   for v in row[rn_offset:index_start]]
         for value, field in map(None, row[index_start:], fields):
