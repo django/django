@@ -40,8 +40,8 @@ class WSGITest(TestCase):
             response_data["headers"],
             [('Content-Type', 'text/html; charset=utf-8')])
         self.assertEqual(
-            six.text_type(response),
-            "Content-Type: text/html; charset=utf-8\n\nHello World!")
+            bytes(response),
+            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
 
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):
