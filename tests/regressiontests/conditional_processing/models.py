@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.test import TestCase
@@ -28,7 +30,7 @@ class ConditionalGet(TestCase):
 
     def assertNotModified(self, response):
         self.assertEqual(response.status_code, 304)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def testWithoutConditions(self):
         response = self.client.get('/condition/')

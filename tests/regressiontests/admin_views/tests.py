@@ -787,7 +787,7 @@ class CustomModelAdminTest(AdminViewBasicTest):
     def testCustomAdminSiteView(self):
         self.client.login(username='super', password='secret')
         response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
-        self.assertEqual(response.content, "Django is a magical pony!")
+        self.assertEqual(response.content, b"Django is a magical pony!")
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
