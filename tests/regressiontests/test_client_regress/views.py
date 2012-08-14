@@ -8,6 +8,7 @@ from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
 from django.template import RequestContext
+from django.utils import six
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -80,9 +81,13 @@ def return_json_file(request):
 
     # This just checks that the uploaded data is JSON
     obj_dict = json.loads(request.body.decode(charset))
-    obj_json = json.dumps(obj_dict, encoding=charset,
-                                cls=DjangoJSONEncoder,
-                                ensure_ascii=False)
+    if six.PY3:
+        obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder,
+                                    ensure_ascii=False)
+    else:
+        obj_json = json.dumps(obj_dict, encoding=charset,
+                                    cls=DjangoJSONEncoder,
+                                    ensure_ascii=False)
     response = HttpResponse(obj_json.encode(charset), status=200,
                             content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
