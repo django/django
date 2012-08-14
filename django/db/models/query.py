@@ -1107,7 +1107,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             # If a field list has been specified, use it. Otherwise, use the
             # full list of fields, including extras and aggregates.
             if self._fields:
-                fields = list(self._fields) + filter(lambda f: f not in self._fields, aggregate_names)
+                fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
             else:
                 fields = names
 

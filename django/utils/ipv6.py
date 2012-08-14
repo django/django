@@ -263,6 +263,6 @@ def _is_shorthand_ip(ip_str):
     """
     if ip_str.count('::') == 1:
         return True
-    if filter(lambda x: len(x) < 4, ip_str.split(':')):
+    if any(len(x) < 4 for x in ip_str.split(':')):
         return True
     return False

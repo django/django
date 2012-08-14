@@ -387,7 +387,7 @@ class Options(object):
             predicates.append(lambda k, v: not k.field.rel.is_hidden())
         cache = (self._related_objects_proxy_cache if include_proxy_eq
                  else self._related_objects_cache)
-        return filter(lambda t: all([p(*t) for p in predicates]), cache.items())
+        return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
         cache = SortedDict()
