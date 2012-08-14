@@ -72,7 +72,7 @@ class DatabaseCache(BaseDatabaseCache):
             transaction.commit_unless_managed(using=db)
             return default
         value = connections[db].ops.process_clob(row[1])
-        return pickle.loads(base64.decodestring(value))
+        return pickle.loads(base64.b64decode(value))
 
     def set(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)
@@ -103,7 +103,7 @@ class DatabaseCache(BaseDatabaseCache):
         if num > self._max_entries:
             self._cull(db, cursor, now)
         pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        encoded = base64.encodestring(pickled).strip()
+        encoded = base64.b64encode(pickled).strip()
         cursor.execute("SELECT cache_key, expires FROM %s "
                        "WHERE cache_key = %%s" % table, [key])
         try:

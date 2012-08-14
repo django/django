@@ -81,10 +81,10 @@ class SessionBase(object):
         "Returns the given session dictionary pickled and encoded as a string."
         pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
         hash = self._hash(pickled)
-        return base64.encodestring(hash.encode() + b":" + pickled)
+        return base64.b64encode(hash.encode() + b":" + pickled)
 
     def decode(self, session_data):
-        encoded_data = base64.decodestring(smart_bytes(session_data))
+        encoded_data = base64.b64decode(smart_bytes(session_data))
         try:
             # could produce ValueError if there is no ':'
             hash, pickled = encoded_data.split(b':', 1)
