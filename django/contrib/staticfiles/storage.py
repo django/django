@@ -51,8 +51,8 @@ class CachedFilesMixin(object):
     default_template = """url("%s")"""
     patterns = (
         ("*.css", (
-            br"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (br"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
+            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
 
