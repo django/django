@@ -408,8 +408,7 @@ class Templates(unittest.TestCase):
         )
 
         failures = []
-        tests = template_tests.items()
-        tests.sort()
+        tests = sorted(template_tests.items())
 
         # Turn TEMPLATE_DEBUG off, because tests assume that.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
@@ -418,7 +417,7 @@ class Templates(unittest.TestCase):
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
 
-        #Set ALLOWED_INCLUDE_ROOTS so that ssi works.
+        # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
         old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
         settings.ALLOWED_INCLUDE_ROOTS = (
             os.path.dirname(os.path.abspath(__file__)),
