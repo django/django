@@ -855,7 +855,7 @@ class Model(six.with_metaclass(ModelBase, object)):
             }
         # unique_together
         else:
-            field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
+            field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
             field_labels = get_text_list(field_labels, _('and'))
             return _("%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': six.text_type(model_name),

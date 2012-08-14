@@ -148,7 +148,7 @@ class ChangeList(object):
         if remove is None: remove = []
         p = self.params.copy()
         for r in remove:
-            for k in p.keys():
+            for k in list(p.keys()):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():
