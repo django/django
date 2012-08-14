@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 import os
 import re
 import warnings
@@ -80,7 +81,7 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage': 1})
+        self.test_data.update({'stage': 1, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
         # Check to confirm stage is set to 2 in output form.
         stage = self.input % 2
@@ -98,7 +99,7 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
         self.assertNotEqual(response.content, success_string_encoded)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
@@ -272,7 +273,7 @@ class WizardTests(TestCase):
         """
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
@@ -297,15 +298,15 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
-                "hash_1": "4c352938f08b0e6467bef3cda578a1d4a82edc66",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_1": "1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
                 "wizard_step": "2"}
         self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
 
@@ -327,7 +328,7 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -351,7 +352,7 @@ class WizardTests(TestCase):
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -377,7 +378,7 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "09a53d8de15fc155bad33423e1d2ee2d82484d8a",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
