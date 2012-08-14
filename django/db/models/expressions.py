@@ -58,8 +58,9 @@ class ExpressionNode(tree.Node):
     def __mul__(self, other):
         return self._combine(other, self.MUL, False)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return self._combine(other, self.DIV, False)
+    __div__ = __truediv__ # Python 2 compatibility
 
     def __mod__(self, other):
         return self._combine(other, self.MOD, False)
