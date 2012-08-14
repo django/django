@@ -22,8 +22,7 @@ class MyWrapper(object):
             return self.value == other.value
         return self.value == other
 
-class MyAutoField(models.CharField):
-    __metaclass__ = models.SubfieldBase
+class MyAutoField(six.with_metaclass(models.SubfieldBase, models.CharField)):
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 10

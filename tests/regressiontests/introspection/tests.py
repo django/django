@@ -4,6 +4,7 @@ from functools import update_wrapper
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.utils import six
 
 from .models import Reporter, Article
 
@@ -35,8 +36,7 @@ class IgnoreNotimplementedError(type):
                 attrs[k] = ignore_not_implemented(v)
         return type.__new__(cls, name, bases, attrs)
 
-class IntrospectionTests(TestCase):
-    __metaclass__ = IgnoreNotimplementedError
+class IntrospectionTests(six.with_metaclass(IgnoreNotimplementedError, TestCase)):
 
     def test_table_names(self):
         tl = connection.introspection.table_names()

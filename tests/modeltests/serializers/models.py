@@ -99,8 +99,7 @@ class Team(object):
         return "%s" % self.title
 
 
-class TeamField(models.CharField):
-    __metaclass__ = models.SubfieldBase
+class TeamField(six.with_metaclass(models.SubfieldBase, models.CharField)):
 
     def __init__(self):
         super(TeamField, self).__init__(max_length=100)
