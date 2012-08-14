@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import codecs
 import os
 import re
 
@@ -168,10 +169,10 @@ def custom_sql_for_model(model, style, connection):
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            with open(sql_file, 'U') as fp:
+            with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
                 # Some backends can't execute more than one SQL statement at a time,
                 # so split into separate statements.
-                output.extend(_split_statements(fp.read().decode(settings.FILE_CHARSET)))
+                output.extend(_split_statements(fp.read()))
     return output
 
 
