@@ -179,14 +179,14 @@ class PriceFormWithoutQuantity(forms.ModelForm):
 
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
-        self.assertEqual(BaseCategoryForm.base_fields.keys(),
+        self.assertEqual(list(BaseCategoryForm.base_fields.keys()),
                          ['name', 'slug', 'url'])
 
     def test_extra_fields(self):
         class ExtraFields(BaseCategoryForm):
             some_extra_field = forms.BooleanField()
 
-        self.assertEqual(ExtraFields.base_fields.keys(),
+        self.assertEqual(list(ExtraFields.base_fields.keys()),
                          ['name', 'slug', 'url', 'some_extra_field'])
 
     def test_replace_field(self):
@@ -215,7 +215,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url']
 
-        self.assertEqual(LimitFields.base_fields.keys(),
+        self.assertEqual(list(LimitFields.base_fields.keys()),
                          ['url'])
 
     def test_exclude_fields(self):
@@ -224,7 +224,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 exclude = ['url']
 
-        self.assertEqual(ExcludeFields.base_fields.keys(),
+        self.assertEqual(list(ExcludeFields.base_fields.keys()),
                          ['name', 'slug'])
 
     def test_confused_form(self):
@@ -237,7 +237,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['name', 'url']
                 exclude = ['url']
 
-        self.assertEqual(ConfusedForm.base_fields.keys(),
+        self.assertEqual(list(ConfusedForm.base_fields.keys()),
                          ['name'])
 
     def test_mixmodel_form(self):
@@ -254,13 +254,13 @@ class ModelFormBaseTest(TestCase):
             # overrides BaseCategoryForm.Meta.
 
         self.assertEqual(
-            MixModelForm.base_fields.keys(),
+            list(MixModelForm.base_fields.keys()),
             ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
         )
 
     def test_article_form(self):
         self.assertEqual(
-            ArticleForm.base_fields.keys(),
+            list(ArticleForm.base_fields.keys()),
             ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
         )
 
@@ -270,7 +270,7 @@ class ModelFormBaseTest(TestCase):
             pass
 
         self.assertEqual(
-            BadForm.base_fields.keys(),
+            list(BadForm.base_fields.keys()),
             ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
         )
 
@@ -282,7 +282,7 @@ class ModelFormBaseTest(TestCase):
             """
             pass
 
-        self.assertEqual(SubCategoryForm.base_fields.keys(),
+        self.assertEqual(list(SubCategoryForm.base_fields.keys()),
                          ['name', 'slug', 'url'])
 
     def test_subclassmeta_form(self):
@@ -312,7 +312,7 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url', 'name']
 
-        self.assertEqual(OrderFields.base_fields.keys(),
+        self.assertEqual(list(OrderFields.base_fields.keys()),
                          ['url', 'name'])
         self.assertHTMLEqual(
             str(OrderFields()),
@@ -327,7 +327,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['slug', 'url', 'name']
                 exclude = ['url']
 
-        self.assertEqual(OrderFields2.base_fields.keys(),
+        self.assertEqual(list(OrderFields2.base_fields.keys()),
                          ['slug', 'name'])
 
 
@@ -751,9 +751,9 @@ class OldFormForXTests(TestCase):
         self.assertEqual(new_art.headline, 'New headline')
 
         # Add some categories and test the many-to-many form output.
-        self.assertEqual(map(lambda o: o.name, new_art.categories.all()), [])
+        self.assertEqual([o.name for o in new_art.categories.all()], [])
         new_art.categories.add(Category.objects.get(name='Entertainment'))
-        self.assertEqual(map(lambda o: o.name, new_art.categories.all()), ["Entertainment"])
+        self.assertEqual([o.name for o in new_art.categories.all()], ["Entertainment"])
         f = TestArticleForm(auto_id=False, instance=new_art)
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
@@ -815,7 +815,7 @@ class OldFormForXTests(TestCase):
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
         new_art = Article.objects.get(id=art_id_1)
-        self.assertEqual(map(lambda o: o.name, new_art.categories.order_by('name')),
+        self.assertEqual([o.name for o in new_art.categories.order_by('name')],
                          ["Entertainment", "It's a test"])
 
         # Now, submit form data with no categories. This deletes the existing categories.
@@ -824,7 +824,7 @@ class OldFormForXTests(TestCase):
         new_art = f.save()
         self.assertEqual(new_art.id == art_id_1, True)
         new_art = Article.objects.get(id=art_id_1)
-        self.assertEqual(map(lambda o: o.name, new_art.categories.all()), [])
+        self.assertEqual([o.name for o in new_art.categories.all()], [])
 
         # Create a new article, with categories, via the form.
         f = ArticleForm({'headline': 'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': '1967-11-01',
@@ -833,7 +833,7 @@ class OldFormForXTests(TestCase):
         art_id_2 = new_art.id
         self.assertEqual(art_id_2 not in (None, art_id_1), True)
         new_art = Article.objects.get(id=art_id_2)
-        self.assertEqual(map(lambda o: o.name, new_art.categories.order_by('name')), ["Entertainment", "It's a test"])
+        self.assertEqual([o.name for o in new_art.categories.order_by('name')], ["Entertainment", "It's a test"])
 
         # Create a new article, with no categories, via the form.
         f = ArticleForm({'headline': 'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': '1967-11-01',
@@ -842,7 +842,7 @@ class OldFormForXTests(TestCase):
         art_id_3 = new_art.id
         self.assertEqual(art_id_3 not in (None, art_id_1, art_id_2), True)
         new_art = Article.objects.get(id=art_id_3)
-        self.assertEqual(map(lambda o: o.name, new_art.categories.all()), [])
+        self.assertEqual([o.name for o in new_art.categories.all()], [])
 
         # Create a new article, with categories, via the form, but use commit=False.
         # The m2m data won't be saved until save_m2m() is invoked on the form.
@@ -857,11 +857,11 @@ class OldFormForXTests(TestCase):
 
         # The instance doesn't have m2m data yet
         new_art = Article.objects.get(id=art_id_4)
-        self.assertEqual(map(lambda o: o.name, new_art.categories.all()), [])
+        self.assertEqual([o.name for o in new_art.categories.all()], [])
 
         # Save the m2m data on the form
         f.save_m2m()
-        self.assertEqual(map(lambda o: o.name, new_art.categories.order_by('name')), ["Entertainment", "It's a test"])
+        self.assertEqual([o.name for o in new_art.categories.order_by('name')], ["Entertainment", "It's a test"])
 
         # Here, we define a custom ModelForm. Because it happens to have the same fields as
         # the Category model, we can just call the form's save() to apply its changes to an
@@ -1007,12 +1007,12 @@ class OldFormForXTests(TestCase):
             f.clean(None)
         with self.assertRaises(ValidationError):
             f.clean([])
-        self.assertEqual(map(lambda o: o.name, f.clean([c1.id])), ["Entertainment"])
-        self.assertEqual(map(lambda o: o.name, f.clean([c2.id])), ["It's a test"])
-        self.assertEqual(map(lambda o: o.name, f.clean([str(c1.id)])), ["Entertainment"])
-        self.assertEqual(map(lambda o: o.name, f.clean([str(c1.id), str(c2.id)])), ["Entertainment", "It's a test"])
-        self.assertEqual(map(lambda o: o.name, f.clean([c1.id, str(c2.id)])), ["Entertainment", "It's a test"])
-        self.assertEqual(map(lambda o: o.name, f.clean((c1.id, str(c2.id)))), ["Entertainment", "It's a test"])
+        self.assertEqual([o.name for o in f.clean([c1.id])], ["Entertainment"])
+        self.assertEqual([o.name for o in f.clean([c2.id])], ["It's a test"])
+        self.assertEqual([o.name for o in f.clean([str(c1.id)])], ["Entertainment"])
+        self.assertEqual([o.name for o in f.clean([str(c1.id), str(c2.id)])], ["Entertainment", "It's a test"])
+        self.assertEqual([o.name for o in f.clean([c1.id, str(c2.id)])], ["Entertainment", "It's a test"])
+        self.assertEqual([o.name for o in f.clean((c1.id, str(c2.id)))], ["Entertainment", "It's a test"])
         with self.assertRaises(ValidationError):
             f.clean(['100'])
         with self.assertRaises(ValidationError):
@@ -1025,7 +1025,7 @@ class OldFormForXTests(TestCase):
         # than caching it at time of instantiation.
         c6 = Category.objects.create(id=6, name='Sixth', url='6th')
         self.assertEqual(c6.name, 'Sixth')
-        self.assertEqual(map(lambda o: o.name, f.clean([c6.id])), ["Sixth"])
+        self.assertEqual([o.name for o in f.clean([c6.id])], ["Sixth"])
 
         # Delete a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
@@ -1050,7 +1050,7 @@ class OldFormForXTests(TestCase):
             (c1.pk, 'Entertainment'),
             (c2.pk, "It's a test"),
             (c3.pk, 'Third')])
-        self.assertEqual(map(lambda o: o.name, f.clean([c3.id])), ["Third"])
+        self.assertEqual([o.name for o in f.clean([c3.id])], ["Third"])
         with self.assertRaises(ValidationError):
             f.clean([c4.id])
         with self.assertRaises(ValidationError):
@@ -1066,9 +1066,9 @@ class OldFormForXTests(TestCase):
 
         # OneToOneField ###############################################################
 
-        self.assertEqual(ImprovedArticleForm.base_fields.keys(), ['article'])
+        self.assertEqual(list(ImprovedArticleForm.base_fields.keys()), ['article'])
 
-        self.assertEqual(ImprovedArticleWithParentLinkForm.base_fields.keys(), [])
+        self.assertEqual(list(ImprovedArticleWithParentLinkForm.base_fields.keys()), [])
 
         bw = BetterWriter(name='Joe Better', score=10)
         bw.save()
@@ -1463,7 +1463,7 @@ class OldFormForXTests(TestCase):
                 model = Category
                 fields = ['description', 'url']
 
-        self.assertEqual(CategoryForm.base_fields.keys(),
+        self.assertEqual(list(CategoryForm.base_fields.keys()),
                          ['description', 'url'])
 
         self.assertHTMLEqual(six.text_type(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
@@ -1472,14 +1472,15 @@ class OldFormForXTests(TestCase):
 
         field = forms.ModelMultipleChoiceField(Inventory.objects.all(), to_field_name='barcode')
         self.assertEqual(tuple(field.choices), ((86, 'Apple'), (87, 'Core'), (22, 'Pear')))
-        self.assertEqual(map(lambda o: o.name, field.clean([86])), ['Apple'])
+        self.assertEqual([o.name for o in field.clean([86])], ['Apple'])
 
         form = SelectInventoryForm({'items': [87, 22]})
         self.assertEqual(form.is_valid(), True)
         self.assertEqual(len(form.cleaned_data), 1)
-        self.assertEqual(map(lambda o: o.name, form.cleaned_data['items']), ['Core', 'Pear'])
+        self.assertEqual([o.name for o in form.cleaned_data['items']], ['Core', 'Pear'])
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
-        self.assertEqual(CustomFieldForExclusionForm.base_fields.keys(), ['name'])
+        self.assertEqual(list(CustomFieldForExclusionForm.base_fields.keys()),
+                         ['name'])
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
