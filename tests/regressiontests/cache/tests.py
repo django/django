@@ -364,7 +364,7 @@ class BaseCacheTests(object):
         # Binary strings should be cacheable
         from zlib import compress, decompress
         value = 'value_to_be_compressed'
-        compressed_value = compress(value)
+        compressed_value = compress(value.encode())
 
         # Test set
         self.cache.set('binary1', compressed_value)
@@ -988,7 +988,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """Test that keys are hashed into subdirectories correctly"""
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = hashlib.md5(key.encode()).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 
@@ -998,7 +998,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = hashlib.md5(key.encode()).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 
