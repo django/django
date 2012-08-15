@@ -774,13 +774,13 @@ class BaseCacheTests(object):
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
         update_middleware.process_response(request, get_cache_data)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
 def custom_key_func(key, key_prefix, version):

@@ -3,6 +3,7 @@
 import gzip
 import re
 import random
+from io import BytesIO
 
 from django.conf import settings
 from django.core import mail
@@ -15,7 +16,7 @@ from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.six.moves import xrange
-from django.utils.six import StringIO
+
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):
@@ -526,14 +527,14 @@ class GZipMiddlewareTest(TestCase):
 
     @staticmethod
     def decompress(gzipped_string):
-        return gzip.GzipFile(mode='rb', fileobj=StringIO(gzipped_string)).read()
+        return gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)).read()
 
     def test_compress_response(self):
         """
         Tests that compression is performed on responses with compressible content.
         """
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(self.decompress(r.content), self.compressible_string)
+        self.assertEqual(self.decompress(r.content), self.compressible_string.encode('utf-8'))
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertEqual(r.get('Content-Length'), str(len(r.content)))
 
@@ -544,7 +545,7 @@ class GZipMiddlewareTest(TestCase):
         """
         self.resp.status_code = 404
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(self.decompress(r.content), self.compressible_string)
+        self.assertEqual(self.decompress(r.content), self.compressible_string.encode('utf-8'))
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
 
     def test_no_compress_short_response(self):
@@ -572,7 +573,7 @@ class GZipMiddlewareTest(TestCase):
         self.req.META['HTTP_USER_AGENT'] = 'Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)'
         self.resp['Content-Type'] = 'application/javascript; charset=UTF-8'
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(r.content, self.compressible_string)
+        self.assertEqual(r.content, self.compressible_string.encode('utf-8'))
         self.assertEqual(r.get('Content-Encoding'), None)
 
     def test_no_compress_uncompressible_response(self):
