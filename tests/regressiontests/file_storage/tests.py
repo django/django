@@ -197,8 +197,8 @@ class FileStorageTests(unittest.TestCase):
             ContentFile(b'file saved with path'))
 
         self.assertTrue(self.storage.exists('path/to'))
-        self.assertEqual(self.storage.open('path/to/test.file').read(),
-            b'file saved with path')
+        with self.storage.open('path/to/test.file') as f:
+            self.assertEqual(f.read(), b'file saved with path')
 
         self.assertTrue(os.path.exists(
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
@@ -305,13 +305,13 @@ class FileStorageTests(unittest.TestCase):
 
             self.storage.save('normal/test.file',
                 ContentFile(b'saved normally'))
-            self.assertEqual(self.storage.open('normal/test.file').read(),
-                b'saved normally')
+            with self.storage.open('normal/test.file') as f:
+                self.assertEqual(f.read(), b'saved normally')
 
             self.storage.save('raced/test.file',
                 ContentFile(b'saved with race'))
-            self.assertEqual(self.storage.open('raced/test.file').read(),
-                b'saved with race')
+            with self.storage.open('raced/test.file') as f:
+                self.assertEqual(f.read(), b'saved with race')
 
             # Check that OSErrors aside from EEXIST are still raised.
             self.assertRaises(OSError,
