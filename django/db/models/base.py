@@ -23,7 +23,7 @@ from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
-from django.utils.encoding import smart_bytes, smart_str, force_text
+from django.utils.encoding import smart_str, force_text
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
@@ -654,7 +654,7 @@ class Model(six.with_metaclass(ModelBase, object)):
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = is_next and 'gt' or 'lt'
         order = not is_next and '-' or ''
-        param = smart_bytes(getattr(self, field.attname))
+        param = force_text(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
