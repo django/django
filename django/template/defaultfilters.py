@@ -234,8 +234,8 @@ def slugify(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = six.text_type(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode()
+    value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))
 
 @register.filter(is_safe=True)
