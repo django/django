@@ -5,6 +5,7 @@ import tempfile
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.utils.encoding import smart_bytes
 
 
 class SessionStore(SessionBase):
@@ -115,7 +116,7 @@ class SessionStore(SessionBase):
             renamed = False
             try:
                 try:
-                    os.write(output_file_fd, self.encode(session_data))
+                    os.write(output_file_fd, self.encode(session_data).encode())
                 finally:
                     os.close(output_file_fd)
                 os.rename(output_file_name, session_file_name)
