@@ -152,10 +152,8 @@ class BaseHandler(object):
                         callback, param_dict = resolver.resolve404()
                         response = callback(request, **param_dict)
                     except:
-                        try:
-                            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-                        finally:
-                            signals.got_request_exception.send(sender=self.__class__, request=request)
+                        signals.got_request_exception.send(sender=self.__class__, request=request)
+                        response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
             except exceptions.PermissionDenied:
                 logger.warning(
                     'Forbidden (Permission denied): %s', request.path,
@@ -167,12 +165,10 @@ class BaseHandler(object):
                     callback, param_dict = resolver.resolve403()
                     response = callback(request, **param_dict)
                 except:
-                    try:
-                        response = self.handle_uncaught_exception(request,
-                            resolver, sys.exc_info())
-                    finally:
-                        signals.got_request_exception.send(
+                    signals.got_request_exception.send(
                             sender=self.__class__, request=request)
+                    response = self.handle_uncaught_exception(request,
+                            resolver, sys.exc_info())
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
                 raise
