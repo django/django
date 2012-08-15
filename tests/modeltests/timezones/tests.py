@@ -467,6 +467,7 @@ class NewDatabaseTests(TestCase):
                 [event],
                 transform=lambda d: d)
 
+    @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
         day = datetime.date(2011, 9, 1)

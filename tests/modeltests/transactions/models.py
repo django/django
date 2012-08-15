@@ -9,8 +9,10 @@ manually.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -19,5 +21,5 @@ class Reporter(models.Model):
     class Meta:
         ordering = ('first_name', 'last_name')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)

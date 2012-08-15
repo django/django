@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 class Event(models.Model):
     # Oracle can have problems with a column named "date"
@@ -20,17 +21,19 @@ class Band(models.Model):
     nr_of_members = models.PositiveIntegerField()
     genres = models.ManyToManyField(Genre)
 
+@python_2_unicode_compatible
 class Musician(models.Model):
     name = models.CharField(max_length=30)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=30)
     members = models.ManyToManyField(Musician, through='Membership')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Membership(models.Model):

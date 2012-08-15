@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.translation import activate, deactivate
 from django.test import TestCase
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class FormsWidgetTestCase(TestCase):
@@ -1096,6 +1097,7 @@ class WidgetTests(TestCase):
         self.assertFalse(form.is_valid())
 
 
+@python_2_unicode_compatible
 class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
@@ -1104,7 +1106,7 @@ class FakeFieldFile(object):
     """
     url = 'something'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.url
 
 class ClearableFileInputTests(TestCase):
@@ -1125,10 +1127,11 @@ class ClearableFileInputTests(TestCase):
         rendering HTML. Refs #15182.
         """
 
+        @python_2_unicode_compatible
         class StrangeFieldFile(object):
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
-            def __unicode__(self):
+            def __str__(self):
                 return '''something<div onclick="alert('oops')">.jpg'''
 
         widget = ClearableFileInput()

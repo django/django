@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import calendar
 import datetime
 import re
@@ -211,7 +213,7 @@ def parse_etags(etag_str):
     if not etags:
         # etag_str has wrong format, treat it as an opaque string then
         return [etag_str]
-    etags = [e.decode('string_escape') for e in etags]
+    etags = [e.encode('ascii').decode('unicode_escape') for e in etags]
     return etags
 
 def quote_etag(etag):

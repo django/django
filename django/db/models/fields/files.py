@@ -8,7 +8,7 @@ from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
 from django.db.models import signals
-from django.utils.encoding import force_text, smart_bytes
+from django.utils.encoding import force_text, smart_str
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -280,7 +280,7 @@ class FileField(Field):
         setattr(cls, self.name, self.descriptor_class(self))
 
     def get_directory_name(self):
-        return os.path.normpath(force_text(datetime.datetime.now().strftime(smart_bytes(self.upload_to))))
+        return os.path.normpath(force_text(datetime.datetime.now().strftime(smart_str(self.upload_to))))
 
     def get_filename(self, filename):
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))

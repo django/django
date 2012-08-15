@@ -3,7 +3,9 @@
 """
 from django.db import models
 from django.contrib.gis.db.backends.base import SpatialRefSysMixin
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class GeometryColumns(models.Model):
     """
     The 'geometry_columns' table from SpatiaLite.
@@ -35,7 +37,7 @@ class GeometryColumns(models.Model):
         """
         return 'f_geometry_column'
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s.%s - %dD %s field (SRID: %d)" % \
                (self.f_table_name, self.f_geometry_column,
                 self.coord_dimension, self.type, self.srid)

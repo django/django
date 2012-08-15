@@ -42,6 +42,10 @@ keyword argument ``update_fields``. By using this argument it is possible to
 save only a select list of model's fields. This can be useful for performance
 reasons or when trying to avoid overwriting concurrent changes.
 
+Deferred instances (those loaded by .only() or .defer()) will automatically
+save just the loaded fields. If any field is set manually after load, that
+field will also get updated on save.
+
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
 
@@ -273,3 +277,10 @@ our own copy of ``simplejson``. You can safely change any use of
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
+
+``django.utils.encoding.StrAndUnicode``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.utils.encoding.StrAndUnicode` mix-in has been deprecated.
+Define a ``__str__`` method and apply the
+:func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.

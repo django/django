@@ -57,7 +57,7 @@ class URLValidator(RegexValidator):
                 value = smart_text(value)
                 scheme, netloc, path, query, fragment = urlsplit(value)
                 try:
-                    netloc = netloc.encode('idna') # IDN -> ACE
+                    netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
                 except UnicodeError: # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -84,7 +84,7 @@ class EmailValidator(RegexValidator):
             if value and '@' in value:
                 parts = value.split('@')
                 try:
-                    parts[-1] = parts[-1].encode('idna')
+                    parts[-1] = parts[-1].encode('idna').decode('ascii')
                 except UnicodeError:
                     raise e
                 super(EmailValidator, self).__call__('@'.join(parts))

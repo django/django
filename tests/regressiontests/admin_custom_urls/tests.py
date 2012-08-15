@@ -29,10 +29,7 @@ class AdminCustomUrlsTest(TestCase):
     def testAddWithGETArgs(self):
         response = self.client.get('/custom_urls/admin/admin_custom_urls/action/!add/', {'name': 'My Action'})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            'value="My Action"' in response.content,
-            "Couldn't find an input with the right value in the response."
-        )
+        self.assertContains(response, 'value="My Action"')
 
     def testBasicAddPost(self):
         """

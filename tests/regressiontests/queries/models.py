@@ -7,6 +7,7 @@ import threading
 
 from django.db import models
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class DumbCategory(models.Model):
@@ -19,6 +20,7 @@ class ProxyCategory(DumbCategory):
 class NamedCategory(DumbCategory):
     name = models.CharField(max_length=10)
 
+@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -28,9 +30,10 @@ class Tag(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Note(models.Model):
     note = models.CharField(max_length=100)
     misc = models.CharField(max_length=10)
@@ -38,7 +41,7 @@ class Note(models.Model):
     class Meta:
         ordering = ['note']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.note
 
     def __init__(self, *args, **kwargs):
@@ -48,14 +51,16 @@ class Note(models.Model):
         # that use objects of that type as an argument.
         self.lock = threading.Lock()
 
+@python_2_unicode_compatible
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
     notes = models.ManyToManyField(Note)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
     note = models.ForeignKey(Note)
@@ -63,9 +68,10 @@ class ExtraInfo(models.Model):
     class Meta:
         ordering = ['info']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.info
 
+@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=10)
     num = models.IntegerField(unique=True)
@@ -74,9 +80,10 @@ class Author(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
@@ -88,16 +95,18 @@ class Item(models.Model):
     class Meta:
         ordering = ['-note', 'name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Report(models.Model):
     name = models.CharField(max_length=10)
     creator = models.ForeignKey(Author, to_field='num', null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Ranking(models.Model):
     rank = models.IntegerField()
     author = models.ForeignKey(Author)
@@ -106,9 +115,10 @@ class Ranking(models.Model):
         # A complex ordering specification. Should stress the system a bit.
         ordering = ('author__extra__note', 'author__name', 'rank')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%d: %s' % (self.rank, self.author.name)
 
+@python_2_unicode_compatible
 class Cover(models.Model):
     title = models.CharField(max_length=50)
     item = models.ForeignKey(Item)
@@ -116,13 +126,14 @@ class Cover(models.Model):
     class Meta:
         ordering = ['item']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
+@python_2_unicode_compatible
 class Number(models.Model):
     num = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.num)
 
 # Symmetrical m2m field with a normal field using the reverse accesor name
@@ -168,6 +179,7 @@ class CustomManager(models.Manager):
         qs = super(CustomManager, self).get_query_set()
         return qs.filter(public=True, tag__name='t1')
 
+@python_2_unicode_compatible
 class ManagedModel(models.Model):
     data = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
@@ -176,7 +188,7 @@ class ManagedModel(models.Model):
     objects = CustomManager()
     normal_manager = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
 # An inter-related setup with multiple paths from Child to Detail.
@@ -211,11 +223,12 @@ class Related(models.Model):
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.
 
+@python_2_unicode_compatible
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class TvChef(Celebrity):
@@ -225,10 +238,11 @@ class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity)
 
 # Multiple foreign keys
+@python_2_unicode_compatible
 class LeafA(models.Model):
     data = models.CharField(max_length=10)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
 class LeafB(models.Model):
@@ -238,11 +252,12 @@ class Join(models.Model):
     a = models.ForeignKey(LeafA)
     b = models.ForeignKey(LeafB)
 
+@python_2_unicode_compatible
 class ReservedName(models.Model):
     name = models.CharField(max_length=20)
     order = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 # A simpler shared-foreign-key setup that can expose some problems.
@@ -256,13 +271,14 @@ class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection)
 
 # Multi-layer ordering
+@python_2_unicode_compatible
 class SingleObject(models.Model):
     name = models.CharField(max_length=10)
 
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class RelatedObject(models.Model):
@@ -271,6 +287,7 @@ class RelatedObject(models.Model):
     class Meta:
         ordering = ['single']
 
+@python_2_unicode_compatible
 class Plaything(models.Model):
     name = models.CharField(max_length=10)
     others = models.ForeignKey(RelatedObject, null=True)
@@ -278,79 +295,89 @@ class Plaything(models.Model):
     class Meta:
         ordering = ['others']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
 
+@python_2_unicode_compatible
 class Food(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Eaten(models.Model):
     food = models.ForeignKey(Food, to_field="name")
     meal = models.CharField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s at %s" % (self.food, self.meal)
 
+@python_2_unicode_compatible
 class Node(models.Model):
     num = models.IntegerField(unique=True)
     parent = models.ForeignKey("self", to_field="num", null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % self.num
 
 # Bug #12252
+@python_2_unicode_compatible
 class ObjectA(models.Model):
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class ObjectB(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA)
     num = models.PositiveSmallIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA)
     objectb = models.ForeignKey(ObjectB)
 
-    def __unicode__(self):
+    def __str__(self):
        return self.name
 
+@python_2_unicode_compatible
 class SimpleCategory(models.Model):
     name = models.CharField(max_length=15)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class SpecialCategory(SimpleCategory):
     special_name = models.CharField(max_length=15)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name + " " + self.special_name
 
+@python_2_unicode_compatible
 class CategoryItem(models.Model):
     category = models.ForeignKey(SimpleCategory)
 
-    def __unicode__(self):
+    def __str__(self):
         return "category item: " + str(self.category)
 
+@python_2_unicode_compatible
 class OneToOneCategory(models.Model):
     new_name = models.CharField(max_length=15)
     category = models.OneToOneField(SimpleCategory)
 
-    def __unicode__(self):
+    def __str__(self):
         return "one2one " + self.new_name
 
 class NullableName(models.Model):

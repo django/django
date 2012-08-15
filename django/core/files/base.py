@@ -5,7 +5,9 @@ from io import BytesIO
 
 from django.utils.encoding import smart_bytes, smart_text
 from django.core.files.utils import FileProxyMixin
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE = 64 * 2**10
 
@@ -18,9 +20,6 @@ class File(FileProxyMixin):
             self.mode = file.mode
 
     def __str__(self):
-        return smart_bytes(self.name or '')
-
-    def __unicode__(self):
         return smart_text(self.name or '')
 
     def __repr__(self):
@@ -124,6 +123,7 @@ class File(FileProxyMixin):
     def close(self):
         self.file.close()
 
+@python_2_unicode_compatible
 class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.

@@ -485,9 +485,8 @@ class CustomMetaclass(ModelFormMetaclass):
         new.base_fields = {}
         return new
 
-class CustomMetaclassForm(forms.ModelForm):
-    __metaclass__ = CustomMetaclass
-
+class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
+    pass
 
 class CustomMetaclassTestCase(TestCase):
     def test_modelform_factory_metaclass(self):

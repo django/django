@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 import os
 import re
 import warnings
@@ -16,6 +18,7 @@ from django.contrib.formtools.tests.wizard import *
 from django.contrib.formtools.tests.forms import *
 
 success_string = "Done was called!"
+success_string_encoded = success_string.encode()
 
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
@@ -78,7 +81,7 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage': 1})
+        self.test_data.update({'stage': 1, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
         # Check to confirm stage is set to 2 in output form.
         stage = self.input % 2
@@ -96,13 +99,13 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
     def test_bool_submit(self):
         """
@@ -122,7 +125,7 @@ class PreviewTests(TestCase):
         self.test_data.update({'hash': hash, 'bool1': 'False'})
         with warnings.catch_warnings(record=True):
             response = self.client.post('/preview/', self.test_data)
-            self.assertEqual(response.content, success_string)
+            self.assertEqual(response.content, success_string_encoded)
 
     def test_form_submit_good_hash(self):
         """
@@ -133,11 +136,11 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
 
     def test_form_submit_bad_hash(self):
@@ -150,11 +153,11 @@ class PreviewTests(TestCase):
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data)) + "bad"
         self.test_data.update({'hash': hash})
         response = self.client.post('/previewpreview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
 
 
 class FormHmacTests(unittest.TestCase):
@@ -165,8 +168,8 @@ class FormHmacTests(unittest.TestCase):
         leading/trailing whitespace so as to be friendly to broken browsers that
         submit it (usually in textareas).
         """
-        f1 = HashTestForm({'name': 'joe', 'bio': 'Nothing notable.'})
-        f2 = HashTestForm({'name': '  joe', 'bio': 'Nothing notable.  '})
+        f1 = HashTestForm({'name': 'joe', 'bio': 'Speaking español.'})
+        f2 = HashTestForm({'name': '  joe', 'bio': 'Speaking español.  '})
         hash1 = utils.form_hmac(f1)
         hash2 = utils.form_hmac(f2)
         self.assertEqual(hash1, hash2)

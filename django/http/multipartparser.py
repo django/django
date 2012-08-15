@@ -6,7 +6,9 @@ file upload handlers for processing.
 """
 from __future__ import unicode_literals
 
+import base64
 import cgi
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
@@ -199,7 +201,7 @@ class MultiPartParser(object):
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
                                 try:
-                                    chunk = str(chunk).decode('base64')
+                                    chunk = base64.b64decode(chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     raise MultiPartParserError("Could not decode base64 data: %r" % e)

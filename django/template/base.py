@@ -11,7 +11,7 @@ from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
-from django.utils.encoding import smart_text, force_text, smart_bytes
+from django.utils.encoding import smart_text, force_text, smart_str
 from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
@@ -20,6 +20,7 @@ from django.utils.html import escape
 from django.utils.module_loading import module_has_submodule
 from django.utils import six
 from django.utils.timezone import template_localtime
+from django.utils.encoding import python_2_unicode_compatible
 
 
 TOKEN_TEXT = 0
@@ -79,6 +80,7 @@ class TemplateDoesNotExist(Exception):
 class TemplateEncodingError(Exception):
     pass
 
+@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -86,9 +88,6 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return six.text_type(self).encode('utf-8')
-
-    def __unicode__(self):
         return self.msg % tuple([force_text(p, errors='replace')
                                  for p in self.params])
 
@@ -849,7 +848,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<Text Node: '%s'>" % smart_bytes(self.s[:25], 'ascii',
+        return "<Text Node: '%s'>" % smart_str(self.s[:25], 'ascii',
                 errors='replace')
 
     def render(self, context):

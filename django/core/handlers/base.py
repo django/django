@@ -225,7 +225,7 @@ class BaseHandler(object):
 
         # If Http500 handler is not installed, re-raise last exception
         if resolver.urlconf_module is None:
-            six.reraise(exc_info[1], None, exc_info[2])
+            six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)

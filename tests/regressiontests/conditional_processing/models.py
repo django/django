@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.test import TestCase
@@ -20,7 +22,7 @@ class ConditionalGet(TestCase):
 
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, FULL_RESPONSE)
+        self.assertEqual(response.content, FULL_RESPONSE.encode())
         if check_last_modified:
             self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
         if check_etag:
@@ -28,7 +30,7 @@ class ConditionalGet(TestCase):
 
     def assertNotModified(self, response):
         self.assertEqual(response.status_code, 304)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def testWithoutConditions(self):
         response = self.client.get('/condition/')

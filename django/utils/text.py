@@ -287,7 +287,7 @@ ustring_re = re.compile("([\u0080-\uffff])")
 def javascript_quote(s, quote_double_quotes=False):
 
     def fix(match):
-        return b"\u%04x" % ord(match.group(1))
+        return "\\u%04x" % ord(match.group(1))
 
     if type(s) == bytes:
         s = s.decode('utf-8')

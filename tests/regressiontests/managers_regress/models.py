@@ -3,6 +3,7 @@ Various edge-cases for model managers.
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class OnlyFred(models.Manager):
@@ -44,35 +45,40 @@ class AbstractBase3(models.Model):
     class Meta:
         abstract = True
 
+@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=50)
 
     manager = OnlyFred()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 # Managers from base classes are inherited and, if no manager is specified
 # *and* the parent has a manager specified, the first one (in the MRO) will
 # become the default.
+@python_2_unicode_compatible
 class Child1(AbstractBase1):
     data = models.CharField(max_length=25)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
+@python_2_unicode_compatible
 class Child2(AbstractBase1, AbstractBase2):
     data = models.CharField(max_length=25)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
+@python_2_unicode_compatible
 class Child3(AbstractBase1, AbstractBase3):
     data = models.CharField(max_length=25)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
+@python_2_unicode_compatible
 class Child4(AbstractBase1):
     data = models.CharField(max_length=25)
 
@@ -80,16 +86,17 @@ class Child4(AbstractBase1):
     # inherited.
     default = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.data
 
+@python_2_unicode_compatible
 class Child5(AbstractBase3):
     name = models.CharField(max_length=25)
 
     default = OnlyFred()
     objects = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 # Will inherit managers from AbstractBase1, but not Child4.

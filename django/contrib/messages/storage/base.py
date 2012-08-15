@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.utils.encoding import force_text, StrAndUnicode
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.contrib.messages import constants, utils
 
 
 LEVEL_TAGS = utils.get_level_tags()
 
 
-class Message(StrAndUnicode):
+@python_2_unicode_compatible
+class Message(object):
     """
     Represents an actual message that can be stored in any of the supported
     storage classes (typically session- or cookie-based) and rendered in a view
@@ -35,7 +36,7 @@ class Message(StrAndUnicode):
         return isinstance(other, Message) and self.level == other.level and \
                                               self.message == other.message
 
-    def __unicode__(self):
+    def __str__(self):
         return force_text(self.message)
 
     def _get_tags(self):

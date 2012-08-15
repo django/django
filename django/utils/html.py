@@ -143,7 +143,7 @@ def smart_urlquote(url):
     # Handle IDN before quoting.
     scheme, netloc, path, query, fragment = urlsplit(url)
     try:
-        netloc = netloc.encode('idna') # IDN -> ACE
+        netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
     except UnicodeError: # invalid domain part
         pass
     else:
@@ -206,7 +206,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             elif not ':' in middle and simple_email_re.match(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
-                    domain = domain.encode('idna')
+                    domain = domain.encode('idna').decode('ascii')
                 except UnicodeError:
                     continue
                 url = 'mailto:%s@%s' % (local, domain)

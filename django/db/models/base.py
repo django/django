@@ -23,7 +23,7 @@ from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import smart_bytes, smart_str, force_text
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 
@@ -404,10 +404,10 @@ class Model(six.with_metaclass(ModelBase, object)):
             u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_bytes('<%s: %s>' % (self.__class__.__name__, u))
+        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if hasattr(self, '__unicode__'):
+        if not six.PY3 and hasattr(self, '__unicode__'):
             return force_text(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
@@ -475,6 +475,7 @@ class Model(six.with_metaclass(ModelBase, object)):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
+        using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
@@ -501,6 +502,23 @@ class Model(six.with_metaclass(ModelBase, object)):
                 raise ValueError("The following fields do not exist in this "
                                  "model or are m2m fields: %s"
                                  % ', '.join(non_model_fields))
+
+        # If saving to the same database, and this model is deferred, then
+        # automatically do a "update_fields" save on the loaded fields.
+        elif not force_insert and self._deferred and using == self._state.db:
+            field_names = set()
+            for field in self._meta.fields:
+                if not field.primary_key and not hasattr(field, 'through'):
+                    field_names.add(field.attname)
+            deferred_fields = [
+                f.attname for f in self._meta.fields
+                if f.attname not in self.__dict__
+                   and isinstance(self.__class__.__dict__[f.attname],
+                                  DeferredAttribute)]
+
+            loaded_fields = field_names.difference(deferred_fields)
+            if loaded_fields:
+                update_fields = frozenset(loaded_fields)
 
         self.save_base(using=using, force_insert=force_insert,
                        force_update=force_update, update_fields=update_fields)
@@ -761,7 +779,7 @@ class Model(six.with_metaclass(ModelBase, object)):
                 lookup_kwargs[str(field_name)] = lookup_value
 
             # some fields were skipped, no reason to do the check
-            if len(unique_check) != len(lookup_kwargs.keys()):
+            if len(unique_check) != len(lookup_kwargs):
                 continue
 
             qs = model_class._default_manager.filter(**lookup_kwargs)
@@ -837,7 +855,7 @@ class Model(six.with_metaclass(ModelBase, object)):
             }
         # unique_together
         else:
-            field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
+            field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
             field_labels = get_text_list(field_labels, _('and'))
             return _("%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': six.text_type(model_name),

@@ -647,14 +647,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_bytes(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 "Second argument is not valid HTML:")
-        real_count = content.count(enc_text)
+        real_count = content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of '%s' in response"
@@ -683,14 +682,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_bytes(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 'Response\'s content is not valid HTML:')
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 'Second argument is not valid HTML:')
-        self.assertEqual(content.count(enc_text), 0,
+        self.assertEqual(content.count(text), 0,
             msg_prefix + "Response should not contain '%s'" % text)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):

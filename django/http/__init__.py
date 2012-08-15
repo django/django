@@ -113,7 +113,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
         get = (pformat(GET_override)
                if GET_override is not None
                else pformat(request.GET))
-    except:
+    except Exception:
         get = '<could not parse>'
     if request._post_parse_error:
         post = '<could not parse>'
@@ -122,19 +122,19 @@ def build_request_repr(request, path_override=None, GET_override=None,
             post = (pformat(POST_override)
                     if POST_override is not None
                     else pformat(request.POST))
-        except:
+        except Exception:
             post = '<could not parse>'
     try:
         cookies = (pformat(COOKIES_override)
                    if COOKIES_override is not None
                    else pformat(request.COOKIES))
-    except:
+    except Exception:
         cookies = '<could not parse>'
     try:
         meta = (pformat(META_override)
                 if META_override is not None
                 else pformat(request.META))
-    except:
+    except Exception:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
     return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
@@ -177,14 +177,14 @@ class HttpRequest(object):
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
             server_port = str(self.META['SERVER_PORT'])
-            if server_port != (self.is_secure() and '443' or '80'):
+            if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
         return host
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, self.META.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) or '')
+        return '%s%s' % (self.path, ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else '')
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
         """
@@ -193,7 +193,7 @@ class HttpRequest(object):
         default argument in which case that value will be returned instead.
         """
         try:
-            cookie_value = self.COOKIES[key].encode('utf-8')
+            cookie_value = self.COOKIES[key]
         except KeyError:
             if default is not RAISE_ERROR:
                 return default
@@ -218,7 +218,7 @@ class HttpRequest(object):
         if not location:
             location = self.get_full_path()
         if not absolute_http_url_re.match(location):
-            current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
+            current_uri = '%s://%s%s' % ('https' if self.is_secure() else 'http',
                                          self.get_host(), self.path)
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
@@ -281,7 +281,7 @@ class HttpRequest(object):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
-            warning = "You cannot alter upload handlers after the upload has been processed."
+            warning="You cannot alter upload handlers after the upload has been processed."
         )
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
@@ -294,7 +294,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, UnreadablePostError(*tuple(e.args)), sys.exc_info()[2])
+                six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -360,6 +360,7 @@ class HttpRequest(object):
             if not buf:
                 break
             yield buf
+
     __iter__ = xreadlines
 
     def readlines(self):
@@ -384,9 +385,16 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
-        for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(force_text(key, encoding, errors='replace'),
-                            force_text(value, encoding, errors='replace'))
+        if six.PY3:
+            for key, value in parse_qsl(query_string or '',
+                                        keep_blank_values=True,
+                                        encoding=encoding):
+                self.appendlist(key, value)
+        else:
+            for key, value in parse_qsl(query_string or '',
+                                        keep_blank_values=True):
+                self.appendlist(force_text(key, encoding, errors='replace'),
+                                force_text(value, encoding, errors='replace'))
         self._mutable = mutable
 
     def _get_encoding(self):
@@ -405,8 +413,8 @@ class QueryDict(MultiValueDict):
 
     def __setitem__(self, key, value):
         self._assert_mutable()
-        key = str_to_unicode(key, self.encoding)
-        value = str_to_unicode(value, self.encoding)
+        key = bytes_to_text(key, self.encoding)
+        value = bytes_to_text(value, self.encoding)
         super(QueryDict, self).__setitem__(key, value)
 
     def __delitem__(self, key):
@@ -415,21 +423,21 @@ class QueryDict(MultiValueDict):
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in self.iterlists():
+        for key, value in six.iterlists(self):
             result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in self.iterlists():
+        for key, value in six.iterlists(self):
             result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
     def setlist(self, key, list_):
         self._assert_mutable()
-        key = str_to_unicode(key, self.encoding)
-        list_ = [str_to_unicode(elt, self.encoding) for elt in list_]
+        key = bytes_to_text(key, self.encoding)
+        list_ = [bytes_to_text(elt, self.encoding) for elt in list_]
         super(QueryDict, self).setlist(key, list_)
 
     def setlistdefault(self, key, default_list=None):
@@ -438,8 +446,8 @@ class QueryDict(MultiValueDict):
 
     def appendlist(self, key, value):
         self._assert_mutable()
-        key = str_to_unicode(key, self.encoding)
-        value = str_to_unicode(value, self.encoding)
+        key = bytes_to_text(key, self.encoding)
+        value = bytes_to_text(value, self.encoding)
         super(QueryDict, self).appendlist(key, value)
 
     def pop(self, key, *args):
@@ -456,8 +464,8 @@ class QueryDict(MultiValueDict):
 
     def setdefault(self, key, default=None):
         self._assert_mutable()
-        key = str_to_unicode(key, self.encoding)
-        default = str_to_unicode(default, self.encoding)
+        key = bytes_to_text(key, self.encoding)
+        default = bytes_to_text(default, self.encoding)
         return super(QueryDict, self).setdefault(key, default)
 
     def copy(self):
@@ -531,6 +539,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
+        # content is a bytestring. See _get_content / _set_content.
         self.content = content
         self.cookies = SimpleCookie()
         if status:
@@ -538,30 +547,40 @@ class HttpResponse(object):
 
         self['Content-Type'] = content_type
 
-    def __str__(self):
-        """Full HTTP message, including headers."""
-        return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self._headers.values()]) \
-            + '\n\n' + self.content
+    def serialize(self):
+        """Full HTTP message, including headers, as a bytestring."""
+        headers = [
+            b'%s: %s' % (key.encode('us-ascii'), value.encode('us-ascii'))
+            for key, value in self._headers.values()
+        ]
+        return b'\r\n'.join(headers) + b'\r\n\r\n' + self.content
+
+    if six.PY3:
+        __bytes__ = serialize
+    else:
+        __str__ = serialize
 
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if isinstance(value, six.text_type):
-                try:
-                    if not six.PY3:
-                        value = value.encode('us-ascii')
-                    else:
-                        # In Python 3, use a string in headers,
-                        # but ensure in only contains ASCII characters.
-                        value.encode('us-ascii')
-                except UnicodeError as e:
-                    e.reason += ', HTTP response headers must be in US-ASCII format'
-                    raise
-            else:
+            if not isinstance(value, six.string_types):
                 value = str(value)
+            try:
+                if six.PY3:
+                    # Ensure string only contains ASCII
+                    value.encode('us-ascii')
+                else:
+                    if isinstance(value, str):
+                        # Ensure string only contains ASCII
+                        value.decode('us-ascii')
+                    else:
+                        # Convert unicode to an ASCII string
+                        value = value.encode('us-ascii')
+            except UnicodeError as e:
+                e.reason += ', HTTP response headers must be in US-ASCII format'
+                raise
             if '\n' in value or '\r' in value:
-                raise BadHeaderError("Header values can't contain newlines (got %r)" % (value))
+                raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
             yield value
 
     def __setitem__(self, header, value):
@@ -652,11 +671,12 @@ class HttpResponse(object):
 
     def _get_content(self):
         if self.has_header('Content-Encoding'):
-            return b''.join([str(e) for e in self._container])
+            # XXX this doesn't work under Python 3 when e is an integer (#18764)
+            return b''.join([bytes(e) for e in self._container])
         return b''.join([smart_bytes(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
-        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.text_type)):
+        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             self._container = value
             self._base_content_is_iter = True
         else:
@@ -673,7 +693,7 @@ class HttpResponse(object):
         chunk = next(self._iterator)
         if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
-        return str(chunk)
+        return bytes(chunk)
 
     next = __next__             # Python 2 compatibility
 
@@ -743,8 +763,8 @@ def get_host(request):
 
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.smart_text for parsing URLs and form inputs. Thus,
-# this slightly more restricted function.
-def str_to_unicode(s, encoding):
+# this slightly more restricted function, used by QueryDict.
+def bytes_to_text(s, encoding):
     """
     Converts basestring objects to unicode, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint

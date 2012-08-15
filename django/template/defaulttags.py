@@ -448,7 +448,7 @@ class WidthRatioNode(Node):
             max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ''
-        except ValueError:
+        except (ValueError, TypeError):
             raise TemplateSyntaxError("widthratio final argument must be an number")
         try:
             value = float(value)
@@ -456,7 +456,7 @@ class WidthRatioNode(Node):
             ratio = (value / max_value) * max_width
         except ZeroDivisionError:
             return '0'
-        except ValueError:
+        except (ValueError, TypeError):
             return ''
         return str(int(round(ratio)))
 

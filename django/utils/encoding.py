@@ -8,6 +8,7 @@ try:
     from urllib.parse import quote
 except ImportError:     # Python 2
     from urllib import quote
+import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
@@ -32,12 +33,31 @@ class StrAndUnicode(object):
     Useful as a mix-in. If you support Python 2 and 3 with a single code base,
     you can inherit this mix-in and just define __unicode__.
     """
+    def __init__(self, *args, **kwargs):
+        warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
+                      "and apply the @python_2_unicode_compatible decorator "
+                      "instead.", PendingDeprecationWarning, stacklevel=2)
+        super(StrAndUnicode, self).__init__(*args, **kwargs)
+
     if six.PY3:
         def __str__(self):
             return self.__unicode__()
     else:
         def __str__(self):
             return self.__unicode__().encode('utf-8')
+
+def python_2_unicode_compatible(klass):
+    """
+    A decorator that defines __unicode__ and __str__ methods under Python 2.
+    Under Python 3 it does nothing.
+
+    To support Python 2 and 3 with a single code base, define a __str__ method
+    returning text and apply this decorator to the class.
+    """
+    if not six.PY3:
+        klass.__unicode__ = klass.__str__
+        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+    return klass
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -205,7 +225,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(smart_bytes(path).replace("\\", "/"), safe=b"/~!*()'")
+    return quote(smart_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could

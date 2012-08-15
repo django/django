@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.translation import ugettext_lazy
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class FormsUtilTestCase(TestCase):
@@ -46,8 +47,9 @@ class FormsUtilTestCase(TestCase):
         self.assertHTMLEqual(str(ErrorList(ValidationError(["First error.", "Not \u03C0.", ugettext_lazy("Error.")]).messages)),
                          '<ul class="errorlist"><li>First error.</li><li>Not π.</li><li>Error.</li></ul>')
 
+        @python_2_unicode_compatible
         class VeryBadError:
-            def __unicode__(self): return "A very bad error."
+            def __str__(self): return "A very bad error."
 
         # Can take a non-string.
         self.assertHTMLEqual(str(ErrorList(ValidationError(VeryBadError()).messages)),

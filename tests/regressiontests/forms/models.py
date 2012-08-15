@@ -7,6 +7,7 @@ import tempfile
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
@@ -36,6 +37,7 @@ class ChoiceModel(models.Model):
     name = models.CharField(max_length=10)
 
 
+@python_2_unicode_compatible
 class ChoiceOptionModel(models.Model):
     """Destination for ChoiceFieldModel's ForeignKey.
     Can't reuse ChoiceModel because error_message tests require that it have no instances."""
@@ -44,7 +46,7 @@ class ChoiceOptionModel(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'ChoiceOption %d' % self.pk
 
 
@@ -66,10 +68,11 @@ class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
 
 
+@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=10)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
 

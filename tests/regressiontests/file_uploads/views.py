@@ -7,6 +7,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import six
+from django.utils.encoding import smart_bytes
 
 from .models import FileModel, UPLOAD_TO
 from .tests import UNICODE_FILENAME
@@ -45,7 +46,7 @@ def file_upload_view_verify(request):
         if isinstance(value, UploadedFile):
             new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = hashlib.sha1(value).hexdigest()
+            new_hash = hashlib.sha1(smart_bytes(value)).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 
@@ -95,7 +96,7 @@ def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
-    r = dict([(k, f.read()) for k, f in request.FILES.items()])
+    r = dict([(k, f.read().decode('utf-8')) for k, f in request.FILES.items()])
     return HttpResponse(json.dumps(r))
 
 def file_upload_quota(request):

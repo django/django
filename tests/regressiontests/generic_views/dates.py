@@ -1,13 +1,26 @@
 from __future__ import absolute_import
 
+import time
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.unittest import skipUnless
 
 from .models import Book, BookSigning
+
+TZ_SUPPORT = hasattr(time, 'tzset')
+
+# On OSes that don't provide tzset (Windows), we can't set the timezone
+# in which the program runs. As a consequence, we must skip tests that
+# don't enforce a specific timezone (with timezone.override or equivalent),
+# or attempt to interpret naive datetimes in the default timezone.
+
+requires_tz_support = skipUnless(TZ_SUPPORT,
+        "This test relies on the ability to run a program in an arbitrary "
+        "time zone, but your operating system isn't able to do that.")
 
 
 class ArchiveIndexViewTests(TestCase):
@@ -100,6 +113,7 @@ class ArchiveIndexViewTests(TestCase):
         res = self.client.get('/dates/booksignings/')
         self.assertEqual(res.status_code, 200)
 
+    @requires_tz_support
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -480,7 +494,7 @@ class DayArchiveViewTests(TestCase):
 
     def test_next_prev_context(self):
         res = self.client.get('/dates/books/2008/oct/01/')
-        self.assertEqual(res.content, "Archive for Oct. 1, 2008. Previous day is May 1, 2006")
+        self.assertEqual(res.content, b"Archive for Oct. 1, 2008. Previous day is May 1, 2006")
 
     def test_custom_month_format(self):
         res = self.client.get('/dates/books/2008/10/01/')
@@ -502,6 +516,7 @@ class DayArchiveViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/2/')
         self.assertEqual(res.status_code, 200)
 
+    @requires_tz_support
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_day_view(self):
         bs = BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -578,6 +593,7 @@ class DateDetailViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/2/%d/' % bs.pk)
         self.assertEqual(res.status_code, 200)
 
+    @requires_tz_support
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_date_detail(self):
         bs = BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))

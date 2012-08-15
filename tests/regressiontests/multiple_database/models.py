@@ -4,15 +4,17 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Review(models.Model):
     source = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.source
 
     class Meta:
@@ -22,11 +24,12 @@ class PersonManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
+@python_2_unicode_compatible
 class Person(models.Model):
     objects = PersonManager()
     name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -45,6 +48,7 @@ class BookManager(models.Manager):
         kwargs.pop('extra_arg', None)
         return super(BookManager, self).get_or_create(*args, **kwargs)
 
+@python_2_unicode_compatible
 class Book(models.Model):
     objects = BookManager()
     title = models.CharField(max_length=100)
@@ -54,17 +58,18 @@ class Book(models.Model):
     reviews = generic.GenericRelation(Review)
     pages = models.IntegerField(default=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
         ordering = ('title',)
 
+@python_2_unicode_compatible
 class Pet(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(Person)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:

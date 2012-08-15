@@ -527,11 +527,11 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         """
         Handle cache key creation correctly, see #17861.
         """
-        name = b"/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + chr(22) + chr(180)
+        name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + "\x16" + "\xb4"
         cache_key = storage.staticfiles_storage.cache_key(name)
         cache_validator = BaseCache({})
         cache_validator.validate_key(cache_key)
-        self.assertEqual(cache_key, 'staticfiles:e95bbc36387084582df2a70750d7b351')
+        self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
@@ -569,8 +569,8 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
         self.assertEqual(relpath, "cached/styles.deploy12345.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn("cached/other.css", content)
-            self.assertIn("other.deploy12345.css", content)
+            self.assertNotIn(b"cached/other.css", content)
+            self.assertIn(b"other.deploy12345.css", content)
 
 if sys.platform != 'win32':
 

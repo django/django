@@ -13,7 +13,7 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
@@ -244,7 +244,8 @@ class TestFixtures(TestCase):
             self.assertEqual(
                 pre_save_checks,
                 [
-                    ("Count = 42 (<type 'int'>)", "Weight = 1.2 (<type 'float'>)")
+                    ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
+                     "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
                 ]
             )
         finally:

@@ -114,8 +114,8 @@ class SerializersTestBase(object):
         Tests the ability to create new objects by
         modifying serialized content.
         """
-        old_headline = b"Poker has no place on ESPN"
-        new_headline = b"Poker has no place on television"
+        old_headline = "Poker has no place on ESPN"
+        new_headline = "Poker has no place on television"
         serial_str = serializers.serialize(self.serializer_name,
                                            Article.objects.all())
         serial_str = serial_str.replace(old_headline, new_headline)
@@ -285,7 +285,7 @@ class SerializersTransactionTestBase(object):
 
 class XmlSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "xml"
-    pkless_str = b"""<?xml version="1.0" encoding="utf-8"?>
+    pkless_str = """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
     <object model="serializers.category">
         <field type="CharField" name="name">Reference</field>
@@ -331,7 +331,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
 
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "xml"
-    fwd_ref_str = b"""<?xml version="1.0" encoding="utf-8"?>
+    fwd_ref_str = """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
     <object pk="1" model="serializers.article">
         <field to="serializers.author" name="author" rel="ManyToOneRel">1</field>
@@ -351,7 +351,7 @@ class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, Transacti
 
 class JsonSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "json"
-    pkless_str = b"""[{"pk": null, "model": "serializers.category", "fields": {"name": "Reference"}}]"""
+    pkless_str = """[{"pk": null, "model": "serializers.category", "fields": {"name": "Reference"}}]"""
 
     @staticmethod
     def _validate_output(serial_str):
@@ -381,7 +381,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
 
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "json"
-    fwd_ref_str = b"""[
+    fwd_ref_str = """[
     {
         "pk": 1,
         "model": "serializers.article",
@@ -414,7 +414,7 @@ except ImportError:
 else:
     class YamlSerializerTestCase(SerializersTestBase, TestCase):
         serializer_name = "yaml"
-        fwd_ref_str = b"""- fields:
+        fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]
@@ -430,7 +430,7 @@ else:
   pk: 1
   model: serializers.author"""
 
-        pkless_str = b"""- fields:
+        pkless_str = """- fields:
     name: Reference
   pk: null
   model: serializers.category"""
@@ -470,7 +470,7 @@ else:
 
     class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
         serializer_name = "yaml"
-        fwd_ref_str = b"""- fields:
+        fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]

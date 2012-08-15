@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
 from django.utils import importlib
+from django.utils.encoding import python_2_unicode_compatible
 
 __all__ = ['UploadFileException','StopUpload', 'SkipFile', 'FileUploadHandler',
            'TemporaryFileUploadHandler', 'MemoryFileUploadHandler',
@@ -21,6 +22,7 @@ class UploadFileException(Exception):
     """
     pass
 
+@python_2_unicode_compatible
 class StopUpload(UploadFileException):
     """
     This exception is raised when an upload must abort.
@@ -33,7 +35,7 @@ class StopUpload(UploadFileException):
         """
         self.connection_reset = connection_reset
 
-    def __unicode__(self):
+    def __str__(self):
         if self.connection_reset:
             return 'StopUpload: Halt current upload.'
         else:

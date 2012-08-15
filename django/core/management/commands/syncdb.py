@@ -75,7 +75,7 @@ class Command(NoArgsCommand):
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
 
         manifest = SortedDict(
-            (app_name, filter(model_installed, model_list))
+            (app_name, list(filter(model_installed, model_list)))
             for app_name, model_list in all_models
         )
 
