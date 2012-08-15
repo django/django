@@ -149,9 +149,11 @@ class BoundMethodWeakref(object):
             self.selfName,
             self.funcName,
         )
-    
+
     __repr__ = __str__
-    
+
+    __hash__ = object.__hash__
+
     def __bool__( self ):
         """Whether we are still a valid reference"""
         return self() is not None
