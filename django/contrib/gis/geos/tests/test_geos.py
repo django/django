@@ -1,5 +1,4 @@
 import ctypes
-import random
 
 from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
     GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
@@ -9,6 +8,7 @@ from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
 from django.utils import unittest
+from django.utils.tokens import RandomToken
 
 
 class GEOSTest(unittest.TestCase, TestDataMixin):
@@ -675,7 +675,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             for i in range(len(mp)):
                 # Creating a random point.
                 pnt = mp[i]
-                new = Point(random.randint(1, 100), random.randint(1, 100))
+                new = Point(RandomToken(3).digits(), RandomToken(3).digits())
                 # Testing the assignment
                 mp[i] = new
                 s = str(new) # what was used for the assignment is still accessible

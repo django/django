@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import mimetypes
 import os
-import random
 import time
 from email import charset as Charset, encoders as Encoders
 from email.generator import Generator
@@ -16,6 +15,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.tokens import RandomToken
 
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -49,7 +49,7 @@ def make_msgid(idstring=None):
     except AttributeError:
         # No getpid() in Jython, for example.
         pid = 1
-    randint = random.randrange(100000)
+    randint = RandomToken(5).digits()
     if idstring is None:
         idstring = ''
     else:

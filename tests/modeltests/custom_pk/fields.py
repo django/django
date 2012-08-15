@@ -1,7 +1,7 @@
-import random
 import string
 
 from django.db import models
+from django.utils.tokens import RandomToken
 
 
 class MyWrapper(object):
@@ -29,7 +29,7 @@ class MyAutoField(models.CharField):
     def pre_save(self, instance, add):
         value = getattr(instance, self.attname, None)
         if not value:
-            value = MyWrapper(''.join(random.sample(string.lowercase, 10)))
+            value = MyWrapper(RandomToken(10).custom_chars(string.lowercase))
             setattr(instance, self.attname, value)
         return value
 

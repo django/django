@@ -5,11 +5,12 @@
 and where files should be stored.
 """
 
-import random
 import tempfile
 
 from django.db import models
 from django.core.files.storage import FileSystemStorage
+
+from django.util.tokens import RandomToken
 
 
 temp_storage_location = tempfile.mkdtemp()
@@ -22,7 +23,7 @@ class Storage(models.Model):
     def random_upload_to(self, filename):
         # This returns a different result each time,
         # to make sure it only gets called once.
-        return '%s/%s' % (random.randint(100, 999), filename)
+        return '%s/%s' % (RandomToken(3).digits(), filename)
 
     normal = models.FileField(storage=temp_storage, upload_to='tests')
     custom = models.FileField(storage=temp_storage, upload_to=custom_upload_to)
