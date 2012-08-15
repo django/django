@@ -122,6 +122,7 @@ class NamedWizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
 
         post_data = self.wizard_step_data[1]
+        post_data['form2-file1'].close()
         post_data['form2-file1'] = open(__file__, 'rb')
         response = self.client.post(
             reverse(self.wizard_urlname,
@@ -149,7 +150,9 @@ class NamedWizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         all_data = response.context['form_list']
-        self.assertEqual(all_data[1]['file1'].read(), open(__file__, 'rb').read())
+        with open(__file__, 'rb') as f:
+            self.assertEqual(all_data[1]['file1'].read(), f.read())
+        all_data[1]['file1'].close()
         del all_data[1]['file1']
         self.assertEqual(all_data, [
             {'name': 'Pony', 'thirsty': True, 'user': self.testuser},
@@ -182,9 +185,10 @@ class NamedWizardTests(object):
         response = self.client.get(step2_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
-        self.assertEqual(
-            response.context['wizard']['form'].files['form2-file1'].read(),
-            open(__file__, 'rb').read())
+        with open(__file__, 'rb') as f:
+            self.assertEqual(
+                response.context['wizard']['form'].files['form2-file1'].read(),
+                f.read())
 
         response = self.client.post(
             reverse(self.wizard_urlname,
@@ -201,7 +205,9 @@ class NamedWizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         all_data = response.context['all_cleaned_data']
-        self.assertEqual(all_data['file1'].read(), open(__file__, 'rb').read())
+        with open(__file__, 'rb') as f:
+            self.assertEqual(all_data['file1'].read(), f.read())
+        all_data['file1'].close()
         del all_data['file1']
         self.assertEqual(
             all_data,
@@ -225,6 +231,7 @@ class NamedWizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         post_data = self.wizard_step_data[1]
+        post_data['form2-file1'].close()
         post_data['form2-file1'] = open(__file__, 'rb')
         response = self.client.post(
             reverse(self.wizard_urlname,
