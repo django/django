@@ -55,7 +55,7 @@ def find_management_module(app_name):
     except ImportError as e:
         if os.path.basename(os.getcwd()) != part:
             raise e
-    finally:
+    else:
         if f:
             f.close()
 
