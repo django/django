@@ -5,7 +5,6 @@ import tempfile
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-from django.utils.encoding import smart_bytes
 
 
 class SessionStore(SessionBase):
