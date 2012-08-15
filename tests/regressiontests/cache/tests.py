@@ -6,7 +6,9 @@ from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+import random
 import re
+import string
 import tempfile
 import time
 import warnings
@@ -939,18 +941,17 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         for cache in settings.CACHES.values()),
     "memcached not available")
 class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
-    backend_name = 'django.core.cache.backends.memcached.MemcachedCache'
 
     def setUp(self):
-        for cache in settings.CACHES.values():
+        for cache_key, cache in settings.CACHES.items():
             if cache['BACKEND'].startswith('django.core.cache.backends.memcached.'):
-                name = cache['LOCATION']
                 break
-        self.cache = get_cache(self.backend_name, LOCATION=name)
-        self.prefix_cache = get_cache(self.backend_name, LOCATION=name, KEY_PREFIX='cacheprefix')
-        self.v2_cache = get_cache(self.backend_name, LOCATION=name, VERSION=2)
-        self.custom_key_cache = get_cache(self.backend_name, LOCATION=name, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=name, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        random_prefix = ''.join(random.choice(string.ascii_letters) for x in range(10))
+        self.cache = get_cache(cache_key)
+        self.prefix_cache = get_cache(cache_key, KEY_PREFIX=random_prefix)
+        self.v2_cache = get_cache(cache_key, VERSION=2)
+        self.custom_key_cache = get_cache(cache_key, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = get_cache(cache_key, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
