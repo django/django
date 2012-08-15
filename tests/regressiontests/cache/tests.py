@@ -932,16 +932,20 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
-# need to contain a cache backend setting that points at
+# need to contain at least one cache backend setting that points at
 # your memcache server.
 @unittest.skipUnless(
-    settings.CACHES[DEFAULT_CACHE_ALIAS]['BACKEND'].startswith('django.core.cache.backends.memcached.'),
+    any(cache['BACKEND'].startswith('django.core.cache.backends.memcached.')
+        for cache in settings.CACHES.values()),
     "memcached not available")
 class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
     backend_name = 'django.core.cache.backends.memcached.MemcachedCache'
 
     def setUp(self):
-        name = settings.CACHES[DEFAULT_CACHE_ALIAS]['LOCATION']
+        for cache in settings.CACHES.values():
+            if cache['BACKEND'].startswith('django.core.cache.backends.memcached.'):
+                name = cache['LOCATION']
+                break
         self.cache = get_cache(self.backend_name, LOCATION=name)
         self.prefix_cache = get_cache(self.backend_name, LOCATION=name, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, LOCATION=name, VERSION=2)
