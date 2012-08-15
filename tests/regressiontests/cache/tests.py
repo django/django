@@ -1513,7 +1513,7 @@ class CacheMiddlewareTest(TestCase):
 
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
-        self.assertNotEquals(result, None)
+        self.assertNotEqual(result, None)
         self.assertEqual(result.content, 'Hello World 1')
 
         # The same request through a different middleware won't hit
@@ -1522,7 +1522,7 @@ class CacheMiddlewareTest(TestCase):
 
         # The same request with a timeout _will_ hit
         result = timeout_middleware.process_request(request)
-        self.assertNotEquals(result, None)
+        self.assertNotEqual(result, None)
         self.assertEqual(result.content, 'Hello World 1')
 
     @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)

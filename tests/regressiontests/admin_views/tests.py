@@ -2361,7 +2361,7 @@ class AdminActionsTest(TestCase):
     def test_popup_actions(self):
         """ Actions should not be shown in popups. """
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
-        self.assertNotEquals(response.context["action_form"], None)
+        self.assertNotEqual(response.context["action_form"], None)
         response = self.client.get(
             '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
         self.assertEqual(response.context["action_form"], None)
