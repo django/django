@@ -15,6 +15,7 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils.six.moves import xrange
 
 
@@ -507,9 +508,9 @@ class GZipMiddlewareTest(TestCase):
     """
     Tests the GZip middleware.
     """
-    short_string = "This string is too short to be worth compressing."
-    compressible_string = 'a' * 500
-    uncompressible_string = ''.join(chr(random.randint(0, 255)) for _ in xrange(500))
+    short_string = b"This string is too short to be worth compressing."
+    compressible_string = b'a' * 500
+    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
 
     def setUp(self):
         self.req = HttpRequest()
@@ -534,7 +535,7 @@ class GZipMiddlewareTest(TestCase):
         Tests that compression is performed on responses with compressible content.
         """
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(self.decompress(r.content), self.compressible_string.encode('utf-8'))
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertEqual(r.get('Content-Length'), str(len(r.content)))
 
@@ -545,7 +546,7 @@ class GZipMiddlewareTest(TestCase):
         """
         self.resp.status_code = 404
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(self.decompress(r.content), self.compressible_string.encode('utf-8'))
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
 
     def test_no_compress_short_response(self):
@@ -573,7 +574,7 @@ class GZipMiddlewareTest(TestCase):
         self.req.META['HTTP_USER_AGENT'] = 'Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)'
         self.resp['Content-Type'] = 'application/javascript; charset=UTF-8'
         r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(r.content, self.compressible_string.encode('utf-8'))
+        self.assertEqual(r.content, self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), None)
 
     def test_no_compress_uncompressible_response(self):
@@ -591,7 +592,7 @@ class ETagGZipMiddlewareTest(TestCase):
     """
     Tests if the ETag middleware behaves correctly with GZip middleware.
     """
-    compressible_string = 'a' * 500
+    compressible_string = b'a' * 500
 
     def setUp(self):
         self.rf = RequestFactory()
