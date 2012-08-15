@@ -51,14 +51,19 @@ def find_management_module(app_name):
     # module, we need look for the case where the project name is part
     # of the app_name but the project directory itself isn't on the path.
     try:
-        f, path, descr = imp.find_module(part,path)
+        f, path, descr = imp.find_module(part, path)
     except ImportError as e:
         if os.path.basename(os.getcwd()) != part:
             raise e
+    finally:
+        if f:
+            f.close()
 
     while parts:
         part = parts.pop()
         f, path, descr = imp.find_module(part, path and [path] or None)
+        if f:
+            f.close()
     return path
 
 def load_command_class(app_name, name):
