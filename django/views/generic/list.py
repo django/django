@@ -15,6 +15,7 @@ class MultipleObjectMixin(ContextMixin):
     queryset = None
     model = None
     paginate_by = None
+    orphans = 0
     context_object_name = None
     paginator_class = Paginator
 
@@ -38,7 +39,7 @@ class MultipleObjectMixin(ContextMixin):
         """
         Paginate the queryset, if needed.
         """
-        paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
+        paginator = self.get_paginator(queryset, page_size, orphans=self.get_orphans(), allow_empty_first_page=self.get_allow_empty())
         page = self.kwargs.get('page') or self.request.GET.get('page') or 1
         try:
             page_number = int(page)
@@ -73,6 +74,12 @@ class MultipleObjectMixin(ContextMixin):
         if a 404 should be raised instead.
         """
         return self.allow_empty
+    
+    def get_orphans(self):
+        """
+        Get the number of orphans for pagination
+        """
+        return self.orphans
 
     def get_context_object_name(self, object_list):
         """
