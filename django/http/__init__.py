@@ -550,7 +550,7 @@ class HttpResponse(object):
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
         headers = [
-            b'%s: %s' % (key.encode('us-ascii'), value.encode('us-ascii'))
+            ('%s: %s' % (key, value)).encode('us-ascii')
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers) + b'\r\n\r\n' + self.content
