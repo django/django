@@ -106,7 +106,7 @@ class Feed(object):
             subtitle = self.__get_dynamic_attr('subtitle', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
-            language = settings.LANGUAGE_CODE.decode(),
+            language = settings.LANGUAGE_CODE,
             feed_url = add_domain(
                 current_site.domain,
                 self.__get_dynamic_attr('feed_url', obj) or request.path,
