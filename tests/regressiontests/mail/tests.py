@@ -553,6 +553,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         msg.send()
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
 
+        connection.close()
+
 
 class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
     email_backend = 'django.core.mail.backends.console.EmailBackend'
