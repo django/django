@@ -1134,7 +1134,7 @@ class LiveServerTestCase(TransactionTestCase):
             host, port_ranges = specified_address.split(':')
             for port_range in port_ranges.split(','):
                 # A port range can be of either form: '8000' or '8000-8010'.
-                extremes = map(int, port_range.split('-'))
+                extremes = list(map(int, port_range.split('-')))
                 assert len(extremes) in [1, 2]
                 if len(extremes) == 1:
                     # Port range of the form '8000'
