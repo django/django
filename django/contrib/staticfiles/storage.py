@@ -87,6 +87,7 @@ class CachedFilesMixin(object):
     def hashed_name(self, name, content=None):
         parsed_name = urlsplit(unquote(name))
         clean_name = parsed_name.path.strip()
+        opened = False
         if content is None:
             if not self.exists(clean_name):
                 raise ValueError("The file '%s' could not be found with %r." %
@@ -96,9 +97,14 @@ class CachedFilesMixin(object):
             except IOError:
                 # Handle directory paths and fragments
                 return name
+            opened = True
+        try:
+            file_hash = self.file_hash(clean_name, content)
+        finally:
+            if opened:
+                content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = self.file_hash(clean_name, content)
         if file_hash is not None:
             file_hash = ".%s" % file_hash
         hashed_name = os.path.join(path, "%s%s%s" %
