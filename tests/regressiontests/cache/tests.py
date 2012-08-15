@@ -372,19 +372,19 @@ class BaseCacheTests(object):
         self.cache.set('binary1', compressed_value)
         compressed_result = self.cache.get('binary1')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
         # Test add
         self.cache.add('binary1-add', compressed_value)
         compressed_result = self.cache.get('binary1-add')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
         # Test set_many
         self.cache.set_many({'binary1-set_many': compressed_value})
         compressed_result = self.cache.get('binary1-set_many')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
     def test_set_many(self):
         # Multiple keys can be set using set_many
@@ -1227,7 +1227,7 @@ class CacheHEADTest(TestCase):
         request = self._get_request('HEAD')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(test_content, get_cache_data.content)
+        self.assertEqual(test_content.encode(), get_cache_data.content)
 
     def test_head_with_cached_get(self):
         test_content = 'test content'
@@ -1238,7 +1238,7 @@ class CacheHEADTest(TestCase):
         request = self._get_request('HEAD')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(test_content, get_cache_data.content)
+        self.assertEqual(test_content.encode(), get_cache_data.content)
 
 
 @override_settings(
@@ -1378,7 +1378,7 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # cache must return content
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
         request = self._get_request_cache(query_string='foo=bar&somethingelse=true')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
@@ -1393,7 +1393,7 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # Check that we can recover the cache
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, en_message)
+        self.assertEqual(get_cache_data.content, en_message.encode())
         # Check that we use etags
         self.assertTrue(get_cache_data.has_header('ETag'))
         # Check that we can disable etags
@@ -1409,11 +1409,11 @@ class CacheI18nTest(TestCase):
         translation.activate('en')
         # retrieve the content from cache
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data.content, en_message)
+        self.assertEqual(get_cache_data.content, en_message.encode())
         # change again the language
         translation.activate('es')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data.content, es_message)
+        self.assertEqual(get_cache_data.content, es_message.encode())
         # reset the language
         translation.deactivate()
 
@@ -1519,7 +1519,7 @@ class CacheMiddlewareTest(TestCase):
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
         self.assertNotEqual(result, None)
-        self.assertEqual(result.content, 'Hello World 1')
+        self.assertEqual(result.content, b'Hello World 1')
 
         # The same request through a different middleware won't hit
         result = prefix_middleware.process_request(request)
@@ -1528,7 +1528,7 @@ class CacheMiddlewareTest(TestCase):
         # The same request with a timeout _will_ hit
         result = timeout_middleware.process_request(request)
         self.assertNotEqual(result, None)
-        self.assertEqual(result.content, 'Hello World 1')
+        self.assertEqual(result.content, b'Hello World 1')
 
     @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
     def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
@@ -1670,7 +1670,7 @@ class CacheMiddlewareTest(TestCase):
         # And if we wait a few more seconds
         time.sleep(2)
 
-        # the custom timeouot cache will miss
+        # the custom timeout cache will miss
         response = other_with_timeout_view(request, '18')
         self.assertEqual(response.content, b'Hello World 18')
 
