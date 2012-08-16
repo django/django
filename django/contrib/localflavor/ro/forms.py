@@ -3,11 +3,15 @@
 Romanian specific form helpers.
 """
 from __future__ import absolute_import, unicode_literals
+import re
 
 from django.contrib.localflavor.ro.ro_counties import COUNTIES_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError, Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
+
+phone_digits_re = re.compile(r'^[0-9\-\.\(\)\s]{3,20}$')
 
 
 class ROCIFField(RegexField):
@@ -183,13 +187,13 @@ class ROPhoneNumberField(RegexField):
             _('Phone numbers may only have 7 or 10 digits, except the ' +
                 'national short numbers which have 3 or 6 digits'),
         'invalid_long_format': 
-            _('Normal phone numbers (7 or 10 digits) must begin with \"0\"'),
+            _('Normal phone numbers (7 or 10 digits) must begin with "0"'),
         'invalid_short_format': 
-            _('National short numbers (3 or 6 digits) must begin with \"1\"'),
+            _('National short numbers (3 or 6 digits) must begin with "1"'),
     }
 
     def __init__(self, max_length=20, min_length=3, *args, **kwargs):
-        super(ROPhoneNumberField, self).__init__(r'^[0-9\-\.\(\)\s]{3,20}$',
+        super(ROPhoneNumberField, self).__init__(phone_digits_re,
                 max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
@@ -205,7 +209,7 @@ class ROPhoneNumberField(RegexField):
         value = value.replace('.','')
         value = value.replace(' ','')
         length = len(value)
-        if length in [3, 6, 7, 10]:
+        if length in (3, 6, 7, 10):
             if (length == 7 or length == 10) and value[0] != '0':
                 raise ValidationError(
                     self.error_messages['invalid_long_format'])    
