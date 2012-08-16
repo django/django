@@ -317,7 +317,7 @@ class ChangeListTests(TestCase):
                 m.list_editable, m)
         self.assertEqual(cl.query_set.count(), 60)
         self.assertEqual(cl.paginator.count, 60)
-        self.assertEqual(cl.paginator.page_range, [1, 2, 3, 4, 5, 6])
+        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
 
         # Test custom queryset
         m = FilteredChildAdmin(Child, admin.site)
@@ -327,7 +327,7 @@ class ChangeListTests(TestCase):
                 m.list_editable, m)
         self.assertEqual(cl.query_set.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
-        self.assertEqual(cl.paginator.page_range, [1, 2, 3])
+        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
 
     def test_computed_list_display_localization(self):
         """
