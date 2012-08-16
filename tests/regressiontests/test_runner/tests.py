@@ -14,6 +14,7 @@ from django.test.runner import DiscoveryRunner
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
 from django.utils.importlib import import_module
+from django.test.utils import override_settings
 
 from ..admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -296,7 +297,8 @@ class DiscoveryTestRunnerTests(AdminScriptTestCase):
         discovered_tests = suite.countTestCases()
         self.assertEqual(1, discovered_tests)
 
+    @override_settings(TEST_DISCOVERY_PATTERN = '*_test.py')
     def test_discovery_of_tests_with_pattern(self):
         suite = DiscoveryRunner().build_suite((DISCOVERY_APP_TESTS, ))
         discovered_tests = suite.countTestCases()
-        self.assertEqual(1, discovered_tests)
+        self.assertEqual(4, discovered_tests)
