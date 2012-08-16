@@ -1044,7 +1044,7 @@ msgstr "Grd."
 #: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
-msgstr "Sausis"
+msgstr "Sausio"
 
 #: utils/dates.py:46
 msgctxt "alt. month"
