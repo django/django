@@ -200,6 +200,7 @@ class EmailMessage(object):
         self.attachments = attachments or []
         self.extra_headers = headers or {}
         self.connection = connection
+        self.encoding = self.encoding or settings.DEFAULT_CHARSET
 
     def get_connection(self, fail_silently=False):
         from django.core.mail import get_connection
@@ -208,8 +209,7 @@ class EmailMessage(object):
         return self.connection
 
     def message(self):
-        encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(self.body, self.content_subtype, encoding)
+        msg = SafeMIMEText(self.body, self.content_subtype, self.encoding)
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
