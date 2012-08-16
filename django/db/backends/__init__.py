@@ -991,7 +991,7 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if router.allow_syncdb(self.connection.alias, model):
                     all_models.append(model)
-        tables = map(self.table_name_converter, tables)
+        tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
             if self.table_name_converter(m._meta.db_table) in tables
