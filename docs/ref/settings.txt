@@ -747,14 +747,15 @@ Did you catch that? NEVER deploy a site into production with :setting:`DEBUG`
 turned on.
 
 One of the main features of debug mode is the display of detailed error pages.
-If your app raises an exception when ``DEBUG`` is ``True``, Django will display
-a detailed traceback, including a lot of metadata about your environment, such
-as all the currently defined Django settings (from ``settings.py``).
+If your app raises an exception when :setting:`DEBUG` is ``True``, Django will
+display a detailed traceback, including a lot of metadata about your
+environment, such as all the currently defined Django settings (from
+``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as ``SECRET_KEY`` or ``PROFANITIES_LIST``.
-Specifically, it will exclude any setting whose name includes any of the
-following:
+sensitive (or offensive), such as :setting:`SECRET_KEY` or
+:setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
+name includes any of the following:
 
     * API
     * KEY
@@ -1356,7 +1357,7 @@ MANAGERS
 Default: ``()`` (Empty tuple)
 
 A tuple in the same format as :setting:`ADMINS` that specifies who should get
-broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
+broken-link notifications when :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``.
 
 .. setting:: MEDIA_ROOT
 
