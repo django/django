@@ -917,7 +917,7 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-if sys.version_info >= (2, 6, 0):
+if sys.version_info >= (2, 7, 0):
     _ImprovedEvent = threading._Event
 else:
     class _ImprovedEvent(threading._Event):
