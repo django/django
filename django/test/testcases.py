@@ -917,23 +917,26 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _ImprovedEvent(threading._Event):
-    """
-    Does the same as `threading.Event` except it overrides the wait() method
-    with some code borrowed from Python 2.7 to return the set state of the
-    event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
-    to know whether the wait() method exited normally or because of the
-    timeout. This class can be removed when Django supports only Python >= 2.7.
-    """
+if sys.version_info >= (2, 6, 0):
+    _ImprovedEvent = threading._Event
+else:
+    class _ImprovedEvent(threading._Event):
+        """
+        Does the same as `threading.Event` except it overrides the wait() method
+        with some code borrowed from Python 2.7 to return the set state of the
+        event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
+        to know whether the wait() method exited normally or because of the
+        timeout. This class can be removed when Django supports only Python >= 2.7.
+        """
 
-    def wait(self, timeout=None):
-        self._Event__cond.acquire()
-        try:
-            if not self._Event__flag:
-                self._Event__cond.wait(timeout)
-            return self._Event__flag
-        finally:
-            self._Event__cond.release()
+        def wait(self, timeout=None):
+            self._Event__cond.acquire()
+            try:
+                if not self._Event__flag:
+                    self._Event__cond.wait(timeout)
+                return self._Event__flag
+            finally:
+                self._Event__cond.release()
 
 
 class StoppableWSGIServer(WSGIServer):
