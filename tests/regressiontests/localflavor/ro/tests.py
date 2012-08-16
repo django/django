@@ -116,16 +116,27 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROIBANField, valid, invalid)
 
     def test_ROPhoneNumberField(self):
-        error_format = ['Phone numbers must be in XXXX-XXXXXX format.']
-        error_atleast = ['Ensure this value has at least 10 characters (it has 9).']
-        error_invalid = ['Phone numbers must be in XXXX-XXXXXX format.']
+        error_invalid_length = ['Phone numbers may only have 7 or 10 digits,' +
+            ' except the national short numbers which have 3 or 6 digits']
+        error_invalid_long_format = ['Normal phone numbers (7 or 10 digits)' + 
+            ' must begin with \"0\"']
+        error_invalid_short_format = ['National short numbers (3 or 6 digits)' +
+            ' must begin with \"1\"']
         valid = {
-            '0264485936': '0264485936',
-            '(0264)-485936': '0264485936',
+            '112': '112',
+            '123.456': '123456',
+            '0232 987': '0232987',
+            '0319876543': '0319876543',
+            '031-987-6543': '0319876543',
+            '(0232) 987 654': '0232987654',
         }
         invalid = {
-            '02644859368': error_format,
-            '026448593': error_atleast + error_invalid,
+            '312': error_invalid_short_format,
+            '723.456': error_invalid_short_format,
+            '4232 987': error_invalid_long_format,
+            '4319876543': error_invalid_long_format,
+            '12345': error_invalid_length,
+            '0232 987 6543': error_invalid_length,
         }
         self.assertFieldOutput(ROPhoneNumberField, valid, invalid)
 

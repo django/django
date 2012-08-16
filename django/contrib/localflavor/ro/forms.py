@@ -47,6 +47,7 @@ class ROCIFField(RegexField):
             raise ValidationError(self.error_messages['invalid'])
         return value[::-1]
 
+
 class ROCNPField(RegexField):
     """
     A Romanian personal identity code (CNP) field
@@ -87,6 +88,7 @@ class ROCNPField(RegexField):
             raise ValidationError(self.error_messages['invalid'])
         return value
 
+
 class ROCountyField(Field):
     """
     A form field that validates its input is a Romanian county name or
@@ -124,6 +126,7 @@ class ROCountyField(Field):
                 return entry[0]
         raise ValidationError(self.error_messages['invalid'])
 
+
 class ROCountySelect(Select):
     """
     A Select widget that uses a list of Romanian counties (judete) as its
@@ -131,6 +134,7 @@ class ROCountySelect(Select):
     """
     def __init__(self, attrs=None):
         super(ROCountySelect, self).__init__(attrs, choices=COUNTIES_CHOICES)
+
 
 class ROIBANField(RegexField):
     """
@@ -155,6 +159,7 @@ class ROIBANField(RegexField):
             return ''
         value = value.replace('-','')
         value = value.replace(' ','')
+
         value = value.upper()
         if value[0:2] != 'RO':
             raise ValidationError(self.error_messages['invalid'])
@@ -168,19 +173,28 @@ class ROIBANField(RegexField):
             raise ValidationError(self.error_messages['invalid'])
         return value
 
+
 class ROPhoneNumberField(RegexField):
-    """Romanian phone number field"""
+    """
+    Romanian phone number field
+    """
     default_error_messages = {
-        'invalid': _('Phone numbers must be in XXXX-XXXXXX format.'),
+        'invalid_length': 
+            _('Phone numbers may only have 7 or 10 digits, except the ' +
+                'national short numbers which have 3 or 6 digits'),
+        'invalid_long_format': 
+            _('Normal phone numbers (7 or 10 digits) must begin with \"0\"'),
+        'invalid_short_format': 
+            _('National short numbers (3 or 6 digits) must begin with \"1\"'),
     }
 
-    def __init__(self, max_length=20, min_length=10, *args, **kwargs):
-        super(ROPhoneNumberField, self).__init__(r'^[0-9\-\(\)\s]{10,20}$',
+    def __init__(self, max_length=20, min_length=3, *args, **kwargs):
+        super(ROPhoneNumberField, self).__init__(r'^[0-9\-\.\(\)\s]{3,20}$',
                 max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         """
-        Strips -, (, ) and spaces. Checks the final length.
+        Strips braces, dashes, dots and spaces. Checks the final length.
         """
         value = super(ROPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -188,10 +202,20 @@ class ROPhoneNumberField(RegexField):
         value = value.replace('-','')
         value = value.replace('(','')
         value = value.replace(')','')
+        value = value.replace('.','')
         value = value.replace(' ','')
-        if len(value) != 10:
-            raise ValidationError(self.error_messages['invalid'])
+        length = len(value)
+        if length in [3, 6, 7, 10]:
+            if (length == 7 or length == 10) and value[0] != '0':
+                raise ValidationError(
+                    self.error_messages['invalid_long_format'])    
+            elif (length == 3 or length == 6) and value[0] != '1':
+                raise ValidationError(
+                    self.error_messages['invalid_short_format'])    
+        else:
+            raise ValidationError(self.error_messages['invalid_length'])
         return value
+
 
 class ROPostalCodeField(RegexField):
     """Romanian postal code field."""
@@ -202,4 +226,3 @@ class ROPostalCodeField(RegexField):
     def __init__(self, max_length=6, min_length=6, *args, **kwargs):
         super(ROPostalCodeField, self).__init__(r'^[0-9][0-8][0-9]{4}$',
                 max_length, min_length, *args, **kwargs)
-
