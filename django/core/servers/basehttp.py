@@ -7,6 +7,8 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
+from __future__ import unicode_literals
+
 import os
 import socket
 import sys
@@ -71,12 +73,12 @@ class WSGIServerException(Exception):
 
 
 class ServerHandler(simple_server.ServerHandler, object):
-    error_status = "500 INTERNAL SERVER ERROR"
+    error_status = str("500 INTERNAL SERVER ERROR")
 
     def write(self, data):
-        """'write()' callable as specified by PEP 333"""
+        """'write()' callable as specified by PEP 3333"""
 
-        assert isinstance(data, str), "write() argument must be string"
+        assert isinstance(data, bytes), "write() argument must be bytestring"
 
         if not self.status:
             raise AssertionError("write() before start_response()")
