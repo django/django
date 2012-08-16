@@ -1,15 +1,18 @@
 from __future__ import unicode_literals
 
 import re
+from django.utils import six
 import unicodedata
 import warnings
 from gzip import GzipFile
 from django.utils.six.moves import html_entities
 from io import BytesIO
 
-# Import force_unicode even though this module doesn't use it, because some
-# people rely on it being here.
-from django.utils.encoding import force_text, force_unicode
+from django.utils.encoding import force_text
+if not six.PY3:
+    # Import force_unicode even though this module doesn't use it, because some
+    # people rely on it being here.
+    from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
