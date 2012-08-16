@@ -56,10 +56,10 @@ will do some additional queries to set these parameters.
 Transaction handling
 ---------------------
 
-:doc:`By default </topics/db/transactions>`, Django starts a transaction when a
-database connection is first used and commits the result at the end of the
-request/response handling. The PostgreSQL backends normally operate the same
-as any other Django backend in this respect.
+:doc:`By default </topics/db/transactions>`, Django runs with an open
+transaction which it commits automatically when any built-in, data-altering
+model function is called. The PostgreSQL backends normally operate the same as
+any other Django backend in this respect.
 
 .. _postgresql-autocommit-mode:
 
