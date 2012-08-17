@@ -238,6 +238,64 @@ wizard's :meth:`as_view` method takes a list of your
         (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
     )
 
+Using a different template for each form
+----------------------------------------
+You may specify a different template for each form. Consider an example
+using a form wizard to implement a multi-step checkout process for an online
+store. In the first step, the user specifies billing and shipping address. In
+the second step, the user chooses payment type. If they chose to pay by
+credit card, in the next step they will enter in credit card information. In
+the final step, they will confirm the purchase.
+
+Here's what the view code might look like:
+
+.. code-block:: python
+
+    FORMS = [("address", myapp.forms.AddressForm),
+             ("paytype", myapp.forms.PaymentChoiceForm),
+             ("cc", myapp.forms.CreditCardForm),
+             ("confirmation", myapp.forms.OrderForm)]
+
+    TEMPLATES = {"address": "checkout/billingaddress.html",
+                 "paytype": "checkout/paymentmethod.html",
+                 "cc": "checkout/creditcard.html",
+                 "confirmation": "checkout/confirmation.html"}
+
+    def pay_by_credit_card(wizard):
+        """Return true if user opts to pay by credit card"""
+        # Get cleaned data from payment step
+        cleaned_data = wizard.get_cleaned_data_for_step('paytype') or {'method': 'none'}
+        # Return true if the user selected credit card
+        return cleaned_data['method'] == 'cc'
+
+
+    class OrderWizard(SessionWizardView):
+        def get_template_names(self):
+            return [TEMPLATES[self.steps.current]]
+
+        def done(self, form_list, **kwargs):
+            do_something_with_the_form_data(form_list)
+            return HttpResponseRedirect('/page-to-redirect-to-when-done/')
+            ...
+
+The ``urls.py`` file would contain something like::
+
+    urlpatterns = patterns('',
+        (r'^checkout/$', OrderWizard.as_view(forms, condition_dict={'cc': pay_by_credit_card})),
+    )
+
+
+
+Note that the :class:`OrderWizard` object is initialized with a list of
+pairs. The first element in the pair is a string that corresponds to the
+name of the step, and the second is the form class.
+
+In this example, the :meth:`get_template_names` method returns a list
+containing a single template, which is selected based on the name of
+the current step.
+
+
+
 .. _wizardview-advanced-methods:
 
 Advanced ``WizardView`` methods
