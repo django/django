@@ -99,7 +99,12 @@ def sanitize_address(addr, encoding):
     if isinstance(addr, six.string_types):
         addr = parseaddr(force_text(addr))
     nm, addr = addr
-    nm = Header(nm, encoding).encode()
+    # This try-except clause is needed on Python 3 < 3.2.4
+    # http://bugs.python.org/issue14291
+    try:
+        nm = Header(nm, encoding).encode()
+    except UnicodeEncodeError:
+        nm = Header(nm, 'utf-8').encode()
     try:
         addr.encode('ascii')
     except UnicodeEncodeError:  # IDN
