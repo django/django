@@ -2,6 +2,9 @@
 Single object mixins
 ====================
 
+SingleObjectMixin
+-----------------
+
 .. class:: django.views.generic.detail.SingleObjectMixin
 
     Provides a mechanism for looking up an object associated with the
@@ -85,6 +88,9 @@ Single object mixins
     * ``object``: The object that this view is displaying. If
       ``context_object_name`` is specified, that variable will also be
       set in the context, with the same value as ``object``.
+
+SingleObjectTemplateResponseMixin
+---------------------------------
 
 .. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
 
