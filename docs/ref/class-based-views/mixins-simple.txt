@@ -2,6 +2,9 @@
 Simple mixins
 =============
 
+ContextMixin
+------------
+
 .. class:: django.views.generic.base.ContextMixin
 
     .. versionadded:: 1.5
@@ -16,6 +19,9 @@ Simple mixins
 
         Returns a dictionary representing the template context. The
         keyword arguments provided will make up the returned context.
+
+TemplateResponseMixin
+---------------------
 
 .. class:: django.views.generic.base.TemplateResponseMixin
 
