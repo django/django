@@ -39,6 +39,7 @@ class SchemaTests(TestCase):
         connection.rollback()
         # Delete any tables made for our models
         cursor = connection.cursor()
+        connection.disable_constraint_checking()
         for model in self.models:
             # Remove any M2M tables first
             for field in model._meta.local_many_to_many:
@@ -59,6 +60,7 @@ class SchemaTests(TestCase):
                 connection.rollback()
             else:
                 connection.commit()
+        connection.enable_constraint_checking()
         # Unhook our models
         for model in self.models:
             model._meta.managed = False

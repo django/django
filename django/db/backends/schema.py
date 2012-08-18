@@ -25,6 +25,7 @@ class BaseDatabaseSchemaEditor(object):
         - Repointing of M2Ms
         - Check constraints (PosIntField)
         - PK changing
+        - db_index on alter field
     """
 
     # Overrideable SQL templates
@@ -358,7 +359,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         # Ensure this field is even column-based
         old_type = old_field.db_type(connection=self.connection)
-        new_type = new_field.db_type(connection=self.connection)
+        new_type = self._type_for_alter(new_field)
         if old_type is None and new_type is None:
             # TODO: Handle M2M fields being repointed
             return
@@ -389,6 +390,7 @@ class BaseDatabaseSchemaEditor(object):
                 "table": self.quote_name(model._meta.db_table),
                 "old_column": self.quote_name(old_field.column),
                 "new_column": self.quote_name(new_field.column),
+                "type": new_type,
             })
         # Next, start accumulating actions to do
         actions = []
@@ -426,6 +428,7 @@ class BaseDatabaseSchemaEditor(object):
                 actions.append((
                     self.sql_alter_column_null % {
                         "column": self.quote_name(new_field.column),
+                        "type": new_type,
                     },
                     [],
                 ))
@@ -433,6 +436,7 @@ class BaseDatabaseSchemaEditor(object):
                 actions.append((
                     self.sql_alter_column_null % {
                         "column": self.quote_name(new_field.column),
+                        "type": new_type,
                     },
                     [],
                 ))
@@ -459,6 +463,14 @@ class BaseDatabaseSchemaEditor(object):
                     "columns": self.quote_name(new_field.column),
                 }
             )
+
+    def _type_for_alter(self, field):
+        """
+        Returns a field's type suitable for ALTER COLUMN.
+        By default it just returns field.db_type().
+        To be overriden by backend specific subclasses
+        """
+        return field.db_type(connection=self.connection)
 
     def _create_index_name(self, model, column_names, suffix=""):
         "Generates a unique name for an index/unique constraint."

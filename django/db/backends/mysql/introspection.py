@@ -105,32 +105,42 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_constraints(self, cursor, table_name):
         """
         Retrieves any constraints (unique, pk, fk, check) across one or more columns.
-        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool}}
+        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool, 'foreign_key': None|(tbl, col)}}
         """
         constraints = {}
-        # Loop over the constraint tables, collecting things as constraints
-        ifsc_tables = ["constraint_column_usage", "key_column_usage"]
-        for ifsc_table in ifsc_tables:
-            cursor.execute("""
-                SELECT kc.constraint_name, kc.column_name, c.constraint_type
-                FROM information_schema.%s AS kc
-                JOIN information_schema.table_constraints AS c ON
-                    kc.table_schema = c.table_schema AND
-                    kc.table_name = c.table_name AND
-                    kc.constraint_name = c.constraint_name
-                WHERE
-                    kc.table_schema = %%s AND
-                    kc.table_name = %%s
-            """ % ifsc_table, [self.connection.settings_dict['NAME'], table_name])
-            for constraint, column, kind in cursor.fetchall():
-                # If we're the first column, make the record
-                if constraint not in constraints:
-                    constraints[constraint] = {
-                        "columns": set(),
-                        "primary_key": kind.lower() == "primary key",
-                        "foreign_key": kind.lower() == "foreign key",
-                        "unique": kind.lower() in ["primary key", "unique"],
-                    }
-                # Record the details
-                constraints[constraint]['columns'].add(column)
+        # Get the actual constraint names and columns
+        name_query = """
+            SELECT kc.`constraint_name`, kc.`column_name`,
+                kc.`referenced_table_name`, kc.`referenced_column_name`
+            FROM information_schema.key_column_usage AS kc
+            WHERE
+                kc.table_schema = %s AND
+                kc.table_name = %s
+        """
+        cursor.execute(name_query, [self.connection.settings_dict['NAME'], table_name])
+        for constraint, column, ref_table, ref_column in cursor.fetchall():
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    'columns': set(),
+                    'primary_key': False,
+                    'unique': False,
+                    'foreign_key': (ref_table, ref_column) if ref_column else None,
+                }
+            constraints[constraint]['columns'].add(column)
+        # Now get the constraint types
+        type_query = """
+            SELECT c.constraint_name, c.constraint_type
+            FROM information_schema.table_constraints AS c
+            WHERE
+                c.table_schema = %s AND
+                c.table_name = %s
+        """
+        cursor.execute(type_query, [self.connection.settings_dict['NAME'], table_name])
+        for constraint, kind in cursor.fetchall():
+            if kind.lower() == "primary key":
+                constraints[constraint]['primary_key'] = True
+                constraints[constraint]['unique'] = True
+            elif kind.lower() == "unique":
+                constraints[constraint]['unique'] = True
+        # Return
         return constraints

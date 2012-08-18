@@ -7,6 +7,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NULL"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s"
+    sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
 
@@ -16,9 +18,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_index = "DROP INDEX %(name)s ON %(table_name)s"
 
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
-
-
-
 
     alter_string_set_null = 'MODIFY %(column)s %(type)s NULL;'
     alter_string_drop_null = 'MODIFY %(column)s %(type)s NOT NULL;'
