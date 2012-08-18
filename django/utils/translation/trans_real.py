@@ -259,6 +259,11 @@ def do_translate(message, translation_function):
     return result
 
 def gettext(message):
+    """
+    Returns a string of the translation of the message.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
+    """
     return do_translate(message, 'gettext')
 
 if six.PY3:
@@ -296,8 +301,10 @@ def do_ntranslate(singular, plural, number, translation_function):
 
 def ngettext(singular, plural, number):
     """
-    Returns a UTF-8 bytestring of the translation of either the singular or
-    plural, based on the number.
+    Returns a string of the translation of either the singular or plural,
+    based on the number.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 

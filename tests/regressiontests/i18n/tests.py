@@ -232,7 +232,7 @@ class TranslationTests(TestCase):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
         """
-        s = mark_safe(b'Password')
+        s = mark_safe(str('Password'))
         self.assertEqual(SafeString, type(s))
         with translation.override('de', deactivate=True):
             self.assertEqual(SafeUnicode, type(ugettext(s)))
