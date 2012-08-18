@@ -560,15 +560,29 @@ string" means that the producer of the string has already turned characters
 that should not be interpreted by the HTML engine (e.g. '<') into the
 appropriate entities.
 
+.. class:: SafeBytes
+
+    .. versionadded:: 1.5
+
+    A :class:`bytes` subclass that has been specifically marked as "safe"
+    (requires no further escaping) for HTML output purposes.
+
 .. class:: SafeString
 
-    A string subclass that has been specifically marked as "safe" (requires no
-    further escaping) for HTML output purposes.
+    A :class:`str` subclass that has been specifically marked as "safe"
+    (requires no further escaping) for HTML output purposes. This is
+    :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
+
+.. class:: SafeText
+
+    .. versionadded:: 1.5
+
+    A :class:`str` (in Python 3) or :class:`unicode` (in Python 2) subclass
+    that has been specifically marked as "safe" for HTML output purposes.
 
 .. class:: SafeUnicode
 
-    A unicode subclass that has been specifically marked as "safe" for HTML
-    output purposes.
+    Historical name of :class:`SafeText`. Only available under Python 2.
 
 .. function:: mark_safe(s)
 

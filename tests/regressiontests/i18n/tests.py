@@ -18,7 +18,7 @@ from django.utils.formats import (get_format, date_format, time_format,
     number_format)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import mark_safe, SafeString, SafeUnicode
+from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
 from django.utils import six
 from django.utils.six import PY3
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
@@ -235,9 +235,9 @@ class TranslationTests(TestCase):
         s = mark_safe(str('Password'))
         self.assertEqual(SafeString, type(s))
         with translation.override('de', deactivate=True):
-            self.assertEqual(SafeUnicode, type(ugettext(s)))
-        self.assertEqual('aPassword', SafeString('a') + s)
-        self.assertEqual('Passworda', s + SafeString('a'))
+            self.assertEqual(SafeText, type(ugettext(s)))
+        self.assertEqual('aPassword', SafeText('a') + s)
+        self.assertEqual('Passworda', s + SafeText('a'))
         self.assertEqual('Passworda', s + mark_safe('a'))
         self.assertEqual('aPassword', mark_safe('a') + s)
         self.assertEqual('as', mark_safe('a') + mark_safe('s'))
@@ -897,9 +897,9 @@ class TestModels(TestCase):
 
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
-        c.name = SafeUnicode('Iñtërnâtiônàlizætiøn1')
+        c.name = SafeText('Iñtërnâtiônàlizætiøn1')
         c.save()
-        c.name = SafeString('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
+        c.name = SafeBytes('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
         c.save()
 
 

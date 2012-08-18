@@ -119,8 +119,8 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
                             errors) for arg in s])
         else:
             # Note: We use .decode() here, instead of six.text_type(s, encoding,
-            # errors), so that if s is a SafeString, it ends up being a
-            # SafeUnicode at the end.
+            # errors), so that if s is a SafeBytes, it ends up being a
+            # SafeText at the end.
             s = s.decode(encoding, errors)
     except UnicodeDecodeError as e:
         if not isinstance(s, Exception):
