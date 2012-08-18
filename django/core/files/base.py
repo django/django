@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import os
-from io import BytesIO
+from io import BytesIO, UnsupportedOperation
 
 from django.utils.encoding import smart_bytes, smart_text
 from django.core.files.utils import FileProxyMixin
@@ -64,8 +64,10 @@ class File(FileProxyMixin):
         if not chunk_size:
             chunk_size = self.DEFAULT_CHUNK_SIZE
 
-        if hasattr(self, 'seek'):
+        try:
             self.seek(0)
+        except (AttributeError, UnsupportedOperation):
+            pass
 
         while True:
             data = self.read(chunk_size)
