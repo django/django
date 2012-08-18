@@ -116,8 +116,8 @@ class TestUtilsText(SimpleTestCase):
 
     def test_slugify(self):
         items = (
-            (u'Hello, World!', 'hello-world'),
-            (u'spam & eggs', 'spam-eggs'),
+            ('Hello, World!', 'hello-world'),
+            ('spam & eggs', 'spam-eggs'),
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)

@@ -126,13 +126,13 @@ strip_tags = allow_lazy(strip_tags)
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
     tags = [re.escape(tag) for tag in tags.split()]
-    tags_re = u'(%s)' % u'|'.join(tags)
-    starttag_re = re.compile(ur'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
-    endtag_re = re.compile(u'</%s>' % tags_re)
-    html = starttag_re.sub(u'', html)
-    html = endtag_re.sub(u'', html)
+    tags_re = '(%s)' % '|'.join(tags)
+    starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
+    endtag_re = re.compile('</%s>' % tags_re)
+    html = starttag_re.sub('', html)
+    html = endtag_re.sub('', html)
     return html
-remove_tags = allow_lazy(remove_tags, unicode)
+remove_tags = allow_lazy(remove_tags, six.text_type)
 
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
