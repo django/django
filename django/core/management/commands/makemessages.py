@@ -55,8 +55,7 @@ def walk(root, topdown=True, onerror=None, followlinks=False,
     if ignore_patterns is None:
         ignore_patterns = []
     dir_suffix = '%s*' % os.sep
-    norm_patterns = map(lambda p: p.endswith(dir_suffix)
-                        and p[:-len(dir_suffix)] or p, ignore_patterns)
+    norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in ignore_patterns]
     for dirpath, dirnames, filenames in os.walk(root, topdown, onerror):
         remove_dirs = []
         for dirname in dirnames:
