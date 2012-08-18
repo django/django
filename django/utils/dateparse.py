@@ -19,7 +19,7 @@ datetime_re = re.compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
     r'[T ](?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
     r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
-    r'(?P<tzinfo>Z|[+-]\d{1,2}:\d{1,2})?$'
+    r'(?P<tzinfo>Z|[+-]\d{1,2}:?\d{1,2})?$'
 )
 
 time_re = re.compile(
@@ -77,7 +77,8 @@ def parse_datetime(value):
         if tzinfo == 'Z':
             tzinfo = utc
         elif tzinfo is not None:
-            offset = 60 * int(tzinfo[1:3]) + int(tzinfo[4:6])
+            tzinfo = re.sub(':','',tzinfo)
+            offset = 60 * int(tzinfo[1:3]) + int(tzinfo[3:5])
             if tzinfo[0] == '-':
                 offset = -offset
             tzinfo = FixedOffset(offset)
