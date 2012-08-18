@@ -113,6 +113,8 @@ urlpatterns = patterns('',
         views.BookArchive.as_view(paginate_by=10)),
     (r'^dates/books/reverse/$',
         views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+    (r'^dates/books/by_month/$',
+        views.BookArchive.as_view(date_list_period='month')),
     (r'^dates/booksignings/$',
         views.BookSigningArchive.as_view()),
 

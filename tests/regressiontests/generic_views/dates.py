@@ -60,7 +60,6 @@ class ArchiveIndexViewTests(TestCase):
         res = self.client.get('/dates/books/allow_empty/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [])
-        self.assertEqual(list(res.context['date_list']), [])
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
     def test_archive_view_template(self):
@@ -79,6 +78,11 @@ class ArchiveIndexViewTests(TestCase):
 
     def test_archive_view_invalid(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/dates/books/invalid/')
+
+    def test_archive_view_by_month(self):
+        res = self.client.get('/dates/books/by_month/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'month')[::-1])
 
     def test_paginated_archive_view(self):
         self._make_books(20, base_date=datetime.date.today())
