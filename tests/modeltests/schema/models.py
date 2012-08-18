@@ -37,6 +37,15 @@ class Tag(models.Model):
         managed = False
 
 
+class TagUniqueRename(models.Model):
+    title = models.CharField(max_length=255)
+    slug2 = models.SlugField(unique=True)
+
+    class Meta:
+        managed = False
+        db_table = "schema_tag"
+
+
 class UniqueTest(models.Model):
     year = models.IntegerField()
     slug = models.SlugField(unique=False)

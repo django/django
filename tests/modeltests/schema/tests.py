@@ -6,7 +6,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.loading import cache
-from .models import Author, Book, AuthorWithM2M, Tag, UniqueTest
+from .models import Author, Book, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TestCase):
@@ -296,6 +296,21 @@ class SchemaTests(TestCase):
         # Ensure the field is unique again
         Tag.objects.create(title="foo", slug="foo")
         self.assertRaises(IntegrityError, Tag.objects.create, title="bar", slug="foo")
+        connection.rollback()
+        # Rename the field
+        new_field = SlugField(unique=False)
+        new_field.set_attributes_from_name("slug2")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Tag,
+            Tag._meta.get_field_by_name("slug")[0],
+            TagUniqueRename._meta.get_field_by_name("slug2")[0],
+        )
+        editor.commit()
+        # Ensure the field is still unique
+        TagUniqueRename.objects.create(title="foo", slug2="foo")
+        self.assertRaises(IntegrityError, TagUniqueRename.objects.create, title="bar", slug2="foo")
         connection.rollback()
 
     def test_unique_together(self):
