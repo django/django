@@ -47,6 +47,8 @@ class BaseDatabaseWrapper(object):
     def __ne__(self, other):
         return not self == other
 
+    __hash__ = object.__hash__
+
     def _commit(self):
         if self.connection is not None:
             return self.connection.commit()
