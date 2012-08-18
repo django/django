@@ -59,6 +59,8 @@ urlpatterns = patterns('',
     # Create/UpdateView
     (r'^edit/artists/create/$',
         views.ArtistCreate.as_view()),
+    (r'^edit/artists/create/formclass/$',
+        views.ArtistOnlyFormClassCreate.as_view()),
     (r'^edit/artists/(?P<pk>\d+)/update/$',
         views.ArtistUpdate.as_view()),
 

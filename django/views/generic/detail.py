@@ -61,8 +61,9 @@ class SingleObjectMixin(ContextMixin):
         `get_object` is overridden.
         """
         if self.queryset is None:
-            if self.model:
-                return self.model._default_manager.all()
+            model = self.get_model()
+            if model:
+                return model._default_manager.all()
             else:
                 raise ImproperlyConfigured("%(cls)s is missing a queryset. Define "
                                            "%(cls)s.model, %(cls)s.queryset, or override "
@@ -98,6 +99,9 @@ class SingleObjectMixin(ContextMixin):
             context[context_object_name] = self.object
         context.update(kwargs)
         return super(SingleObjectMixin, self).get_context_data(**context)
+
+    def get_model(self):
+        return self.model
 
 
 class BaseDetailView(SingleObjectMixin, View):
@@ -147,12 +151,14 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                 self.object._meta.object_name.lower(),
                 self.template_name_suffix
             ))
-        elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
-            names.append("%s/%s%s.html" % (
-                self.model._meta.app_label,
-                self.model._meta.object_name.lower(),
-                self.template_name_suffix
-            ))
+        elif hasattr(self, 'get_model'):
+            model = self.get_model()
+            if model is not None and issubclass(model, models.Model):
+                names.append("%s/%s%s.html" % (
+                    model._meta.app_label,
+                    model._meta.object_name.lower(),
+                    self.template_name_suffix
+                ))
         return names
 
 
