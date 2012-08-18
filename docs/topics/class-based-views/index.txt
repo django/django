@@ -119,11 +119,11 @@ For example, a simple JSON mixin might look something like this::
             # -- can be serialized as JSON.
             return json.dumps(context)
 
-Now we mix this into the base view::
+Now we mix this into the base TemplateView::
 
-    from django.views.generic import View
+    from django.views.generic import TemplateView
 
-    class JSONView(JSONResponseMixin, View):
+    class JSONView(JSONResponseMixin, TemplateView):
         pass
 
 Equally we could use our mixin with one of the generic views. We can make our
