@@ -198,6 +198,8 @@ straight lookups. Here are some things to keep in mind:
 * A variable can only be called if it has no required arguments. Otherwise,
   the system will return an empty string.
 
+.. _alters-data-description:
+
 * Obviously, there can be side effects when calling some variables, and
   it'd be either foolish or a security hole to allow the template system
   to access them.
