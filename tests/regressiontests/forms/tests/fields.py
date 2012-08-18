@@ -668,6 +668,18 @@ class FieldsTests(SimpleTestCase):
             # Valid IDN
             self.assertEqual(url, f.clean(url))
 
+    def test_urlfield_10(self):
+        """Test URLField correctly validates IPv6 (#18779)."""
+        f = URLField()
+        urls = (
+            'http://::/',
+            'http://6:21b4:92/',
+            'http://[12:34:3a53]/',
+            'http://[a34:9238::]:8080/',
+        )
+        for url in urls:
+            self.assertEqual(url, f.clean(url))
+
     def test_urlfield_not_string(self):
         f = URLField(required=False)
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 23)
