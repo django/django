@@ -486,6 +486,33 @@ escaping HTML.
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_text` on the values.
 
+.. function:: strip_tags(value)
+
+    Removes anything that looks like an html tag from the string, that is
+    anything contained within ``<>``.
+
+    For example::
+
+        strip_tags(value)
+
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"Joel is a slug"``.
+
+.. function:: remove_tags(value, tags)
+
+    Removes a list of [X]HTML tag names from the output.
+
+    For example::
+
+        remove_tags(value, ["b", "span"])
+
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"Joel <button>is</button> a slug"``.
+
+    Note that this filter is case-sensitive.
+
+    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
 
@@ -584,6 +611,24 @@ appropriate entities.
 
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
+
+``django.utils.text``
+=====================
+
+.. module:: django.utils.text
+    :synopsis: Text manipulation.
+
+.. function:: slugify
+
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and trailing
+    whitespace.
+
+    For example::
+
+        slugify(value)
+
+    If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 
 ``django.utils.translation``
 ============================

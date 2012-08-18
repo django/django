@@ -16,6 +16,7 @@ if not six.PY3:
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
+from django.utils.safestring import mark_safe
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
@@ -383,3 +384,14 @@ def unescape_string_literal(s):
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 unescape_string_literal = allow_lazy(unescape_string_literal)
+
+def slugify(value):
+    """
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
+    """
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    return mark_safe(re.sub('[-\s]+', '-', value))
+slugify = allow_lazy(slugify, unicode)

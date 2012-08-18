@@ -113,3 +113,11 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap(long_word, 20), long_word)
         self.assertEqual(text.wrap('a %s word' % long_word, 10),
                          'a\n%s\nword' % long_word)
+
+    def test_slugify(self):
+        items = (
+            (u'Hello, World!', 'hello-world'),
+            (u'spam & eggs', 'spam-eggs'),
+        )
+        for value, output in items:
+            self.assertEqual(text.slugify(value), output)

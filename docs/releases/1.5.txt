@@ -261,6 +261,10 @@ Miscellaneous
 * :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
   instead of :exc:`ValueError` for non-integer inputs.
 
+* The ``slugify`` template filter is now available as a standard python
+  function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
+  available at :func:`django.utils.html.remove_tags`.
+
 Features deprecated in 1.5
 ==========================
 
