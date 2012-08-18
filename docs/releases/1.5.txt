@@ -138,6 +138,14 @@ year|date:"Y" }}``.
 ``next_year`` and ``previous_year`` were also added in the context. They are
 calculated according to ``allow_empty`` and ``allow_future``.
 
+Context in TemplateView
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For consistency with the design of the other generic views,
+:class:`~django.views.generic.base.TemplateView` no longer passes a ``params``
+dictionary into the context, instead passing the variables from the URLconf
+directly into the context.
+
 OPTIONS, PUT and DELETE requests in the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
