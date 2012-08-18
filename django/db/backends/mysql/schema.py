@@ -1,0 +1,24 @@
+from django.db.backends.schema import BaseDatabaseSchemaEditor
+
+
+class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+
+    sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
+
+    sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
+    sql_alter_column_not_null = "MODIFY %(column)s %(type)s NULL"
+
+    sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
+
+    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s)"
+    sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
+
+    sql_delete_index = "DROP INDEX %(name)s ON %(table_name)s"
+
+    sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
+
+
+
+
+    alter_string_set_null = 'MODIFY %(column)s %(type)s NULL;'
+    alter_string_drop_null = 'MODIFY %(column)s %(type)s NOT NULL;'

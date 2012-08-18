@@ -91,7 +91,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints (unique, pk, check) across one or more columns.
+        Retrieves any constraints (unique, pk, fk, check) across one or more columns.
         Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool}}
         """
         constraints = {}

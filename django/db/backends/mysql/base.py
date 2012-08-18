@@ -37,6 +37,7 @@ from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
+from django.db.backends.mysql.schema import DatabaseSchemaEditor
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString, SafeUnicode
 from django.utils import six
@@ -488,3 +489,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0],
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
+
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)

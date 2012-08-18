@@ -167,7 +167,6 @@ class SchemaTests(TestCase):
         # Ensure the field is right to begin with
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
-        self.assertEqual(columns['name'][1][3], 255)
         self.assertEqual(columns['name'][1][6], False)
         # Alter the name field to a TextField
         new_field = TextField(null=True)
@@ -197,7 +196,6 @@ class SchemaTests(TestCase):
         # Ensure the field is right to begin with
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
-        self.assertEqual(columns['name'][1][3], 255)
         self.assertNotIn("display_name", columns)
         # Alter the name field's name
         new_field = CharField(max_length=254)
@@ -213,7 +211,6 @@ class SchemaTests(TestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['display_name'][0], "CharField")
-        self.assertEqual(columns['display_name'][1][3], 254)
         self.assertNotIn("name", columns)
 
     def test_m2m(self):
