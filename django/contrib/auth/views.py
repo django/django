@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
+from django.utils.encoding import force_str
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_post_parameters
@@ -116,10 +117,10 @@ def redirect_to_login(next, login_url=None,
     """
     Redirects the user to the login page, passing the given 'next' page
     """
-    if not login_url:
-        login_url = settings.LOGIN_URL
+    # urlparse chokes on lazy objects in Python 3
+    login_url_as_str = force_str(login_url or settings.LOGIN_URL)
 
-    login_url_parts = list(urlparse(login_url))
+    login_url_parts = list(urlparse(login_url_as_str))
     if redirect_field_name:
         querystring = QueryDict(login_url_parts[4], mutable=True)
         querystring[redirect_field_name] = next
