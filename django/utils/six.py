@@ -365,4 +365,6 @@ def iterlists(d):
     """Return an iterator over the values of a MultiValueDict."""
     return getattr(d, _iterlists)()
 
+
 add_move(MovedModule("_dummy_thread", "dummy_thread"))
+add_move(MovedModule("_thread", "thread"))

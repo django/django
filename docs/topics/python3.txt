@@ -122,8 +122,8 @@ Moved modules
 Some modules were renamed in Python 3. The :mod:`django.utils.six.moves
 <six.moves>` module provides a compatible location to import them.
 
-In addition to six' defaults, Django's version provides ``dummy_thread`` as
-``_dummy_thread``.
+In addition to six' defaults, Django's version provides ``thread`` as
+``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
 
 PY3
 ---

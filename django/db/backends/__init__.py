@@ -1,7 +1,7 @@
 from django.db.utils import DatabaseError
 
 try:
-    import thread
+    from django.utils.six.moves import _thread as thread
 except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 from contextlib import contextmanager
