@@ -240,13 +240,28 @@ The functions defined in this module share the following properties:
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
+.. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    .. versionadded:: 1.5
+
+    Similar to ``smart_bytes``, except that lazy instances are resolved to
+    bytestrings, rather than kept as lazy objects.
+
+    If ``strings_only`` is ``True``, don't convert (some) non-string-like
+    objects.
+
 .. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Alias of :func:`smart_bytes` on Python 2 and :func:`smart_text` on Python
-    3. This function always returns a :class:`str`.
+    3. This function returns a :class:`str` or a lazy string.
 
     For instance, this is  suitable for writing to :attr:`sys.stdout` on
     Python 2 and 3.
+
+.. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    Alias of :func:`force_bytes` on Python 2 and :func:`force_text` on Python
+    3. This function always returns a :class:`str`.
 
 .. function:: iri_to_uri(iri)
 

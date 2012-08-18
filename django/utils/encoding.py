@@ -141,6 +141,19 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    if isinstance(s, Promise):
+        # The input is the result of a gettext_lazy() call.
+        return s
+    return force_bytes(s, encoding, strings_only, errors)
+
+
+def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Similar to smart_bytes, except that lazy instances are resolved to
+    strings, rather than kept as lazy objects.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
+    """
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
@@ -169,8 +182,10 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 if six.PY3:
     smart_str = smart_text
+    force_str = force_text
 else:
     smart_str = smart_bytes
+    force_str = force_bytes
     # backwards compatibility for Python 2
     smart_unicode = smart_text
     force_unicode = force_text
@@ -179,6 +194,10 @@ smart_str.__doc__ = """\
 Apply smart_text in Python 3 and smart_bytes in Python 2.
 
 This is suitable for writing to sys.stdout (for instance).
+"""
+
+force_str.__doc__ = """\
+Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
 def iri_to_uri(iri):
