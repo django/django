@@ -29,6 +29,9 @@ ArchiveIndexView
 
     * Uses a default ``context_object_name`` of ``latest``.
     * Uses a default ``template_name_suffix`` of ``_archive``.
+    * Defaults to providing ``date_list`` by year, but this can be altered to
+      month or day using the attribute ``date_list_period``. This also applies
+      to all subclass views.
 
 YearArchiveView
 ---------------
