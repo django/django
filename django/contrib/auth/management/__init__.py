@@ -84,14 +84,17 @@ def get_system_username():
     :returns: The username as a unicode string, or an empty string if the
         username could not be determined.
     """
-    try:
-        return getpass.getuser().decode(locale.getdefaultlocale()[1])
-    except (ImportError, KeyError, UnicodeDecodeError):
-        # KeyError will be raised by os.getpwuid() (called by getuser())
-        # if there is no corresponding entry in the /etc/passwd file
-        # (a very restricted chroot environment, for example).
-        # UnicodeDecodeError - preventive treatment for non-latin Windows.
-        return ''
+    default_locale = locale.getdefaultlocale()[1]
+    if default_locale:
+        try:
+            return getpass.getuser().decode(default_locale)
+        except (ImportError, KeyError, UnicodeDecodeError):
+            # KeyError will be raised by os.getpwuid() (called by getuser())
+            # if there is no corresponding entry in the /etc/passwd file
+            # (a very restricted chroot environment, for example).
+            # UnicodeDecodeError - preventive treatment for non-latin Windows.
+            pass
+    return ''
 
 
 def get_default_username(check_db=True):
