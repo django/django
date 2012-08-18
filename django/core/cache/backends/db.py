@@ -167,7 +167,7 @@ class DatabaseCache(BaseDatabaseCache):
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:
-                cull_num = num / self._cull_frequency
+                cull_num = num // self._cull_frequency
                 cursor.execute(
                     connections[db].ops.cache_key_culling_sql() % table,
                     [cull_num])
