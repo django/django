@@ -18,6 +18,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -335,6 +336,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # an in-memory db.
         if self.settings_dict['NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
+
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 

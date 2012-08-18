@@ -44,18 +44,18 @@ class SchemaTests(TestCase):
             # Remove any M2M tables first
             for field in model._meta.local_many_to_many:
                 try:
-                    cursor.execute("DROP TABLE %s CASCADE" % (
-                        connection.ops.quote_name(field.rel.through._meta.db_table),
-                    ))
+                    cursor.execute(connection.schema_editor().sql_delete_table % {
+                        "table": connection.ops.quote_name(field.rel.through._meta.db_table),
+                    })
                 except DatabaseError:
                     connection.rollback()
                 else:
                     connection.commit()
             # Then remove the main tables
             try:
-                cursor.execute("DROP TABLE %s CASCADE" % (
-                    connection.ops.quote_name(model._meta.db_table),
-                ))
+                cursor.execute(connection.schema_editor().sql_delete_table % {
+                    "table": connection.ops.quote_name(model._meta.db_table),
+                })
             except DatabaseError:
                 connection.rollback()
             else:
