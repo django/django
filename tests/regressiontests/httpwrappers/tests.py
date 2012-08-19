@@ -296,7 +296,7 @@ class HttpResponseTests(unittest.TestCase):
         my_iter = r.__iter__()
         result = list(my_iter)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
-        self.assertEqual(result, ['1', '2', '3', b'\xde\x9e'])
+        self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header

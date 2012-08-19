@@ -85,7 +85,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_bytes, smart_str, iri_to_uri, force_text
+from django.utils.encoding import force_bytes, force_text, iri_to_uri, smart_bytes, smart_str
 from django.utils.http import cookie_date
 from django.utils import six
 from django.utils import timezone
@@ -670,10 +670,12 @@ class HttpResponse(object):
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
     def _get_content(self):
-        if self.has_header('Content-Encoding'):
-            # XXX this doesn't work under Python 3 when e is an integer (#18764)
-            return b''.join([bytes(e) for e in self._container])
-        return b''.join([smart_bytes(e, self._charset) for e in self._container])
+        # The logic below obeys the following constraints:
+        # - do not perform any encoding if a Content-Encoding is set (#4969)
+        # - force string conversion of non-string types (#16494)
+        # - avoid simply calling bytes() with Python 3 (#18764)
+        encoding = 'ascii' if self.has_header('Content-Encoding') else self._charset
+        return b''.join(force_bytes(e, encoding) for e in self._container)
 
     def _set_content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
@@ -690,10 +692,9 @@ class HttpResponse(object):
         return self
 
     def __next__(self):
-        chunk = next(self._iterator)
-        if isinstance(chunk, six.text_type):
-            chunk = chunk.encode(self._charset)
-        return bytes(chunk)
+        # Use the same logic as _get_content.
+        encoding = 'ascii' if self.has_header('Content-Encoding') else self._charset
+        return force_bytes(next(self._iterator), encoding)
 
     next = __next__             # Python 2 compatibility
 
