@@ -301,12 +301,12 @@ Division
         def __truediv__(self, other):
             return self / other     # implement some logic here
 
-    __div__ = __truediv__           # Python 2 compatibility
+        __div__ = __truediv__           # Python 2 compatibility
 
-    def __itruediv__(self, other):
+        def __itruediv__(self, other):
             return self // other    # implement some logic here
 
-    __idiv__ = __itruediv__         # Python 2 compatibility
+        __idiv__ = __itruediv__         # Python 2 compatibility
 
 .. module: django.utils.six
 
