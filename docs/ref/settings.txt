@@ -1366,8 +1366,7 @@ MEDIA_ROOT
 
 Default: ``''`` (Empty string)
 
-Absolute path to the directory that holds media for this installation, used
-for :doc:`managing stored files </topics/files>`.
+Absolute filesystem path to the directory that will hold user-uploaded files :doc:`managing stored files </topics/files>`.
 
 Example: ``"/var/www/example.com/media/"``
 
