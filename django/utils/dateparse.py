@@ -43,8 +43,6 @@ def parse_time(value):
 
     This function doesn't support time zone offsets.
 
-    Sub-microsecond precision is accepted, but ignored.
-
     Raises ValueError if the input is well formatted but not a valid time.
     Returns None if the input isn't well formatted, in particular if it
     contains an offset.
@@ -62,8 +60,6 @@ def parse_datetime(value):
 
     This function supports time zone offsets. When the input contains one,
     the output uses an instance of FixedOffset as tzinfo.
-
-    Sub-microsecond precision is accepted, but ignored.
 
     Raises ValueError if the input is well formatted but not a valid datetime.
     Returns None if the input isn't well formatted.
