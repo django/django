@@ -673,11 +673,11 @@ class HttpResponse(object):
         if self.has_header('Content-Encoding'):
             def make_bytes(value):
                 if isinstance(value, int):
-                    return six.text_type(value).encode()
-                elif isinstance(value, six.text_type):
-                    return value.encode('ascii')
-                else:
-                    return bytes(value)
+                    value = six.text_type(value)
+                if isinstance(value, six.text_type):
+                    value = value.encode('ascii')
+                # force conversion to bytes in case chunk is a subclass
+                return bytes(value)
             return b''.join(make_bytes(e) for e in self._container)
         return b''.join(smart_bytes(e, self._charset) for e in self._container)
 
@@ -698,9 +698,10 @@ class HttpResponse(object):
     def __next__(self):
         chunk = next(self._iterator)
         if isinstance(chunk, int):
-            return six.text_type(chunk).encode()
+            chunk = six.text_type(chunk)
         if isinstance(chunk, six.text_type):
-            return chunk.encode(self._charset)
+            chunk = chunk.encode(self._charset)
+        # force conversion to bytes in case chunk is a subclass
         return bytes(chunk)
 
     next = __next__             # Python 2 compatibility
