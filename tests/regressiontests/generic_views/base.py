@@ -173,15 +173,6 @@ class ViewTest(unittest.TestCase):
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
-    def test_head_no_get(self):
-        """
-        Test that a view class with no get responds to a HEAD request with HTTP
-        405.
-        """
-        request = self.rf.head('/')
-        view = PostOnlyView.as_view()
-        self.assertEqual(405, view(request).status_code)
-
     def test_options(self):
         """
         Test that views respond to HTTP OPTIONS requests with an Allow header
