@@ -191,10 +191,11 @@ According to :pep:`3333`:
 - input and output streams are always :class:`bytes` objects.
 
 Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
-contains :class:`bytes`, which may require refactoring your tests.This won't
-be an issue if you use :meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains`: these methods expect a
-unicode string.
+contains :class:`bytes`, which may become an issue if you compare it with a
+:class:`str` in your tests. The preferred solution is to rely on
+:meth:`~django.test.TestCase.assertContains` and
+:meth:`~django.test.TestCase.assertNotContains`. These methods accept a
+response and a unicode string as arguments.
 
 Coding guidelines
 =================
