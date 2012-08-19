@@ -214,15 +214,57 @@ var DateTimeShortcuts = {
         var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
         var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num)
         var inp = DateTimeShortcuts.calendarInputs[num];
+        var value = inp.value;
 
         // Determine if the current value in the input has a valid date.
         // If so, draw the calendar with that date's year and month.
-        if (inp.value) {
-            var date_parts = inp.value.split('-');
-            var year = date_parts[0];
-            var month = parseFloat(date_parts[1]);
-            if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
-                DateTimeShortcuts.calendars[num].drawDate(month, year);
+        if (value) {
+            //Poor and incomplete port of python's _strptime module.
+            //We only look for %Y, %y, %m, %d formats.
+            //That should be enough for every locale included with django,
+            //but still may not work with custom format files.
+            var format = get_format('DATE_INPUT_FORMATS')[0];
+            var regexes = {
+                'Y' : '(\\d{4})',
+                'y' : '(\\d{2})',
+                'm' : '(\\d{2})',
+                'd' : '(\\d{2})',
+                '%' : '%'
+            };
+            var directives = '';
+            var processed_format = '';
+            var directive_index;
+            //Escape those symbols in format that are special for regular expressions syntax
+            format = format.replace(new RegExp("([\\.^$*+?\(\){}\[\]|])", 'g'), '\\$&');
+            while (format.indexOf('%') !== -1){
+                directive_index = format.indexOf('%') + 1;
+                processed_format = processed_format + format.substr(0, directive_index-1) + regexes[format[directive_index]];
+                directives += format[directive_index];
+                format = format.substr(directive_index+1);
+            }
+            var format_regexp = new RegExp('^'+processed_format+'$');
+            if ( (directives.toLowerCase().indexOf('y') !== -1) && (directives.indexOf('m') !== -1)){
+                var groups = format_regexp.exec(value);
+                var year;
+                var year_index = directives.indexOf('Y');
+                if (year_index !== -1){
+                    year = parseInt(groups[year_index+1]);
+                }else{
+                    year_index = directives.indexOf('y');
+                    year = parseInt(groups[year_index+1]);
+                    if (year <= 68){
+                        year += 2000;
+                    }else{
+                        year += 1900;
+                    }
+                }
+                var month = parseInt(groups[directives.indexOf('m')+1]);
+                if ((month < 1) || (month > 12)){
+                    month = undefined;
+                }
+                if (year && month){
+                    DateTimeShortcuts.calendars[num].drawDate(month, year);
+                }
             }
         }
 
