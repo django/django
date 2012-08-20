@@ -1,8 +1,9 @@
+import re
+from .base import FIELD_TYPE
+
 from django.db.backends import BaseDatabaseIntrospection
 from django.utils import six
-from MySQLdb import ProgrammingError, OperationalError
-from MySQLdb.constants import FIELD_TYPE
-import re
+
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
