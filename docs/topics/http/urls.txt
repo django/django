@@ -314,6 +314,9 @@ that should be called if none of the URL patterns match.
 By default, this is ``'django.views.defaults.page_not_found'``. That default
 value should suffice.
 
+See the documentation about :ref:`the 404 (HTTP Not Found) view
+<http_not_found_view>` for more information.
+
 handler500
 ----------
 
@@ -325,6 +328,9 @@ have runtime errors in view code.
 
 By default, this is ``'django.views.defaults.server_error'``. That default
 value should suffice.
+
+See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
+<http_internal_server_error_view>` for more information.
 
 Notes on capturing text in URLs
 ===============================
