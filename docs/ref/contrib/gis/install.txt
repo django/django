@@ -60,14 +60,14 @@ The geospatial libraries required for a GeoDjango installation depends
 on the spatial database used.  The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  =========================================
 PostgreSQL          GEOS, PROJ.4, PostGIS           8.1+                Requires PostGIS.
 MySQL               GEOS                            5.x                 Not OGC-compliant; limited functionality.
 Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
-SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+, and Django 1.1.
-==================  ==============================  ==================  ==========================================================
+SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
+==================  ==============================  ==================  =========================================
 
 .. _geospatial_libs:
 
@@ -467,8 +467,8 @@ pysqlite2
 ^^^^^^^^^
 
 Because SpatiaLite must be loaded as an external extension, it requires the
-``enable_load_extension`` method, which is only available in versions 2.5+.
-Thus, download pysqlite2 2.6, and untar::
+``enable_load_extension`` method, which is only available in versions 2.5+ of
+pysqlite2. Thus, download pysqlite2 2.6, and untar::
 
     $ wget http://pysqlite.googlecode.com/files/pysqlite-2.6.0.tar.gz
     $ tar xzf pysqlite-2.6.0.tar.gz
@@ -583,7 +583,7 @@ After you've installed SpatiaLite, you'll need to create a number of spatial
 metadata tables in your database in order to perform spatial queries.
 
 If you're using SpatiaLite 3.0 or newer, use the ``spatialite`` utility to
-call the ``InitSpatiaMetaData()`` function, like this::
+call the ``InitSpatialMetaData()`` function, like this::
 
    $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
    the SPATIAL_REF_SYS table already contains some row(s)
@@ -642,10 +642,6 @@ Invoke the Django shell from your project and execute the
     $ python manage shell
     >>> from django.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(900913)
-
-.. note::
-
-    In Django 1.1 the name of this function is ``add_postgis_srs``.
 
 This adds an entry for the 900913 SRID to the ``spatial_ref_sys`` (or equivalent)
 table, making it possible for the spatial database to transform coordinates in
