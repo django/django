@@ -1,9 +1,13 @@
+from __future__ import unicode_literals
+
 import os
-from io import BytesIO
+from io import BytesIO, UnsupportedOperation
 
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_bytes, smart_text
 from django.core.files.utils import FileProxyMixin
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE = 64 * 2**10
 
@@ -16,16 +20,14 @@ class File(FileProxyMixin):
             self.mode = file.mode
 
     def __str__(self):
-        return smart_str(self.name or '')
-
-    def __unicode__(self):
-        return smart_unicode(self.name or u'')
+        return smart_text(self.name or '')
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.name)
+    __nonzero__ = __bool__ # Python 2
 
     def __len__(self):
         return self.size
@@ -62,8 +64,10 @@ class File(FileProxyMixin):
         if not chunk_size:
             chunk_size = self.DEFAULT_CHUNK_SIZE
 
-        if hasattr(self, 'seek'):
+        try:
             self.seek(0)
+        except (AttributeError, UnsupportedOperation):
+            pass
 
         while True:
             data = self.read(chunk_size)
@@ -121,6 +125,7 @@ class File(FileProxyMixin):
     def close(self):
         self.file.close()
 
+@python_2_unicode_compatible
 class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.
@@ -133,8 +138,9 @@ class ContentFile(File):
     def __str__(self):
         return 'Raw content'
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
+    __nonzero__ = __bool__ # Python 2
 
     def open(self, mode=None):
         self.seek(0)

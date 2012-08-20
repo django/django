@@ -1,9 +1,13 @@
-import urlparse
+try:
+    from urllib.parse import urlparse, urlunparse
+except ImportError:     # Python 2
+    from urlparse import urlparse, urlunparse
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
+from django.utils.encoding import force_str
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_post_parameters
@@ -34,7 +38,7 @@ def login(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
-            netloc = urlparse.urlparse(redirect_to)[1]
+            netloc = urlparse(redirect_to)[1]
 
             # Use default setting if redirect_to is empty
             if not redirect_to:
@@ -81,7 +85,7 @@ def logout(request, next_page=None,
     auth_logout(request)
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to:
-        netloc = urlparse.urlparse(redirect_to)[1]
+        netloc = urlparse(redirect_to)[1]
         # Security check -- don't allow redirection to a different host.
         if not (netloc and netloc != request.get_host()):
             return HttpResponseRedirect(redirect_to)
@@ -116,16 +120,16 @@ def redirect_to_login(next, login_url=None,
     """
     Redirects the user to the login page, passing the given 'next' page
     """
-    if not login_url:
-        login_url = settings.LOGIN_URL
+    # urlparse chokes on lazy objects in Python 3
+    login_url_as_str = force_str(login_url or settings.LOGIN_URL)
 
-    login_url_parts = list(urlparse.urlparse(login_url))
+    login_url_parts = list(urlparse(login_url_as_str))
     if redirect_field_name:
         querystring = QueryDict(login_url_parts[4], mutable=True)
         querystring[redirect_field_name] = next
         login_url_parts[4] = querystring.urlencode(safe='/')
 
-    return HttpResponseRedirect(urlparse.urlunparse(login_url_parts))
+    return HttpResponseRedirect(urlunparse(login_url_parts))
 
 
 # 4 views for password reset:
@@ -203,7 +207,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
     try:
         uid_int = base36_to_int(uidb36)
         user = User.objects.get(id=uid_int)
-    except (ValueError, User.DoesNotExist):
+    except (ValueError, OverflowError, User.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):

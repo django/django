@@ -12,7 +12,7 @@ def page_not_found(request, template_name='404.html'):
     """
     Default 404 handler.
 
-    Templates: `404.html`
+    Templates: :template:`404.html`
     Context:
         request_path
             The path of the requested URL (e.g., '/app/pages/bad_page/')
@@ -26,7 +26,7 @@ def server_error(request, template_name='500.html'):
     """
     500 error handler.
 
-    Templates: `500.html`
+    Templates: :template:`500.html`
     Context: None
     """
     t = loader.get_template(template_name) # You need to create a 500.html template.
@@ -41,7 +41,7 @@ def permission_denied(request, template_name='403.html'):
     """
     Permission denied (403) handler.
 
-    Templates: `403.html`
+    Templates: :template:`403.html`
     Context: None
 
     If the template does not exist, an Http403 response containing the text

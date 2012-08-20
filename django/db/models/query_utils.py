@@ -5,8 +5,10 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
+from __future__ import unicode_literals
 
 from django.db.backends import util
+from django.utils import six
 from django.utils import tree
 
 
@@ -39,7 +41,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + kwargs.items())
+        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -113,7 +115,7 @@ class DeferredAttribute(object):
 
     def _check_parent_chain(self, instance, name):
         """
-        Check if the field value can be fetched from a parent field already 
+        Check if the field value can be fetched from a parent field already
         loaded in the instance. This can be done if the to-be fetched
         field is a primary key field.
         """
@@ -125,18 +127,19 @@ class DeferredAttribute(object):
         return None
 
 
-def select_related_descend(field, restricted, requested, reverse=False):
+def select_related_descend(field, restricted, requested, load_fields, reverse=False):
     """
     Returns True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
     (sql.query.fill_related_selections()) and the model instance creation code
-    (query.get_cached_row()).
+    (query.get_klass_info()).
 
     Arguments:
      * field - the field to be checked
      * restricted - a boolean field, indicating if the field list has been
        manually restricted using a requested clause)
      * requested - The select_related() dictionary.
+     * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
     if not field.rel:
@@ -150,6 +153,14 @@ def select_related_descend(field, restricted, requested, reverse=False):
             return False
     if not restricted and field.null:
         return False
+    if load_fields:
+        if field.name not in load_fields:
+            if restricted and field.name in requested:
+                raise InvalidQuery("Field %s.%s cannot be both deferred"
+                                   " and traversed using select_related"
+                                   " at the same time." %
+                                   (field.model._meta.object_name, field.name))
+            return False
     return True
 
 # This function is needed because data descriptors must be defined on a class
@@ -177,7 +188,7 @@ def deferred_class_factory(model, attrs):
     overrides["Meta"] = Meta
     overrides["__module__"] = model.__module__
     overrides["_deferred"] = True
-    return type(name, (model,), overrides)
+    return type(str(name), (model,), overrides)
 
 # The above function is also used to unpickle model instances with deferred
 # fields.

@@ -1,10 +1,11 @@
 from django.forms.widgets import Textarea
 from django.template import loader, Context
 from django.templatetags.static import static
+from django.utils import six
 from django.utils import translation
 
 from django.contrib.gis.gdal import OGRException
-from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from django.contrib.gis.geos import GEOSGeometry, GEOSException, fromstr
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
@@ -25,7 +26,7 @@ class OpenLayersWidget(Textarea):
 
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             try:
                 value = GEOSGeometry(value)
             except (GEOSException, ValueError):
@@ -104,3 +105,25 @@ class OpenLayersWidget(Textarea):
                     raise TypeError
                 map_options[js_name] = value
         return map_options
+
+    def _has_changed(self, initial, data):
+        """ Compare geographic value of data with its initial value. """
+
+        # Ensure we are dealing with a geographic object
+        if isinstance(initial, six.string_types):
+            try:
+                initial = GEOSGeometry(initial)
+            except (GEOSException, ValueError):
+                initial = None
+
+        # Only do a geographic comparison if both values are available
+        if initial and data:
+            data = fromstr(data)
+            data.transform(initial.srid)
+            # If the initial value was not added by the browser, the geometry
+            # provided may be slightly different, the first time it is saved.
+            # The comparison is done with a very low tolerance.
+            return not initial.equals_exact(data, tolerance=0.000001)
+        else:
+            # Check for change of state of existence
+            return bool(initial) != bool(data)

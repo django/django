@@ -1,0 +1,215 @@
+==========================
+Django's security policies
+==========================
+
+Django's development team is strongly committed to responsible
+reporting and disclosure of security-related issues. As such, we've
+adopted and follow a set of policies which conform to that ideal and
+are geared toward allowing us to deliver timely security updates to
+the official distribution of Django, as well as to third-party
+distributions.
+
+.. _reporting-security-issues:
+
+Reporting security issues
+=========================
+
+**Short version: please report security issues by emailing
+security@djangoproject.com**.
+
+Most normal bugs in Django are reported to `our public Trac
+instance`_, but due to the sensitive nature of security issues, we ask
+that they *not* be publicly reported in this fashion.
+
+Instead, if you believe you've found something in Django which has
+security implications, please send a description of the issue via
+email to ``security@djangoproject.com``. Mail sent to that address
+reaches a subset of the core development team, who can forward
+security issues into the private committers' mailing list for broader
+discussion if needed.
+
+You can send encrypted email to this address; the public key ID for
+``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this
+public key is available from most commonly-used keyservers.
+
+Once you've submitted an issue via email, you should receive an
+acknowledgment from a member of the Django development team within 48
+hours, and depending on the action to be taken, you may receive
+further followup emails.
+
+.. _our public Trac instance: https://code.djangoproject.com/query
+
+.. _security-support:
+
+Supported versions
+==================
+
+At any given time, the Django team provides official security support
+for several versions of Django:
+
+* The `master development branch`_, hosted on GitHub, which will
+  become the next release of Django, receives security support.
+
+* The two most recent Django release series receive security
+  support. For example, during the development cycle leading to the
+  release of Django 1.5, support will be provided for Django 1.4 and
+  Django 1.3. Upon the release of Django 1.5, Django 1.3's security
+  support will end.
+
+When new releases are issued for security reasons, the accompanying
+notice will include a list of affected versions. This list is
+comprised solely of *supported* versions of Django: older versions may
+also be affected, but we do not investigate to determine that, and
+will not issue patches or new releases for those versions.
+
+.. _master development branch: https://github.com/django/django/
+
+.. _security-disclosure:
+
+How Django discloses security issues
+====================================
+
+Our process for taking a security issue from private discussion to
+public disclosure involves multiple steps.
+
+Approximately one week before full public disclosure, we will send
+advance notification of the issue to a list of people and
+organizations, primarily composed of operating-system vendors and
+other distributors of Django. This notification will consist of an
+email message, signed with the Django release key, containing:
+
+* A full description of the issue and the affected versions of Django.
+
+* The steps we will be taking to remedy the issue.
+
+* The patch(es), if any, that will be applied to Django.
+
+* The date on which the Django team will apply these patches, issue
+  new releases and publicy disclose the issue.
+
+Simultaneously, the reporter of the issue will receive notification of
+the date on which we plan to take the issue public.
+
+On the day of disclosure, we will take the following steps:
+
+1. Apply the relevant patch(es) to Django's codebase. The commit
+   messages for these patches will indicate that they are for security
+   issues, but will not describe the issue in any detail; instead,
+   they will warn of upcoming disclosure.
+
+2. Issue the relevant release(s), by placing new packages on `the
+   Python Package Index`_ and on the Django website, and tagging the
+   new release(s) in Django's git repository.
+
+3. Post a public entry on `the official Django development blog`_,
+   describing the issue and its resolution in detail, pointing to the
+   relevant patches and new releases, and crediting the reporter of
+   the issue (if the reporter wishes to be publicly identified).
+
+.. _the Python Package Index: http://pypi.python.org/pypi
+.. _the official Django development blog: https://www.djangoproject.com/weblog/
+
+If a reported issue is believed to be particularly time-sensitive --
+due to a known exploit in the wild, for example -- the time between
+advance notification and public disclosure may be shortened
+considerably.
+
+Additionally, if we have reason to believe that an issue reported to
+us affects other frameworks or tools in the Python/web ecosystem, we
+may privately contact and discuss those issues with the appropriate
+maintainers, and coordinate our own disclosure and resolution with
+theirs.
+
+.. _security-notifications:
+
+Who receives advance notification
+=================================
+
+The full list of people and organizations who receive advance
+notification of security issues is not and will not be made public.
+
+We also aim to keep this list as small as effectively possible, in
+order to better manage the flow of confidential information prior to
+disclosure. As such, our notification list is *not* simply a list of
+users of Django, and merely being a user of Django is not sufficient
+reason to be placed on the notification list.
+
+In broad terms, recipients of security notifications fall into three
+groups:
+
+1. Operating-system vendors and other distributors of Django who
+   provide a suitably-generic (i.e., *not* an individual's personal
+   email address) contact address for reporting issues with their
+   Django package, or for general security reporting. In either case,
+   such addresses **must not** forward to public mailing lists or bug
+   trackers. Addresses which forward to the private email of an
+   individual maintainer or security-response contact are acceptable,
+   although private security trackers or security-response groups are
+   strongly preferred.
+
+2. On a case-by-case basis, individual package maintainers who have
+   demonstrated a commitment to responding to and responsibly acting
+   on these notifications.
+
+3. On a case-by-case basis, other entities who, in the judgment of the
+   Django development team, need to be made aware of a pending
+   security issue. Typically, membership in this group will consist of
+   some of the largest and/or most likely to be severely impacted
+   known users or distributors of Django, and will require a
+   demonstrated ability to responsibly receive, keep confidential and
+   act on these notifications.
+
+Additionally, a maximum of six days prior to disclosure, notification
+will be sent to the ``distros@vs.openwall.org`` mailing list, whose
+membership includes representatives of most major open-source
+operating system vendors.
+
+Requesting notifications
+========================
+
+If you believe that you, or an organization you are authorized to
+represent, fall into one of the groups listed above, you can ask to be
+added to Django's notification list by emailing
+``security@djangoproject.com``. Please use the subject line "Security
+notification request".
+
+Your request **must** include the following information:
+
+* Your full, real name and the name of the organization you represent,
+  if applicable, as well as your role within that organization.
+
+* A detailed explanation of how you or your organization fit at least
+  one set of criteria listed above.
+
+* A detailed explanation of why you are requesting security
+  notifications. Again, please keep in mind that this is *not* simply
+  a list for users of Django, and the overwhelming majority of users
+  of Django should not request notifications and will not be added to
+  our notification list if they do.
+
+* The email address you would like to have added to our notification
+  list.
+
+* An explanation of who will be receiving/reviewing mail sent to that
+  address, as well as information regarding any automated actions that
+  will be taken (i.e., filing of a confidential issue in a bug
+  tracker).
+
+* For individuals, the ID of a public key associated with your address
+  which can be used to verify email received from you and encrypt
+  email sent to you, as needed.
+
+Once submitted, your request will be considered by the Django
+development team; you will receive a reply notifying you of the result
+of your request within 30 days.
+
+Please also bear in mind that for any individual or organization,
+receiving security notifications is a privilege granted at the sole
+discretion of the Django development team, and that this privilege can
+be revoked at any time, with or without explanation.
+
+If you are added to the notification list, security-related emails
+will be sent to you by Django's release manager, and all notification
+emails will be signed with the same key used to sign Django releases;
+that key has the ID ``0x3684C0C08C8B2AE1``, and is available from most
+commonly-used keyservers.

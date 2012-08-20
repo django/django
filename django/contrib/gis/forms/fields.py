@@ -1,9 +1,11 @@
+from __future__ import unicode_literals
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSException, GEOSGeometry
 
 class GeometryField(forms.Field):
     """
@@ -14,10 +16,10 @@ class GeometryField(forms.Field):
     widget = forms.Textarea
 
     default_error_messages = {
-        'no_geom' : _(u'No geometry value provided.'),
-        'invalid_geom' : _(u'Invalid geometry value.'),
-        'invalid_geom_type' : _(u'Invalid geometry type.'),
-        'transform_error' : _(u'An error occurred when transforming the geometry '
+        'no_geom' : _('No geometry value provided.'),
+        'invalid_geom' : _('Invalid geometry value.'),
+        'invalid_geom_type' : _('Invalid geometry type.'),
+        'transform_error' : _('An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
         }
 
@@ -28,6 +30,15 @@ class GeometryField(forms.Field):
         self.geom_type = kwargs.pop('geom_type', 'GEOMETRY')
         self.null = kwargs.pop('null', True)
         super(GeometryField, self).__init__(**kwargs)
+
+    def to_python(self, value):
+        """
+        Transforms the value to a Geometry object.
+        """
+        try:
+            return GEOSGeometry(value)
+        except (GEOSException, ValueError, TypeError):
+            raise forms.ValidationError(self.error_messages['invalid_geom'])
 
     def clean(self, value):
         """
@@ -42,11 +53,8 @@ class GeometryField(forms.Field):
             else:
                 raise forms.ValidationError(self.error_messages['no_geom'])
 
-        # Trying to create a Geometry object from the form value.
-        try:
-            geom = GEOSGeometry(value)
-        except:
-            raise forms.ValidationError(self.error_messages['invalid_geom'])
+        # Transform the value to a python object first
+        geom = self.to_python(value)
 
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).

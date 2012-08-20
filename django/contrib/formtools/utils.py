@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 # Do not try cPickle here (see #18340)
 import pickle
 
 from django.utils.crypto import salted_hmac
+from django.utils import six
 
 
 def form_hmac(form):
@@ -16,7 +19,7 @@ def form_hmac(form):
             value = bf.data or ''
         else:
             value = bf.field.clean(bf.data) or ''
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             value = value.strip()
         data.append((bf.name, value))
 

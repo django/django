@@ -10,6 +10,7 @@ from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils import formats
+from django.utils import six
 
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
@@ -316,7 +317,7 @@ class ChangeListTests(TestCase):
                 m.list_editable, m)
         self.assertEqual(cl.query_set.count(), 60)
         self.assertEqual(cl.paginator.count, 60)
-        self.assertEqual(cl.paginator.page_range, [1, 2, 3, 4, 5, 6])
+        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
 
         # Test custom queryset
         m = FilteredChildAdmin(Child, admin.site)
@@ -326,7 +327,7 @@ class ChangeListTests(TestCase):
                 m.list_editable, m)
         self.assertEqual(cl.query_set.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
-        self.assertEqual(cl.paginator.page_range, [1, 2, 3])
+        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
 
     def test_computed_list_display_localization(self):
         """
@@ -339,7 +340,7 @@ class ChangeListTests(TestCase):
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get('/admin/admin_changelist/event/')
         self.assertContains(response, formats.localize(event.date))
-        self.assertNotContains(response, unicode(event.date))
+        self.assertNotContains(response, six.text_type(event.date))
 
     def test_dynamic_list_display(self):
         """
@@ -443,9 +444,9 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/swallow/', superuser)
         response = model_admin.changelist_view(request)
         # just want to ensure it doesn't blow up during rendering
-        self.assertContains(response, unicode(swallow.origin))
-        self.assertContains(response, unicode(swallow.load))
-        self.assertContains(response, unicode(swallow.speed))
+        self.assertContains(response, six.text_type(swallow.origin))
+        self.assertContains(response, six.text_type(swallow.load))
+        self.assertContains(response, six.text_type(swallow.speed))
 
     def test_deterministic_order_for_unordered_model(self):
         """

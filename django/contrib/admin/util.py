@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 import decimal
 
@@ -7,11 +9,11 @@ from django.db.models.deletion import Collector
 from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils import timezone
-from django.utils.encoding import force_unicode, smart_unicode, smart_str
+from django.utils.encoding import force_text, smart_text, smart_bytes
+from django.utils import six
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 
@@ -50,7 +52,7 @@ def quote(s):
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, six.string_types):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -122,15 +124,15 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
-                             (escape(capfirst(opts.verbose_name)),
-                              admin_url,
-                              escape(obj)))
+            return format_html('{0}: <a href="{1}">{2}</a>',
+                               capfirst(opts.verbose_name),
+                               admin_url,
+                               obj)
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+            return '%s: %s' % (capfirst(opts.verbose_name),
+                                force_text(obj))
 
     to_delete = collector.nested(format_callback)
 
@@ -205,8 +207,8 @@ def model_format_dict(obj):
     else:
         opts = obj
     return {
-        'verbose_name': force_unicode(opts.verbose_name),
-        'verbose_name_plural': force_unicode(opts.verbose_name_plural)
+        'verbose_name': force_text(opts.verbose_name),
+        'verbose_name_plural': force_text(opts.verbose_name_plural)
     }
 
 
@@ -272,11 +274,11 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             label = field.verbose_name
     except models.FieldDoesNotExist:
         if name == "__unicode__":
-            label = force_unicode(model._meta.verbose_name)
-            attr = unicode
+            label = force_text(model._meta.verbose_name)
+            attr = six.text_type
         elif name == "__str__":
-            label = smart_str(model._meta.verbose_name)
-            attr = str
+            label = smart_bytes(model._meta.verbose_name)
+            attr = bytes
         else:
             if callable(name):
                 attr = name
@@ -309,7 +311,7 @@ def help_text_for_field(name, model):
         help_text = model._meta.get_field_by_name(name)[0].help_text
     except models.FieldDoesNotExist:
         help_text = ""
-    return smart_unicode(help_text)
+    return smart_text(help_text)
 
 
 def display_for_field(value, field):
@@ -333,7 +335,7 @@ def display_for_field(value, field):
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
     else:
-        return smart_unicode(value)
+        return smart_text(value)
 
 
 def display_for_value(value, boolean=False):
@@ -348,10 +350,10 @@ def display_for_value(value, boolean=False):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, (decimal.Decimal, float, int, long)):
+    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
         return formats.number_format(value)
     else:
-        return smart_unicode(value)
+        return smart_text(value)
 
 
 class NotRelationField(Exception):

@@ -1,9 +1,10 @@
-from __future__ import absolute_import
+from __future__ import absolute_import,unicode_literals
 
 from functools import update_wrapper
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.utils import six
 
 from .models import Reporter, Article
 
@@ -35,8 +36,7 @@ class IgnoreNotimplementedError(type):
                 attrs[k] = ignore_not_implemented(v)
         return type.__new__(cls, name, bases, attrs)
 
-class IntrospectionTests(TestCase):
-    __metaclass__ = IgnoreNotimplementedError
+class IntrospectionTests(six.with_metaclass(IgnoreNotimplementedError, TestCase)):
 
     def test_table_names(self):
         tl = connection.introspection.table_names()
@@ -125,12 +125,12 @@ class IntrospectionTests(TestCase):
     def test_get_key_columns(self):
         cursor = connection.cursor()
         key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(key_columns, [(u'reporter_id', Reporter._meta.db_table, u'id')])
+        self.assertEqual(key_columns, [('reporter_id', Reporter._meta.db_table, 'id')])
 
     def test_get_primary_key_column(self):
         cursor = connection.cursor()
         primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
-        self.assertEqual(primary_key_column, u'id')
+        self.assertEqual(primary_key_column, 'id')
 
     def test_get_indexes(self):
         cursor = connection.cursor()

@@ -2,7 +2,7 @@
 NL-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -10,7 +10,7 @@ from django.contrib.localflavor.nl.nl_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -29,7 +29,7 @@ class NLZipCodeField(Field):
     def clean(self, value):
         super(NLZipCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip().upper().replace(' ', '')
         if not pc_re.search(value):
@@ -38,7 +38,7 @@ class NLZipCodeField(Field):
         if int(value[:4]) < 1000:
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s %s' % (value[:4], value[4:])
+        return '%s %s' % (value[:4], value[4:])
 
 class NLProvinceSelect(Select):
     """
@@ -59,9 +59,9 @@ class NLPhoneNumberField(Field):
     def clean(self, value):
         super(NLPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
-        phone_nr = re.sub('[\-\s\(\)]', '', smart_unicode(value))
+        phone_nr = re.sub('[\-\s\(\)]', '', smart_text(value))
 
         if len(phone_nr) == 10 and numeric_re.search(phone_nr):
             return value
@@ -85,7 +85,7 @@ class NLSoFiNumberField(Field):
     def clean(self, value):
         super(NLSoFiNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not sofi_re.search(value):
             raise ValidationError(self.error_messages['invalid'])

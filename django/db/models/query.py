@@ -14,6 +14,7 @@ from django.db.models.query_utils import (Q, select_related_descend,
 from django.db.models.deletion import Collector
 from django.db.models import sql
 from django.utils.functional import partition
+from django.utils import six
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -119,7 +120,7 @@ class QuerySet(object):
             if len(self._result_cache) <= pos:
                 self._fill_cache()
 
-    def __nonzero__(self):
+    def __bool__(self):
         if self._prefetch_related_lookups and not self._prefetch_done:
             # We need all the results in order to be able to do the prefetch
             # in one go. To minimize code duplication, we use the __len__
@@ -133,6 +134,7 @@ class QuerySet(object):
         except StopIteration:
             return False
         return True
+    __nonzero__ = __bool__ # Python 2
 
     def __contains__(self, val):
         # The 'in' operator works without this method, due to __iter__. This
@@ -168,7 +170,7 @@ class QuerySet(object):
         """
         Retrieves an item or slice from the set of results.
         """
-        if not isinstance(k, (slice, int, long)):
+        if not isinstance(k, (slice,) + six.integer_types):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)
@@ -244,8 +246,8 @@ class QuerySet(object):
             requested = None
         max_depth = self.query.max_depth
 
-        extra_select = self.query.extra_select.keys()
-        aggregate_select = self.query.aggregate_select.keys()
+        extra_select = list(self.query.extra_select)
+        aggregate_select = list(self.query.aggregate_select)
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
@@ -388,7 +390,7 @@ class QuerySet(object):
         obj.save(force_insert=True, using=self.db)
         return obj
 
-    def bulk_create(self, objs):
+    def bulk_create(self, objs, batch_size=None):
         """
         Inserts each of the instances into the database. This does *not* call
         save() on each of the instances, does not send any pre/post save
@@ -401,8 +403,10 @@ class QuerySet(object):
         # this could be implemented if you didn't have an autoincrement pk,
         # and 2) you could do it by doing O(n) normal inserts into the parent
         # tables to get the primary keys back, and then doing a single bulk
-        # insert into the childmost table. We're punting on these for now
-        # because they are relatively rare cases.
+        # insert into the childmost table. Some databases might allow doing
+        # this by using RETURNING clause for the insert query. We're punting
+        # on these for now because they are relatively rare cases.
+        assert batch_size is None or batch_size > 0
         if self.model._meta.parents:
             raise ValueError("Can't bulk create an inherited model")
         if not objs:
@@ -418,13 +422,14 @@ class QuerySet(object):
         try:
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
-                self.model._base_manager._insert(objs, fields=fields, using=self.db)
+                self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
                 if objs_with_pk:
-                    self.model._base_manager._insert(objs_with_pk, fields=fields, using=self.db)
+                    self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
-                    self.model._base_manager._insert(objs_without_pk, fields=[f for f in fields if not isinstance(f, AutoField)], using=self.db)
+                    fields= [f for f in fields if not isinstance(f, AutoField)]
+                    self._batched_insert(objs_without_pk, fields, batch_size)
             if forced_managed:
                 transaction.commit(using=self.db)
             else:
@@ -467,7 +472,7 @@ class QuerySet(object):
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
                     # Re-raise the IntegrityError with its original traceback.
-                    raise exc_info[1], None, exc_info[2]
+                    six.reraise(*exc_info)
 
     def latest(self, field_name=None):
         """
@@ -589,7 +594,7 @@ class QuerySet(object):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
@@ -689,7 +694,7 @@ class QuerySet(object):
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs),))
         obj = self._clone()
         if fields:
             if depth:
@@ -747,7 +752,7 @@ class QuerySet(object):
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(kwargs.keys())
+        obj._setup_aggregate_query(list(kwargs))
 
         # Add the aggregates to the query
         for (alias, aggregate_expr) in kwargs.items():
@@ -860,6 +865,20 @@ class QuerySet(object):
     ###################
     # PRIVATE METHODS #
     ###################
+    def _batched_insert(self, objs, fields, batch_size):
+        """
+        A little helper method for bulk_insert to insert the bulk one batch
+        at a time. Inserts recursively a batch from the front of the bulk and
+        then _batched_insert() the remaining objects again.
+        """
+        if not objs:
+            return
+        ops = connections[self.db].ops
+        batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
+        for batch in [objs[i:i+batch_size]
+                      for i in range(0, len(objs), batch_size)]:
+            self.model._base_manager._insert(batch, fields=fields,
+                                             using=self.db)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
@@ -948,9 +967,9 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         # Purge any extra columns that haven't been explicitly asked for
-        extra_names = self.query.extra_select.keys()
+        extra_names = list(self.query.extra_select)
         field_names = self.field_names
-        aggregate_names = self.query.aggregate_select.keys()
+        aggregate_names = list(self.query.aggregate_select)
 
         names = extra_names + field_names + aggregate_names
 
@@ -1079,16 +1098,16 @@ class ValuesListQuerySet(ValuesQuerySet):
             # When extra(select=...) or an annotation is involved, the extra
             # cols are always at the start of the row, and we need to reorder
             # the fields to match the order in self._fields.
-            extra_names = self.query.extra_select.keys()
+            extra_names = list(self.query.extra_select)
             field_names = self.field_names
-            aggregate_names = self.query.aggregate_select.keys()
+            aggregate_names = list(self.query.aggregate_select)
 
             names = extra_names + field_names + aggregate_names
 
             # If a field list has been specified, use it. Otherwise, use the
             # full list of fields, including extras and aggregates.
             if self._fields:
-                fields = list(self._fields) + filter(lambda f: f not in self._fields, aggregate_names)
+                fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
             else:
                 fields = names
 
@@ -1296,7 +1315,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         # Build the list of fields that *haven't* been requested
         for field, model in klass._meta.get_fields_with_model():
             if field.name not in load_fields:
-                skip.add(field.name)
+                skip.add(field.attname)
             elif local_only and model is not None:
                 continue
             else:
@@ -1327,7 +1346,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     related_fields = []
     for f in klass._meta.fields:
-        if select_related_descend(f, restricted, requested):
+        if select_related_descend(f, restricted, requested, load_fields):
             if restricted:
                 next = requested[f.name]
             else:
@@ -1339,7 +1358,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     reverse_related_fields = []
     if restricted:
         for o in klass._meta.get_all_related_objects():
-            if o.field.unique and select_related_descend(o.field, restricted, requested, reverse=True):
+            if o.field.unique and select_related_descend(o.field, restricted, requested,
+                                                         only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
                 klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
                                             requested=next, only_load=only_load, local_only=True)
@@ -1508,7 +1528,7 @@ class RawQuerySet(object):
             # Associate fields to values
             if skip:
                 model_init_kwargs = {}
-                for attname, pos in model_init_field_names.iteritems():
+                for attname, pos in six.iteritems(model_init_field_names):
                     model_init_kwargs[attname] = values[pos]
                 instance = model_cls(**model_init_kwargs)
             else:

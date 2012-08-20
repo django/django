@@ -2,7 +2,7 @@
 Czech-specific form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -29,7 +29,7 @@ class CZPostalCodeField(RegexField):
     Valid form is XXXXX or XXX XX, where X represents integer.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXX or XXX XX.'),
+        'invalid': _('Enter a postal code in the format XXXXX or XXX XX.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -49,15 +49,15 @@ class CZBirthNumberField(Field):
     Czech birth number field.
     """
     default_error_messages = {
-        'invalid_format': _(u'Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX.'),
-        'invalid': _(u'Enter a valid birth number.'),
+        'invalid_format': _('Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX.'),
+        'invalid': _('Enter a valid birth number.'),
     }
 
     def clean(self, value, gender=None):
         super(CZBirthNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = re.match(birth_number, value)
         if not match:
@@ -67,7 +67,7 @@ class CZBirthNumberField(Field):
 
         # Three digits for verification number were used until 1. january 1954
         if len(id) == 3:
-            return u'%s' % value
+            return '%s' % value
 
         # Birth number is in format YYMMDD. Females have month value raised by 50.
         # In case that all possible number are already used (for given date),
@@ -90,7 +90,7 @@ class CZBirthNumberField(Field):
         modulo = int(birth + id[:3]) % 11
 
         if (modulo == int(id[-1])) or (modulo == 10 and id[-1] == '0'):
-            return u'%s' % value
+            return '%s' % value
         else:
             raise ValidationError(self.error_messages['invalid'])
 
@@ -99,14 +99,14 @@ class CZICNumberField(Field):
     Czech IC number field.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid IC number.'),
+        'invalid': _('Enter a valid IC number.'),
     }
 
     def clean(self, value):
         super(CZICNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = re.match(ic_number, value)
         if not match:
@@ -130,7 +130,7 @@ class CZICNumberField(Field):
         if (not remainder % 10 and check == 1) or \
         (remainder == 1 and check == 0) or \
         (check == (11 - remainder)):
-            return u'%s' % value
+            return '%s' % value
 
         raise ValidationError(self.error_messages['invalid'])
 

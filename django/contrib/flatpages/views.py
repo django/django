@@ -23,7 +23,7 @@ def flatpage(request, url):
 
     Models: `flatpages.flatpages`
     Templates: Uses the template defined by the ``template_name`` field,
-        or `flatpages/default.html` if template_name is not defined.
+        or :template:`flatpages/default.html` if template_name is not defined.
     Context:
         flatpage
             `flatpages.flatpages` object

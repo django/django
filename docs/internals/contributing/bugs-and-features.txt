@@ -2,7 +2,16 @@
 Reporting bugs and requesting features
 ======================================
 
-Before reporting a bug or requesting a new feature, please consider these
+.. Important::
+
+    Please report security issues **only** to
+    security@djangoproject.com.  This is a private list only open to
+    long-time, highly trusted Django developers, and its archives are
+    not public. For further details, please see :doc:`our security
+    policies </internals/security>`.
+
+
+Otherwise, before reporting a bug or requesting a new feature, please consider these
 general points:
 
 * Check that someone hasn't already filed the bug or feature request by
@@ -52,42 +61,6 @@ To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
 
 .. _django-updates: http://groups.google.com/group/django-updates
-
-.. _reporting-security-issues:
-
-Reporting security issues
--------------------------
-
-.. Important::
-
-    Please report security issues **only** to security@djangoproject.com.
-    This is a private list only open to long-time, highly trusted Django
-    developers, and its archives are not publicly readable.
-
-In the event of a confirmed vulnerability in Django itself, we will take the
-following actions:
-
-* Acknowledge to the reporter that we've received the report and that a
-  fix is forthcoming. We'll give a rough timeline and ask the reporter
-  to keep the issue confidential until we announce it.
-
-* Focus on developing a fix as quickly as possible and produce patches
-  against the current and two previous releases.
-
-* Determine a go-public date for announcing the vulnerability and the fix.
-  To try to mitigate a possible "arms race" between those applying the
-  patch and those trying to exploit the hole, we will not announce
-  security problems immediately.
-
-* Pre-notify third-party distributors of Django ("vendors"). We will send
-  these vendor notifications through private email which will include
-  documentation of the vulnerability, links to the relevant patch(es), and
-  a request to keep the vulnerability confidential until the official
-  go-public date.
-
-* Publicly announce the vulnerability and the fix on the pre-determined
-  go-public date. This will probably mean a new release of Django, but
-  in some cases it may simply be patches against current releases.
 
 Reporting user interface bugs and features
 ------------------------------------------
@@ -149,9 +122,8 @@ description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
-it's much more likely to be accepted. If it's a large feature that might need
-multiple developers, we're always happy to give you an experimental branch in
-our repository; see the :doc:`writing-code/branch-policy`.
+it's much more likely to be accepted. Just fork Django on GitHub, create a
+feature branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 

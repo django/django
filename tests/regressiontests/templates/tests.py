@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 
@@ -13,7 +13,10 @@ import time
 import os
 import sys
 import traceback
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 
 from django import template
 from django.template import base as template_base, RequestContext, Template, Context
@@ -24,9 +27,11 @@ from django.test import RequestFactory
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 from django.utils import unittest
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.tzinfo import LocalTimezone
 
 from .callables import CallableVariablesTests
@@ -42,7 +47,7 @@ from .response import (TemplateResponseTest, CacheMiddlewareTest,
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
 except ImportError as e:
-    if "pkg_resources" in e.message:
+    if "pkg_resources" in e.args[0]:
         pass # If setuptools isn't installed, that's fine. Just move on.
     else:
         raise
@@ -144,17 +149,18 @@ class SilentAttrClass(object):
         raise SomeException
     b = property(b)
 
+@python_2_unicode_compatible
 class UTF8Class:
-    "Class whose __str__ returns non-ASCII data"
+    "Class whose __str__ returns non-ASCII data on Python 2"
     def __str__(self):
-        return u'ŠĐĆŽćžšđ'.encode('utf-8')
+        return 'ŠĐĆŽćžšđ'
 
 class Templates(unittest.TestCase):
     def setUp(self):
         self.old_static_url = settings.STATIC_URL
         self.old_media_url = settings.MEDIA_URL
-        settings.STATIC_URL = u"/static/"
-        settings.MEDIA_URL = u"/media/"
+        settings.STATIC_URL = "/static/"
+        settings.MEDIA_URL = "/media/"
 
     def tearDown(self):
         settings.STATIC_URL = self.old_static_url
@@ -193,13 +199,13 @@ class Templates(unittest.TestCase):
 
         # UTF-8 bytestrings are permitted.
         test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', template_dirs,
-                              [u'/dir1/Ångström', u'/dir2/Ångström'])
+                              ['/dir1/Ångström', '/dir2/Ångström'])
         # Unicode strings are permitted.
-        test_template_sources(u'Ångström', template_dirs,
-                              [u'/dir1/Ångström', u'/dir2/Ångström'])
-        test_template_sources(u'Ångström', [b'/Stra\xc3\x9fe'], [u'/Straße/Ångström'])
+        test_template_sources('Ångström', template_dirs,
+                              ['/dir1/Ångström', '/dir2/Ångström'])
+        test_template_sources('Ångström', [b'/Stra\xc3\x9fe'], ['/Straße/Ångström'])
         test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', [b'/Stra\xc3\x9fe'],
-                              [u'/Straße/Ångström'])
+                              ['/Straße/Ångström'])
         # Invalid UTF-8 encoding in bytestrings is not. Should raise a
         # semi-useful error message.
         test_template_sources(b'\xc3\xc3', template_dirs, UnicodeDecodeError)
@@ -399,13 +405,12 @@ class Templates(unittest.TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in template_tests.iteritems()]),
+            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
             use_cached_loader=True,
         )
 
         failures = []
-        tests = template_tests.items()
-        tests.sort()
+        tests = sorted(template_tests.items())
 
         # Turn TEMPLATE_DEBUG off, because tests assume that.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
@@ -414,7 +419,7 @@ class Templates(unittest.TestCase):
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
 
-        #Set ALLOWED_INCLUDE_ROOTS so that ssi works.
+        # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
         old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
         settings.ALLOWED_INCLUDE_ROOTS = (
             os.path.dirname(os.path.abspath(__file__)),
@@ -684,7 +689,7 @@ class Templates(unittest.TestCase):
 
             # Make sure that any unicode strings are converted to bytestrings
             # in the final output.
-            'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'),
+            'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'),
 
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
@@ -1239,11 +1244,11 @@ class Templates(unittest.TestCase):
             'i18n02': ('{% load i18n %}{% trans "xxxyyyxxx" %}', {}, "xxxyyyxxx"),
 
             # simple translation of a variable
-            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u"Å"),
+            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, "Å"),
 
             # simple translation of a variable and filter
-            'i18n04': ('{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u'å'),
-            'legacyi18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u'å'),
+            'i18n04': ('{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, 'å'),
+            'legacyi18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, 'å'),
 
             # simple translation of a string with interpolation
             'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),
@@ -1279,42 +1284,42 @@ class Templates(unittest.TestCase):
 
             # Escaping inside blocktrans and trans works as if it was directly in the
             # template.
-            'i18n17': ('{% load i18n %}{% blocktrans with berta=anton|escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
-            'i18n18': ('{% load i18n %}{% blocktrans with berta=anton|force_escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
-            'i18n19': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': 'a & b'}, u'a &amp; b'),
-            'i18n20': ('{% load i18n %}{% trans andrew %}', {'andrew': 'a & b'}, u'a &amp; b'),
-            'i18n21': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': mark_safe('a & b')}, u'a & b'),
-            'i18n22': ('{% load i18n %}{% trans andrew %}', {'andrew': mark_safe('a & b')}, u'a & b'),
-            'legacyi18n17': ('{% load i18n %}{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
-            'legacyi18n18': ('{% load i18n %}{% blocktrans with anton|force_escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
+            'i18n17': ('{% load i18n %}{% blocktrans with berta=anton|escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, 'α &amp; β'),
+            'i18n18': ('{% load i18n %}{% blocktrans with berta=anton|force_escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, 'α &amp; β'),
+            'i18n19': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': 'a & b'}, 'a &amp; b'),
+            'i18n20': ('{% load i18n %}{% trans andrew %}', {'andrew': 'a & b'}, 'a &amp; b'),
+            'i18n21': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': mark_safe('a & b')}, 'a & b'),
+            'i18n22': ('{% load i18n %}{% trans andrew %}', {'andrew': mark_safe('a & b')}, 'a & b'),
+            'legacyi18n17': ('{% load i18n %}{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, 'α &amp; β'),
+            'legacyi18n18': ('{% load i18n %}{% blocktrans with anton|force_escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, 'α &amp; β'),
 
             # Use filters with the {% trans %} tag, #5972
-            'i18n23': ('{% load i18n %}{% trans "Page not found"|capfirst|slice:"6:" %}', {'LANGUAGE_CODE': 'de'}, u'nicht gefunden'),
-            'i18n24': ("{% load i18n %}{% trans 'Page not found'|upper %}", {'LANGUAGE_CODE': 'de'}, u'SEITE NICHT GEFUNDEN'),
-            'i18n25': ('{% load i18n %}{% trans somevar|upper %}', {'somevar': 'Page not found', 'LANGUAGE_CODE': 'de'}, u'SEITE NICHT GEFUNDEN'),
+            'i18n23': ('{% load i18n %}{% trans "Page not found"|capfirst|slice:"6:" %}', {'LANGUAGE_CODE': 'de'}, 'nicht gefunden'),
+            'i18n24': ("{% load i18n %}{% trans 'Page not found'|upper %}", {'LANGUAGE_CODE': 'de'}, 'SEITE NICHT GEFUNDEN'),
+            'i18n25': ('{% load i18n %}{% trans somevar|upper %}', {'somevar': 'Page not found', 'LANGUAGE_CODE': 'de'}, 'SEITE NICHT GEFUNDEN'),
 
             # translation of plural form with extra field in singular form (#13568)
             'i18n26': ('{% load i18n %}{% blocktrans with extra_field=myextra_field count counter=number %}singular {{ extra_field }}{% plural %}plural{% endblocktrans %}', {'number': 1, 'myextra_field': 'test'}, "singular test"),
             'legacyi18n26': ('{% load i18n %}{% blocktrans with myextra_field as extra_field count number as counter %}singular {{ extra_field }}{% plural %}plural{% endblocktrans %}', {'number': 1, 'myextra_field': 'test'}, "singular test"),
 
             # translation of singular form in russian (#14126)
-            'i18n27': ('{% load i18n %}{% blocktrans count counter=number %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
-            'legacyi18n27': ('{% load i18n %}{% blocktrans count number as counter %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
+            'i18n27': ('{% load i18n %}{% blocktrans count counter=number %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, '1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
+            'legacyi18n27': ('{% load i18n %}{% blocktrans count number as counter %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, '1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
 
             # simple translation of multiple variables
-            'i18n28': ('{% load i18n %}{% blocktrans with a=anton b=berta %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, u'α + β'),
-            'legacyi18n28': ('{% load i18n %}{% blocktrans with anton as a and berta as b %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, u'α + β'),
+            'i18n28': ('{% load i18n %}{% blocktrans with a=anton b=berta %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, 'α + β'),
+            'legacyi18n28': ('{% load i18n %}{% blocktrans with anton as a and berta as b %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, 'α + β'),
 
             # retrieving language information
             'i18n28_2': ('{% load i18n %}{% get_language_info for "de" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
             'i18n29': ('{% load i18n %}{% get_language_info for LANGUAGE_CODE as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {'LANGUAGE_CODE': 'fi'}, 'fi: Finnish/suomi bidi=False'),
-            'i18n30': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': ['it', 'no']}, u'it: Italian/italiano bidi=False; no: Norwegian/Norsk bidi=False; '),
-            'i18n31': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': (('sl', 'Slovenian'), ('fa', 'Persian'))}, u'sl: Slovenian/Sloven\u0161\u010dina bidi=False; fa: Persian/\u0641\u0627\u0631\u0633\u06cc bidi=True; '),
-            'i18n32': ('{% load i18n %}{{ "hu"|language_name }} {{ "hu"|language_name_local }} {{ "hu"|language_bidi }}', {}, u'Hungarian Magyar False'),
-            'i18n33': ('{% load i18n %}{{ langcode|language_name }} {{ langcode|language_name_local }} {{ langcode|language_bidi }}', {'langcode': 'nl'}, u'Dutch Nederlands False'),
+            'i18n30': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': ['it', 'no']}, 'it: Italian/italiano bidi=False; no: Norwegian/Norsk bidi=False; '),
+            'i18n31': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': (('sl', 'Slovenian'), ('fa', 'Persian'))}, 'sl: Slovenian/Sloven\u0161\u010dina bidi=False; fa: Persian/\u0641\u0627\u0631\u0633\u06cc bidi=True; '),
+            'i18n32': ('{% load i18n %}{{ "hu"|language_name }} {{ "hu"|language_name_local }} {{ "hu"|language_bidi }}', {}, 'Hungarian Magyar False'),
+            'i18n33': ('{% load i18n %}{{ langcode|language_name }} {{ langcode|language_name_local }} {{ langcode|language_bidi }}', {'langcode': 'nl'}, 'Dutch Nederlands False'),
 
             # blocktrans handling of variables which are not in the context.
-            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, u''),
+            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, ''),
 
             # trans tag with as var
             'i18n35': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
@@ -1448,8 +1453,9 @@ class Templates(unittest.TestCase):
             'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
             'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
 
-            # 62.5 should round to 63
-            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '63'),
+            # 62.5 should round to 63 on Python 2 and 62 on Python 3
+            # See http://docs.python.org/py3k/whatsnew/3.0.html
+            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '62' if six.PY3 else '63'),
 
             # 71.4 should round to 71
             'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),
@@ -1461,6 +1467,14 @@ class Templates(unittest.TestCase):
 
             # #10043: widthratio should allow max_width to be a variable
             'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
+
+            # #18739: widthratio should handle None args consistently with non-numerics
+            'widthratio12a': ('{% widthratio a b c %}', {'a':'a','b':100,'c':100}, ''),
+            'widthratio12b': ('{% widthratio a b c %}', {'a':None,'b':100,'c':100}, ''),
+            'widthratio13a': ('{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''),
+            'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
+            'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
+            'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1498,11 +1512,11 @@ class Templates(unittest.TestCase):
             'url02c': ("{% url 'regressiontests.templates.views.client_action' client.id 'update' %}", {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03': ('{% url "regressiontests.templates.views.index" %}', {}, '/url_tag/'),
             'url04': ('{% url "named.client" client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
-            'url05': (u'{% url "метка_оператора" v %}', {'v': u'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url06': (u'{% url "метка_оператора_2" tag=v %}', {'v': u'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url07': (u'{% url "regressiontests.templates.views.client2" tag=v %}', {'v': u'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url08': (u'{% url "метка_оператора" v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url09': (u'{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url05': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url06': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url07': ('{% url "regressiontests.templates.views.client2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url08': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
+            'url09': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url10': ('{% url "regressiontests.templates.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
             'url11': ('{% url "regressiontests.templates.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/==/'),
             'url12': ('{% url "regressiontests.templates.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/,/'),
@@ -1577,7 +1591,7 @@ class Templates(unittest.TestCase):
             # Strings (ASCII or unicode) already marked as "safe" are not
             # auto-escaped
             'autoescape-tag06': ("{{ first }}", {"first": mark_safe("<b>first</b>")}, "<b>first</b>"),
-            'autoescape-tag07': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": mark_safe(u"<b>Apple</b>")}, u"<b>Apple</b>"),
+            'autoescape-tag07': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": mark_safe("<b>Apple</b>")}, "<b>Apple</b>"),
 
             # Literal string arguments to filters, if used in the result, are
             # safe.
@@ -1616,6 +1630,16 @@ class Templates(unittest.TestCase):
             'static-prefixtag04': ('{% load static %}{% get_media_prefix as media_prefix %}{{ media_prefix }}', {}, settings.MEDIA_URL),
             'static-statictag01': ('{% load static %}{% static "admin/base.css" %}', {}, urljoin(settings.STATIC_URL, 'admin/base.css')),
             'static-statictag02': ('{% load static %}{% static base_css %}', {'base_css': 'admin/base.css'}, urljoin(settings.STATIC_URL, 'admin/base.css')),
+            'static-statictag03': ('{% load static %}{% static "admin/base.css" as foo %}{{ foo }}', {}, urljoin(settings.STATIC_URL, 'admin/base.css')),
+            'static-statictag04': ('{% load static %}{% static base_css as foo %}{{ foo }}', {'base_css': 'admin/base.css'}, urljoin(settings.STATIC_URL, 'admin/base.css')),
+
+            # Verbatim template tag outputs contents without rendering.
+            'verbatim-tag01': ('{% verbatim %}{{bare   }}{% endverbatim %}', {}, '{{bare   }}'),
+            'verbatim-tag02': ('{% verbatim %}{% endif %}{% endverbatim %}', {}, '{% endif %}'),
+            'verbatim-tag03': ("{% verbatim %}It's the {% verbatim %} tag{% endverbatim %}", {}, "It's the {% verbatim %} tag"),
+            'verbatim-tag04': ('{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}', {}, template.TemplateSyntaxError),
+            'verbatim-tag05': ('{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}', {}, ''),
+            'verbatim-tag06': ("{% verbatim special %}Don't {% endverbatim %} just yet{% endverbatim special %}", {}, "Don't {% endverbatim %} just yet"),
         }
         return tests
 

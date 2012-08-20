@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.fr.forms import (FRZipCodeField,
         FRPhoneNumberField, FRDepartmentSelect)
 
@@ -7,19 +9,20 @@ from django.test import SimpleTestCase
 
 class FRLocalFlavorTests(SimpleTestCase):
     def test_FRZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX.']
+        error_format = ['Enter a zip code in the format XXXXX.']
         valid = {
             '75001': '75001',
             '93200': '93200',
         }
         invalid = {
             '2A200': error_format,
-            '980001': error_format,
+            '980001': ['Ensure this value has at most 5 characters (it has 6).'
+                      ] + error_format,
         }
         self.assertFieldOutput(FRZipCodeField, valid, invalid)
 
     def test_FRPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in 0X XX XX XX XX format.']
+        error_format = ['Phone numbers must be in 0X XX XX XX XX format.']
         valid = {
             '01 55 44 58 64': '01 55 44 58 64',
             '0155445864': '01 55 44 58 64',
@@ -35,7 +38,7 @@ class FRLocalFlavorTests(SimpleTestCase):
 
     def test_FRDepartmentSelect(self):
         f = FRDepartmentSelect()
-        out = u'''<select name="dep">
+        out = '''<select name="dep">
 <option value="01">01 - Ain</option>
 <option value="02">02 - Aisne</option>
 <option value="03">03 - Allier</option>

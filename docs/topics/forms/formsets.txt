@@ -102,15 +102,12 @@ limit the maximum number of empty forms the formset will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-.. versionchanged:: 1.2
-
 If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
 A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed. Please note that the default value of ``max_num`` was changed
-from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
+forms displayed.
 
 Formset validation
 ------------------
@@ -209,8 +206,6 @@ the management data by rendering ``{{ my_formset.management_form }}``
 pre-filled, and is also used to determine how many forms are required. You
 will probably never need to override either of these methods, so please be
 sure you understand what they do before doing so.
-
-.. versionadded:: 1.2
 
 ``empty_form``
 ~~~~~~~~~~~~~~

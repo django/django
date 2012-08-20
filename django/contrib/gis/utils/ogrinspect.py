@@ -5,10 +5,11 @@ models for GeoDjango and/or mapping dictionaries for use with the
 
 Author: Travis Pinney, Dane Springmeyer, & Justin Bronn
 """
-from future_builtins import zip
+from django.utils.six.moves import zip
 # Requires GDAL to use.
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
+from django.utils import six
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
@@ -24,7 +25,7 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
 
      `multi_geom` => Boolean (default: False) - specify as multigeometry.
     """
-    if isinstance(data_source, basestring):
+    if isinstance(data_source, six.string_types):
         # Instantiating the DataSource from the string.
         data_source = DataSource(data_source)
     elif isinstance(data_source, DataSource):
@@ -222,4 +223,4 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     if name_field:
         yield ''
-        yield '    def __unicode__(self): return self.%s' % name_field
+        yield '    def __str__(self): return self.%s' % name_field

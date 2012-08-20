@@ -86,8 +86,8 @@ the message itself. Here's what the :file:`forms.py` might look like::
     section :ref:`Handling files <wizard-files>` below to learn more about
     what to do.
 
-Creating a ``WizardView`` class
--------------------------------
+Creating a ``WizardView`` subclass
+----------------------------------
 
 The next step is to create a
 :class:`django.contrib.formtools.wizard.views.WizardView` subclass. You can
@@ -528,7 +528,7 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import pattern
+    from django.conf.urls import patterns
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
@@ -554,9 +554,8 @@ How to work with ModelForm and ModelFormSet
 WizardView supports :doc:`ModelForms </topics/forms/modelforms>` and
 :ref:`ModelFormSets <model-formsets>`. Additionally to
 :attr:`~WizardView.initial_dict`, the :meth:`~WizardView.as_view` method takes
-an ``instance_dict`` argument that should contain instances of ``ModelForm`` and
-``ModelFormSet``.  Similarly to :attr:`~WizardView.initial_dict`, these
-dictionary key values should be equal to the step number in the form list.
+an ``instance_dict`` argument that should contain model instances for steps
+based on ``ModelForm`` and querysets for steps based on ``ModelFormSet``.
 
 Usage of ``NamedUrlWizardView``
 ===============================

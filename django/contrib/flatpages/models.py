@@ -1,8 +1,12 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class FlatPage(models.Model):
     url = models.CharField(_('URL'), max_length=100, db_index=True)
     title = models.CharField(_('title'), max_length=200)
@@ -19,8 +23,8 @@ class FlatPage(models.Model):
         verbose_name_plural = _('flat pages')
         ordering = ('url',)
 
-    def __unicode__(self):
-        return u"%s -- %s" % (self.url, self.title)
+    def __str__(self):
+        return "%s -- %s" % (self.url, self.title)
 
     def get_absolute_url(self):
         return self.url

@@ -11,13 +11,16 @@ Model inheritance exists in two varieties:
 
 Both styles are demonstrated here.
 """
+from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 #
 # Abstract base classes
 #
 
+@python_2_unicode_compatible
 class CommonInfo(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveIntegerField()
@@ -26,8 +29,8 @@ class CommonInfo(models.Model):
         abstract = True
         ordering = ['name']
 
-    def __unicode__(self):
-        return u'%s %s' % (self.__class__.__name__, self.name)
+    def __str__(self):
+        return '%s %s' % (self.__class__.__name__, self.name)
 
 class Worker(CommonInfo):
     job = models.CharField(max_length=50)
@@ -48,6 +51,7 @@ class StudentWorker(Student, Worker):
 class Post(models.Model):
     title = models.CharField(max_length=50)
 
+@python_2_unicode_compatible
 class Attachment(models.Model):
     post = models.ForeignKey(Post, related_name='attached_%(class)s_set')
     content = models.TextField()
@@ -55,7 +59,7 @@ class Attachment(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.content
 
 class Comment(Attachment):
@@ -68,18 +72,20 @@ class Link(Attachment):
 # Multi-table inheritance
 #
 
+@python_2_unicode_compatible
 class Chef(models.Model):
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
-        return u"%s the chef" % self.name
+    def __str__(self):
+        return "%s the chef" % self.name
 
+@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
 
-    def __unicode__(self):
-        return u"%s the place" % self.name
+    def __str__(self):
+        return "%s the place" % self.name
 
 class Rating(models.Model):
     rating = models.IntegerField(null=True, blank=True)
@@ -88,6 +94,7 @@ class Rating(models.Model):
         abstract = True
         ordering = ['-rating']
 
+@python_2_unicode_compatible
 class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
@@ -96,28 +103,31 @@ class Restaurant(Place, Rating):
     class Meta(Rating.Meta):
         db_table = 'my_restaurant'
 
-    def __unicode__(self):
-        return u"%s the restaurant" % self.name
+    def __str__(self):
+        return "%s the restaurant" % self.name
 
+@python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField()
 
-    def __unicode__(self):
-        return u"%s the italian restaurant" % self.name
+    def __str__(self):
+        return "%s the italian restaurant" % self.name
 
+@python_2_unicode_compatible
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name='provider')
 
-    def __unicode__(self):
-        return u"%s the supplier" % self.name
+    def __str__(self):
+        return "%s the supplier" % self.name
 
+@python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
     main_site = models.ForeignKey(Place, related_name='lot')
 
-    def __unicode__(self):
-        return u"%s the parking lot" % self.name
+    def __str__(self):
+        return "%s the parking lot" % self.name
 
 #
 # Abstract base classes with related models where the sub-class has the
@@ -138,10 +148,11 @@ class NamedURL(models.Model):
     class Meta:
         abstract = True
 
+@python_2_unicode_compatible
 class Copy(NamedURL):
     content = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.content
 
 class Mixin(object):

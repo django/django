@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.unittest import TestCase
 
@@ -15,14 +17,16 @@ class PaginatorTests(TestCase):
         paginator = Paginator(*params)
         self.check_attribute('count', paginator, count, params)
         self.check_attribute('num_pages', paginator, num_pages, params)
-        self.check_attribute('page_range', paginator, page_range, params)
+        self.check_attribute('page_range', paginator, page_range, params, coerce=list)
 
-    def check_attribute(self, name, paginator, expected, params):
+    def check_attribute(self, name, paginator, expected, params, coerce=None):
         """
         Helper method that checks a single attribute and gives a nice error
         message upon test failure.
         """
         got = getattr(paginator, name)
+        if coerce is not None:
+            got = coerce(got)
         self.assertEqual(expected, got,
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
             % (name, expected, got, params))
@@ -96,9 +100,9 @@ class PaginatorTests(TestCase):
             ((eleven, 10, 1, True), (11, 1, [1])),
             # Non-integer inputs
             ((ten, '4', 1, False), (10, 3, [1, 2, 3])),
-            ((ten, u'4', 1, False), (10, 3, [1, 2, 3])),
+            ((ten, '4', 1, False), (10, 3, [1, 2, 3])),
             ((ten, 4, '1', False), (10, 3, [1, 2, 3])),
-            ((ten, 4, u'1', False), (10, 3, [1, 2, 3])),
+            ((ten, 4, '1', False), (10, 3, [1, 2, 3])),
         )
         for params, output in tests:
             self.check_paginator(params, output)

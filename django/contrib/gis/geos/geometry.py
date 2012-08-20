@@ -27,6 +27,8 @@ from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ew
 # For recognizing geometry input.
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
+from django.utils import six
+
 class GEOSGeometry(GEOSBase, ListMixin):
     "A class that, generally, encapsulates a GEOS geometry."
 
@@ -52,8 +54,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         The `srid` keyword is used to specify the Source Reference Identifier
         (SRID) number for this Geometry.  If not set, the SRID will be None.
         """
-        if isinstance(geo_input, basestring):
-            if isinstance(geo_input, unicode):
+        if isinstance(geo_input, six.string_types):
+            if isinstance(geo_input, six.text_type):
                 # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
                 geo_input = geo_input.encode('ascii')
 
@@ -65,7 +67,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(geo_input)
-            elif gdal.GEOJSON and json_regex.match(geo_input):
+            elif gdal.HAS_GDAL and json_regex.match(geo_input):
                 # Handling GeoJSON input.
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
@@ -153,7 +155,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Equivalence testing, a Geometry may be compared with another Geometry
         or a WKT representation.
         """
-        if isinstance(other, basestring):
+        if isinstance(other, six.string_types):
             return self.wkt == other
         elif isinstance(other, GEOSGeometry):
             return self.equals_exact(other)
@@ -333,7 +335,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns true if the elements in the DE-9IM intersection matrix for the
         two Geometries match the elements in pattern.
         """
-        if not isinstance(pattern, basestring) or len(pattern) > 9:
+        if not isinstance(pattern, six.string_types) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
         return capi.geos_relatepattern(self.ptr, other.ptr, pattern)
 
@@ -409,13 +411,12 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def json(self):
         """
-        Returns GeoJSON representation of this Geometry if GDAL 1.5+
-        is installed.
+        Returns GeoJSON representation of this Geometry if GDAL is installed.
         """
-        if gdal.GEOJSON:
+        if gdal.HAS_GDAL:
             return self.ogr.json
         else:
-            raise GEOSException('GeoJSON output only supported on GDAL 1.5+.')
+            raise GEOSException('GeoJSON output only supported when GDAL is installed.')
     geojson = json
 
     @property

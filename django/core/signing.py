@@ -32,6 +32,8 @@ start of the base64 JSON.
 There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
+from __future__ import unicode_literals
+
 import base64
 import json
 import time
@@ -41,7 +43,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_bytes
 from django.utils.importlib import import_module
 
 
@@ -60,12 +62,12 @@ class SignatureExpired(BadSignature):
 
 
 def b64_encode(s):
-    return base64.urlsafe_b64encode(s).strip('=')
+    return base64.urlsafe_b64encode(smart_bytes(s)).decode('ascii').strip('=')
 
 
 def b64_decode(s):
     pad = '=' * (-len(s) % 4)
-    return base64.urlsafe_b64decode(s + pad)
+    return base64.urlsafe_b64decode(smart_bytes(s + pad)).decode('ascii')
 
 
 def base64_hmac(salt, value, key):
@@ -121,7 +123,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
     if compress:
         # Avoid zlib dependency unless compress is being used
-        compressed = zlib.compress(data)
+        compressed = zlib.compress(smart_bytes(data))
         if len(compressed) < (len(data) - 1):
             data = compressed
             is_compressed = True
@@ -135,8 +137,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     Reverse of dumps(), raises BadSignature if signature fails
     """
-    base64d = smart_str(
-        TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
+    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age)
     decompress = False
     if base64d[0] == '.':
         # It's compressed; uncompress it first
@@ -159,16 +160,14 @@ class Signer(object):
         return base64_hmac(self.salt + 'signer', value, self.key)
 
     def sign(self, value):
-        value = smart_str(value)
         return '%s%s%s' % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
-        signed_value = smart_str(signed_value)
         if not self.sep in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):
-            return force_unicode(value)
+            return value
         raise BadSignature('Signature "%s" does not match' % sig)
 
 
@@ -178,7 +177,7 @@ class TimestampSigner(Signer):
         return baseconv.base62.encode(int(time.time()))
 
     def sign(self, value):
-        value = smart_str('%s%s%s' % (value, self.sep, self.timestamp()))
+        value = '%s%s%s' % (value, self.sep, self.timestamp())
         return '%s%s%s' % (value, self.sep, self.signature(value))
 
     def unsign(self, value, max_age=None):

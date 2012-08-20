@@ -115,9 +115,7 @@ subclass::
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
-    .. versionadded:: 1.2
-
-    Controls whether a selection counter is display next to the action dropdown.
+    Controls whether a selection counter is displayed next to the action dropdown.
     By default, the admin changelist will display it
     (``actions_selection_counter = True``).
 
@@ -177,12 +175,9 @@ subclass::
             fields = ('url', 'title', 'content')
 
     In the above example, only the fields ``url``, ``title`` and ``content``
-    will be displayed, sequentially, in the form.
-
-    .. versionadded:: 1.2
-
-    ``fields`` can contain values defined in :attr:`ModelAdmin.readonly_fields`
-    to be displayed as read-only.
+    will be displayed, sequentially, in the form. ``fields`` can contain
+    values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
+    read-only.
 
     .. versionadded:: 1.4
 
@@ -261,8 +256,6 @@ subclass::
             {
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
             }
-
-        .. versionadded:: 1.2
 
         ``fields`` can contain values defined in
         :attr:`~ModelAdmin.readonly_fields` to be displayed as read-only.
@@ -377,14 +370,6 @@ subclass::
         fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
         because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
         their own.
-
-.. attribute:: ModelAdmin.get_changelist
-
-    .. versionchanged:: 1.2
-
-    Returns the Changelist class to be used for listing. By default,
-    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
-    class you can change the behavior of the listing.
 
 .. attribute:: ModelAdmin.inlines
 
@@ -638,7 +623,7 @@ subclass::
                    provided in the query string and retrievable via
                    `self.value()`.
                    """
-                   # Compare the requested value (either '80s' or 'other')
+                   # Compare the requested value (either '80s' or '90s')
                    # to decide how to filter the queryset.
                    if self.value() == '80s':
                        return queryset.filter(birthday__gte=date(1980, 1, 1),
@@ -819,8 +804,6 @@ subclass::
 
 .. attribute:: ModelAdmin.readonly_fields
 
-    .. versionadded:: 1.2
-
     By default the admin shows all fields as editable. Any fields in this
     option (which should be a ``list`` or ``tuple``) will display its data
     as-is and non-editable. This option behaves nearly identical to
@@ -928,8 +911,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.add_form_template
 
-    .. versionadded:: 1.2
-
     Path to a custom template, used by :meth:`add_view`.
 
 .. attribute:: ModelAdmin.change_form_template
@@ -946,8 +927,6 @@ templates used by the :class:`ModelAdmin` views:
     confirmation page when deleting one or more objects.
 
 .. attribute:: ModelAdmin.delete_selected_confirmation_template
-
-    .. versionadded:: 1.2
 
     Path to a custom template, used by the :meth:`delete_selected`
     action method for displaying a confirmation page when deleting one
@@ -1034,8 +1013,6 @@ templates used by the :class:`ModelAdmin` views:
     that at this point the parent object and its form have already been saved.
 
 .. method:: ModelAdmin.get_readonly_fields(self, request, obj=None)
-
-    .. versionadded:: 1.2
 
     The ``get_readonly_fields`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
@@ -1185,6 +1162,12 @@ templates used by the :class:`ModelAdmin` views:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
+.. method:: ModelAdmin.get_changelist(self, request, **kwargs)
+
+    Returns the Changelist class to be used for listing. By default,
+    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
+    class you can change the behavior of the listing.
+
 .. method:: ModelAdmin.has_add_permission(self, request)
 
     Should return ``True`` if adding an object is permitted, ``False``
@@ -1283,11 +1266,11 @@ provided some extra mapping data that would not otherwise be available::
             # ...
             pass
 
-        def change_view(self, request, object_id, extra_context=None):
+        def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
             return super(MyModelAdmin, self).change_view(request, object_id,
-                extra_context=extra_context)
+                form_url, extra_context=extra_context)
 
 .. versionadded:: 1.4
 
@@ -1405,19 +1388,16 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~InlineModelAdmin.form`
 - :attr:`~ModelAdmin.fieldsets`
 - :attr:`~ModelAdmin.fields`
+- :attr:`~ModelAdmin.formfield_overrides`
 - :attr:`~ModelAdmin.exclude`
 - :attr:`~ModelAdmin.filter_horizontal`
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.prepopulated_fields`
 - :attr:`~ModelAdmin.radio_fields`
+- :attr:`~ModelAdmin.readonly_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
-
-.. versionadded:: 1.2
-
-- :attr:`~ModelAdmin.readonly_fields`
-- :attr:`~ModelAdmin.formfield_overrides`
 
 .. versionadded:: 1.3
 
@@ -1462,8 +1442,6 @@ The ``InlineModelAdmin`` class adds:
     addition to the initial forms. See the
     :doc:`formsets documentation </topics/forms/formsets>` for more
     information.
-
-    .. versionadded:: 1.2
 
     For users with JavaScript-enabled browsers, an "Add another" link is
     provided to enable any number of additional inlines to be added in addition
@@ -1540,8 +1518,6 @@ automatically::
 
 Working with many-to-many models
 --------------------------------
-
-.. versionadded:: 1.2
 
 By default, admin widgets for many-to-many relations will be displayed
 on whichever model contains the actual reference to the
@@ -1842,20 +1818,14 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.logout_template
 
-    .. versionadded:: 1.2
-
     Path to a custom template that will be used by the admin site logout view.
 
 .. attribute:: AdminSite.password_change_template
-
-    .. versionadded:: 1.2
 
     Path to a custom template that will be used by the admin site password
     change view.
 
 .. attribute:: AdminSite.password_change_done_template
-
-    .. versionadded:: 1.2
 
     Path to a custom template that will be used by the admin site password
     change done view.
@@ -1978,16 +1948,17 @@ accessible using Django's :ref:`URL reversing system <naming-url-patterns>`.
 
 The :class:`AdminSite` provides the following named URL patterns:
 
-======================  ========================  =============
-Page                    URL name                  Parameters
-======================  ========================  =============
-Index                   ``index``
-Logout                  ``logout``
-Password change         ``password_change``
-Password change done    ``password_change_done``
-i18n javascript         ``jsi18n``
-Application index page  ``app_list``              ``app_label``
-======================  ========================  =============
+=========================  ========================  ==================================
+Page                       URL name                  Parameters
+=========================  ========================  ==================================
+Index                      ``index``
+Logout                     ``logout``
+Password change            ``password_change``
+Password change done       ``password_change_done``
+i18n javascript            ``jsi18n``
+Application index page     ``app_list``              ``app_label``
+Redirect to object's page  ``view_on_site``          ``content_type_id``, ``object_id``
+=========================  ========================  ==================================
 
 Each :class:`ModelAdmin` instance provides an additional set of named URLs:
 

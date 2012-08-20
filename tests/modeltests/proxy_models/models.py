@@ -5,6 +5,7 @@ than using a new table of their own. This allows them to act as simple proxies,
 providing a modified interface to the data from the base class.
 """
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 # A couple of managers for testing managing overriding in proxy model cases.
 
@@ -16,6 +17,7 @@ class SubManager(models.Manager):
     def get_query_set(self):
         return super(SubManager, self).get_query_set().exclude(name="wilma")
 
+@python_2_unicode_compatible
 class Person(models.Model):
     """
     A simple concrete base class.
@@ -24,7 +26,7 @@ class Person(models.Model):
 
     objects = PersonManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Abstract(models.Model):
@@ -82,10 +84,11 @@ class MyPersonProxy(MyPerson):
 class LowerStatusPerson(MyPersonProxy):
     status = models.CharField(max_length=80)
 
+@python_2_unicode_compatible
 class User(models.Model):
     name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class UserProxy(User):
@@ -100,11 +103,12 @@ class UserProxyProxy(UserProxy):
 class Country(models.Model):
     name = models.CharField(max_length=50)
 
+@python_2_unicode_compatible
 class State(models.Model):
     name = models.CharField(max_length=50)
     country = models.ForeignKey(Country)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class StateProxy(State):
@@ -124,11 +128,12 @@ class ProxyTrackerUser(TrackerUser):
         proxy = True
 
 
+@python_2_unicode_compatible
 class Issue(models.Model):
     summary = models.CharField(max_length=255)
     assignee = models.ForeignKey(TrackerUser)
 
-    def __unicode__(self):
+    def __str__(self):
         return ':'.join((self.__class__.__name__,self.summary,))
 
 class Bug(Issue):

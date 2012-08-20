@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.six.moves import xrange
 
 from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
 
@@ -10,7 +12,7 @@ class GoogleMapException(Exception):
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
-GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&amp;v=%s&amp;key='
+GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):
@@ -48,7 +50,7 @@ class GoogleMap(object):
 
         # Can specify the API URL in the `api_url` keyword.
         if not api_url:
-            self.api_url = mark_safe(getattr(settings, 'GOOGLE_MAPS_URL', GOOGLE_MAPS_URL) % self.version)
+            self.api_url = getattr(settings, 'GOOGLE_MAPS_URL', GOOGLE_MAPS_URL) % self.version
         else:
             self.api_url = api_url
 
@@ -111,17 +113,18 @@ class GoogleMap(object):
     @property
     def body(self):
         "Returns HTML body tag for loading and unloading Google Maps javascript."
-        return mark_safe('<body %s %s>' % (self.onload, self.onunload))
+        return format_html('<body {0} {1}>', self.onload, self.onunload)
 
     @property
     def onload(self):
         "Returns the `onload` HTML <body> attribute."
-        return mark_safe('onload="%s.%s_load()"' % (self.js_module, self.dom_id))
+        return format_html('onload="{0}.{1}_load()"', self.js_module, self.dom_id)
 
     @property
     def api_script(self):
         "Returns the <script> tag for the Google Maps API javascript."
-        return mark_safe('<script src="%s%s" type="text/javascript"></script>' % (self.api_url, self.key))
+        return format_html('<script src="{0}{1}" type="text/javascript"></script>',
+                           self.api_url, self.key)
 
     @property
     def js(self):
@@ -131,17 +134,17 @@ class GoogleMap(object):
     @property
     def scripts(self):
         "Returns all <script></script> tags required with Google Maps JavaScript."
-        return mark_safe('%s\n  <script type="text/javascript">\n//<![CDATA[\n%s//]]>\n  </script>' % (self.api_script, self.js))
+        return format_html('%s\n  <script type="text/javascript">\n//<![CDATA[\n%s//]]>\n  </script>', self.api_script, mark_safe(self.js))
 
     @property
     def style(self):
         "Returns additional CSS styling needed for Google Maps on IE."
-        return mark_safe('<style type="text/css">%s</style>' % self.vml_css)
+        return format_html('<style type="text/css">{0}</style>', self.vml_css)
 
     @property
     def xhtml(self):
         "Returns XHTML information needed for IE VML overlays."
-        return mark_safe('<html xmlns="http://www.w3.org/1999/xhtml" %s>' % self.xmlns)
+        return format_html('<html xmlns="http://www.w3.org/1999/xhtml" {0}>', self.xmlns)
 
     @property
     def icons(self):

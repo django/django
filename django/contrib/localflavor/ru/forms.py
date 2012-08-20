@@ -1,7 +1,7 @@
 """
 Russian-specific forms helpers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -34,7 +34,7 @@ class RUPostalCodeField(RegexField):
     Format: XXXXXX, where X is any digit, and first digit is not zero.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXXX.'),
+        'invalid': _('Enter a postal code in the format XXXXXX.'),
     }
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUPostalCodeField, self).__init__(r'^\d{6}$',
@@ -47,7 +47,7 @@ class RUPassportNumberField(RegexField):
     XXXX XXXXXX where X - any digit.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a passport number in the format XXXX XXXXXX.'),
+        'invalid': _('Enter a passport number in the format XXXX XXXXXX.'),
     }
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUPassportNumberField, self).__init__(r'^\d{4} \d{6}$',
@@ -60,7 +60,7 @@ class RUAlienPassportNumberField(RegexField):
     XX XXXXXXX where X - any digit.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a passport number in the format XX XXXXXXX.'),
+        'invalid': _('Enter a passport number in the format XX XXXXXXX.'),
     }
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUAlienPassportNumberField, self).__init__(r'^\d{2} \d{7}$',

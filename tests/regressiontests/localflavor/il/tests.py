@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.il.forms import (ILPostalCodeField,
     ILIDNumberField)
 
@@ -6,7 +8,7 @@ from django.test import SimpleTestCase
 
 class ILLocalFlavorTests(SimpleTestCase):
     def test_ILPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XXXXX']
+        error_format = ['Enter a postal code in the format XXXXX']
         valid = {
             '69973': '69973',
             '699 73': '69973',
@@ -21,7 +23,7 @@ class ILLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ILPostalCodeField, valid, invalid)
 
     def test_ILIDNumberField(self):
-        error_invalid = [u'Enter a valid ID number.']
+        error_invalid = ['Enter a valid ID number.']
         valid = {
             '3933742-3': '39337423',
             '39337423': '39337423',

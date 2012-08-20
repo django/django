@@ -10,7 +10,7 @@ Install Python
 --------------
 
 Being a Python Web framework, Django requires Python. It works with any Python
-version from 2.6 to 2.7 (due to backwards incompatibilities in Python 3.0,
+version from 2.6.5 to 2.7 (due to backwards incompatibilities in Python 3.0,
 Django does not currently work with Python 3.0; see :doc:`the Django FAQ
 </faq/install>` for more information on supported Python versions and the 3.0
 transition), these versions of Python include a lightweight database called
@@ -84,8 +84,9 @@ Then at the Python prompt, try to import Django::
 
     >>> import django
     >>> print(django.get_version())
-    1.4
+    1.5
 
+You may have another version of Django installed.
 
 That's it!
 ----------

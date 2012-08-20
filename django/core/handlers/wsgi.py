@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import sys
 from io import BytesIO
 from threading import Lock
@@ -7,7 +9,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.encoding import force_text, smart_str, iri_to_uri
 from django.utils.log import getLogger
 
 logger = getLogger('django.request')
@@ -125,7 +127,7 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_unicode(environ.get('PATH_INFO', u'/'))
+        path_info = force_text(environ.get('PATH_INFO', '/'))
         if not path_info or path_info == script_name:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -134,7 +136,7 @@ class WSGIRequest(http.HttpRequest):
             #
             # (The comparison of path_info to script_name is to work around an
             # apparent bug in flup 1.0.1. See Django ticket #8490).
-            path_info = u'/'
+            path_info = '/'
         self.environ = environ
         self.path_info = path_info
         self.path = '%s%s' % (script_name, path_info)
@@ -208,8 +210,7 @@ class WSGIHandler(base.BaseHandler):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
-            self.initLock.acquire()
-            try:
+            with self.initLock:
                 try:
                     # Check that middleware is still uninitialised.
                     if self._request_middleware is None:
@@ -218,8 +219,6 @@ class WSGIHandler(base.BaseHandler):
                     # Unload whatever middleware we got
                     self._request_middleware = None
                     raise
-            finally:
-                self.initLock.release()
 
         set_script_prefix(base.get_script_name(environ))
         signals.request_started.send(sender=self.__class__)
@@ -246,6 +245,6 @@ class WSGIHandler(base.BaseHandler):
         status = '%s %s' % (response.status_code, status_text)
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
-            response_headers.append(('Set-Cookie', str(c.output(header=''))))
-        start_response(status, response_headers)
+            response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
+        start_response(smart_str(status), response_headers)
         return response

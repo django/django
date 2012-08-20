@@ -1,12 +1,15 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext
 from django.utils import feedgenerator, tzinfo
-from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
+from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.timezone import is_naive
+
 
 def add_domain(domain, url, secure=False):
     protocol = 'https' if secure else 'http'
@@ -16,9 +19,7 @@ def add_domain(domain, url, secure=False):
     elif not (url.startswith('http://')
             or url.startswith('https://')
             or url.startswith('mailto:')):
-        # 'url' must already be ASCII and URL-quoted, so no need for encoding
-        # conversions here.
-        url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
+        url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
@@ -42,10 +43,10 @@ class Feed(object):
 
     def item_title(self, item):
         # Titles should be double escaped by default (see #6533)
-        return escape(force_unicode(item))
+        return escape(force_text(item))
 
     def item_description(self, item):
-        return force_unicode(item)
+        return force_text(item)
 
     def item_link(self, item):
         try:
@@ -59,14 +60,14 @@ class Feed(object):
         except AttributeError:
             return default
         if callable(attr):
-            # Check func_code.co_argcount rather than try/excepting the
+            # Check __code__.co_argcount rather than try/excepting the
             # function and catching the TypeError, because something inside
             # the function may raise the TypeError. This technique is more
             # accurate.
-            if hasattr(attr, 'func_code'):
-                argcount = attr.func_code.co_argcount
+            if hasattr(attr, '__code__'):
+                argcount = attr.__code__.co_argcount
             else:
-                argcount = attr.__call__.func_code.co_argcount
+                argcount = attr.__call__.__code__.co_argcount
             if argcount == 2: # one argument is 'self'
                 return attr(obj)
             else:
@@ -105,7 +106,7 @@ class Feed(object):
             subtitle = self.__get_dynamic_attr('subtitle', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
-            language = settings.LANGUAGE_CODE.decode(),
+            language = settings.LANGUAGE_CODE,
             feed_url = add_domain(
                 current_site.domain,
                 self.__get_dynamic_attr('feed_url', obj) or request.path,
@@ -153,9 +154,9 @@ class Feed(object):
             enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
                 enc = feedgenerator.Enclosure(
-                    url = smart_unicode(enc_url),
-                    length = smart_unicode(self.__get_dynamic_attr('item_enclosure_length', item)),
-                    mime_type = smart_unicode(self.__get_dynamic_attr('item_enclosure_mime_type', item))
+                    url = smart_text(enc_url),
+                    length = smart_text(self.__get_dynamic_attr('item_enclosure_length', item)),
+                    mime_type = smart_text(self.__get_dynamic_attr('item_enclosure_mime_type', item))
                 )
             author_name = self.__get_dynamic_attr('item_author_name', item)
             if author_name is not None:

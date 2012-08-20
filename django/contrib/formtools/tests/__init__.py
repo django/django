@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+import datetime
 import os
+import pickle
 import re
 import warnings
 
@@ -14,6 +19,7 @@ from django.contrib.formtools.tests.wizard import *
 from django.contrib.formtools.tests.forms import *
 
 success_string = "Done was called!"
+success_string_encoded = success_string.encode()
 
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
@@ -41,7 +47,7 @@ class PreviewTests(TestCase):
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
-        self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
+        self.test_data = {'field1': 'foo', 'field1_': 'asdf'}
 
     def test_unused_name(self):
         """
@@ -76,7 +82,7 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage': 1})
+        self.test_data.update({'stage': 1, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
         # Check to confirm stage is set to 2 in output form.
         stage = self.input % 2
@@ -94,13 +100,13 @@ class PreviewTests(TestCase):
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
-        self.test_data.update({'stage':2})
+        self.test_data.update({'stage': 2, 'date1': datetime.date(2006, 10, 25)})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
     def test_bool_submit(self):
         """
@@ -117,10 +123,10 @@ class PreviewTests(TestCase):
         """
         self.test_data.update({'stage':2})
         hash = self.preview.security_hash(None, TestForm(self.test_data))
-        self.test_data.update({'hash':hash, 'bool1':u'False'})
+        self.test_data.update({'hash': hash, 'bool1': 'False'})
         with warnings.catch_warnings(record=True):
             response = self.client.post('/preview/', self.test_data)
-            self.assertEqual(response.content, success_string)
+            self.assertEqual(response.content, success_string_encoded)
 
     def test_form_submit_good_hash(self):
         """
@@ -131,11 +137,11 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.assertEqual(response.content, success_string_encoded)
 
 
     def test_form_submit_bad_hash(self):
@@ -148,11 +154,11 @@ class PreviewTests(TestCase):
         self.test_data.update({'stage':2})
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
         hash = utils.form_hmac(TestForm(self.test_data)) + "bad"
         self.test_data.update({'hash': hash})
         response = self.client.post('/previewpreview/', self.test_data)
-        self.assertNotEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string_encoded)
 
 
 class FormHmacTests(unittest.TestCase):
@@ -163,8 +169,8 @@ class FormHmacTests(unittest.TestCase):
         leading/trailing whitespace so as to be friendly to broken browsers that
         submit it (usually in textareas).
         """
-        f1 = HashTestForm({'name': u'joe', 'bio': u'Nothing notable.'})
-        f2 = HashTestForm({'name': u'  joe', 'bio': u'Nothing notable.  '})
+        f1 = HashTestForm({'name': 'joe', 'bio': 'Speaking español.'})
+        f2 = HashTestForm({'name': '  joe', 'bio': 'Speaking español.  '})
         hash1 = utils.form_hmac(f1)
         hash2 = utils.form_hmac(f2)
         self.assertEqual(hash1, hash2)
@@ -266,10 +272,13 @@ class WizardTests(TestCase):
         Form should advance if the hash is present and good, as calculated using
         current method.
         """
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "wizard_step": u"1"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "1"}
         response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
 
@@ -291,18 +300,27 @@ class WizardTests(TestCase):
                     reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm])
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "wizard_step": u"1"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "hash_1": u"1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
-                "wizard_step": u"2"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "hash_1": {
+                    2: "1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
+                    3: "c33142ef9d01b1beae238adf22c3c6c57328f51a",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "2"}
         self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
 
     def test_14498(self):
@@ -315,16 +333,19 @@ class WizardTests(TestCase):
 
         class WizardWithProcessStep(TestWizardClass):
             def process_step(self, request, form, step):
-                that.assertTrue(hasattr(form, 'cleaned_data'))
+                that.assertTrue(form.is_valid())
                 reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
                                         WizardPageThreeForm])
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "wizard_step": u"1"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
@@ -345,10 +366,13 @@ class WizardTests(TestCase):
         wizard = Wizard([WizardPageOneForm,
                          WizardPageTwoForm])
 
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "wizard_step": u"1"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
@@ -371,10 +395,13 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
                                         WizardPageThreeForm])
-        data = {"0-field": u"test",
-                "1-field": u"test2",
-                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "wizard_step": u"1"}
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 

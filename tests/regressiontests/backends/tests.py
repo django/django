@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import threading
@@ -16,6 +16,8 @@ from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 from . import models
@@ -50,7 +52,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([unicode(x) for x in xrange(4000)])
+        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
         c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()
@@ -65,6 +67,18 @@ class OracleChecks(unittest.TestCase):
         connection.cursor()  # Ensure the connection is initialized.
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle connection semantics")
+    def test_order_of_nls_parameters(self):
+        # an 'almost right' datetime should work with configured
+        # NLS parameters as per #18465.
+        c = connection.cursor()
+        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+        # Test that the query succeeds without errors - pre #18465 this
+        # wasn't the case.
+        c.execute(query)
+        self.assertEqual(c.fetchone()[0], 1)
 
 class MySQLTests(TestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
@@ -125,35 +139,25 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+
 class LastExecutedQueryTest(TestCase):
+    @override_settings(DEBUG=True)
+    def test_debug_sql(self):
+        list(models.Tag.objects.filter(name="test"))
+        sql = connection.queries[-1]['sql'].lower()
+        self.assertTrue(sql.startswith("select"))
+        self.assertIn(models.Tag._meta.db_table, sql)
 
-    def setUp(self):
-        # connection.queries will not be filled in without this
-        settings.DEBUG = True
+    def test_query_encoding(self):
+        """
+        Test that last_executed_query() returns an Unicode string
+        """
+        tags = models.Tag.objects.extra(select={'föö':1})
+        sql, params = tags.query.sql_with_params()
+        cursor = tags.query.get_compiler('default').execute_sql(None)
+        last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
+        self.assertTrue(isinstance(last_sql, six.text_type))
 
-    def tearDown(self):
-        settings.DEBUG = False
-
-    # There are no tests for the sqlite backend because it does not
-    # implement paramater escaping. See #14091.
-
-    @unittest.skipUnless(connection.vendor in ('oracle', 'postgresql'),
-                         "These backends use the standard parameter escaping rules")
-    def test_parameter_escaping(self):
-        # check that both numbers and string are properly quoted
-        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
-        sql = connection.queries[-1]['sql']
-        self.assertTrue("= 'special:\\\"'':' " in sql)
-        self.assertTrue("= 12 " in sql)
-
-    @unittest.skipUnless(connection.vendor == 'mysql',
-                         "MySQL uses backslashes to escape parameters.")
-    def test_parameter_escaping(self):
-        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
-        sql = connection.queries[-1]['sql']
-        # only this line is different from the test above
-        self.assertTrue("= 'special:\\\\\\\"\\':' " in sql)
-        self.assertTrue("= 12 " in sql)
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
@@ -393,9 +397,9 @@ class BackendTestCase(TestCase):
              qn(f3.column)))
         cursor = connection.cursor()
         cursor.execute(query2)
-        self.assertEqual(cursor.fetchone(), (u'Clark', u'Kent'))
-        self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
-        self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
+        self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
+        self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
+        self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
 
     def test_database_operations_helper_class(self):
         # Ticket #13630
@@ -403,8 +407,7 @@ class BackendTestCase(TestCase):
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
 
-    def test_supports_needed_confirm(self):
-        connection.features.confirm()
+    def test_cached_db_features(self):
         self.assertIn(connection.features.supports_transactions, (True, False))
         self.assertIn(connection.features.supports_stddev, (True, False))
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
@@ -529,7 +532,7 @@ class ThreadTests(TestCase):
             from django.db import connection
             connection.cursor()
             connections_set.add(connection.connection)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
@@ -556,7 +559,7 @@ class ThreadTests(TestCase):
                 # main thread.
                 conn.allow_thread_sharing = True
                 connections_set.add(conn)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
@@ -581,7 +584,7 @@ class ThreadTests(TestCase):
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")
-                except DatabaseError as e:
+                except Exception as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
             t.start()
@@ -591,21 +594,21 @@ class ThreadTests(TestCase):
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to False
         connections['default'].allow_thread_sharing = False
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to True
         connections['default'].allow_thread_sharing = True
         exceptions = []
         do_thread()
         # All good
-        self.assertEqual(len(exceptions), 0)
+        self.assertEqual(exceptions, [])
 
     def test_closing_non_shared_connections(self):
         """

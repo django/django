@@ -2,7 +2,7 @@
 India-specific Form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -10,7 +10,7 @@ from django.contrib.localflavor.in_.in_states import STATES_NORMALIZED, STATE_CH
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, CharField, Select
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -38,7 +38,7 @@ phone_digits_re = re.compile(r"""
 
 class INZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': _(u'Enter a zip code in the format XXXXXX or XXX XXX.'),
+        'invalid': _('Enter a zip code in the format XXXXXX or XXX XXX.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -48,7 +48,7 @@ class INZipCodeField(RegexField):
     def clean(self, value):
         super(INZipCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         # Convert to "NNNNNN" if "NNN NNN" given
         value = re.sub(r'^(\d{3})\s(\d{3})$', r'\1\2', value)
         return value
@@ -61,20 +61,20 @@ class INStateField(Field):
     registration abbreviation for the given state or union territory
     """
     default_error_messages = {
-        'invalid': _(u'Enter an Indian state or territory.'),
+        'invalid': _('Enter an Indian state or territory.'),
     }
 
     def clean(self, value):
         super(INStateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().lower()
         except AttributeError:
             pass
         else:
             try:
-                return smart_unicode(STATES_NORMALIZED[value.strip().lower()])
+                return smart_text(STATES_NORMALIZED[value.strip().lower()])
             except KeyError:
                 pass
         raise ValidationError(self.error_messages['invalid'])
@@ -106,10 +106,10 @@ class INPhoneNumberField(CharField):
     def clean(self, value):
         super(INPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
-        value = smart_unicode(value)
+            return ''
+        value = smart_text(value)
         m = phone_digits_re.match(value)
         if m:
-            return u'%s' % (value)
+            return '%s' % (value)
         raise ValidationError(self.error_messages['invalid'])
 

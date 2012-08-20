@@ -1,6 +1,10 @@
+from __future__ import unicode_literals
+
 import copy
 import pickle
 
+from django.test.utils import str_prefix
+from django.utils import six
 from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
 
@@ -15,16 +19,26 @@ class _ComplexObject(object):
     def __hash__(self):
         return hash(self.name)
 
-    def __str__(self):
-        return "I am _ComplexObject(%r)" % self.name
+    if six.PY3:
+        def __bytes__(self):
+            return ("I am _ComplexObject(%r)" % self.name).encode("utf-8")
 
-    def __unicode__(self):
-        return unicode(self.name)
+        def __str__(self):
+            return self.name
+
+    else:
+        def __str__(self):
+            return b"I am _ComplexObject(%r)" % str(self.name)
+
+        def __unicode__(self):
+            return self.name
 
     def __repr__(self):
         return "_ComplexObject(%r)" % self.name
 
+
 complex_object = lambda: _ComplexObject("joe")
+
 
 class TestUtilsSimpleLazyObject(TestCase):
     """
@@ -50,11 +64,12 @@ class TestUtilsSimpleLazyObject(TestCase):
         # proxy __repr__
         self.assertTrue("SimpleLazyObject" in repr(SimpleLazyObject(complex_object)))
 
-    def test_str(self):
-        self.assertEqual("I am _ComplexObject('joe')", str(SimpleLazyObject(complex_object)))
+    def test_bytes(self):
+        self.assertEqual(b"I am _ComplexObject('joe')",
+                bytes(SimpleLazyObject(complex_object)))
 
-    def test_unicode(self):
-        self.assertEqual(u"joe", unicode(SimpleLazyObject(complex_object)))
+    def test_text(self):
+        self.assertEqual("joe", six.text_type(SimpleLazyObject(complex_object)))
 
     def test_class(self):
         # This is important for classes that use __class__ in things like
@@ -104,5 +119,5 @@ class TestUtilsSimpleLazyObject(TestCase):
         pickled = pickle.dumps(x)
         unpickled = pickle.loads(pickled)
         self.assertEqual(unpickled, x)
-        self.assertEqual(unicode(unpickled), unicode(x))
+        self.assertEqual(six.text_type(unpickled), six.text_type(x))
         self.assertEqual(unpickled.name, x.name)

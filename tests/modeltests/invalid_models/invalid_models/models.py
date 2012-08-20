@@ -5,6 +5,8 @@
 This example exists purely to point out errors in models.
 """
 
+from __future__ import unicode_literals
+
 from django.db import connection, models
 
 
@@ -261,12 +263,12 @@ class InvalidSetDefault(models.Model):
 class UnicodeForeignKeys(models.Model):
     """Foreign keys which can translate to ascii should be OK, but fail if
     they're not."""
-    good = models.ForeignKey(u'FKTarget')
-    also_good = models.ManyToManyField(u'FKTarget', related_name='unicode2')
+    good = models.ForeignKey('FKTarget')
+    also_good = models.ManyToManyField('FKTarget', related_name='unicode2')
 
     # In Python 3 this should become legal, but currently causes unicode errors
     # when adding the errors in core/management/validation.py
-    #bad = models.ForeignKey(u'★')
+    #bad = models.ForeignKey('★')
 
 
 class PrimaryKeyNull(models.Model):

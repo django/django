@@ -3,7 +3,7 @@
 Spanish-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -91,7 +91,7 @@ class ESIdentityCardNumberField(RegexField):
     def clean(self, value):
         super(ESIdentityCardNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         nif_get_checksum = lambda d: self.nif_control[int(d)%23]
 
         value = value.upper().replace(' ', '').replace('-', '')
@@ -157,7 +157,7 @@ class ESCCCField(RegexField):
     def clean(self, value):
         super(ESCCCField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         control_str = [1, 2, 4, 8, 5, 10, 9, 7, 3, 6]
         m = re.match(r'^(\d{4})[ -]?(\d{4})[ -]?(\d{2})[ -]?(\d{10})$', value)
         entity, office, checksum, account = m.groups()

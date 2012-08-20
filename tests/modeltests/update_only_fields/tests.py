@@ -18,6 +18,107 @@ class UpdateOnlyFieldsTests(TestCase):
         self.assertEqual(s.gender, 'F')
         self.assertEqual(s.name, 'Ian')
 
+    def test_update_fields_deferred(self):
+        s = Person.objects.create(name='Sara', gender='F', pid=22)
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.defer("gender", "pid").get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(1):
+            s1.save()
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Emily")
+        self.assertEqual(s2.gender, "M")
+
+    def test_update_fields_only_1(self):
+        s = Person.objects.create(name='Sara', gender='F')
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(1):
+            s1.save()
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Emily")
+        self.assertEqual(s2.gender, "M")
+
+    def test_update_fields_only_2(self):
+        s = Person.objects.create(name='Sara', gender='F', pid=22)
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(2):
+            s1.save(update_fields=['pid'])
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Sara")
+        self.assertEqual(s2.gender, "F")
+
+    def test_update_fields_only_repeated(self):
+        s = Person.objects.create(name='Sara', gender='F')
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        s1.gender = 'M'
+        with self.assertNumQueries(1):
+            s1.save()
+        # Test that the deferred class does not remember that gender was
+        # set, instead the instace should remember this.
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        with self.assertNumQueries(1):
+            s1.save()
+
+    def test_update_fields_inheritance_defer(self):
+        profile_boss = Profile.objects.create(name='Boss', salary=3000)
+        e1 = Employee.objects.create(name='Sara', gender='F',
+            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.only('name').get(pk=e1.pk)
+        e1.name = 'Linda'
+        with self.assertNumQueries(1):
+            e1.save()
+        self.assertEqual(Employee.objects.get(pk=e1.pk).name,
+                         'Linda')
+
+    def test_update_fields_fk_defer(self):
+        profile_boss = Profile.objects.create(name='Boss', salary=3000)
+        profile_receptionist = Profile.objects.create(name='Receptionist', salary=1000)
+        e1 = Employee.objects.create(name='Sara', gender='F',
+            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.only('profile').get(pk=e1.pk)
+        e1.profile = profile_receptionist
+        with self.assertNumQueries(1):
+            e1.save()
+        self.assertEqual(Employee.objects.get(pk=e1.pk).profile, profile_receptionist)
+        e1.profile_id = profile_boss.pk
+        with self.assertNumQueries(1):
+            e1.save()
+        self.assertEqual(Employee.objects.get(pk=e1.pk).profile, profile_boss)
+
+    def test_select_related_only_interaction(self):
+        profile_boss = Profile.objects.create(name='Boss', salary=3000)
+        e1 = Employee.objects.create(name='Sara', gender='F',
+            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.only('profile__salary').select_related('profile').get(pk=e1.pk)
+        profile_boss.name = 'Clerk'
+        profile_boss.salary = 1000
+        profile_boss.save()
+        # The loaded salary of 3000 gets saved, the name of 'Clerk' isn't
+        # overwritten.
+        with self.assertNumQueries(1):
+            e1.profile.save()
+        reloaded_profile = Profile.objects.get(pk=profile_boss.pk)
+        self.assertEqual(reloaded_profile.name, profile_boss.name)
+        self.assertEqual(reloaded_profile.salary, 3000)
+
     def test_update_fields_m2m(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
         e1 = Employee.objects.create(name='Sara', gender='F',
@@ -54,6 +155,14 @@ class UpdateOnlyFieldsTests(TestCase):
         e3 = Employee.objects.get(pk=e1.pk)
         self.assertEqual(e3.name, 'Ian')
         self.assertEqual(e3.profile, profile_receptionist)
+
+        with self.assertNumQueries(1):
+            e3.profile = profile_boss
+            e3.save(update_fields=['profile_id'])
+
+        e4 = Employee.objects.get(pk=e3.pk)
+        self.assertEqual(e4.profile, profile_boss)
+        self.assertEqual(e4.profile_id, profile_boss.pk)
 
     def test_update_fields_inheritance_with_proxy_model(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)

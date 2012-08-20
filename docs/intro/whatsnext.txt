@@ -108,7 +108,7 @@ On the Web
 ----------
 
 The most recent version of the Django documentation lives at
-http://docs.djangoproject.com/en/dev/. These HTML pages are generated
+https://docs.djangoproject.com/en/dev/. These HTML pages are generated
 automatically from the text files in source control. That means they reflect the
 "latest and greatest" in Django -- they include the very latest corrections and
 additions, and they discuss the latest Django features, which may only be
@@ -124,7 +124,7 @@ rather than asking broad tech-support questions. If you need help with your
 particular Django setup, try the `django-users mailing list`_ or the `#django
 IRC channel`_ instead.
 
-.. _ticket system: https://code.djangoproject.com/simpleticket?component=Documentation
+.. _ticket system: https://code.djangoproject.com/newticket?component=Documentation
 .. _django-users mailing list: http://groups.google.com/group/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 
@@ -191,6 +191,8 @@ You can get a local copy of the HTML documentation following a few easy steps:
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
 
+.. _differences-between-doc-versions:
+
 Differences between versions
 ============================
 
@@ -226,4 +228,4 @@ We follow this policy:
 * The `main documentation Web page`_ includes links to documentation for
   all previous versions.
 
-.. _main documentation Web page: http://docs.djangoproject.com/en/dev/
+.. _main documentation Web page: https://docs.djangoproject.com/en/dev/

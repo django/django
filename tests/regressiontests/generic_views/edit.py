@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
+from django.views.generic.base import View
 from django.views.generic.edit import FormMixin
 
 from . import views
@@ -31,6 +32,7 @@ class CreateViewTests(TestCase):
         res = self.client.get('/edit/authors/create/')
         self.assertEqual(res.status_code, 200)
         self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
+        self.assertTrue(isinstance(res.context['view'], View))
         self.assertFalse('object' in res.context)
         self.assertFalse('author' in res.context)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
@@ -100,6 +102,7 @@ class CreateViewTests(TestCase):
                         {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/accounts/login/?next=/edit/authors/create/restricted/')
+
 
 class UpdateViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'
@@ -226,6 +229,7 @@ class UpdateViewTests(TestCase):
         res = self.client.get('/edit/author/update/')
         self.assertEqual(res.status_code, 200)
         self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
+        self.assertTrue(isinstance(res.context['view'], View))
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
@@ -236,6 +240,7 @@ class UpdateViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
+
 
 class DeleteViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'

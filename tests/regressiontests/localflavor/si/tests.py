@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from datetime import date
 
@@ -9,7 +10,7 @@ from django.test import SimpleTestCase
 
 class SILocalFlavorTests(SimpleTestCase):
     def test_SITaxNumberField(self):
-        error_invalid = [u'Enter a valid tax number in form SIXXXXXXXX']
+        error_invalid = ['Enter a valid tax number in form SIXXXXXXXX']
         valid = {
             '15012557': '15012557',
             'SI15012557': '15012557',
@@ -26,9 +27,9 @@ class SILocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(SITaxNumberField, valid, invalid)
 
     def test_SIEMSOField(self):
-        error_invalid = [u'This field should contain exactly 13 digits.']
-        error_invalid_date = [u'The first 7 digits of the EMSO must represent a valid past date.']
-        error_invalid_chksum = [u'The EMSO is not valid.']
+        error_invalid = ['This field should contain exactly 13 digits.']
+        error_invalid_date = ['The first 7 digits of the EMSO must represent a valid past date.']
+        error_invalid_chksum = ['The EMSO is not valid.']
         valid = {
             '0205951500462': '0205951500462',
             '2309002500068': '2309002500068',
@@ -58,7 +59,7 @@ class SILocalFlavorTests(SimpleTestCase):
             self.assertEqual(f.info, info)
 
     def test_SIPhoneNumberField(self):
-        error_invalid = [u'Enter phone number in form +386XXXXXXXX or 0XXXXXXXX.']
+        error_invalid = ['Enter phone number in form +386XXXXXXXX or 0XXXXXXXX.']
         valid = {
             '+38640999999': '40999999',
             '+3861999999': '1999999',
@@ -81,14 +82,14 @@ class SILocalFlavorTests(SimpleTestCase):
             '1000': '1000'
         }
         invalid = {
-            '1113': [u'Select a valid choice. 1113 is not one of the available choices.'],
-            '111': [u'Select a valid choice. 111 is not one of the available choices.'],
+            '1113': ['Select a valid choice. 1113 is not one of the available choices.'],
+            '111': ['Select a valid choice. 111 is not one of the available choices.'],
         }
         self.assertFieldOutput(SIPostalCodeField, valid, invalid)
 
     def test_SIPostalCodeSelect(self):
         f = SIPostalCodeSelect()
-        out = u'''<select name="Kranj">
+        out = '''<select name="Kranj">
 <option value="8341">Adle\u0161i\u010di</option>
 <option value="5270">Ajdov\u0161\u010dina</option>
 <option value="6280">Ankaran - Ancarano</option>

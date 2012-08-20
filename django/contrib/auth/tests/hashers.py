@@ -1,7 +1,9 @@
+from __future__ import unicode_literals
+
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
 from django.contrib.auth.hashers import (is_password_usable, 
     check_password, make_password, PBKDF2PasswordHasher, load_hashers,
-    PBKDF2SHA1PasswordHasher, get_hasher, UNUSABLE_PASSWORD)
+    PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
 from django.utils import unittest
 from django.utils.unittest import skipUnless
 
@@ -26,7 +28,7 @@ class TestUtilsHashPass(unittest.TestCase):
         encoded = make_password('letmein')
         self.assertTrue(encoded.startswith('pbkdf2_sha256$'))
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
 
     def test_pkbdf2(self):
@@ -34,47 +36,53 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertEqual(encoded, 
 'pbkdf2_sha256$10000$seasalt$FQCNpiZpTb0zub+HBsH6TOwyRxJ19FwvjbweatNmK/Y=')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "pbkdf2_sha256")
 
     def test_sha1(self):
         encoded = make_password('letmein', 'seasalt', 'sha1')
         self.assertEqual(encoded, 
 'sha1$seasalt$fec3530984afba6bade3347b7140d1a7da7da8c7')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "sha1")
 
     def test_md5(self):
         encoded = make_password('letmein', 'seasalt', 'md5')
         self.assertEqual(encoded, 
                          'md5$seasalt$f5531bef9f3687d0ccf0f617f0e25573')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "md5")
 
     def test_unsalted_md5(self):
         encoded = make_password('letmein', 'seasalt', 'unsalted_md5')
         self.assertEqual(encoded, '0d107d09f5bbe40cade3de5c71e9e9b7')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_md5")
 
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
         encoded = make_password('letmein', 'ab', 'crypt')
         self.assertEqual(encoded, 'crypt$$abN/qM.L/H8EQ')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "crypt")
 
     @skipUnless(bcrypt, "py-bcrypt not installed")
     def test_bcrypt(self):
         encoded = make_password('letmein', hasher='bcrypt')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(encoded.startswith('bcrypt$'))
-        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertTrue(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "bcrypt")
 
     def test_unusable(self):
         encoded = make_password(None)
@@ -82,13 +90,15 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertFalse(check_password(None, encoded))
         self.assertFalse(check_password(UNUSABLE_PASSWORD, encoded))
         self.assertFalse(check_password('', encoded))
-        self.assertFalse(check_password(u'letmein', encoded))
+        self.assertFalse(check_password('letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        self.assertRaises(ValueError, identify_hasher, encoded)
 
     def test_bad_algorithm(self):
         def doit():
             make_password('letmein', hasher='lolcat')
         self.assertRaises(ValueError, doit)
+        self.assertRaises(ValueError, identify_hasher, "lolcat$salt$hash")
 
     def test_low_level_pkbdf2(self):
         hasher = PBKDF2PasswordHasher()

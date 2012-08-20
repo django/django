@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def validate_answer_to_universe(value):
@@ -64,13 +67,14 @@ class Article(models.Model):
         if self.pub_date is None:
             self.pub_date = datetime.now()
 
+@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class FlexibleDatePost(models.Model):
@@ -80,8 +84,8 @@ class FlexibleDatePost(models.Model):
     posted = models.DateField(blank=True, null=True)
 
 class UniqueErrorsModel(models.Model):
-    name = models.CharField(max_length=100, unique=True, error_messages={'unique': u'Custom unique name message.'})
-    no = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
+    name = models.CharField(max_length=100, unique=True, error_messages={'unique': 'Custom unique name message.'})
+    no = models.IntegerField(unique=True, error_messages={'unique': 'Custom unique number message.'})
 
 class GenericIPAddressTestModel(models.Model):
     generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)
@@ -99,6 +103,6 @@ try:
     class MultipleAutoFields(models.Model):
         auto1 = models.AutoField(primary_key=True)
         auto2 = models.AutoField(primary_key=True)
-except AssertionError as assertion_error:
-    pass # Fail silently
-assert str(assertion_error) == u"A model can't have more than one AutoField."
+except AssertionError as exc:
+    assertion_error = exc
+assert str(assertion_error) == "A model can't have more than one AutoField."

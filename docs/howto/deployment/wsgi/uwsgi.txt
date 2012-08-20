@@ -46,7 +46,7 @@ uWSGI supports multiple ways to configure the process. See uWSGI's
 
 Here's an example command to start a uWSGI server::
 
-    uwsgi --chdir=/path/to/your/project
+    uwsgi --chdir=/path/to/your/project \
         --module=mysite.wsgi:application \
         --env DJANGO_SETTINGS_MODULE=mysite.settings \
         --master --pidfile=/tmp/project-master.pid \

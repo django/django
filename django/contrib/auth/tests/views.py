@@ -1,6 +1,5 @@
 import os
 import re
-import urllib
 
 from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite
@@ -8,8 +7,9 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import escape
+from django.utils.http import urlquote
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -46,7 +46,7 @@ class AuthViewsTestCase(TestCase):
         self.assertTrue(SESSION_KEY in self.client.session)
 
     def assertContainsEscaped(self, response, text, **kwargs):
-        return self.assertContains(response, escape(force_unicode(text)), **kwargs)
+        return self.assertContains(response, escape(force_text(text)), **kwargs)
 
 
 class AuthViewNamedURLTests(AuthViewsTestCase):
@@ -256,7 +256,7 @@ class LoginTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urllib.quote(bad_url),
+                'bad_url': urlquote(bad_url),
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
@@ -277,7 +277,7 @@ class LoginTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urllib.quote(good_url),
+                'good_url': urlquote(good_url),
             }
             response = self.client.post(safe_url, {
                     'username': 'testclient',
@@ -412,7 +412,7 @@ class LogoutTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urllib.quote(bad_url),
+                'bad_url': urlquote(bad_url),
             }
             self.login()
             response = self.client.get(nasty_url)
@@ -432,7 +432,7 @@ class LogoutTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urllib.quote(good_url),
+                'good_url': urlquote(good_url),
             }
             self.login()
             response = self.client.get(safe_url)

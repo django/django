@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.utils import six
 from django.utils.unittest import skip
 
 from .models import Person
@@ -475,16 +476,16 @@ class AssertRaisesMsgTest(SimpleTestCase):
 class AssertFieldOutputTests(SimpleTestCase):
 
     def test_assert_field_output(self):
-        error_invalid = [u'Enter a valid e-mail address.']
+        error_invalid = ['Enter a valid e-mail address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + [u'Another error']})
+        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
         self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Come on, gimme some well formatted data, dude.']})
+        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']})
 
     def test_custom_required_message(self):
         class MyCustomField(IntegerField):
             default_error_messages = {
-                'required': u'This is really required.',
+                'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
@@ -493,13 +494,7 @@ __test__ = {"API_TEST": r"""
 # Standard doctests do fairly
 >>> import json
 >>> from django.utils.xmlutils import SimplerXMLGenerator
->>> from StringIO import StringIO
-
->>> def produce_long():
-...     return 42L
-
->>> def produce_int():
-...     return 42
+>>> from django.utils.six import StringIO
 
 >>> def produce_json():
 ...     return json.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
@@ -529,14 +524,6 @@ __test__ = {"API_TEST": r"""
 ...     xml.endElement("bar")
 ...     return stream.getvalue()
 
-# Long values are normalized and are comparable to normal integers ...
->>> produce_long()
-42
-
-# ... and vice versa
->>> produce_int()
-42L
-
 # JSON output is normalized for field order, so it doesn't matter
 # which order json dictionary attributes are listed in output
 >>> produce_json()
@@ -560,3 +547,21 @@ __test__ = {"API_TEST": r"""
 '<foo bbb="2.0" aaa="1.0">Hello</foo><bar ddd="4.0" ccc="3.0"></bar>'
 
 """}
+
+if not six.PY3:
+    __test__["API_TEST"] += """
+>>> def produce_long():
+...     return 42L
+
+>>> def produce_int():
+...     return 42
+
+# Long values are normalized and are comparable to normal integers ...
+>>> produce_long()
+42
+
+# ... and vice versa
+>>> produce_int()
+42L
+
+"""

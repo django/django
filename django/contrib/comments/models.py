@@ -7,6 +7,7 @@ from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 
 COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
@@ -40,6 +41,7 @@ class BaseCommentAbstractModel(models.Model):
         )
 
 
+@python_2_unicode_compatible
 class Comment(BaseCommentAbstractModel):
     """
     A user comment about some object.
@@ -77,7 +79,7 @@ class Comment(BaseCommentAbstractModel):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s..." % (self.name, self.comment[:50])
 
     def save(self, *args, **kwargs):
@@ -158,6 +160,7 @@ class Comment(BaseCommentAbstractModel):
         return _('Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % d
 
 
+@python_2_unicode_compatible
 class CommentFlag(models.Model):
     """
     Records a flag on a comment. This is intentionally flexible; right now, a
@@ -187,7 +190,7 @@ class CommentFlag(models.Model):
         verbose_name = _('comment flag')
         verbose_name_plural = _('comment flags')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s flag of comment ID %s by %s" % \
             (self.flag, self.comment_id, self.user.username)
 

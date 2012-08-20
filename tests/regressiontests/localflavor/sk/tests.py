@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.sk.forms import (SKRegionSelect,
     SKPostalCodeField, SKDistrictSelect)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class SKLocalFlavorTests(SimpleTestCase):
     def test_SKRegionSelect(self):
         f = SKRegionSelect()
-        out = u'''<select name="regions">
+        out = '''<select name="regions">
 <option value="BB">Banska Bystrica region</option>
 <option value="BA">Bratislava region</option>
 <option value="KE">Kosice region</option>
@@ -21,7 +23,7 @@ class SKLocalFlavorTests(SimpleTestCase):
 
     def test_SKDistrictSelect(self):
         f = SKDistrictSelect()
-        out = u'''<select name="Districts">
+        out = '''<select name="Districts">
 <option value="BB">Banska Bystrica</option>
 <option value="BS">Banska Stiavnica</option>
 <option value="BJ">Bardejov</option>
@@ -105,7 +107,7 @@ class SKLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('Districts', 'RK'), out)
 
     def test_SKPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XXXXX or XXX XX.']
+        error_format = ['Enter a postal code in the format XXXXX or XXX XX.']
         valid = {
             '91909': '91909',
             '917 01': '91701',

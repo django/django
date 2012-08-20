@@ -5,15 +5,14 @@ The messages framework
 .. module:: django.contrib.messages
    :synopsis: Provides cookie- and session-based temporary message storage.
 
-Django provides full support for cookie- and session-based messaging, for
-both anonymous and authenticated clients. The messages framework allows you
-to temporarily store messages in one request and retrieve them for display
-in a subsequent request (usually the next one). Every message is tagged
-with a specific ``level`` that determines its priority (e.g., ``info``,
-``warning``, or ``error``).
-
-.. versionadded:: 1.2
-   The messages framework was added.
+Quite commonly in web applications, you may need to display a one-time
+notification message (also know as "flash message") to the user after
+processing a form or some other types of user input. For this, Django provides
+full support for cookie- and session-based messaging, for both anonymous and
+authenticated users. The messages framework allows you to temporarily store
+messages in one request and retrieve them for display in a subsequent request
+(usually the next one). Every message is tagged with a specific ``level`` that
+determines its priority (e.g., ``info``, ``warning``, or ``error``).
 
 Enabling messages
 =================
@@ -57,7 +56,8 @@ Storage backends
 ----------------
 
 The messages framework can use different backends to store temporary messages.
-To change which backend is being used, add a `MESSAGE_STORAGE`_ to your
+If the default FallbackStorage isn't suitable to your needs, you can change
+which backend is being used by adding a `MESSAGE_STORAGE`_ to your
 settings, referencing the module and class of the storage class. For
 example::
 
@@ -65,7 +65,7 @@ example::
 
 The value should be the full path of the desired storage class.
 
-Four storage classes are included:
+Three storage classes are available:
 
 ``'django.contrib.messages.storage.session.SessionStorage'``
     This class stores all messages inside of the request's session. It
@@ -77,6 +77,8 @@ Four storage classes are included:
     messages are dropped if the cookie data size would exceed 4096 bytes.
 
 ``'django.contrib.messages.storage.fallback.FallbackStorage'``
+    This is the default storage class.
+
     This class first uses CookieStorage for all messages, falling back to using
     SessionStorage for the messages that could not fit in a single cookie.
 

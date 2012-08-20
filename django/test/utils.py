@@ -6,6 +6,7 @@ from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.utils.translation import deactivate
 from django.utils.functional import wraps
+from django.utils import six
 
 
 __all__ = (
@@ -35,7 +36,7 @@ class ContextList(list):
     in a list of context objects.
     """
     def __getitem__(self, key):
-        if isinstance(key, basestring):
+        if isinstance(key, six.string_types):
             for subcontext in self:
                 if key in subcontext:
                     return subcontext[key]
@@ -220,3 +221,7 @@ class override_settings(object):
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value)
+
+
+def str_prefix(s):
+    return s % {'_': '' if six.PY3 else 'u'}

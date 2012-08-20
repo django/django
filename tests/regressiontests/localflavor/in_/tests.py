@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.in_.forms import (INZipCodeField,
     INStateField, INStateSelect, INPhoneNumberField)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 
 class INLocalFlavorTests(SimpleTestCase):
     def test_INPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format.']
+        error_format = ['Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format.']
         valid = {
             '0423-2443667': '0423-2443667',
             '0423 2443667': '0423 2443667',
@@ -27,7 +29,7 @@ class INLocalFlavorTests(SimpleTestCase):
 
     def test_INPStateSelect(self):
         f = INStateSelect()
-        out = u'''<select name="state">
+        out = '''<select name="state">
 <option value="KA">Karnataka</option>
 <option value="AP" selected="selected">Andhra Pradesh</option>
 <option value="KL">Kerala</option>
@@ -67,7 +69,7 @@ class INLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('state', 'AP'), out)
 
     def test_INZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXXX or XXX XXX.']
+        error_format = ['Enter a zip code in the format XXXXXX or XXX XXX.']
         valid = {
             '360311': '360311',
             '360 311': '360311',
@@ -82,7 +84,7 @@ class INLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(INZipCodeField, valid, invalid)
 
     def test_INStateField(self):
-        error_format = [u'Enter an Indian state or territory.']
+        error_format = ['Enter an Indian state or territory.']
         valid = {
             'an': 'AN',
             'AN': 'AN',

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 from functools import partial
@@ -11,14 +11,16 @@ from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
-from django.utils.encoding import smart_unicode, force_unicode, smart_str
+from django.utils.encoding import smart_text, force_text, smart_str
 from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
 from django.utils.formats import localize
 from django.utils.html import escape
 from django.utils.module_loading import module_has_submodule
+from django.utils import six
 from django.utils.timezone import template_localtime
+from django.utils.encoding import python_2_unicode_compatible
 
 
 TOKEN_TEXT = 0
@@ -78,6 +80,7 @@ class TemplateDoesNotExist(Exception):
 class TemplateEncodingError(Exception):
     pass
 
+@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -85,10 +88,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
-        return self.msg % tuple([force_unicode(p, errors='replace')
+        return self.msg % tuple([force_text(p, errors='replace')
                                  for p in self.params])
 
 class InvalidTemplateLibrary(Exception):
@@ -116,7 +116,7 @@ class Template(object):
     def __init__(self, template_string, origin=None,
                  name='<Unknown Template>'):
         try:
-            template_string = smart_unicode(template_string)
+            template_string = smart_text(template_string)
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
@@ -184,6 +184,7 @@ class Lexer(object):
         self.template_string = template_string
         self.origin = origin
         self.lineno = 1
+        self.verbatim = False
 
     def tokenize(self):
         """
@@ -203,15 +204,21 @@ class Lexer(object):
         If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
-        if in_tag:
+        if in_tag and token_string.startswith(BLOCK_TAG_START):
             # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
             # We could do len(BLOCK_TAG_START) to be more "correct", but we've
             # hard-coded the 2s here for performance. And it's not like
             # the TAG_START values are going to change anytime, anyway.
+            block_content = token_string[2:-2].strip()
+            if self.verbatim and block_content == self.verbatim:
+                self.verbatim = False
+        if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
                 token = Token(TOKEN_VAR, token_string[2:-2].strip())
             elif token_string.startswith(BLOCK_TAG_START):
-                token = Token(TOKEN_BLOCK, token_string[2:-2].strip())
+                if block_content[:9] in ('verbatim', 'verbatim '):
+                    self.verbatim = 'end%s' % block_content
+                token = Token(TOKEN_BLOCK, block_content)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
@@ -823,8 +830,8 @@ class NodeList(list):
                 bit = self.render_node(node, context)
             else:
                 bit = node
-            bits.append(force_unicode(bit))
-        return mark_safe(u''.join(bits))
+            bits.append(force_text(bit))
+        return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -855,7 +862,7 @@ def _render_value_in_context(value, context):
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
-    value = force_unicode(value)
+    value = force_text(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
             isinstance(value, EscapeData)):
         return escape(value)
@@ -953,7 +960,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         kwarg = token_kwargs([bit], parser)
         if kwarg:
             # The kwarg was successfully extracted
-            param, value = kwarg.items()[0]
+            param, value = list(six.iteritems(kwarg))[0]
             if param not in params and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(
@@ -994,8 +1001,8 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
     if unhandled_params:
         # Some positional arguments were not supplied
         raise TemplateSyntaxError(
-            u"'%s' did not receive value(s) for the argument(s): %s" %
-            (name, u", ".join([u"'%s'" % p for p in unhandled_params])))
+            "'%s' did not receive value(s) for the argument(s): %s" %
+            (name, ", ".join(["'%s'" % p for p in unhandled_params])))
     return args, kwargs
 
 def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
@@ -1181,7 +1188,7 @@ class Library(object):
                         from django.template.loader import get_template, select_template
                         if isinstance(file_name, Template):
                             t = file_name
-                        elif not isinstance(file_name, basestring) and is_iterable(file_name):
+                        elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
                             t = select_template(file_name)
                         else:
                             t = get_template(file_name)

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import json
@@ -6,6 +6,8 @@ import os
 
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
+from django.utils import six
+from django.utils.encoding import smart_bytes
 
 from .models import FileModel, UPLOAD_TO
 from .tests import UNICODE_FILENAME
@@ -19,7 +21,7 @@ def file_upload_view(request):
     """
     form_data = request.POST.copy()
     form_data.update(request.FILES)
-    if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], unicode):
+    if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], six.text_type):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':
@@ -44,7 +46,7 @@ def file_upload_view_verify(request):
         if isinstance(value, UploadedFile):
             new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = hashlib.sha1(value).hexdigest()
+            new_hash = hashlib.sha1(smart_bytes(value)).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 
@@ -67,7 +69,7 @@ def file_upload_unicode_name(request):
     # through file save.
     uni_named_file = request.FILES['file_unicode']
     obj = FileModel.objects.create(testfile=uni_named_file)
-    full_name = u'%s/%s' % (UPLOAD_TO, uni_named_file.name)
+    full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
     if not os.path.exists(full_name):
         response = HttpResponseServerError()
 
@@ -94,7 +96,7 @@ def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
-    r = dict([(k, f.read()) for k, f in request.FILES.items()])
+    r = dict([(k, f.read().decode('utf-8')) for k, f in request.FILES.items()])
     return HttpResponse(json.dumps(r))
 
 def file_upload_quota(request):

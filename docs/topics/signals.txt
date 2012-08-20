@@ -52,10 +52,10 @@ called when the signal is sent by using the
 :meth:`.Signal.connect` method:
 
 .. method:: Signal.connect(receiver, [sender=None, weak=True, dispatch_uid=None])
-    
+
     :param receiver: The callback function which will be connected to this
         signal. See :ref:`receiver-functions` for more information.
-    
+
     :param sender: Specifies a particular sender to receive signals from. See
         :ref:`connecting-to-specific-signals` for more information.
 
@@ -129,9 +129,16 @@ receiver:
 
 Now, our ``my_callback`` function will be called each time a request finishes.
 
+Note that ``receiver`` can also take a list of signals to connect a function
+to.
+
 .. versionadded:: 1.3
 
 The ``receiver`` decorator was added in Django 1.3.
+
+.. versionchanged:: 1.5
+
+The ability to pass a list of signals was added.
 
 .. admonition:: Where should this code live?
 
@@ -182,7 +189,7 @@ Preventing duplicate signals
 In some circumstances, the module in which you are connecting signals may be
 imported multiple times. This can cause your receiver function to be
 registered more than once, and thus called multiples times for a single signal
-event. 
+event.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as
@@ -228,7 +235,7 @@ Remember that you're allowed to change this list of arguments at any time, so ge
 Sending signals
 ---------------
 
-There are two ways to send send signals in Django.
+There are two ways to send signals in Django.
 
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)

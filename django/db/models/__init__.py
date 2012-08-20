@@ -15,8 +15,6 @@ from django.db.models.deletion import CASCADE, PROTECT, SET, SET_NULL, SET_DEFAU
 from django.db.models import signals
 from django.utils.decorators import wraps
 
-# Admin stages.
-ADD, CHANGE, BOTH = 1, 2, 3
 
 def permalink(func):
     """

@@ -80,7 +80,7 @@ class BaseAggregateTestCase(TestCase):
         b = books.get(pk=1)
         self.assertEqual(
             b.name,
-            u'The Definitive Guide to Django: Web Development Done Right'
+            'The Definitive Guide to Django: Web Development Done Right'
         )
         self.assertEqual(b.mean_age, 34.5)
 
@@ -88,10 +88,10 @@ class BaseAggregateTestCase(TestCase):
         books = Book.objects.filter(rating__lt=4.5).annotate(Avg("authors__age")).order_by("name")
         self.assertQuerysetEqual(
             books, [
-                (u'Artificial Intelligence: A Modern Approach', 51.5),
-                (u'Practical Django Projects', 29.0),
-                (u'Python Web Development with Django', Approximate(30.3, places=1)),
-                (u'Sams Teach Yourself Django in 24 Hours', 45.0)
+                ('Artificial Intelligence: A Modern Approach', 51.5),
+                ('Practical Django Projects', 29.0),
+                ('Python Web Development with Django', Approximate(30.3, places=1)),
+                ('Sams Teach Yourself Django in 24 Hours', 45.0)
             ],
             lambda b: (b.name, b.authors__age__avg),
         )
@@ -99,12 +99,12 @@ class BaseAggregateTestCase(TestCase):
         books = Book.objects.annotate(num_authors=Count("authors")).order_by("name")
         self.assertQuerysetEqual(
             books, [
-                (u'Artificial Intelligence: A Modern Approach', 2),
-                (u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
-                (u'Practical Django Projects', 1),
-                (u'Python Web Development with Django', 3),
-                (u'Sams Teach Yourself Django in 24 Hours', 1),
-                (u'The Definitive Guide to Django: Web Development Done Right', 2)
+                ('Artificial Intelligence: A Modern Approach', 2),
+                ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                ('Practical Django Projects', 1),
+                ('Python Web Development with Django', 3),
+                ('Sams Teach Yourself Django in 24 Hours', 1),
+                ('The Definitive Guide to Django: Web Development Done Right', 2)
             ],
             lambda b: (b.name, b.num_authors)
         )
@@ -113,12 +113,12 @@ class BaseAggregateTestCase(TestCase):
         authors = Author.objects.filter(name__contains="a").annotate(Avg("book__rating")).order_by("name")
         self.assertQuerysetEqual(
             authors, [
-                (u'Adrian Holovaty', 4.5),
-                (u'Brad Dayley', 3.0),
-                (u'Jacob Kaplan-Moss', 4.5),
-                (u'James Bennett', 4.0),
-                (u'Paul Bissex', 4.0),
-                (u'Stuart Russell', 4.0)
+                ('Adrian Holovaty', 4.5),
+                ('Brad Dayley', 3.0),
+                ('Jacob Kaplan-Moss', 4.5),
+                ('James Bennett', 4.0),
+                ('Paul Bissex', 4.0),
+                ('Stuart Russell', 4.0)
             ],
             lambda a: (a.name, a.book__rating__avg)
         )
@@ -126,15 +126,15 @@ class BaseAggregateTestCase(TestCase):
         authors = Author.objects.annotate(num_books=Count("book")).order_by("name")
         self.assertQuerysetEqual(
             authors, [
-                (u'Adrian Holovaty', 1),
-                (u'Brad Dayley', 1),
-                (u'Jacob Kaplan-Moss', 1),
-                (u'James Bennett', 1),
-                (u'Jeffrey Forcier', 1),
-                (u'Paul Bissex', 1),
-                (u'Peter Norvig', 2),
-                (u'Stuart Russell', 1),
-                (u'Wesley J. Chun', 1)
+                ('Adrian Holovaty', 1),
+                ('Brad Dayley', 1),
+                ('Jacob Kaplan-Moss', 1),
+                ('James Bennett', 1),
+                ('Jeffrey Forcier', 1),
+                ('Paul Bissex', 1),
+                ('Peter Norvig', 2),
+                ('Stuart Russell', 1),
+                ('Wesley J. Chun', 1)
             ],
             lambda a: (a.name, a.num_books)
         )
@@ -143,12 +143,12 @@ class BaseAggregateTestCase(TestCase):
         books = Book.objects.annotate(Sum("publisher__num_awards")).order_by("name")
         self.assertQuerysetEqual(
             books, [
-                (u'Artificial Intelligence: A Modern Approach', 7),
-                (u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 9),
-                (u'Practical Django Projects', 3),
-                (u'Python Web Development with Django', 7),
-                (u'Sams Teach Yourself Django in 24 Hours', 1),
-                (u'The Definitive Guide to Django: Web Development Done Right', 3)
+                ('Artificial Intelligence: A Modern Approach', 7),
+                ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 9),
+                ('Practical Django Projects', 3),
+                ('Python Web Development with Django', 7),
+                ('Sams Teach Yourself Django in 24 Hours', 1),
+                ('The Definitive Guide to Django: Web Development Done Right', 3)
             ],
             lambda b: (b.name, b.publisher__num_awards__sum)
         )
@@ -156,11 +156,11 @@ class BaseAggregateTestCase(TestCase):
         publishers = Publisher.objects.annotate(Sum("book__price")).order_by("name")
         self.assertQuerysetEqual(
             publishers, [
-                (u'Apress', Decimal("59.69")),
-                (u"Jonno's House of Books", None),
-                (u'Morgan Kaufmann', Decimal("75.00")),
-                (u'Prentice Hall', Decimal("112.49")),
-                (u'Sams', Decimal("23.09"))
+                ('Apress', Decimal("59.69")),
+                ("Jonno's House of Books", None),
+                ('Morgan Kaufmann', Decimal("75.00")),
+                ('Prentice Hall', Decimal("112.49")),
+                ('Sams', Decimal("23.09"))
             ],
             lambda p: (p.name, p.book__price__sum)
         )
@@ -252,15 +252,15 @@ class BaseAggregateTestCase(TestCase):
         self.assertEqual(len(authors), 9)
         self.assertQuerysetEqual(
             authors, [
-                (u'Adrian Holovaty', 32.0),
-                (u'Brad Dayley', None),
-                (u'Jacob Kaplan-Moss', 29.5),
-                (u'James Bennett', 34.0),
-                (u'Jeffrey Forcier', 27.0),
-                (u'Paul Bissex', 31.0),
-                (u'Peter Norvig', 46.0),
-                (u'Stuart Russell', 57.0),
-                (u'Wesley J. Chun', Approximate(33.66, places=1))
+                ('Adrian Holovaty', 32.0),
+                ('Brad Dayley', None),
+                ('Jacob Kaplan-Moss', 29.5),
+                ('James Bennett', 34.0),
+                ('Jeffrey Forcier', 27.0),
+                ('Paul Bissex', 31.0),
+                ('Peter Norvig', 46.0),
+                ('Stuart Russell', 57.0),
+                ('Wesley J. Chun', Approximate(33.66, places=1))
             ],
             lambda a: (a.name, a.friends__age__avg)
         )
@@ -498,25 +498,25 @@ class BaseAggregateTestCase(TestCase):
                     'earliest_book': datetime.date(1991, 10, 15),
                     'num_awards': 9,
                     'id': 4,
-                    'name': u'Morgan Kaufmann'
+                    'name': 'Morgan Kaufmann'
                 },
                 {
                     'earliest_book': datetime.date(1995, 1, 15),
                     'num_awards': 7,
                     'id': 3,
-                    'name': u'Prentice Hall'
+                    'name': 'Prentice Hall'
                 },
                 {
                     'earliest_book': datetime.date(2007, 12, 6),
                     'num_awards': 3,
                     'id': 1,
-                    'name': u'Apress'
+                    'name': 'Apress'
                 },
                 {
                     'earliest_book': datetime.date(2008, 3, 3),
                     'num_awards': 1,
                     'id': 2,
-                    'name': u'Sams'
+                    'name': 'Sams'
                 }
             ]
         )
@@ -563,5 +563,25 @@ class BaseAggregateTestCase(TestCase):
                 (Decimal('30'), 1),
                 (Decimal('75'), 1),
                 (Decimal('82.8'), 1),
+            ]
+        )
+
+    def test_dates_with_aggregation(self):
+        """
+        Test that .dates() returns a distinct set of dates when applied to a
+        QuerySet with aggregation.
+
+        Refs #18056. Previously, .dates() would return distinct (date_kind,
+        aggregation) sets, in this case (year, num_authors), so 2008 would be
+        returned twice because there are books from 2008 with a different
+        number of authors.
+        """
+        dates = Book.objects.annotate(num_authors=Count("authors")).dates('pubdate', 'year')
+        self.assertQuerysetEqual(
+            dates, [
+                "datetime.datetime(1991, 1, 1, 0, 0)",
+                "datetime.datetime(1995, 1, 1, 0, 0)",
+                "datetime.datetime(2007, 1, 1, 0, 0)",
+                "datetime.datetime(2008, 1, 1, 0, 0)"
             ]
         )

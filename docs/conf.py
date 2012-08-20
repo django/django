@@ -11,6 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import unicode_literals
+
 import sys
 import os
 
@@ -92,6 +94,7 @@ pygments_style = 'trac'
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
     'sphinx': ('http://sphinx.pocoo.org/', None),
+    'six': ('http://packages.python.org/six/', None),
 }
 
 # Python's docs don't change every week.
@@ -187,18 +190,16 @@ modindex_common_prefix = ["django."]
 
 # -- Options for LaTeX output --------------------------------------------------
 
-# The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
-
-# The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+latex_elements = {
+    'preamble': '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}'
+}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('contents', 'django.tex', u'Django Documentation',
-   u'Django Software Foundation', 'manual'),
+  ('contents', 'django.tex', 'Django Documentation',
+   'Django Software Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -214,9 +215,6 @@ latex_documents = [
 
 # If true, show URL addresses after external links.
 #latex_show_urls = False
-
-# Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
@@ -237,10 +235,10 @@ man_pages = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Django'
-epub_author = u'Django Software Foundation'
-epub_publisher = u'Django Software Foundation'
-epub_copyright = u'2010, Django Software Foundation'
+epub_title = 'Django'
+epub_author = 'Django Software Foundation'
+epub_publisher = 'Django Software Foundation'
+epub_copyright = '2010, Django Software Foundation'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

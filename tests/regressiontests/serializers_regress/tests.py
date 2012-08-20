@@ -6,11 +6,10 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
-from io import BytesIO
 
 try:
     import yaml
@@ -21,7 +20,9 @@ from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import DeserializationError
 from django.db import connection, models
+from django.http import HttpResponse
 from django.test import TestCase
+from django.utils import six
 from django.utils.functional import curry
 from django.utils.unittest import skipUnless
 
@@ -183,7 +184,7 @@ test_data = [
     (data_obj, 15, CharData, None),
     # (We use something that will fit into a latin1 database encoding here,
     # because that is still the default used on many system setups.)
-    (data_obj, 16, CharData, u'\xa5'),
+    (data_obj, 16, CharData, '\xa5'),
     (data_obj, 20, DateData, datetime.date(2006,6,16)),
     (data_obj, 21, DateData, None),
     (data_obj, 30, DateTimeData, datetime.datetime(2006,6,16,10,42,37)),
@@ -501,15 +502,18 @@ def streamTest(format, self):
     obj.save_base(raw=True)
 
     # Serialize the test database to a stream
-    stream = BytesIO()
-    serializers.serialize(format, [obj], indent=2, stream=stream)
+    for stream in (six.StringIO(), HttpResponse()):
+        serializers.serialize(format, [obj], indent=2, stream=stream)
 
-    # Serialize normally for a comparison
-    string_data = serializers.serialize(format, [obj], indent=2)
+        # Serialize normally for a comparison
+        string_data = serializers.serialize(format, [obj], indent=2)
 
-    # Check that the two are the same
-    self.assertEqual(string_data, stream.getvalue())
-    stream.close()
+        # Check that the two are the same
+        if isinstance(stream, six.StringIO):
+            self.assertEqual(string_data, stream.getvalue())
+        else:
+            self.assertEqual(string_data, stream.content.decode('utf-8'))
+        stream.close()
 
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))

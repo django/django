@@ -727,8 +727,6 @@ passed to ``select_related()``. This includes foreign keys that have
 It's an error to use both a list of fields and the ``depth`` parameter in the
 same ``select_related()`` call; they are conflicting options.
 
-.. versionchanged:: 1.2
-
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
 ``select_related`` — that is, you can traverse a
@@ -1083,11 +1081,13 @@ to ``defer()``::
     # Load all fields immediately.
     my_queryset.defer(None)
 
+.. versionchanged:: 1.5
+
 Some fields in a model won't be deferred, even if you ask for them. You can
 never defer the loading of the primary key. If you are using
 :meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related one
-(at the moment, that doesn't raise an error, but it will eventually).
+loading of the field that connects from the primary model to the related
+one, doing so will result in an error.
 
 .. note::
 
@@ -1109,6 +1109,14 @@ loading of the field that connects from the primary model to the related one
     might otherwise call ``defer()``. This makes your code more explicit to the
     reader, is slightly faster and consumes a little less memory in the Python
     process.
+
+.. versionchanged:: 1.5
+
+.. note::
+
+    When calling :meth:`~Model.save()` for instances with deferred fields,
+    only the loaded fields will be saved. See :meth:`~Model.save()` for more
+    details.
 
 
 only
@@ -1147,16 +1155,25 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
+.. versionchanged:: 1.5
+
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options.
+options. Also note that using :meth:`only` and omitting a field requested
+using :meth:`select_related` is an error as well.
+
+.. versionchanged:: 1.5
+
+.. note::
+
+    When calling :meth:`~Model.save()` for instances with deferred fields,
+    only the loaded fields will be saved. See :meth:`~Model.save()` for more
+    details.
 
 using
 ~~~~~
 
 .. method:: using(alias)
-
-.. versionadded:: 1.2
 
 This method is for controlling which database the ``QuerySet`` will be
 evaluated against if you are using more than one database.  The only argument
@@ -1349,7 +1366,7 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 bulk_create
 ~~~~~~~~~~~
 
-.. method:: bulk_create(objs)
+.. method:: bulk_create(objs, batch_size=None)
 
 .. versionadded:: 1.4
 
@@ -1371,20 +1388,12 @@ This has a number of caveats though:
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
   does not retrieve and set the primary key attribute, as ``save()`` does.
 
-.. admonition:: Limits of SQLite
+The ``batch_size`` parameter controls how many objects are created in single
+query. The default is to create all objects in one batch, except for SQLite
+where the default is such that at maximum 999 variables per query is used.
 
-    SQLite sets a limit on the number of parameters per SQL statement. The
-    maximum is defined by the SQLITE_MAX_VARIABLE_NUMBER_ compilation option,
-    which defaults to 999. For instance, if your model has 8 fields (including
-    the primary key), you cannot create more than 999 // 8 = 124 instances at
-    a time. If you exceed this limit, you'll get an exception::
-
-        django.db.utils.DatabaseError: too many SQL variables
-
-    If your application's performance requirements exceed SQLite's limits, you
-    should switch to another database engine, such as PostgreSQL.
-
-.. _SQLITE_MAX_VARIABLE_NUMBER: http://sqlite.org/limits.html#max_variable_number
+.. versionadded:: 1.5
+    The ``batch_size`` parameter was added in version 1.5.
 
 count
 ~~~~~
@@ -1511,8 +1520,6 @@ exists
 ~~~~~~
 
 .. method:: exists()
-
-.. versionadded:: 1.2
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
@@ -1768,22 +1775,6 @@ instead of providing a list of literal values::
 This queryset will be evaluated as subselect statement::
 
     SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
-
-The above code fragment could also be written as follows::
-
-    inner_q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
-    entries = Entry.objects.filter(blog__in=inner_q)
-
-.. warning::
-
-    This ``query`` attribute should be considered an opaque internal attribute.
-    It's fine to use it like above, but its API may change between Django
-    versions.
-
-This second form is a bit less readable and unnatural to write, since it
-accesses the internal ``query`` attribute and requires a ``ValuesQuerySet``.
-If your code doesn't require compatibility with Django 1.0, use the first
-form, passing in a queryset directly.
 
 If you pass in a ``ValuesQuerySet`` or ``ValuesListQuerySet`` (the result of
 calling ``values()`` or ``values_list()`` on a queryset) as the value to an

@@ -2,6 +2,10 @@ from django.conf import settings
 from django.test.simple import build_suite, DjangoTestSuiteRunner
 from django.utils import unittest
 
+from .test_geoforms import GeometryFieldTest
+from .test_measure import DistanceTest, AreaTest
+from .test_spatialrefsys import SpatialRefSysTest
+
 
 def geo_apps(namespace=True, runtests=False):
     """
@@ -54,20 +58,12 @@ def geodjango_suite(apps=True):
     from django.contrib.gis.geos import tests as geos_tests
     suite.addTest(geos_tests.suite())
 
-    # Adding the measurment tests.
-    from django.contrib.gis.tests import test_measure
-    suite.addTest(test_measure.suite())
-
     # Adding GDAL tests, and any test suite that depends on GDAL, to the
     # suite if GDAL is available.
     from django.contrib.gis.gdal import HAS_GDAL
     if HAS_GDAL:
         from django.contrib.gis.gdal import tests as gdal_tests
         suite.addTest(gdal_tests.suite())
-
-        from django.contrib.gis.tests import test_spatialrefsys, test_geoforms
-        suite.addTest(test_spatialrefsys.suite())
-        suite.addTest(test_geoforms.suite())
     else:
         sys.stderr.write('GDAL not available - no tests requiring GDAL will be run.\n')
 

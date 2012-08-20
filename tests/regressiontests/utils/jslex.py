@@ -23,7 +23,7 @@ class JsTokensTest(TestCase):
         (''' 'hello' "hello" ''', ["string 'hello'", 'string "hello"']),
         (r""" 'don\'t' "don\"t" '"' "'" '\'' "\"" """,
          [r"""string 'don\'t'""", r'''string "don\"t"''', r"""string '"'""", r'''string "'"''', r"""string '\''""", r'''string "\""''']),
-        (ur'"ƃuıxǝ⅂ ʇdıɹɔsɐʌɐſ\""', [ur'string "ƃuıxǝ⅂ ʇdıɹɔsɐʌɐſ\""']),
+        (r'"ƃuıxǝ⅂ ʇdıɹɔsɐʌɐſ\""', [r'string "ƃuıxǝ⅂ ʇdıɹɔsɐʌɐſ\""']),
         # comments
         ("a//b", ["id a", "linecomment //b"]),
         ("/****/a/=2//hello", ["comment /****/", "id a", "punct /=", "dnum 2", "linecomment //hello"]),

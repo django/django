@@ -31,7 +31,7 @@ attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
 aggregate with a database backend that falls within the affected release range.
 
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
-.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+.. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
 
 Optimizing PostgreSQL's configuration
 -------------------------------------
@@ -56,10 +56,10 @@ will do some additional queries to set these parameters.
 Transaction handling
 ---------------------
 
-:doc:`By default </topics/db/transactions>`, Django starts a transaction when a
-database connection is first used and commits the result at the end of the
-request/response handling. The PostgreSQL backends normally operate the same
-as any other Django backend in this respect.
+:doc:`By default </topics/db/transactions>`, Django runs with an open
+transaction which it commits automatically when any built-in, data-altering
+model function is called. The PostgreSQL backends normally operate the same as
+any other Django backend in this respect.
 
 .. _postgresql-autocommit-mode:
 
@@ -111,7 +111,7 @@ outputs a single ``CREATE INDEX`` statement.  However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perfrom
+for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
@@ -238,7 +238,7 @@ to you, the developer, to handle the fact that you will receive bytestrings if
 you configure your table(s) to use ``utf8_bin`` collation. Django itself should
 mostly work smoothly with such columns (except for the ``contrib.sessions``
 ``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.smart_unicode()`` at
+your code must be prepared to call ``django.utils.encoding.smart_text()`` at
 times if it really wants to work with consistent data -- Django will not do
 this for you (the database backend layer and the model population layer are
 separated internally so the database layer doesn't know it needs to make this
@@ -335,7 +335,9 @@ storage engine, you have a couple of options.
       }
 
   This sets the default storage engine upon connecting to the database.
-  After your tables have been created, you should remove this option.
+  After your tables have been created, you should remove this option as it
+  adds a query that is only needed during table creation to each database
+  connection.
 
 * Another method for changing the storage engine is described in
   AlterModelOnSyncDB_.
@@ -372,15 +374,6 @@ these methods in no-op's based in the results of such detection.
 
 Notes on specific fields
 ------------------------
-
-Boolean fields
-~~~~~~~~~~~~~~
-
-.. versionchanged:: 1.2
-
-In previous versions of Django when running under MySQL ``BooleanFields`` would
-return their data as ``ints``, instead of true ``bools``.  See the release
-notes for a complete description of the change.
 
 Character fields
 ~~~~~~~~~~~~~~~~

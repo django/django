@@ -1,6 +1,7 @@
 """
 Extra HTML Widget classes
 """
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -10,6 +11,7 @@ from django.utils import datetime_safe
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
+from django.utils import six
 from django.conf import settings
 
 __all__ = ('SelectDateWidget',)
@@ -63,7 +65,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]
@@ -77,7 +79,7 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
         choices = [(i, i) for i in self.years]
         year_html = self.create_select(name, self.year_field, value, year_val, choices)
-        choices = MONTHS.items()
+        choices = list(six.iteritems(MONTHS))
         month_html = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
         day_html = self.create_select(name, self.day_field, value, day_val,  choices)
@@ -90,7 +92,7 @@ class SelectDateWidget(Widget):
                 output.append(month_html)
             elif field == 'day':
                 output.append(day_html)
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
         first_select = None

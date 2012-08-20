@@ -1,8 +1,9 @@
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
+from django.utils import six
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -24,7 +25,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
-                  for alias, col in self.query.extra_select.iteritems()]
+                  for alias, col in six.iteritems(self.query.extra_select)]
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -170,7 +171,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         objects.
         """
         values = []
-        aliases = self.query.extra_select.keys()
+        aliases = list(self.query.extra_select)
 
         # Have to set a starting row number offset that is used for
         # determining the correct starting row index -- needed for

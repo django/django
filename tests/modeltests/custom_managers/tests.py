@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+from django.utils import six
 
 from .models import Person, Book, Car, PersonManager, PublishedBookManager
 
@@ -14,7 +15,7 @@ class CustomManagerTests(TestCase):
             Person.objects.get_fun_people(), [
                 "Bugs Bunny"
             ],
-            unicode
+            six.text_type
         )
         # The RelatedManager used on the 'books' descriptor extends the default
         # manager

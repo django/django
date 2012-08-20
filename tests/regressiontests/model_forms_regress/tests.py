@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import date
 
@@ -7,6 +7,7 @@ from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import (modelform_factory, ModelChoiceField,
     fields_for_model, construct_instance, ModelFormMetaclass)
+from django.utils import six
 from django.utils import unittest
 from django.test import TestCase
 
@@ -134,7 +135,7 @@ class ManyToManyCallableInitialTests(TestCase):
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
         form = ModelForm()
-        self.assertHTMLEqual(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
+        self.assertHTMLEqual(form.as_ul(), """<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
 <li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
 <option value="%d" selected="selected">First Book</option>
 <option value="%d" selected="selected">Second Book</option>
@@ -194,7 +195,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
@@ -212,7 +213,7 @@ class OneToOneFieldTests(TestCase):
         publication = Publication.objects.create(title="Pravda",
             date_published=date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
-        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        form = AuthorForm({'publication':'', 'full_name':'John Doe'}, instance=author)
         self.assertTrue(not form.is_valid())
 
 
@@ -392,14 +393,14 @@ class FileFieldTests(unittest.TestCase):
 
         """
         form = DocumentForm()
-        self.assertTrue('name="myfile"' in unicode(form))
-        self.assertTrue('myfile-clear' not in unicode(form))
+        self.assertTrue('name="myfile"' in six.text_type(form))
+        self.assertTrue('myfile-clear' not in six.text_type(form))
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
         form = DocumentForm(instance=doc)
-        self.assertTrue('myfile-clear' in unicode(form))
+        self.assertTrue('myfile-clear' in six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
         self.assertEqual(bool(doc.myfile), False)
@@ -419,8 +420,8 @@ class FileFieldTests(unittest.TestCase):
                             data={'myfile-clear': 'true'})
         self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],
-                         [u'Please either submit a file or check the clear checkbox, not both.'])
-        rendered = unicode(form)
+                         ['Please either submit a file or check the clear checkbox, not both.'])
+        rendered = six.text_type(form)
         self.assertTrue('something.txt' in rendered)
         self.assertTrue('myfile-clear' in rendered)
 
@@ -435,8 +436,8 @@ class EditionForm(forms.ModelForm):
 
 class UniqueErrorsTests(TestCase):
     def setUp(self):
-        self.author1 = Person.objects.create(name=u'Author #1')
-        self.author2 = Person.objects.create(name=u'Author #2')
+        self.author1 = Person.objects.create(name='Author #1')
+        self.author2 = Person.objects.create(name='Author #2')
         self.pub1 = Publication.objects.create(title='Pub #1', date_published=date(2000, 10, 31))
         self.pub2 = Publication.objects.create(title='Pub #2', date_published=date(2004, 1, 5))
         form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161484100'})
@@ -444,13 +445,13 @@ class UniqueErrorsTests(TestCase):
 
     def test_unique_error_message(self):
         form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub2.pk, 'edition': 1, 'isbn': '9783161484100'})
-        self.assertEqual(form.errors, {'isbn': [u'Edition with this Isbn already exists.']})
+        self.assertEqual(form.errors, {'isbn': ['Edition with this Isbn already exists.']})
 
     def test_unique_together_error_message(self):
         form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub1.pk, 'edition': 2, 'isbn': '9783161489999'})
-        self.assertEqual(form.errors, {'__all__': [u'Edition with this Author and Publication already exists.']})
+        self.assertEqual(form.errors, {'__all__': ['Edition with this Author and Publication already exists.']})
         form = EditionForm(data={'author': self.author2.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161487777'})
-        self.assertEqual(form.errors, {'__all__': [u'Edition with this Publication and Edition already exists.']})
+        self.assertEqual(form.errors, {'__all__': ['Edition with this Publication and Edition already exists.']})
 
 
 class EmptyFieldsTestCase(TestCase):
@@ -484,9 +485,8 @@ class CustomMetaclass(ModelFormMetaclass):
         new.base_fields = {}
         return new
 
-class CustomMetaclassForm(forms.ModelForm):
-    __metaclass__ = CustomMetaclass
-
+class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
+    pass
 
 class CustomMetaclassTestCase(TestCase):
     def test_modelform_factory_metaclass(self):

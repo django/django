@@ -1,7 +1,8 @@
 import os
 import stat
 from os.path import join, normcase, normpath, abspath, isabs, sep
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 
 try:
     WindowsError = WindowsError
@@ -10,13 +11,12 @@ except NameError:
         pass
 
 
-# Define our own abspath function that can handle joining
-# unicode paths to a current working directory that has non-ASCII
-# characters in it.  This isn't necessary on Windows since the
-# Windows version of abspath handles this correctly.  The Windows
-# abspath also handles drive letters differently than the pure
-# Python implementation, so it's best not to replace it.
-if os.name == 'nt':
+# Under Python 2, define our own abspath function that can handle joining
+# unicode paths to a current working directory that has non-ASCII characters
+# in it.  This isn't necessary on Windows since the Windows version of abspath
+# handles this correctly. It also handles drive letters differently than the
+# pure Python implementation, so it's best not to replace it.
+if six.PY3 or os.name == 'nt':
     abspathu = abspath
 else:
     def abspathu(path):
@@ -37,8 +37,8 @@ def safe_join(base, *paths):
     The final path must be located inside of the base path component (otherwise
     a ValueError is raised).
     """
-    base = force_unicode(base)
-    paths = [force_unicode(p) for p in paths]
+    base = force_text(base)
+    paths = [force_text(p) for p in paths]
     final_path = abspathu(join(base, *paths))
     base_path = abspathu(base)
     base_path_len = len(base_path)

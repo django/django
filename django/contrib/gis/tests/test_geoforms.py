@@ -1,9 +1,14 @@
 from django.forms import ValidationError
-from django.contrib.gis import forms
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
 from django.utils import unittest
 
 
+if HAS_SPATIALREFSYS:
+    from django.contrib.gis import forms
+    from django.contrib.gis.geos import GEOSGeometry
+
+@unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS, "GeometryFieldTest needs gdal support and a spatial database")
 class GeometryFieldTest(unittest.TestCase):
 
     def test00_init(self):
@@ -51,7 +56,24 @@ class GeometryFieldTest(unittest.TestCase):
 
         pnt_fld = forms.GeometryField(geom_type='POINT')
         self.assertEqual(GEOSGeometry('POINT(5 23)'), pnt_fld.clean('POINT(5 23)'))
+        # a WKT for any other geom_type will be properly transformed by `to_python`
+        self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)'), pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
+        # but rejected by `clean`
         self.assertRaises(forms.ValidationError, pnt_fld.clean, 'LINESTRING(0 0, 1 1)')
+
+    def test04_to_python(self):
+        """
+        Testing to_python returns a correct GEOSGeometry object or
+        a ValidationError
+        """
+        fld = forms.GeometryField()
+        # to_python returns the same GEOSGeometry for a WKT
+        for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
+            self.assertEqual(GEOSGeometry(wkt), fld.to_python(wkt))
+        # but raises a ValidationError for any other string
+        for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
+            self.assertRaises(forms.ValidationError, fld.to_python, wkt)
+
 
 def suite():
     s = unittest.TestSuite()

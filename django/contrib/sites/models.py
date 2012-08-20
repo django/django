@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 
 SITE_CACHE = {}
@@ -32,6 +33,7 @@ class SiteManager(models.Manager):
         SITE_CACHE = {}
 
 
+@python_2_unicode_compatible
 class Site(models.Model):
 
     domain = models.CharField(_('domain name'), max_length=100)
@@ -44,7 +46,7 @@ class Site(models.Model):
         verbose_name_plural = _('sites')
         ordering = ('domain',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.domain
 
     def save(self, *args, **kwargs):
@@ -62,6 +64,7 @@ class Site(models.Model):
             pass
 
 
+@python_2_unicode_compatible
 class RequestSite(object):
     """
     A class that shares the primary interface of Site (i.e., it has
@@ -73,7 +76,7 @@ class RequestSite(object):
     def __init__(self, request):
         self.domain = self.name = request.get_host()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.domain
 
     def save(self, force_insert=False, force_update=False):

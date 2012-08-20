@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import errno
 import os
@@ -197,8 +197,8 @@ class FileStorageTests(unittest.TestCase):
             ContentFile(b'file saved with path'))
 
         self.assertTrue(self.storage.exists('path/to'))
-        self.assertEqual(self.storage.open('path/to/test.file').read(),
-            b'file saved with path')
+        with self.storage.open('path/to/test.file') as f:
+            self.assertEqual(f.read(), b'file saved with path')
 
         self.assertTrue(os.path.exists(
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
@@ -251,9 +251,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set([u'storage_dir_1']))
+        self.assertEqual(set(dirs), set(['storage_dir_1']))
         self.assertEqual(set(files),
-                         set([u'storage_test_1', u'storage_test_2']))
+                         set(['storage_test_1', 'storage_test_2']))
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -305,13 +305,13 @@ class FileStorageTests(unittest.TestCase):
 
             self.storage.save('normal/test.file',
                 ContentFile(b'saved normally'))
-            self.assertEqual(self.storage.open('normal/test.file').read(),
-                b'saved normally')
+            with self.storage.open('normal/test.file') as f:
+                self.assertEqual(f.read(), b'saved normally')
 
             self.storage.save('raced/test.file',
                 ContentFile(b'saved with race'))
-            self.assertEqual(self.storage.open('raced/test.file').read(),
-                b'saved with race')
+            with self.storage.open('raced/test.file') as f:
+                self.assertEqual(f.read(), b'saved with race')
 
             # Check that OSErrors aside from EEXIST are still raised.
             self.assertRaises(OSError,
@@ -388,7 +388,7 @@ class UnicodeFileNameTests(unittest.TestCase):
         out the encoding situation between doctest and this file, but the actual
         repr doesn't matter; it just shouldn't return a unicode object.
         """
-        uf = UploadedFile(name=u'¿Cómo?',content_type='text')
+        uf = UploadedFile(name='¿Cómo?',content_type='text')
         self.assertEqual(type(uf.__repr__()), str)
 
 # Tests for a race condition on file saving (#4948).
@@ -424,7 +424,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0666
+        settings.FILE_UPLOAD_PERMISSIONS = 0o666
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
@@ -434,8 +434,8 @@ class FileStoragePermissions(unittest.TestCase):
 
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile(b"data"))
-        actual_mode = os.stat(self.storage.path(name))[0] & 0777
-        self.assertEqual(actual_mode, 0666)
+        actual_mode = os.stat(self.storage.path(name))[0] & 0o777
+        self.assertEqual(actual_mode, 0o666)
 
 
 class FileStoragePathParsing(unittest.TestCase):

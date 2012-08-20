@@ -53,6 +53,8 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view()),
     (r'^detail/author/invalid/qs/$',
         views.AuthorDetail.as_view(queryset=None)),
+    (r'^detail/nonmodel/1/$',
+        views.NonModelDetail.as_view()),
 
     # Create/UpdateView
     (r'^edit/artists/create/$',
@@ -111,6 +113,8 @@ urlpatterns = patterns('',
         views.BookArchive.as_view(paginate_by=10)),
     (r'^dates/books/reverse/$',
         views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+    (r'^dates/books/by_month/$',
+        views.BookArchive.as_view(date_list_period='month')),
     (r'^dates/booksignings/$',
         views.BookSigningArchive.as_view()),
 

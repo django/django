@@ -10,8 +10,9 @@ all about the internals of models in order to get the information it needs.
 import copy
 
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.tree import Node
+from django.utils import six
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.expressions import ExpressionNode
@@ -602,22 +603,22 @@ class Query(object):
             # slight complexity here is handling fields that exist on parent
             # models.
             workset = {}
-            for model, values in seen.iteritems():
+            for model, values in six.iteritems(seen):
                 for field, m in model._meta.get_fields_with_model():
                     if field in values:
                         continue
                     add_to_dict(workset, m or model, field)
-            for model, values in must_include.iteritems():
+            for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
                 # empty set means "include all fields". That's why there's no
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in workset.iteritems():
+            for model, values in six.iteritems(workset):
                 callback(target, model, values)
         else:
-            for model, values in must_include.iteritems():
+            for model, values in six.iteritems(must_include):
                 if model in seen:
                     seen[model].update(values)
                 else:
@@ -631,7 +632,7 @@ class Query(object):
             for model in orig_opts.get_parent_list():
                 if model not in seen:
                     seen[model] = set()
-            for model, values in seen.iteritems():
+            for model, values in six.iteritems(seen):
                 callback(target, model, values)
 
 
@@ -770,7 +771,7 @@ class Query(object):
         for k, aliases in self.join_map.items():
             aliases = tuple([change_map.get(a, a) for a in aliases])
             self.join_map[k] = aliases
-        for old_alias, new_alias in change_map.iteritems():
+        for old_alias, new_alias in six.iteritems(change_map):
             alias_data = self.alias_map[old_alias]
             alias_data = alias_data._replace(rhs_alias=new_alias)
             self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
@@ -792,7 +793,7 @@ class Query(object):
                 self.included_inherited_models[key] = change_map[alias]
 
         # 3. Update any joins that refer to the old alias.
-        for alias, data in self.alias_map.iteritems():
+        for alias, data in six.iteritems(self.alias_map):
             lhs = data.lhs_alias
             if lhs in change_map:
                 data = data._replace(lhs_alias=change_map[lhs])
@@ -842,7 +843,7 @@ class Query(object):
         count. Note that after execution, the reference counts are zeroed, so
         tables added in compiler will not be seen by this method.
         """
-        return len([1 for count in self.alias_refcount.itervalues() if count])
+        return len([1 for count in six.itervalues(self.alias_refcount) if count])
 
     def join(self, connection, always_create=False, exclusions=(),
             promote=False, outer_if_first=False, nullable=False, reuse=None):
@@ -1302,7 +1303,7 @@ class Query(object):
                         field, model, direct, m2m = opts.get_field_by_name(f.name)
                         break
                 else:
-                    names = opts.get_all_field_names() + self.aggregate_select.keys()
+                    names = opts.get_all_field_names() + list(self.aggregate_select)
                     raise FieldError("Cannot resolve keyword %r into field. "
                             "Choices are: %s" % (name, ", ".join(names)))
 
@@ -1549,7 +1550,7 @@ class Query(object):
         N-to-many relation field.
         """
         query = Query(self.model)
-        query.add_filter(filter_expr, can_reuse=can_reuse)
+        query.add_filter(filter_expr)
         query.bump_prefix()
         query.clear_ordering(True)
         query.set_start(prefix)
@@ -1571,7 +1572,7 @@ class Query(object):
         # Tag.objects.exclude(parent__parent__name='t1'), a tag with no parent
         # would otherwise be overlooked).
         active_positions = [pos for (pos, count) in
-                enumerate(query.alias_refcount.itervalues()) if count]
+                enumerate(six.itervalues(query.alias_refcount)) if count]
         if active_positions[-1] > 1:
             self.add_filter(('%s__isnull' % prefix, False), negate=True,
                     trim=True, can_reuse=can_reuse)
@@ -1655,10 +1656,15 @@ class Query(object):
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
-            names = opts.get_all_field_names() + self.extra.keys() + self.aggregate_select.keys()
-            names.sort()
-            raise FieldError("Cannot resolve keyword %r into field. "
-                    "Choices are: %s" % (name, ", ".join(names)))
+            if LOOKUP_SEP in name:
+                # For lookups spanning over relationships, show the error
+                # from the model on which the lookup failed.
+                raise
+            else:
+                names = sorted(opts.get_all_field_names() + list(self.extra)
+                               + list(self.aggregate_select))
+                raise FieldError("Cannot resolve keyword %r into field. "
+                                 "Choices are: %s" % (name, ", ".join(names)))
         self.remove_inherited_models()
 
     def add_ordering(self, *ordering):
@@ -1770,7 +1776,7 @@ class Query(object):
             else:
                 param_iter = iter([])
             for name, entry in select.items():
-                entry = force_unicode(entry)
+                entry = force_text(entry)
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
@@ -1845,9 +1851,15 @@ class Query(object):
 
         If no fields are marked for deferral, returns an empty dictionary.
         """
-        collection = {}
-        self.deferred_to_data(collection, self.get_loaded_field_names_cb)
-        return collection
+        # We cache this because we call this function multiple times
+        # (compiler.fill_related_selections, query.iterator)
+        try:
+            return self._loaded_field_names_cache
+        except AttributeError:
+            collection = {}
+            self.deferred_to_data(collection, self.get_loaded_field_names_cb)
+            self._loaded_field_names_cache = collection
+            return collection
 
     def get_loaded_field_names_cb(self, target, model, fields):
         """

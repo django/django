@@ -113,8 +113,8 @@ Just one thing to do: We need to tell the admin that ``Poll``
 objects have an admin interface. To do this, create a file called
 ``admin.py`` in your ``polls`` directory, and edit it to look like this::
 
-    from polls.models import Poll
     from django.contrib import admin
+    from polls.models import Poll
 
     admin.site.register(Poll)
 
@@ -283,6 +283,9 @@ It'd be better if you could add a bunch of Choices directly when you create the
 Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Poll``
 registration code to read::
 
+    from django.contrib import admin
+    from polls.models import Choice, Poll
+
     class ChoiceInline(admin.StackedInline):
         model = Choice
         extra = 3
@@ -308,6 +311,14 @@ It works like this: There are three slots for related Choices -- as specified
 by ``extra`` -- and each time you come back to the "Change" page for an
 already-created object, you get another three extra slots.
 
+At the end of the three current slots you will find an "Add another Choice"
+link.  If you click on it, a new slot will be added. If you want to remove the
+added slot, you can click on the X to the top right of the added slot. Note
+that you can't remove the original three slots. This image shows an added slot:
+
+.. image:: _images/admin15t.png
+   :alt: Additional slot added dynamically
+
 One small problem, though. It takes a lot of screen space to display all the
 fields for entering related ``Choice`` objects. For that reason, Django offers a
 tabular way of displaying inline related objects; you just need to change
@@ -319,8 +330,11 @@ the ``ChoiceInline`` declaration to read::
 With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
 
-.. image:: _images/admin12.png
+.. image:: _images/admin12t.png
    :alt: Add poll page now has more compact choices
+
+Note that there is an extra "Delete?" column that allows removing rows added
+using the "Add Another Choice" button and rows that have already been saved.
 
 Customize the admin change list
 ===============================
@@ -441,6 +455,19 @@ your :setting:`TEMPLATE_DIRS` includes ``'/home/my_username/mytemplates'``, as
 above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 ``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
+
+.. admonition:: Where are the Django source files?
+
+    If you have difficulty finding where the Django source files are located
+    on your system, run the following command:
+
+    .. code-block:: bash
+
+        python -c "
+        import sys
+        sys.path = sys.path[1:]
+        import django
+        print(django.__path__)"
 
 Then, just edit the file and replace the generic Django text with your own
 site's name as you see fit.

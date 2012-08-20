@@ -313,9 +313,6 @@ Custom database types
 
 .. method:: Field.db_type(self, connection)
 
-.. versionadded:: 1.2
-   The ``connection`` argument was added to support multiple databases.
-
 Returns the database column data type for the :class:`~django.db.models.Field`,
 taking into account the connection object, and the settings associated with it.
 
@@ -334,7 +331,6 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 
     class Person(models.Model):
         name = models.CharField(max_length=80)
-        gender = models.CharField(max_length=1)
         something_else = MytypeField()
 
 If you aim to build a database-agnostic application, you should account for
@@ -438,10 +434,14 @@ database, so we need to be able to process strings and ``Hand`` instances in
             p1 = re.compile('.{26}')
             p2 = re.compile('..')
             args = [p2.findall(x) for x in p1.findall(value)]
+            if len(args) != 4:
+                raise ValidationError("Invalid input for a Hand instance")
             return Hand(*args)
 
 Notice that we always return a ``Hand`` instance from this method. That's the
-Python object type we want to store in the model's attribute.
+Python object type we want to store in the model's attribute. If anything is
+going wrong during value conversion, you should raise a
+:exc:`~django.core.exceptions.ValidationError` exception.
 
 **Remember:** If your custom field needs the :meth:`to_python` method to be
 called when it is created, you should be using `The SubfieldBase metaclass`_
@@ -452,9 +452,6 @@ Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: Field.get_prep_value(self, value)
-
-.. versionadded:: 1.2
-   This method was factored out of ``get_db_prep_value()``
 
 This is the reverse of :meth:`.to_python` when working with the
 database backends (as opposed to serialization). The ``value``
@@ -481,9 +478,6 @@ Converting query values to database values
 
 .. method:: Field.get_db_prep_value(self, value, connection, prepared=False)
 
-.. versionadded:: 1.2
-   The ``connection`` and ``prepared`` arguments were added to support multiple databases.
-
 Some data types (for example, dates) need to be in a specific format
 before they can be used by a database backend.
 :meth:`.get_db_prep_value` is the method where those conversions should
@@ -499,9 +493,6 @@ initial data conversions before performing any database-specific
 processing.
 
 .. method:: Field.get_db_prep_save(self, value, connection)
-
-.. versionadded:: 1.2
-   The ``connection`` argument was added to support multiple databases.
 
 Same as the above, but called when the Field value must be *saved* to
 the database. As the default implementation just calls
@@ -540,9 +531,6 @@ As with value conversions, preparing a value for database lookups is a
 two phase process.
 
 .. method:: Field.get_prep_lookup(self, lookup_type, value)
-
-.. versionadded:: 1.2
-   This method was factored out of ``get_db_prep_lookup()``
 
 :meth:`.get_prep_lookup` performs the first phase of lookup preparation,
 performing generic data validity checks
@@ -591,9 +579,6 @@ accepted lookup types to ``exact`` and ``in``::
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
 .. method:: Field.get_db_prep_lookup(self, lookup_type, value, connection, prepared=False)
-
-.. versionadded:: 1.2
-   The ``connection`` and ``prepared`` arguments were added to support multiple databases.
 
 Performs any database-specific data conversions required by a lookup.
 As with :meth:`.get_db_prep_value`, the specific connection that will
@@ -685,7 +670,7 @@ data storage anyway, we can reuse some existing conversion code::
 
         def value_to_string(self, obj):
             value = self._get_val_from_obj(obj)
-            return self.get_db_prep_value(value)
+            return self.get_prep_value(value)
 
 Some general advice
 --------------------
@@ -703,7 +688,7 @@ smoothly:
 2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
    wrapping up as a field. There are a lot of places where the default
    behavior of the field code is to call
-   :func:`~django.utils.encoding.force_unicode` on the value. (In our
+   :func:`~django.utils.encoding.force_text` on the value. (In our
    examples in this document, ``value`` would be a ``Hand`` instance, not a
    ``HandField``). So if your :meth:`__unicode__` method automatically
    converts to the string form of your Python object, you can save yourself

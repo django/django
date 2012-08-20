@@ -2,25 +2,31 @@
 Testing of admin inline formsets.
 
 """
+from __future__ import unicode_literals
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Teacher(models.Model):
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Child(models.Model):
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(Teacher)
@@ -29,8 +35,8 @@ class Child(models.Model):
     object_id = models.PositiveIntegerField()
     parent = generic.GenericForeignKey()
 
-    def __unicode__(self):
-        return u'I am %s, a child of %s' % (self.name, self.parent)
+    def __str__(self):
+        return 'I am %s, a child of %s' % (self.name, self.parent)
 
 
 class Book(models.Model):
@@ -136,6 +142,31 @@ class Consigliere(models.Model):
 class SottoCapo(models.Model):
     name = models.CharField(max_length=100)
     capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
+
+# Models for #18433
+
+class ParentModelWithCustomPk(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+
+
+class ChildModel1(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(ParentModelWithCustomPk)
+
+    def get_absolute_url(self):
+        return '/child_model1/'
+
+
+class ChildModel2(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(ParentModelWithCustomPk)
+
+    def get_absolute_url(self):
+        return '/child_model2/'
+
 
 # Other models
 

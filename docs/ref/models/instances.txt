@@ -25,12 +25,45 @@ The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
 that, you need to :meth:`~Model.save()`.
 
+.. note::
+
+    You may be tempted to customize the model by overriding the ``__init__``
+    method. If you do so, however, take care not to change the calling
+    signature as any change may prevent the model instance from being saved.
+    Rather than overriding ``__init__``, try using one of these approaches:
+
+    1. Add a classmethod on the model class::
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            @classmethod
+            def create(cls, title):
+                book = cls(title=title)
+                # do something with the book
+                return book
+
+        book = Book.create("Pride and Prejudice")
+
+    2. Add a method on a custom manager (usually preferred)::
+
+        class BookManager(models.Manager):
+            def create_book(title):
+                book = self.create(title=title)
+                # do something with the book
+                return book
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            objects = BookManager()
+
+        book = Book.objects.create_book("Pride and Prejudice")
+
 .. _validating-objects:
 
 Validating objects
 ==================
-
-.. versionadded:: 1.2
 
 There are three steps involved in validating a model:
 
@@ -136,9 +169,6 @@ Saving objects
 To save an object back to the database, call ``save()``:
 
 .. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
@@ -356,13 +386,16 @@ perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
 
+When saving a model fetched through deferred model loading
+(:meth:`~Model.only()` or :meth:`~Model.defer()`) only the fields loaded from
+the DB will get updated. In effect there is an automatic ``update_fields`` in
+this case. If you assign or change any deferred field value, these fields will
+be added to the updated fields.
+
 Deleting objects
 ================
 
 .. method:: Model.delete([using=DEFAULT_DB_ALIAS])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 Issues a SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
@@ -426,9 +459,9 @@ using ``__str__()`` like this::
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            # Note use of django.utils.encoding.smart_str() here because
+            # Note use of django.utils.encoding.smart_bytes() here because
             # first_name and last_name will be unicode strings.
-            return smart_str('%s %s' % (self.first_name, self.last_name))
+            return smart_bytes('%s %s' % (self.first_name, self.last_name))
 
 ``get_absolute_url``
 --------------------
@@ -572,25 +605,29 @@ might have some of the following methods:
 
 For every field that has :attr:`~django.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
-the field. This method returns the "human-readable" value of the field. For
-example, in the following model::
+the field. This method returns the "human-readable" value of the field.
 
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-    )
-    class Person(models.Model):
-        name = models.CharField(max_length=20)
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+For example::
 
-...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
+        from django.db import models
 
-    >>> p = Person(name='John', gender='M')
-    >>> p.save()
-    >>> p.gender
-    'M'
-    >>> p.get_gender_display()
-    'Male'
+        class Person(models.Model):
+            SHIRT_SIZES = (
+                (u'S', u'Small'),
+                (u'M', u'Medium'),
+                (u'L', u'Large'),
+            )
+            name = models.CharField(max_length=60)
+            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+
+    ::
+
+        >>> p = Person(name="Fred Flintstone", shirt_size="L")
+        >>> p.save()
+        >>> p.shirt_size
+        u'L'
+        >>> p.get_shirt_size_display()
+        u'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
@@ -608,4 +645,3 @@ described in :ref:`Field lookups <field-lookups>`.
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
 duplicated. That also means you cannot use those methods on unsaved objects.
-

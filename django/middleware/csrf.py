@@ -4,6 +4,7 @@ Cross Site Request Forgery Middleware.
 This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
+from __future__ import unicode_literals
 
 import hashlib
 import re
@@ -12,6 +13,7 @@ import random
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
+from django.utils.encoding import force_text
 from django.utils.http import same_origin
 from django.utils.log import getLogger
 from django.utils.crypto import constant_time_compare, get_random_string
@@ -51,11 +53,10 @@ def get_token(request):
 
 
 def _sanitize_token(token):
-    # Allow only alphanum, and ensure we return a 'str' for the sake
-    # of the post processing middleware.
+    # Allow only alphanum
     if len(token) > CSRF_KEY_LENGTH:
         return _get_new_csrf_key()
-    token = re.sub('[^a-zA-Z0-9]+', '', str(token.decode('ascii', 'ignore')))
+    token = re.sub('[^a-zA-Z0-9]+', '', force_text(token))
     if token == "":
         # In case the cookie has been truncated to nothing at some point.
         return _get_new_csrf_key()

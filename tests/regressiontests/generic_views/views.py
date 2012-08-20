@@ -226,3 +226,18 @@ class BookSigningTodayArchive(BookSigningConfig, generic.TodayArchiveView):
 
 class BookSigningDetail(BookSigningConfig, generic.DateDetailView):
     context_object_name = 'book'
+
+
+class NonModel(object):
+    id = "non_model_1"
+
+    _meta = None
+
+
+class NonModelDetail(generic.DetailView):
+
+    template_name = 'generic_views/detail.html'
+    model = NonModel
+
+    def get_object(self, queryset=None):
+        return NonModel()

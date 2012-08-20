@@ -71,6 +71,10 @@ class AdminScriptTestCase(unittest.TestCase):
                 os.remove(full_name + 'c')
         except OSError:
             pass
+        # Also remove a __pycache__ directory, if it exists
+        cache_name = os.path.join(test_dir, '__pycache__')
+        if os.path.isdir(cache_name):
+            shutil.rmtree(cache_name)
 
     def _ext_backend_paths(self):
         """
@@ -110,14 +114,11 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path.extend(ext_backend_base_dirs)
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
-        # Silence the DeprecationWarning caused by having a locale directory
-        # in the project directory.
-        cmd = [sys.executable, '-Wignore:::django.utils.translation', script]
-
         # Move to the test directory and run
         os.chdir(test_dir)
-        out, err = subprocess.Popen(cmd + args,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        out, err = subprocess.Popen([sys.executable, script] + args,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                universal_newlines=True).communicate()
 
         # Restore the old environment
         if old_django_settings_module:
@@ -1540,6 +1541,24 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             content = fp.read()
             self.assertIn("project_name = 'another_project'", content)
             self.assertIn("project_directory = '%s'" % testproject_dir, content)
+
+    def test_no_escaping_of_project_variables(self):
+        "Make sure template context variables are not html escaped"
+        # We're using a custom command so we need the alternate settings
+        self.write_settings('alternate_settings.py')
+        template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template')
+        args = ['custom_startproject', '--template', template_path, 'another_project', 'project_dir', '--extra', '<&>', '--settings=alternate_settings']
+        testproject_dir = os.path.join(test_dir, 'project_dir')
+        os.mkdir(testproject_dir)
+        out, err = self.run_manage(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
+        self.assertNoOutput(err)
+        test_manage_py = os.path.join(testproject_dir, 'additional_dir', 'extra.py')
+        with open(test_manage_py, 'r') as fp:
+            content = fp.read()
+            self.assertIn("<&>", content)
+        # tidy up alternate settings
+        self.remove_settings('alternate_settings.py')
 
     def test_custom_project_destination_missing(self):
         """

@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import timezone
 from django.utils import unittest
 
@@ -86,16 +87,16 @@ class SessionTestsMixin(object):
         self.assertFalse(self.session.modified)
 
     def test_values(self):
-        self.assertEqual(self.session.values(), [])
+        self.assertEqual(list(self.session.values()), [])
         self.assertTrue(self.session.accessed)
         self.session['some key'] = 1
-        self.assertEqual(self.session.values(), [1])
+        self.assertEqual(list(self.session.values()), [1])
 
     def test_iterkeys(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = self.session.iterkeys()
+        i = six.iterkeys(self.session)
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -105,7 +106,7 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = self.session.itervalues()
+        i = six.itervalues(self.session)
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -115,7 +116,7 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = self.session.iteritems()
+        i = six.iteritems(self.session)
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -125,9 +126,9 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        self.assertEqual(self.session.items(), [('x', 1)])
+        self.assertEqual(list(self.session.items()), [('x', 1)])
         self.session.clear()
-        self.assertEqual(self.session.items(), [])
+        self.assertEqual(list(self.session.items()), [])
         self.assertTrue(self.session.accessed)
         self.assertTrue(self.session.modified)
 
@@ -154,10 +155,10 @@ class SessionTestsMixin(object):
         self.session['a'], self.session['b'] = 'c', 'd'
         self.session.save()
         prev_key = self.session.session_key
-        prev_data = self.session.items()
+        prev_data = list(self.session.items())
         self.session.cycle_key()
         self.assertNotEqual(self.session.session_key, prev_key)
-        self.assertEqual(self.session.items(), prev_data)
+        self.assertEqual(list(self.session.items()), prev_data)
 
     def test_invalid_key(self):
         # Submitting an invalid session key (either by guessing, or if the db has
@@ -408,6 +409,22 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         self.assertNotIn('httponly',
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
+
+    def test_session_save_on_500(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Horrible error')
+        response.status_code = 500
+        middleware = SessionMiddleware()
+
+        # Simulate a request the modifies the session
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the value wasn't saved above.
+        self.assertNotIn('hello', request.session.load())
 
 
 class CookieSessionTests(SessionTestsMixin, TestCase):

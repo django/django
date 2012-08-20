@@ -1,12 +1,14 @@
 """
 PT-specific Form helpers
 """
+from __future__ import unicode_literals
+
 import re
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 phone_digits_re = re.compile(r'^(\d{9}|(00|\+)\d*)$')
@@ -24,10 +26,10 @@ class PTZipCodeField(RegexField):
     def clean(self,value):
         cleaned = super(PTZipCodeField, self).clean(value)
         if len(cleaned) == 7:
-           return u'%s-%s' % (cleaned[:4],cleaned[4:])
+           return '%s-%s' % (cleaned[:4],cleaned[4:])
         else:
            return cleaned
-        
+
 class PTPhoneNumberField(Field):
     """
     Validate local Portuguese phone number (including international ones)
@@ -40,9 +42,9 @@ class PTPhoneNumberField(Field):
     def clean(self, value):
         super(PTPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
-        value = re.sub('(\.|\s)', '', smart_unicode(value))
+            return ''
+        value = re.sub('(\.|\s)', '', smart_text(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s' % value
+            return '%s' % value
         raise ValidationError(self.error_messages['invalid'])

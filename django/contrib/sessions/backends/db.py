@@ -1,7 +1,6 @@
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction, router
-from django.utils.encoding import force_unicode
 from django.utils import timezone
 
 
@@ -18,7 +17,7 @@ class SessionStore(SessionBase):
                 session_key = self.session_key,
                 expire_date__gt=timezone.now()
             )
-            return self.decode(force_unicode(s.session_data))
+            return self.decode(s.session_data)
         except (Session.DoesNotExist, SuspiciousOperation):
             self.create()
             return {}

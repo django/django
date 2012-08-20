@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 
-import StringIO
-
 from django.contrib.sites.models import Site
 from django.core import management
-from django.db import connection
+from django.db import connection, IntegrityError
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.six import StringIO
 
 from .models import Article, Book, Spy, Tag, Visa
 
@@ -26,7 +25,7 @@ class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
                          use_base_manager=False, exclude_list=[]):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
         management.call_command('dumpdata', *args, **{'format':format,
                                                       'stdout':new_io,
                                                       'stderr':new_io,
@@ -43,7 +42,7 @@ class FixtureLoadingTests(TestCase):
         ])
 
     def test_loading_and_dumping(self):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
 
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
@@ -185,18 +184,14 @@ class FixtureLoadingTests(TestCase):
             exclude_list=['fixtures.Article', 'fixtures.Book', 'sites'])
 
         # Excluding a bogus app should throw an error
-        self.assertRaises(management.CommandError,
-                          self._dumpdata_assert,
-                          ['fixtures', 'sites'],
-                          '',
-                          exclude_list=['foo_app'])
+        with self.assertRaisesRegexp(management.CommandError,
+                "Unknown app in excludes: foo_app"):
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        self.assertRaises(management.CommandError,
-                          self._dumpdata_assert,
-                          ['fixtures', 'sites'],
-                          '',
-                          exclude_list=['fixtures.FooModel'])
+        with self.assertRaisesRegexp(management.CommandError,
+                "Unknown model in excludes: fixtures.FooModel"):
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
     def test_dumpdata_with_filtering_manager(self):
         spy1 = Spy.objects.create(name='Paul')
@@ -232,11 +227,9 @@ class FixtureLoadingTests(TestCase):
 
     def test_ambiguous_compressed_fixture(self):
         # The name "fixture5" is ambigous, so loading it will raise an error
-        new_io = StringIO.StringIO()
-        management.call_command('loaddata', 'fixture5', verbosity=0, stderr=new_io, commit=False)
-        output = new_io.getvalue().strip().split('\n')
-        self.assertEqual(len(output), 1)
-        self.assertTrue(output[0].startswith("Multiple fixtures named 'fixture5'"))
+        with self.assertRaisesRegexp(management.CommandError,
+                "Multiple fixtures named 'fixture5'"):
+            management.call_command('loaddata', 'fixture5', verbosity=0, commit=False)
 
     def test_db_loading(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
@@ -258,10 +251,9 @@ class FixtureLoadingTests(TestCase):
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
             connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
-        new_io = StringIO.StringIO()
-        management.call_command('loaddata', 'invalid.json', verbosity=0, stderr=new_io, commit=False)
-        output = new_io.getvalue().strip().split('\n')
-        self.assertRegexpMatches(output[-1], "Error: Could not load fixtures.Article\(pk=1\): .*$")
+        with self.assertRaisesRegexp(IntegrityError,
+                "Could not load fixtures.Article\(pk=1\): .*$"):
+            management.call_command('loaddata', 'invalid.json', verbosity=0, commit=False)
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
@@ -300,7 +292,7 @@ class FixtureLoadingTests(TestCase):
 
 class FixtureTransactionTests(TransactionTestCase):
     def _dumpdata_assert(self, args, output, format='json'):
-        new_io = StringIO.StringIO()
+        new_io = StringIO()
         management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
@@ -316,11 +308,9 @@ class FixtureTransactionTests(TransactionTestCase):
 
         # Try to load fixture 2 using format discovery; this will fail
         # because there are two fixture2's in the fixtures directory
-        new_io = StringIO.StringIO()
-        management.call_command('loaddata', 'fixture2', verbosity=0, stderr=new_io)
-        output = new_io.getvalue().strip().split('\n')
-        self.assertEqual(len(output), 1)
-        self.assertTrue(output[0].startswith("Multiple fixtures named 'fixture2'"))
+        with self.assertRaisesRegexp(management.CommandError,
+                "Multiple fixtures named 'fixture2'"):
+            management.call_command('loaddata', 'fixture2', verbosity=0)
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [

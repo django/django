@@ -1,4 +1,4 @@
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 from django.core.exceptions import FieldError
 from django.db import transaction
@@ -9,6 +9,7 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
 from django.db.utils import DatabaseError
+from django.utils import six
 
 
 class SQLCompiler(object):
@@ -82,7 +83,7 @@ class SQLCompiler(object):
         where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
         having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
         params = []
-        for val in self.query.extra_select.itervalues():
+        for val in six.itervalues(self.query.extra_select):
             params.extend(val[1])
 
         result = ['SELECT']
@@ -177,7 +178,7 @@ class SQLCompiler(object):
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.query.extra_select.iteritems()]
+        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -553,7 +554,7 @@ class SQLCompiler(object):
             group_by = self.query.group_by or []
 
             extra_selects = []
-            for extra_select, extra_params in self.query.extra_select.itervalues():
+            for extra_select, extra_params in six.itervalues(self.query.extra_select):
                 extra_selects.append(extra_select)
                 params.extend(extra_params)
             cols = (group_by + self.query.select +
@@ -596,6 +597,7 @@ class SQLCompiler(object):
         if avoid_set is None:
             avoid_set = set()
         orig_dupe_set = dupe_set
+        only_load = self.query.get_loaded_field_names()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -607,7 +609,8 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
-            if not select_related_descend(f, restricted, requested):
+            if not select_related_descend(f, restricted, requested,
+                                          only_load.get(model or self.query.model)):
                 continue
             # The "avoid" set is aliases we want to avoid just for this
             # particular branch of the recursion. They aren't permanently
@@ -680,7 +683,8 @@ class SQLCompiler(object):
                 if o.field.unique
             ]
             for f, model in related_fields:
-                if not select_related_descend(f, restricted, requested, reverse=True):
+                if not select_related_descend(f, restricted, requested,
+                                              only_load.get(model), reverse=True):
                     continue
                 # The "avoid" set is aliases we want to avoid just for this
                 # particular branch of the recursion. They aren't permanently
@@ -782,7 +786,7 @@ class SQLCompiler(object):
                     row = self.resolve_columns(row, fields)
 
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select.keys()) + len(self.query.select)
+                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.query.resolve_aggregate(value, aggregate, self.connection)

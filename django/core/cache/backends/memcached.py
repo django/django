@@ -5,10 +5,13 @@ from threading import local
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 
+from django.utils import six
+from django.utils.encoding import smart_str
+
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, basestring):
+        if isinstance(server, six.string_types):
             self._servers = server.split(';')
         else:
             self._servers = server
@@ -47,6 +50,10 @@ class BaseMemcachedCache(BaseCache):
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
         return int(timeout)
+
+    def make_key(self, key, version=None):
+        # Python 2 memcache requires the key to be a byte string.
+        return smart_str(super(BaseMemcachedCache, self).make_key(key, version))
 
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version)

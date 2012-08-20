@@ -1,6 +1,8 @@
 """
 Creates permissions for all installed apps that need permissions.
 """
+from __future__ import unicode_literals
+
 import getpass
 import locale
 import unicodedata
@@ -8,17 +10,18 @@ import unicodedata
 from django.contrib.auth import models as auth_app, get_user_model
 from django.core import exceptions
 from django.db.models import get_models, signals
+from django.utils.six.moves import input
 
 
 def _get_permission_codename(action, opts):
-    return u'%s_%s' % (action, opts.object_name.lower())
+    return '%s_%s' % (action, opts.object_name.lower())
 
 
 def _get_all_permissions(opts):
     "Returns (codename, name) for all permissions in the given opts."
     perms = []
     for action in ('add', 'change', 'delete'):
-        perms.append((_get_permission_codename(action, opts), u'Can %s %s' % (action, opts.verbose_name_raw)))
+        perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name_raw)))
     return perms + list(opts.permissions)
 
 
@@ -67,10 +70,10 @@ def create_superuser(app, created_models, verbosity, db, **kwargs):
         msg = ("\nYou just installed Django's auth system, which means you "
             "don't have any superusers defined.\nWould you like to create one "
             "now? (yes/no): ")
-        confirm = raw_input(msg)
+        confirm = input(msg)
         while 1:
             if confirm not in ('yes', 'no'):
-                confirm = raw_input('Please enter either "yes" or "no": ')
+                confirm = input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
                 call_command("createsuperuser", interactive=True, database=db)
@@ -84,14 +87,17 @@ def get_system_username():
     :returns: The username as a unicode string, or an empty string if the
         username could not be determined.
     """
-    try:
-        return getpass.getuser().decode(locale.getdefaultlocale()[1])
-    except (ImportError, KeyError, UnicodeDecodeError):
-        # KeyError will be raised by os.getpwuid() (called by getuser())
-        # if there is no corresponding entry in the /etc/passwd file
-        # (a very restricted chroot environment, for example).
-        # UnicodeDecodeError - preventive treatment for non-latin Windows.
-        return u''
+    default_locale = locale.getdefaultlocale()[1]
+    if default_locale:
+        try:
+            return getpass.getuser().decode(default_locale)
+        except (ImportError, KeyError, UnicodeDecodeError):
+            # KeyError will be raised by os.getpwuid() (called by getuser())
+            # if there is no corresponding entry in the /etc/passwd file
+            # (a very restricted chroot environment, for example).
+            # UnicodeDecodeError - preventive treatment for non-latin Windows.
+            pass
+    return ''
 
 
 def get_default_username(check_db=True):
@@ -111,7 +117,7 @@ def get_default_username(check_db=True):
     default_username = get_system_username()
     try:
         default_username = unicodedata.normalize('NFKD', default_username)\
-            .encode('ascii', 'ignore').replace(' ', '').lower()
+            .encode('ascii', 'ignore').decode('ascii').replace(' ', '').lower()
     except UnicodeDecodeError:
         return ''
 

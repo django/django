@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.us.forms import (USZipCodeField,
     USPhoneNumberField, USStateField, USStateSelect,
@@ -23,7 +23,7 @@ class USLocalFlavorTests(SimpleTestCase):
         """Test that required USStateFields throw appropriate errors."""
         form = USPlaceForm({'state':'GA', 'name':'Place in GA'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['state_req'], [u'This field is required.'])
+        self.assertEqual(form.errors['state_req'], ['This field is required.'])
 
     def test_field_blank_option(self):
         """Test that the empty option is there."""
@@ -164,7 +164,7 @@ class USLocalFlavorTests(SimpleTestCase):
 
     def test_USStateSelect(self):
         f = USStateSelect()
-        out = u'''<select name="state">
+        out = '''<select name="state">
 <option value="AL">Alabama</option>
 <option value="AK">Alaska</option>
 <option value="AS">American Samoa</option>
@@ -228,7 +228,7 @@ class USLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('state', 'IL'), out)
 
     def test_USZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+        error_format = ['Enter a zip code in the format XXXXX or XXXXX-XXXX.']
         valid = {
             '60606': '60606',
             60606: '60606',
@@ -243,7 +243,7 @@ class USLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(USZipCodeField, valid, invalid)
 
     def test_USPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in XXX-XXX-XXXX format.']
+        error_format = ['Phone numbers must be in XXX-XXX-XXXX format.']
         valid = {
             '312-555-1212': '312-555-1212',
             '3125551212': '312-555-1212',
@@ -261,7 +261,7 @@ class USLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(USPhoneNumberField, valid, invalid)
 
     def test_USStateField(self):
-        error_invalid = [u'Enter a U.S. state or territory.']
+        error_invalid = ['Enter a U.S. state or territory.']
         valid = {
             'il': 'IL',
             'IL': 'IL',
@@ -274,7 +274,7 @@ class USLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(USStateField, valid, invalid)
 
     def test_USSocialSecurityNumberField(self):
-        error_invalid = [u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
+        error_invalid = ['Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
 
         valid = {
             '987-65-4330': '987-65-4330',

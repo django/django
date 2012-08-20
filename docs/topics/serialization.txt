@@ -173,12 +173,12 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
 
     import json
     from django.utils.functional import Promise
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_text
 
     class LazyEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Promise):
-                return force_unicode(obj)
+                return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
 .. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
@@ -187,11 +187,6 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
 
 Natural keys
 ------------
-
-.. versionadded:: 1.2
-
-   The ability to use natural keys when serializing/deserializing data was
-   added in the 1.2 release.
 
 The default serialization strategy for foreign keys and many-to-many relations
 is to serialize the value of the primary key(s) of the objects in the relation.

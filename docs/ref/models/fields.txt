@@ -86,36 +86,43 @@ field.
 If this is given, Django's admin will use a select box instead of the standard
 text field and will limit choices to the choices given.
 
-A choices list looks like this::
+A choices list is an iterable of 2-tuples; the first element in each
+tuple is the actual value to be stored, and the second element is the
+human-readable name. For example::
 
     YEAR_IN_SCHOOL_CHOICES = (
         ('FR', 'Freshman'),
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
-        ('GR', 'Graduate'),
     )
 
-The first element in each tuple is the actual value to be stored. The second
-element is the human-readable name for the option.
+Generally, it's best to define choices inside a model class, and to
+define a suitably-named constant for each value::
 
-The choices list can be defined either as part of your model class::
-
-    class Foo(models.Model):
-        GENDER_CHOICES = (
-            ('M', 'Male'),
-            ('F', 'Female'),
+    class Student(models.Model):
+        FRESHMAN = 'FR'
+        SOPHOMORE = 'SO'
+        JUNIOR = 'JR'
+        SENIOR = 'SR'
+        YEAR_IN_SCHOOL_CHOICES = (
+            (FRESHMAN, 'Freshman'),
+            (SOPHOMORE, 'Sophomore'),
+            (JUNIOR, 'Junior'),
+            (SENIOR, 'Senior'),
         )
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+        year_in_school = models.CharField(max_length=2,
+                                          choices=YEAR_IN_SCHOOL_CHOICES,
+                                          default=FRESHMAN)
 
-or outside your model class altogether::
+        def is_upperclass(self):
+	    return self.year_in_school in (self.JUNIOR, self.SENIOR)
 
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-    )
-    class Foo(models.Model):
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+Though you can define a choices list outside of a model class and then
+refer to it, defining the choices and names for each choice inside the
+model class keeps all of that information with the class that uses it,
+and makes the choices easy to reference (e.g, ``Student.SOPHOMORE``
+will work anywhere that the ``Student`` model has been imported).
 
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
@@ -201,8 +208,6 @@ automatically generated from the model class. Default is ``True``.
 
 ``error_messages``
 ------------------
-
-.. versionadded:: 1.2
 
 .. attribute:: Field.error_messages
 
@@ -303,8 +308,6 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 ``validators``
 -------------------
 
-.. versionadded:: 1.2
-
 .. attribute:: Field.validators
 
 A list of validators to run for this field. See the :doc:`validators
@@ -330,8 +333,6 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 ``BigIntegerField``
 -------------------
 
-.. versionadded:: 1.2
-
 .. class:: BigIntegerField([**options])
 
 A 64 bit integer, much like an :class:`IntegerField` except that it is
@@ -350,11 +351,6 @@ The admin represents this as a checkbox.
 
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
-
-.. versionchanged:: 1.2
-    In previous versions of Django when running under MySQL ``BooleanFields``
-    would return their data as ``ints``, instead of true ``bools``.  See the
-    release notes for a complete description of the change.
 
 ``CharField``
 -------------
@@ -683,7 +679,7 @@ directory on the filesystem. Has three special arguments, of which the first is
     Optional. A regular expression, as a string, that :class:`FilePathField`
     will use to filter filenames. Note that the regex will be applied to the
     base filename, not the full path. Example: ``"foo.*\.txt$"``, which will
-    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.png``.
 
 .. attribute:: FilePathField.recursive
 
@@ -714,9 +710,9 @@ base filename, not the full path. So, this example::
 
     FilePathField(path="/home/images", match="foo.*", recursive=True)
 
-...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+...will match ``/home/images/foo.png`` but not ``/home/images/foo/bar.png``
 because the :attr:`~FilePathField.match` applies to the base filename
-(``foo.gif`` and ``bar.gif``).
+(``foo.png`` and ``bar.png``).
 
 By default, :class:`FilePathField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
@@ -1007,9 +1003,10 @@ define the details of how the relation works.
     <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django didn't create a backwards relation, set ``related_name``
-    to ``'+'``. For example, this will ensure that the ``User`` model won't get a
-    backwards relation to this model::
+    If you'd prefer Django not to create a backwards relation, set
+    ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
+    ensure that the ``User`` model won't have a backwards relation to this
+    model::
 
         user = models.ForeignKey(User, related_name='+')
 
@@ -1079,15 +1076,14 @@ the model is related. This works exactly the same as it does for
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to
-represent the many-to-many relationship. By default, this table name
-is generated using the name of the many-to-many field and the model
-that contains it. Since some databases don't support table names above
-a certain length, these table names will be automatically truncated to
-64 characters and a uniqueness hash will be used. This means you might
-see table names like ``author_books_9cdf4``; this is perfectly normal.
-You can manually provide the name of the join table using the
-:attr:`~ManyToManyField.db_table` option.
+Behind the scenes, Django creates an intermediary join table to represent the
+many-to-many relationship. By default, this table name is generated using the
+name of the many-to-many field and the name of the table for the model that
+contains it. Since some databases don't support table names above a certain
+length, these table names will be automatically truncated to 64 characters and a
+uniqueness hash will be used. This means you might see table names like
+``author_books_9cdf4``; this is perfectly normal.  You can manually provide the
+name of the join table using the :attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
 
@@ -1100,6 +1096,13 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.related_name
 
     Same as :attr:`ForeignKey.related_name`.
+
+    If you have more than one ``ManyToManyField`` pointing to the same model
+    and want to suppress the backwards relations, set each ``related_name``
+    to a unique value ending with ``'+'``::
+
+        users = models.ManyToManyField(User, related_name='u+')
+        referents = models.ManyToManyField(User, related_name='ref+')
 
 .. attribute:: ManyToManyField.limit_choices_to
 
@@ -1143,8 +1146,9 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of
-    the two tables being joined.
+    is not provided, Django will assume a default name based upon the names of:
+    the table for the model defining the relationship and the name of the field
+    itself.
 
 .. _ref-onetoone:
 

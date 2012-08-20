@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.test import TestCase
@@ -20,7 +22,7 @@ class ConditionalGet(TestCase):
 
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, FULL_RESPONSE)
+        self.assertEqual(response.content, FULL_RESPONSE.encode())
         if check_last_modified:
             self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
         if check_etag:
@@ -28,7 +30,7 @@ class ConditionalGet(TestCase):
 
     def assertNotModified(self, response):
         self.assertEqual(response.status_code, 304)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def testWithoutConditions(self):
         response = self.client.get('/condition/')
@@ -143,14 +145,14 @@ class HttpDateProcessing(unittest.TestCase):
     def testParsingRfc1123(self):
         parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))
+                         datetime(1994, 11, 6, 8, 49, 37))
 
     def testParsingRfc850(self):
         parsed = parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))
+                         datetime(1994, 11, 6, 8, 49, 37))
 
     def testParsingAsctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))
+                         datetime(1994, 11, 6, 8, 49, 37))

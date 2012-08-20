@@ -14,6 +14,9 @@ from django.contrib.gis.gdal.srs import SpatialReference
 # GDAL ctypes function prototypes.
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
+from django.utils import six
+from django.utils.six.moves import xrange
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -25,8 +28,8 @@ class Layer(GDALBase):
     def __init__(self, layer_ptr, ds):
         """
         Initializes on an OGR C pointer to the Layer and the `DataSource` object
-        that owns this layer.  The `DataSource` object is required so that a 
-        reference to it is kept with this Layer.  This prevents garbage 
+        that owns this layer.  The `DataSource` object is required so that a
+        reference to it is kept with this Layer.  This prevents garbage
         collection of the `DataSource` while this Layer is still active.
         """
         if not layer_ptr:
@@ -39,7 +42,7 @@ class Layer(GDALBase):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        if isinstance(index, (int, long)):
+        if isinstance(index, six.integer_types):
             # An integer index was given -- we cannot do a check based on the
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.
@@ -85,7 +88,7 @@ class Layer(GDALBase):
             # each feature until the given feature ID is encountered.
             for feat in self:
                 if feat.fid == feat_id: return feat
-        # Should have returned a Feature, raise an OGRIndexError.    
+        # Should have returned a Feature, raise an OGRIndexError.
         raise OGRIndexError('Invalid feature id: %s.' % feat_id)
 
     #### Layer properties ####
@@ -131,9 +134,9 @@ class Layer(GDALBase):
         Returns a list of string names corresponding to each of the Fields
         available in this Layer.
         """
-        return [capi.get_field_name(capi.get_field_defn(self._ldefn, i)) 
+        return [capi.get_field_name(capi.get_field_defn(self._ldefn, i))
                 for i in xrange(self.num_fields) ]
-    
+
     @property
     def field_types(self):
         """
@@ -145,13 +148,13 @@ class Layer(GDALBase):
         return [OGRFieldTypes[capi.get_field_type(capi.get_field_defn(self._ldefn, i))]
                 for i in xrange(self.num_fields)]
 
-    @property 
+    @property
     def field_widths(self):
         "Returns a list of the maximum field widths for the features."
         return [capi.get_field_width(capi.get_field_defn(self._ldefn, i))
                 for i in xrange(self.num_fields)]
 
-    @property 
+    @property
     def field_precisions(self):
         "Returns the field precisions for the features."
         return [capi.get_field_precision(capi.get_field_defn(self._ldefn, i))

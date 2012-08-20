@@ -2,7 +2,7 @@
 IT-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -13,7 +13,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 
 class ITZipCodeField(RegexField):
@@ -45,7 +45,7 @@ class ITSocialSecurityNumberField(RegexField):
     'Informazioni sulla codificazione delle persone fisiche'.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid Social Security number.'),
+        'invalid': _('Enter a valid Social Security number.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -55,8 +55,8 @@ class ITSocialSecurityNumberField(RegexField):
     def clean(self, value):
         value = super(ITSocialSecurityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
-        value = re.sub('\s', u'', value).upper()
+            return ''
+        value = re.sub('\s', '', value).upper()
         try:
             check_digit = ssn_check_digit(value)
         except ValueError:
@@ -70,13 +70,13 @@ class ITVatNumberField(Field):
     A form field that validates Italian VAT numbers (partita IVA).
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid VAT number.'),
+        'invalid': _('Enter a valid VAT number.'),
     }
 
     def clean(self, value):
         value = super(ITVatNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             vat_number = int(value)
         except ValueError:
@@ -85,4 +85,4 @@ class ITVatNumberField(Field):
         check_digit = vat_number_check_digit(vat_number[0:10])
         if not vat_number[10] == check_digit:
             raise ValidationError(self.error_messages['invalid'])
-        return smart_unicode(vat_number)
+        return smart_text(vat_number)

@@ -1,9 +1,12 @@
+from __future__ import unicode_literals
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.wsgi import get_wsgi_application
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import unittest
 
 
@@ -37,8 +40,8 @@ class WSGITest(TestCase):
             response_data["headers"],
             [('Content-Type', 'text/html; charset=utf-8')])
         self.assertEqual(
-            unicode(response),
-            u"Content-Type: text/html; charset=utf-8\n\nHello World!")
+            bytes(response),
+            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
 
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):

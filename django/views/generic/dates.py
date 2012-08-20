@@ -1,9 +1,11 @@
+from __future__ import unicode_literals
+
 import datetime
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -12,6 +14,9 @@ from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResp
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
 class YearMixin(object):
+    """
+    Mixin for views manipulating year-based data.
+    """
     year_format = '%Y'
     year = None
 
@@ -34,7 +39,7 @@ class YearMixin(object):
                 try:
                     year = self.request.GET['year']
                 except KeyError:
-                    raise Http404(_(u"No year specified"))
+                    raise Http404(_("No year specified"))
         return year
 
     def get_next_year(self, date):
@@ -65,6 +70,9 @@ class YearMixin(object):
 
 
 class MonthMixin(object):
+    """
+    Mixin for views manipulating month-based data.
+    """
     month_format = '%b'
     month = None
 
@@ -87,7 +95,7 @@ class MonthMixin(object):
                 try:
                     month = self.request.GET['month']
                 except KeyError:
-                    raise Http404(_(u"No month specified"))
+                    raise Http404(_("No month specified"))
         return month
 
     def get_next_month(self, date):
@@ -121,6 +129,9 @@ class MonthMixin(object):
 
 
 class DayMixin(object):
+    """
+    Mixin for views manipulating day-based data.
+    """
     day_format = '%d'
     day = None
 
@@ -143,7 +154,7 @@ class DayMixin(object):
                 try:
                     day = self.request.GET['day']
                 except KeyError:
-                    raise Http404(_(u"No day specified"))
+                    raise Http404(_("No day specified"))
         return day
 
     def get_next_day(self, date):
@@ -174,6 +185,9 @@ class DayMixin(object):
 
 
 class WeekMixin(object):
+    """
+    Mixin for views manipulating week-based data.
+    """
     week_format = '%U'
     week = None
 
@@ -196,7 +210,7 @@ class WeekMixin(object):
                 try:
                     week = self.request.GET['week']
                 except KeyError:
-                    raise Http404(_(u"No week specified"))
+                    raise Http404(_("No week specified"))
         return week
 
     def get_next_week(self, date):
@@ -252,7 +266,7 @@ class DateMixin(object):
         Get the name of the date field to be used to filter by.
         """
         if self.date_field is None:
-            raise ImproperlyConfigured(u"%s.date_field is required." % self.__class__.__name__)
+            raise ImproperlyConfigured("%s.date_field is required." % self.__class__.__name__)
         return self.date_field
 
     def get_allow_future(self):
@@ -310,9 +324,10 @@ class DateMixin(object):
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     """
-    Abstract base class for date-based views display a list of objects.
+    Abstract base class for date-based views displaying a list of objects.
     """
     allow_empty = False
+    date_list_period = 'year'
 
     def get(self, request, *args, **kwargs):
         self.date_list, self.object_list, extra_context = self.get_dated_items()
@@ -350,24 +365,29 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
             # than to load the unpaginated queryset in memory.
             is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
             if is_empty:
-                raise Http404(_(u"No %(verbose_name_plural)s available") % {
-                        'verbose_name_plural': force_unicode(qs.model._meta.verbose_name_plural)
+                raise Http404(_("No %(verbose_name_plural)s available") % {
+                        'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                 })
 
         return qs
 
-    def get_date_list(self, queryset, date_type):
+    def get_date_list_period(self):
+        return self.date_list_period
+
+    def get_date_list(self, queryset, date_type=None):
         """
         Get a date list by calling `queryset.dates()`, checking along the way
         for empty lists that aren't allowed.
         """
         date_field = self.get_date_field()
         allow_empty = self.get_allow_empty()
+        if date_type is None:
+            date_type = self.get_date_list_period()
 
         date_list = queryset.dates(date_field, date_type)[::-1]
         if date_list is not None and not date_list and not allow_empty:
-            name = force_unicode(queryset.model._meta.verbose_name_plural)
-            raise Http404(_(u"No %(verbose_name_plural)s available") %
+            name = force_text(queryset.model._meta.verbose_name_plural)
+            raise Http404(_("No %(verbose_name_plural)s available") %
                           {'verbose_name_plural': name})
 
         return date_list
@@ -386,7 +406,7 @@ class BaseArchiveIndexView(BaseDateListView):
         Return (date_list, items, extra_context) for this request.
         """
         qs = self.get_dated_queryset(ordering='-%s' % self.get_date_field())
-        date_list = self.get_date_list(qs, 'year')
+        date_list = self.get_date_list(qs)
 
         if not date_list:
             qs = qs.none()
@@ -405,6 +425,7 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
     """
     List of objects published in a given year.
     """
+    date_list_period = 'month'
     make_object_list = False
 
     def get_dated_items(self):
@@ -424,7 +445,7 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
         }
 
         qs = self.get_dated_queryset(ordering='-%s' % date_field, **lookup_kwargs)
-        date_list = self.get_date_list(qs, 'month')
+        date_list = self.get_date_list(qs)
 
         if not self.get_make_object_list():
             # We need this to be a queryset since parent classes introspect it
@@ -456,6 +477,8 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
     """
     List of objects published in a given year.
     """
+    date_list_period = 'day'
+
     def get_dated_items(self):
         """
         Return (date_list, items, extra_context) for this request.
@@ -475,7 +498,7 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
-        date_list = self.get_date_list(qs, 'day')
+        date_list = self.get_date_list(qs)
 
         return (date_list, qs, {
             'month': date,
@@ -617,7 +640,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         qs = queryset or self.get_queryset()
 
         if not self.get_allow_future() and date > datetime.date.today():
-            raise Http404(_(u"Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {
+            raise Http404(_("Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
             })
@@ -649,7 +672,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
-        raise Http404(_(u"Invalid date string '%(datestr)s' given format '%(format)s'") % {
+        raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
             'datestr': datestr,
             'format': format,
         })

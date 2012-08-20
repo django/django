@@ -314,9 +314,6 @@ that should be called if none of the URL patterns match.
 By default, this is ``'django.views.defaults.page_not_found'``. That default
 value should suffice.
 
-.. versionchanged:: 1.2
-    Previous versions of Django only accepted strings representing import paths.
-
 handler500
 ----------
 
@@ -328,9 +325,6 @@ have runtime errors in view code.
 
 By default, this is ``'django.views.defaults.server_error'``. That default
 value should suffice.
-
-.. versionchanged:: 1.2
-    Previous versions of Django only accepted strings representing import paths.
 
 Notes on capturing text in URLs
 ===============================
@@ -710,8 +704,8 @@ target each pattern individually by using its name:
 
 .. code-block:: html+django
 
-    {% url arch-summary 1945 %}
-    {% url full-archive 2007 %}
+    {% url 'arch-summary' 1945 %}
+    {% url 'full-archive' 2007 %}
 
 Even though both URL patterns refer to the ``archive`` view here, using the
 ``name`` parameter to ``url()`` allows you to tell them apart in templates.

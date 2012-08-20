@@ -2,7 +2,10 @@
 Tests for django.core.servers.
 """
 import os
-import urllib2
+try:
+    from urllib.request import urlopen, HTTPError
+except ImportError:     # Python 2
+    from urllib2 import urlopen, HTTPError
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
@@ -39,7 +42,7 @@ class LiveServerBase(LiveServerTestCase):
         super(LiveServerBase, cls).tearDownClass()
 
     def urlopen(self, url):
-        return urllib2.urlopen(self.live_server_url + url)
+        return urlopen(self.live_server_url + url)
 
 
 class LiveServerAddress(LiveServerBase):
@@ -102,7 +105,7 @@ class LiveServerViews(LiveServerBase):
         """
         try:
             self.urlopen('/')
-        except urllib2.HTTPError as err:
+        except HTTPError as err:
             self.assertEqual(err.code, 404, 'Expected 404 response')
         else:
             self.fail('Expected 404 response')
@@ -141,7 +144,7 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/model_view/')
-        self.assertEqual(f.read().splitlines(), ['jane', 'robert'])
+        self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """

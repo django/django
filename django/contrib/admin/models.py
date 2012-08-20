@@ -1,10 +1,12 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
-from django.utils.safestring import mark_safe
+from django.utils.encoding import smart_text
+from django.utils.encoding import python_2_unicode_compatible
 
 ADDITION = 1
 CHANGE = 2
@@ -13,10 +15,11 @@ DELETION = 3
 
 class LogEntryManager(models.Manager):
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
-        e = self.model(None, None, user_id, content_type_id, smart_unicode(object_id), object_repr[:200], action_flag, change_message)
+        e = self.model(None, None, user_id, content_type_id, smart_text(object_id), object_repr[:200], action_flag, change_message)
         e.save()
 
 
+@python_2_unicode_compatible
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -35,9 +38,9 @@ class LogEntry(models.Model):
         ordering = ('-action_time',)
 
     def __repr__(self):
-        return smart_unicode(self.action_time)
+        return smart_text(self.action_time)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.action_flag == ADDITION:
             return _('Added "%(object)s".') % {'object': self.object_repr}
         elif self.action_flag == CHANGE:
@@ -66,5 +69,5 @@ class LogEntry(models.Model):
         This is relative to the Django admin index page.
         """
         if self.content_type and self.object_id:
-            return mark_safe(u"%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, quote(self.object_id)))
+            return "%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, quote(self.object_id))
         return None

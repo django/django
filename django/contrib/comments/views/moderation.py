@@ -17,7 +17,7 @@ def flag(request, comment_id, next=None):
     """
     Flags a comment. Confirmation on GET, action on POST.
 
-    Templates: `comments/flag.html`,
+    Templates: :template:`comments/flag.html`,
     Context:
         comment
             the flagged `comments.comment` object
@@ -43,7 +43,7 @@ def delete(request, comment_id, next=None):
     Deletes a comment. Confirmation on GET, action on POST. Requires the "can
     moderate comments" permission.
 
-    Templates: `comments/delete.html`,
+    Templates: :template:`comments/delete.html`,
     Context:
         comment
             the flagged `comments.comment` object
@@ -70,7 +70,7 @@ def approve(request, comment_id, next=None):
     Approve a comment (that is, mark it as public and non-removed). Confirmation
     on GET, action on POST. Requires the "can moderate comments" permission.
 
-    Templates: `comments/approve.html`,
+    Templates: :template:`comments/approve.html`,
     Context:
         comment
             the `comments.comment` object for approval

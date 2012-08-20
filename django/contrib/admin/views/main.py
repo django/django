@@ -6,7 +6,7 @@ from django.core.paginator import InvalidPage
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import force_text, smart_bytes
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
@@ -75,7 +75,7 @@ class ChangeList(object):
             title = ugettext('Select %s')
         else:
             title = ugettext('Select %s to change')
-        self.title = title % force_unicode(self.opts.verbose_name)
+        self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
     def get_filters(self, request):
@@ -94,7 +94,7 @@ class ChangeList(object):
                 # 'key' will be used as a keyword argument later, so Python
                 # requires it to be a string.
                 del lookup_params[key]
-                lookup_params[smart_str(key)] = value
+                lookup_params[smart_bytes(key)] = value
 
             if not self.model_admin.lookup_allowed(key, value):
                 raise SuspiciousOperation("Filtering by %s not allowed" % key)
@@ -148,7 +148,7 @@ class ChangeList(object):
         if remove is None: remove = []
         p = self.params.copy()
         for r in remove:
-            for k in p.keys():
+            for k in list(p):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():

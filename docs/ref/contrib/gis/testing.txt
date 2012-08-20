@@ -2,12 +2,6 @@
 Testing GeoDjango apps
 ======================
 
-.. versionchanged:: 1.2
-
-In Django 1.2, the addition of :ref:`spatial-backends` simplified the
-process of testing GeoDjango applications. The process is now the
-same as :doc:`/topics/testing`.
-
 Included in this documentation are some additional notes and settings
 for :ref:`testing-postgis` and :ref:`testing-spatialite` users.
 
@@ -28,11 +22,9 @@ Settings
 ``POSTGIS_TEMPLATE``
 ^^^^^^^^^^^^^^^^^^^^
 
-.. versionchanged:: 1.2
-
 This setting may be used to customize the name of the PostGIS template
-database to use. In Django versions 1.2 and above, it automatically
-defaults to ``'template_postgis'`` (the same name used in the
+database to use. It automatically defaults to ``'template_postgis'``
+(the same name used in the
 :ref:`installation documentation <spatialdb_template>`).
 
 .. setting:: POSTGIS_VERSION
@@ -129,7 +121,8 @@ Settings
 
 Only relevant when using a SpatiaLite version older than 3.0.
 
-By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
+By default, the GeoDjango test runner looks for the :ref:`file containing the
+SpatiaLite dababase-initialization SQL code <create_spatialite_db>` in the
 same directory where it was invoked (by default the same directory where
 ``manage.py`` is located). To use a different location, add the following to
 your settings::

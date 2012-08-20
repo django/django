@@ -16,6 +16,7 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
+from __future__ import unicode_literals
 
 import hashlib
 import re
@@ -23,7 +24,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import get_cache
-from django.utils.encoding import iri_to_uri, force_unicode
+from django.utils.encoding import iri_to_uri, force_text, smart_bytes
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -65,7 +66,7 @@ def patch_cache_control(response, **kwargs):
     # max-age, use the minimum of the two ages. In practice this happens when
     # a decorator and a piece of middleware both operate on a given view.
     if 'max-age' in cc and 'max_age' in kwargs:
-        kwargs['max_age'] = min(cc['max-age'], kwargs['max_age'])
+        kwargs['max_age'] = min(int(cc['max-age']), kwargs['max_age'])
 
     # Allow overriding private caching and vice versa
     if 'private' in cc and 'public' in kwargs:
@@ -169,8 +170,8 @@ def _i18n_cache_key_suffix(request, cache_key):
         # Windows is known to use non-standard, locale-dependant names.
         # User-defined tzinfo classes may return absolutely anything.
         # Hence this paranoid conversion to create a valid cache key.
-        tz_name = force_unicode(get_current_timezone_name(), errors='ignore')
-        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').replace(' ', '_')
+        tz_name = force_text(get_current_timezone_name(), errors='ignore')
+        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
@@ -180,14 +181,14 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(value)
-    path = hashlib.md5(iri_to_uri(request.get_full_path()))
+    path = hashlib.md5(smart_bytes(iri_to_uri(request.get_full_path())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, path.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = hashlib.md5(iri_to_uri(request.get_full_path()))
+    path = hashlib.md5(smart_bytes(iri_to_uri(request.get_full_path())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)

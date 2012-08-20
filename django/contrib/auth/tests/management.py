@@ -1,5 +1,5 @@
+from __future__ import unicode_literals
 from datetime import date
-from StringIO import StringIO
 
 from django.contrib.auth import models, management
 from django.contrib.auth.management.commands import changepassword
@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.six import StringIO
 
 
 class GetDefaultUsernameTestCase(TestCase):
@@ -20,19 +21,19 @@ class GetDefaultUsernameTestCase(TestCase):
         management.get_system_username = self._getpass_getuser
 
     def test_simple(self):
-        management.get_system_username = lambda: u'joe'
+        management.get_system_username = lambda: 'joe'
         self.assertEqual(management.get_default_username(), 'joe')
 
     def test_existing(self):
         models.User.objects.create(username='joe')
-        management.get_system_username = lambda: u'joe'
+        management.get_system_username = lambda: 'joe'
         self.assertEqual(management.get_default_username(), '')
         self.assertEqual(
             management.get_default_username(check_db=False), 'joe')
 
     def test_i18n(self):
         # 'Julia' with accented 'u':
-        management.get_system_username = lambda: u'J\xfalia'
+        management.get_system_username = lambda: 'J\xfalia'
         self.assertEqual(management.get_default_username(), 'julia')
 
 

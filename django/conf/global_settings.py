@@ -270,19 +270,19 @@ SECRET_KEY = ''
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/media/"
+# Example: "/var/www/example.com/media/"
 MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT.
-# Example: "http://media.lawrence.com/media/"
+# Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = ''
 
-# Absolute path to the directory that holds static files.
-# Example: "/home/media/media.lawrence.com/static/"
+# Absolute path to the directory static files should be collected to.
+# Example: "/var/www/example.com/static/"
 STATIC_ROOT = ''
 
 # URL that handles the static files served from STATIC_ROOT.
-# Example: "http://media.lawrence.com/static/"
+# Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
@@ -451,7 +451,7 @@ MIDDLEWARE_CLASSES = (
 
 SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
-SESSION_COOKIE_DOMAIN = None                            # A string like ".lawrence.com", or None for standard domain cookie.
+SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.
 SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
 SESSION_COOKIE_PATH = '/'                               # The path of the session cookie.
 SESSION_COOKIE_HTTPONLY = True                          # Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)

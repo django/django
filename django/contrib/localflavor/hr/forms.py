@@ -2,7 +2,7 @@
 """
 HR-specific Form helpers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -12,15 +12,15 @@ from django.contrib.localflavor.hr.hr_choices import (
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select, RegexField
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
 jmbg_re = re.compile(r'^(?P<dd>\d{2})(?P<mm>\d{2})(?P<yyy>\d{3})' + \
             r'(?P<rr>\d{2})(?P<bbb>\d{3})(?P<k>\d{1})$')
 oib_re = re.compile(r'^\d{11}$')
-plate_re = re.compile(ur'^(?P<prefix>[A-ZČŠŽ]{2})' + \
-            ur'(?P<number>\d{3,4})(?P<suffix>[ABCDEFGHIJKLMNOPRSTUVZ]{1,2})$')
+plate_re = re.compile(r'^(?P<prefix>[A-ZČŠŽ]{2})' + \
+            r'(?P<number>\d{3,4})(?P<suffix>[ABCDEFGHIJKLMNOPRSTUVZ]{1,2})$')
 postal_code_re = re.compile(r'^\d{5}$')
 phone_re = re.compile(r'^(\+385|00385|0)(?P<prefix>\d{2})(?P<number>\d{6,7})$')
 jmbag_re = re.compile(r'^601983(?P<copy>\d{1})1(?P<jmbag>\d{10})(?P<k>\d{1})$')
@@ -79,7 +79,7 @@ class HRJMBGField(Field):
     def clean(self, value):
         super(HRJMBGField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
 
@@ -110,7 +110,7 @@ class HRJMBGField(Field):
         if not str(m) == k:
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s' % (value, )
+        return '%s' % (value, )
 
 
 class HROIBField(RegexField):
@@ -130,7 +130,7 @@ class HROIBField(RegexField):
     def clean(self, value):
         super(HROIBField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         return '%s' % (value, )
 
@@ -157,9 +157,9 @@ class HRLicensePlateField(Field):
     def clean(self, value):
         super(HRLicensePlateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
-        value = re.sub(r'[\s\-]+', '', smart_unicode(value.strip())).upper()
+        value = re.sub(r'[\s\-]+', '', smart_text(value.strip())).upper()
 
         matches = plate_re.search(value)
         if matches is None:
@@ -175,7 +175,7 @@ class HRLicensePlateField(Field):
         if int(number) == 0:
             raise ValidationError(self.error_messages['number'])
 
-        return u'%s %s-%s' % (prefix,number,matches.group('suffix'), )
+        return '%s %s-%s' % (prefix,number,matches.group('suffix'), )
 
 
 class HRPostalCodeField(Field):
@@ -193,7 +193,7 @@ class HRPostalCodeField(Field):
     def clean(self, value):
         super(HRPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
         if not postal_code_re.search(value):
@@ -223,9 +223,9 @@ class HRPhoneNumberField(Field):
     def clean(self, value):
         super(HRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
-        value = re.sub(r'[\-\s\(\)]', '', smart_unicode(value))
+        value = re.sub(r'[\-\s\(\)]', '', smart_text(value))
 
         matches = phone_re.search(value)
         if matches is None:
@@ -262,7 +262,7 @@ class HRJMBAGField(Field):
     def clean(self, value):
         super(HRJMBAGField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = re.sub(r'[\-\s]', '', value.strip())
 

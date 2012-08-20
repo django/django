@@ -1,9 +1,12 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Animal(models.Model):
     name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
@@ -13,7 +16,7 @@ class Animal(models.Model):
     # use a non-default name for the default manager
     specimens = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -24,12 +27,13 @@ class Plant(models.Model):
         # For testing when upper case letter in app name; regression for #4057
         db_table = "Fixtures_regress_plant"
 
+@python_2_unicode_compatible
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name) + u' is owned by ' + unicode(self.owner)
+    def __str__(self):
+        return six.text_type(self.name) + ' is owned by ' + six.text_type(self.owner)
 
 
 class Absolute(models.Model):
@@ -67,13 +71,14 @@ class Article(models.Model):
 
 
 # Models to regression test #11428
+@python_2_unicode_compatible
 class Widget(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -88,20 +93,23 @@ class TestManager(models.Manager):
         return self.get(name=key)
 
 
+@python_2_unicode_compatible
 class Store(models.Model):
     objects = TestManager()
     name = models.CharField(max_length=255)
+    main = models.ForeignKey('self', null=True)
 
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def natural_key(self):
         return (self.name,)
 
 
+@python_2_unicode_compatible
 class Person(models.Model):
     objects = TestManager()
     name = models.CharField(max_length=255)
@@ -109,7 +117,7 @@ class Person(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     # Person doesn't actually have a dependency on store, but we need to define
@@ -119,6 +127,7 @@ class Person(models.Model):
     natural_key.dependencies = ['fixtures_regress.store']
 
 
+@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=255)
     author = models.ForeignKey(Person)
@@ -127,8 +136,8 @@ class Book(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
-        return u'%s by %s (available at %s)' % (
+    def __str__(self):
+        return '%s by %s (available at %s)' % (
             self.name,
             self.author.name,
             ', '.join(s.name for s in self.stores.all())
@@ -140,6 +149,7 @@ class NKManager(models.Manager):
         return self.get(data=data)
 
 
+@python_2_unicode_compatible
 class NKChild(Parent):
     data = models.CharField(max_length=10, unique=True)
     objects = NKManager()
@@ -147,17 +157,18 @@ class NKChild(Parent):
     def natural_key(self):
         return self.data
 
-    def __unicode__(self):
-        return u'NKChild %s:%s' % (self.name, self.data)
+    def __str__(self):
+        return 'NKChild %s:%s' % (self.name, self.data)
 
 
+@python_2_unicode_compatible
 class RefToNKChild(models.Model):
     text = models.CharField(max_length=10)
     nk_fk = models.ForeignKey(NKChild, related_name='ref_fks')
     nk_m2m = models.ManyToManyField(NKChild, related_name='ref_m2ms')
 
-    def __unicode__(self):
-        return u'%s: Reference to %s [%s]' % (
+    def __str__(self):
+        return '%s: Reference to %s [%s]' % (
             self.text,
             self.nk_fk,
             ', '.join(str(o) for o in self.nk_m2m.all())

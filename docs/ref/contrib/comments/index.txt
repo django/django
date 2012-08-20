@@ -130,8 +130,6 @@ details.
 Linking to comments
 -------------------
 
-.. versionadded:: 1.2
-
 To provide a permalink to a specific comment, use :ttag:`get_comment_permalink`::
 
     {% get_comment_permalink comment_obj [format_string] %}
@@ -252,7 +250,7 @@ Redirecting after the comment post
 To specify the URL you want to redirect to after the comment has been posted,
 you can include a hidden form input called ``next`` in your comment form. For example::
 
-    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
+    <input type="hidden" name="next" value="{% url 'my_comment_was_posted' %}" />
 
 .. _notes-on-the-comment-form:
 

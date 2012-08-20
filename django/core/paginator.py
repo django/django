@@ -132,10 +132,10 @@ class Page(object):
         return self.has_previous() or self.has_next()
 
     def next_page_number(self):
-        return self.number + 1
+        return self.paginator.validate_number(self.number + 1)
 
     def previous_page_number(self):
-        return self.number - 1
+        return self.paginator.validate_number(self.number - 1)
 
     def start_index(self):
         """

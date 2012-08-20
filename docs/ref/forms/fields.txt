@@ -25,8 +25,6 @@ exception or returns the clean value::
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
     u'foo@example.com'
-    >>> f.clean(u'foo@example.com')
-    u'foo@example.com'
     >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
@@ -256,8 +254,6 @@ error message keys it uses.
 ``validators``
 ~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
-
 .. attribute:: Field.validators
 
 The ``validators`` argument lets you provide a list of validation functions
@@ -267,8 +263,6 @@ See the :doc:`validators documentation </ref/validators>` for more information.
 
 ``localize``
 ~~~~~~~~~~~~
-
-.. versionadded:: 1.2
 
 .. attribute:: Field.localize
 
@@ -492,11 +486,6 @@ For each field, we describe the default widget used if you don't specify
     If provided, these arguments ensure that the string is at most or at least the
     given length.
 
-.. versionchanged:: 1.2
-   The EmailField previously did not recognize email addresses as valid that
-   contained an IDN (Internationalized Domain Name; a domain containing
-   unicode characters) domain part. This has now been corrected.
-
 ``FileField``
 ~~~~~~~~~~~~~
 
@@ -602,7 +591,11 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ImageField requires that the `Python Imaging Library`_ is installed.
+    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
+    is installed and supports the image formats you use. If you encounter a
+    ``corrupt image`` error when you upload an image, it usually means PIL
+    doesn't understand its format. To fix this, install the appropriate
+    library and reinstall PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
@@ -814,11 +807,6 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: min_length
 
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
-
-.. versionchanged:: 1.2
-   The URLField previously did not recognize URLs as valid that contained an IDN
-   (Internationalized Domain Name; a domain name containing unicode characters)
-   domain name. This has now been corrected.
 
 
 Slightly complex built-in ``Field`` classes

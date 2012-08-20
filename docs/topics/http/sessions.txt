@@ -423,6 +423,9 @@ cookie will be sent on every request.
 Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
+.. versionchanged:: 1.5
+  The session is not saved if the response's status code is 500.
+
 Browser-length sessions vs. persistent sessions
 ===============================================
 
@@ -503,7 +506,7 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` (note the leading dot!) for cross-domain cookies, or use
+``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
 
 SESSION_COOKIE_HTTPONLY
@@ -521,7 +524,7 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
-.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 SESSION_COOKIE_NAME
 -------------------

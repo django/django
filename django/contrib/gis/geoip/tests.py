@@ -1,8 +1,12 @@
+from __future__ import unicode_literals
+
 import os
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geoip import GeoIP, GeoIPException
 from django.utils import unittest
+
+from django.utils import six
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
@@ -33,7 +37,7 @@ class GeoIPTest(unittest.TestCase):
         bad_params = (23, 'foo', 15.23)
         for bad in bad_params:
             self.assertRaises(GeoIPException, GeoIP, cache=bad)
-            if isinstance(bad, basestring):
+            if isinstance(bad, six.string_types):
                 e = GeoIPException
             else:
                 e = TypeError
@@ -99,13 +103,13 @@ class GeoIPTest(unittest.TestCase):
         "Testing that GeoIP strings are properly encoded, see #16553."
         g = GeoIP()
         d = g.city('62.224.93.23')
-        self.assertEqual(u'Sch\xf6mberg', d['city'])
+        self.assertEqual('Schümberg', d['city'])
 
     def test06_unicode_query(self):
         "Testing that GeoIP accepts unicode string queries, see #17059."
         g = GeoIP()
-        d = g.country(u'whitehouse.gov')
-        self.assertEqual(u'US', d['country_code'])
+        d = g.country('whitehouse.gov')
+        self.assertEqual('US', d['country_code'])
 
 
 def suite():

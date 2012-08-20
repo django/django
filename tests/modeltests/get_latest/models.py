@@ -9,8 +9,10 @@ farthest into the future."
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
@@ -18,14 +20,15 @@ class Article(models.Model):
     class Meta:
         get_latest_by = 'pub_date'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
+@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=30)
     birthday = models.DateField()
 
     # Note that this model doesn't have "get_latest_by" set.
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

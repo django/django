@@ -1,10 +1,11 @@
+from __future__ import unicode_literals
 import re
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.formats import number_format
 from django.utils.translation import pgettext, ungettext, ugettext as _
 from django.utils.timezone import is_aware, utc
@@ -23,8 +24,8 @@ def ordinal(value):
         return value
     suffixes = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return u"%d%s" % (value, suffixes[0])
-    return u"%d%s" % (value, suffixes[value % 10])
+        return "%d%s" % (value, suffixes[0])
+    return "%d%s" % (value, suffixes[value % 10])
 
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
@@ -40,7 +41,7 @@ def intcomma(value, use_l10n=True):
             return intcomma(value, False)
         else:
             return number_format(value, force_grouping=True)
-    orig = force_unicode(value)
+    orig = force_text(value)
     new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
     if orig == new:
         return new
@@ -142,7 +143,9 @@ def apnumber(value):
         return value
     return (_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine'))[value-1]
 
-@register.filter
+# Perform the comparison in the default time zone when USE_TZ = True
+# (unless a specific time zone has been applied with the |timezone filter).
+@register.filter(expects_localtime=True)
 def naturalday(value, arg=None):
     """
     For date values that are tomorrow, today or yesterday compared to
@@ -161,13 +164,15 @@ def naturalday(value, arg=None):
     today = datetime.now(tzinfo).date()
     delta = value - today
     if delta.days == 0:
-        return _(u'today')
+        return _('today')
     elif delta.days == 1:
-        return _(u'tomorrow')
+        return _('tomorrow')
     elif delta.days == -1:
-        return _(u'yesterday')
+        return _('yesterday')
     return defaultfilters.date(value, arg)
 
+# This filter doesn't require expects_localtime=True because it deals properly
+# with both naive and aware datetimes. Therefore avoid the cost of conversion.
 @register.filter
 def naturaltime(value):
     """
@@ -183,42 +188,42 @@ def naturaltime(value):
         if delta.days != 0:
             return pgettext(
                 'naturaltime', '%(delta)s ago'
-            ) % {'delta': defaultfilters.timesince(value)}
+            ) % {'delta': defaultfilters.timesince(value, now)}
         elif delta.seconds == 0:
-            return _(u'now')
+            return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                u'a second ago', u'%(count)s seconds ago', delta.seconds
+                'a second ago', '%(count)s seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                u'a minute ago', u'%(count)s minutes ago', count
+                'a minute ago', '%(count)s minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                u'an hour ago', u'%(count)s hours ago', count
+                'an hour ago', '%(count)s hours ago', count
             ) % {'count': count}
     else:
         delta = value - now
         if delta.days != 0:
             return pgettext(
                 'naturaltime', '%(delta)s from now'
-            ) % {'delta': defaultfilters.timeuntil(value)}
+            ) % {'delta': defaultfilters.timeuntil(value, now)}
         elif delta.seconds == 0:
-            return _(u'now')
+            return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                u'a second from now', u'%(count)s seconds from now', delta.seconds
+                'a second from now', '%(count)s seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                u'a minute from now', u'%(count)s minutes from now', count
+                'a minute from now', '%(count)s minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                u'an hour from now', u'%(count)s hours from now', count
+                'an hour from now', '%(count)s hours from now', count
             ) % {'count': count}
