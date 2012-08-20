@@ -1029,7 +1029,7 @@ class Query(object):
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
 
-    def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
+    def add_filter(self, filter_expr, connector=AND, negate=False,
             can_reuse=None, process_extras=True, force_having=False):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
@@ -1041,9 +1041,6 @@ class Query(object):
         filters often require multiple calls to add_filter() and the negation
         should only happen once. So the caller is responsible for this (the
         caller will normally be add_q(), so that as an example).
-
-        If 'trim' is True, we automatically trim the final join group (used
-        internally when constructing nested queries).
 
         If 'can_reuse' is a set, we are processing a component of a
         multi-component filter (e.g. filter(Q1, Q2)). In this case, 'can_reuse'
@@ -1115,7 +1112,7 @@ class Query(object):
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
-        allow_many = trim or not negate
+        allow_many = not negate
 
         try:
             field, target, opts, join_list, last, extra_filters = self.setup_joins(
@@ -1141,7 +1138,7 @@ class Query(object):
         # Process the join list to see if we can remove any inner joins from
         # the far end (fewer tables in a query is better).
         nonnull_comparison = (lookup_type == 'isnull' and value is False)
-        col, alias, join_list = self.trim_joins(target, join_list, last, trim,
+        col, alias, join_list = self.trim_joins(target, join_list, last,
                 nonnull_comparison)
 
         if connector == OR:
@@ -1456,7 +1453,7 @@ class Query(object):
 
         return field, target, opts, joins, last, extra_filters
 
-    def trim_joins(self, target, join_list, last, trim, nonnull_check=False):
+    def trim_joins(self, target, join_list, last, nonnull_check=False):
         """
         Sometimes joins at the end of a multi-table sequence can be trimmed. If
         the final join is against the same column as we are comparing against,
@@ -1473,10 +1470,6 @@ class Query(object):
         same way, so 'last' has an entry for the first of the two tables and
         then the table immediately after the second table, in that case.
 
-        The 'trim' parameter forces the final piece of the join list to be
-        trimmed before anything. See the documentation of add_filter() for
-        details about this.
-
         The 'nonnull_check' parameter is True when we are using inner joins
         between tables explicitly to exclude NULL entries. In that case, the
         tables shouldn't be trimmed, because the very action of joining to them
@@ -1489,16 +1482,7 @@ class Query(object):
         penultimate = last.pop()
         if penultimate == final:
             penultimate = last.pop()
-        if trim and final > 1:
-            extra = join_list[penultimate:]
-            join_list = join_list[:penultimate]
-            final = penultimate
-            penultimate = last.pop()
-            col = self.alias_map[extra[0]].lhs_join_col
-            for alias in extra:
-                self.unref_alias(alias)
-        else:
-            col = target.column
+        col = target.column
         alias = join_list[-1]
         while final > 1:
             join = self.alias_map[alias]
@@ -1520,6 +1504,19 @@ class Query(object):
         to use a subquery. This method constructs the nested query, given the
         original exclude filter (filter_expr) and the portion up to the first
         N-to-many relation field.
+
+        As an example we could have original filter ~Q(child__name='foo').
+        We would get here with filter_expr = child_name, prefix = child and
+        can_reuse is a set of joins we can reuse for filtering in the original
+        query.
+
+        We will turn this into
+            WHERE pk NOT IN (SELECT parent_id FROM thetable
+                             WHERE name = 'foo' AND parent_id IS NOT NULL)
+
+        It might be worth it to consider using WHERE NOT EXISTS as that has
+        saner null handling, and is easier for the backend's optimizer to
+        handle.
         """
         query = Query(self.model)
         query.add_filter(filter_expr)
@@ -1532,8 +1529,19 @@ class Query(object):
         # nothing
         alias, col = query.select[0].col
         query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
+        # We need to trim the last part from the prefix.
+        trimmed_prefix = '__'.join(prefix.split(LOOKUP_SEP)[0:-1])
+        if not trimmed_prefix:
+            rel, _, direct, m2m = self.model._meta.get_field_by_name(prefix)
+            if not m2m:
+                trimmed_prefix = rel.field.rel.field_name
+            else:
+                if direct:
+                    trimmed_prefix = rel.m2m_target_field_name()
+                else:
+                    trimmed_prefix = rel.field.m2m_reverse_target_field_name()
 
-        self.add_filter(('%s__in' % prefix, query), negate=True, trim=True,
+        self.add_filter(('%s__in' % trimmed_prefix, query), negate=True,
                 can_reuse=can_reuse)
 
         # If there's more than one join in the inner query (before any initial
@@ -1546,8 +1554,8 @@ class Query(object):
         active_positions = len([count for count
                                 in query.alias_refcount.items() if count])
         if active_positions > 1:
-            self.add_filter(('%s__isnull' % prefix, False), negate=True,
-                    trim=True, can_reuse=can_reuse)
+            self.add_filter(('%s__isnull' % trimmed_prefix, False), negate=True,
+                    can_reuse=can_reuse)
 
     def set_limits(self, low=None, high=None):
         """
