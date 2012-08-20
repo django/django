@@ -4,7 +4,7 @@ from django import forms
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy, ugettext as _
 
 ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
@@ -29,9 +29,10 @@ class AdminAuthenticationForm(AuthenticationForm):
             if self.user_cache is None:
                 if '@' in username:
                     # Mistakenly entered e-mail address instead of username? Look it up.
+                    user_model = get_user_model()
                     try:
-                        user = User.objects.get(email=username)
-                    except (User.DoesNotExist, User.MultipleObjectsReturned):
+                        user = user_model.objects.get(email=username)
+                    except (user_model.DoesNotExist, user_model.MultipleObjectsReturned):
                         # Nothing to do here, moving along.
                         pass
                     else:
