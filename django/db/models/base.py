@@ -404,6 +404,8 @@ class Model(six.with_metaclass(ModelBase, object)):
             u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
+        if not six.PY3:
+            u = u.encode('ascii', 'replace')
         return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):

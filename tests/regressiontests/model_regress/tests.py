@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from __future__ import absolute_import, unicode_literals
 
 import datetime
@@ -145,6 +147,14 @@ class ModelTests(TestCase):
         # Models with broken unicode methods should still have a printable repr
         b = BrokenUnicodeMethod.objects.create(name="Jerry")
         self.assertEqual(repr(b), "<BrokenUnicodeMethod: [Bad Unicode data]>")
+
+    def test_no_unicode_in_repr(self):
+        a = Article.objects.create(
+            headline="Watch for umlauts: üöä", pub_date=datetime.datetime.now())
+        if six.PY3:
+            self.assertEqual(repr(a), '<Article: Watch for umlauts: üöä>')
+        else:
+            self.assertEqual(repr(a), '<Article: Watch for umlauts: ???>')
 
     @skipUnlessDBFeature("supports_timezones")
     def test_timezones(self):
