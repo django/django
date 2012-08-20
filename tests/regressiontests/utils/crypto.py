@@ -6,7 +6,17 @@ import timeit
 import hashlib
 
 from django.utils import unittest
-from django.utils.crypto import pbkdf2
+from django.utils.crypto import constant_time_compare, pbkdf2
+
+
+class TestUtilsCryptoMisc(unittest.TestCase):
+
+    def test_constant_time_compare(self):
+        # It's hard to test for constant time, just test the result.
+        self.assertTrue(constant_time_compare(b'spam', b'spam'))
+        self.assertFalse(constant_time_compare(b'spam', b'eggs'))
+        with self.assertRaises(TypeError):
+            constant_time_compare('spam', 'spam')
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):

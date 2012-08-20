@@ -6,7 +6,7 @@ from __future__ import absolute_import
 from .archive import TestBzip2Tar, TestGzipTar, TestTar, TestZip
 from .baseconv import TestBaseConv
 from .checksums import TestUtilsChecksums
-from .crypto import TestUtilsCryptoPBKDF2
+from .crypto import TestUtilsCryptoMisc, TestUtilsCryptoPBKDF2
 from .datastructures import (DictWrapperTests, ImmutableListTests,
     MergeDictTests, MultiValueDictTests, SortedDictTests)
 from .dateformat import DateFormatTests
