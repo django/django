@@ -114,6 +114,10 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(m.file.name, 'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
         m.delete()
 
+    def test_incorrect_instance_raises_exception(self):
+        # ModelForm with incorrect instance raises ValueError on init ##########
+        self.assertRaises(ValueError, ChoiceFieldForm, instance=Group)
+
     def test_boundary_conditions(self):
         # Boundary conditions on a PostitiveIntegerField #########################
         class BoundaryForm(ModelForm):
