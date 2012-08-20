@@ -574,10 +574,8 @@ For example::
         (r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
 
-In this example, for a request to ``/blog/2005/``, Django will call the
-``blog.views.year_archive()`` view, passing it these keyword arguments::
-
-    year='2005', foo='bar'
+In this example, for a request to ``/blog/2005/``, Django will call
+``blog.views.year_archive(year='2005', foo='bar')``.
 
 This technique is used in the
 :doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
