@@ -9,6 +9,7 @@ import unicodedata
 from django.contrib.auth import models as auth_app
 from django.db.models import get_models, signals
 from django.contrib.auth.models import User
+from django.utils import six
 from django.utils.six.moves import input
 
 
@@ -84,17 +85,23 @@ def get_system_username():
     :returns: The username as a unicode string, or an empty string if the
         username could not be determined.
     """
-    default_locale = locale.getdefaultlocale()[1]
-    if default_locale:
+    try:
+        result = getpass.getuser()
+    except (ImportError, KeyError):
+        # KeyError will be raised by os.getpwuid() (called by getuser())
+        # if there is no corresponding entry in the /etc/passwd file
+        # (a very restricted chroot environment, for example).
+        return ''
+    if not six.PY3:
+        default_locale = locale.getdefaultlocale()[1]
+        if not default_locale:
+            return ''
         try:
-            return getpass.getuser().decode(default_locale)
-        except (ImportError, KeyError, UnicodeDecodeError):
-            # KeyError will be raised by os.getpwuid() (called by getuser())
-            # if there is no corresponding entry in the /etc/passwd file
-            # (a very restricted chroot environment, for example).
+            result = result.decode(default_locale)
+        except UnicodeDecodeError:
             # UnicodeDecodeError - preventive treatment for non-latin Windows.
-            pass
-    return ''
+            return ''
+    return result
 
 
 def get_default_username(check_db=True):
