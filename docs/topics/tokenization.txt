@@ -1,0 +1,173 @@
+==========================
+Centralizated Tokenization
+==========================
+
+.. module:: django.util.tokens
+   :synopsis: Django's tokenization framework.
+
+.. versionadded:: 1.5
+
+Tokens strings are common in web projects and applications. The tokenization
+library provides an abstraction over ``hashlib`` and ``random``.
+
+It provides two kind of tokens, `HashToken`_ for hashed strings and
+`RandomToken`_ for random strings.
+
+HashToken
+=========
+
+.. class:: HashToken([value='', algorithm='sha256'])
+
+For genrating hashed tokens based on an initial string.It lives in
+``django.util.tokens`` module. To create a hash token, instantiate a
+``HashToken`` instance::
+
+    >>> from django.util.token import HashToken
+    >>> token = HashToken('My String')
+    >>> tokenized_string = token.hex() # Retrive the token in hex format.
+    >>> tokenized_string
+    '8a7046a0b97e45470b13f30448c9d7d959aa5eea583d2f007921736b2141ac75'
+
+The default algorithm used for hashing is ``hashlib.sha256``. It can be
+configured using the ``algorithm`` keyword argument while instantiating
+`HashToken`_::
+
+    >>> from django.util.token import HashToken
+    >>> token = HashToken('My String', algorithm='md5')
+    >>> tokenized_string = token.hex() # Retrive the md5 token in hex format.
+    >>> tokenized_string
+    '4545102cc40ea0a85124cf4b31574661'
+
+Apart from hex, the token string can be retrivied in multiple other methods.
+Like: digits, alphanumeric etc. They are explaied in more detail in `Token
+strings retrival API`_
+
+To modify the value associated with a hash object, used ``HashToken.update``
+method::
+
+    >>> from django.util.token import HashToken
+    >>> token = HashToken()
+    >>> token.update('Updated String')
+    >>> tokenized_string = token.hex()
+    >>> tokenized_string
+    'e90301dcb21ecb62a899aff07c7d5141590d4d70af318768cb1540d8f0a13e8a'
+
+To retrive the hashlib constructors, for feeding into functions like
+``hamc.new(key[, msg[, digestmod]])``, use ``HashToken.digestmod``::
+
+    >>> from django.util.token import HashToken
+    >>> token = HashToken()
+    >>> token.digestmod
+    <function _hashlib.openssl_sha256>
+
+RandomToken
+===========
+
+.. class:: RandomToken([length=32])
+
+``RandomToken`` can be used for generation of random streams of strings. It is
+an abscraction over the random module.::
+
+    >>> from django.util.token import RandomToken
+    >>> token = RandomToken()
+    >>> random_string = token.hex() # Retrive the random string in hex format.
+    >>> random_string
+    '6d0d79bb05854d00a4e1c9c5f6ab08ef'
+
+The default length of a random generated string is 32. The length of output
+string can be configured through the `length` intialization parameter::
+
+    >>> from django.util.token import RandomToken
+    >>> token = RandomToken(length=5)
+    >>> random_string = token.hex()
+    >>> random_string
+    '70a29'
+
+The same random token can be reused to generate more random strings::
+
+    >>> from django.util.token import RandomToken
+    >>> token = RandomToken()
+    >>> token.hex()
+    '0309accbacdafa8356779c78d969c73a'
+    >>> token.hex()
+    '96e4d4e716712f03079dc44ad58c070c'
+    >>> token.hex()
+    '0f98cbdb0de5b1c8494c1b96de956e20'
+
+Token strings retrival API
+==========================
+
+.. class:: Token
+
+All tokenizers provide a common interface for limiting the character set of the
+retrived strings.
+
+hex
+~~~
+
+.. method:: hex()
+
+Return the token in hex character set.::
+
+    >>> token = RandomToken()
+    >>> token.hex()
+    '0f98cbdb0de5b1c8494c1b96de956e20'
+
+digits
+~~~~~~
+
+.. method:: digits()
+
+Token strings will contain only numbers from 0-9.::
+
+    >>> token = RandomToken()
+    >>> token.digits()
+    '90928318046766945374466410471035'
+
+alphanumeric
+~~~~~~~~~~~~
+
+.. method:: alphanumeric()
+
+The string will include alphanumeric characters (digits, lower/upper case
+alphabets).::
+
+    >>> token = RandomToken()
+    >>> token.alphanumeric()
+    'kevD6bPVXf062zXyKRhtMttDmvAfbglf'
+
+lower_alphanumeric
+~~~~~~~~~~~~~~~~~~
+
+.. method:: lower_alphanumeric()
+
+The string will include alphanumeric characters but exclude the upper cased
+alphabets.::
+
+    >>> token = RandomToken()
+    >>> token.lower_alphanumeric()
+    '3g4eksyk3mva5kq5egtvausehtlpjaju'
+
+readable_alphabet
+~~~~~~~~~~~~~~~~~
+
+.. method:: readable_alphabet()
+
+A character set consisting of alphabets and digits which are easily
+distinguishable by humans.::
+
+    >>> token = RandomToken()
+    >>> token.lower_alphanumeric()
+    'AhAE52FDecZ7jhSWxRFTfE6gflU7juQr'
+
+custom_chars
+~~~~~~~~~~~~
+
+.. method:: custom_chars(characters)
+
+Accepts a string of characters as arguments which defines the set of characters
+out of which the output is required.::
+
+    >>> token = RandomToken()
+    >>> token.custom_chars('asdfg12345!@#$%')
+    '2!4a$5#f3d#fs4s125a153d#f3d3#1'
