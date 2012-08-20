@@ -104,9 +104,11 @@ to know about views via the links below:
   :doc:`Custom storage <howto/custom-file-storage>`
 
 * **Class-based views:**
-  :doc:`Overview<topics/class-based-views/index>` |
-  :doc:`Built-in class-based views<ref/class-based-views/index>` |
-  :doc:`Built-in view mixins<ref/class-based-views/mixins>`
+  :doc:`Overview <topics/class-based-views/index>` |
+  :doc:`Built-in display views <topics/class-based-views/generic-display>` |
+  :doc:`Built-in editing views <topics/class-based-views/generic-editing>` |
+  :doc:`Using mixins <topics/class-based-views/mixins>` |
+  :doc:`API reference <ref/class-based-views/index>`
 
 * **Advanced:**
   :doc:`Generating CSV <howto/outputting-csv>` |
