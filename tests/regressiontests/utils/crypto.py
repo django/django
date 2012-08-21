@@ -15,8 +15,8 @@ class TestUtilsCryptoMisc(unittest.TestCase):
         # It's hard to test for constant time, just test the result.
         self.assertTrue(constant_time_compare(b'spam', b'spam'))
         self.assertFalse(constant_time_compare(b'spam', b'eggs'))
-        with self.assertRaises(TypeError):
-            constant_time_compare('spam', 'spam')
+        self.assertTrue(constant_time_compare('spam', 'spam'))
+        self.assertFalse(constant_time_compare('spam', 'eggs'))
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):

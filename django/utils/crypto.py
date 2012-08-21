@@ -82,16 +82,14 @@ def get_random_string(length=12,
 
 def constant_time_compare(val1, val2):
     """
-    Returns True if the two bytestrings are equal, False otherwise.
+    Returns True if the two strings are equal, False otherwise.
 
     The time taken is independent of the number of characters that match.
     """
-    if not (isinstance(val1, bytes) and isinstance(val2, bytes)):
-        raise TypeError("constant_time_compare only supports bytes")
     if len(val1) != len(val2):
         return False
     result = 0
-    if six.PY3:
+    if six.PY3 and isinstance(val1, bytes) and isinstance(val2, bytes):
         for x, y in zip(val1, val2):
             result |= x ^ y
     else:
