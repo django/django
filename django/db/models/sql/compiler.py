@@ -470,9 +470,7 @@ class SQLCompiler(object):
         # Must use left outer joins for nullable fields and their relations.
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
-        if joins_to_promote:
-            self.query.promote_alias_chain(joins_to_promote,
-                self.query.alias_map[joins_to_promote[0]].join_type == self.query.LOUTER)
+        self.query.promote_joins(joins_to_promote)
         return field, col, alias, joins, opts
 
     def _final_join_removal(self, col, alias):
@@ -645,8 +643,6 @@ class SQLCompiler(object):
                     alias_chain.append(alias)
                     for (dupe_opts, dupe_col) in dupe_set:
                         self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
-                if self.query.alias_map[root_alias].join_type == self.query.LOUTER:
-                    self.query.promote_alias_chain(alias_chain, True)
             else:
                 alias = root_alias
 
@@ -663,8 +659,6 @@ class SQLCompiler(object):
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(columns)
-            if self.query.alias_map[alias].join_type == self.query.LOUTER:
-                self.query.promote_alias_chain(aliases, True)
             self.query.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:
                 next = requested.get(f.name, {})
@@ -738,7 +732,9 @@ class SQLCompiler(object):
                 self.query.related_select_fields.extend(model._meta.fields)
 
                 next = requested.get(f.related_query_name(), {})
-                new_nullable = f.null or None
+                # Use True here because we are looking at the _reverse_ side of
+                # the relation, which is always nullable.
+                new_nullable = True
 
                 self.fill_related_selections(model._meta, table, cur_depth+1,
                     used, next, restricted, new_nullable)
