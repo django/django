@@ -238,7 +238,6 @@ class LazyObject(object):
         raise NotImplementedError
 
     # introspection support:
-    __members__ = property(lambda self: self.__dir__())
     __dir__ = new_method_proxy(dir)
 
 
