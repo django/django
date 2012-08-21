@@ -385,3 +385,18 @@ class NullableName(models.Model):
 
     class Meta:
         ordering = ['id']
+
+class ModelD(models.Model):
+    name = models.TextField()
+
+class ModelC(models.Model):
+    name = models.TextField()
+
+class ModelB(models.Model):
+    name = models.TextField()
+    c = models.ForeignKey(ModelC)
+
+class ModelA(models.Model):
+    name = models.TextField()
+    b = models.ForeignKey(ModelB, null=True)
+    d = models.ForeignKey(ModelD)

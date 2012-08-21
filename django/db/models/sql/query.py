@@ -910,7 +910,12 @@ class Query(object):
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
             join_type = None
-        elif promote or outer_if_first:
+        elif (promote or outer_if_first
+              or self.alias_map[lhs].join_type == self.LOUTER):
+            # We need to use LOUTER join if asked by promote or outer_if_first,
+            # or if the LHS table is left-joined in the query. Adding inner join
+            # to an existing outer join effectively cancels the effect of the
+            # outer join.
             join_type = self.LOUTER
         else:
             join_type = self.INNER
