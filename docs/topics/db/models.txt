@@ -108,8 +108,8 @@ determine a few things:
 
 * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
 
-* The :doc:`widget </ref/forms/widgets>` to use in Django's admin interface,
-  if you care to use it (e.g. ``<input type="text">``, ``<select>``).
+* The default :doc:`widget </ref/forms/widgets>` to use when rendering a form
+  field (e.g. ``<input type="text">``, ``<select>``).
 
 * The minimal validation requirements, used in Django's admin and in
   automatically-generated forms.
@@ -143,13 +143,13 @@ ones:
     Note that this is different than :attr:`~Field.null`.
     :attr:`~Field.null` is purely database-related, whereas
     :attr:`~Field.blank` is validation-related. If a field has
-    :attr:`blank=True <Field.blank>`, validation on Django's admin site will
+    :attr:`blank=True <Field.blank>`, form validation will
     allow entry of an empty value. If a field has :attr:`blank=False
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
     An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-    this field. If this is given, Django's admin will use a select box
+    this field. If this is given, the default form widget will be a select box
     instead of the standard text field and will limit choices to the choices
     given.
 
@@ -164,7 +164,7 @@ ones:
         )
 
     The first element in each tuple is the value that will be stored in the
-    database, the second element will be displayed by the admin interface,
+    database, the second element will be displayed by the default form widget
     or in a ModelChoiceField. Given an instance of a model object, the
     display value for a choices field can be accessed using the
     ``get_FOO_display`` method. For example::
@@ -195,9 +195,8 @@ ones:
     created.
 
 :attr:`~Field.help_text`
-    Extra "help" text to be displayed under the field on the object's admin
-    form. It's useful for documentation even if your object doesn't have an
-    admin form.
+    Extra "help" text to be displayed with the form widget. It's useful for
+    documentation even if your field isn't used on a form.
 
 :attr:`~Field.primary_key`
     If ``True``, this field is the primary key for the model.
@@ -359,13 +358,12 @@ It doesn't matter which model has the
 :class:`~django.db.models.ManyToManyField`, but you should only put it in one
 of the models -- not both.
 
-Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
-object that's going to be edited in the admin interface, if you're using
-Django's admin. In the above example, ``toppings`` is in ``Pizza`` (rather than
-``Topping`` having a ``pizzas`` :class:`~django.db.models.ManyToManyField` )
-because it's more natural to think about a pizza having toppings than a
-topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
-form would let users select the toppings.
+Generally, :class:`~django.db.models.ManyToManyField` instances should go in
+the object that's going to be edited on a form. In the above example,
+``toppings`` is in ``Pizza`` (rather than ``Topping`` having a ``pizzas``
+:class:`~django.db.models.ManyToManyField` ) because it's more natural to think
+about a pizza having toppings than a topping being on multiple pizzas. The way
+it's set up above, the ``Pizza`` form would let users select the toppings.
 
 .. seealso::
 
