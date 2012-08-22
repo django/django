@@ -243,7 +243,12 @@ class HttpRequest(object):
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-    def _set_encoding(self, val):
+    @property
+    def encoding(self):
+        return self._encoding
+
+    @encoding.setter
+    def encoding(self, val):
         """
         Sets the encoding used for GET/POST accesses. If the GET or POST
         dictionary has already been created, it is removed and recreated on the
@@ -255,27 +260,22 @@ class HttpRequest(object):
         if hasattr(self, '_post'):
             del self._post
 
-    def _get_encoding(self):
-        return self._encoding
-
-    encoding = property(_get_encoding, _set_encoding)
-
     def _initialize_handlers(self):
         self._upload_handlers = [uploadhandler.load_handler(handler, self)
                                  for handler in settings.FILE_UPLOAD_HANDLERS]
 
-    def _set_upload_handlers(self, upload_handlers):
-        if hasattr(self, '_files'):
-            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
-        self._upload_handlers = upload_handlers
-
-    def _get_upload_handlers(self):
+    @property
+    def upload_handlers(self):
         if not self._upload_handlers:
             # If there are no upload handlers defined, initialize them from settings.
             self._initialize_handlers()
         return self._upload_handlers
 
-    upload_handlers = property(_get_upload_handlers, _set_upload_handlers)
+    @upload_handlers.setter
+    def upload_handlers(self, upload_handlers):
+        if hasattr(self, '_files'):
+            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
+        self._upload_handlers = upload_handlers
 
     def parse_file_upload(self, META, post_data):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
@@ -397,15 +397,15 @@ class QueryDict(MultiValueDict):
                                 force_text(value, encoding, errors='replace'))
         self._mutable = mutable
 
-    def _get_encoding(self):
+    @property
+    def encoding(self):
         if self._encoding is None:
             self._encoding = settings.DEFAULT_CHARSET
         return self._encoding
 
-    def _set_encoding(self, value):
+    @encoding.setter
+    def encoding(self, value):
         self._encoding = value
-
-    encoding = property(_get_encoding, _set_encoding)
 
     def _assert_mutable(self):
         if not self._mutable:
@@ -539,7 +539,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        # content is a bytestring. See _get_content / _set_content.
+        # content is a bytestring. See the content property methods.
         self.content = content
         self.cookies = SimpleCookie()
         if status:
@@ -669,7 +669,8 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
-    def _get_content(self):
+    @property
+    def content(self):
         if self.has_header('Content-Encoding'):
             def make_bytes(value):
                 if isinstance(value, int):
@@ -681,15 +682,14 @@ class HttpResponse(object):
             return b''.join(make_bytes(e) for e in self._container)
         return b''.join(smart_bytes(e, self._charset) for e in self._container)
 
-    def _set_content(self, value):
+    @content.setter
+    def content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             self._container = value
             self._base_content_is_iter = True
         else:
             self._container = [value]
             self._base_content_is_iter = False
-
-    content = property(_get_content, _set_content)
 
     def __iter__(self):
         self._iterator = iter(self._container)

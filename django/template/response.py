@@ -102,7 +102,7 @@ class SimpleTemplateResponse(HttpResponse):
         """
         retval = self
         if not self._is_rendered:
-            self._set_content(self.rendered_content)
+            self.content = self.rendered_content
             for post_callback in self._post_render_callbacks:
                 newretval = post_callback(retval)
                 if newretval is not None:
@@ -119,19 +119,19 @@ class SimpleTemplateResponse(HttpResponse):
                                           'rendered before it can be iterated over.')
         return super(SimpleTemplateResponse, self).__iter__()
 
-    def _get_content(self):
+    @property
+    def content(self):
         if not self._is_rendered:
             raise ContentNotRenderedError('The response content must be '
                                           'rendered before it can be accessed.')
-        return super(SimpleTemplateResponse, self)._get_content()
+        return super(SimpleTemplateResponse, self).content
 
-    def _set_content(self, value):
+    @content.setter
+    def content(self, value):
         """Sets the content for the response
         """
-        super(SimpleTemplateResponse, self)._set_content(value)
+        HttpResponse.content.fset(self, value)
         self._is_rendered = True
-
-    content = property(_get_content, _set_content)
 
 
 class TemplateResponse(SimpleTemplateResponse):
