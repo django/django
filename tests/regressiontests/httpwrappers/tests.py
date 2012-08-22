@@ -6,7 +6,7 @@ import pickle
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
-                         HttpResponsePermanentRedirect,
+                         HttpResponsePermanentRedirect, HttpResponseNotModified,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
 from django.utils import six
@@ -328,6 +328,16 @@ class HttpResponseTests(unittest.TestCase):
                               HttpResponseRedirect, url)
             self.assertRaises(SuspiciousOperation,
                               HttpResponsePermanentRedirect, url)
+
+
+class HttpResponseSubclassesTests(unittest.TestCase):
+    def test_not_modified(self):
+        response = HttpResponseNotModified()
+        self.assertEqual(response.status_code, 304)
+        # 304 responses should not have content/content-type
+        with self.assertRaises(AttributeError):
+            response.content = "Hello dear"
+        self.assertNotIn('content-type', response)
 
 
 class CookieTests(unittest.TestCase):

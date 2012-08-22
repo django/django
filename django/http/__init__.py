@@ -744,6 +744,16 @@ class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
 class HttpResponseNotModified(HttpResponse):
     status_code = 304
 
+    def __init__(self, *args, **kwargs):
+        super(HttpResponseNotModified, self).__init__(*args, **kwargs)
+        del self['content-type']
+
+    @HttpResponse.content.setter
+    def content(self, value):
+        if value:
+            raise AttributeError("You cannot set content to a 304 (Not Modified) response")
+        self._container = []
+
 class HttpResponseBadRequest(HttpResponse):
     status_code = 400
 
