@@ -10,8 +10,6 @@ import decimal
 import sys
 import warnings
 
-from django.utils import six
-
 def _setup_environment(environ):
     import platform
     # Cygwin requires some special voodoo to set the environment variables

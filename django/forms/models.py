@@ -18,7 +18,6 @@ from django.utils.datastructures import SortedDict
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils import six
 
 
 __all__ = (
