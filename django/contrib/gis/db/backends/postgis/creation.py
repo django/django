@@ -40,8 +40,11 @@ class PostGISCreation(DatabaseCreation):
 
             if f.spatial_index:
                 # Spatial indexes created the same way for both Geometry and
-                # Geography columns
-                # PostGIS 2.0 does not support GIST_GEOMETRY_OPS
+                # Geography columns.
+                # PostGIS 2.0 does not support GIST_GEOMETRY_OPS. So, on 1.5
+                # we use GIST_GEOMETRY_OPS, on 2.0 we use either "nd" ops
+                # which are fast on multidimensional cases, or just plain
+                # gist index for the 2d case.
                 if f.geography:
                     index_opts = ''
                 elif self.connection.ops.spatial_version >= (2, 0):
