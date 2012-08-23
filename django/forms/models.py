@@ -13,12 +13,11 @@ from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property)
+from django.utils import six
 from django.utils.encoding import smart_text, force_text
 from django.utils.datastructures import SortedDict
-from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils import six
 
 
 __all__ = (
