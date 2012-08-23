@@ -728,11 +728,11 @@ class HttpResponse(object):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
-    def __init__(self, redirect_to):
+    def __init__(self, redirect_to, *args, **kwargs):
         parsed = urlparse(redirect_to)
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
-        super(HttpResponseRedirectBase, self).__init__()
+        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
@@ -766,8 +766,8 @@ class HttpResponseForbidden(HttpResponse):
 class HttpResponseNotAllowed(HttpResponse):
     status_code = 405
 
-    def __init__(self, permitted_methods):
-        super(HttpResponseNotAllowed, self).__init__()
+    def __init__(self, permitted_methods, *args, **kwargs):
+        super(HttpResponseNotAllowed, self).__init__(*args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
 
 class HttpResponseGone(HttpResponse):

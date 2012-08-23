@@ -6,9 +6,11 @@ import pickle
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
-                         HttpResponsePermanentRedirect, HttpResponseNotModified,
+                         HttpResponsePermanentRedirect, HttpResponseNotAllowed,
+                         HttpResponseNotModified,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
+from django.test import TestCase
 from django.utils import six
 from django.utils import unittest
 
@@ -330,7 +332,16 @@ class HttpResponseTests(unittest.TestCase):
                               HttpResponsePermanentRedirect, url)
 
 
-class HttpResponseSubclassesTests(unittest.TestCase):
+class HttpResponseSubclassesTests(TestCase):
+    def test_redirect(self):
+        response = HttpResponseRedirect('/redirected/')
+        self.assertEqual(response.status_code, 302)
+        # Test that standard HttpResponse init args can be used
+        response = HttpResponseRedirect('/redirected/',
+            content='The resource has temporarily moved',
+            content_type='text/html')
+        self.assertContains(response, 'The resource has temporarily moved', status_code=302)
+
     def test_not_modified(self):
         response = HttpResponseNotModified()
         self.assertEqual(response.status_code, 304)
@@ -339,6 +350,14 @@ class HttpResponseSubclassesTests(unittest.TestCase):
             response.content = "Hello dear"
         self.assertNotIn('content-type', response)
 
+    def test_not_allowed(self):
+        response = HttpResponseNotAllowed(['GET'])
+        self.assertEqual(response.status_code, 405)
+        # Test that standard HttpResponse init args can be used
+        response = HttpResponseNotAllowed(['GET'],
+            content='Only the GET method is allowed',
+            content_type='text/html')
+        self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):
