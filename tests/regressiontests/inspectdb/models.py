@@ -20,8 +20,11 @@ class DigitsInColumnName(models.Model):
     leading_digit = models.CharField(max_length=11, db_column='4extra')
     leading_digits = models.CharField(max_length=11, db_column='45extra')
 
-class UnderscoresInColumnName(models.Model):
+class SpecialColumnName(models.Model):
     field = models.IntegerField(db_column='field')
+    # Underscores
     field_field_0 = models.IntegerField(db_column='Field_')
     field_field_1 = models.IntegerField(db_column='Field__')
     field_field_2 = models.IntegerField(db_column='__field')
+    # Other chars
+    prc_x = models.IntegerField(db_column='prc(%) x')

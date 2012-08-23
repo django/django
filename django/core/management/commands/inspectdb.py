@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import keyword
+import re
 from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
@@ -142,18 +143,16 @@ class Command(NoArgsCommand):
             else:
                 field_params['db_column'] = col_name
 
-        if ' ' in new_name:
-            new_name = new_name.replace(' ', '_')
-            field_notes.append('Field renamed to remove spaces.')
-
-        if '-' in new_name:
-            new_name = new_name.replace('-', '_')
-            field_notes.append('Field renamed to remove dashes.')
+        new_name, num_repl = re.subn(r'\W', '_', new_name)
+        if num_repl > 0:
+            field_notes.append('Field renamed to remove unsuitable characters.')
 
         if new_name.find('__') >= 0:
             while new_name.find('__') >= 0:
                 new_name = new_name.replace('__', '_')
-            field_notes.append("Field renamed because it contained more than one '_' in a row.")
+            if col_name.lower().find('__') >= 0:
+                # Only add the comment if the double underscore was in the original name
+                field_notes.append("Field renamed because it contained more than one '_' in a row.")
 
         if new_name.startswith('_'):
             new_name = 'field%s' % new_name
