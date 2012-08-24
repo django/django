@@ -900,10 +900,10 @@ possible to easily create new instance with all fields' values copied. In the
 simplest case, you can just set ``pk`` to ``None``. Using our blog example::
 
     blog = Blog(name='My blog', tagline='Blogging is easy')
-    blog.save() # post.pk == 1
+    blog.save() # blog.pk == 1
 
     blog.pk = None
-    blog.save() # post.pk == 2
+    blog.save() # blog.pk == 2
 
 Things get more complicated if you use inheritance. Consider a subclass of
 ``Blog``::
