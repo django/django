@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 
 class PostGISCreation(DatabaseCreation):
@@ -64,5 +65,15 @@ class PostGISCreation(DatabaseCreation):
         return output
 
     def sql_table_creation_suffix(self):
-        qn = self.connection.ops.quote_name
-        return ' TEMPLATE %s' % qn(getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis'))
+        cursor = self.connection.cursor()
+        cursor.execute('select datname from pg_database;')
+        db_names = [row[0] for row in cursor.fetchall()]
+        postgis_template = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
+
+        if postgis_template in db_names:
+            qn = self.connection.ops.quote_name
+            return ' TEMPLATE %s' % qn(postgis_template)
+        elif self.connection.ops.spatial_version < (2, 0):
+            raise ImproperlyConfigured("Template database '%s' does not exist." % postgis_template)
+        else:
+            return ''
