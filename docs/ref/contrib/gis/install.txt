@@ -582,7 +582,7 @@ Creating a spatial database for SpatiaLite
 After you've installed SpatiaLite, you'll need to create a number of spatial
 metadata tables in your database in order to perform spatial queries.
 
-If you're using SpatiaLite 3.0 or newer, use the ``spatialite`` utility to
+If you're using SpatiaLite 2.4 or newer, use the ``spatialite`` utility to
 call the ``InitSpatialMetaData()`` function, like this::
 
    $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
@@ -593,12 +593,10 @@ call the ``InitSpatialMetaData()`` function, like this::
 You can safely ignore the error messages shown. When you've done this, you can
 skip the rest of this section.
 
-If you're using a version of SpatiaLite older than 3.0, you'll need to download
-a database-initialization file and execute its SQL queries in your database.
+If you're using SpatiaLite 2.3, you'll need to download a
+database-initialization file and execute its SQL queries in your database.
 
-First, get it from the appropriate SpatiaLite Resources page (
-http://www.gaia-gis.it/spatialite-2.3.1/resources.html for 2.3 or
-http://www.gaia-gis.it/spatialite-2.4.0/ for 2.4)::
+First, get it from the `SpatiaLite Resources`__ page::
 
    $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
@@ -612,6 +610,8 @@ Then, use the ``spatialite`` command to initialize a spatial database::
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
+
+__ http://www.gaia-gis.it/spatialite-2.3.1/resources.html
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------

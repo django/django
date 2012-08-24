@@ -119,7 +119,7 @@ Settings
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
 
-Only relevant when using a SpatiaLite version older than 3.0.
+Only relevant when using a SpatiaLite version 2.3.
 
 By default, the GeoDjango test runner looks for the :ref:`file containing the
 SpatiaLite dababase-initialization SQL code <create_spatialite_db>` in the
