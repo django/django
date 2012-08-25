@@ -4,8 +4,8 @@ import time
 
 from django.core import signing
 from django.test import TestCase
+from django.utils.encoding import force_str
 from django.utils import six
-from django.utils.encoding import force_text
 
 
 class TestSigner(TestCase):
@@ -22,7 +22,7 @@ class TestSigner(TestCase):
             self.assertEqual(
                 signer.signature(s),
                 signing.base64_hmac(signer.salt + 'signer', s,
-                    'predictable-secret')
+                    'predictable-secret').decode()
             )
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
@@ -32,7 +32,8 @@ class TestSigner(TestCase):
         self.assertEqual(
             signer.signature('hello'),
                 signing.base64_hmac('extra-salt' + 'signer',
-                'hello', 'predictable-secret'))
+                'hello', 'predictable-secret').decode()
+            )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
             signing.Signer('predictable-secret', salt='two').signature('hello'))
@@ -40,17 +41,20 @@ class TestSigner(TestCase):
     def test_sign_unsign(self):
         "sign/unsign should be reversible"
         signer = signing.Signer('predictable-secret')
-        examples = (
+        examples = [
             'q;wjmbk;wkmb',
             '3098247529087',
             '3098247:529:087:',
             'jkw osanteuh ,rcuh nthu aou oauh ,ud du',
             '\u2019',
-        )
+        ]
+        if not six.PY3:
+            examples.append(b'a byte string')
         for example in examples:
-            self.assertNotEqual(
-                force_text(example), force_text(signer.sign(example)))
-            self.assertEqual(example, signer.unsign(signer.sign(example)))
+            signed = signer.sign(example)
+            self.assertIsInstance(signed, str)
+            self.assertNotEqual(force_str(example), signed)
+            self.assertEqual(example, signer.unsign(signed))
 
     def unsign_detects_tampering(self):
         "unsign should raise an exception if the value has been tampered with"

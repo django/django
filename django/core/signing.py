@@ -32,6 +32,7 @@ start of the base64 JSON.
 There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
+
 from __future__ import unicode_literals
 
 import base64
@@ -43,7 +44,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.encoding import smart_bytes
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.importlib import import_module
 
 
@@ -62,12 +63,12 @@ class SignatureExpired(BadSignature):
 
 
 def b64_encode(s):
-    return base64.urlsafe_b64encode(smart_bytes(s)).decode('ascii').strip('=')
+    return base64.urlsafe_b64encode(s).strip(b'=')
 
 
 def b64_decode(s):
-    pad = '=' * (-len(s) % 4)
-    return base64.urlsafe_b64decode(smart_bytes(s + pad)).decode('ascii')
+    pad = b'=' * (-len(s) % 4)
+    return base64.urlsafe_b64decode(s + pad)
 
 
 def base64_hmac(salt, value, key):
@@ -116,20 +117,20 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     value or re-using a salt value across different parts of your
     application without good cause is a security risk.
     """
-    data = serializer().dumps(obj)
+    data = force_bytes(serializer().dumps(obj))
 
     # Flag for if it's been compressed or not
     is_compressed = False
 
     if compress:
         # Avoid zlib dependency unless compress is being used
-        compressed = zlib.compress(smart_bytes(data))
+        compressed = zlib.compress(data)
         if len(compressed) < (len(data) - 1):
             data = compressed
             is_compressed = True
     base64d = b64_encode(data)
     if is_compressed:
-        base64d = '.' + base64d
+        base64d = b'.' + base64d
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
@@ -137,37 +138,45 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     Reverse of dumps(), raises BadSignature if signature fails
     """
-    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age)
+    # TimestampSigner.unsign always returns unicode but base64 and zlib
+    # compression operate on bytes.
+    base64d = force_bytes(TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
     decompress = False
-    if base64d[0] == '.':
+    if base64d[0] == b'.':
         # It's compressed; uncompress it first
         base64d = base64d[1:]
         decompress = True
     data = b64_decode(base64d)
     if decompress:
         data = zlib.decompress(data)
-    return serializer().loads(data)
+    return serializer().loads(force_str(data))
 
 
 class Signer(object):
+
     def __init__(self, key=None, sep=':', salt=None):
-        self.sep = sep
-        self.key = key or settings.SECRET_KEY
-        self.salt = salt or ('%s.%s' %
-            (self.__class__.__module__, self.__class__.__name__))
+        # Use of native strings in all versions of Python
+        self.sep = str(sep)
+        self.key = str(key or settings.SECRET_KEY)
+        self.salt = str(salt or
+            '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key)
+        signature = base64_hmac(self.salt + 'signer', value, self.key)
+        # Convert the signature from bytes to str only on Python 3
+        return force_str(signature)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        value = force_str(value)
+        return str('%s%s%s') % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
+        signed_value = force_str(signed_value)
         if not self.sep in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):
-            return value
+            return force_text(value)
         raise BadSignature('Signature "%s" does not match' % sig)
 
 
@@ -177,8 +186,9 @@ class TimestampSigner(Signer):
         return baseconv.base62.encode(int(time.time()))
 
     def sign(self, value):
-        value = '%s%s%s' % (value, self.sep, self.timestamp())
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        value = force_str(value)
+        value = str('%s%s%s') % (value, self.sep, self.timestamp())
+        return super(TimestampSigner, self).sign(value)
 
     def unsign(self, value, max_age=None):
         result =  super(TimestampSigner, self).unsign(value)
