@@ -8,8 +8,8 @@ import sys
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
-from django.db.models import Count
-from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
+from django.db.models import Count, F, Q
+from django.db.models.query import ITER_CHUNK_SIZE, EmptyQuerySet
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
@@ -24,7 +24,7 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
     SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
     SingleObject, RelatedObject, ModelA, ModelD, Responsibility, Job,
-    JobResponsibilities)
+    JobResponsibilities, BaseA)
 
 
 class BaseQuerysetTest(TestCase):
@@ -2451,3 +2451,127 @@ class JoinReuseTest(TestCase):
     def test_revfk_noreuse(self):
         qs = Author.objects.filter(report__name='r4').filter(report__name='r1')
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+class DisjunctionPromotionTests(TestCase):
+    def test_disjunction_promotion1(self):
+        # Pre-existing join, add two ORed filters to the same join,
+        # all joins can be INNER JOINS.
+        qs = BaseA.objects.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        qs = qs.filter(Q(b__f1='foo') | Q(b__f2='foo'))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 2)
+        # Reverse the order of AND and OR filters.
+        qs = BaseA.objects.filter(Q(b__f1='foo') | Q(b__f2='foo'))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        qs = qs.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 2)
+
+    def test_disjunction_promotion2(self):
+        qs = BaseA.objects.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        # Now we have two different joins in an ORed condition, these
+        # must be OUTER joins. The pre-existing join should remain INNER.
+        qs = qs.filter(Q(b__f1='foo') | Q(c__f2='foo'))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        # Reverse case.
+        qs = BaseA.objects.filter(Q(b__f1='foo') | Q(c__f2='foo'))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        qs = qs.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+
+    def test_disjunction_promotion3(self):
+        qs = BaseA.objects.filter(a__f2='bar')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        # The ANDed a__f2 filter allows us to use keep using INNER JOIN
+        # even inside the ORed case. If the join to a__ returns nothing,
+        # the ANDed filter for a__f2 can't be true.
+        qs = qs.filter(Q(a__f1='foo') | Q(b__f2='foo'))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+
+    @unittest.expectedFailure
+    def test_disjunction_promotion3_failing(self):
+        # Now the ORed filter creates LOUTER join, but we do not have
+        # logic to unpromote it for the AND filter after it. The query
+        # results will be correct, but we have one LOUTER JOIN too much
+        # currently.
+        qs = BaseA.objects.filter(
+            Q(a__f1='foo') | Q(b__f2='foo')).filter(a__f2='bar')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+
+    def test_disjunction_promotion4(self):
+        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('JOIN'), 0)
+        qs = qs.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        qs = BaseA.objects.filter(a__f1='foo')
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        qs = qs.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+
+    def test_disjunction_promotion5(self):
+        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        # Note that the above filters on a force the join to an
+        # inner join even if it is trimmed.
+        self.assertEqual(str(qs.query).count('JOIN'), 0)
+        qs = qs.filter(Q(a__f1='foo') | Q(b__f1='foo'))
+        # So, now the a__f1 join doesn't need promotion.
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+
+    @unittest.expectedFailure
+    def test_disjunction_promotion5_failing(self):
+        qs = BaseA.objects.filter(Q(a__f1='foo') | Q(b__f1='foo'))
+        # Now the join to a is created as LOUTER
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 0)
+        # The below filter should force the a to be inner joined. But,
+        # this is failing as we do not have join unpromotion logic.
+        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+
+    def test_disjunction_promotion6(self):
+        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('JOIN'), 0)
+        qs = BaseA.objects.filter(Q(a__f1='foo') & Q(b__f1='foo'))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 2)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 0)
+
+        qs = BaseA.objects.filter(Q(a__f1='foo') & Q(b__f1='foo'))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 2)
+        qs = qs.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 2)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 0)
+
+    def test_disjunction_promotion7(self):
+        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('JOIN'), 0)
+        qs = BaseA.objects.filter(Q(a__f1='foo') | (Q(b__f1='foo') & Q(a__f1='bar')))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+        qs = BaseA.objects.filter(
+            (Q(a__f1='foo') | Q(b__f1='foo')) & (Q(a__f1='bar') | Q(c__f1='foo'))
+        )
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 3)
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 0)
+        qs = BaseA.objects.filter(
+            (Q(a__f1='foo') | (Q(a__f1='bar')) & (Q(b__f1='bar') | Q(c__f1='foo')))
+        )
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+
+    def test_disjunction_promotion_fexpression(self):
+        qs = BaseA.objects.filter(Q(a__f1=F('b__f1')) | Q(b__f1='foo'))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        qs = BaseA.objects.filter(Q(a__f1=F('c__f1')) | Q(b__f1='foo'))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 3)
+        qs = BaseA.objects.filter(Q(a__f1=F('b__f1')) | Q(a__f2=F('b__f2')) | Q(c__f1='foo'))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 3)
+        qs = BaseA.objects.filter(Q(a__f1=F('c__f1')) | (Q(pk=1) & Q(pk=2)))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 0)
