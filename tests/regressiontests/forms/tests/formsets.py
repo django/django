@@ -662,9 +662,9 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>
-<tr><th><label for="id_form-2-name">Name:</label></th><td><input type="text" name="form-2-name" id="id_form-2-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
+<tr><th><label class="required" for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>
+<tr><th><label class="required" for="id_form-2-name">Name:</label></th><td><input type="text" name="form-2-name" id="id_form-2-name" /></td></tr>""")
 
         # If max_num is 0 then no form is rendered at all.
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=3, max_num=0)
@@ -683,8 +683,8 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>
+<tr><th><label class="required" for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
 
         # Ensure that max_num has no effect when extra is less than max_num.
 
@@ -695,7 +695,7 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>""")
 
     def test_max_num_with_initial_data(self):
         # max_num with initial data
@@ -714,8 +714,8 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Fernet and Coke" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Fernet and Coke" id="id_form-0-name" /></td></tr>
+<tr><th><label class="required" for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
 
     def test_max_num_zero(self):
         # If max_num is 0 then no form is rendered at all, even if extra and initial
@@ -750,8 +750,8 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" value="Bloody Mary" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
+<tr><th><label class="required" for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" value="Bloody Mary" id="id_form-1-name" /></td></tr>""")
 
         # One form from initial and extra=3 with max_num=2 should result in the one
         # initial form and one extra.
@@ -765,8 +765,8 @@ class FormsFormsetTestCase(TestCase):
         for form in formset.forms:
             form_output.append(str(form))
 
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label class="required" for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
+<tr><th><label class="required" for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
 
     def test_regression_6926(self):
         # Regression test for #6926 ##################################################

@@ -70,9 +70,9 @@ class FormsTestCase(TestCase):
             ['Last name', 'Lennon'],
             ['Birthday', '1940-10-9']
         ])
-        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>""")
+        self.assertHTMLEqual(str(p), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>""")
 
     def test_empty_dict(self):
         # Empty dictionaries are valid, too.
@@ -83,21 +83,21 @@ class FormsTestCase(TestCase):
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {})
-        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
+        self.assertHTMLEqual(str(p), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
         self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
-<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
-<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
-<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>""")
+<p><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>""")
 
     def test_unbound_form(self):
         # If you don't pass any values to the Form's __init__(), or if you pass None,
@@ -112,25 +112,25 @@ class FormsTestCase(TestCase):
             self.fail('Attempts to access cleaned_data when validation fails should fail.')
         except AttributeError:
             pass
-        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
-<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
-        self.assertHTMLEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
-<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
-<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>""")
+        self.assertHTMLEqual(str(p), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
+        self.assertHTMLEqual(p.as_p(), """<p><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>""")
 
     def test_unicode_values(self):
         # Unicode values are handled properly.
         p = Person({'first_name': 'John', 'last_name': '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111', 'birthday': '1940-10-9'})
-        self.assertHTMLEqual(p.as_table(), '<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>\n<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></td></tr>\n<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>')
-        self.assertHTMLEqual(p.as_ul(), '<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></li>\n<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></li>\n<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></li>')
-        self.assertHTMLEqual(p.as_p(), '<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></p>\n<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></p>\n<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></p>')
+        self.assertHTMLEqual(p.as_table(), '<tr><th><label class="required" for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>\n<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></td></tr>\n<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>')
+        self.assertHTMLEqual(p.as_ul(), '<li><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></li>\n<li><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></li>\n<li><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></li>')
+        self.assertHTMLEqual(p.as_p(), '<p><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></p>\n<p><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></p>\n<p><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></p>')
 
         p = Person({'last_name': 'Lennon'})
         self.assertEqual(p.errors['first_name'], ['This field is required.'])
@@ -200,23 +200,23 @@ class FormsTestCase(TestCase):
         # into which the field's name will be inserted. It will also put a <label> around
         # the human-readable labels for a field.
         p = Person(auto_id='%s_id')
-        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="first_name_id">First name:</label></th><td><input type="text" name="first_name" id="first_name_id" /></td></tr>
-<tr><th><label for="last_name_id">Last name:</label></th><td><input type="text" name="last_name" id="last_name_id" /></td></tr>
-<tr><th><label for="birthday_id">Birthday:</label></th><td><input type="text" name="birthday" id="birthday_id" /></td></tr>""")
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></li>
-<li><label for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></li>
-<li><label for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></li>""")
-        self.assertHTMLEqual(p.as_p(), """<p><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></p>
-<p><label for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></p>
-<p><label for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></p>""")
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label class="required" for="first_name_id">First name:</label></th><td><input type="text" name="first_name" id="first_name_id" /></td></tr>
+<tr><th><label class="required" for="last_name_id">Last name:</label></th><td><input type="text" name="last_name" id="last_name_id" /></td></tr>
+<tr><th><label class="required" for="birthday_id">Birthday:</label></th><td><input type="text" name="birthday" id="birthday_id" /></td></tr>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></li>
+<li><label class="required" for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></li>
+<li><label class="required" for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></li>""")
+        self.assertHTMLEqual(p.as_p(), """<p><label class="required" for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></p>
+<p><label class="required" for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></p>
+<p><label class="required" for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></p>""")
 
     def test_auto_id_true(self):
         # If auto_id is any True value whose str() does not contain '%s', the "id"
         # attribute will be the name of the field.
         p = Person(auto_id=True)
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name">First name:</label> <input type="text" name="first_name" id="first_name" /></li>
-<li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
-<li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="first_name">First name:</label> <input type="text" name="first_name" id="first_name" /></li>
+<li><label class="required" for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
+<li><label class="required" for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
 
     def test_auto_id_false(self):
         # If auto_id is any False value, an "id" attribute won't be output unless it
@@ -230,7 +230,7 @@ class FormsTestCase(TestCase):
         # In this example, auto_id is False, but the "id" attribute for the "first_name"
         # field is given. Also note that field gets a <label>, while the others don't.
         p = PersonNew(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>""")
 
@@ -238,9 +238,9 @@ class FormsTestCase(TestCase):
         # If the "id" attribute is specified in the Form and auto_id is True, the "id"
         # attribute in the Form gets precedence.
         p = PersonNew(auto_id=True)
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
-<li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
-<li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
+<li><label class="required" for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
+<li><label class="required" for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
 
     def test_various_boolean_values(self):
         class SignupForm(Form):
@@ -413,18 +413,18 @@ class FormsTestCase(TestCase):
         # When RadioSelect is used with auto_id, and the whole form is printed using
         # either as_table() or as_ul(), the label for the RadioSelect will point to the
         # ID of the *first* radio button.
-        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul>
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label class="required" for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
+<tr><th><label class="required" for="id_language_0">Language:</label></th><td><ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></td></tr>""")
-        self.assertHTMLEqual(f.as_ul(), """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
-<li><label for="id_language_0">Language:</label> <ul>
+        self.assertHTMLEqual(f.as_ul(), """<li><label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+<li><label class="required" for="id_language_0">Language:</label> <ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>""")
-        self.assertHTMLEqual(f.as_p(), """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
-<p><label for="id_language_0">Language:</label> <ul>
+        self.assertHTMLEqual(f.as_p(), """<p><label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+<p><label class="required" for="id_language_0">Language:</label> <ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></p>""")
@@ -843,15 +843,15 @@ class FormsTestCase(TestCase):
 
         # With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
         p = Person(auto_id='id_%s')
-        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></td></tr>""")
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
-<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>""")
-        self.assertHTMLEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
-<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
-<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></p>""")
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label class="required" for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label class="required" for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label class="required" for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></td></tr>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>""")
+        self.assertHTMLEqual(p.as_p(), """<p><label class="required" for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label class="required" for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label class="required" for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></p>""")
 
         # If a field with a HiddenInput has errors, the as_table() and as_ul() output
         # will include the error message(s) with the text "(Hidden field [fieldname]) "
@@ -971,11 +971,11 @@ class FormsTestCase(TestCase):
 <p>The answer to life is: <input type="text" name="q3" /></p>
 <p>Answer this question! <input type="text" name="q4" /></p>
 <p>The last question. Period. <input type="text" name="q5" /></p>""")
-        self.assertHTMLEqual(Questions().as_p(), """<p><label for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
-<p><label for="id_q2">What is your name?</label> <input type="text" name="q2" id="id_q2" /></p>
-<p><label for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
-<p><label for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
-<p><label for="id_q5">The last question. Period.</label> <input type="text" name="q5" id="id_q5" /></p>""")
+        self.assertHTMLEqual(Questions().as_p(), """<p><label class="required" for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
+<p><label class="required" for="id_q2">What is your name?</label> <input type="text" name="q2" id="id_q2" /></p>
+<p><label class="required" for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
+<p><label class="required" for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
+<p><label class="required" for="id_q5">The last question. Period.</label> <input type="text" name="q5" id="id_q5" /></p>""")
 
         # A label can be a Unicode object or a bytestring with special characters.
         class UserRegistration(Form):
@@ -995,7 +995,7 @@ class FormsTestCase(TestCase):
 <li>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration(auto_id='id_%s')
         self.assertHTMLEqual(p.as_ul(), """<li> <input id="id_username" type="text" name="username" maxlength="10" /></li>
-<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
+<li><label class="required" for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
 
         # If label is None, Django will auto-create the label from the field name. This
         # is default behavior.
@@ -1007,8 +1007,8 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration(auto_id='id_%s')
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
-<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+<li><label class="required" for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
 
     def test_label_suffix(self):
         # You can specify the 'label_suffix' argument to a Form class to modify the
@@ -1312,9 +1312,9 @@ class FormsTestCase(TestCase):
             'person1-birthday': '1940-10-9'
         }
         p = Person(data, prefix='person1')
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_person1-first_name">First name:</label> <input type="text" name="person1-first_name" value="John" id="id_person1-first_name" /></li>
-<li><label for="id_person1-last_name">Last name:</label> <input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" /></li>
-<li><label for="id_person1-birthday">Birthday:</label> <input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" /></li>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="id_person1-first_name">First name:</label> <input type="text" name="person1-first_name" value="John" id="id_person1-first_name" /></li>
+<li><label class="required" for="id_person1-last_name">Last name:</label> <input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" /></li>
+<li><label class="required" for="id_person1-birthday">Birthday:</label> <input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" /></li>""")
         self.assertHTMLEqual(str(p['first_name']), '<input type="text" name="person1-first_name" value="John" id="id_person1-first_name" />')
         self.assertHTMLEqual(str(p['last_name']), '<input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" />')
         self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" />')
@@ -1388,9 +1388,9 @@ class FormsTestCase(TestCase):
                 return self.prefix and '%s-prefix-%s' % (self.prefix, field_name) or field_name
 
         p = Person(prefix='foo')
-        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
-<li><label for="id_foo-prefix-last_name">Last name:</label> <input type="text" name="foo-prefix-last_name" id="id_foo-prefix-last_name" /></li>
-<li><label for="id_foo-prefix-birthday">Birthday:</label> <input type="text" name="foo-prefix-birthday" id="id_foo-prefix-birthday" /></li>""")
+        self.assertHTMLEqual(p.as_ul(), """<li><label class="required" for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
+<li><label class="required" for="id_foo-prefix-last_name">Last name:</label> <input type="text" name="foo-prefix-last_name" id="id_foo-prefix-last_name" /></li>
+<li><label class="required" for="id_foo-prefix-birthday">Birthday:</label> <input type="text" name="foo-prefix-birthday" id="id_foo-prefix-birthday" /></li>""")
         data = {
             'foo-prefix-first_name': 'John',
             'foo-prefix-last_name': 'Lennon',
@@ -1717,7 +1717,7 @@ class FormsTestCase(TestCase):
         class MyForm(Form):
             field1 = CharField(max_length=50, show_hidden_initial=True)
 
-        self.assertHTMLEqual(MyForm().as_table(), '<tr><th><label for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>')
+        self.assertHTMLEqual(MyForm().as_table(), '<tr><th><label class="required" for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>')
 
     def test_error_html_required_html_classes(self):
         class Person(Form):
@@ -1730,34 +1730,34 @@ class FormsTestCase(TestCase):
         p.error_css_class = 'error'
         p.required_css_class = 'required'
 
-        self.assertHTMLEqual(p.as_ul(), """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
-<li class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
+        self.assertHTMLEqual(p.as_ul(), """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+<li class="required"><label class="required" for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></li>
 <li><label for="id_email">Email:</label> <input type="text" name="email" id="id_email" /></li>
-<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></li>""")
+<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label class="required" for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></li>""")
 
         self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
-<p class="required error"><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
-<p class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
+<p class="required error"><label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+<p class="required"><label class="required" for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></p>
 <p><label for="id_email">Email:</label> <input type="text" name="email" id="id_email" /></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
-<p class="required error"><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>""")
+<p class="required error"><label class="required" for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>""")
 
-        self.assertHTMLEqual(p.as_table(), """<tr class="required error"><th><label for="id_name">Name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="name" id="id_name" /></td></tr>
-<tr class="required"><th><label for="id_is_cool">Is cool:</label></th><td><select name="is_cool" id="id_is_cool">
+        self.assertHTMLEqual(p.as_table(), """<tr class="required error"><th><label class="required" for="id_name">Name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="name" id="id_name" /></td></tr>
+<tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th><td><select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></td></tr>
 <tr><th><label for="id_email">Email:</label></th><td><input type="text" name="email" id="id_email" /></td></tr>
-<tr class="required error"><th><label for="id_age">Age:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="age" id="id_age" /></td></tr>""")
+<tr class="required error"><th><label class="required" for="id_age">Age:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="age" id="id_age" /></td></tr>""")
 
     def test_label_split_datetime_not_displayed(self):
         class EventForm(Form):

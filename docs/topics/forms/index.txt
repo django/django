@@ -216,7 +216,7 @@ wrapped in a paragraph. Here's the output for our example template::
        <input type="text" name="message" id="id_message" /></p>
    <p><label for="id_sender">Sender:</label>
        <input type="text" name="sender" id="id_sender" /></p>
-   <p><label for="id_cc_myself">Cc myself:</label>
+   <p><label class="required" for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit" />
    </form>
@@ -256,7 +256,7 @@ above example::
         </div>
         <div class="fieldWrapper">
             {{ form.cc_myself.errors }}
-            <label for="id_cc_myself">CC yourself?</label>
+            <label class="required" for="id_cc_myself">CC yourself?</label>
             {{ form.cc_myself }}
         </div>
         <p><input type="submit" value="Send message" /></p>
