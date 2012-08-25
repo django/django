@@ -16,11 +16,44 @@ class Command(NoArgsCommand):
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_model_validation = False
-
+    
+    def get_initial_shell_locals(self):
+        """
+         returns a dict to use for local package imports
+         
+         Sample settings:
+         SHELL_IMPORTS_ALL_MODELS = True
+         SHELL_IMPORTS = [
+            'django.db.models.Q',
+            'haystack.query.SearchQuerySet'
+         ]
+        """
+        
+        from django.conf import settings
+        shell_locals = {}
+        
+        if getattr(settings, 'SHELL_IMPORTS_ALL_MODELS', False):
+            from django.db.models.loading import get_models
+            
+            all_models   = get_models()
+            shell_locals.update(dict([[m.__name__, m] for m in all_models]))
+            
+        for item in getattr(settings, 'SHELL_IMPORTS', []):
+            if '.' in item:
+                item_parts = item.split('.')
+                module_name = '.'.join(item_parts[:-1])
+                import_name = item_parts[-1]
+                resulting_import = __import__(module_name, fromlist=[import_name])
+                shell_locals[import_name] = resulting_import
+            else:
+                shell_locals[item] = __import__(item)
+        
+        return shell_locals
+    
     def ipython(self):
         try:
             from IPython import embed
-            embed()
+            embed(local_ns=self.get_initial_shell_locals())
         except ImportError:
             # IPython < 0.11
             # Explicitly pass an empty list as arguments, because otherwise
@@ -35,7 +68,7 @@ class Command(NoArgsCommand):
 
     def bpython(self):
         import bpython
-        bpython.embed()
+        bpython.embed(locals_=self.get_initial_shell_locals())
 
     def run_shell(self, shell=None):
         available_shells = [shell] if shell else self.shells
@@ -67,7 +100,7 @@ class Command(NoArgsCommand):
             # Set up a dictionary to serve as the environment for the shell, so
             # that tab completion works on objects that are imported at runtime.
             # See ticket 5082.
-            imported_objects = {}
+            imported_objects = self.get_initial_shell_locals()
             try:  # Try activating rlcompleter, because it's handy.
                 import readline
             except ImportError:
