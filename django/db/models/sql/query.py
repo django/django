@@ -772,17 +772,37 @@ class Query(object):
             unref_amount = cur_refcount - to_counts.get(alias, 0)
             self.unref_alias(alias, unref_amount)
 
-    def promote_unused_aliases(self, initial_refcounts, used_aliases):
+    def promote_disjunction(self, aliases_before, alias_usage_counts,
+                            num_childs):
         """
-        Given a "before" copy of the alias_refcounts dictionary (as
-        'initial_refcounts') and a collection of aliases that may have been
-        changed or created, works out which aliases have been created since
-        then and which ones haven't been used and promotes all of those
-        aliases, plus any children of theirs in the alias tree, to outer joins.
+        This method is to be used for promoting joins in ORed filters.
+
+        The principle for promotion is: any alias which is used (it is in
+        alias_usage_counts), is not used by every child of the ORed filter,
+        and isn't pre-existing needs to be promoted to LOUTER join.
+
+        Some examples (assume all joins used are nullable):
+            - existing filter: a__f1=foo
+            - add filter: b__f1=foo|b__f2=foo
+            In this case we should not promote either of the joins (using INNER
+            doesn't remove results). We correctly avoid join promotion, because
+            a is not used in this branch, and b is used two times.
+
+            - add filter a__f1=foo|b__f2=foo
+            In this case we should promote both a and b, otherwise they will
+            remove results. We will also correctly do that as both aliases are
+            used, and in addition both are used only once while there are two
+            filters.
+
+            - existing: a__f1=bar
+            - add filter: a__f2=foo|b__f2=foo
+            We will not promote a as it is previously used. If the join results
+            in null, the existing filter can't succeed.
+
+        The above (and some more) are tested in queries.DisjunctionPromotionTests
         """
-        for alias in self.tables:
-            if alias in used_aliases and (alias not in initial_refcounts or
-                    self.alias_refcount[alias] == initial_refcounts[alias]):
+        for alias, use_count in alias_usage_counts.items():
+            if use_count < num_childs and alias not in aliases_before:
                 self.promote_joins([alias])
 
     def change_aliases(self, change_map):
@@ -1150,55 +1170,18 @@ class Query(object):
                     can_reuse)
             return
 
-        table_promote = False
-        join_promote = False
-
         if (lookup_type == 'isnull' and value is True and not negate and
                 len(join_list) > 1):
             # If the comparison is against NULL, we may need to use some left
             # outer joins when creating the join chain. This is only done when
             # needed, as it's less efficient at the database level.
             self.promote_joins(join_list)
-            join_promote = True
 
         # Process the join list to see if we can remove any inner joins from
         # the far end (fewer tables in a query is better). Note that join
         # promotion must happen before join trimming to have the join type
         # information available when reusing joins.
         col, alias, join_list = self.trim_joins(target, join_list, path)
-
-        if connector == OR:
-            # Some joins may need to be promoted when adding a new filter to a
-            # disjunction. We walk the list of new joins and where it diverges
-            # from any previous joins (ref count is 1 in the table list), we
-            # make the new additions (and any existing ones not used in the new
-            # join list) an outer join.
-            join_it = iter(join_list)
-            table_it = iter(self.tables)
-            next(join_it), next(table_it)
-            unconditional = False
-            for join in join_it:
-                table = next(table_it)
-                # Once we hit an outer join, all subsequent joins must
-                # also be promoted, regardless of whether they have been
-                # promoted as a result of this pass through the tables.
-                unconditional = (unconditional or
-                    self.alias_map[join].join_type == self.LOUTER)
-                if join == table and self.alias_refcount[join] > 1:
-                    # We have more than one reference to this join table.
-                    # This means that we are dealing with two different query
-                    # subtrees, so we don't need to do any join promotion.
-                    continue
-                join_promote = join_promote or self.promote_joins([join], unconditional)
-                if table != join:
-                    table_promote = self.promote_joins([table])
-                # We only get here if we have found a table that exists
-                # in the join list, but isn't on the original tables list.
-                # This means we've reached the point where we only have
-                # new tables, so we can break out of this promotion loop.
-                break
-            self.promote_joins(join_it, join_promote)
-            self.promote_joins(table_it, table_promote or join_promote)
 
         if having_clause or force_having:
             if (alias, col) not in self.group_by:
@@ -1256,33 +1239,36 @@ class Query(object):
                 subtree = True
             else:
                 subtree = False
-            connector = AND
+            connector = q_object.connector
+            if connector == OR:
+                alias_usage_counts = dict()
+                aliases_before = set(self.tables)
             if q_object.connector == OR and not force_having:
                 force_having = self.need_force_having(q_object)
             for child in q_object.children:
-                if connector == OR:
-                    refcounts_before = self.alias_refcount.copy()
                 if force_having:
                     self.having.start_subtree(connector)
                 else:
                     self.where.start_subtree(connector)
+                if connector == OR:
+                    refcounts_before = self.alias_refcount.copy()
                 if isinstance(child, Node):
                     self.add_q(child, used_aliases, force_having=force_having)
                 else:
                     self.add_filter(child, connector, q_object.negated,
                             can_reuse=used_aliases, force_having=force_having)
+                if connector == OR:
+                    used = alias_diff(refcounts_before, self.alias_refcount)
+                    for alias in used:
+                        alias_usage_counts[alias] = alias_usage_counts.get(alias, 0) + 1
                 if force_having:
                     self.having.end_subtree()
                 else:
                     self.where.end_subtree()
 
-                if connector == OR:
-                    # Aliases that were newly added or not used at all need to
-                    # be promoted to outer joins if they are nullable relations.
-                    # (they shouldn't turn the whole conditional into the empty
-                    # set just because they don't match anything).
-                    self.promote_unused_aliases(refcounts_before, used_aliases)
-                connector = q_object.connector
+            if connector == OR:
+                self.promote_disjunction(aliases_before, alias_usage_counts,
+                                         len(q_object.children))
             if q_object.negated:
                 self.where.negate()
             if subtree:
@@ -2005,3 +1991,11 @@ def is_reverse_o2o(field):
     expected to be some sort of relation field or related object.
     """
     return not hasattr(field, 'rel') and field.field.unique
+
+def alias_diff(refcounts_before, refcounts_after):
+    """
+    Given the before and after copies of refcounts works out which aliases
+    have been added to the after copy.
+    """
+    return set(t for t in refcounts_after
+               if refcounts_after[t] > refcounts_before.get(t, 0))
