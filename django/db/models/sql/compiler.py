@@ -274,7 +274,8 @@ class SQLCompiler(object):
                 except KeyError:
                     link_field = opts.get_ancestor_link(model)
                     alias = self.query.join((start_alias, model._meta.db_table,
-                            link_field.column, model._meta.pk.column))
+                            link_field.column, model._meta.pk.column),
+                            join_field=link_field)
                     seen[model] = alias
             else:
                 # If we're starting from the base model of the queryset, the
@@ -448,8 +449,8 @@ class SQLCompiler(object):
         """
         if not alias:
             alias = self.query.get_initial_alias()
-        field, target, opts, joins, _, _ = self.query.setup_joins(pieces,
-                opts, alias, REUSE_ALL)
+        field, target, opts, joins, _ = self.query.setup_joins(
+            pieces, opts, alias, REUSE_ALL)
         # We will later on need to promote those joins that were added to the
         # query afresh above.
         joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
@@ -501,20 +502,27 @@ class SQLCompiler(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         first = True
+        from_params = []
         for alias in self.query.tables:
             if not self.query.alias_refcount[alias]:
                 continue
             try:
-                name, alias, join_type, lhs, lhs_col, col, nullable = self.query.alias_map[alias]
+                name, alias, join_type, lhs, lhs_col, col, _, join_field = self.query.alias_map[alias]
             except KeyError:
                 # Extra tables can end up in self.tables, but not in the
                 # alias_map if they aren't in a join. That's OK. We skip them.
                 continue
             alias_str = (alias != name and ' %s' % alias or '')
             if join_type and not first:
-                result.append('%s %s%s ON (%s.%s = %s.%s)'
-                        % (join_type, qn(name), alias_str, qn(lhs),
-                           qn2(lhs_col), qn(alias), qn2(col)))
+                if join_field and hasattr(join_field, 'get_extra_join_sql'):
+                    extra_cond, extra_params = join_field.get_extra_join_sql(
+                        self.connection, qn, lhs, alias)
+                    from_params.extend(extra_params)
+                else:
+                    extra_cond = ""
+                result.append('%s %s%s ON (%s.%s = %s.%s%s)' %
+                              (join_type, qn(name), alias_str, qn(lhs),
+                               qn2(lhs_col), qn(alias), qn2(col), extra_cond))
             else:
                 connector = not first and ', ' or ''
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
@@ -528,7 +536,7 @@ class SQLCompiler(object):
                 connector = not first and ', ' or ''
                 result.append('%s%s' % (connector, qn(alias)))
                 first = False
-        return result, []
+        return result, from_params
 
     def get_grouping(self, ordering_group_by):
         """
@@ -638,7 +646,7 @@ class SQLCompiler(object):
 
             alias = self.query.join((alias, table, f.column,
                     f.rel.get_related_field().column),
-                    promote=promote)
+                    promote=promote, join_field=f)
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
@@ -685,7 +693,7 @@ class SQLCompiler(object):
                         alias_chain.append(alias)
                 alias = self.query.join(
                     (alias, table, f.rel.get_related_field().column, f.column),
-                    promote=True
+                    promote=True, join_field=f
                 )
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)

@@ -50,10 +50,10 @@ class SQLEvaluator(object):
             self.cols.append((node, query.aggregate_select[node.name]))
         else:
             try:
-                field, source, opts, join_list, last, _ = query.setup_joins(
+                field, source, opts, join_list, path = query.setup_joins(
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
-                col, _, join_list = query.trim_joins(source, join_list, last, False)
+                col, _, join_list = query.trim_joins(source, join_list, path)
                 if self.reuse is not None and self.reuse != REUSE_ALL:
                     self.reuse.update(join_list)
                 self.cols.append((node, (join_list[-1], col)))

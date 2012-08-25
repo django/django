@@ -283,6 +283,7 @@ class SingleObject(models.Model):
 
 class RelatedObject(models.Model):
     single = models.ForeignKey(SingleObject, null=True)
+    f = models.IntegerField(null=True)
 
     class Meta:
         ordering = ['single']
@@ -311,7 +312,7 @@ class Food(models.Model):
 
 @python_2_unicode_compatible
 class Eaten(models.Model):
-    food = models.ForeignKey(Food, to_field="name")
+    food = models.ForeignKey(Food, to_field="name", null=True)
     meal = models.CharField(max_length=20)
 
     def __str__(self):
@@ -400,3 +401,23 @@ class ModelA(models.Model):
     name = models.TextField()
     b = models.ForeignKey(ModelB, null=True)
     d = models.ForeignKey(ModelD)
+
+@python_2_unicode_compatible
+class Job(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class JobResponsibilities(models.Model):
+    job = models.ForeignKey(Job, to_field='name')
+    responsibility = models.ForeignKey('Responsibility', to_field='description')
+
+@python_2_unicode_compatible
+class Responsibility(models.Model):
+    description = models.CharField(max_length=20, unique=True)
+    jobs = models.ManyToManyField(Job, through=JobResponsibilities,
+                                  related_name='responsibilities')
+
+    def __str__(self):
+        return self.description
