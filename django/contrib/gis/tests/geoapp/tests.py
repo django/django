@@ -186,6 +186,13 @@ class GeoModelTest(TestCase):
         self.assertEqual(1, qs.count())
         for pc in qs: self.assertEqual(32128, pc.point.srid)
 
+    def test_raw_sql_query(self):
+        "Testing raw SQL query."
+        cities1 = City.objects.all()
+        cities2 = City.objects.raw('select * from geoapp_city')
+        self.assertEqual(len(cities1), len(list(cities2)))
+        self.assertTrue(isinstance(cities2[0].point, Point))
+
 
 class GeoLookupTest(TestCase):
 
