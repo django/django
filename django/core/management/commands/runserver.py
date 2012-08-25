@@ -76,7 +76,9 @@ class Command(BaseCommand):
         """
         use_reloader = options.get('use_reloader')
 
-        if options.get('use_persist_sock'):
+        # test if socket.fromfd is supported on this platform as it's needed
+        # later for this code to work
+        if options.get('use_persist_sock') and getattr(socket, 'fromfd', False):
             address_family = socket.AF_INET
             if self.use_ipv6:
                 address_family = socket.AF_INET6
