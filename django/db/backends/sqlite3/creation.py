@@ -11,6 +11,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # schema inspection is more useful.
     data_types = {
         'AutoField': 'integer',
+        'BigAutoField': 'integer',
         'BinaryField': 'BLOB',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
@@ -36,6 +37,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
+        'BigAutoField': 'AUTOINCREMENT',
     }
 
     def sql_for_pending_references(self, model, style, pending_references):
