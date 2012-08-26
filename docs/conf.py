@@ -191,7 +191,8 @@ modindex_common_prefix = ["django."]
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-    'preamble': '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}'
+    'preamble': '''\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}
+\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'''
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
