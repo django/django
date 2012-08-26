@@ -889,8 +889,8 @@ class BaseDatabaseOperations(object):
             return value
         elif internal_type == 'FloatField':
             return float(value)
-        elif (internal_type and (internal_type.endswith('IntegerField')
-                                 or internal_type == 'AutoField')):
+        elif (internal_type and internal_type.endswith('IntegerField')
+                or internal_type.endswith('AutoField')):
             return int(value)
         elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
             return value

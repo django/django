@@ -1043,12 +1043,9 @@ class ForeignKey(RelatedField, Field):
         # If the database needs similar types for key fields however, the only
         # thing we can do is making AutoField an IntegerField.
         rel_field = self.rel.get_related_field()
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+
+        return rel_field.rel_db_type(connection=connection)
+
 
 class OneToOneField(ForeignKey):
     """

@@ -16,6 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # output (the "qn_" prefix is stripped before the lookup is performed.
 
     data_types = {
+        'BigAutoField':                 'NUMBER(19)',
         'AutoField':                    'NUMBER(11)',
         'BooleanField':                 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
         'CharField':                    'NVARCHAR2(%(max_length)s)',
