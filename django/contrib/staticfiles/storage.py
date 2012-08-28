@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_text, smart_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 
@@ -118,7 +118,7 @@ class CachedFilesMixin(object):
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
-        return 'staticfiles:%s' % hashlib.md5(smart_bytes(name)).hexdigest()
+        return 'staticfiles:%s' % hashlib.md5(force_bytes(name)).hexdigest()
 
     def url(self, name, force=False):
         """
@@ -254,7 +254,7 @@ class CachedFilesMixin(object):
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(smart_bytes(content))
+                    content_file = ContentFile(force_bytes(content))
                     saved_name = self._save(hashed_name, content_file)
                     hashed_name = force_text(saved_name.replace('\\', '/'))
                     processed = True

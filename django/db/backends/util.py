@@ -6,7 +6,7 @@ import hashlib
 from time import time
 
 from django.conf import settings
-from django.utils.encoding import smart_bytes
+from django.utils.encoding import force_bytes
 from django.utils.log import getLogger
 from django.utils.timezone import utc
 
@@ -138,7 +138,7 @@ def truncate_name(name, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return name
 
-    hsh = hashlib.md5(smart_bytes(name)).hexdigest()[:hash_len]
+    hsh = hashlib.md5(force_bytes(name)).hexdigest()[:hash_len]
     return '%s%s' % (name[:length-hash_len], hsh)
 
 def format_number(value, max_digits, decimal_places):

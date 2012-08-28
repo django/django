@@ -41,7 +41,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve

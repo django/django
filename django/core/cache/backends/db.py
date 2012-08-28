@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.db import connections, router, transaction, DatabaseError
 from django.utils import timezone
-from django.utils.encoding import smart_bytes
+from django.utils.encoding import force_bytes
 
 
 class Options(object):
@@ -73,7 +73,7 @@ class DatabaseCache(BaseDatabaseCache):
             transaction.commit_unless_managed(using=db)
             return default
         value = connections[db].ops.process_clob(row[1])
-        return pickle.loads(base64.b64decode(smart_bytes(value)))
+        return pickle.loads(base64.b64decode(force_bytes(value)))
 
     def set(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)

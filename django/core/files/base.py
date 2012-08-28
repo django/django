@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO, UnsupportedOperation
 
-from django.utils.encoding import smart_bytes, smart_text
+from django.utils.encoding import smart_text
 from django.core.files.utils import FileProxyMixin
 from django.utils.encoding import python_2_unicode_compatible
 

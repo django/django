@@ -174,7 +174,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # An Exception subclass containing non-ASCII data that doesn't
                 # know how to print itself properly. We shouldn't raise a
                 # further exception.
-                return ' '.join([smart_bytes(arg, encoding, strings_only,
+                return ' '.join([force_bytes(arg, encoding, strings_only,
                         errors) for arg in s])
             return six.text_type(s).encode(encoding, errors)
     else:
@@ -225,7 +225,7 @@ def iri_to_uri(iri):
     # converted.
     if iri is None:
         return iri
-    return quote(smart_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
+    return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
     """Convert an file system path to a URI portion that is suitable for
@@ -244,7 +244,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(smart_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
+    return quote(force_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could

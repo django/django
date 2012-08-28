@@ -11,7 +11,7 @@ except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
@@ -164,7 +164,7 @@ def smart_urlquote(url):
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = quote(smart_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
+        url = quote(force_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
 

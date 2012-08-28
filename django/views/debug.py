@@ -14,7 +14,7 @@ from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
 from django.utils.importlib import import_module
-from django.utils.encoding import smart_text, smart_bytes
+from django.utils.encoding import force_bytes, smart_text
 from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
@@ -440,7 +440,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': request.path_info[1:], # Trim leading slash
         'urlpatterns': tried,
-        'reason': smart_bytes(exception, errors='replace'),
+        'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
     })

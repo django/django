@@ -85,7 +85,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_bytes, smart_str, iri_to_uri, force_text
+from django.utils.encoding import force_bytes, force_text, smart_str, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils import six
 from django.utils import timezone
@@ -489,13 +489,13 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = smart_bytes(safe, self.encoding)
+            safe = force_bytes(safe, self.encoding)
             encode = lambda k, v: '%s=%s' % ((quote(k, safe), quote(v, safe)))
         else:
             encode = lambda k, v: urlencode({k: v})
         for k, list_ in self.lists():
-            k = smart_bytes(k, self.encoding)
-            output.extend([encode(k, smart_bytes(v, self.encoding))
+            k = force_bytes(k, self.encoding)
+            output.extend([encode(k, force_bytes(v, self.encoding))
                            for v in list_])
         return '&'.join(output)
 
@@ -680,7 +680,7 @@ class HttpResponse(object):
                 # force conversion to bytes in case chunk is a subclass
                 return bytes(value)
             return b''.join(make_bytes(e) for e in self._container)
-        return b''.join(smart_bytes(e, self._charset) for e in self._container)
+        return b''.join(force_bytes(e, self._charset) for e in self._container)
 
     @content.setter
     def content(self, value):
