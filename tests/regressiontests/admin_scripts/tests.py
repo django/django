@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 A series of tests to establish that the command-line managment tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
+from __future__ import unicode_literals
 
 import os
 import re
@@ -10,6 +12,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import codecs
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -1584,5 +1587,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
-        self.assertEqual(open(os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')).read(),
-                         'Some non-ASCII text for testing ticket #18091:\n\xc3\xbc\xc3\xa4\xc3\xb6 \xe2\x82\xac\n')
+        path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
+        self.assertEqual(codecs.open(path, 'r', 'utf-8').read(),
+                         'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
