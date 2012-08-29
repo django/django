@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
 import os
-from io import BytesIO, UnsupportedOperation
+from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.utils.encoding import smart_text
 from django.core.files.utils import FileProxyMixin
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
@@ -132,7 +133,8 @@ class ContentFile(File):
     """
     def __init__(self, content, name=None):
         content = content or b''
-        super(ContentFile, self).__init__(BytesIO(content), name=name)
+        stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
+        super(ContentFile, self).__init__(stream_class(content), name=name)
         self.size = len(content)
 
     def __str__(self):

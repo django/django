@@ -21,6 +21,7 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
+from django.utils import six
 from django.utils import unittest
 from ..servers.tests import LiveServerBase
 
@@ -538,15 +539,24 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(size_1, size_2)
 
 class ContentFileTestCase(unittest.TestCase):
-    """
-    Test that the constructor of ContentFile accepts 'name' (#16590).
-    """
+
     def test_content_file_default_name(self):
         self.assertEqual(ContentFile(b"content").name, None)
 
     def test_content_file_custom_name(self):
+        """
+        Test that the constructor of ContentFile accepts 'name' (#16590).
+        """
         name = "I can have a name too!"
         self.assertEqual(ContentFile(b"content", name=name).name, name)
+
+    def test_content_file_input_type(self):
+        """
+        Test that ContentFile can accept both bytes and unicode and that the
+        retrieved content is of the same type.
+        """
+        self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
+        self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
 
 class NoNameFileTestCase(unittest.TestCase):
     """
