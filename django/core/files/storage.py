@@ -195,11 +195,18 @@ class FileSystemStorage(Storage):
                     fd = os.open(full_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0))
                     try:
                         locks.lock(fd, locks.LOCK_EX)
+                        _file = None
                         for chunk in content.chunks():
-                            os.write(fd, chunk)
+                            if _file is None:
+                                mode = 'wb' if isinstance(chunk, bytes) else 'wt'
+                                _file = os.fdopen(fd, mode)
+                            _file.write(chunk)
                     finally:
                         locks.unlock(fd)
-                        os.close(fd)
+                        if _file is not None:
+                            _file.close()
+                        else:
+                            os.close(fd)
             except OSError as e:
                 if e.errno == errno.EEXIST:
                     # Ooops, the file exists. We need a new file name.

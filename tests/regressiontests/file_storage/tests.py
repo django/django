@@ -356,6 +356,17 @@ class FileStorageTests(unittest.TestCase):
         finally:
             os.remove = real_remove
 
+    def test_file_chunks_error(self):
+        """
+        Test behaviour when file.chunks() is raising an error
+        """
+        f1 = ContentFile('chunks fails')
+        def failing_chunks():
+            raise IOError
+        f1.chunks = failing_chunks
+        with self.assertRaises(IOError):
+            self.storage.save('error.file', f1)
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
