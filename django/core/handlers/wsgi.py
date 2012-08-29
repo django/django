@@ -9,7 +9,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_text, smart_str, iri_to_uri
+from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.log import getLogger
 
 logger = getLogger('django.request')
@@ -246,5 +246,5 @@ class WSGIHandler(base.BaseHandler):
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
-        start_response(smart_str(status), response_headers)
+        start_response(force_str(status), response_headers)
         return response

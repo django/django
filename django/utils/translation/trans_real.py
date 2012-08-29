@@ -9,7 +9,7 @@ import gettext as gettext_module
 from threading import local
 
 from django.utils.importlib import import_module
-from django.utils.encoding import smart_str, smart_text
+from django.utils.encoding import force_str, force_text
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
@@ -454,7 +454,7 @@ def templatize(src, origin=None):
     from django.conf import settings
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
-    src = smart_text(src, settings.FILE_CHARSET)
+    src = force_text(src, settings.FILE_CHARSET)
     out = StringIO()
     message_context = None
     intrans = False
@@ -469,7 +469,7 @@ def templatize(src, origin=None):
                 content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
-                    if line.lstrip().startswith(smart_text(TRANSLATOR_COMMENT_MARK)):
+                    if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
                     if translators_comment_start is not None and lineno >= translators_comment_start:
@@ -584,7 +584,7 @@ def templatize(src, origin=None):
                 out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
-    return smart_str(out.getvalue())
+    return force_str(out.getvalue())
 
 def parse_accept_lang_header(lang_string):
     """

@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import formats
 from django.utils.text import capfirst
-from django.utils.encoding import smart_text, smart_str, iri_to_uri
+from django.utils.encoding import smart_text, force_str, iri_to_uri
 from django.db.models.query import QuerySet
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -23,7 +23,7 @@ class EasyModel(object):
         self.verbose_name_plural = model._meta.verbose_name_plural
 
     def __repr__(self):
-        return smart_str('<EasyModel for %s>' % self.model._meta.object_name)
+        return force_str('<EasyModel for %s>' % self.model._meta.object_name)
 
     def model_databrowse(self):
         "Returns the ModelDatabrowse class for this model."
@@ -62,7 +62,7 @@ class EasyField(object):
         self.model, self.field = easy_model, field
 
     def __repr__(self):
-        return smart_str('<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return force_str('<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def choices(self):
         for value, label in self.field.choices:
@@ -80,7 +80,7 @@ class EasyChoice(object):
         self.value, self.label = value, label
 
     def __repr__(self):
-        return smart_str('<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return force_str('<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def url(self):
         return '%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value))
@@ -91,7 +91,7 @@ class EasyInstance(object):
         self.model, self.instance = easy_model, instance
 
     def __repr__(self):
-        return smart_str('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
+        return force_str('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
 
     def __str__(self):
         val = smart_text(self.instance)
@@ -135,7 +135,7 @@ class EasyInstanceField(object):
         self.raw_value = getattr(instance.instance, field.name)
 
     def __repr__(self):
-        return smart_str('<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return force_str('<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def values(self):
         """
