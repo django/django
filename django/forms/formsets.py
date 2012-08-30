@@ -254,13 +254,10 @@ class BaseFormSet(object):
     errors = property(_get_errors)
 
     def _should_delete_form(self, form):
-        # The way we lookup the value of the deletion field here takes
-        # more code than we'd like, but the form's cleaned_data will
-        # not exist if the form is invalid.
-        field = form.fields[DELETION_FIELD_NAME]
-        raw_value = form._raw_value(DELETION_FIELD_NAME)
-        should_delete = field.clean(raw_value)
-        return should_delete
+        """
+        Returns whether or not the form was marked for deletion.
+        """
+        return form.cleaned_data.get(DELETION_FIELD_NAME, False)
 
     def is_valid(self):
         """
