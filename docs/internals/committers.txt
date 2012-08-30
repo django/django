@@ -77,15 +77,13 @@ record of being helpful on the mailing lists, and a proven desire to dedicate
 serious time to Django. In return, they've been granted the coveted commit bit,
 and have free rein to hack on all parts of Django.
 
-`Malcolm Tredinnick`_
+Malcolm Tredinnick
     Malcolm originally wanted to be a mathematician, somehow ended up a software
     developer. He's contributed to many Open Source projects, has served on the
     board of the GNOME foundation, and will kick your ass at chess.
 
     When he's not busy being an International Man of Mystery, Malcolm lives in
     Sydney, Australia.
-
-.. _malcolm tredinnick: http://www.pointy-stick.com/
 
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
