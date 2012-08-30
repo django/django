@@ -54,7 +54,7 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_index = "CREATE %(unique)s INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s;"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s;"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(constraint)s PRIMARY KEY (%(columns)s)"
@@ -181,7 +181,6 @@ class BaseDatabaseSchemaEditor(object):
             if field.db_index:
                 self.deferred_sql.append(
                     self.sql_create_index % {
-                        "unique": "",
                         "name": self._create_index_name(model, [field.column], suffix=""),
                         "table": self.quote_name(model._meta.db_table),
                         "columns": self.quote_name(field.column),
@@ -350,12 +349,13 @@ class BaseDatabaseSchemaEditor(object):
         }
         self.execute(sql)
 
-    def alter_field(self, model, old_field, new_field):
+    def alter_field(self, model, old_field, new_field, strict=False):
         """
         Allows a field's type, uniqueness, nullability, default, column,
         constraints etc. to be modified.
         Requires a copy of the old field as well so we can only perform
         changes that are required.
+        If strict is true, raises errors if the old column does not match old_field precisely.
         """
         # Ensure this field is even column-based
         old_type = old_field.db_type(connection=self.connection)
@@ -372,18 +372,36 @@ class BaseDatabaseSchemaEditor(object):
         if old_field.unique and not new_field.unique:
             # Find the unique constraint for this field
             constraint_names = self._constraint_names(model, [old_field.column], unique=True)
-            if len(constraint_names) != 1:
+            if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s.%s" % (
                     len(constraint_names),
                     model._meta.db_table,
                     old_field.column,
                 ))
-            self.execute(
-                self.sql_delete_unique % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": constraint_names[0],
-                },
-            )
+            for constraint_name in constraint_names:
+                self.execute(
+                    self.sql_delete_unique % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": constraint_name,
+                    },
+                )
+        # Removed an index?
+        if old_field.db_index and not new_field.db_index and not old_field.unique and not new_field.unique:
+            # Find the index for this field
+            index_names = self._constraint_names(model, [old_field.column], index=True)
+            if strict and len(index_names) != 1:
+                raise ValueError("Found wrong number (%s) of indexes for %s.%s" % (
+                    len(index_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for index_name in index_names:
+                self.execute(
+                    self.sql_delete_index % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": index_name,
+                    }
+                )
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self.sql_rename_column % {
@@ -463,6 +481,16 @@ class BaseDatabaseSchemaEditor(object):
                     "columns": self.quote_name(new_field.column),
                 }
             )
+        # Added an index?
+        if not old_field.db_index and new_field.db_index and not old_field.unique and not new_field.unique:
+            self.execute(
+                self.sql_create_index % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "name": self._create_index_name(model, [new_field.column], suffix="_uniq"),
+                    "columns": self.quote_name(new_field.column),
+                    "extra": "",
+                }
+            )
 
     def _type_for_alter(self, field):
         """
@@ -490,7 +518,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
         return index_name
 
-    def _constraint_names(self, model, column_names, unique=None, primary_key=None):
+    def _constraint_names(self, model, column_names, unique=None, primary_key=None, index=None):
         "Returns all constraint names matching the columns and conditions"
         column_names = set(column_names)
         constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
@@ -500,6 +528,8 @@ class BaseDatabaseSchemaEditor(object):
                 if unique is not None and infodict['unique'] != unique:
                     continue
                 if primary_key is not None and infodict['primary_key'] != unique:
+                    continue
+                if index is not None and infodict['index'] != index:
                     continue
                 result.append(name)
         return result

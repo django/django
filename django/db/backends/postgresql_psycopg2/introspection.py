@@ -91,32 +91,87 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints (unique, pk, fk, check) across one or more columns.
-        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool}}
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
         constraints = {}
-        # Loop over the constraint tables, collecting things as constraints
-        ifsc_tables = ["constraint_column_usage", "key_column_usage"]
-        for ifsc_table in ifsc_tables:
-            cursor.execute("""
-                SELECT kc.constraint_name, kc.column_name, c.constraint_type
-                FROM information_schema.%s AS kc
-                JOIN information_schema.table_constraints AS c ON
-                    kc.table_schema = c.table_schema AND
-                    kc.table_name = c.table_name AND
-                    kc.constraint_name = c.constraint_name
-                WHERE
-                    kc.table_schema = %%s AND
-                    kc.table_name = %%s
-            """ % ifsc_table, ["public", table_name])
-            for constraint, column, kind in cursor.fetchall():
-                # If we're the first column, make the record
-                if constraint not in constraints:
-                    constraints[constraint] = {
-                        "columns": set(),
-                        "primary_key": kind.lower() == "primary key",
-                        "unique": kind.lower() in ["primary key", "unique"],
-                    }
-                # Record the details
-                constraints[constraint]['columns'].add(column)
+        # Loop over the key table, collecting things as constraints
+        # This will get PKs, FKs, and uniques, but not CHECK
+        cursor.execute("""
+            SELECT
+                kc.constraint_name,
+                kc.column_name,
+                c.constraint_type,
+                array(SELECT table_name::text || '.' || column_name::text FROM information_schema.constraint_column_usage WHERE constraint_name = kc.constraint_name)
+            FROM information_schema.key_column_usage AS kc
+            JOIN information_schema.table_constraints AS c ON
+                kc.table_schema = c.table_schema AND
+                kc.table_name = c.table_name AND
+                kc.constraint_name = c.constraint_name
+            WHERE
+                kc.table_schema = %s AND
+                kc.table_name = %s
+        """, ["public", table_name])
+        for constraint, column, kind, used_cols in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": set(),
+                    "primary_key": kind.lower() == "primary key",
+                    "unique": kind.lower() in ["primary key", "unique"],
+                    "foreign_key": set([tuple(x.split(".", 1)) for x in used_cols]) if kind.lower() == "foreign key" else None,
+                    "check": False,
+                    "index": False,
+                }
+            # Record the details
+            constraints[constraint]['columns'].add(column)
+        # Now get CHECK constraint columns
+        cursor.execute("""
+            SELECT kc.constraint_name, kc.column_name
+            FROM information_schema.constraint_column_usage AS kc
+            JOIN information_schema.table_constraints AS c ON
+                kc.table_schema = c.table_schema AND
+                kc.table_name = c.table_name AND
+                kc.constraint_name = c.constraint_name
+            WHERE
+                c.constraint_type = 'CHECK' AND
+                kc.table_schema = %s AND
+                kc.table_name = %s
+        """, ["public", table_name])
+        for constraint, column, kind in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": set(),
+                    "primary_key": False,
+                    "unique": False,
+                    "foreign_key": False,
+                    "check": True,
+                    "index": False,
+                }
+            # Record the details
+            constraints[constraint]['columns'].add(column)
+        # Now get indexes
+        cursor.execute("""
+            SELECT c2.relname, attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+            FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+                pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+            WHERE c.oid = idx.indrelid
+                AND idx.indexrelid = c2.oid
+                AND attr.attrelid = c.oid
+                AND attr.attnum = idx.indkey[0]
+                AND c.relname = %s
+        """, [table_name])
+        for index, column, coli, unique, primary in cursor.fetchall():
+            # If we're the first column, make the record
+            if index not in constraints:
+                constraints[index] = {
+                    "columns": set(),
+                    "primary_key": False,
+                    "unique": False,
+                    "foreign_key": False,
+                    "check": False,
+                    "index": True,
+                }
+            # Record the details
+            constraints[index]['columns'].add(column)
         return constraints

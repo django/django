@@ -104,8 +104,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints (unique, pk, fk, check) across one or more columns.
-        Returns {'cnname': {'columns': set(columns), 'primary_key': bool, 'unique': bool, 'foreign_key': None|(tbl, col)}}
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
         constraints = {}
         # Get the actual constraint names and columns
@@ -124,6 +123,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     'columns': set(),
                     'primary_key': False,
                     'unique': False,
+                    'index': False,
+                    'check': False,
                     'foreign_key': (ref_table, ref_column) if ref_column else None,
                 }
             constraints[constraint]['columns'].add(column)
@@ -142,5 +143,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[constraint]['unique'] = True
             elif kind.lower() == "unique":
                 constraints[constraint]['unique'] = True
+        # Now add in the indexes
+        cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
+        for table, non_unique, index, colseq, column in [x[:5] for x in cursor.fetchall()]:
+            if index not in constraints:
+                constraints[index] = {
+                    'columns': set(),
+                    'primary_key': False,
+                    'unique': False,
+                    'index': True,
+                    'check': False,
+                    'foreign_key': None,
+                }
+            constraints[index]['index'] = True
+            constraints[index]['columns'].add(column)
         # Return
         return constraints

@@ -15,7 +15,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s)"
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
-    sql_delete_index = "DROP INDEX %(name)s ON %(table_name)s"
+    sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
 
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 

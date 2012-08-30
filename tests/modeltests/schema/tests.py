@@ -179,7 +179,8 @@ class SchemaTests(TestCase):
             Author,
             Author._meta.get_field_by_name("name")[0],
             new_field,
-        )
+            strict=True,
+          )
         editor.commit()
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
@@ -208,6 +209,7 @@ class SchemaTests(TestCase):
             Author,
             Author._meta.get_field_by_name("name")[0],
             new_field,
+            strict = True,
         )
         editor.commit()
         # Ensure the field is right afterwards
@@ -276,6 +278,7 @@ class SchemaTests(TestCase):
             Tag,
             Tag._meta.get_field_by_name("slug")[0],
             new_field,
+            strict = True,
         )
         editor.commit()
         # Ensure the field is no longer unique
@@ -291,6 +294,7 @@ class SchemaTests(TestCase):
             Tag,
             new_field,
             new_new_field,
+            strict = True,
         )
         editor.commit()
         # Ensure the field is unique again
@@ -306,6 +310,7 @@ class SchemaTests(TestCase):
             Tag,
             Tag._meta.get_field_by_name("slug")[0],
             TagUniqueRename._meta.get_field_by_name("slug2")[0],
+            strict = True,
         )
         editor.commit()
         # Ensure the field is still unique
@@ -395,3 +400,81 @@ class SchemaTests(TestCase):
         Author._meta.db_table = "schema_author"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
+
+    def test_indexes(self):
+        """
+        Tests creation/altering of indexes
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.create_model(Book)
+        editor.commit()
+        # Ensure the table is there and has the right index
+        self.assertIn(
+            "title",
+            connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
+        )
+        # Alter to remove the index
+        new_field = CharField(max_length=100, db_index=False)
+        new_field.set_attributes_from_name("title")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Book,
+            Book._meta.get_field_by_name("title")[0],
+            new_field,
+            strict = True,
+        )
+        editor.commit()
+        # Ensure the table is there and has no index
+        self.assertNotIn(
+            "title",
+            connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
+        )
+        # Alter to re-add the index
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Book,
+            new_field,
+            Book._meta.get_field_by_name("title")[0],
+            strict = True,
+        )
+        editor.commit()
+        # Ensure the table is there and has the index again
+        self.assertIn(
+            "title",
+            connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
+        )
+        # Add a unique column, verify that creates an implicit index
+        new_field = CharField(max_length=20, unique=True)
+        new_field.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_field(
+            Book,
+            new_field,
+        )
+        editor.commit()
+        self.assertIn(
+            "slug",
+            connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
+        )
+        # Remove the unique, check the index goes with it
+        new_field2 = CharField(max_length=20, unique=False)
+        new_field2.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Book,
+            new_field,
+            new_field2,
+            strict = True,
+        )
+        editor.commit()
+        self.assertNotIn(
+            "slug",
+            connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
+        )

@@ -21,7 +21,7 @@ class AuthorWithM2M(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, db_index=True)
     pub_date = models.DateTimeField()
     #tags = models.ManyToManyField("Tag", related_name="books")
 
