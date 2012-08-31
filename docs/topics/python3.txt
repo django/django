@@ -237,9 +237,9 @@ sometimes necessary::
 
     value = value.encode('ascii', 'ignore').decode('ascii')
 
-Be cautious if you have to `slice bytestrings`_.
+Be cautious if you have to take an `index of a bytestring`_.
 
-.. _slice bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
+.. _index of a bytestring: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
 
 Exceptions
 ~~~~~~~~~~
