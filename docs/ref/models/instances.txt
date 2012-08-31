@@ -48,7 +48,7 @@ that, you need to :meth:`~Model.save()`.
     2. Add a method on a custom manager (usually preferred)::
 
         class BookManager(models.Manager):
-            def create_book(title):
+            def create_book(self, title):
                 book = self.create(title=title)
                 # do something with the book
                 return book
