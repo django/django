@@ -192,7 +192,7 @@ Type 'yes' to continue, or 'no' to cancel: """
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destinatin storage backend.
+        Deletes the given relative path using the destination storage backend.
         """
         dirs, files = self.storage.listdir(path)
         for f in files:

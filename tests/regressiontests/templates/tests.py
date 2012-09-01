@@ -27,6 +27,7 @@ from django.test import RequestFactory
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 from django.utils import unittest
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
@@ -148,10 +149,11 @@ class SilentAttrClass(object):
         raise SomeException
     b = property(b)
 
+@python_2_unicode_compatible
 class UTF8Class:
-    "Class whose __str__ returns non-ASCII data"
+    "Class whose __str__ returns non-ASCII data on Python 2"
     def __str__(self):
-        return 'ŠĐĆŽćžšđ'.encode('utf-8')
+        return 'ŠĐĆŽćžšđ'
 
 class Templates(unittest.TestCase):
     def setUp(self):
@@ -1451,8 +1453,9 @@ class Templates(unittest.TestCase):
             'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
             'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
 
-            # 62.5 should round to 63
-            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '63'),
+            # 62.5 should round to 63 on Python 2 and 62 on Python 3
+            # See http://docs.python.org/py3k/whatsnew/3.0.html
+            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '62' if six.PY3 else '63'),
 
             # 71.4 should round to 71
             'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),

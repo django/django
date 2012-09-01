@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.views.generic.base import View
 
 from .models import Artist, Author, Page
 
@@ -14,6 +15,7 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/obj/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], {'foo': 'bar'})
+        self.assertTrue(isinstance(res.context['view'], View))
         self.assertTemplateUsed(res, 'generic_views/detail.html')
 
     def test_detail_by_pk(self):

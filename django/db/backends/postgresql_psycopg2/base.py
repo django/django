@@ -14,7 +14,7 @@ from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.utils.log import getLogger
-from django.utils.safestring import SafeUnicode, SafeString
+from django.utils.safestring import SafeText, SafeBytes
 from django.utils import six
 from django.utils.timezone import utc
 
@@ -29,8 +29,8 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
-psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedString)
+psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
+psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
 logger = getLogger('django.db.backends')
 

@@ -38,7 +38,7 @@ from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeString, SafeUnicode
+from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
 
@@ -75,7 +75,7 @@ def adapt_datetime_with_timezone_support(value, conv):
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
 # and Django expects time, so we still need to override that. We also need to
-# add special handling for SafeUnicode and SafeString as MySQLdb's type
+# add special handling for SafeText and SafeBytes as MySQLdb's type
 # checking is too tight to catch those (see Django ticket #6052).
 # Finally, MySQLdb always returns naive datetime objects. However, when
 # timezone support is active, Django expects timezone-aware datetime objects.
@@ -402,8 +402,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             kwargs['client_flag'] = CLIENT.FOUND_ROWS
             kwargs.update(settings_dict['OPTIONS'])
             self.connection = Database.connect(**kwargs)
-            self.connection.encoders[SafeUnicode] = self.connection.encoders[six.text_type]
-            self.connection.encoders[SafeString] = self.connection.encoders[bytes]
+            self.connection.encoders[SafeText] = self.connection.encoders[six.text_type]
+            self.connection.encoders[SafeBytes] = self.connection.encoders[bytes]
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:

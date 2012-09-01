@@ -12,7 +12,6 @@ from django.db import models
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
-from django.utils.encoding import smart_bytes
 from django.utils import six
 
 

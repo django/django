@@ -31,7 +31,7 @@
 import os, sys, time, signal
 
 try:
-    import thread
+    from django.utils.six.moves import _thread as thread
 except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import os
+import pickle
 import re
 import warnings
 
@@ -273,7 +274,10 @@ class WizardTests(TestCase):
         """
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "1"}
         response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
@@ -298,15 +302,24 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
-                "hash_1": "1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
+                "hash_1": {
+                    2: "1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
+                    3: "c33142ef9d01b1beae238adf22c3c6c57328f51a",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "2"}
         self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
 
@@ -328,7 +341,10 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -352,7 +368,10 @@ class WizardTests(TestCase):
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -378,7 +397,10 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_0": {
+                    2: "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                    3: "9355d5dff22d49dbad58e46189982cec649f9f5b",
+                }[pickle.HIGHEST_PROTOCOL],
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])

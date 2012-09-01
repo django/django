@@ -12,7 +12,7 @@ from django.utils import formats
 from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils import timezone
-from django.utils.encoding import force_text, smart_text, smart_bytes
+from django.utils.encoding import force_str, force_text, smart_text
 from django.utils import six
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
@@ -277,7 +277,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             label = force_text(model._meta.verbose_name)
             attr = six.text_type
         elif name == "__str__":
-            label = smart_bytes(model._meta.verbose_name)
+            label = force_str(model._meta.verbose_name)
             attr = bytes
         else:
             if callable(name):

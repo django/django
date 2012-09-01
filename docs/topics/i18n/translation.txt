@@ -37,6 +37,13 @@ from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
     controls if Django should implement format localization. See
     :doc:`/topics/i18n/formatting` for more details.
 
+.. note::
+
+    Make sure you've activated translation for your project (the fastest way is
+    to check if :setting:`MIDDLEWARE_CLASSES` includes
+    :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
+    see :ref:`how-django-discovers-language-preference`.
+
 Internationalization: in Python code
 ====================================
 
@@ -456,6 +463,9 @@ Internationalization: in template code
 Translations in :doc:`Django templates </topics/templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
+As with all template tags, this tag needs to be loaded in all templates which
+use translations, even those templates that extend from other templates which
+have already loaded the ``i18n`` tag.
 
 .. templatetag:: trans
 

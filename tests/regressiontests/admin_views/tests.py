@@ -30,7 +30,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.utils import formats, translation, unittest
 from django.utils.cache import get_max_age
-from django.utils.encoding import iri_to_uri, smart_bytes
+from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils import six
@@ -84,7 +84,7 @@ class AdminViewBasicTest(TestCase):
         content.
         """
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.content.index(smart_bytes(text1)) < response.content.index(smart_bytes(text2)),
+        self.assertTrue(response.content.index(force_bytes(text1)) < response.content.index(force_bytes(text2)),
             failing_msg
         )
 
@@ -1378,9 +1378,9 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         logentry.content_type = None
         logentry.save()
 
-        counted_presence_before = response.content.count(smart_bytes(should_contain))
+        counted_presence_before = response.content.count(force_bytes(should_contain))
         response = self.client.get('/test_admin/admin/')
-        counted_presence_after = response.content.count(smart_bytes(should_contain))
+        counted_presence_after = response.content.count(force_bytes(should_contain))
         self.assertEqual(counted_presence_before - 1,
                           counted_presence_after)
 
@@ -2361,7 +2361,7 @@ class AdminActionsTest(TestCase):
     def test_popup_actions(self):
         """ Actions should not be shown in popups. """
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
-        self.assertNotEquals(response.context["action_form"], None)
+        self.assertNotEqual(response.context["action_form"], None)
         response = self.client.get(
             '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
         self.assertEqual(response.context["action_form"], None)

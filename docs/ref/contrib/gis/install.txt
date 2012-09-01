@@ -60,14 +60,14 @@ The geospatial libraries required for a GeoDjango installation depends
 on the spatial database used.  The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  =========================================
 PostgreSQL          GEOS, PROJ.4, PostGIS           8.1+                Requires PostGIS.
 MySQL               GEOS                            5.x                 Not OGC-compliant; limited functionality.
 Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
-SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+, and Django 1.1.
-==================  ==============================  ==================  ==========================================================
+SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
+==================  ==============================  ==================  =========================================
 
 .. _geospatial_libs:
 
@@ -140,7 +140,7 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.2 from the refractions Web site and untar the source
+First, download GEOS 3.3.0 from the refractions Web site and untar the source
 archive::
 
     $ wget http://download.osgeo.org/geos/geos-3.3.0.tar.bz2
@@ -421,7 +421,7 @@ After SQLite has been built with the R*Tree module enabled, get the latest
 SpatiaLite library source and tools bundle from the `download page`__::
 
     $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-amalgamation-2.3.1.tar.gz
-    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/spatialite-tools-2.3.1.tar.gz
+    $ wget http://www.gaia-gis.it/gaia-sins/spatialite-tools-sources/spatialite-tools-2.3.1.tar.gz
     $ tar xzf libspatialite-amalgamation-2.3.1.tar.gz
     $ tar xzf spatialite-tools-2.3.1.tar.gz
 
@@ -467,8 +467,8 @@ pysqlite2
 ^^^^^^^^^
 
 Because SpatiaLite must be loaded as an external extension, it requires the
-``enable_load_extension`` method, which is only available in versions 2.5+.
-Thus, download pysqlite2 2.6, and untar::
+``enable_load_extension`` method, which is only available in versions 2.5+ of
+pysqlite2. Thus, download pysqlite2 2.6, and untar::
 
     $ wget http://pysqlite.googlecode.com/files/pysqlite-2.6.0.tar.gz
     $ tar xzf pysqlite-2.6.0.tar.gz
@@ -582,8 +582,8 @@ Creating a spatial database for SpatiaLite
 After you've installed SpatiaLite, you'll need to create a number of spatial
 metadata tables in your database in order to perform spatial queries.
 
-If you're using SpatiaLite 3.0 or newer, use the ``spatialite`` utility to
-call the ``InitSpatiaMetaData()`` function, like this::
+If you're using SpatiaLite 2.4 or newer, use the ``spatialite`` utility to
+call the ``InitSpatialMetaData()`` function, like this::
 
    $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
    the SPATIAL_REF_SYS table already contains some row(s)
@@ -593,25 +593,25 @@ call the ``InitSpatiaMetaData()`` function, like this::
 You can safely ignore the error messages shown. When you've done this, you can
 skip the rest of this section.
 
-If you're using a version of SpatiaLite older than 3.0, you'll need to download
-a database-initialization file and execute its SQL queries in your database.
+If you're using SpatiaLite 2.3, you'll need to download a
+database-initialization file and execute its SQL queries in your database.
 
-First, get it from the appropriate SpatiaLite Resources page (
-http://www.gaia-gis.it/spatialite-2.3.1/resources.html for 2.3 or
-http://www.gaia-gis.it/spatialite-2.4.0/ for 2.4)::
+First, get it from the `SpatiaLite Resources`__ page::
 
    $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
 
 Then, use the ``spatialite`` command to initialize a spatial database::
 
-   $ spatialite geodjango.db < init_spatialite-2.X.sql
+   $ spatialite geodjango.db < init_spatialite-2.3.sql
 
 .. note::
 
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
+
+__ http://www.gaia-gis.it/spatialite-2.3.1/resources.html
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
@@ -642,10 +642,6 @@ Invoke the Django shell from your project and execute the
     $ python manage shell
     >>> from django.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(900913)
-
-.. note::
-
-    In Django 1.1 the name of this function is ``add_postgis_srs``.
 
 This adds an entry for the 900913 SRID to the ``spatial_ref_sys`` (or equivalent)
 table, making it possible for the spatial database to transform coordinates in
@@ -824,8 +820,10 @@ Download the framework packages for:
 * GDAL
 
 Install the packages in the order they are listed above, as the GDAL and SQLite
-packages require the packages listed before them.  Afterwards, you can also
-install the KyngChaos binary packages for `PostgreSQL and PostGIS`__.
+packages require the packages listed before them.
+
+Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
+and PostGIS`__.
 
 After installing the binary packages, you'll want to add the following to
 your ``.profile`` to be able to run the package programs from the command-line::

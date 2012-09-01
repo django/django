@@ -114,7 +114,7 @@ def get_filter_tests():
         # The make_list filter can destroy existing escaping, so the results are
         # escaped.
         'filter-make_list01': ("{% autoescape off %}{{ a|make_list }}{% endautoescape %}", {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
-        'filter-make_list02': ("{{ a|make_list }}", {"a": mark_safe("&")}, "[u&#39;&amp;&#39;]"),
+        'filter-make_list02': ("{{ a|make_list }}", {"a": mark_safe("&")}, str_prefix("[%(_)s&#39;&amp;&#39;]")),
         'filter-make_list03': ('{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}', {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
         'filter-make_list04': ('{{ a|make_list|stringformat:"s"|safe }}', {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
 

@@ -18,7 +18,6 @@ from django.utils.datastructures import SortedDict
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils import six
 
 
 __all__ = (
@@ -592,6 +591,10 @@ class BaseModelFormSet(BaseFormSet):
             return []
 
         saved_instances = []
+        try:
+            forms_to_delete = self.deleted_forms
+        except AttributeError:
+            forms_to_delete = []
         for form in self.initial_forms:
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
@@ -602,7 +605,7 @@ class BaseModelFormSet(BaseFormSet):
             pk_value = getattr(pk_value, 'pk', pk_value)
 
             obj = self._existing_object(pk_value)
-            if self.can_delete and self._should_delete_form(form):
+            if form in forms_to_delete:
                 self.deleted_objects.append(obj)
                 obj.delete()
                 continue

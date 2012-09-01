@@ -352,7 +352,7 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             qs = BookReview.objects.prefetch_related('book')
             titles = [obj.book.title for obj in qs]
-        self.assertEquals(titles, ["Poems", "More poems"])
+        self.assertEqual(titles, ["Poems", "More poems"])
 
     def test_m2m_to_inheriting_model(self):
         qs = AuthorWithAge.objects.prefetch_related('books_with_year')

@@ -5,6 +5,9 @@ Generic date views
 Date-based generic views (in the module :mod:`django.views.generic.dates`)
 are views for displaying drilldown pages for date-based data.
 
+ArchiveIndexView
+----------------
+
 .. class:: django.views.generic.dates.ArchiveIndexView
 
     A top-level index page showing the "latest" objects, by date. Objects with
@@ -21,11 +24,17 @@ are views for displaying drilldown pages for date-based data.
     * :class:`django.views.generic.list.MultipleObjectMixin`
     * :class:`django.views.generic.dates.DateMixin`
     * :class:`django.views.generic.base.View`
-    
+
     **Notes**
 
     * Uses a default ``context_object_name`` of ``latest``.
     * Uses a default ``template_name_suffix`` of ``_archive``.
+    * Defaults to providing ``date_list`` by year, but this can be altered to
+      month or day using the attribute ``date_list_period``. This also applies
+      to all subclass views.
+
+YearArchiveView
+---------------
 
 .. class:: django.views.generic.dates.YearArchiveView
 
@@ -86,6 +95,9 @@ are views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
+MonthArchiveView
+----------------
+
 .. class:: django.views.generic.dates.MonthArchiveView
 
     A monthly archive page showing all objects in a given month. Objects with a
@@ -134,6 +146,9 @@ are views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
+WeekArchiveView
+---------------
+
 .. class:: django.views.generic.dates.WeekArchiveView
 
     A weekly archive page showing all objects in a given week. Objects with a
@@ -174,6 +189,9 @@ are views for displaying drilldown pages for date-based data.
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
+
+DayArchiveView
+--------------
 
 .. class:: django.views.generic.dates.DayArchiveView
 
@@ -225,6 +243,9 @@ are views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
+TodayArchiveView
+----------------
+
 .. class:: django.views.generic.dates.TodayArchiveView
 
     A day archive page showing all objects for *today*. This is exactly the
@@ -245,6 +266,10 @@ are views for displaying drilldown pages for date-based data.
     * :class:`django.views.generic.list.MultipleObjectMixin`
     * :class:`django.views.generic.dates.DateMixin`
     * :class:`django.views.generic.base.View`
+
+
+DateDetailView
+--------------
 
 .. class:: django.views.generic.dates.DateDetailView
 

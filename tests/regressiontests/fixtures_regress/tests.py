@@ -126,6 +126,20 @@ class TestFixtures(TestCase):
                 commit=False,
             )
 
+    @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
+    def test_unimportable_serializer(self):
+        """
+        Test that failing serializer import raises the proper error
+        """
+        with self.assertRaisesRegexp(ImportError,
+                "No module named unexistent.path"):
+            management.call_command(
+                'loaddata',
+                'bad_fixture1.unkn',
+                verbosity=0,
+                commit=False,
+            )
+
     def test_invalid_data(self):
         """
         Test for ticket #4371 -- Loading a fixture file with invalid data

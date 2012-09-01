@@ -1,7 +1,7 @@
 from collections import namedtuple
 import re
 
-# Valid query types (a dictionary is used for speedy lookups).
+# Valid query types (a set is used for speedy lookups).
 QUERY_TERMS = set([
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',

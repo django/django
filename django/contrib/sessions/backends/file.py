@@ -115,7 +115,7 @@ class SessionStore(SessionBase):
             renamed = False
             try:
                 try:
-                    os.write(output_file_fd, self.encode(session_data))
+                    os.write(output_file_fd, self.encode(session_data).encode())
                 finally:
                     os.close(output_file_fd)
                 os.rename(output_file_name, session_file_name)

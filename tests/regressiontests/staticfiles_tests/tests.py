@@ -197,9 +197,8 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         call_command('findstatic', filepath, all=False, verbosity=0, stdout=out)
         out.seek(0)
         lines = [l.strip() for l in out.readlines()]
-        contents = codecs.open(
-            smart_text(lines[1].strip()), "r", "utf-8").read()
-        return contents
+        with codecs.open(smart_text(lines[1].strip()), "r", "utf-8") as f:
+            return f.read()
 
     def test_all_files(self):
         """

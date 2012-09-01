@@ -80,8 +80,9 @@ class ExpressionNode(tree.Node):
     def __rmul__(self, other):
         return self._combine(other, self.MUL, True)
 
-    def __rdiv__(self, other):
+    def __rtruediv__(self, other):
         return self._combine(other, self.DIV, True)
+    __rdiv__ = __rtruediv__ # Python 2 compatibility
 
     def __rmod__(self, other):
         return self._combine(other, self.MOD, True)

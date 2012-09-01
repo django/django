@@ -46,7 +46,8 @@ def extract(path, to_path=''):
     Unpack the tar or zip file at the specified path to the directory
     specified by to_path.
     """
-    Archive(path).extract(to_path)
+    with Archive(path) as archive:
+        archive.extract(to_path)
 
 
 class Archive(object):
@@ -77,11 +78,20 @@ class Archive(object):
                 "Path not a recognized archive format: %s" % filename)
         return cls
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
     def extract(self, to_path=''):
         self._archive.extract(to_path)
 
     def list(self):
         self._archive.list()
+
+    def close(self):
+        self._archive.close()
 
 
 class BaseArchive(object):
@@ -161,6 +171,9 @@ class TarArchive(BaseArchive):
                     if extracted:
                         extracted.close()
 
+    def close(self):
+        self._archive.close()
+
 
 class ZipArchive(BaseArchive):
 
@@ -188,6 +201,9 @@ class ZipArchive(BaseArchive):
             else:
                 with open(filename, 'wb') as outfile:
                     outfile.write(data)
+
+    def close(self):
+        self._archive.close()
 
 extension_map = {
     '.tar': TarArchive,

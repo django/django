@@ -20,7 +20,7 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeString
+from django.utils.safestring import SafeBytes
 from django.utils import six
 from django.utils import timezone
 
@@ -80,7 +80,7 @@ if Database.version_info >= (2, 4, 1):
     # slow-down, this adapter is only registered for sqlite3 versions
     # needing it (Python 2.6 and up).
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeString, lambda s: s.decode('utf-8'))
+    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set

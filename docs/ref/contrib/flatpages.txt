@@ -42,6 +42,16 @@ To install the flatpages app, follow these steps:
 2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
    setting.
 
+Then either:
+
+3. Add an entry in your URLconf. For example::
+
+    urlpatterns = patterns('',
+        ('^pages/', include('django.contrib.flatpages.urls')),
+    )
+
+or:
+
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
    to your :setting:`MIDDLEWARE_CLASSES` setting.
 
@@ -57,8 +67,38 @@ and ``django_flatpage_sites``. ``django_flatpage`` is a simple lookup table
 that simply maps a URL to a title and bunch of text content.
 ``django_flatpage_sites`` associates a flatpage with a site.
 
+Using the URLconf
+-----------------
+
+There are several ways to include the flat pages in your URLconf. You can
+dedicate a particular path to flat pages::
+
+    urlpatterns = patterns('',
+        ('^pages/', include('django.contrib.flatpages.urls')),
+    )
+
+You can also set it up as a "catchall" pattern. In this case, it is important
+to place the pattern at the end of the other urlpatterns::
+
+    # Your other patterns here
+    urlpatterns += patterns('django.contrib.flatpages.views',
+        (r'^(?P<url>.*)$', 'flatpage'),
+    )
+
+Another common setup is to use flat pages for a limited set of known pages and
+to hard code the urls, so you can reference them with the :ttag:`url` template
+tag::
+
+    urlpatterns += patterns('django.contrib.flatpages.views',
+        url(r'^about-us/$', 'flatpage', {'url': '/about-us/'}, name='about'),
+        url(r'^license/$', 'flatpage', {'url': '/license/'}, name='license'),
+    )
+
+Using the middleware
+--------------------
+
 The :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-does all of the work.
+can do all of the work.
 
 .. class:: FlatpageFallbackMiddleware
 
@@ -255,4 +295,3 @@ For example:
     {% get_flatpages '/about/' as about_pages %}
     {% get_flatpages about_prefix as about_pages %}
     {% get_flatpages '/about/' for someuser as about_pages %}
-

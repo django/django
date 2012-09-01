@@ -14,7 +14,7 @@ from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
-from django.utils.encoding import smart_bytes
+from django.utils.encoding import force_bytes
 
 class CreateError(Exception):
     """
@@ -81,10 +81,10 @@ class SessionBase(object):
         "Returns the given session dictionary pickled and encoded as a string."
         pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
         hash = self._hash(pickled)
-        return base64.b64encode(hash.encode() + b":" + pickled)
+        return base64.b64encode(hash.encode() + b":" + pickled).decode('ascii')
 
     def decode(self, session_data):
-        encoded_data = base64.b64decode(smart_bytes(session_data))
+        encoded_data = base64.b64decode(force_bytes(session_data))
         try:
             # could produce ValueError if there is no ':'
             hash, pickled = encoded_data.split(b':', 1)

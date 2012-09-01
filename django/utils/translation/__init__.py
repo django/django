@@ -79,10 +79,10 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
-ngettext_lazy = lazy(ngettext, bytes)
-gettext_lazy = lazy(gettext, bytes)
-ungettext_lazy = lazy(ungettext, six.text_type)
+gettext_lazy = lazy(gettext, str)
+ngettext_lazy = lazy(ngettext, str)
 ugettext_lazy = lazy(ugettext, six.text_type)
+ungettext_lazy = lazy(ungettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
 npgettext_lazy = lazy(npgettext, six.text_type)
 

@@ -144,7 +144,7 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/model_view/')
-        self.assertEqual(f.read().splitlines(), ['jane', 'robert'])
+        self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """
