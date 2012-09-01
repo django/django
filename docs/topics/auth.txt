@@ -1189,24 +1189,25 @@ includes a few other useful built-in views located in
       :file:`registration/password_reset_form.html` if not supplied.
 
     * ``email_template_name``: The full name of a template to use for
-      generating the email with the new password. Defaults to
+      generating the email with the reset password link. Defaults to
       :file:`registration/password_reset_email.html` if not supplied.
 
     * ``subject_template_name``: The full name of a template to use for
-      the subject of the email with the new password. Defaults
+      the subject of the email with the reset password link. Defaults
       to :file:`registration/password_reset_subject.txt` if not supplied.
 
       .. versionadded:: 1.4
 
-    * ``password_reset_form``: Form that will be used to set the password.
-      Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
+    * ``password_reset_form``: Form that will be used to get the email of
+      the user to reset the password for. Defaults to
+      :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
-    * ``token_generator``: Instance of the class to check the password. This
-      will default to ``default_token_generator``, it's an instance of
+    * ``token_generator``: Instance of the class to check the one time link.
+      This will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
     * ``post_reset_redirect``: The URL to redirect to after a successful
-      password change.
+      password reset request.
 
     * ``from_email``: A valid email address. By default Django uses
       the :setting:`DEFAULT_FROM_EMAIL`.
@@ -1237,7 +1238,7 @@ includes a few other useful built-in views located in
 
     * ``uid``: The user's id encoded in base 36.
 
-    * ``token``: Token to check that the password is valid.
+    * ``token``: Token to check that the reset link is valid.
 
     Sample ``registration/password_reset_email.html`` (email body template):
 
