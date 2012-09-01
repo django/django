@@ -1,0 +1,14 @@
+==========================
+Django 1.4.2 release notes
+==========================
+
+*TO BE RELEASED*
+
+This is the second security release in the Django 1.4 series.
+
+Backwards incompatible changes
+==============================
+
+* The newly introduced :class:`~django.db.models.GenericIPAddressField`
+  constructor arguments have been adapted to match those of all other model
+  fields. The first two keyword arguments are now verbose_name and name.

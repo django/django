@@ -12,7 +12,7 @@ from django.utils import six
 from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, Document, RenamedField)
+    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField)
 
 from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
     TwoImageFieldTests, ImageFieldNoDimensionsTests,
@@ -63,6 +63,14 @@ class BasicFieldTests(test.TestCase):
         instance = RenamedField()
         self.assertTrue(hasattr(instance, 'get_fieldname_display'))
         self.assertFalse(hasattr(instance, 'get_modelname_display'))
+
+    def test_field_verbose_name(self):
+        m = VerboseNameField
+        for i in range(1, 23):
+            self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
+                    'verbose field%d' % i)
+
+        self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
