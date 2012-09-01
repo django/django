@@ -184,7 +184,9 @@ Handling uploaded files with a model
 
 If you're saving a file on a :class:`~django.db.models.Model` with a
 :class:`~django.db.models.FileField`, using a :class:`~django.forms.ModelForm`
-makes this process much easier. The file object will be saved when calling
+makes this process much easier. The file object will be saved to the location
+specified by the :attr:`~django.db.models.FileField.upload_to` argument of the
+corresponding :class:`~django.db.models.FileField` when calling
 ``form.save()``::
 
     from django.http import HttpResponseRedirect
