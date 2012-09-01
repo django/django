@@ -419,6 +419,10 @@ optional, third positional argument, ``processors``. In this example, the
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
 
+    Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
+    the same as a call to :func:`~django.shortcuts.render_to_response()` with a
+    context_instance argument that forces the use of a ``RequestContext``.
+
 Here's what each of the default processors does:
 
 django.contrib.auth.context_processors.auth
