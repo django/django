@@ -49,6 +49,11 @@ field will also get updated on save.
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
 
+New Django Discovery Test Runner
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 Caching of related model instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
