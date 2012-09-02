@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.test import TestCase
 from django.utils import six
 
-from .models import Person, Book, Car, PersonManager, PublishedBookManager
+from .models import Person, Book, Car, PersonManager, PublishedBookManager, User
 
 
 class CustomManagerTests(TestCase):
@@ -72,3 +72,12 @@ class CustomManagerTests(TestCase):
             ],
             lambda c: c.name
         )
+
+        u1 = User.objects.create(firstname="John", middlename="Alex", lastname="Dow")
+        u1 = User.objects.create(firstname="Jane", middlename="Mary", lastname="Dow")
+
+        qs = User.objects.all()
+        self.assertTrue(hasattr(qs, 'join'))
+        self.assertEquals(qs.join(' ', ('firstname', 'lastname')), ['John Dow', 'Jane Dow'])
+        self.assertEquals(qs.join(' ', ('middlename', 'lastname')), ['Alex Dow', 'Mary Dow'])
+        self.assertEquals(qs.filter(id=1).join(' ', ('firstname', 'lastname')), ['John Dow'])
