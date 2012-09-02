@@ -58,9 +58,9 @@ class GBNationSelect(Select):
 
 
 /**
-  Definitions for GB telephone numbers:
+  //  Definitions for GB telephone numbers:
 
-VALID INPUT FORMAT (CHECKS ONLY FORMAT, NOT NUMBER RANGE):
+  //  VALID INPUT FORMAT (CHECKS ONLY FORMAT, NOT NUMBER RANGE):
 
     $validGBformat = '/^
     (?:
@@ -86,7 +86,7 @@ VALID INPUT FORMAT (CHECKS ONLY FORMAT, NOT NUMBER RANGE):
 
 
 
-EXTRACT GB NUMBER PARTS:
+  //  EXTRACT GB NUMBER PARTS:
 
     $patternGBnumberparts = '/^
     (\(?(?:0(?:0|11)\)?\s?\(?|\+)(44)\)?\s?)?\(?0?(?:\)\s?)?   # country or trunk prefix
@@ -96,13 +96,13 @@ EXTRACT GB NUMBER PARTS:
     (\#\d+)?                                                   # optional extension
     $/x';
 
-$2 contains "44" or NULL depending on whether number entered in international or national format.
-$3 contains NSN
-$4 contains extension
+  //  $2 contains "44" or NULL depending on whether number entered in international or national format.
+  //  $3 contains NSN
+  //  $4 contains extension
 
 
 
-TEST THE NSN TO SEE IF NUMBER IS IN A VALID RANGE WITH RIGHT NUMBER OF DIGITS:
+  //  TEST THE NSN TO SEE IF NUMBER IS IN A VALID RANGE WITH RIGHT NUMBER OF DIGITS:
 
     $patternGBvalidrange = '/^
     ( // 2d with 10 digits [2+8] Landlines
@@ -140,7 +140,7 @@ TEST THE NSN TO SEE IF NUMBER IS IN A VALID RANGE WITH RIGHT NUMBER OF DIGITS:
 
 
 
-FORMAT GB NUMBER BY INITIAL DIGITS AND LENGTH:
+  //  FORMAT GB NUMBER BY INITIAL DIGITS AND LENGTH:
 
     $phonenumberNSNLength = strlen($phonenumberNSN);
     // RegEx patterns to define formatting by length and initial digits
@@ -207,5 +207,7 @@ FORMAT GB NUMBER BY INITIAL DIGITS AND LENGTH:
             $phonenumberNSN = $matches['1'] . " " . $matches['2'] . " " . $matches['3'];
         }
     }
+
+  //  Finally add the prefix (+44 or 0) and the extension back on to finish.
 
 **/
