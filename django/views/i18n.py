@@ -55,14 +55,13 @@ def get_formats():
     for module in [settings] + get_format_modules(reverse=True):
         for attr in FORMAT_SETTINGS:
             result[attr] = get_format(attr)
-    src = []
+    formats = {}
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
-            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_text(v))))
+            formats[k] = smart_text(v)
         elif isinstance(v, (tuple, list)):
-            v = [javascript_quote(smart_text(value)) for value in v]
-            src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
-    return ''.join(src)
+            formats[k] = [smart_text(value) for value in v]
+    return formats
 
 
 js_catalog_template = r"""
@@ -144,9 +143,7 @@ js_catalog_template = r"""
 
   /* formatting library */
 
-  var formats = {};
-
-{{ formats_str }}
+  var formats = {{ formats_str }};
 
   globals.get_format = function (format_type) {
     var value = formats[format_type];
@@ -167,7 +164,8 @@ def render_javascript_catalog(catalog=None, plural=None):
     context = Context({
         'catalog_str': simplejson.dumps(catalog, sort_keys=True,
                 indent=2).replace('\n', '\n  ') if catalog else None,
-        'formats_str': get_formats(),
+        'formats_str': simplejson.dumps(get_formats(), sort_keys=True,
+                indent=2).replace('\n', '\n  '),
         'plural': plural,
     })
 
