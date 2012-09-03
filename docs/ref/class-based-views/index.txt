@@ -39,8 +39,8 @@ A class-based view is deployed into a URL pattern using the
 Arguments passed into :meth:`~View.as_view()` will be assigned onto the
 instance that is used to service a request. Using the previous example,
 this means that every request on ``MyView`` is able to use ``self.size``.
-Arguments must correspond to attributes that can be set on the class using
-``setattr``.
+Arguments must correspond to attributes that return True on a ``hasattr`` 
+check.
 
 Base vs Generic views
 ---------------------

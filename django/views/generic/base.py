@@ -54,8 +54,8 @@ class View(object):
                                 % (key, cls.__name__))
             if not hasattr(cls, key):
                 raise TypeError("%s() received an invalid keyword %r. as_view only "
-                                "accepts arguments that are attributes of the class"
-                                % (cls.__name__, key))
+                        "accepts arguments that are already attributes of the class"
+                        % (cls.__name__, key))
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
