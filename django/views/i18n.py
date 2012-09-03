@@ -77,9 +77,9 @@ js_catalog_template = r"""
     } else {
       return v;
     }
-  }
+  };
   {% else %}
-  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; }
+  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
   {% endif %}
 
   {% if catalog_str %}
@@ -94,7 +94,7 @@ js_catalog_template = r"""
     } else {
       return (typeof(value) == 'string') ? value : value[0];
     }
-  }
+  };
 
   globals.ngettext = function (singular, plural, count) {
     value = catalog[singular];
@@ -103,9 +103,9 @@ js_catalog_template = r"""
     } else {
       return value[pluralidx(count)];
     }
-  }
+  };
 
-  globals.gettext_noop = function (msgid) { return msgid; }
+  globals.gettext_noop = function (msgid) { return msgid; };
 
   globals.pgettext = function (context, msgid) {
     var value = gettext(context + '\\x04' + msgid);
@@ -113,7 +113,7 @@ js_catalog_template = r"""
       value = msgid;
     }
     return value;
-  }
+  };
 
   globals.npgettext = function (context, singular, plural, count) {
     var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
@@ -121,15 +121,15 @@ js_catalog_template = r"""
       value = ngettext(singular, plural, count);
     }
     return value;
-  }
+  };
   {% else %}
   /* gettext identity library */
 
-  globals.gettext = function (msgid) { return msgid; }
-  globals.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; }
-  globals.gettext_noop = function (msgid) { return msgid; }
-  globals.pgettext = function (context, msgid) { return msgid; }
-  globals.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; }
+  globals.gettext = function (msgid) { return msgid; };
+  globals.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
+  globals.gettext_noop = function (msgid) { return msgid; };
+  globals.pgettext = function (context, msgid) { return msgid; };
+  globals.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
   {% endif %}
 
 
@@ -139,7 +139,7 @@ js_catalog_template = r"""
     } else {
       return fmt.replace(/%s/g, function(match){return String(obj.shift())});
     }
-  }
+  };
 
 
   /* formatting library */
@@ -155,7 +155,7 @@ js_catalog_template = r"""
     } else {
       return value;
     }
-  }
+  };
 
 }(this));
 {% endautoescape %}
