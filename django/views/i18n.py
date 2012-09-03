@@ -3,7 +3,9 @@ import gettext as gettext_module
 
 from django import http
 from django.conf import settings
+from django.template import Context, Template
 from django.utils import importlib
+from django.utils import simplejson
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
 from django.utils.encoding import smart_text
@@ -62,24 +64,28 @@ def get_formats():
             src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
     return ''.join(src)
 
-NullSource = """
-/* gettext identity library */
 
-function gettext(msgid) { return msgid; }
-function ngettext(singular, plural, count) { return (count == 1) ? singular : plural; }
-function gettext_noop(msgid) { return msgid; }
-function pgettext(context, msgid) { return msgid; }
-function npgettext(context, singular, plural, count) { return (count == 1) ? singular : plural; }
-"""
-
-LibHead = """
-/* gettext library */
-
+js_catalog_template = r"""
+{% autoescape off %}
 (function (globals) {
-  var catalog = {};
-"""
 
-LibFoot = """
+  {% if plural %}
+  globals.pluralidx = function (n) {
+    var v={{ plural }};
+    if (typeof(v) == 'boolean') {
+      return v ? 1 : 0;
+    } else {
+      return v;
+    }
+  }
+  {% else %}
+  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; }
+  {% endif %}
+
+  {% if catalog_str %}
+  /* gettext library */
+
+  var catalog = {{ catalog_str }};
 
   globals.gettext = function (msgid) {
     var value = catalog[msgid];
@@ -116,18 +122,32 @@ LibFoot = """
     }
     return value;
   }
-}(this));
-"""
+  {% else %}
+  /* gettext identity library */
 
-LibFormatHead = """
-/* formatting library */
+  globals.gettext = function (msgid) { return msgid; }
+  globals.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; }
+  globals.gettext_noop = function (msgid) { return msgid; }
+  globals.pgettext = function (context, msgid) { return msgid; }
+  globals.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; }
+  {% endif %}
 
-(function (globals) {
+
+  globals.interpolate = function (fmt, obj, named) {
+    if (named) {
+      return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+    } else {
+      return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+    }
+  }
+
+
+  /* formatting library */
+
   var formats = {};
 
-"""
+{{ formats_str }}
 
-LibFormatFoot = """
   globals.get_format = function (format_type) {
     var value = formats[format_type];
     if (typeof(value) == 'undefined') {
@@ -136,41 +156,31 @@ LibFormatFoot = """
       return value;
     }
   }
+
 }(this));
+{% endautoescape %}
 """
 
-SimplePlural = """
-  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; }
-"""
 
-InterPolate = r"""
-function interpolate(fmt, obj, named) {
-  if (named) {
-    return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
-  } else {
-    return fmt.replace(/%s/g, function(match){return String(obj.shift())});
-  }
-}
-"""
+def render_javascript_catalog(catalog=None, plural=None):
+    template = Template(js_catalog_template)
+    context = Context({
+        'catalog_str': simplejson.dumps(catalog, sort_keys=True,
+                indent=2).replace('\n', '\n  ') if catalog else None,
+        'formats_str': get_formats(),
+        'plural': plural,
+    })
 
-PluralIdx = r"""
-  globals.pluralidx = function (n) {
-    var v=%s;
-    if (typeof(v) == 'boolean') {
-      return v ? 1 : 0;
-    } else {
-      return v;
-    }
-  }
-"""
+    return http.HttpResponse(template.render(context), 'text/javascript')
+
 
 def null_javascript_catalog(request, domain=None, packages=None):
     """
     Returns "identity" versions of the JavaScript i18n functions -- i.e.,
     versions that don't actually do anything.
     """
-    src = [NullSource, InterPolate, LibFormatHead, get_formats(), LibFormatFoot]
-    return http.HttpResponse(''.join(src), 'text/javascript')
+    return render_javascript_catalog()
+
 
 def javascript_catalog(request, domain='djangojs', packages=None):
     """
@@ -247,7 +257,6 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                     locale_t.update(catalog._catalog)
             if locale_t:
                 t = locale_t
-    src = [LibHead]
     plural = None
     if '' in t:
         for l in t[''].split('\n'):
@@ -257,32 +266,23 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         # this should actually be a compiled function of a typical plural-form:
         # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
         plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=',1)[1]
-        src.append(PluralIdx % plural)
-    else:
-        src.append(SimplePlural)
-    csrc = []
+
     pdict = {}
+    catalog = {}
     for k, v in t.items():
         if k == '':
             continue
         if isinstance(k, six.string_types):
-            csrc.append("  catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
+            catalog[k] = v
         elif isinstance(k, tuple):
             if k[0] not in pdict:
                 pdict[k[0]] = k[1]
             else:
                 pdict[k[0]] = max(k[1], pdict[k[0]])
-            csrc.append("  catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
+            catalog.setdefault(k, {})[k[1]] = v
         else:
             raise TypeError(k)
-    csrc.sort()
     for k, v in pdict.items():
-        src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
-    src.extend(csrc)
-    src.append(LibFoot)
-    src.append(InterPolate)
-    src.append(LibFormatHead)
-    src.append(get_formats())
-    src.append(LibFormatFoot)
-    src = ''.join(src)
-    return http.HttpResponse(src, 'text/javascript')
+        catalog[k] = ','.join(["''"] * (v + 1))
+
+    return render_javascript_catalog(catalog, plural)
