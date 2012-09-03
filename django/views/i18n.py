@@ -7,7 +7,6 @@ from django.template import Context, Template
 from django.utils import importlib
 from django.utils import simplejson
 from django.utils.translation import check_for_language, activate, to_locale, get_language
-from django.utils.text import javascript_quote
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
@@ -39,6 +38,7 @@ def set_language(request):
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
+
 
 def get_formats():
     """
@@ -259,11 +259,11 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     if '' in t:
         for l in t[''].split('\n'):
             if l.startswith('Plural-Forms:'):
-                plural = l.split(':',1)[1].strip()
+                plural = l.split(':', 1)[1].strip()
     if plural is not None:
         # this should actually be a compiled function of a typical plural-form:
         # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
-        plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=',1)[1]
+        plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=', 1)[1]
 
     pdict = {}
     catalog = {}
