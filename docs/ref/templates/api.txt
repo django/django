@@ -125,6 +125,10 @@ dot in a variable name, it tries the following lookups, in this order:
 * Attribute lookup. Example: ``foo.bar``
 * List-index lookup. Example: ``foo[bar]``
 
+Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
+interpreted as a literal string and not using the value of the variable "bar",
+if one exists in the template context.
+
 The template system uses the first lookup type that works. It's short-circuit
 logic. Here are a few examples::
 

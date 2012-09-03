@@ -245,8 +245,13 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
+        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+            # Don't bother to output the whole list, it can be huge
+            urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
+        else:
+            urlconf_repr = repr(self.urlconf_name)
         return force_str('<%s %s (%s:%s) %s>' % (
-            self.__class__.__name__, self.urlconf_name, self.app_name,
+            self.__class__.__name__, urlconf_repr, self.app_name,
             self.namespace, self.regex.pattern))
 
     def _populate(self):
