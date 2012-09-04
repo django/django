@@ -13,6 +13,7 @@ from .dateformat import DateFormatTests
 from .dateparse import DateParseTests
 from .datetime_safe import DatetimeTests
 from .decorators import DecoratorFromMiddlewareTests
+from .encoding import TestEncodingUtils
 from .feedgenerator import FeedgeneratorTest
 from .functional import FunctionalTestCase
 from .html import TestUtilsHtml
