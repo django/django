@@ -152,7 +152,7 @@ class CachedFilesMixin(object):
                 urlparts[2] += '?'
             final_url = urlunsplit(urlparts)
 
-        return unquote(final_url)
+        return final_url
 
     def url_converter(self, name, template=None):
         """
