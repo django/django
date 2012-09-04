@@ -17,6 +17,7 @@ from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, override_settings, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.http import HttpResponse
+from django.contrib.auth.signals import user_logged_out, user_logged_in
 
 
 @override_settings(
@@ -742,6 +743,57 @@ class SessionTests(TestCase):
         self.assertTrue(login, 'Could not log in')
         self.client.logout()
         self.client.logout()
+
+    def test_logout_signal_send(self):
+        """Logout should send user_logged_out signal if user was logged in."""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_out.connect(listener)
+        self.client.login(username='testclient', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+
+        self.assertTrue(listener.executed)
+
+    def test_logout_without_signal(self):
+        """Logout shouldn't send signal if user wasn't logged in."""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_out.connect(listener)
+        self.client.login(username='incorrect', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+
+        self.assertFalse(listener.executed)
+
+    def test_login_signal_send(self):
+        """Logout should send user_logged_in signal on successful login."""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_in.connect(listener)
+        self.client.login(username='testclient', password='password')
+        user_logged_out.disconnect(listener)
+
+        self.assertTrue(listener.executed)
+
+    def test_login_without_signal(self):
+        """Login shouldn't send signal if user wasn't logged in"""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_in.connect(listener)
+        self.client.login(username='incorrect', password='password')
+        user_logged_in.disconnect(listener)
+
+        self.assertFalse(listener.executed)
+
 
 class RequestMethodTests(TestCase):
     def test_get(self):

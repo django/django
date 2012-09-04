@@ -14,7 +14,6 @@ except ImportError:     # Python 2
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
@@ -521,11 +520,13 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
+        from django.contrib.auth.models import User
         session = import_module(settings.SESSION_ENGINE).SessionStore()
         session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
         uid = self.session.get("_auth_user_id")
-        user = User.objects.get(pk=uid)
-        user_logged_out.send(sender=user.__class__, request=HttpRequest(), user=user)
+        if uid:
+            user = User.objects.get(pk=uid)
+            user_logged_out.send(sender=user.__class__, request=HttpRequest(), user=user)
         if session_cookie:
             session.delete(session_key=session_cookie.value)
         self.cookies = SimpleCookie()
