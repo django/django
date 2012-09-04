@@ -99,7 +99,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for row in rows:
             if row[2] in multicol_indexes:
                 continue
-            indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
+            if row[4] not in indexes:
+                indexes[row[4]] = {'primary_key': False, 'unique': False}
+            if row[2] == 'PRIMARY':
+                indexes[row[4]]['primary_key'] = True
+            if not bool(row[1]):
+                indexes[row[4]]['unique'] = True
         return indexes
 
     def get_constraints(self, cursor, table_name):

@@ -478,3 +478,37 @@ class SchemaTests(TestCase):
             "slug",
             connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
         )
+
+    def test_primary_key(self):
+        """
+        Tests altering of the primary key
+        """
+        # Create the table
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Tag)
+        editor.commit()
+        # Ensure the table is there and has the right PK
+        self.assertTrue(
+            connection.introspection.get_indexes(connection.cursor(), Tag._meta.db_table)['id']['primary_key'],
+        )
+        # Alter to change the PK
+        new_field = SlugField(primary_key=True)
+        new_field.set_attributes_from_name("slug")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.delete_field(Tag, Tag._meta.get_field_by_name("id")[0])
+        editor.alter_field(
+            Tag,
+            Tag._meta.get_field_by_name("slug")[0],
+            new_field,
+        )
+        editor.commit()
+        # Ensure the PK changed
+        self.assertNotIn(
+            'id',
+            connection.introspection.get_indexes(connection.cursor(), Tag._meta.db_table),
+        )
+        self.assertTrue(
+            connection.introspection.get_indexes(connection.cursor(), Tag._meta.db_table)['slug']['primary_key'],
+        )

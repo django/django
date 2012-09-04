@@ -21,3 +21,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     alter_string_set_null = 'MODIFY %(column)s %(type)s NULL;'
     alter_string_drop_null = 'MODIFY %(column)s %(type)s NOT NULL;'
+
+    sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
+    sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
