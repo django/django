@@ -92,9 +92,7 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = BytesIO(chunk)
-
-            for line in chunk_buffer:
+            for line in chunk.splitlines(True):
                 if buffer_:
                     line = buffer_ + line
                     buffer_ = None
