@@ -63,7 +63,10 @@ class GBNationSelect(Select):
 
 
 
+
+
   ## GB telephone numbers:
+
 
 
 
@@ -82,6 +85,15 @@ class GBNationSelect(Select):
   //  CHECK IF INPUT FORMAT IS VALID THEN CHECK IF RANGE IS VALID
 
 def valid_gb_phone_number(phonenumber):
+    """
+    Verifies that phonenumber is a United Kingdom phone number in a valid
+    number range. Rejects numbers that are too long or too short or are in
+    a non-valid range. Accepts a wide range of input formats and a number
+    of different dial prefixes.
+    created by @g1smd
+    @param string phonenumber
+    @return boolean Returns boolean FALSE if the phone number is not valid
+    """
     # Check if number entered matches a valid format
     if (!valid_gb_phone_pattern(phonenumber)):
         return FALSE;
@@ -105,6 +117,16 @@ def valid_gb_phone_number(phonenumber):
   //  FORMAT GB PHONE NUMBER
 
 def format_gb_phone_number(phonenumber):
+    """
+    Convert a valid United Kingdom phone number into standard +44 20 3000 5555 #0001,
+    +44 121 555 7788, +44 1970 223344, +44 1750 62555, +44 19467 55555 or +44 16977 2333 
+    international format or into national format with 0, according to entry format.
+    Accepts a wide range of input formats and prefixes and re-formats the number taking
+    into account the required 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 and 3+6 formats by number range.
+    created by @g1smd
+    @param string phonenumber must be a valid nine or ten-digit number (with optional extension)
+    @return string phonenumber
+    """
     phonenumberPrefix = ''
     phonenumberNSNraw = ''
     phonenumberNSNformatted = ''
@@ -148,12 +170,20 @@ def format_gb_phone_number(phonenumber):
 
 
 
-
-
-
   //  VALID INPUT FORMAT (CHECKS ONLY FORMAT, NOT NUMBER RANGE):
 
 def valid_gb_phone_pattern(phonenumber):
+    """
+    Verifies that phonenumber uses a valid UK phone number input pattern.
+    Pattern matches any number entered as 2+8, 3+7, 4+6, 4+5, 5+5, 5+4, 3+6
+    with or without spaces, with a variety of prefixes and optional extension.
+    RegEx patterns are based on
+    http://www.aa-asterisk.org.uk/index.php/Number_format
+    http://www.aa-asterisk.org.uk/index.php/Regular_Expressions_for_Validating_and_Formatting_UK_Telephone_Numbers
+    created by @g1smd
+    @param string phonenumber
+    @return boolean Returns boolean FALSE if the phone number is not valid.
+    """
     validGBpattern = re.compile(r"^
     (?:
         (?:\(?(?:0(?:0|11)\)?\s?\(?|\+)44\)?\s?(?:\(?0\)?\s?)?)   # leading 00, 011 or + before 44 with optional (0); parentheses and spaces optional
@@ -189,6 +219,16 @@ def valid_gb_phone_pattern(phonenumber):
   //  EXTRACT GB NUMBER PARTS:
 
 def extract_gb_phone_parts(phonenumber):
+    """
+    Extract parts from GB phone number: prefix, NSN and optional extension.
+    Accepts a wide range of input formats and prefixes. This function also
+    cleans up the NSN part by removing spaces, hyphens and brackets.
+    Returned prefix is either +44 with space or a 0 without space.
+    created by @g1smd
+    @param string phonenumber must be a valid UK phone number (with optional extension)
+    @return array phonenumberPartsArray Returns prefix, NSN and extension in array.
+ */
+    """
     patternGBnumberparts = re.compile(r"^
     (\(?(?:0(?:0|11)\)?\s?\(?|\+)(44)\)?\s?)?\(?0?(?:\)\s?)?   # country or trunk prefix
     (
@@ -197,9 +237,9 @@ def extract_gb_phone_parts(phonenumber):
     (\#\d+)?                                                   # optional extension
     $", re.X)
 
-    #  $2 contains "44" or NULL depending on whether number entered in international or national format
-    #  $3 contains NSN
-    #  $4 contains extension
+    #  group(2) contains "44" or NULL depending on whether number entered in international or national format
+    #  group(3) contains NSN
+    #  group(4) contains extension
 
     m = (re.search(patternGBnumberparts, phonenumber))
     if m.group:
@@ -216,7 +256,7 @@ def extract_gb_phone_parts(phonenumber):
             else:
                 phonenumberPrefix = '0'
 
-            // Extract extension
+            # Extract extension
             phonenumberExtension = null
             if m.group(4):
                 phonenumberExtension = m.group(4)
@@ -236,6 +276,15 @@ def extract_gb_phone_parts(phonenumber):
   //  TEST THE NSN TO SEE IF NUMBER IS IN A VALID RANGE WITH RIGHT NUMBER OF DIGITS:
 
 def valid_gb_phone_range(phonenumberNSN):
+    """
+    Verifies that phonenumberNSN is a valid UK phone number range by initial
+    digits and length. Tests the NSN part for length and number range. Based on
+    http://www.aa-asterisk.org.uk/index.php/Number_format
+    http://www.aa-asterisk.org.uk/index.php/Regular_Expressions_for_Validating_and_Formatting_UK_Telephone_Numbers
+    created by @g1smd
+    @param string phonenumberNSN
+    @return boolean Returns boolean FALSE if the phone number is not valid.
+    """
     patternGBvalidrange = re.compile(r"^
     (         # 2d with 10 digits [2+8] Landlines
         2(?:0[01378]|3[0189]|4[017]|8[0-46-9]|9[012])\d{7}
@@ -283,6 +332,14 @@ def valid_gb_phone_range(phonenumberNSN):
   //  FORMAT GB NUMBER BY INITIAL DIGITS AND LENGTH:
 
 def format_gb_nsn(phonenumberNSN):
+    """
+    Format GB phone numbers in correct format per number range. Based on
+    http://www.aa-asterisk.org.uk/index.php/Number_format
+    http://www.aa-asterisk.org.uk/index.php/Regular_Expressions_for_Validating_and_Formatting_UK_Telephone_Numbers
+    created by @g1smd
+    @param string phonenumberNSN Must be the 10 or 9 digit NSN part of the number.
+    @return string phonenumberNSN Returns correctly formatted NSN by length and range.
+    """
     phonenumberNSNLength = len(phonenumberNSN)
     # RegEx patterns to define formatting by length and initial digits
     # [2+8] 2d, 55, 56, 70, 76 (not 7624) with 10 digits
