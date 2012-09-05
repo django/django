@@ -310,7 +310,7 @@ def valid_gb_phone_range(phonenumberNSN):
         8(?:4[2-5]|70)\d{7}
         |     # 70 with 10 digits [2+8] Personal numbers
         70\d{8}
-        |     # 56 with 10 digits [2+8] LIECS/VoIP
+        |     # 56 with 10 digits [2+8] LIECS&VoIP
         56\d{8}
         |     # 30d, 33d, 34d, 37d, 55 with 10 digits [3+7] UAN and [2+8] Corporate
         (?:3[0347]|55)\d{8}
