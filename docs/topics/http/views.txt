@@ -127,6 +127,8 @@ called ``404.html`` and located in the top level of your template tree.
 Customizing error views
 =======================
 
+.. _http_not_found_view:
+
 The 404 (page not found) view
 -----------------------------
 
@@ -166,6 +168,8 @@ Four things to note about 404 views:
 * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
   your 404 view will never be used, and your URLconf will be displayed
   instead, with some debug information.
+
+.. _http_internal_server_error_view:
 
 The 500 (server error) view
 ----------------------------

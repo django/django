@@ -223,4 +223,4 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     if name_field:
         yield ''
-        yield '    def __unicode__(self): return self.%s' % name_field
+        yield '    def __str__(self): return self.%s' % name_field

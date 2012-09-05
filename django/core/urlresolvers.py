@@ -14,7 +14,7 @@ from threading import local
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import iri_to_uri, force_text, smart_bytes
+from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
@@ -89,18 +89,11 @@ def get_callable(lookup_view, can_fail=False):
     """
     if not callable(lookup_view):
         mod_name, func_name = get_mod_func(lookup_view)
+        if func_name == '':
+            return lookup_view
+
         try:
-            if func_name != '':
-                lookup_view = getattr(import_module(mod_name), func_name)
-                if not callable(lookup_view):
-                    raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable." %
-                        (mod_name, func_name))
-        except AttributeError:
-            if not can_fail:
-                raise ViewDoesNotExist(
-                    "Could not import %s. View does not exist in module %s." %
-                    (lookup_view, mod_name))
+            mod = import_module(mod_name)
         except ImportError:
             parentmod, submod = get_mod_func(mod_name)
             if (not can_fail and submod != '' and
@@ -110,6 +103,18 @@ def get_callable(lookup_view, can_fail=False):
                     (lookup_view, mod_name))
             if not can_fail:
                 raise
+        else:
+            try:
+                lookup_view = getattr(mod, func_name)
+                if not callable(lookup_view):
+                    raise ViewDoesNotExist(
+                        "Could not import %s.%s. View is not callable." %
+                        (mod_name, func_name))
+            except AttributeError:
+                if not can_fail:
+                    raise ViewDoesNotExist(
+                        "Could not import %s. View does not exist in module %s." %
+                        (lookup_view, mod_name))
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache, 1)
 
@@ -190,7 +195,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return smart_bytes('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -240,7 +245,14 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
-        return smart_bytes('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
+        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+            # Don't bother to output the whole list, it can be huge
+            urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
+        else:
+            urlconf_repr = repr(self.urlconf_name)
+        return force_str('<%s %s (%s:%s) %s>' % (
+            self.__class__.__name__, urlconf_repr, self.app_name,
+            self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()

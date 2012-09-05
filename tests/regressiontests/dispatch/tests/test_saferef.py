@@ -54,10 +54,8 @@ class SaferefTests(unittest.TestCase):
             sd[s] = 1
         for t in self.ts:
             if hasattr(t, 'x'):
-                self.assertTrue(sd.has_key(safeRef(t.x)))
                 self.assertTrue(safeRef(t.x) in sd)
             else:
-                self.assertTrue(sd.has_key(safeRef(t)))
                 self.assertTrue(safeRef(t) in sd)
 
     def testRepresentation(self):

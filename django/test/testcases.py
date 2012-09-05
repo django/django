@@ -41,7 +41,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
@@ -647,14 +647,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_bytes(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 "Second argument is not valid HTML:")
-        real_count = content.count(enc_text)
+        real_count = content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of '%s' in response"
@@ -683,14 +682,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_bytes(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 'Response\'s content is not valid HTML:')
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 'Second argument is not valid HTML:')
-        self.assertEqual(content.count(enc_text), 0,
+        self.assertEqual(content.count(text), 0,
             msg_prefix + "Response should not contain '%s'" % text)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
@@ -919,23 +917,26 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _ImprovedEvent(threading._Event):
-    """
-    Does the same as `threading.Event` except it overrides the wait() method
-    with some code borrowed from Python 2.7 to return the set state of the
-    event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
-    to know whether the wait() method exited normally or because of the
-    timeout. This class can be removed when Django supports only Python >= 2.7.
-    """
+if sys.version_info >= (2, 7, 0):
+    _ImprovedEvent = threading._Event
+else:
+    class _ImprovedEvent(threading._Event):
+        """
+        Does the same as `threading.Event` except it overrides the wait() method
+        with some code borrowed from Python 2.7 to return the set state of the
+        event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
+        to know whether the wait() method exited normally or because of the
+        timeout. This class can be removed when Django supports only Python >= 2.7.
+        """
 
-    def wait(self, timeout=None):
-        self._Event__cond.acquire()
-        try:
-            if not self._Event__flag:
-                self._Event__cond.wait(timeout)
-            return self._Event__flag
-        finally:
-            self._Event__cond.release()
+        def wait(self, timeout=None):
+            self._Event__cond.acquire()
+            try:
+                if not self._Event__flag:
+                    self._Event__cond.wait(timeout)
+                return self._Event__flag
+            finally:
+                self._Event__cond.release()
 
 
 class StoppableWSGIServer(WSGIServer):
@@ -1136,7 +1137,7 @@ class LiveServerTestCase(TransactionTestCase):
             host, port_ranges = specified_address.split(':')
             for port_range in port_ranges.split(','):
                 # A port range can be of either form: '8000' or '8000-8010'.
-                extremes = map(int, port_range.split('-'))
+                extremes = list(map(int, port_range.split('-')))
                 assert len(extremes) in [1, 2]
                 if len(extremes) == 1:
                     # Port range of the form '8000'

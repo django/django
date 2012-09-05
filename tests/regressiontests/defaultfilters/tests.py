@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.utils import six
 from django.utils import unittest, translation
 from django.utils.safestring import SafeData
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class DefaultFiltersTests(TestCase):
@@ -456,10 +457,11 @@ class DefaultFiltersTests(TestCase):
             'Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>'\
             '\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>')
 
+        @python_2_unicode_compatible
         class ULItem(object):
             def __init__(self, title):
               self.title = title
-            def __unicode__(self):
+            def __str__(self):
                 return 'ulitem-%s' % str(self.title)
 
         a = ULItem('a')

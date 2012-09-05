@@ -858,7 +858,7 @@ class UnicodePayloadTests(TestCase):
         json = '{"english": "mountain pass"}'
         response = self.client.post("/test_client_regress/parse_unicode_json/", json,
                                     content_type="application/json")
-        self.assertEqual(response.content, json)
+        self.assertEqual(response.content, json.encode())
 
     def test_unicode_payload_utf8(self):
         "A non-ASCII unicode data encoded as UTF-8 can be POSTed"
@@ -888,7 +888,7 @@ class DummyFile(object):
     def __init__(self, filename):
         self.name = filename
     def read(self):
-        return 'TEST_FILE_CONTENT'
+        return b'TEST_FILE_CONTENT'
 
 class UploadedFileEncodingTest(TestCase):
     def test_file_encoding(self):

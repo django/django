@@ -2,6 +2,9 @@
 Multiple object mixins
 ======================
 
+MultipleObjectMixin
+-------------------
+
 .. class:: django.views.generic.list.MultipleObjectMixin
 
     A mixin that can be used to display a list of objects.
@@ -147,6 +150,9 @@ Multiple object mixins
       :class:`django.core.paginator.Page`. If the page is not paginated,
       this context variable will be ``None``.
 
+
+MultipleObjectTemplateResponseMixin
+-----------------------------------
 
 .. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
 

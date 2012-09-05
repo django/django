@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.utils.html import format_html, format_html_join
-from django.utils.encoding import StrAndUnicode, force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -22,13 +22,14 @@ def flatatt(attrs):
     """
     return format_html_join('', ' {0}="{1}"', attrs.items())
 
-class ErrorDict(dict, StrAndUnicode):
+@python_2_unicode_compatible
+class ErrorDict(dict):
     """
     A collection of errors that knows how to display itself in various formats.
 
     The dictionary keys are the field names, and the values are the errors.
     """
-    def __unicode__(self):
+    def __str__(self):
         return self.as_ul()
 
     def as_ul(self):
@@ -42,11 +43,12 @@ class ErrorDict(dict, StrAndUnicode):
     def as_text(self):
         return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_text(i) for i in v])) for k, v in self.items()])
 
-class ErrorList(list, StrAndUnicode):
+@python_2_unicode_compatible
+class ErrorList(list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
-    def __unicode__(self):
+    def __str__(self):
         return self.as_ul()
 
     def as_ul(self):

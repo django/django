@@ -23,7 +23,7 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
     SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
-    SingleObject, RelatedObject)
+    SingleObject, RelatedObject, ModelA, ModelD)
 
 
 class BaseQuerysetTest(TestCase):
@@ -806,7 +806,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
         qs.query.bump_prefix()
         first = qs[0]
-        self.assertEqual(list(qs), range(first, first+5))
+        self.assertEqual(list(qs), list(range(first, first+5)))
 
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable
@@ -1272,8 +1272,8 @@ class Queries5Tests(TestCase):
         # them in a values() query.
         dicts = qs.values('id', 'rank').order_by('id')
         self.assertEqual(
-            [d.items()[1] for d in dicts],
-            [('rank', 2), ('rank', 1), ('rank', 3)]
+            [d['rank'] for d in dicts],
+            [2, 1, 3]
         )
 
     def test_ticket7256(self):
@@ -2043,65 +2043,88 @@ class WhereNodeTest(TestCase):
     def test_empty_full_handling_conjunction(self):
         qn = connection.ops.quote_name
         w = WhereNode(children=[EverythingNode()])
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w = WhereNode(children=[NothingNode()])
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w = WhereNode(children=[EverythingNode(), EverythingNode()])
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w = WhereNode(children=[EverythingNode(), self.DummyNode()])
-        self.assertEquals(w.as_sql(qn, connection), ('dummy', []))
+        self.assertEqual(w.as_sql(qn, connection), ('dummy', []))
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
-        self.assertEquals(w.as_sql(qn, connection), ('(dummy AND dummy)', []))
+        self.assertEqual(w.as_sql(qn, connection), ('(dummy AND dummy)', []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy AND dummy)', []))
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy AND dummy)', []))
         w = WhereNode(children=[NothingNode(), self.DummyNode()])
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
 
     def test_empty_full_handling_disjunction(self):
         qn = connection.ops.quote_name
         w = WhereNode(children=[EverythingNode()], connector='OR')
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w = WhereNode(children=[NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w = WhereNode(children=[EverythingNode(), EverythingNode()], connector='OR')
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w = WhereNode(children=[EverythingNode(), self.DummyNode()], connector='OR')
-        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
         w.negate()
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
-        self.assertEquals(w.as_sql(qn, connection), ('(dummy OR dummy)', []))
+        self.assertEqual(w.as_sql(qn, connection), ('(dummy OR dummy)', []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy OR dummy)', []))
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy OR dummy)', []))
         w = WhereNode(children=[NothingNode(), self.DummyNode()], connector='OR')
-        self.assertEquals(w.as_sql(qn, connection), ('dummy', []))
+        self.assertEqual(w.as_sql(qn, connection), ('dummy', []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy)', []))
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy)', []))
 
     def test_empty_nodes(self):
         qn = connection.ops.quote_name
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
-        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
         w.connector = 'OR'
-        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
         w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+
+class NullJoinPromotionOrTest(TestCase):
+    def setUp(self):
+        d = ModelD.objects.create(name='foo')
+        ModelA.objects.create(name='bar', d=d)
+
+    def test_ticket_17886(self):
+        # The first Q-object is generating the match, the rest of the filters
+        # should not remove the match even if they do not match anything. The
+        # problem here was that b__name generates a LOUTER JOIN, then
+        # b__c__name generates join to c, which the ORM tried to promote but
+        # failed as that join isn't nullable.
+        q_obj =  (
+            Q(d__name='foo')|
+            Q(b__name='foo')|
+            Q(b__c__name='foo')
+        )
+        qset = ModelA.objects.filter(q_obj)
+        self.assertEqual(len(qset), 1)
+        # We generate one INNER JOIN to D. The join is direct and not nullable
+        # so we can use INNER JOIN for it. However, we can NOT use INNER JOIN
+        # for the b->c join, as a->b is nullable.
+        self.assertEqual(str(qset.query).count('INNER JOIN'), 1)

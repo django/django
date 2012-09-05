@@ -31,7 +31,7 @@
 import os, sys, time, signal
 
 try:
-    import thread
+    from django.utils.six.moves import _thread as thread
 except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 
@@ -54,7 +54,8 @@ _win = (sys.platform == "win32")
 
 def code_changed():
     global _mtimes, _win
-    for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
+    filenames = [getattr(m, "__file__", None) for m in sys.modules.values()]
+    for filename in filter(None, filenames):
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if filename.endswith("$py.class"):

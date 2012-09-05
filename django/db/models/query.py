@@ -472,7 +472,7 @@ class QuerySet(object):
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
                     # Re-raise the IntegrityError with its original traceback.
-                    six.reraise(exc_info[1], None, exc_info[2])
+                    six.reraise(*exc_info)
 
     def latest(self, field_name=None):
         """
@@ -498,9 +498,7 @@ class QuerySet(object):
                 "Cannot use 'limit' or 'offset' with in_bulk"
         if not id_list:
             return {}
-        qs = self._clone()
-        qs.query.add_filter(('pk__in', id_list))
-        qs.query.clear_ordering(force_empty=True)
+        qs = self.filter(pk__in=id_list).order_by()
         return dict([(obj._get_pk_val(), obj) for obj in qs])
 
     def delete(self):
@@ -1107,7 +1105,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             # If a field list has been specified, use it. Otherwise, use the
             # full list of fields, including extras and aggregates.
             if self._fields:
-                fields = list(self._fields) + filter(lambda f: f not in self._fields, aggregate_names)
+                fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
             else:
                 fields = names
 

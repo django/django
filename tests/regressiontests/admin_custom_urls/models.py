@@ -2,13 +2,15 @@ from functools import update_wrapper
 
 from django.contrib import admin
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -26,7 +28,7 @@ class ActionAdmin(admin.ModelAdmin):
         Remove all entries named 'name' from the ModelAdmin instance URL
         patterns list
         """
-        return filter(lambda e: e.name != name, super(ActionAdmin, self).get_urls())
+        return [url for url in super(ActionAdmin, self).get_urls() if url.name != name]
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs

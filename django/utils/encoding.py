@@ -8,6 +8,7 @@ try:
     from urllib.parse import quote
 except ImportError:     # Python 2
     from urllib import quote
+import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
@@ -32,12 +33,31 @@ class StrAndUnicode(object):
     Useful as a mix-in. If you support Python 2 and 3 with a single code base,
     you can inherit this mix-in and just define __unicode__.
     """
+    def __init__(self, *args, **kwargs):
+        warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
+                      "and apply the @python_2_unicode_compatible decorator "
+                      "instead.", PendingDeprecationWarning, stacklevel=2)
+        super(StrAndUnicode, self).__init__(*args, **kwargs)
+
     if six.PY3:
         def __str__(self):
             return self.__unicode__()
     else:
         def __str__(self):
             return self.__unicode__().encode('utf-8')
+
+def python_2_unicode_compatible(klass):
+    """
+    A decorator that defines __unicode__ and __str__ methods under Python 2.
+    Under Python 3 it does nothing.
+
+    To support Python 2 and 3 with a single code base, define a __str__ method
+    returning text and apply this decorator to the class.
+    """
+    if not six.PY3:
+        klass.__unicode__ = klass.__str__
+        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+    return klass
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -99,8 +119,8 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
                             errors) for arg in s])
         else:
             # Note: We use .decode() here, instead of six.text_type(s, encoding,
-            # errors), so that if s is a SafeString, it ends up being a
-            # SafeUnicode at the end.
+            # errors), so that if s is a SafeBytes, it ends up being a
+            # SafeText at the end.
             s = s.decode(encoding, errors)
     except UnicodeDecodeError as e:
         if not isinstance(s, Exception):
@@ -118,6 +138,19 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
 def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Returns a bytestring version of 's', encoded as specified in 'encoding'.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
+    """
+    if isinstance(s, Promise):
+        # The input is the result of a gettext_lazy() call.
+        return s
+    return force_bytes(s, encoding, strings_only, errors)
+
+
+def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Similar to smart_bytes, except that lazy instances are resolved to
+    strings, rather than kept as lazy objects.
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
@@ -141,7 +174,7 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # An Exception subclass containing non-ASCII data that doesn't
                 # know how to print itself properly. We shouldn't raise a
                 # further exception.
-                return ' '.join([smart_bytes(arg, encoding, strings_only,
+                return b' '.join([force_bytes(arg, encoding, strings_only,
                         errors) for arg in s])
             return six.text_type(s).encode(encoding, errors)
     else:
@@ -149,8 +182,10 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 if six.PY3:
     smart_str = smart_text
+    force_str = force_text
 else:
     smart_str = smart_bytes
+    force_str = force_bytes
     # backwards compatibility for Python 2
     smart_unicode = smart_text
     force_unicode = force_text
@@ -159,6 +194,10 @@ smart_str.__doc__ = """\
 Apply smart_text in Python 3 and smart_bytes in Python 2.
 
 This is suitable for writing to sys.stdout (for instance).
+"""
+
+force_str.__doc__ = """\
+Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
 def iri_to_uri(iri):
@@ -186,7 +225,7 @@ def iri_to_uri(iri):
     # converted.
     if iri is None:
         return iri
-    return quote(smart_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
+    return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
     """Convert an file system path to a URI portion that is suitable for
@@ -205,7 +244,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(smart_bytes(path).replace("\\", "/"), safe=b"/~!*()'")
+    return quote(force_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could

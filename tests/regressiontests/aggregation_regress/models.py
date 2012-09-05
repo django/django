@@ -1,24 +1,28 @@
 # coding: utf-8
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     friends = models.ManyToManyField('self', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Book(models.Model):
     isbn = models.CharField(max_length=9)
     name = models.CharField(max_length=255)
@@ -33,17 +37,18 @@ class Book(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Store(models.Model):
     name = models.CharField(max_length=255)
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Entries(models.Model):
@@ -58,8 +63,9 @@ class Clues(models.Model):
     Clue = models.CharField(max_length=150)
 
 
+@python_2_unicode_compatible
 class HardbackBook(Book):
     weight = models.FloatField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s (hardback): %s" % (self.name, self.weight)

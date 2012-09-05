@@ -8,8 +8,9 @@ from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
 from django.test import TestCase
+from django.utils import six
 from django.utils import translation
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 
 from .error_messages import AssertFormErrorsMixin
 
@@ -553,14 +554,24 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
     def test_smart_text(self):
         class Test:
-            def __str__(self):
-               return 'ŠĐĆŽćžšđ'.encode('utf-8')
+            if six.PY3:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'
+            else:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'.encode('utf-8')
 
         class TestU:
-            def __str__(self):
-               return 'Foo'
-            def __unicode__(self):
-               return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+            if six.PY3:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'
+                def __bytes__(self):
+                    return b'Foo'
+            else:
+                def __str__(self):
+                    return b'Foo'
+                def __unicode__(self):
+                    return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 
         self.assertEqual(smart_text(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
         self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
@@ -585,8 +596,9 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertEqual(f.cleaned_data['username'], 'sirrobin')
 
     def test_overriding_errorlist(self):
+        @python_2_unicode_compatible
         class DivErrorList(ErrorList):
-            def __unicode__(self):
+            def __str__(self):
                 return self.as_divs()
 
             def as_divs(self):

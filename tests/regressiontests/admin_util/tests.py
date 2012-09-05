@@ -171,7 +171,7 @@ class UtilTests(unittest.TestCase):
         )
         self.assertEqual(
             label_for_field("__str__", Article),
-            b"article"
+            str("article")
         )
 
         self.assertRaises(

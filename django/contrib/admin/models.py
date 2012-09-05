@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text
+from django.utils.encoding import python_2_unicode_compatible
 
 ADDITION = 1
 CHANGE = 2
@@ -16,6 +17,7 @@ class LogEntryManager(models.Manager):
         e = self.model(None, None, user_id, content_type_id, smart_text(object_id), object_repr[:200], action_flag, change_message)
         e.save()
 
+@python_2_unicode_compatible
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(User)
@@ -36,7 +38,7 @@ class LogEntry(models.Model):
     def __repr__(self):
         return smart_text(self.action_time)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.action_flag == ADDITION:
             return _('Added "%(object)s".') % {'object': self.object_repr}
         elif self.action_flag == CHANGE:

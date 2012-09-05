@@ -8,6 +8,7 @@ from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.http import urlquote
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class ConcreteModel(models.Model):
@@ -17,13 +18,14 @@ class ProxyModel(ConcreteModel):
     class Meta:
         proxy = True
 
+@python_2_unicode_compatible
 class FooWithoutUrl(models.Model):
     """
     Fake model not defining ``get_absolute_url`` for
     :meth:`ContentTypesTests.test_shortcut_view_without_get_absolute_url`"""
     name = models.CharField(max_length=30, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

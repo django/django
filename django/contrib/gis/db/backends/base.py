@@ -5,6 +5,7 @@ Base/mixin classes for the spatial backend database operations and the
 import re
 from django.contrib.gis import gdal
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 class BaseSpatialOperations(object):
     """
@@ -131,6 +132,7 @@ class BaseSpatialOperations(object):
     def spatial_ref_sys(self):
         raise NotImplementedError
 
+@python_2_unicode_compatible
 class SpatialRefSysMixin(object):
     """
     The SpatialRefSysMixin is a class used by the database-dependent
@@ -325,7 +327,7 @@ class SpatialRefSysMixin(object):
                 radius, flattening = sphere_params
             return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns the string representation.  If GDAL is installed,
         it will be 'pretty' OGC WKT.

@@ -47,32 +47,27 @@ def _popen(cmd):
     output, errors = p.communicate()
     return output, errors, p.returncode
 
-def walk(root, topdown=True, onerror=None, followlinks=False,
-         ignore_patterns=None, verbosity=0, stdout=sys.stdout):
+def find_files(root, ignore_patterns, verbosity, stdout=sys.stdout, symlinks=False):
     """
-    A version of os.walk that can follow symlinks for Python < 2.6
+    Helper function to get all files in the given root.
     """
-    if ignore_patterns is None:
-        ignore_patterns = []
     dir_suffix = '%s*' % os.sep
-    norm_patterns = map(lambda p: p.endswith(dir_suffix)
-                        and p[:-len(dir_suffix)] or p, ignore_patterns)
-    for dirpath, dirnames, filenames in os.walk(root, topdown, onerror):
-        remove_dirs = []
-        for dirname in dirnames:
+    norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in ignore_patterns]
+    all_files = []
+    for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=symlinks):
+        for dirname in dirnames[:]:
             if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
-                remove_dirs.append(dirname)
-        for dirname in remove_dirs:
-            dirnames.remove(dirname)
-            if verbosity > 1:
-                stdout.write('ignoring directory %s\n' % dirname)
-        yield (dirpath, dirnames, filenames)
-        if followlinks:
-            for d in dirnames:
-                p = os.path.join(dirpath, d)
-                if os.path.islink(p):
-                    for link_dirpath, link_dirnames, link_filenames in walk(p):
-                        yield (link_dirpath, link_dirnames, link_filenames)
+                dirnames.remove(dirname)
+                if verbosity > 1:
+                    stdout.write('ignoring directory %s\n' % dirname)
+        for filename in filenames:
+            if is_ignored(os.path.normpath(os.path.join(dirpath, filename)), ignore_patterns):
+                if verbosity > 1:
+                    stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
+            else:
+                all_files.extend([(dirpath, filename)])
+    all_files.sort()
+    return all_files
 
 def is_ignored(path, ignore_patterns):
     """
@@ -82,23 +77,6 @@ def is_ignored(path, ignore_patterns):
         if fnmatch.fnmatchcase(path, pattern):
             return True
     return False
-
-def find_files(root, ignore_patterns, verbosity, stdout=sys.stdout, symlinks=False):
-    """
-    Helper function to get all files in the given root.
-    """
-    all_files = []
-    for (dirpath, dirnames, filenames) in walk(root, followlinks=symlinks,
-            ignore_patterns=ignore_patterns, verbosity=verbosity, stdout=stdout):
-        for filename in filenames:
-            norm_filepath = os.path.normpath(os.path.join(dirpath, filename))
-            if is_ignored(norm_filepath, ignore_patterns):
-                if verbosity > 1:
-                    stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
-            else:
-                all_files.extend([(dirpath, filename)])
-    all_files.sort()
-    return all_files
 
 def copy_plural_forms(msgs, locale, domain, verbosity, stdout=sys.stdout):
     """
@@ -144,7 +122,7 @@ def write_pot_file(potfile, msgs, file, work_file, is_templatized):
         msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
     else:
         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
-    with open(potfile, 'ab') as fp:
+    with open(potfile, 'a') as fp:
         fp.write(msgs)
 
 def process_file(file, dirpath, potfile, domain, verbosity,
@@ -252,7 +230,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         msgs = copy_plural_forms(msgs, locale, domain, verbosity, stdout)
     msgs = msgs.replace(
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
-    with open(pofile, 'wb') as fp:
+    with open(pofile, 'w') as fp:
         fp.write(msgs)
     os.unlink(potfile)
     if no_obsolete:

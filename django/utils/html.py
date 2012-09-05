@@ -11,7 +11,7 @@ except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
@@ -123,6 +123,17 @@ def strip_tags(value):
     return re.sub(r'<[^>]*?>', '', force_text(value))
 strip_tags = allow_lazy(strip_tags)
 
+def remove_tags(html, tags):
+    """Returns the given HTML with given tags removed."""
+    tags = [re.escape(tag) for tag in tags.split()]
+    tags_re = '(%s)' % '|'.join(tags)
+    starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
+    endtag_re = re.compile('</%s>' % tags_re)
+    html = starttag_re.sub('', html)
+    html = endtag_re.sub('', html)
+    return html
+remove_tags = allow_lazy(remove_tags, six.text_type)
+
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
@@ -143,7 +154,7 @@ def smart_urlquote(url):
     # Handle IDN before quoting.
     scheme, netloc, path, query, fragment = urlsplit(url)
     try:
-        netloc = netloc.encode('idna') # IDN -> ACE
+        netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
     except UnicodeError: # invalid domain part
         pass
     else:
@@ -153,7 +164,7 @@ def smart_urlquote(url):
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = quote(smart_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
+        url = quote(force_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
 
@@ -206,7 +217,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             elif not ':' in middle and simple_email_re.match(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
-                    domain = domain.encode('idna')
+                    domain = domain.encode('idna').decode('ascii')
                 except UnicodeError:
                     continue
                 url = 'mailto:%s@%s' % (local, domain)

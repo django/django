@@ -4,6 +4,7 @@ import os
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Person(models.Model):
@@ -20,18 +21,20 @@ class Triple(models.Model):
 class FilePathModel(models.Model):
     path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)
 
+@python_2_unicode_compatible
 class Publication(models.Model):
     title = models.CharField(max_length=30)
     date_published = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     publications = models.ManyToManyField(Publication)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
 class CustomFileField(models.FileField):

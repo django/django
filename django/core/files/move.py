@@ -66,7 +66,7 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         try:
             locks.lock(fd, locks.LOCK_EX)
             current_chunk = None
-            while current_chunk != '':
+            while current_chunk != b'':
                 current_chunk = old_file.read(chunk_size)
                 os.write(fd, current_chunk)
         finally:

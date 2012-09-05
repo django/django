@@ -4,13 +4,19 @@ import re
 import unicodedata
 import warnings
 from gzip import GzipFile
-from django.utils.six.moves import html_entities
 from io import BytesIO
 
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
+from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
+from django.utils.safestring import mark_safe
+
+if not six.PY3:
+    # Import force_unicode even though this module doesn't use it, because some
+    # people rely on it being here.
+    from django.utils.encoding import force_unicode
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
@@ -287,7 +293,7 @@ ustring_re = re.compile("([\u0080-\uffff])")
 def javascript_quote(s, quote_double_quotes=False):
 
     def fix(match):
-        return b"\u%04x" % ord(match.group(1))
+        return "\\u%04x" % ord(match.group(1))
 
     if type(s) == bytes:
         s = s.decode('utf-8')
@@ -378,3 +384,14 @@ def unescape_string_literal(s):
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 unescape_string_literal = allow_lazy(unescape_string_literal)
+
+def slugify(value):
+    """
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
+    """
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub('[^\w\s-]', '', value).strip().lower()
+    return mark_safe(re.sub('[-\s]+', '-', value))
+slugify = allow_lazy(slugify, six.text_type)

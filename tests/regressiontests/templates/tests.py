@@ -27,6 +27,7 @@ from django.test import RequestFactory
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 from django.utils import unittest
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
@@ -46,7 +47,7 @@ from .response import (TemplateResponseTest, CacheMiddlewareTest,
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
 except ImportError as e:
-    if "pkg_resources" in e.message:
+    if "pkg_resources" in e.args[0]:
         pass # If setuptools isn't installed, that's fine. Just move on.
     else:
         raise
@@ -148,10 +149,11 @@ class SilentAttrClass(object):
         raise SomeException
     b = property(b)
 
+@python_2_unicode_compatible
 class UTF8Class:
-    "Class whose __str__ returns non-ASCII data"
+    "Class whose __str__ returns non-ASCII data on Python 2"
     def __str__(self):
-        return 'ŠĐĆŽćžšđ'.encode('utf-8')
+        return 'ŠĐĆŽćžšđ'
 
 class Templates(unittest.TestCase):
     def setUp(self):
@@ -408,8 +410,7 @@ class Templates(unittest.TestCase):
         )
 
         failures = []
-        tests = template_tests.items()
-        tests.sort()
+        tests = sorted(template_tests.items())
 
         # Turn TEMPLATE_DEBUG off, because tests assume that.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
@@ -418,7 +419,7 @@ class Templates(unittest.TestCase):
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
 
-        #Set ALLOWED_INCLUDE_ROOTS so that ssi works.
+        # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
         old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
         settings.ALLOWED_INCLUDE_ROOTS = (
             os.path.dirname(os.path.abspath(__file__)),
@@ -1452,8 +1453,9 @@ class Templates(unittest.TestCase):
             'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
             'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
 
-            # 62.5 should round to 63
-            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '63'),
+            # 62.5 should round to 63 on Python 2 and 62 on Python 3
+            # See http://docs.python.org/py3k/whatsnew/3.0.html
+            'widthratio06': ('{% widthratio a b 100 %}', {'a':50,'b':80}, '62' if six.PY3 else '63'),
 
             # 71.4 should round to 71
             'widthratio07': ('{% widthratio a b 100 %}', {'a':50,'b':70}, '71'),
@@ -1465,6 +1467,14 @@ class Templates(unittest.TestCase):
 
             # #10043: widthratio should allow max_width to be a variable
             'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
+
+            # #18739: widthratio should handle None args consistently with non-numerics
+            'widthratio12a': ('{% widthratio a b c %}', {'a':'a','b':100,'c':100}, ''),
+            'widthratio12b': ('{% widthratio a b c %}', {'a':None,'b':100,'c':100}, ''),
+            'widthratio13a': ('{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''),
+            'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
+            'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
+            'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),

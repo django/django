@@ -14,6 +14,9 @@ The following mixins are used to construct Django's editing views:
     Examples of how these are combined into editing views can be found at
     the documentation on ``Generic editing views``.
 
+FormMixin
+---------
+
 .. class:: django.views.generic.edit.FormMixin
 
     A mixin class that provides facilities for creating and displaying forms.
@@ -90,6 +93,9 @@ The following mixins are used to construct Django's editing views:
         :meth:`~django.views.generic.FormMixin.form_invalid`.
 
 
+ModelFormMixin
+--------------
+
 .. class:: django.views.generic.edit.ModelFormMixin
 
     A form mixin that works on ModelForms, rather than a standalone form.
@@ -147,12 +153,16 @@ The following mixins are used to construct Django's editing views:
     .. method:: form_invalid()
 
         Renders a response, providing the invalid form as context.
-            
+
+
+ProcessFormView
+---------------
+
 .. class:: django.views.generic.edit.ProcessFormView
 
     A mixin that provides basic HTTP GET and POST workflow.
 
-    .. note:: 
+    .. note::
 
         This is named 'ProcessFormView' and inherits directly from
         :class:`django.views.generic.base.View`, but breaks if used

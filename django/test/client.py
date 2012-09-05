@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import sys
 import os
 import re
@@ -19,7 +21,7 @@ from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
-from django.utils.encoding import smart_bytes
+from django.utils.encoding import force_bytes
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
@@ -108,7 +110,7 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
+    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
     is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
@@ -124,37 +126,37 @@ def encode_multipart(boundary, data):
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
                 else:
-                    lines.extend([
-                        '--' + boundary,
-                        'Content-Disposition: form-data; name="%s"' % to_str(key),
+                    lines.extend([to_bytes(val) for val in [
+                        '--%s' % boundary,
+                        'Content-Disposition: form-data; name="%s"' % key,
                         '',
-                        to_str(item)
-                    ])
+                        item
+                    ]])
         else:
-            lines.extend([
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % to_str(key),
+            lines.extend([to_bytes(val) for val in [
+                '--%s' % boundary,
+                'Content-Disposition: form-data; name="%s"' % key,
                 '',
-                to_str(value)
-            ])
+                value
+            ]])
 
     lines.extend([
-        '--' + boundary + '--',
-        '',
+        to_bytes('--%s--' % boundary),
+        b'',
     ])
-    return '\r\n'.join(lines)
+    return b'\r\n'.join(lines)
 
 def encode_file(boundary, key, file):
-    to_str = lambda s: smart_bytes(s, settings.DEFAULT_CHARSET)
+    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
     content_type = mimetypes.guess_type(file.name)[0]
     if content_type is None:
         content_type = 'application/octet-stream'
     return [
-        '--' + to_str(boundary),
-        'Content-Disposition: form-data; name="%s"; filename="%s"' \
-            % (to_str(key), to_str(os.path.basename(file.name))),
-        'Content-Type: %s' % content_type,
-        '',
+        to_bytes('--%s' % boundary),
+        to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"' \
+            % (key, os.path.basename(file.name))),
+        to_bytes('Content-Type: %s' % content_type),
+        b'',
         file.read()
     ]
 
@@ -220,7 +222,7 @@ class RequestFactory(object):
                 charset = match.group(1)
             else:
                 charset = settings.DEFAULT_CHARSET
-            return smart_bytes(data, encoding=charset)
+            return force_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
         # If there are parameters, add them
@@ -291,7 +293,7 @@ class RequestFactory(object):
     def generic(self, method, path,
                 data='', content_type='application/octet-stream', **extra):
         parsed = urlparse(path)
-        data = smart_bytes(data, settings.DEFAULT_CHARSET)
+        data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   parsed[4],
@@ -385,7 +387,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                six.reraise(exc_info[1], None, exc_info[2])
+                six.reraise(*exc_info)
 
             # Save the client and request that stimulated the response.
             response.client = self

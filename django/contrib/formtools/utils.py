@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 # Do not try cPickle here (see #18340)
 import pickle
 

@@ -231,12 +231,12 @@ def make_list(value):
 @stringfilter
 def slugify(value):
     """
-    Normalizes string, converts to lowercase, removes non-alpha characters,
-    and converts spaces to hyphens.
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
     """
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = six.text_type(re.sub('[^\w\s-]', '', value).strip().lower())
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    from django.utils.text import slugify
+    return slugify(value)
 
 @register.filter(is_safe=True)
 def stringformat(value, arg):
@@ -468,13 +468,8 @@ def safeseq(value):
 @stringfilter
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
-    tags = [re.escape(tag) for tag in tags.split()]
-    tags_re = '(%s)' % '|'.join(tags)
-    starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
-    endtag_re = re.compile('</%s>' % tags_re)
-    value = starttag_re.sub('', value)
-    value = endtag_re.sub('', value)
-    return value
+    from django.utils.html import remove_tags
+    return remove_tags(value, tags)
 
 @register.filter(is_safe=True)
 @stringfilter

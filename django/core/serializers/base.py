@@ -2,8 +2,6 @@
 Module for abstract serializer/unserializer base classes.
 """
 
-from io import BytesIO
-
 from django.db import models
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -35,7 +33,7 @@ class Serializer(object):
         """
         self.options = options
 
-        self.stream = options.pop("stream", BytesIO())
+        self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
@@ -125,7 +123,7 @@ class Deserializer(object):
         """
         self.options = options
         if isinstance(stream_or_string, six.string_types):
-            self.stream = BytesIO(stream_or_string)
+            self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
         # hack to make sure that the models have all been loaded before

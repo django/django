@@ -79,7 +79,7 @@ class ModelFormsTests(TestCase):
             'pub_date': '2010-1-10 14:49:00'
         }
         form = ArticleForm(data)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors), [])
         article = form.save(commit=False)
         article.author = self.author
         article.save()
@@ -95,7 +95,7 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors), [])
         self.assertNotEqual(form.instance.pub_date, None)
         article = form.save()
 
@@ -108,7 +108,7 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), ['pub_date'])
+        self.assertEqual(list(form.errors), ['pub_date'])
 
 
 class GenericIPAddressFieldTests(ValidationTestCase):

@@ -21,7 +21,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeString
+from django.utils.safestring import SafeBytes
 from django.utils import six
 from django.utils import timezone
 
@@ -57,13 +57,21 @@ def adapt_datetime_with_timezone_support(value):
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
     return value.isoformat(str(" "))
 
-Database.register_converter(str("bool"), lambda s: str(s) == '1')
-Database.register_converter(str("time"), parse_time)
-Database.register_converter(str("date"), parse_date)
-Database.register_converter(str("datetime"), parse_datetime_with_timezone_support)
-Database.register_converter(str("timestamp"), parse_datetime_with_timezone_support)
-Database.register_converter(str("TIMESTAMP"), parse_datetime_with_timezone_support)
-Database.register_converter(str("decimal"), util.typecast_decimal)
+def decoder(conv_func):
+    """ The Python sqlite3 interface returns always byte strings.
+        This function converts the received value to a regular string before
+        passing it to the receiver function.
+    """
+    return lambda s: conv_func(s.decode('utf-8'))
+
+Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
+Database.register_converter(str("time"), decoder(parse_time))
+Database.register_converter(str("date"), decoder(parse_date))
+Database.register_converter(str("datetime"), decoder(parse_datetime_with_timezone_support))
+Database.register_converter(str("timestamp"), decoder(parse_datetime_with_timezone_support))
+Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime_with_timezone_support))
+Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
+
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 if Database.version_info >= (2, 4, 1):
@@ -73,7 +81,7 @@ if Database.version_info >= (2, 4, 1):
     # slow-down, this adapter is only registered for sqlite3 versions
     # needing it (Python 2.6 and up).
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeString, lambda s: s.decode('utf-8'))
+    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set

@@ -2,8 +2,10 @@ from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Poly
 from django.utils.functional import total_ordering
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class GEvent(object):
     """
     A Python wrapper for the Google GEvent object.
@@ -48,10 +50,11 @@ class GEvent(object):
         self.event = event
         self.action = action
 
-    def __unicode__(self):
+    def __str__(self):
         "Returns the parameter part of a GEvent."
         return mark_safe('"%s", %s' %(self.event, self.action))
 
+@python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
         self.events = []
@@ -64,7 +67,7 @@ class GOverlayBase(object):
         "Attaches a GEvent to the overlay object."
         self.events.append(event)
 
-    def __unicode__(self):
+    def __str__(self):
         "The string representation is the JavaScript API call."
         return mark_safe('%s(%s)' % (self.__class__.__name__, self.js_params))
 

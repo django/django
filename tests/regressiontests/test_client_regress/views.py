@@ -80,9 +80,7 @@ def return_json_file(request):
 
     # This just checks that the uploaded data is JSON
     obj_dict = json.loads(request.body.decode(charset))
-    obj_json = json.dumps(obj_dict, encoding=charset,
-                                cls=DjangoJSONEncoder,
-                                ensure_ascii=False)
+    obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder, ensure_ascii=False)
     response = HttpResponse(obj_json.encode(charset), status=200,
                             content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'

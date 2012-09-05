@@ -91,7 +91,7 @@ class ClientTest(TestCase):
                                     content_type="text/xml")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name, "Book template")
-        self.assertEqual(response.content, "Blink - Malcolm Gladwell")
+        self.assertEqual(response.content, b"Blink - Malcolm Gladwell")
 
     def test_redirect(self):
         "GET a URL that redirects elsewhere"

@@ -125,6 +125,10 @@ dot in a variable name, it tries the following lookups, in this order:
 * Attribute lookup. Example: ``foo.bar``
 * List-index lookup. Example: ``foo[bar]``
 
+Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
+interpreted as a literal string and not using the value of the variable "bar",
+if one exists in the template context.
+
 The template system uses the first lookup type that works. It's short-circuit
 logic. Here are a few examples::
 
@@ -197,6 +201,8 @@ straight lookups. Here are some things to keep in mind:
 
 * A variable can only be called if it has no required arguments. Otherwise,
   the system will return an empty string.
+
+.. _alters-data-description:
 
 * Obviously, there can be side effects when calling some variables, and
   it'd be either foolish or a security hole to allow the template system
@@ -421,6 +427,10 @@ optional, third positional argument, ``processors``. In this example, the
             return render_to_response('my_template.html',
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
+
+    Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
+    the same as a call to :func:`~django.shortcuts.render_to_response()` with a
+    context_instance argument that forces the use of a ``RequestContext``.
 
 Here's what each of the default processors does:
 

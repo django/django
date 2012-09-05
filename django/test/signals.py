@@ -4,7 +4,6 @@ import time
 from django.conf import settings
 from django.db import connections
 from django.dispatch import receiver, Signal
-from django.template import context
 from django.utils import timezone
 
 template_rendered = Signal(providing_args=["template", "context"])
@@ -48,7 +47,15 @@ def update_connections_time_zone(**kwargs):
 @receiver(setting_changed)
 def clear_context_processors_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
+        from django.template import context
         context._standard_context_processors = None
+
+
+@receiver(setting_changed)
+def clear_serializers_cache(**kwargs):
+    if kwargs['setting'] == 'SERIALIZATION_MODULES':
+        from django.core import serializers
+        serializers._serializers = {}
 
 
 @receiver(setting_changed)

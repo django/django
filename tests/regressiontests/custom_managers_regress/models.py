@@ -3,6 +3,7 @@ Regression tests for custom manager classes.
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class RestrictedManager(models.Manager):
@@ -12,12 +13,14 @@ class RestrictedManager(models.Manager):
     def get_query_set(self):
         return super(RestrictedManager, self).get_query_set().filter(is_public=True)
 
+@python_2_unicode_compatible
 class RelatedModel(models.Model):
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
@@ -26,9 +29,10 @@ class RestrictedModel(models.Model):
     objects = RestrictedManager()
     plain_manager = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
@@ -37,5 +41,5 @@ class OneToOneRestrictedModel(models.Model):
     objects = RestrictedManager()
     plain_manager = models.Manager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

@@ -65,9 +65,9 @@ through this property::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
 Here's a list of all possible ``Media`` options. There are no required options.
 
@@ -110,9 +110,9 @@ requirements::
 
 If this last CSS definition were to be rendered, it would become the following HTML::
 
-    <link href="http://media.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
-    <link href="http://media.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
-    <link href="http://media.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
+    <link href="http://static.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
+    <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
 
 ``js``
 ~~~~~~
@@ -140,11 +140,11 @@ basic Calendar widget from the example above::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 The FancyCalendar widget inherits all the media from it's parent widget. If
 you don't want media to be inherited in this way, add an ``extend=False``
@@ -160,8 +160,8 @@ declaration to the media declaration::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you require even more control over media inheritance, define your media
 using a `dynamic property`_. Dynamic properties give you complete control over
@@ -253,12 +253,12 @@ to filter out a medium of interest. For example::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
     >>> print(w.media)['css']
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
 
 When you use the subscript operator, the value that is returned is a new
 Media object -- but one that only contains the media of interest.
@@ -283,10 +283,10 @@ the resulting Media object contains the union of the media from both files::
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
     >>> print(w1.media + w2.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 Media on Forms
 --------------
@@ -306,10 +306,10 @@ of adding the media definitions for all widgets that are part of the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you want to associate additional media with a form -- for example, CSS for form
 layout -- simply add a media declaration to the form::
@@ -325,8 +325,8 @@ layout -- simply add a media declaration to the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://media.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>

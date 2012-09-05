@@ -5,7 +5,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 # True if we are running on Python 3.
@@ -26,19 +26,23 @@ else:
     text_type = unicode
     binary_type = str
 
-    # It's possible to have sizeof(long) != sizeof(Py_ssize_t).
-    class X(object):
-        def __len__(self):
-            return 1 << 31
-    try:
-        len(X())
-    except OverflowError:
-        # 32-bit
+    if sys.platform == "java":
+        # Jython always uses 32 bits.
         MAXSIZE = int((1 << 31) - 1)
     else:
-        # 64-bit
-        MAXSIZE = int((1 << 63) - 1)
-    del X
+        # It's possible to have sizeof(long) != sizeof(Py_ssize_t).
+        class X(object):
+            def __len__(self):
+                return 1 << 31
+        try:
+            len(X())
+        except OverflowError:
+            # 32-bit
+            MAXSIZE = int((1 << 31) - 1)
+        else:
+            # 64-bit
+            MAXSIZE = int((1 << 63) - 1)
+            del X
 
 
 def _add_doc(func, doc):
@@ -201,12 +205,19 @@ else:
     _iteritems = "iteritems"
 
 
+try:
+    advance_iterator = next
+except NameError:
+    def advance_iterator(it):
+        return it.next()
+next = advance_iterator
+
+
 if PY3:
     def get_unbound_function(unbound):
         return unbound
 
-
-    advance_iterator = next
+    Iterator = object
 
     def callable(obj):
         return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
@@ -214,9 +225,10 @@ else:
     def get_unbound_function(unbound):
         return unbound.im_func
 
+    class Iterator(object):
 
-    def advance_iterator(it):
-        return it.next()
+        def next(self):
+            return type(self).__next__(self)
 
     callable = callable
 _add_doc(get_unbound_function,
@@ -231,15 +243,15 @@ get_function_defaults = operator.attrgetter(_func_defaults)
 
 def iterkeys(d):
     """Return an iterator over the keys of a dictionary."""
-    return getattr(d, _iterkeys)()
+    return iter(getattr(d, _iterkeys)())
 
 def itervalues(d):
     """Return an iterator over the values of a dictionary."""
-    return getattr(d, _itervalues)()
+    return iter(getattr(d, _itervalues)())
 
 def iteritems(d):
     """Return an iterator over the (key, value) pairs of a dictionary."""
-    return getattr(d, _iteritems)()
+    return iter(getattr(d, _iteritems)())
 
 
 if PY3:
@@ -365,4 +377,6 @@ def iterlists(d):
     """Return an iterator over the values of a MultiValueDict."""
     return getattr(d, _iterlists)()
 
+
 add_move(MovedModule("_dummy_thread", "dummy_thread"))
+add_move(MovedModule("_thread", "thread"))

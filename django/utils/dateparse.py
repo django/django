@@ -15,16 +15,16 @@ date_re = re.compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$'
 )
 
+time_re = re.compile(
+    r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
+    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
+)
+
 datetime_re = re.compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
     r'[T ](?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
     r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
-    r'(?P<tzinfo>Z|[+-]\d{1,2}:\d{1,2})?$'
-)
-
-time_re = re.compile(
-    r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
-    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
+    r'(?P<tzinfo>Z|[+-]\d{2}:?\d{2})?$'
 )
 
 def parse_date(value):
@@ -42,8 +42,6 @@ def parse_time(value):
     """Parses a string and return a datetime.time.
 
     This function doesn't support time zone offsets.
-
-    Sub-microsecond precision is accepted, but ignored.
 
     Raises ValueError if the input is well formatted but not a valid time.
     Returns None if the input isn't well formatted, in particular if it
@@ -63,8 +61,6 @@ def parse_datetime(value):
     This function supports time zone offsets. When the input contains one,
     the output uses an instance of FixedOffset as tzinfo.
 
-    Sub-microsecond precision is accepted, but ignored.
-
     Raises ValueError if the input is well formatted but not a valid datetime.
     Returns None if the input isn't well formatted.
     """
@@ -77,7 +73,7 @@ def parse_datetime(value):
         if tzinfo == 'Z':
             tzinfo = utc
         elif tzinfo is not None:
-            offset = 60 * int(tzinfo[1:3]) + int(tzinfo[4:6])
+            offset = 60 * int(tzinfo[1:3]) + int(tzinfo[-2:])
             if tzinfo[0] == '-':
                 offset = -offset
             tzinfo = FixedOffset(offset)

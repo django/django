@@ -17,11 +17,9 @@ from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import conditional_escape, format_html, format_html_join
 from django.utils.translation import ugettext, ugettext_lazy
-from django.utils.encoding import StrAndUnicode, force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils import datetime_safe, formats
-from django.utils import six
+from django.utils import datetime_safe, formats, six
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -34,7 +32,8 @@ __all__ = (
 
 MEDIA_TYPES = ('css','js')
 
-class Media(StrAndUnicode):
+@python_2_unicode_compatible
+class Media(object):
     def __init__(self, media=None, **kwargs):
         if media:
             media_attrs = media.__dict__
@@ -51,7 +50,7 @@ class Media(StrAndUnicode):
         # if media_attrs != {}:
         #     raise TypeError("'class Media' has invalid attribute(s): %s" % ','.join(media_attrs.keys()))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.render()
 
     def render(self):
@@ -142,7 +141,8 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
         return new_class
 
-class SubWidget(StrAndUnicode):
+@python_2_unicode_compatible
+class SubWidget(object):
     """
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
     This is a class that represents the "inner" HTML element of a widget.
@@ -152,7 +152,7 @@ class SubWidget(StrAndUnicode):
         self.name, self.value = name, value
         self.attrs, self.choices = attrs, choices
 
-    def __unicode__(self):
+    def __str__(self):
         args = [self.name, self.value, self.attrs]
         if self.choices:
             args.append(self.choices)
@@ -647,6 +647,7 @@ class SelectMultiple(Select):
         data_set = set([force_text(value) for value in data])
         return data_set != initial_set
 
+@python_2_unicode_compatible
 class RadioInput(SubWidget):
     """
     An object used by RadioFieldRenderer that represents a single
@@ -660,7 +661,7 @@ class RadioInput(SubWidget):
         self.choice_label = force_text(choice[1])
         self.index = index
 
-    def __unicode__(self):
+    def __str__(self):
         return self.render()
 
     def render(self, name=None, value=None, attrs=None, choices=()):
@@ -685,7 +686,8 @@ class RadioInput(SubWidget):
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))
 
-class RadioFieldRenderer(StrAndUnicode):
+@python_2_unicode_compatible
+class RadioFieldRenderer(object):
     """
     An object used by RadioSelect to enable customization of radio widgets.
     """
@@ -702,7 +704,7 @@ class RadioFieldRenderer(StrAndUnicode):
         choice = self.choices[idx] # Let the IndexError propogate
         return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.render()
 
     def render(self):

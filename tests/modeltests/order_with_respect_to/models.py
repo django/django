@@ -4,11 +4,13 @@ Tests for the order_with_respect_to Meta attribute.
 
 from django.db import models
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Question(models.Model):
     text = models.CharField(max_length=200)
 
+@python_2_unicode_compatible
 class Answer(models.Model):
     text = models.CharField(max_length=200)
     question = models.ForeignKey(Question)
@@ -16,9 +18,10 @@ class Answer(models.Model):
     class Meta:
         order_with_respect_to = 'question'
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.text)
 
+@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=200)
     parent = models.ForeignKey("self", related_name="children", null=True)
@@ -26,5 +29,5 @@ class Post(models.Model):
     class Meta:
         order_with_respect_to = "parent"
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title

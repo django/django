@@ -113,6 +113,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     def __init__(self, connection):
         super(DatabaseOperations, self).__init__(connection)
 
+        # Creating the GIS terms dictionary.
+        gis_terms = ['isnull']
+        gis_terms += self.geometry_functions.keys()
+        self.gis_terms = dict([(term, None) for term in gis_terms])
+
+    def confirm_spatial_components_versions(self):
         # Determine the version of the SpatiaLite library.
         try:
             vtup = self.spatialite_version_tuple()
@@ -128,11 +134,6 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                                        'database (error was "%s").  Was the SpatiaLite initialization '
                                        'SQL loaded on this database?' %
                                        (self.connection.settings_dict['NAME'], msg))
-
-        # Creating the GIS terms dictionary.
-        gis_terms = ['isnull']
-        gis_terms += list(self.geometry_functions)
-        self.gis_terms = dict([(term, None) for term in gis_terms])
 
         if version >= (2, 4, 0):
             # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both

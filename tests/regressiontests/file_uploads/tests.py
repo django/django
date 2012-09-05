@@ -12,6 +12,7 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
+from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 from django.utils import unittest
 
@@ -48,12 +49,12 @@ class FileUploadTests(TestCase):
             'file_field2': file2,
             }
 
-        for key in post_data.keys():
+        for key in list(post_data):
             try:
                 post_data[key + '_hash'] = hashlib.sha1(post_data[key].read()).hexdigest()
                 post_data[key].seek(0)
             except AttributeError:
-                post_data[key + '_hash'] = hashlib.sha1(post_data[key]).hexdigest()
+                post_data[key + '_hash'] = hashlib.sha1(force_bytes(post_data[key])).hexdigest()
 
         response = self.client.post('/file_uploads/verify/', post_data)
 
@@ -67,7 +68,7 @@ class FileUploadTests(TestCase):
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
             '',
-            base64.b64encode(test_string),
+            base64.b64encode(force_bytes(test_string)).decode('ascii'),
             '--' + client.BOUNDARY + '--',
             '',
         ]).encode('utf-8')
@@ -79,7 +80,7 @@ class FileUploadTests(TestCase):
             'wsgi.input':     client.FakePayload(payload),
         }
         response = self.client.request(**r)
-        received = json.loads(response.content)
+        received = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(received['file'], test_string)
 
@@ -87,7 +88,7 @@ class FileUploadTests(TestCase):
         tdir = tempfile.gettempdir()
 
         # This file contains chinese symbols and an accented char in the name.
-        with open(os.path.join(tdir, UNICODE_FILENAME.encode('utf-8')), 'w+b') as file1:
+        with open(os.path.join(tdir, UNICODE_FILENAME), 'w+b') as file1:
             file1.write(b'b' * (2 ** 10))
             file1.seek(0)
 
@@ -150,7 +151,7 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
 
         # The filenames should have been sanitized by the time it got to the view.
-        recieved = json.loads(response.content)
+        recieved = json.loads(response.content.decode('utf-8'))
         for i, name in enumerate(scary_file_names):
             got = recieved["file%s" % i]
             self.assertEqual(got, "hax0rd.txt")
@@ -174,7 +175,7 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input':     client.FakePayload(payload),
         }
-        got = json.loads(self.client.request(**r).content)
+        got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
 
     def test_truncated_multipart_handled_gracefully(self):
@@ -200,7 +201,7 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input': client.FakePayload(payload),
         }
-        got = json.loads(self.client.request(**r).content)
+        got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertEqual(got, {})
 
     def test_empty_multipart_handled_gracefully(self):
@@ -215,7 +216,7 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input': client.FakePayload(b''),
         }
-        got = json.loads(self.client.request(**r).content)
+        got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertEqual(got, {})
 
     def test_custom_upload_handler(self):
@@ -231,12 +232,12 @@ class FileUploadTests(TestCase):
 
         # Small file posting should work.
         response = self.client.post('/file_uploads/quota/', {'f': smallfile})
-        got = json.loads(response.content)
+        got = json.loads(response.content.decode('utf-8'))
         self.assertTrue('f' in got)
 
         # Large files don't go through.
         response = self.client.post("/file_uploads/quota/", {'f': bigfile})
-        got = json.loads(response.content)
+        got = json.loads(response.content.decode('utf-8'))
         self.assertTrue('f' not in got)
 
     def test_broken_custom_upload_handler(self):
@@ -274,7 +275,7 @@ class FileUploadTests(TestCase):
             'field5': 'test7',
             'file2': (file2, file2a)
         })
-        got = json.loads(response.content)
+        got = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(got.get('file1'), 1)
         self.assertEqual(got.get('file2'), 2)
@@ -299,8 +300,8 @@ class FileUploadTests(TestCase):
         # it raises when there is an attempt to read more than the available bytes:
         try:
             client.FakePayload(b'a').read(2)
-        except Exception as reference_error:
-            pass
+        except Exception as err:
+            reference_error = err
 
         # install the custom handler that tries to access request.POST
         self.client.handler = POSTAccessingHandler()

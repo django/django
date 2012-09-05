@@ -1,5 +1,6 @@
 # coding: utf-8
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 CHOICES = (
@@ -8,6 +9,7 @@ CHOICES = (
 )
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -20,7 +22,7 @@ class Article(models.Model):
         # A utf-8 verbose name (Ångström's Articles) to test they are valid.
         verbose_name = "\xc3\x85ngstr\xc3\xb6m's Articles"
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
 
@@ -38,29 +40,31 @@ class Event(models.Model):
     when = models.DateTimeField()
 
 
+@python_2_unicode_compatible
 class Department(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=200)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Worker(models.Model):
     department = models.ForeignKey(Department)
     name = models.CharField(max_length=200)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class BrokenUnicodeMethod(models.Model):
     name = models.CharField(max_length=7)
 
-    def __unicode__(self):
-        # Intentionally broken (trying to insert a unicode value into a str
-        # object).
-        return 'Názov: %s' % self.name
+    def __str__(self):
+        # Intentionally broken (invalid start byte in byte string).
+        return b'Name\xff: %s'.decode() % self.name
 
 
 class NonAutoPK(models.Model):

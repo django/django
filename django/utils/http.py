@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import calendar
 import datetime
 import re
@@ -13,7 +15,7 @@ except ImportError:     # Python 2
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text, smart_str
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 
@@ -37,7 +39,7 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote(smart_str(url), smart_str(safe)))
+    return force_text(urllib_parse.quote(force_str(url), force_str(safe)))
 urlquote = allow_lazy(urlquote, six.text_type)
 
 def urlquote_plus(url, safe=''):
@@ -47,7 +49,7 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote_plus(smart_str(url), smart_str(safe)))
+    return force_text(urllib_parse.quote_plus(force_str(url), force_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 def urlunquote(quoted_url):
@@ -55,7 +57,7 @@ def urlunquote(quoted_url):
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
-    return force_text(urllib_parse.unquote(smart_str(quoted_url)))
+    return force_text(urllib_parse.unquote(force_str(quoted_url)))
 urlunquote = allow_lazy(urlunquote, six.text_type)
 
 def urlunquote_plus(quoted_url):
@@ -63,7 +65,7 @@ def urlunquote_plus(quoted_url):
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
-    return force_text(urllib_parse.unquote_plus(smart_str(quoted_url)))
+    return force_text(urllib_parse.unquote_plus(force_str(quoted_url)))
 urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 def urlencode(query, doseq=0):
@@ -77,8 +79,8 @@ def urlencode(query, doseq=0):
     elif hasattr(query, 'items'):
         query = query.items()
     return urllib_parse.urlencode(
-        [(smart_str(k),
-         [smart_str(i) for i in v] if isinstance(v, (list,tuple)) else smart_str(v))
+        [(force_str(k),
+         [force_str(i) for i in v] if isinstance(v, (list,tuple)) else force_str(v))
             for k, v in query],
         doseq)
 
@@ -211,7 +213,7 @@ def parse_etags(etag_str):
     if not etags:
         # etag_str has wrong format, treat it as an opaque string then
         return [etag_str]
-    etags = [e.decode('string_escape') for e in etags]
+    etags = [e.encode('ascii').decode('unicode_escape') for e in etags]
     return etags
 
 def quote_etag(etag):

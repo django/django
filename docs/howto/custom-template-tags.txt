@@ -189,7 +189,7 @@ passed around inside the template code:
   They're commonly used for output that contains raw HTML that is intended
   to be interpreted as-is on the client side.
 
-  Internally, these strings are of type ``SafeString`` or ``SafeUnicode``.
+  Internally, these strings are of type ``SafeBytes`` or ``SafeText``.
   They share a common base class of ``SafeData``, so you can test
   for them using code like:
 
@@ -204,8 +204,8 @@ passed around inside the template code:
   not. These strings are only escaped once, however, even if auto-escaping
   applies.
 
-  Internally, these strings are of type ``EscapeString`` or
-  ``EscapeUnicode``. Generally you don't have to worry about these; they
+  Internally, these strings are of type ``EscapeBytes`` or
+  ``EscapeText``. Generally you don't have to worry about these; they
   exist for the implementation of the :tfilter:`escape` filter.
 
 Template filter code falls into one of two situations:

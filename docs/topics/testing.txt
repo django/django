@@ -2039,7 +2039,7 @@ out the `full reference`_ for more details.
             self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
             # Wait until the response is received
             WebDriverWait(self.selenium, timeout).until(
-                lambda driver: driver.find_element_by_tag_name('body'), timeout=10)
+                lambda driver: driver.find_element_by_tag_name('body'))
 
     The tricky thing here is that there's really no such thing as a "page load,"
     especially in modern Web apps that generate HTML dynamically after the

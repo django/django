@@ -36,7 +36,7 @@ class DebugViewTests(TestCase):
         self.assertEqual(response.status_code, 500)
 
         data = {
-            'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
+            'file_data.txt': SimpleUploadedFile('file_data.txt', b'haha'),
         }
         response = self.client.post('/raises/', data)
         self.assertContains(response, 'file_data.txt', status_code=500)

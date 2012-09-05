@@ -216,7 +216,7 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
-        self.assertEqual("", resp.content)
+        self.assertEqual(resp.content, b'')
 
     def test_token_node_empty_csrf_cookie(self):
         """

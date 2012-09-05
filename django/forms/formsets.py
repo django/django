@@ -5,7 +5,7 @@ from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import Media, HiddenInput
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
@@ -33,7 +33,8 @@ class ManagementForm(Form):
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
-class BaseFormSet(StrAndUnicode):
+@python_2_unicode_compatible
+class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
@@ -51,7 +52,7 @@ class BaseFormSet(StrAndUnicode):
         # construct the forms in the formset
         self._construct_forms()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.as_table()
 
     def __iter__(self):
@@ -94,10 +95,11 @@ class BaseFormSet(StrAndUnicode):
             total_forms = initial_forms + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
-            if initial_forms > self.max_num >= 0:
-                total_forms = initial_forms
-            elif total_forms > self.max_num >= 0:
-                total_forms = self.max_num
+            if self.max_num is not None:
+                if initial_forms > self.max_num >= 0:
+                    total_forms = initial_forms
+                elif total_forms > self.max_num >= 0:
+                    total_forms = self.max_num
         return total_forms
 
     def initial_form_count(self):
@@ -107,7 +109,7 @@ class BaseFormSet(StrAndUnicode):
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num >= 0:
+            if self.max_num is not None and (initial_forms > self.max_num >= 0):
                 initial_forms = self.max_num
         return initial_forms
 
@@ -252,13 +254,10 @@ class BaseFormSet(StrAndUnicode):
     errors = property(_get_errors)
 
     def _should_delete_form(self, form):
-        # The way we lookup the value of the deletion field here takes
-        # more code than we'd like, but the form's cleaned_data will
-        # not exist if the form is invalid.
-        field = form.fields[DELETION_FIELD_NAME]
-        raw_value = form._raw_value(DELETION_FIELD_NAME)
-        should_delete = field.clean(raw_value)
-        return should_delete
+        """
+        Returns whether or not the form was marked for deletion.
+        """
+        return form.cleaned_data.get(DELETION_FIELD_NAME, False)
 
     def is_valid(self):
         """

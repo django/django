@@ -10,36 +10,43 @@ from django.utils import six
 class EscapeData(object):
     pass
 
-class EscapeString(bytes, EscapeData):
+class EscapeBytes(bytes, EscapeData):
     """
-    A string that should be HTML-escaped when output.
+    A byte string that should be HTML-escaped when output.
     """
     pass
 
-class EscapeUnicode(six.text_type, EscapeData):
+class EscapeText(six.text_type, EscapeData):
     """
-    A unicode object that should be HTML-escaped when output.
+    A unicode string object that should be HTML-escaped when output.
     """
     pass
+
+if six.PY3:
+    EscapeString = EscapeText
+else:
+    EscapeString = EscapeBytes
+    # backwards compatibility for Python 2
+    EscapeUnicode = EscapeText
 
 class SafeData(object):
     pass
 
-class SafeString(bytes, SafeData):
+class SafeBytes(bytes, SafeData):
     """
-    A string subclass that has been specifically marked as "safe" (requires no
+    A bytes subclass that has been specifically marked as "safe" (requires no
     further escaping) for HTML output purposes.
     """
     def __add__(self, rhs):
         """
-        Concatenating a safe string with another safe string or safe unicode
-        object is safe. Otherwise, the result is no longer safe.
+        Concatenating a safe byte string with another safe byte string or safe
+        unicode string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeString, self).__add__(rhs)
-        if isinstance(rhs, SafeUnicode):
-            return SafeUnicode(t)
-        elif isinstance(rhs, SafeString):
-            return SafeString(t)
+        t = super(SafeBytes, self).__add__(rhs)
+        if isinstance(rhs, SafeText):
+            return SafeText(t)
+        elif isinstance(rhs, SafeBytes):
+            return SafeBytes(t)
         return t
 
     def _proxy_method(self, *args, **kwargs):
@@ -51,25 +58,25 @@ class SafeString(bytes, SafeData):
         method = kwargs.pop('method')
         data = method(self, *args, **kwargs)
         if isinstance(data, bytes):
-            return SafeString(data)
+            return SafeBytes(data)
         else:
-            return SafeUnicode(data)
+            return SafeText(data)
 
     decode = curry(_proxy_method, method=bytes.decode)
 
-class SafeUnicode(six.text_type, SafeData):
+class SafeText(six.text_type, SafeData):
     """
-    A unicode subclass that has been specifically marked as "safe" for HTML
-    output purposes.
+    A unicode (Python 2) / str (Python 3) subclass that has been specifically
+    marked as "safe" for HTML output purposes.
     """
     def __add__(self, rhs):
         """
-        Concatenating a safe unicode object with another safe string or safe
-        unicode object is safe. Otherwise, the result is no longer safe.
+        Concatenating a safe unicode string with another safe byte string or
+        safe unicode string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeUnicode, self).__add__(rhs)
+        t = super(SafeText, self).__add__(rhs)
         if isinstance(rhs, SafeData):
-            return SafeUnicode(t)
+            return SafeText(t)
         return t
 
     def _proxy_method(self, *args, **kwargs):
@@ -81,11 +88,18 @@ class SafeUnicode(six.text_type, SafeData):
         method = kwargs.pop('method')
         data = method(self, *args, **kwargs)
         if isinstance(data, bytes):
-            return SafeString(data)
+            return SafeBytes(data)
         else:
-            return SafeUnicode(data)
+            return SafeText(data)
 
     encode = curry(_proxy_method, method=six.text_type.encode)
+
+if six.PY3:
+    SafeString = SafeText
+else:
+    SafeString = SafeBytes
+    # backwards compatibility for Python 2
+    SafeUnicode = SafeText
 
 def mark_safe(s):
     """
@@ -97,10 +111,10 @@ def mark_safe(s):
     if isinstance(s, SafeData):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
-        return SafeString(s)
+        return SafeBytes(s)
     if isinstance(s, (six.text_type, Promise)):
-        return SafeUnicode(s)
-    return SafeString(bytes(s))
+        return SafeText(s)
+    return SafeString(str(s))
 
 def mark_for_escaping(s):
     """
@@ -113,8 +127,8 @@ def mark_for_escaping(s):
     if isinstance(s, (SafeData, EscapeData)):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
-        return EscapeString(s)
+        return EscapeBytes(s)
     if isinstance(s, (six.text_type, Promise)):
-        return EscapeUnicode(s)
-    return EscapeString(bytes(s))
+        return EscapeText(s)
+    return EscapeBytes(bytes(s))
 
