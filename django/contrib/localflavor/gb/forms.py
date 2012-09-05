@@ -59,9 +59,6 @@ class GBNationSelect(Select):
 
 
 
-/**
-
-
 
 
 
@@ -227,7 +224,6 @@ def extract_gb_phone_parts(phonenumber):
     created by @g1smd
     @param string phonenumber must be a valid UK phone number (with optional extension)
     @return array phonenumberPartsArray Returns prefix, NSN and extension in array.
- */
     """
     patternGBnumberparts = re.compile(r"^
     (\(?(?:0(?:0|11)\)?\s?\(?|\+)(44)\)?\s?)?\(?0?(?:\)\s?)?   # country or trunk prefix
@@ -407,5 +403,3 @@ def format_gb_nsn(phonenumberNSN):
 
     return phonenumberNSN
 
-
-**/
