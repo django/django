@@ -244,6 +244,37 @@ class AppCache(object):
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
+    def save_state(self):
+        """
+        Returns an object that contains the current AppCache state.
+        Can be provided to restore_state to undo actions.
+        """
+        return {
+            "app_store": SortedDict(self.app_store.items()),
+            "app_labels": dict(self.app_errors.items()),
+            "app_models": SortedDict(self.app_models.items()),
+            "app_errors": dict(self.app_errors.items()),
+        }
+
+    def restore_state(self, state):
+        """
+        Restores the AppCache to a previous state from save_state.
+        """
+        self.app_store = state['app_store']
+        self.app_labels = state['app_labels']
+        self.app_models = state['app_models']
+        self.app_errors = state['app_errors']
+
+    def unregister_all(self):
+        """
+        Wipes the AppCache clean of all registered models.
+        Used for things like migration libraries' fake ORMs.
+        """
+        self.app_store = SortedDict()
+        self.app_labels = {}
+        self.app_models = SortedDict()
+        self.app_errors = {}
+
 cache = AppCache()
 
 # These methods were always module level, so are kept that way for backwards
