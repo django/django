@@ -244,7 +244,7 @@ class FileSystemStorage(Storage):
             path = safe_join(self.location, name)
         except ValueError:
             raise SuspiciousOperation("Attempted access to '%s' denied." % name)
-        return os.path.normpath(path)
+        return os.path.normpath(path).encode('UTF-8')
 
     def size(self, name):
         return os.path.getsize(self.path(name))
