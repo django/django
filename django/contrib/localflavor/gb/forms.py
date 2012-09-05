@@ -62,7 +62,16 @@ class GBNationSelect(Select):
 
 
 
-  ## GB telephone numbers:
+
+
+
+
+class UKPhoneNumberField(phonenumber):
+    default_error_messages = {
+        'digit_count': _('incorrect number of digits'),
+        'number_format': _('non-valid number format'),
+        'number_range': _('non-valid number range')
+    }
 
 
 
