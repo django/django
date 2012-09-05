@@ -96,14 +96,14 @@ def valid_gb_phone_number(phonenumber):
     """
     # Check if number entered matches a valid format
     if (!valid_gb_phone_pattern(phonenumber)):
-        return FALSE;
+        return FALSE
     else:
         # Extract number parts: prefix, NSN, extension
-        phonenumberPartsArray = (extract_gb_phone_parts(phonenumber));
+        phonenumberPartsArray = (extract_gb_phone_parts(phonenumber))
         if (empty(phonenumberPartsArray)):
-            return FALSE;
+            return FALSE
         else:
-            phonenumberNSN = phonenumberPartsArray['NSN'];
+            phonenumberNSN = phonenumberPartsArray['NSN']
             # Check if NSN entered is in a valid range
             if (!valid_gb_phone_range(phonenumberNSN)):
                 return FALSE
@@ -136,19 +136,19 @@ def format_gb_phone_number(phonenumber):
     phonenumberPartsArray = extract_gb_phone_parts(phonenumber)
     if (!empty(phonenumberPartsArray)):
         # Grab the NSN part of GB number
-        phonenumberNSN = phonenumberPartsArray['NSN'];
+        phonenumberNSN = phonenumberPartsArray['NSN']
         if (phonenumberNSN == null):
             return phonenumber
 
         # Remove spaces, hyphens, and brackets from NSN part of GB number
-        arrayReplace = array(")", "-", " ");
+        arrayReplace = array(")", "-", " ")
         phonenumberNSN = trim(str_replace(arrayReplace, "", phonenumberNSN))
         # Format NSN part of GB number
         phonenumberNSNformatted = format_gb_nsn(phonenumberNSN)
 
         # Set prefix (will be +44 or 0)
         if (isset(phonenumberPartsArray['prefix']) && phonenumberPartsArray['prefix'] != null):
-            phonenumberPrefix = phonenumberPartsArray['prefix'];
+            phonenumberPrefix = phonenumberPartsArray['prefix']
 
         # Grab extension and trim it
         phonenumberHasExtension = false
