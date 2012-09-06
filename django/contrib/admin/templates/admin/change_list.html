@@ -53,11 +53,11 @@
       {% if has_add_permission %}
         <ul class="object-tools">
           {% block object-tools-items %}
+            {% for name, desc, css_class in object_tools %}
             <li>
-              <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
-                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
-              </a>
+                <a href="{% url cl.opts|admin_urlname:name %}{% if is_popup %}?_popup=1{% endif %}" {% if css_class %}class="{{ css_class }}"{% endif %}>{{ desc }}</a>
             </li>
+            {% endfor %}
           {% endblock %}
         </ul>
       {% endif %}

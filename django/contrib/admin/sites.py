@@ -1,6 +1,6 @@
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
-from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin import ModelAdmin, actions, list_tools
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
@@ -46,6 +46,8 @@ class AdminSite(object):
         self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
+        self._list_tools = { 'add': list_tools.AddItem() }
+        self._global_list_tools = self._list_tools.copy()
 
     def register(self, model_or_iterable, admin_class=None, **options):
         """
@@ -135,6 +137,34 @@ class AdminSite(object):
         Get all the enabled actions as an iterable of (name, func).
         """
         return six.iteritems(self._actions)
+
+    def add_list_tool(self, tool, name=None):
+        """
+        Register a list tool to be available globally.
+        """
+        name = name or tool.__name__
+        self._list_tools[name] = tool
+
+    def disable_list_tool(self, name):
+        """
+        Disable a globally-registered list tool. Raises KeyError for invalid
+        names.
+        """
+        del self._list_tools[name]
+
+    def get_list_tool(self, name):
+        """
+        Explicitally get a registered global list too wheather it's enabled or
+        not. Raises KeyError for invalid names.
+        """
+        return self._global_list_tools[name]
+
+    @property
+    def list_tools(self):
+        """
+        Get all the enabled list tools as an iterable of (name, func).
+        """
+        return six.iteritems(self._list_tools)
 
     def has_permission(self, request):
         """

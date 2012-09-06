@@ -5,7 +5,7 @@ from django.forms.formsets import all_valid
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.admin import widgets, helpers
+from django.contrib.admin import widgets, helpers, list_tools
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
@@ -337,6 +337,9 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_bottom = False
     actions_selection_counter = True
 
+    # Object Tools
+    list_tools = []
+
     def __init__(self, model, admin_site):
         self.model = model
         self.opts = model._meta
@@ -358,6 +361,28 @@ class ModelAdmin(BaseModelAdmin):
 
         return inline_instances
 
+    def get_object_tool_urls(self):
+        """
+        Generates URLs for each object tool that is registered and wraps the
+        view so that it gets called with the admin instance as its first
+        parameter.
+        """
+        from django.conf.urls import patterns, url
+
+        def wrap(view):
+            def wrapper(*args, **kwargs):
+                return view(self, *args, **kwargs)
+            return wrapper
+
+        info = self.model._meta.app_label, self.model._meta.module_name
+
+        return patterns('', *(
+            url(object_tool[4],
+                wrap(object_tool[0]),
+                name='%s_%s_%s' % (info + (name,)))
+            for name, object_tool in self.get_list_tools().items()
+        ))
+
     def get_urls(self):
         from django.conf.urls import patterns, url
 
@@ -372,19 +397,21 @@ class ModelAdmin(BaseModelAdmin):
             url(r'^$',
                 wrap(self.changelist_view),
                 name='%s_%s_changelist' % info),
-            url(r'^add/$',
-                wrap(self.add_view),
-                name='%s_%s_add' % info),
             url(r'^(.+)/history/$',
                 wrap(self.history_view),
                 name='%s_%s_history' % info),
             url(r'^(.+)/delete/$',
                 wrap(self.delete_view),
                 name='%s_%s_delete' % info),
+        )
+
+        urlpatterns += self.get_object_tool_urls()
+        urlpatterns += [
             url(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-        )
+        ]
+
         return urlpatterns
 
     def urls(self):
@@ -563,6 +590,69 @@ class ModelAdmin(BaseModelAdmin):
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, force_text(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
     action_checkbox.allow_tags = True
+
+    def get_list_tools(self, request=None):
+        """
+        Return a dictionary mapping the names of all list object tools for this
+        ModelAdmin to a tuple of (callable, name, description, css_class, url)
+        for each object tool.
+
+        This gets called once when the URLs get setup so it may not always be
+        given a request.
+        """
+        list_tools = []
+
+        # Then gather them from the model admin and all parent classes,
+        # starting with self and working back up.
+        for klass in self.__class__.mro()[::-1]:
+            class_tools = getattr(klass, 'list_tools', [])
+            # Avoid trying to iterate over None
+            if not class_tools:
+                continue
+            list_tools.extend(self.get_list_tool(tool) for tool in class_tools)
+
+        for (name, func) in self.admin_site.list_tools:
+            list_tools.append(self.get_list_tool(func))
+
+        list_tools = filter(None, list_tools)
+
+        return SortedDict([
+            (name, (func, name, desc, css, url))
+            for func, name, desc, css, url in list_tools
+        ])
+
+    def get_list_tool(self, tool):
+        """
+        Return a given list object tool from a parameter, which can either be a
+        callable, or the name of a method on the ModelAdmin.  Return is a tuple
+        of (callable, name, description, css class, url).
+        """
+        if callable(tool):
+            func = tool
+            name = getattr(tool, 'name')
+
+            if not name:
+                if hasattr(tool, '__name__'):
+                    name = tool.__name__
+                elif hasattr(tool, '__class__'):
+                    name = tool.__class__.__name__
+
+        elif hasattr(self.__class__, tool):
+            name = tool
+            func = getattr(self.__class__, tool)
+        else:
+            try:
+                func = self.admin_site.get_list_tool(tool)
+            except KeyError:
+                return None
+
+        description = (
+                getattr(func, 'short_description', name.replace('_', ' ')) %
+                model_format_dict(self.opts))
+        css_class = getattr(func, 'css_class', '')
+        url = getattr(func, 'url', "^{0}/$".format(name))
+
+        return func, name, description, css_class, url
 
     def get_actions(self, request):
         """
@@ -762,46 +852,6 @@ class ModelAdmin(BaseModelAdmin):
             "admin/change_form.html"
         ], context, current_app=self.admin_site.name)
 
-    def response_add(self, request, obj, post_url_continue='../%s/'):
-        """
-        Determines the HttpResponse for the add_view stage.
-        """
-        opts = obj._meta
-        pk_value = obj._get_pk_val()
-
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
-        # Here, we distinguish between different save types by checking for
-        # the presence of keys in request.POST.
-        if "_continue" in request.POST:
-            self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if "_popup" in request.POST:
-                post_url_continue += "?_popup=1"
-            return HttpResponseRedirect(post_url_continue % pk_value)
-
-        if "_popup" in request.POST:
-            return HttpResponse(
-                '<!DOCTYPE html><html><head><title></title></head><body>'
-                '<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' % \
-                # escape() calls force_text.
-                (escape(pk_value), escapejs(obj)))
-        elif "_addanother" in request.POST:
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_text(opts.verbose_name)))
-            return HttpResponseRedirect(request.path)
-        else:
-            self.message_user(request, msg)
-
-            # Figure out where to redirect. If the user has change permission,
-            # redirect to the change-list page for this object. Otherwise,
-            # redirect to the admin index.
-            if self.has_change_permission(request, None):
-                post_url = reverse('admin:%s_%s_changelist' %
-                                   (opts.app_label, opts.module_name),
-                                   current_app=self.admin_site.name)
-            else:
-                post_url = reverse('admin:index',
-                                   current_app=self.admin_site.name)
-            return HttpResponseRedirect(post_url)
-
     def response_change(self, request, obj):
         """
         Determines the HttpResponse for the change_view stage.
@@ -921,93 +971,6 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     @transaction.commit_on_success
-    def add_view(self, request, form_url='', extra_context=None):
-        "The 'add' admin view for this model."
-        model = self.model
-        opts = model._meta
-
-        if not self.has_add_permission(request):
-            raise PermissionDenied
-
-        ModelForm = self.get_form(request)
-        formsets = []
-        inline_instances = self.get_inline_instances(request)
-        if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES)
-            if form.is_valid():
-                new_object = self.save_form(request, form, change=False)
-                form_validated = True
-            else:
-                form_validated = False
-                new_object = self.model()
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(data=request.POST, files=request.FILES,
-                                  instance=new_object,
-                                  save_as_new="_saveasnew" in request.POST,
-                                  prefix=prefix, queryset=inline.queryset(request))
-                formsets.append(formset)
-            if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, False)
-                self.save_related(request, form, formsets, False)
-                self.log_addition(request, new_object)
-                return self.response_add(request, new_object)
-        else:
-            # Prepare the dict of initial data from the request.
-            # We have to special-case M2Ms as a list of comma-separated PKs.
-            initial = dict(request.GET.items())
-            for k in initial:
-                try:
-                    f = opts.get_field(k)
-                except models.FieldDoesNotExist:
-                    continue
-                if isinstance(f, models.ManyToManyField):
-                    initial[k] = initial[k].split(",")
-            form = ModelForm(initial=initial)
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(instance=self.model(), prefix=prefix,
-                                  queryset=inline.queryset(request))
-                formsets.append(formset)
-
-        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
-            self.get_prepopulated_fields(request),
-            self.get_readonly_fields(request),
-            model_admin=self)
-        media = self.media + adminForm.media
-
-        inline_admin_formsets = []
-        for inline, formset in zip(inline_instances, formsets):
-            fieldsets = list(inline.get_fieldsets(request))
-            readonly = list(inline.get_readonly_fields(request))
-            prepopulated = dict(inline.get_prepopulated_fields(request))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
-            media = media + inline_admin_formset.media
-
-        context = {
-            'title': _('Add %s') % force_text(opts.verbose_name),
-            'adminform': adminForm,
-            'is_popup': "_popup" in request.REQUEST,
-            'media': media,
-            'inline_admin_formsets': inline_admin_formsets,
-            'errors': helpers.AdminErrorList(form, formsets),
-            'app_label': opts.app_label,
-        }
-        context.update(extra_context or {})
-        return self.render_change_form(request, context, form_url=form_url, add=True)
-
-    @csrf_protect_m
-    @transaction.commit_on_success
     def change_view(self, request, object_id, form_url='', extra_context=None):
         "The 'change' admin view for this model."
         model = self.model
@@ -1022,9 +985,10 @@ class ModelAdmin(BaseModelAdmin):
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_text(opts.verbose_name), 'key': escape(object_id)})
 
         if request.method == 'POST' and "_saveasnew" in request.POST:
-            return self.add_view(request, form_url=reverse('admin:%s_%s_add' %
-                                    (opts.app_label, opts.module_name),
-                                    current_app=self.admin_site.name))
+            return list_tools.AddItem()(self, request,
+                    form_url=reverse('admin:%s_%s_add' %
+                                (opts.app_label, opts.module_name),
+                                current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
         formsets = []
@@ -1117,6 +1081,9 @@ class ModelAdmin(BaseModelAdmin):
         if actions:
             # Add the action checkboxes if there are any actions available.
             list_display = ['action_checkbox'] +  list(list_display)
+
+        # Only give the view the bits it needs
+        list_tools = [t[1:4] for t in self.get_list_tools(request).values()]
 
         ChangeList = self.get_changelist(request)
         try:
@@ -1234,6 +1201,7 @@ class ModelAdmin(BaseModelAdmin):
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
+            'object_tools': list_tools,
             'media': media,
             'has_add_permission': self.has_add_permission(request),
             'app_label': app_label,
