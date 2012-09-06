@@ -11,6 +11,7 @@ from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test.utils import override_settings
+from django.utils.encoding import force_bytes
 
 def test_processor(request):
     return {'processors': 'yes'}
@@ -31,12 +32,12 @@ class SimpleTemplateResponseTest(TestCase):
     def test_template_resolving(self):
         response = SimpleTemplateResponse('first/test.html')
         response.render()
-        self.assertEqual(response.content, b'First template\n')
+        self.assertEqual(response.content, b'First template' + force_bytes(os.linesep))
 
         templates = ['foo.html', 'second/test.html', 'first/test.html']
         response = SimpleTemplateResponse(templates)
         response.render()
-        self.assertEqual(response.content, b'Second template\n')
+        self.assertEqual(response.content, b'Second template' + force_bytes(os.linesep))
 
         response = self._response()
         response.render()
@@ -142,7 +143,7 @@ class SimpleTemplateResponseTest(TestCase):
 
         # When the content is rendered, all the callbacks are invoked, too.
         response.render()
-        self.assertEqual(response.content, b'First template\n')
+        self.assertEqual(response.content, b'First template' + force_bytes(os.linesep))
         self.assertEqual(post, ['post1','post2'])
 
 
