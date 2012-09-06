@@ -76,8 +76,16 @@ POST to your Web site and have another logged in user unwittingly submit that
 form. The malicious user would have to know the nonce, which is user specific
 (using a cookie).
 
+When deployed with :ref:`HTTPS <security-recommendation-ssl>`, 
+``CsrfViewMiddleware`` will check that the HTTP referer header is set to a 
+URL on the same origin (including subdomain and port). Because HTTPS
+provides additional security, it is imperative to ensure connections use HTTPS
+where it is available by forwarding insecure connection requests and using
+HSTS for supported browsers.
+
 Be very careful with marking views with the ``csrf_exempt`` decorator unless
 it is absolutely necessary.
+
 
 SQL injection protection
 ========================
@@ -111,6 +119,8 @@ or to configure the exact header value sent.
 The middleware is strongly recommended for any site that does not need to have
 its pages wrapped in a frame by third party sites, or only needs to allow that
 for a small section of the site.
+
+.. _security-recommendation-ssl:
 
 SSL/HTTPS
 =========
@@ -155,7 +165,7 @@ server, there are some additional steps you may need:
   the added security of SSL provided one successful connection has occurred.
   HSTS is usually configured on the web server.
 
-.. _additional-security-topics:
+.. _host-headers-virtual-hosting:
 
 Host headers and virtual hosting
 ================================
@@ -174,6 +184,8 @@ recommend you ensure your Web server is configured such that:
 
 Additionally, as of 1.3.1, Django requires you to explicitly enable support for
 the ``X-Forwarded-Host`` header if your configuration requires it.
+
+.. _additional-security-topics:
 
 Additional security topics
 ==========================
