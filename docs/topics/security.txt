@@ -176,11 +176,11 @@ Site Scripting attacks, they can be used for Cross-Site Request
 Forgery and cache poisoning attacks in some circumstances. We
 recommend you ensure your Web server is configured such that:
 
-    * It always validates incoming HTTP ``Host`` headers against the expected
-      host name.
-    * Disallows requests with no ``Host`` header.
-    * Is *not* configured with a catch-all virtual host that forwards requests
-      to a Django application.
+* It always validates incoming HTTP ``Host`` headers against the expected
+  host name.
+* Disallows requests with no ``Host`` header.
+* Is *not* configured with a catch-all virtual host that forwards requests
+  to a Django application.
 
 Additionally, as of 1.3.1, Django requires you to explicitly enable support for
 the ``X-Forwarded-Host`` header if your configuration requires it.
