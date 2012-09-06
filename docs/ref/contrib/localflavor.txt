@@ -1046,6 +1046,11 @@ Russia (``ru``)
     Russian Postal code field. The valid format is XXXXXX, where X is any
     digit and the first digit is not zero.
 
+.. class:: ru.forms.RUPhoneNumberField
+
+    Russian phone number field, supports internal numbers beginning with ``8``
+    and international numbers with ``+7``, maximum number length is 11 digits.
+
 .. class:: ru.forms.RUCountySelect
 
     A ``Select`` widget that uses a list of Russian Counties as its choices.

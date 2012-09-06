@@ -7,6 +7,19 @@ from django.test import SimpleTestCase
 
 class RULocalFlavorTests(SimpleTestCase):
 
+    def test_RUPhoneNumberField(self):
+        valid = {
+            '8-3435-123-456': '8-3435-123-456',
+            '+7-3435-123-456': '+7-3435-123-456',
+            '8-2345678901': '8-2345678901',
+        }
+        invalid = {
+            '123-456': ['Phone numbers must be in russian format.'],
+            '8-23456789012': ['Phone numbers must contain exactly 11 digits.'],
+            '1-435487-13-47': ['Phone numbers must be in russian format.']
+        }
+        self.assertFieldOutput(RUPhoneNumberField, valid, invalid)
+
     def test_RUPassportNumberField(self):
         error = ['Enter a passport number in the format XXXX XXXXXX.']
         valid = {
