@@ -147,6 +147,14 @@ server, there are some additional steps you may need:
   any POST data being accepted over HTTP (which will be fine if you are
   redirecting all HTTP traffic to HTTPS).
 
+* Use HTTP Strict Transport Security (HSTS)
+
+  HSTS is an HTTP header that informs a browser that all future connections
+  to a particular site should always use HTTPS. Combined with redirecting
+  requests over HTTP to HTTPS, this will ensure that connections always enjoy
+  the added security of SSL provided one successful connection has occurred.
+  HSTS is usually configured on the web server.
+
 .. _additional-security-topics:
 
 Host headers and virtual hosting
