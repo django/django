@@ -114,39 +114,6 @@ float-right
 clear
     clears all
 
-Object Tools
-============
-
-Certain actions which apply directly to an object are used in form and
-changelist pages. These appear in a "toolbar" row above the form or changelist,
-to the right of the page. The tools are wrapped in a ``ul`` with the class
-``object-tools``. There are two custom tool types which can be defined with an
-additional class on the ``a`` for that tool. These are ``.addlink`` and
-``.viewsitelink``.
-
-Example from a changelist page:
-
-.. code-block:: html+django
-
-    <ul class="object-tools">
-      <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
-    </ul>
-
-.. image:: _images/objecttools_01.png
-   :alt: Object tools on a changelist page
-
-and from a form page:
-
-.. code-block:: html+django
-
-    <ul class="object-tools">
-     <li><a href="/history/303/152383/">History</a></li>
-     <li><a href="/r/303/152383/" class="viewsitelink">View on site</a></li>
-    </ul>
-
-.. image:: _images/objecttools_02.png
-   :alt: Object tools on a form page
-
 Form Styles
 ===========
 

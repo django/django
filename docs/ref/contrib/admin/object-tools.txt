@@ -1,0 +1,29 @@
+============
+Object Tools
+============
+
+.. currentmodule:: django.contrib.admin
+
+Certain actions apply directly to a model but not individual models or
+collections of models. These appear in a "toolbar" row above the form or
+changelist, to the right of the page. These buttons are called object tools.
+
+Example from a changelist page:
+
+.. image:: _images/objecttools_01.png
+   :alt: Object tools on a changelist page
+
+and from a form page:
+
+.. image:: _images/objecttools_02.png
+   :alt: Object tools on a form page
+
+In the change list object tools are very similar to :doc:`Admin actions
+<actions>` but are intended to be used for creation of objects or manipulations
+that don't require individual model objects or querysets.
+
+Writing object tools
+====================
+Object tools are just Django views that get automatically added to the admin
+routes for a model. One common use case for an object tool is the add model
+button.
