@@ -7,6 +7,15 @@ from django.test import SimpleTestCase
 
 class RULocalFlavorTests(SimpleTestCase):
 
+    '''
+    Checks if the phone regex works properly on multi-digit city codes
+    '''
+    def test_PhoneDigitsRE(self):
+        self.assertTrue(phone_digits_re.match('8-3435-123-456'))
+        self.assertTrue(phone_digits_re.match('8-812-4123-456'))
+        self.assertTrue(phone_digits_re.match('8-343-123-4567'))
+        self.assertFalse(phone_digits_re.match('8-343578-13-47'))
+
     def test_RUPassportNumberField(self):
         error = ['Enter a passport number in the format XXXX XXXXXX.']
         valid = {
