@@ -372,7 +372,7 @@ class ModelAdmin(BaseModelAdmin):
         def wrap(view):
             def wrapper(*args, **kwargs):
                 return view(self, *args, **kwargs)
-            return wrapper
+            return self.admin_site.admin_view(wrapper)
 
         info = self.model._meta.app_label, self.model._meta.module_name
 
