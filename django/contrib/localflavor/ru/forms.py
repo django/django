@@ -6,11 +6,12 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 from django.contrib.localflavor.ru.ru_regions import RU_COUNTY_CHOICES, RU_REGIONS_CHOICES
+from django.forms import ValidationError
 from django.forms.fields import RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 
 
-phone_digits_re = re.compile(r'^(?:[78]-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
+phone_digits_re = re.compile(r'^(?:\+7|8-)([\d-]+)$')
 
 class RUCountySelect(Select):
     """
@@ -65,3 +66,25 @@ class RUAlienPassportNumberField(RegexField):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUAlienPassportNumberField, self).__init__(r'^\d{2} \d{7}$',
             max_length, min_length, *args, **kwargs)
+
+
+class RUPhoneNumberField(RegexField):
+    """
+    Russian phone number field
+    Contains max 11 digits
+    Dash-separated, can start with 8 or +7
+    """
+    default_error_messages = {
+        'invalid': _('Phone numbers must be in russian format.'),
+        'invalid_length': _('Phone numbers must contain exactly 11 digits.'),
+    }
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        super(RUPhoneNumberField, self).__init__(phone_digits_re,
+            max_length, min_length, *args, **kwargs)
+
+    def clean(self, value):
+        value = super(RUPhoneNumberField, self).clean(value)
+        digits = re.sub('[^\d]', '', value)
+        if len(digits) > 11:
+            raise ValidationError(self.error_messages['invalid_length'])
+        return value
