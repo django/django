@@ -531,9 +531,6 @@ class Client(RequestFactory):
         else:
             request.session = engine.SessionStore()
         logout(request)
-        session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_cookie:
-            engine.SessionStore().delete(session_key=session_cookie.value)
         
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
