@@ -83,9 +83,10 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.get_latest_by
 
-    The name of a :class:`DateField` or :class:`DateTimeField` in the model.
-    This specifies the default field to use in your model :class:`Manager`'s
-    :class:`~QuerySet.latest` method.
+    The name of an orderable field in the model, typically a :class:`DateField`,
+    :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
+    field to use in your model :class:`Manager`'s :class:`~QuerySet.latest`
+    method.
 
     Example::
 
