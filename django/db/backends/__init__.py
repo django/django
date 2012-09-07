@@ -432,6 +432,9 @@ class BaseDatabaseFeatures(object):
     # What's the maximum length for index names?
     max_index_name_length = 63
 
+    # Does it support foreign keys?
+    supports_foreign_keys = True
+
     def __init__(self, connection):
         self.connection = connection
 

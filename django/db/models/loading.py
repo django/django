@@ -265,6 +265,10 @@ class AppCache(object):
         self.app_models = state['app_models']
         self.app_errors = state['app_errors']
 
+    def temporary_state(self):
+        "Returns a context manager that restores the state on exit"
+        return StateContextManager(self)
+
     def unregister_all(self):
         """
         Wipes the AppCache clean of all registered models.
@@ -274,6 +278,23 @@ class AppCache(object):
         self.app_labels = {}
         self.app_models = SortedDict()
         self.app_errors = {}
+
+
+class StateContextManager(object):
+    """
+    Context manager for locking cache state.
+    Useful for making temporary models you don't want to stay in the cache.
+    """
+
+    def __init__(self, cache):
+        self.cache = cache
+
+    def __enter__(self):
+        self.state = self.cache.save_state()
+
+    def __exit__(self, type, value, traceback):
+        self.cache.restore_state(self.state)
+
 
 cache = AppCache()
 

@@ -96,6 +96,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
+    supports_foreign_keys = False
 
     @cached_property
     def supports_stddev(self):

@@ -29,6 +29,17 @@ class Book(models.Model):
         managed = False
 
 
+class BookWithSlug(models.Model):
+    author = models.ForeignKey(Author)
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+    slug = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        managed = False
+        db_table = "schema_book"
+
+
 class Tag(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)

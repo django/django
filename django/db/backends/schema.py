@@ -187,7 +187,7 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
             # FK
-            if field.rel:
+            if field.rel and self.connection.features.supports_foreign_keys:
                 to_table = field.rel.to._meta.db_table
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
                 self.deferred_sql.append(
@@ -311,7 +311,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             }
         # Add any FK constraints later
-        if field.rel:
+        if field.rel and self.connection.features.supports_foreign_keys:
             to_table = field.rel.to._meta.db_table
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(

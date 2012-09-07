@@ -154,7 +154,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if len(info) != 1:
                 continue
             name = info[0][2] # seqno, cid, name
-            indexes[name] = {'primary_key': False,
+            indexes[name] = {'primary_key': indexes.get(name, {}).get("primary_key", False),
                              'unique': unique}
         return indexes
 
@@ -182,3 +182,37 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                  'null_ok': not field[3],
                  'pk': field[5]     # undocumented
                  } for field in cursor.fetchall()]
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        """
+        constraints = {}
+        # Get the index info
+        cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
+        for number, index, unique in cursor.fetchall():
+            # Get the index info for that index
+            cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
+            for index_rank, column_rank, column in cursor.fetchall():
+                if index not in constraints:
+                    constraints[index] = {
+                        "columns": set(),
+                        "primary_key": False,
+                        "unique": bool(unique),
+                        "foreign_key": False,
+                        "check": False,
+                        "index": True,
+                    }
+                constraints[index]['columns'].add(column)
+        # Get the PK
+        pk_column = self.get_primary_key_column(cursor, table_name)
+        if pk_column:
+            constraints["__primary__"] = {
+                "columns": set([pk_column]),
+                "primary_key": True,
+                "unique": False,  # It's not actually a unique constraint
+                "foreign_key": False,
+                "check": False,
+                "index": False,
+            }
+        return constraints

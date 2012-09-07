@@ -2,11 +2,12 @@ from __future__ import absolute_import
 import copy
 import datetime
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.loading import cache
-from .models import Author, Book, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
+from .models import Author, Book, BookWithSlug, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TestCase):
@@ -18,7 +19,7 @@ class SchemaTests(TestCase):
     as the code it is testing.
     """
 
-    models = [Author, Book, AuthorWithM2M, Tag, UniqueTest]
+    models = [Author, Book, BookWithSlug, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest]
 
     # Utility functions
 
@@ -70,13 +71,21 @@ class SchemaTests(TestCase):
 
     def column_classes(self, model):
         cursor = connection.cursor()
-        return dict(
+        columns = dict(
             (d[0], (connection.introspection.get_field_type(d[1], d), d))
             for d in connection.introspection.get_table_description(
                 cursor,
                 model._meta.db_table,
             )
         )
+        # SQLite has a different format for field_type
+        for name, (type, desc) in columns.items():
+            if isinstance(type, tuple):
+                columns[name] = (type[0], desc)
+        # SQLite also doesn't error properly
+        if not columns:
+            raise DatabaseError("Table does not exist (empty pragma)")
+        return columns
 
     # Tests
 
@@ -104,6 +113,7 @@ class SchemaTests(TestCase):
             lambda: list(Author.objects.all()),
         )
 
+    @skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_creation_fk(self):
         "Tests that creating tables out of FK order works"
         # Create the table
@@ -449,13 +459,11 @@ class SchemaTests(TestCase):
             connection.introspection.get_indexes(connection.cursor(), Book._meta.db_table),
         )
         # Add a unique column, verify that creates an implicit index
-        new_field = CharField(max_length=20, unique=True)
-        new_field.set_attributes_from_name("slug")
         editor = connection.schema_editor()
         editor.start()
         editor.create_field(
             Book,
-            new_field,
+            BookWithSlug._meta.get_field_by_name("slug")[0],
         )
         editor.commit()
         self.assertIn(
@@ -468,8 +476,8 @@ class SchemaTests(TestCase):
         editor = connection.schema_editor()
         editor.start()
         editor.alter_field(
-            Book,
-            new_field,
+            BookWithSlug,
+            BookWithSlug._meta.get_field_by_name("slug")[0],
             new_field2,
             strict = True,
         )
