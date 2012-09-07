@@ -51,6 +51,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
+from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils import timezone
@@ -571,6 +572,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+    
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
 
 
 class OracleParam(object):
