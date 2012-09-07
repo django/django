@@ -400,5 +400,12 @@ The version of six bundled with Django includes one extra function:
     2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
     Python 3.
 
+.. function:: assertRaisesRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
+    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
+    exists in current Python3 versions, but issues a warning.
+
+
 In addition to six' defaults moves, Django's version provides ``thread`` as
 ``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
