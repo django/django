@@ -9,16 +9,20 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils.six import StringIO
 
 
 class GetDefaultUsernameTestCase(TestCase):
 
     def setUp(self):
-        self._getpass_getuser = management.get_system_username
+        self.old_get_system_username = management.get_system_username
 
     def tearDown(self):
-        management.get_system_username = self._getpass_getuser
+        management.get_system_username = self.old_get_system_username
+
+    def test_actual_implementation(self):
+        self.assertIsInstance(management.get_system_username(), six.text_type)
 
     def test_simple(self):
         management.get_system_username = lambda: 'joe'

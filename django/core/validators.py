@@ -8,7 +8,7 @@ except ImportError:     # Python 2
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils import six
 
@@ -37,7 +37,7 @@ class RegexValidator(object):
         """
         Validates that the input matches the regular expression.
         """
-        if not self.regex.search(smart_text(value)):
+        if not self.regex.search(force_text(value)):
             raise ValidationError(self.message, code=self.code)
 
 
@@ -57,7 +57,7 @@ class URLValidator(RegexValidator):
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                value = smart_text(value)
+                value = force_text(value)
                 scheme, netloc, path, query, fragment = urlsplit(value)
                 try:
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE

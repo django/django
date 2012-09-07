@@ -609,7 +609,7 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        from django.utils.encoding import smart_text, force_text
+        from django.utils.encoding import force_text
 
         # Convert params to contain Unicode values.
         to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
@@ -618,7 +618,7 @@ class BaseDatabaseOperations(object):
         else:
             u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
 
-        return smart_text(sql) % u_params
+        return force_text(sql) % u_params
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -802,8 +802,8 @@ class BaseDatabaseOperations(object):
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        from django.utils.encoding import smart_text
-        return smart_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        from django.utils.encoding import force_text
+        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.

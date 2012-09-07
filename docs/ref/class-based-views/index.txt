@@ -13,6 +13,7 @@ Class-based views API reference. For introductory material, see
    generic-editing
    generic-date-based
    mixins
+   flattened-index
 
 Specification
 -------------

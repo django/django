@@ -89,6 +89,11 @@ class IntrospectionTests(six.with_metaclass(IgnoreNotimplementedError, TestCase)
             [datatype(r[1], r) for r in desc],
             ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
         )
+        # Check also length of CharFields
+        self.assertEqual(
+            [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
+            [30, 30, 75]
+        )
 
     # Oracle forces null=True under the hood in some cases (see
     # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)

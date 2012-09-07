@@ -6,7 +6,17 @@ import timeit
 import hashlib
 
 from django.utils import unittest
-from django.utils.crypto import pbkdf2
+from django.utils.crypto import constant_time_compare, pbkdf2
+
+
+class TestUtilsCryptoMisc(unittest.TestCase):
+
+    def test_constant_time_compare(self):
+        # It's hard to test for constant time, just test the result.
+        self.assertTrue(constant_time_compare(b'spam', b'spam'))
+        self.assertFalse(constant_time_compare(b'spam', b'eggs'))
+        self.assertTrue(constant_time_compare('spam', 'spam'))
+        self.assertFalse(constant_time_compare('spam', 'eggs'))
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
@@ -134,21 +144,3 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
             result = pbkdf2(**vector['args'])
             self.assertEqual(binascii.hexlify(result).decode('ascii'),
                              vector['result'])
-
-    def test_performance_scalability(self):
-        """
-        Theory: If you run with 100 iterations, it should take 100
-        times as long as running with 1 iteration.
-        """
-        # These values are chosen as a reasonable tradeoff between time
-        # to run the test suite and false positives caused by imprecise
-        # measurement.
-        n1, n2 = 200000, 800000
-        elapsed = lambda f: timeit.Timer(f,
-                    'from django.utils.crypto import pbkdf2').timeit(number=1)
-        t1 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n1)
-        t2 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n2)
-        measured_scale_exponent = math.log(t2 / t1, n2 / n1)
-        # This should be less than 1. We allow up to 1.2 so that tests don't
-        # fail nondeterministically too often.
-        self.assertLess(measured_scale_exponent, 1.2)

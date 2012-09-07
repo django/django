@@ -808,13 +808,13 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-cn')
 
-    def test_get_language_from_path(self):
+    def test_get_language_from_path_real(self):
         from django.utils.translation.trans_real import get_language_from_path as g
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertEqual(g('/xyz/'), None)
 
-    def test_get_language_from_path(self):
+    def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
         self.assertEqual(g('/pl/'), None)
         self.assertEqual(g('/pl'), None)

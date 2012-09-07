@@ -192,7 +192,7 @@ compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), smart_bytes(key)])
+        return ':'.join([key_prefix, str(version), key])
 
 You may use any key function you want, as long as it has the same
 argument signature.
@@ -1375,8 +1375,8 @@ MEDIA_ROOT
 
 Default: ``''`` (Empty string)
 
-Absolute path to the directory that holds media for this installation, used
-for :doc:`managing stored files </topics/files>`.
+Absolute filesystem path to the directory that will hold :doc:`user-uploaded
+files </topics/files>`.
 
 Example: ``"/var/www/example.com/media/"``
 

@@ -587,7 +587,7 @@ gettext domain):
   ones listed later.
 
 * The ``locale`` subdirectory of the directory containing the settings, that
-  usually coincides with and is know as the *project directory* is being
+  usually coincides with and is known as the *project directory* is being
   deprecated in this release as a source of translations. (the precedence of
   these translations is intermediate between applications and :setting:`LOCALE_PATHS`
   translations). See the `corresponding deprecated features section`_

@@ -10,8 +10,6 @@ import decimal
 import sys
 import warnings
 
-from django.utils import six
-
 def _setup_environment(environ):
     import platform
     # Cygwin requires some special voodoo to set the environment variables
@@ -53,7 +51,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.utils.encoding import smart_bytes, force_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils import timezone
 
@@ -66,7 +64,7 @@ IntegrityError = Database.IntegrityError
 if int(Database.version.split('.', 1)[0]) >= 5 and not hasattr(Database, 'UNICODE'):
     convert_unicode = force_text
 else:
-    convert_unicode = smart_bytes
+    convert_unicode = force_bytes
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -604,9 +602,9 @@ class OracleParam(object):
         elif param is False:
             param = "0"
         if hasattr(param, 'bind_parameter'):
-            self.smart_bytes = param.bind_parameter(cursor)
+            self.force_bytes = param.bind_parameter(cursor)
         else:
-            self.smart_bytes = convert_unicode(param, cursor.charset,
+            self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
@@ -685,7 +683,7 @@ class FormatStylePlaceholderCursor(object):
         self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
-        return [p.smart_bytes for p in params]
+        return [p.force_bytes for p in params]
 
     def execute(self, query, params=None):
         if params is None:

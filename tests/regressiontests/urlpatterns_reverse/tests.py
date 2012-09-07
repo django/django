@@ -6,7 +6,7 @@ from __future__ import absolute_import, unicode_literals
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (reverse, resolve, get_callable,
-    NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
+    get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
@@ -172,6 +172,16 @@ class URLPatternReverse(TestCase):
         self.assertRaises(NoReverseMatch, reverse, None)
 
 class ResolverTests(unittest.TestCase):
+    def test_resolver_repr(self):
+        """
+        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        (#17892).
+        """
+        # Pick a resolver from a namespaced urlconf
+        resolver = get_resolver('regressiontests.urlpatterns_reverse.namespace_urls')
+        sub_resolver = resolver.namespace_dict['test-ns1'][1]
+        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+
     def test_non_regex(self):
         """
         Verifies that we raise a Resolver404 if what we are resolving doesn't

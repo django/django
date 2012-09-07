@@ -235,14 +235,14 @@ refinements together. For example::
     ... ).exclude(
     ...     pub_date__gte=datetime.now()
     ... ).filter(
-    ...     pub_date__gte=datetime(2005, 1, 1)
+    ...     pub_date__gte=datetime(2005, 1, 30)
     ... )
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
 in the database, adds a filter, then an exclusion, then another filter. The
 final result is a :class:`~django.db.models.query.QuerySet` containing all
 entries with a headline that starts with "What", that were published between
-January 1, 2005, and the current day.
+January 30, 2005, and the current day.
 
 .. _filtered-querysets-are-unique:
 
@@ -900,10 +900,10 @@ possible to easily create new instance with all fields' values copied. In the
 simplest case, you can just set ``pk`` to ``None``. Using our blog example::
 
     blog = Blog(name='My blog', tagline='Blogging is easy')
-    blog.save() # post.pk == 1
+    blog.save() # blog.pk == 1
 
     blog.pk = None
-    blog.save() # post.pk == 2
+    blog.save() # blog.pk == 2
 
 Things get more complicated if you use inheritance. Consider a subclass of
 ``Blog``::

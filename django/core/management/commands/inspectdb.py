@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 import keyword
+import re
 from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
@@ -31,6 +34,7 @@ class Command(NoArgsCommand):
         table_name_filter = options.get('table_name_filter')
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
+        strip_prefix = lambda s: s.startswith("u'") and s[1:] or s
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
@@ -41,6 +45,7 @@ class Command(NoArgsCommand):
         yield "#"
         yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"
         yield "# into your database."
+        yield "from __future__ import unicode_literals"
         yield ''
         yield 'from %s import models' % self.db_module
         yield ''
@@ -59,16 +64,19 @@ class Command(NoArgsCommand):
                 indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
+            used_column_names = [] # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
-                column_name = row[0]
-                att_name = column_name.lower()
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
                 extra_params = {}  # Holds Field parameters such as 'db_column'.
+                column_name = row[0]
+                is_relation = i in relations
 
-                # If the column name can't be used verbatim as a Python
-                # attribute, set the "db_column" for this Field.
-                if ' ' in att_name or '-' in att_name or keyword.iskeyword(att_name) or column_name != att_name:
-                    extra_params['db_column'] = column_name
+                att_name, params, notes = self.normalize_col_name(
+                    column_name, used_column_names, is_relation)
+                extra_params.update(params)
+                comment_notes.extend(notes)
+
+                used_column_names.append(att_name)
 
                 # Add primary_key and unique, if necessary.
                 if column_name in indexes:
@@ -77,30 +85,12 @@ class Command(NoArgsCommand):
                     elif indexes[column_name]['unique']:
                         extra_params['unique'] = True
 
-                # Modify the field name to make it Python-compatible.
-                if ' ' in att_name:
-                    att_name = att_name.replace(' ', '_')
-                    comment_notes.append('Field renamed to remove spaces.')
-
-                if '-' in att_name:
-                    att_name = att_name.replace('-', '_')
-                    comment_notes.append('Field renamed to remove dashes.')
-
-                if column_name != att_name:
-                    comment_notes.append('Field name made lowercase.')
-
-                if i in relations:
+                if is_relation:
                     rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
-
                     if rel_to in known_models:
                         field_type = 'ForeignKey(%s' % rel_to
                     else:
                         field_type = "ForeignKey('%s'" % rel_to
-
-                    if att_name.endswith('_id'):
-                        att_name = att_name[:-3]
-                    else:
-                        extra_params['db_column'] = column_name
                 else:
                     # Calling `get_field_type` to get the field type string and any
                     # additional paramters and notes.
@@ -109,16 +99,6 @@ class Command(NoArgsCommand):
                     comment_notes.extend(field_notes)
 
                     field_type += '('
-
-                if keyword.iskeyword(att_name):
-                    att_name += '_field'
-                    comment_notes.append('Field renamed because it was a Python reserved word.')
-
-                if att_name[0].isdigit():
-                    att_name = 'number_%s' % att_name
-                    extra_params['db_column'] = six.text_type(column_name)
-                    comment_notes.append("Field renamed because it wasn't a "
-                        "valid Python identifier.")
 
                 # Don't output 'id = meta.AutoField(primary_key=True)', because
                 # that's assumed if it doesn't exist.
@@ -136,13 +116,71 @@ class Command(NoArgsCommand):
                 if extra_params:
                     if not field_desc.endswith('('):
                         field_desc += ', '
-                    field_desc += ', '.join(['%s=%r' % (k, v) for k, v in extra_params.items()])
+                    field_desc += ', '.join([
+                        '%s=%s' % (k, strip_prefix(repr(v)))
+                        for k, v in extra_params.items()])
                 field_desc += ')'
                 if comment_notes:
                     field_desc += ' # ' + ' '.join(comment_notes)
                 yield '    %s' % field_desc
             for meta_line in self.get_meta(table_name):
                 yield meta_line
+
+    def normalize_col_name(self, col_name, used_column_names, is_relation):
+        """
+        Modify the column name to make it Python-compatible as a field name
+        """
+        field_params = {}
+        field_notes = []
+
+        new_name = col_name.lower()
+        if new_name != col_name:
+            field_notes.append('Field name made lowercase.')
+
+        if is_relation:
+            if new_name.endswith('_id'):
+                new_name = new_name[:-3]
+            else:
+                field_params['db_column'] = col_name
+
+        new_name, num_repl = re.subn(r'\W', '_', new_name)
+        if num_repl > 0:
+            field_notes.append('Field renamed to remove unsuitable characters.')
+
+        if new_name.find('__') >= 0:
+            while new_name.find('__') >= 0:
+                new_name = new_name.replace('__', '_')
+            if col_name.lower().find('__') >= 0:
+                # Only add the comment if the double underscore was in the original name
+                field_notes.append("Field renamed because it contained more than one '_' in a row.")
+
+        if new_name.startswith('_'):
+            new_name = 'field%s' % new_name
+            field_notes.append("Field renamed because it started with '_'.")
+
+        if new_name.endswith('_'):
+            new_name = '%sfield' % new_name
+            field_notes.append("Field renamed because it ended with '_'.")
+
+        if keyword.iskeyword(new_name):
+            new_name += '_field'
+            field_notes.append('Field renamed because it was a Python reserved word.')
+
+        if new_name[0].isdigit():
+            new_name = 'number_%s' % new_name
+            field_notes.append("Field renamed because it wasn't a valid Python identifier.")
+
+        if new_name in used_column_names:
+            num = 0
+            while '%s_%d' % (new_name, num) in used_column_names:
+                num += 1
+            new_name = '%s_%d' % (new_name, num)
+            field_notes.append('Field renamed because of name conflict.')
+
+        if col_name != new_name and field_notes:
+            field_params['db_column'] = col_name
+
+        return new_name, field_params, field_notes
 
     def get_field_type(self, connection, table_name, row):
         """
@@ -181,6 +219,6 @@ class Command(NoArgsCommand):
         to construct the inner Meta class for the model corresponding
         to the given database table name.
         """
-        return ['    class Meta:',
-                '        db_table = %r' % table_name,
-                '']
+        return ["    class Meta:",
+                "        db_table = '%s'" % table_name,
+                ""]
