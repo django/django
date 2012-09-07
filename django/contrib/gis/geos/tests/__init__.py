@@ -4,13 +4,14 @@ GEOS Testing module.
 from __future__ import absolute_import
 
 from django.utils.unittest import TestSuite, TextTestRunner
-from . import test_geos, test_io, test_geos_mutation, test_mutable_list
+from . import test_geos, test_io, test_geos_mutation, test_mutable_list, test_linestring
 
 test_suites = [
     test_geos.suite(),
     test_io.suite(),
     test_geos_mutation.suite(),
     test_mutable_list.suite(),
+    test_linestring.suite(),
     ]
 
 def suite():
