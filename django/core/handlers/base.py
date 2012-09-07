@@ -153,8 +153,13 @@ class BaseHandler(object):
                         callback, param_dict = resolver.resolve404()
                         response = callback(request, **param_dict)
                     except:
-                        signals.got_request_exception.send(sender=self.__class__, request=request)
-                        response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                        exc_info = sys.exc_info() # See ticket #18925 for why this is localized
+                        signals.got_request_exception.send(
+                                sender=self.__class__, request=request,
+                                exc_info=exc_info)
+                        response = self.handle_uncaught_exception(request,
+                                resolver, exc_info)
+                        del exc_info
             except exceptions.PermissionDenied:
                 logger.warning(
                     'Forbidden (Permission denied): %s', request.path,
@@ -166,17 +171,24 @@ class BaseHandler(object):
                     callback, param_dict = resolver.resolve403()
                     response = callback(request, **param_dict)
                 except:
+                    exc_info = sys.exc_info() # See ticket #18925 for why this is localized
                     signals.got_request_exception.send(
-                            sender=self.__class__, request=request)
+                            sender=self.__class__, request=request,
+                            exc_info=exc_info)
                     response = self.handle_uncaught_exception(request,
-                            resolver, sys.exc_info())
+                            resolver, exc_info)
+                    del exc_info
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
                 raise
             except: # Handle everything else, including SuspiciousOperation, etc.
                 # Get the exception info now, in case another exception is thrown later.
-                signals.got_request_exception.send(sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                exc_info = sys.exc_info() # See ticket #18925 for why this is localized
+                signals.got_request_exception.send(
+                    sender=self.__class__, request=request,
+                    exc_info=exc_info)
+                response = self.handle_uncaught_exception(request, resolver, exc_info)
+                del exc_info
         finally:
             # Reset URLconf for this thread on the way out for complete
             # isolation of request.urlconf
@@ -188,8 +200,12 @@ class BaseHandler(object):
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            exc_info = sys.exc_info() # See ticket #18925 for why this is localized
+            signals.got_request_exception.send(
+                sender=self.__class__, request=request,
+                exc_info=exc_info)
+            response = self.handle_uncaught_exception(request, resolver, exc_info)
+            del exc_info
 
         return response
 
