@@ -334,14 +334,21 @@ class FormattingTests(TestCase):
         Localization of numbers
         """
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
-            self.assertEqual('66666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-            self.assertEqual('66666A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
-            self.assertEqual('66666', nformat(self.n, decimal_sep='X', decimal_pos=0, grouping=1, thousand_sep='Y'))
+            self.assertEqual(u'66666.67', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+            self.assertEqual(u'66666A7', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+            self.assertEqual('66667', nformat(self.n, decimal_sep='X', decimal_pos=0, grouping=1, thousand_sep='Y'))
+
+            # ticket #14317
+            self.assertEqual(u'0,00', nformat(0.000000001, decimal_sep=',', decimal_pos=2))
+            self.assertEqual(u'0,00', nformat(0.00000000000099, decimal_sep=',', decimal_pos=2))
+            self.assertEqual(u'0,00', nformat(decimal.Decimal(1e-37), decimal_sep=',', decimal_pos=2))
+            self.assertEqual(u'0,67', nformat(0.666, decimal_sep=',', decimal_pos=2))
+            self.assertEqual(u'0,67', nformat('0.666', decimal_sep=',', decimal_pos=2))
 
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
-            self.assertEqual('66,666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-            self.assertEqual('6B6B6B6B6A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
-            self.assertEqual('-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
+            self.assertEqual('66,666.67', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+            self.assertEqual('6B6B6B6B6A7', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+            self.assertEqual('-66666.7', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
             self.assertEqual('-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
             self.assertEqual('10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
             # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
