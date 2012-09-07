@@ -617,7 +617,7 @@ class TestServeDisabled(TestServeStatic):
         settings.DEBUG = False
 
     def test_disabled_serving(self):
-        self.assertRaisesRegexp(ImproperlyConfigured, 'The staticfiles view '
+        six.assertRaisesRegex(self, ImproperlyConfigured, 'The staticfiles view '
             'can only be used in debug mode ', self._response, 'test.txt')
 
 
