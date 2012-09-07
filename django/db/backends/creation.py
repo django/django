@@ -4,6 +4,7 @@ import time
 
 from django.conf import settings
 from django.db.utils import load_backend
+from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 
 # The prefix to put on the default database name when creating
@@ -30,7 +31,7 @@ class BaseDatabaseCreation(object):
         """
         h = hashlib.md5()
         for arg in args:
-            h.update(arg)
+            h.update(force_bytes(arg))
         return h.hexdigest()[:8]
 
     def sql_create_model(self, model, style, known_models=set()):
