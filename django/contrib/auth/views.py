@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_str
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 from django.shortcuts import resolve_url
