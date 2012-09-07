@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+from django.utils import six
 
 from .models import Article, Publication
 
@@ -52,7 +53,7 @@ class ManyToManyTests(TestCase):
             ])
 
         # Adding an object of the wrong type raises TypeError
-        with self.assertRaisesRegexp(TypeError, "'Publication' instance expected, got <Article.*"):
+        with six.assertRaisesRegex(self, TypeError, "'Publication' instance expected, got <Article.*"):
             a6.publications.add(a5)
         # Add a Publication directly via publications.add by using keyword arguments.
         p4 = a6.publications.create(title='Highlights for Adults')

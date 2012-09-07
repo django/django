@@ -24,7 +24,7 @@ class PoFileTests(MessageCompilationTests):
 
     def test_bom_rejection(self):
         os.chdir(test_dir)
-        with self.assertRaisesRegexp(CommandError,
+        with six.assertRaisesRegex(self, CommandError,
                 "file has a BOM \(Byte Order Mark\)"):
             call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
         self.assertFalse(os.path.exists(self.MO_FILE))

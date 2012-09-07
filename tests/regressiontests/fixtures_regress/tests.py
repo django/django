@@ -13,6 +13,7 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils.six import PY3, StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
@@ -116,7 +117,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Problem installing fixture 'bad_fixture1': "
                 "unkn is not a known serialization format."):
             management.call_command(
@@ -131,7 +132,7 @@ class TestFixtures(TestCase):
         """
         Test that failing serializer import raises the proper error
         """
-        with self.assertRaisesRegexp(ImportError,
+        with six.assertRaisesRegex(self, ImportError,
                 "No module named unexistent.path"):
             management.call_command(
                 'loaddata',
@@ -146,7 +147,7 @@ class TestFixtures(TestCase):
         using explicit filename.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -161,7 +162,7 @@ class TestFixtures(TestCase):
         without file extension.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -175,7 +176,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading a fixture file with no data returns an error.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'empty'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -188,7 +189,7 @@ class TestFixtures(TestCase):
         """
         (Regression for #9011 - error message is correct)
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "^No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)$"):
             management.call_command(
                 'loaddata',
@@ -353,7 +354,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        with self.assertRaisesRegexp(IntegrityError,
+        with six.assertRaisesRegex(self, IntegrityError,
                 "Problem installing fixture"):
             management.call_command(
                 'loaddata',
@@ -385,7 +386,7 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No database fixture specified. Please provide the path of "
                 "at least one fixture in the command line."):
             management.call_command(
