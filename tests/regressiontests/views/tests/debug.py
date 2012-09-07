@@ -6,12 +6,14 @@ import sys
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.signals import got_request_exception
 from django.test import TestCase, RequestFactory
 from django.test.utils import (setup_test_template_loader,
                                restore_template_loaders)
 from django.core.urlresolvers import reverse
 from django.views.debug import ExceptionReporter
 from django.core import mail
+from django.core.handlers.wsgi import WSGIHandler
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
@@ -86,6 +88,21 @@ class DebugViewTests(TestCase):
         template_path = os.path.join('templates', 'i_dont_exist.html')
         self.assertContains(response, template_path, status_code=500)
 
+    def test_exception_preservation(self):
+        "An exception is preserved and reported correctly, even if sys.exc_clear is called."
+        def on_request_exception(sender, request, **kwargs):
+            sys.exc_clear()
+
+        got_request_exception.connect(on_request_exception)
+        try:
+            with self.settings(DEBUG=True):
+                handler = WSGIHandler()
+                environ = RequestFactory().get(reverse('view_exception', args=(1,))).environ
+                response = handler(environ, lambda *a, **k: None)
+                self.assertContains(response, '<h2>Traceback ', status_code=500)
+                self.assertContains(response, 'raise BrokenException(', status_code=500)
+        finally:
+            got_request_exception.disconnect(on_request_exception)
 
 class ExceptionReporterTests(TestCase):
     rf = RequestFactory()
