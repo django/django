@@ -101,11 +101,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Ensure this field is even column-based
         old_type = old_field.db_type(connection=self.connection)
         new_type = self._type_for_alter(new_field)
-        if old_type is None and new_type is None:
-            # TODO: Handle M2M fields being repointed
-            return
+        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
+            return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
-            raise ValueError("Cannot alter field %s into %s - they are not compatible types" % (
+            raise ValueError("Cannot alter field %s into %s - they are not compatible types (probably means only one is an M2M with implicit through model)" % (
                     old_field,
                     new_field,
                 ))
@@ -114,3 +113,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         self._remake_table(model, override_uniques=new_unique_together)
+
+    def _alter_many_to_many(self, model, old_field, new_field, strict):
+        "Alters M2Ms to repoint their to= endpoints."
+        # Make a new through table
+        self.create_model(new_field.rel.through)
+        # Copy the data across
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
+            self.quote_name(new_field.rel.through._meta.db_table),
+            ', '.join([
+                "id",
+                new_field.m2m_column_name(),
+                new_field.m2m_reverse_name(),
+            ]),
+            ', '.join([
+                "id",
+                old_field.m2m_column_name(),
+                old_field.m2m_reverse_name(),
+            ]),
+            self.quote_name(old_field.rel.through._meta.db_table),
+        ))
+        # Delete the old through table
+        self.delete_model(old_field.rel.through, force=True)

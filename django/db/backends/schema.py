@@ -21,7 +21,6 @@ class BaseDatabaseSchemaEditor(object):
     commit() is called.
 
     TODO:
-        - Repointing of M2Ms
         - Check constraints (PosIntField)
     """
 
@@ -154,13 +153,13 @@ class BaseDatabaseSchemaEditor(object):
 
     # Actions
 
-    def create_model(self, model):
+    def create_model(self, model, force=False):
         """
         Takes a model and creates a table for it in the database.
         Will also create any accompanying indexes or unique constraints.
         """
         # Do nothing if this is an unmanaged or proxy model
-        if not model._meta.managed or model._meta.proxy:
+        if not force and (not model._meta.managed or model._meta.proxy):
             return
         # Create column SQL, add FK deferreds if needed
         column_sqls = []
@@ -214,13 +213,16 @@ class BaseDatabaseSchemaEditor(object):
             "definition": ", ".join(column_sqls)
         }
         self.execute(sql, params)
+        # Make M2M tables
+        for field in model._meta.local_many_to_many:
+            self.create_model(field.rel.through, force=True)
 
-    def delete_model(self, model):
+    def delete_model(self, model, force=False):
         """
         Deletes a model from the database.
         """
         # Do nothing if this is an unmanaged or proxy model
-        if not model._meta.managed or model._meta.proxy:
+        if not force and (not model._meta.managed or model._meta.proxy):
             return
         # Delete the table
         self.execute(self.sql_delete_table % {
@@ -287,7 +289,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
-            return self.create_model(field.rel.through)
+            return self.create_model(field.rel.through, force=True)
         # Get the column's definition
         definition, params = self.column_sql(model, field, include_default=True)
         # It might not actually have a column behind it
@@ -358,11 +360,10 @@ class BaseDatabaseSchemaEditor(object):
         # Ensure this field is even column-based
         old_type = old_field.db_type(connection=self.connection)
         new_type = self._type_for_alter(new_field)
-        if old_type is None and new_type is None:
-            # TODO: Handle M2M fields being repointed
-            return
+        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
+            return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
-            raise ValueError("Cannot alter field %s into %s - they are not compatible types" % (
+            raise ValueError("Cannot alter field %s into %s - they are not compatible types (probably means only one is an M2M with implicit through model)" % (
                     old_field,
                     new_field,
                 ))
@@ -542,6 +543,17 @@ class BaseDatabaseSchemaEditor(object):
                     "to_column": self.quote_name(new_field.rel.get_related_field().column),
                 }
             )
+
+    def _alter_many_to_many(self, model, old_field, new_field, strict):
+        "Alters M2Ms to repoint their to= endpoints."
+        # Rename the through table
+        self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table, new_field.rel.through._meta.db_table)
+        # Repoint the FK to the other side
+        self.alter_field(
+            new_field.rel.through,
+            old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
+            new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+        )
 
     def _type_for_alter(self, field):
         """

@@ -29,6 +29,16 @@ class Book(models.Model):
         managed = False
 
 
+class BookWithM2M(models.Model):
+    author = models.ForeignKey(Author)
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+    tags = models.ManyToManyField("Tag", related_name="books")
+
+    class Meta:
+        managed = False
+
+
 class BookWithSlug(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)

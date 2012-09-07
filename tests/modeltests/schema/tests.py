@@ -7,7 +7,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.models.loading import cache
-from .models import Author, Book, BookWithSlug, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
+from .models import Author, Book, BookWithSlug, BookWithM2M, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TestCase):
@@ -19,7 +19,7 @@ class SchemaTests(TestCase):
     as the code it is testing.
     """
 
-    models = [Author, Book, BookWithSlug, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest]
+    models = [Author, Book, BookWithSlug, BookWithM2M, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest]
 
     # Utility functions
 
@@ -248,6 +248,21 @@ class SchemaTests(TestCase):
         self.assertEqual(columns['display_name'][0], "CharField")
         self.assertNotIn("name", columns)
 
+    def test_m2m_create(self):
+        """
+        Tests M2M fields on models during creation
+        """
+        # Create the tables
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.create_model(Tag)
+        editor.create_model(BookWithM2M)
+        editor.commit()
+        # Ensure there is now an m2m table there
+        columns = self.column_classes(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
+        self.assertEqual(columns['tag_id'][0], "IntegerField")
+
     def test_m2m(self):
         """
         Tests adding/removing M2M fields on models
@@ -286,6 +301,51 @@ class SchemaTests(TestCase):
         # Ensure there's no m2m table there
         self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
         connection.rollback()
+
+    def test_m2m_repoint(self):
+        """
+        Tests repointing M2M fields
+        """
+        # Create the tables
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.create_model(BookWithM2M)
+        editor.create_model(Tag)
+        editor.create_model(UniqueTest)
+        editor.commit()
+        # Ensure the M2M exists and points to Tag
+        constraints = connection.introspection.get_constraints(connection.cursor(), BookWithM2M._meta.get_field_by_name("tags")[0].rel.through._meta.db_table)
+        if connection.features.supports_foreign_keys:
+            for name, details in constraints.items():
+                if details['columns'] == set(["tag_id"]) and details['foreign_key']:
+                    self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                    break
+            else:
+                self.fail("No FK constraint for tag_id found")
+        # Repoint the M2M
+        new_field = ManyToManyField(UniqueTest)
+        new_field.contribute_to_class(BookWithM2M, "uniques")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Author,
+            BookWithM2M._meta.get_field_by_name("tags")[0],
+            new_field,
+        )
+        editor.commit()
+        # Ensure old M2M is gone
+        self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
+        connection.rollback()
+        # Ensure the new M2M exists and points to UniqueTest
+        constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
+        if connection.features.supports_foreign_keys:
+            for name, details in constraints.items():
+                if details['columns'] == set(["uniquetest_id"]) and details['foreign_key']:
+                    self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
+                    break
+            else:
+                self.fail("No FK constraint for tag_id found")
 
     def test_unique(self):
         """
