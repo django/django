@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
-from django.db.models.fields.related import ManyToManyField
+from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.models.loading import cache
 from .models import Author, Book, BookWithSlug, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
 
@@ -114,15 +114,16 @@ class SchemaTests(TestCase):
         )
 
     @skipUnless(connection.features.supports_foreign_keys, "No FK support")
-    def test_creation_fk(self):
-        "Tests that creating tables out of FK order works"
+    def test_fk(self):
+        "Tests that creating tables out of FK order, then repointing, works"
         # Create the table
         editor = connection.schema_editor()
         editor.start()
         editor.create_model(Book)
         editor.create_model(Author)
+        editor.create_model(Tag)
         editor.commit()
-        # Check that both tables are there
+        # Check that initial tables are there
         try:
             list(Author.objects.all())
         except DatabaseError, e:
@@ -139,6 +140,26 @@ class SchemaTests(TestCase):
                 pub_date = datetime.datetime.now(),
             )
             connection.commit()
+        # Repoint the FK constraint
+        new_field = ForeignKey(Tag)
+        new_field.set_attributes_from_name("author")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Book,
+            Book._meta.get_field_by_name("author")[0],
+            new_field,
+            strict=True,
+        )
+        editor.commit()
+        # Make sure the new FK constraint is present
+        constraints = connection.introspection.get_constraints(connection.cursor(), Book._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == set(["author_id"]) and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
 
     def test_create_field(self):
         """

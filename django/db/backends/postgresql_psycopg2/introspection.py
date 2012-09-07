@@ -118,7 +118,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "columns": set(),
                     "primary_key": kind.lower() == "primary key",
                     "unique": kind.lower() in ["primary key", "unique"],
-                    "foreign_key": set([tuple(x.split(".", 1)) for x in used_cols]) if kind.lower() == "foreign key" else None,
+                    "foreign_key": tuple(used_cols[0].split(".", 1)) if kind.lower() == "foreign key" else None,
                     "check": False,
                     "index": False,
                 }

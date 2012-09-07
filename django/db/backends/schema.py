@@ -21,7 +21,6 @@ class BaseDatabaseSchemaEditor(object):
     commit() is called.
 
     TODO:
-        - Repointing of FKs
         - Repointing of M2Ms
         - Check constraints (PosIntField)
     """
@@ -401,6 +400,22 @@ class BaseDatabaseSchemaEditor(object):
                         "name": index_name,
                     }
                 )
+        # Drop any FK constraints, we'll remake them later
+        if getattr(old_field, "rel"):
+            fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
+            if strict and len(fk_names) != 1:
+                raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
+                    len(fk_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for fk_name in fk_names:
+                self.execute(
+                    self.sql_delete_fk % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": fk_name,
+                    }
+                )
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self.sql_rename_column % {
@@ -516,6 +531,17 @@ class BaseDatabaseSchemaEditor(object):
                     "columns": self.quote_name(new_field.column),
                 }
             )
+        # Does it have a foreign key?
+        if getattr(new_field, "rel"):
+            self.execute(
+                self.sql_create_fk % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "name": self._create_index_name(model, [new_field.column], suffix="_fk"),
+                    "column": self.quote_name(new_field.column),
+                    "to_table": self.quote_name(new_field.rel.to._meta.db_table),
+                    "to_column": self.quote_name(new_field.rel.get_related_field().column),
+                }
+            )
 
     def _type_for_alter(self, field):
         """
@@ -543,7 +569,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
         return index_name
 
-    def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None):
+    def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None):
         "Returns all constraint names matching the columns and conditions"
         column_names = set(column_names) if column_names else None
         constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
@@ -555,6 +581,8 @@ class BaseDatabaseSchemaEditor(object):
                 if primary_key is not None and infodict['primary_key'] != primary_key:
                     continue
                 if index is not None and infodict['index'] != index:
+                    continue
+                if foreign_key is not None and not infodict['foreign_key']:
                     continue
                 result.append(name)
         return result
