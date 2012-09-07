@@ -71,7 +71,8 @@ class BaseFormSet(object):
         return True
     __nonzero__ = __bool__ # Python 2
 
-    def _management_form(self):
+    @property
+    def management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
@@ -84,7 +85,6 @@ class BaseFormSet(object):
                 MAX_NUM_FORM_COUNT: self.max_num
             })
         return form
-    management_form = property(_management_form)
 
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
@@ -140,17 +140,18 @@ class BaseFormSet(object):
         self.add_fields(form, i)
         return form
 
-    def _get_initial_forms(self):
+    @property
+    def initial_forms(self):
         """Return a list of all the initial forms in this formset."""
         return self.forms[:self.initial_form_count()]
-    initial_forms = property(_get_initial_forms)
 
-    def _get_extra_forms(self):
+    @property
+    def extra_forms(self):
         """Return a list of all the extra forms in this formset."""
         return self.forms[self.initial_form_count():]
-    extra_forms = property(_get_extra_forms)
 
-    def _get_empty_form(self, **kwargs):
+    @property
+    def empty_form(self, **kwargs):
         defaults = {
             'auto_id': self.auto_id,
             'prefix': self.add_prefix('__prefix__'),
@@ -160,19 +161,19 @@ class BaseFormSet(object):
         form = self.form(**defaults)
         self.add_fields(form, None)
         return form
-    empty_form = property(_get_empty_form)
 
     # Maybe this should just go away?
-    def _get_cleaned_data(self):
+    @property
+    def cleaned_data(self):
         """
         Returns a list of form.cleaned_data dicts for every form in self.forms.
         """
         if not self.is_valid():
             raise AttributeError("'%s' object has no attribute 'cleaned_data'" % self.__class__.__name__)
         return [form.cleaned_data for form in self.forms]
-    cleaned_data = property(_get_cleaned_data)
 
-    def _get_deleted_forms(self):
+    @property
+    def deleted_forms(self):
         """
         Returns a list of forms that have been marked for deletion. Raises an
         AttributeError if deletion is not allowed.
@@ -191,9 +192,9 @@ class BaseFormSet(object):
                 if self._should_delete_form(form):
                     self._deleted_form_indexes.append(i)
         return [self.forms[i] for i in self._deleted_form_indexes]
-    deleted_forms = property(_get_deleted_forms)
 
-    def _get_ordered_forms(self):
+    @property
+    def ordered_forms(self):
         """
         Returns a list of form in the order specified by the incoming data.
         Raises an AttributeError if ordering is not allowed.
@@ -228,7 +229,6 @@ class BaseFormSet(object):
         # Return a list of form.cleaned_data dicts in the order specified by
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]
-    ordered_forms = property(_get_ordered_forms)
 
     @classmethod
     def get_default_prefix(cls):
@@ -244,14 +244,14 @@ class BaseFormSet(object):
             return self._non_form_errors
         return self.error_class()
 
-    def _get_errors(self):
+    @property
+    def errors(self):
         """
         Returns a list of form.errors for every form in self.forms.
         """
         if self._errors is None:
             self.full_clean()
         return self._errors
-    errors = property(_get_errors)
 
     def _should_delete_form(self, form):
         """
@@ -332,14 +332,14 @@ class BaseFormSet(object):
         """
         return self.forms and self.forms[0].is_multipart()
 
-    def _get_media(self):
+    @property
+    def media(self):
         # All the forms on a FormSet are the same, so you only need to
         # interrogate the first form for media.
         if self.forms:
             return self.forms[0].media
         else:
             return Media()
-    media = property(_get_media)
 
     def as_table(self):
         "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."

@@ -100,7 +100,7 @@ class FileUploadTests(TestCase):
 
         try:
             os.unlink(file1.name)
-        except:
+        except OSError:
             pass
 
         self.assertEqual(response.status_code, 200)
@@ -384,15 +384,13 @@ class DirectoryCreationTests(unittest.TestCase):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
-        try:
+        with self.assertRaises(IOError) as exc_info:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'))
-        except IOError as err:
-            # The test needs to be done on a specific string as IOError
-            # is raised even without the patch (just not early enough)
-            self.assertEqual(err.args[0],
-                              "%s exists and is not a directory." % UPLOAD_TO)
-        except:
-            self.fail("IOError not raised")
+        # The test needs to be done on a specific string as IOError
+        # is raised even without the patch (just not early enough)
+        self.assertEqual(exc_info.exception.args[0],
+                          "%s exists and is not a directory." % UPLOAD_TO)
+
 
 class MultiParserTests(unittest.TestCase):
 

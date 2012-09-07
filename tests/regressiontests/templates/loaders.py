@@ -17,7 +17,7 @@ import os.path
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.utils import unittest
+from django.utils import unittest, six
 from django.utils.six import StringIO
 
 
@@ -30,7 +30,7 @@ class MockProvider(pkg_resources.NullProvider):
     def _has(self, path):
         return path in self.module._resources
 
-    def _isdir(self,path):
+    def _isdir(self, path):
         return False
 
     def get_resource_stream(self, manager, resource_name):
@@ -61,8 +61,8 @@ class EggLoaderTest(unittest.TestCase):
 
         self.empty_egg = create_egg("egg_empty", {})
         self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO("x"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
+            os.path.normcase('templates/x.txt'): StringIO("x"),
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
@@ -144,12 +144,12 @@ class RenderToStringTest(unittest.TestCase):
         self.assertEqual(context['obj'], 'before')
 
     def test_empty_list(self):
-        self.assertRaisesRegexp(TemplateDoesNotExist,
+        six.assertRaisesRegex(self, TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.render_to_string, [])
 
 
     def test_select_templates_from_empty_list(self):
-        self.assertRaisesRegexp(TemplateDoesNotExist,
+        six.assertRaisesRegex(self, TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.select_template, [])

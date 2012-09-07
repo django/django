@@ -9,7 +9,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, six
 from django.utils.encoding import force_text
 
 from .models import Book, Department, Employee
@@ -17,6 +17,7 @@ from .models import Book, Department, Employee
 
 def select_by(dictlist, key, value):
     return [x for x in dictlist if x[key] == value][0]
+
 
 class DecadeListFilter(SimpleListFilter):
 
@@ -520,7 +521,7 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutTitle(Book, site)
         request = self.request_factory.get('/', {})
-        self.assertRaisesRegexp(ImproperlyConfigured,
+        six.assertRaisesRegex(self, ImproperlyConfigured,
             "The list filter 'DecadeListFilterWithoutTitle' does not specify a 'title'.",
             self.get_changelist, request, Book, modeladmin)
 
@@ -530,7 +531,7 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = DecadeFilterBookAdminWithoutParameter(Book, site)
         request = self.request_factory.get('/', {})
-        self.assertRaisesRegexp(ImproperlyConfigured,
+        six.assertRaisesRegex(self, ImproperlyConfigured,
             "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'.",
             self.get_changelist, request, Book, modeladmin)
 
