@@ -81,7 +81,7 @@ don't yet suggest that you use Django and Python 3 in production.
 Python 3 support should be considered a "preview". It's offered to bootstrap
 the transition of the Django ecosystem to Python 3, and to help you start
 porting your apps for future Python 3 compatibility. But we're not yet
-confidant enough to promise stability in production.
+confident enough to promise stability in production.
 
 Our current plan is to make Django 1.6 suitable for general use with Python 3.
 
