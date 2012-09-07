@@ -921,3 +921,18 @@ location (e.g., ``/home/bob/lib/libgeos_c.so``).
 
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
+
+.. setting:: GEOS_USE_NUMPY
+
+GEOS_USE_NUMPY
+--------------
+
+A boolean indicating that numpy data structures should be used when available 
+and appropriate. If numpy is unavailable, or this is set to ``False``, numpy will
+not be used. The default is ``True``.
+
+.. note::
+
+    If you have numpy available and choose to use it, you will need to be
+    careful when comparing return types. Make sure to use the proper type
+    when making comparisons.
