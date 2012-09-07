@@ -25,7 +25,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             pass
         login_required(normal_view)
 
-    def testLoginRequired(self, view_url='/login_required/', login_url=settings.LOGIN_URL):
+    def testLoginRequired(self, view_url='/login_required/', login_url='/login/'):
         """
         Check that login_required works on a simple view wrapped in a
         login_required decorator.

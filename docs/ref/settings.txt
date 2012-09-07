@@ -1324,6 +1324,14 @@ decorator, for example.
     This also works fine with localized URLs using
     :func:`~django.conf.urls.i18n.i18n_patterns`.
 
+.. versionchanged:: 1.5
+
+This setting now also accepts view function names and
+:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+configuration duplication since you no longer have to define the URL in two
+places (``settings`` and URLconf).
+For backward compatibility reasons the default remains unchanged.
+
 .. setting:: LOGIN_URL
 
 LOGIN_URL
@@ -1336,6 +1344,14 @@ The URL where requests are redirected for login, especially when using the
 
 .. note::
     See the `note on LOGIN_REDIRECT_URL setting`_
+
+.. versionchanged:: 1.5
+
+This setting now also accepts view function names and
+:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+configuration duplication since you no longer have to define the URL in two
+places (``settings`` and URLconf).
+For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGOUT_URL
 
