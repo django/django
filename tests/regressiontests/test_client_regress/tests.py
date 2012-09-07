@@ -744,7 +744,7 @@ class SessionTests(TestCase):
         self.client.logout()
         self.client.logout()
 
-    def test_logout_signal_send(self):
+    def test_logout_with_user(self):
         """Logout should send user_logged_out signal if user was logged in."""
         def listener(*args, **kwargs):
             listener.executed = True
@@ -757,9 +757,10 @@ class SessionTests(TestCase):
 
         self.assertTrue(listener.executed)
 
-    def test_logout_without_signal(self):
-        """Logout shouldn't send signal if user wasn't logged in."""
-        def listener(*args, **kwargs):
+    def test_logout_without_user(self):
+        """Logout should send signal even if user not authenticated."""
+        def listener(user, *args, **kwargs):
+            listener.user = user
             listener.executed = True
         listener.executed = False
 
@@ -768,10 +769,11 @@ class SessionTests(TestCase):
         self.client.logout()
         user_logged_out.disconnect(listener)
 
-        self.assertFalse(listener.executed)
+        self.assertTrue(listener.executed)
+        self.assertIsNone(listener.user)
 
-    def test_login_signal_send(self):
-        """Logout should send user_logged_in signal on successful login."""
+    def test_login_with_user(self):
+        """Login should send user_logged_in signal on successful login."""
         def listener(*args, **kwargs):
             listener.executed = True
         listener.executed = False
