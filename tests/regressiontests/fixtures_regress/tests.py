@@ -21,18 +21,15 @@ from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     ExternalDependency, Thingy)
 
 
-pre_save_checks = []
-def animal_pre_save_check(signal, sender, instance, **kwargs):
-    "A signal that is used to check the type of data loaded from fixtures"
-    pre_save_checks.append(
-        (
-            'Count = %s (%s)' % (instance.count, type(instance.count)),
-            'Weight = %s (%s)' % (instance.weight, type(instance.weight)),
-        )
-    )
-
-
 class TestFixtures(TestCase):
+    def animal_pre_save_check(self, signal, sender, instance, **kwargs):
+        self.pre_save_checks.append(
+            (
+                'Count = %s (%s)' % (instance.count, type(instance.count)),
+                'Weight = %s (%s)' % (instance.weight, type(instance.weight)),
+            )
+        )
+
     def test_duplicate_pk(self):
         """
         This is a regression test for ticket #3790.
@@ -110,7 +107,6 @@ class TestFixtures(TestCase):
             commit=False
         )
         self.assertEqual(Absolute.load_count, 1)
-
 
     def test_unknown_format(self):
         """
@@ -246,9 +242,8 @@ class TestFixtures(TestCase):
         Test for tickets #8298, #9942 - Field values should be coerced into the
         correct type by the deserializer, not as part of the database write.
         """
-        global pre_save_checks
-        pre_save_checks = []
-        signals.pre_save.connect(animal_pre_save_check)
+        self.pre_save_checks = []
+        signals.pre_save.connect(self.animal_pre_save_check)
         try:
             management.call_command(
                 'loaddata',
@@ -257,14 +252,14 @@ class TestFixtures(TestCase):
                 commit=False,
             )
             self.assertEqual(
-                pre_save_checks,
+                self.pre_save_checks,
                 [
                     ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
                      "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
                 ]
             )
         finally:
-            signals.pre_save.disconnect(animal_pre_save_check)
+            signals.pre_save.disconnect(self.animal_pre_save_check)
 
     def test_dumpdata_uses_default_manager(self):
         """
