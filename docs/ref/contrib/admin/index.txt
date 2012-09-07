@@ -53,6 +53,7 @@ Other topics
    :maxdepth: 1
 
    actions
+   object-tools
    admindocs
 
 .. seealso::

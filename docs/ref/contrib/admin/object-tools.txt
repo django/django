@@ -1,0 +1,108 @@
+============
+Object Tools
+============
+
+.. currentmodule:: django.contrib.admin
+
+Certain actions apply directly to a model but not individual models or
+collections of models. These appear in a "toolbar" row above the form or
+changelist, to the right of the page. These buttons are called object tools.
+
+In the change list object tools are very similar to :doc:`Admin actions
+<actions>` but are intended to be used for creation of objects or manipulations
+that don't require individual model objects or querysets.
+
+Writing object tools
+====================
+
+Object tools are just Django views that get automatically wrapped in permission
+checks and added to the admin urlconfs for a model. Object tools are just
+regular functions that take two arguments:
+
+* The current :class:`ModelAdmin`
+* An :class:`~django.http.HttpRequest` representing the current request,
+
+A simple object tool that displays a template in the admin would look like
+this::
+
+    def polls_by_user(modeladmin, request, **kwargs):
+        return render(request, "admin/reports/polls_by_user.html", {
+            'polls': Poll.objects.all(),
+        })
+
+This will show up as "polls by user" in the object tools bar which works but we
+should probably provide a more human-friendly name by giving the function a
+``short_description`` attribute::
+
+    def polls_by_user(modeladmin, request, **kwargs):
+        return render(request, "admin/reports/polls_by_user.html", {
+            'polls': Poll.objects.all(),
+        })
+    polls_by_user.short_description = "User Poll Report"
+
+Adding object tools to the :class:`ModelAdmin`
+----------------------------------------------
+
+Next, we'll need to inform our :class:`ModelAdmin` of the object tool. This
+works just like any other configuration option. So, the complete ``admin.py``
+with the action and its registration would look like::
+
+    from django.contrib import admin
+    from myapp.models import Poll
+
+    def polls_by_user(modeladmin, request, **kwargs):
+        return render(request, "admin/reports/polls_by_user.html", {
+            'polls': Poll.objects.all(),
+        })
+    polls_by_user.short_description = "User Poll Report"
+
+    class PollAdmin(admin.ModelAdmin):
+        actions = [polls_by_user]
+
+    admin.site.register(Poll, PollAdmin)
+
+CSS classes
+-----------
+
+By default an admin tool is added to the template with no CSS class, which will
+render a simple object tool with no additional decoration. However, the default
+admin CSS provides two decorations for object tools. The add button has a CSS
+class of ``.addlink`` and looks like this:
+
+.. image:: _images/objecttools_01.png
+   :alt: Object tools on a changelist page
+
+The view button has a class of ``.viewsitelink`` and looks like this:
+
+.. image:: _images/objecttools_02.png
+   :alt: Object tools on a form page
+
+To add custom CSS classes to object too buttons just add a ``css_class``
+attribute to the method like this::
+
+    def add(modeladmin, request, **kwargs):
+        return render(request, "admin/redirect/add_form.html", {
+            'form': RedirectForm(),
+        })
+    add.short_description = "Add redirect"
+    add.css_class = "addlink"
+
+Customizing urlconf
+-------------------
+
+Unless specifically specified a urlconf will be generated for the object tool
+method under the current model's admin urlconfs. The name of the urlconf is
+``admin_{model}_{method_name}`` and the URL for the will be the current
+URL for the change list plus the method's name. In our reporting example this
+would be http://localhost:8000/admin/polls/poll/polls_by_user/
+
+It is possible to specify a custom urlconf by adding a ``url`` method to the
+object tool method::
+
+    def add(modeladmin, request, **kwargs):
+        return render(request, "admin/redirect/add_form.html", {
+            'form': RedirectForm(),
+        })
+    add.short_description = "Add redirect"
+    add.css_class = "addlink"
+    add.url = r"^add_poll/$"
