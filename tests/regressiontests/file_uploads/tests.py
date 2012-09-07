@@ -100,7 +100,7 @@ class FileUploadTests(TestCase):
 
         try:
             os.unlink(file1.name)
-        except:
+        except OSError:
             pass
 
         self.assertEqual(response.status_code, 200)

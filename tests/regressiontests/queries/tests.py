@@ -1677,10 +1677,7 @@ class CloneTests(TestCase):
         list(n_list)
         # Use the note queryset in a query, and evalute
         # that query in a way that involves cloning.
-        try:
-            self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
-        except:
-            self.fail('Query should be clonable')
+        self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
 
 
 class EmptyQuerySetTests(TestCase):
