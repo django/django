@@ -138,7 +138,7 @@ def resolve_url(to, *args, **kwargs):
         if callable(to):
             raise
         # If this doesn't "feel" like a URL, re-raise.
-        if '/' not in to and '.' not in to:
+        if '/' not in to:
             raise
 
     # Finally, fall back and assume it's a URL
