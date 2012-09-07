@@ -356,7 +356,7 @@ def format_gb_nsn(phonenumberNSN):
     # [5+5] 1dddd (12 areas) with 10 digits
     pattern55 = re.compile(r"^(?:1(?:3873|5(?:242|39[456])|697[347]|768[347]|9467))")
     capture55 = re.compile(r"^(\d{5})(\d{5})")
-    # [5+4] 1ddd (1 area) with 9 digits
+    # [5+4] 1dddd (1 area) with 9 digits
     pattern54 = re.compile(r"^(?:16977[23])")
     capture54 = re.compile(r"^(\d{5})(\d{4})$")
     # [4+6] 1ddd, 7ddd (inc 7624) (not 70, 76) with 10 digits
