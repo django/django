@@ -347,6 +347,56 @@ class SchemaTests(TestCase):
             else:
                 self.fail("No FK constraint for tag_id found")
 
+    @skipUnless(connection.features.supports_check_constraints, "No check constraints")
+    def test_check_constraints(self):
+        """
+        Tests creating/deleting CHECK constraints
+        """
+        # Create the tables
+        editor = connection.schema_editor()
+        editor.start()
+        editor.create_model(Author)
+        editor.commit()
+        # Ensure the constraint exists
+        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == set(["height"]) and details['check']:
+                break
+        else:
+            self.fail("No check constraint for height found")
+        # Alter the column to remove it
+        new_field = IntegerField(null=True, blank=True)
+        new_field.set_attributes_from_name("height")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Author,
+            Author._meta.get_field_by_name("height")[0],
+            new_field,
+            strict = True,
+        )
+        editor.commit()
+        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == set(["height"]) and details['check']:
+                self.fail("Check constraint for height found")
+        # Alter the column to re-add it
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Author,
+            new_field,
+            Author._meta.get_field_by_name("height")[0],
+            strict = True,
+        )
+        editor.commit()
+        constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == set(["height"]) and details['check']:
+                break
+        else:
+            self.fail("No check constraint for height found")
+
     def test_unique(self):
         """
         Tests removing and adding unique constraints to a single column.

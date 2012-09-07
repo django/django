@@ -1050,6 +1050,9 @@ class ForeignKey(RelatedField, Field):
             return IntegerField().db_type(connection=connection)
         return rel_field.db_type(connection=connection)
 
+    def db_parameters(self, connection):
+        return {"type": self.db_type(connection), "check": []}
+
 class OneToOneField(ForeignKey):
     """
     A OneToOneField is essentially the same as a ForeignKey, with the exception
@@ -1292,3 +1295,6 @@ class ManyToManyField(RelatedField, Field):
         # A ManyToManyField is not represented by a single column,
         # so return None.
         return None
+
+    def db_parameters(self, connection):
+        return {"type": None, "check": None}

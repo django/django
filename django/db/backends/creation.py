@@ -18,6 +18,7 @@ class BaseDatabaseCreation(object):
     destruction of test databases.
     """
     data_types = {}
+    data_type_check_constraints = {}
 
     def __init__(self, connection):
         self.connection = connection

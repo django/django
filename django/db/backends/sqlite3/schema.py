@@ -99,8 +99,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_field(self, model, old_field, new_field, strict=False):
         # Ensure this field is even column-based
-        old_type = old_field.db_type(connection=self.connection)
-        new_type = self._type_for_alter(new_field)
+        old_db_params = old_field.db_parameters(connection=self.connection)
+        old_type = old_db_params['type']
+        new_db_params = new_field.db_parameters(connection=self.connection)
+        new_type = new_db_params['type']
         if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:

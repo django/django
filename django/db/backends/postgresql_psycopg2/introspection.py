@@ -137,7 +137,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 kc.table_schema = %s AND
                 kc.table_name = %s
         """, ["public", table_name])
-        for constraint, column, kind in cursor.fetchall():
+        for constraint, column in cursor.fetchall():
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {

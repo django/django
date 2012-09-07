@@ -435,6 +435,9 @@ class BaseDatabaseFeatures(object):
     # Does it support foreign keys?
     supports_foreign_keys = True
 
+    # Does it support CHECK constraints?
+    supports_check_constraints = True
+
     def __init__(self, connection):
         self.connection = connection
 

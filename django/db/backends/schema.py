@@ -19,9 +19,6 @@ class BaseDatabaseSchemaEditor(object):
     then the relevant actions, and then commit(). This is necessary to allow
     things like circular foreign key references - FKs will only be created once
     commit() is called.
-
-    TODO:
-        - Check constraints (PosIntField)
     """
 
     # Overrideable SQL templates
@@ -41,7 +38,7 @@ class BaseDatabaseSchemaEditor(object):
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
 
-    sql_create_check = "ADD CONSTRAINT %(name)s CHECK (%(check)s)"
+    sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
@@ -105,7 +102,8 @@ class BaseDatabaseSchemaEditor(object):
         The field must already have had set_attributes_from_name called.
         """
         # Get the column's type and use that as the basis of the SQL
-        sql = field.db_type(connection=self.connection)
+        db_params = field.db_parameters(connection=self.connection)
+        sql = db_params['type']
         params = []
         # Check for fields that aren't actually columns (e.g. M2M)
         if sql is None:
@@ -169,6 +167,11 @@ class BaseDatabaseSchemaEditor(object):
             definition, extra_params = self.column_sql(model, field)
             if definition is None:
                 continue
+            # Check constraints can go on the column SQL here
+            db_params = field.db_parameters(connection=self.connection)
+            if db_params['check']:
+                definition += " CHECK (%s)" % db_params['check']
+            # Add the SQL to our big list
             column_sqls.append("%s %s" % (
                 self.quote_name(field.column),
                 definition,
@@ -295,6 +298,10 @@ class BaseDatabaseSchemaEditor(object):
         # It might not actually have a column behind it
         if definition is None:
             return
+        # Check constraints can go on the column SQL here
+        db_params = field.db_parameters(connection=self.connection)
+        if db_params['check']:
+            definition += " CHECK (%s)" % db_params['check']
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -358,8 +365,10 @@ class BaseDatabaseSchemaEditor(object):
         If strict is true, raises errors if the old column does not match old_field precisely.
         """
         # Ensure this field is even column-based
-        old_type = old_field.db_type(connection=self.connection)
-        new_type = self._type_for_alter(new_field)
+        old_db_params = old_field.db_parameters(connection=self.connection)
+        old_type = old_db_params['type']
+        new_db_params = new_field.db_parameters(connection=self.connection)
+        new_type = new_db_params['type']
         if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
@@ -415,6 +424,22 @@ class BaseDatabaseSchemaEditor(object):
                     self.sql_delete_fk % {
                         "table": self.quote_name(model._meta.db_table),
                         "name": fk_name,
+                    }
+                )
+        # Change check constraints?
+        if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
+            constraint_names = self._constraint_names(model, [old_field.column], check=True)
+            if strict and len(constraint_names) != 1:
+                raise ValueError("Found wrong number (%s) of check constraints for %s.%s" % (
+                    len(constraint_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for constraint_name in constraint_names:
+                self.execute(
+                    self.sql_delete_check % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": constraint_name,
                     }
                 )
         # Have they renamed the column?
@@ -543,6 +568,16 @@ class BaseDatabaseSchemaEditor(object):
                     "to_column": self.quote_name(new_field.rel.get_related_field().column),
                 }
             )
+        # Does it have check constraints we need to add?
+        if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
+            self.execute(
+                self.sql_create_check % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "name": self._create_index_name(model, [new_field.column], suffix="_check"),
+                    "column": self.quote_name(new_field.column),
+                    "check": new_db_params['check'],
+                }
+            )
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         "Alters M2Ms to repoint their to= endpoints."
@@ -554,14 +589,6 @@ class BaseDatabaseSchemaEditor(object):
             old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
             new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
         )
-
-    def _type_for_alter(self, field):
-        """
-        Returns a field's type suitable for ALTER COLUMN.
-        By default it just returns field.db_type().
-        To be overriden by backend specific subclasses
-        """
-        return field.db_type(connection=self.connection)
 
     def _create_index_name(self, model, column_names, suffix=""):
         "Generates a unique name for an index/unique constraint."
@@ -581,7 +608,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
         return index_name
 
-    def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None):
+    def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None, check=None):
         "Returns all constraint names matching the columns and conditions"
         column_names = set(column_names) if column_names else None
         constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
@@ -593,6 +620,8 @@ class BaseDatabaseSchemaEditor(object):
                 if primary_key is not None and infodict['primary_key'] != primary_key:
                     continue
                 if index is not None and infodict['index'] != index:
+                    continue
+                if check is not None and infodict['check'] != check:
                     continue
                 if foreign_key is not None and not infodict['foreign_key']:
                     continue
