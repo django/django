@@ -130,14 +130,14 @@ def _is_ignorable_404(uri):
     if getattr(settings, 'IGNORABLE_404_STARTS', ()):
         import warnings
         warnings.warn('The IGNORABLE_404_STARTS setting has been deprecated '
-                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning)
+                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning, stacklevel=2)
         for start in settings.IGNORABLE_404_STARTS:
             if uri.startswith(start):
                 return True
     if getattr(settings, 'IGNORABLE_404_ENDS', ()):
         import warnings
         warnings.warn('The IGNORABLE_404_ENDS setting has been deprecated '
-                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning)
+                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning, stacklevel=2)
         for end in settings.IGNORABLE_404_ENDS:
             if uri.endswith(end):
                 return True

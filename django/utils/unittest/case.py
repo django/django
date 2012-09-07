@@ -339,7 +339,7 @@ class TestCase(unittest.TestCase):
                         addExpectedFailure(self, e.exc_info)
                     else:
                         warnings.warn("Use of a TestResult without an addExpectedFailure method is deprecated",
-                                      DeprecationWarning)
+                                      DeprecationWarning, stacklevel=2)
                         result.addSuccess(self)
                 except _UnexpectedSuccess:
                     addUnexpectedSuccess = getattr(result, 'addUnexpectedSuccess', None)
@@ -347,7 +347,7 @@ class TestCase(unittest.TestCase):
                         addUnexpectedSuccess(self)
                     else:
                         warnings.warn("Use of a TestResult without an addUnexpectedSuccess method is deprecated",
-                                      DeprecationWarning)
+                                      DeprecationWarning, stacklevel=2)
                         result.addFailure(self, sys.exc_info())
                 except SkipTest, e:
                     self._addSkip(result, str(e))
