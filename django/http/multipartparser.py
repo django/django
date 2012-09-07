@@ -68,11 +68,10 @@ class MultiPartParser(object):
         if not boundary or not cgi.valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
 
-
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH',0)))
+            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH', 0)))
         except (ValueError, TypeError):
             content_length = 0
 
@@ -178,7 +177,7 @@ class MultiPartParser(object):
 
                     content_type = meta_data.get('content-type', ('',))[0].strip()
                     try:
-                        charset = meta_data.get('content-type', (0,{}))[1].get('charset', None)
+                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
                     except:
                         charset = None
 

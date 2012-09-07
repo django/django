@@ -4,6 +4,7 @@ HR-specific Form helpers
 """
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import re
 
 from django.contrib.localflavor.hr.hr_choices import (
@@ -91,17 +92,16 @@ class HRJMBGField(Field):
         dd = int(matches.group('dd'))
         mm = int(matches.group('mm'))
         yyy = int(matches.group('yyy'))
-        import datetime
         try:
-            datetime.date(yyy,mm,dd)
-        except:
+            datetime.date(yyy, mm, dd)
+        except ValueError:
             raise ValidationError(self.error_messages['date'])
 
         # Validate checksum.
         k = matches.group('k')
         checksum = 0
-        for i,j in zip(range(7,1,-1),range(6)):
-            checksum+=i*(int(value[j])+int(value[13-i]))
+        for i, j in zip(range(7, 1, -1), range(6)):
+            checksum += i * (int(value[j]) + int(value[13 - i]))
         m = 11 - checksum % 11
         if m == 10:
             raise ValidationError(self.error_messages['invalid'])

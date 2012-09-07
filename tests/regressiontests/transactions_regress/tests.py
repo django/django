@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS
+from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
@@ -151,21 +150,14 @@ class TestTransactionClosing(TransactionTestCase):
         # Create a user
         create_system_user()
 
-        try:
-            # The second call to create_system_user should fail for violating a unique constraint
-            # (it's trying to re-create the same user)
+        with self.assertRaises(DatabaseError):
+            # The second call to create_system_user should fail for violating
+            # a unique constraint (it's trying to re-create the same user)
             create_system_user()
-        except:
-            pass
-        else:
-            raise ImproperlyConfigured('Unique constraint not enforced on django.contrib.auth.models.User')
 
-        try:
-            # Try to read the database. If the last transaction was indeed closed,
-            # this should cause no problems
-            _ = User.objects.all()[0]
-        except:
-            self.fail("A transaction consisting of a failed operation was not closed.")
+        # Try to read the database. If the last transaction was indeed closed,
+        # this should cause no problems
+        User.objects.all()[0]
 
     @override_settings(DEBUG=True)
     def test_failing_query_transaction_closed_debug(self):
