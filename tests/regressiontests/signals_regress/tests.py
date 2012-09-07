@@ -6,31 +6,6 @@ from django.test import TestCase
 from .models import Author, Book
 
 
-signal_output = []
-
-def pre_save_test(signal, sender, instance, **kwargs):
-    signal_output.append('pre_save signal, %s' % instance)
-    if kwargs.get('raw'):
-        signal_output.append('Is raw')
-
-def post_save_test(signal, sender, instance, **kwargs):
-    signal_output.append('post_save signal, %s' % instance)
-    if 'created' in kwargs:
-        if kwargs['created']:
-            signal_output.append('Is created')
-        else:
-            signal_output.append('Is updated')
-    if kwargs.get('raw'):
-        signal_output.append('Is raw')
-
-def pre_delete_test(signal, sender, instance, **kwargs):
-    signal_output.append('pre_save signal, %s' % instance)
-    signal_output.append('instance.id is not None: %s' % (instance.id != None))
-
-def post_delete_test(signal, sender, instance, **kwargs):
-    signal_output.append('post_delete signal, %s' % instance)
-    signal_output.append('instance.id is not None: %s' % (instance.id != None))
-
 class SignalsRegressTests(TestCase):
     """
     Testing signals before/after saving and deleting.
@@ -38,12 +13,35 @@ class SignalsRegressTests(TestCase):
 
     def get_signal_output(self, fn, *args, **kwargs):
         # Flush any existing signal output
-        global signal_output
-        signal_output = []
+        self.signal_output = []
         fn(*args, **kwargs)
-        return signal_output
+        return self.signal_output
+
+    def pre_save_test(self, signal, sender, instance, **kwargs):
+        self.signal_output.append('pre_save signal, %s' % instance)
+        if kwargs.get('raw'):
+            self.signal_output.append('Is raw')
+
+    def post_save_test(self, signal, sender, instance, **kwargs):
+        self.signal_output.append('post_save signal, %s' % instance)
+        if 'created' in kwargs:
+            if kwargs['created']:
+                self.signal_output.append('Is created')
+            else:
+                self.signal_output.append('Is updated')
+        if kwargs.get('raw'):
+            self.signal_output.append('Is raw')
+
+    def pre_delete_test(self, signal, sender, instance, **kwargs):
+        self.signal_output.append('pre_save signal, %s' % instance)
+        self.signal_output.append('instance.id is not None: %s' % (instance.id != None))
+
+    def post_delete_test(self, signal, sender, instance, **kwargs):
+        self.signal_output.append('post_delete signal, %s' % instance)
+        self.signal_output.append('instance.id is not None: %s' % (instance.id != None))
 
     def setUp(self):
+        self.signal_output = []
         # Save up the number of connected signals so that we can check at the end
         # that all the signals we register get properly unregistered (#9989)
         self.pre_signals = (len(models.signals.pre_save.receivers),
@@ -51,16 +49,16 @@ class SignalsRegressTests(TestCase):
                        len(models.signals.pre_delete.receivers),
                        len(models.signals.post_delete.receivers))
 
-        models.signals.pre_save.connect(pre_save_test)
-        models.signals.post_save.connect(post_save_test)
-        models.signals.pre_delete.connect(pre_delete_test)
-        models.signals.post_delete.connect(post_delete_test)
+        models.signals.pre_save.connect(self.pre_save_test)
+        models.signals.post_save.connect(self.post_save_test)
+        models.signals.pre_delete.connect(self.pre_delete_test)
+        models.signals.post_delete.connect(self.post_delete_test)
 
     def tearDown(self):
-        models.signals.post_delete.disconnect(post_delete_test)
-        models.signals.pre_delete.disconnect(pre_delete_test)
-        models.signals.post_save.disconnect(post_save_test)
-        models.signals.pre_save.disconnect(pre_save_test)
+        models.signals.post_delete.disconnect(self.post_delete_test)
+        models.signals.pre_delete.disconnect(self.pre_delete_test)
+        models.signals.post_save.disconnect(self.post_save_test)
+        models.signals.pre_save.disconnect(self.pre_save_test)
 
         # Check that all our signals got disconnected properly.
         post_signals = (len(models.signals.pre_save.receivers),
