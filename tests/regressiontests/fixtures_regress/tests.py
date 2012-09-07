@@ -14,6 +14,7 @@ from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils import simplejson
 from django.utils.six import PY3, StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
@@ -311,6 +312,20 @@ class TestFixtures(TestCase):
         self.assertTrue(lion_json in data)
         self.assertTrue(emu_json in data)
         self.assertTrue(platypus_json in data)
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.animal',
+            format='json',
+            stdout=stdout,
+            primary_keys=['1 10']
+        )
+        data = stdout.getvalue()
+        json = simplejson.loads(data)
+        self.assertEqual(len(json), 2)
+        keys = sorted([item['pk'] for item in json])
+        self.assertEqual(keys, [1, 10])
 
     def test_proxy_model_included(self):
         """
