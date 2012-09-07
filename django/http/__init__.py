@@ -585,9 +585,7 @@ class HttpResponse(object):
                     value = value.encode(charset)
         except UnicodeError as e:
             if mime_encode:
-                # The extra str() is required because .encode() returns unicode
-                # under Python 2. This behavior is triggered by the 'utf-8'
-                # charset registration in django.core.mail.message.
+                # Wrapping in str() is a workaround for #12422 under Python 2.
                 value = str(Header(value, 'utf-8').encode())
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
