@@ -7,7 +7,6 @@ a list of all possible variables.
 """
 
 import os
-import re
 import time     # Needed for Windows
 import warnings
 
