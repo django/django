@@ -256,7 +256,7 @@ send queries for the ``auth`` app to ``auth_db``::
             """
             if model._meta.app_label == 'auth':
                 return 'auth_db'
-            return Non
+            return None
 
         def allow_relation(self, obj1, obj2, **hints):
             """
