@@ -20,6 +20,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import (QUERY_TERMS, LOOKUP_SEP, ORDER_DIR,
     SINGLE, ORDER_PATTERN, JoinInfo)
+from django.db.models.sql.matching import match_functions
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
@@ -97,6 +98,7 @@ class Query(object):
     alias_prefix = 'T'
     query_terms = QUERY_TERMS
     aggregates_module = base_aggregates_module
+    match_functions = match_functions
 
     compiler = 'SQLCompiler'
 

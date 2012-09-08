@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from django.db.backends import util
 from django.utils import six
 from django.utils import tree
+from django.db.sql.constance import LOOKUP_SEP
 
 
 class InvalidQuery(Exception):
@@ -42,6 +43,7 @@ class Q(tree.Node):
 
     def __init__(self, *args, **kwargs):
         super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        self._compiled_matcher = None
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -62,6 +64,50 @@ class Q(tree.Node):
         obj.add(self, self.AND)
         obj.negate()
         return obj
+
+    def _compile_matcher(self, manager):
+        """
+        Create a mirrored version of self, but where leaves are LookupExpressions
+        that understand a call to .matches().
+        """
+        def descend(parent, children):
+            for child in children:
+                if isinstance(child, type(self)):
+                    # a Q subtree
+                    branch_root = LookupExpression(connector=child.connector,
+                            manager=manager)
+                    parent.children.append(branch_root)
+
+                    descend(branch_root, child.children)
+
+                else:
+                    # in a properly formed Q, could only be a tuple
+                    parent.children.append(LookupExpression(
+                        expr=child, manager=manager))
+
+        root = LookupExpression(connector=self.connector)
+        for child in self.children:
+            descend(root, self.children)
+
+        self._compiled_matcher = root
+
+    def matches(self, instance, manager=None):
+        """
+        Returns true if the model instance matches this predicate.
+        """
+        if manager is None:
+            manager = instance._default_manager
+        if not isinstance(instance, manager.model):
+            raise ValueError("invalid manager given for {}".format(instance))
+
+        if self._compiled_matcher is None:
+            # we are evaluating the first model, or are uncompiled
+            self._compile_matcher(manager)
+        if self._compiled_matcher.manager.model != manager.model:
+            # the pre-compiled matcher was compiled for a different manager
+            self._compile_matcher(manager)
+        return self._compiled_matcher.matches(instance)
+
 
 class DeferredAttribute(object):
     """
@@ -127,6 +173,85 @@ class DeferredAttribute(object):
         return None
 
 
+class LookupExpression(tree.Node):
+    """
+    A thin wrapper around a filter expression tuple of (lookup-type, value) to
+    provide a matches method.
+    """
+    # Connection types
+    AND = 'AND'
+    OR = 'OR'
+    default = AND
+
+    def __init__(self, expr=None, manager=None):
+        super(LookupExpression, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        self.manager = manager
+        if expr:
+            # if we don't get a expr - we are just a root node
+            self.lookup, self.value = expr
+            self.attr_route = []
+            self.field = None
+            self.lookup_type = 'exact' # Default lookup type
+            self.query = manager.get_query_set().query
+            self.traverse_lookup(manager.model)
+            if self.lookup_type not in self.query.match_functions:
+                raise ValueError("invalid lookup: {}".format(self.lookup))
+            self.lookup_function = self.query.match_functions[self.lookup_type]
+
+
+    def traverse_lookup(self, model):
+        """
+        Validates a lookup string as a traversable sequence of attributes,
+        storing them for for future use
+        """
+
+        parts = self.lookup.split(LOOKUP_SEP)
+        num_parts = len(parts)
+        if (len(parts) > 1 and parts[-1] in self.query.query_terms):
+            # Traverse the lookup query to distinguish related fields from
+            # lookup types.
+            lookup_model = model
+            for counter, field_name in enumerate(parts):
+                try:
+                    lookup_field = getattr(lookup_model, field_name)
+                    self.attr_route.append(field_name)
+                except AttributeError:
+                    # Not a field. Bail out.
+                    self.attr_route.append(field_name)
+                    self.lookup_type = parts.pop()
+                    return
+                # Unless we're at the end of the list of lookups, let's attempt
+                # to continue traversing relations.
+                if (counter + 1) < num_parts:
+                    try:
+                        dummy = lookup_model._meta.get_field(field_name).rel.to
+                        lookup_model = lookup_field
+                    except AttributeError:
+                        # # Not a related field. Bail out.
+                        self.lookup_type = parts.pop()
+                        return
+        else:
+            self.attr_route.append(parts[0])
+            return
+
+    def get_instance_value(self, instance):
+        current = instance
+        for attr in self.attr_route:
+            current = getattr(current, attr)
+        return current
+
+    def matches(self, instance):
+        """
+        Evaluates an instance against the lookup we were created with.
+        Return true if the instance matches the condiiton.
+        """
+        evaluators = {"AND": all, "OR": any}
+        evaluator = evaluators[self.connector]
+        if self.children:
+            return (evaluator(c.matches(instance) for c in self.children))
+        return self.lookup_function(instance, self.get_instance_value(instance), self.value)
+
+
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):
     """
     Returns True if this field should be used to descend deeper for
@@ -190,6 +315,7 @@ def deferred_class_factory(model, attrs):
     overrides["_deferred"] = True
     return type(str(name), (model,), overrides)
 
-# The above function is also used to unpickle model instances with deferred
+
+# The following function is also used to unpickle model instances with deferred
 # fields.
 deferred_class_factory.__safe_for_unpickling__ = True
