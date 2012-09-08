@@ -167,6 +167,7 @@ def password_reset(request, is_admin_site=False,
         form = password_reset_form()
     context = {
         'form': form,
+        'title': _('Password reset'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -176,7 +177,9 @@ def password_reset(request, is_admin_site=False,
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         current_app=None, extra_context=None):
-    context = {}
+    context = {
+               'title': _('Password reset successful'),
+               }
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
@@ -206,6 +209,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
 
     if user is not None and token_generator.check_token(user, token):
         validlink = True
+        content_title = _('Enter new password')
         if request.method == 'POST':
             form = set_password_form(user, request.POST)
             if form.is_valid():
@@ -216,8 +220,10 @@ def password_reset_confirm(request, uidb36=None, token=None,
     else:
         validlink = False
         form = None
+        content_title = _('Password reset unsuccessful')
     context = {
         'form': form,
+        'title': content_title,
         'validlink': validlink,
     }
     if extra_context is not None:
@@ -229,7 +235,8 @@ def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):
     context = {
-        'login_url': settings.LOGIN_URL
+        'login_url': settings.LOGIN_URL,
+        'title': _('Password reset complete'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -255,6 +262,7 @@ def password_change(request,
         form = password_change_form(user=request.user)
     context = {
         'form': form,
+        'title': _('Password change successful'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -265,7 +273,9 @@ def password_change(request,
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
                          current_app=None, extra_context=None):
-    context = {}
+    context = {
+               'title': _('Password change successful'),
+               }
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,

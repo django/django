@@ -22,5 +22,5 @@ from django.contrib.auth.tests.tokens import TokenGeneratorTest
 from django.contrib.auth.tests.views import (AuthViewNamedURLTests,
     PasswordResetTest, ChangePasswordTest, LoginTest, LogoutTest,
     LoginURLSettings)
-
+from django.contrib.auth.tests.auth_views import TitleContentTitleTests
 # The password for the fixture data users is 'password'
