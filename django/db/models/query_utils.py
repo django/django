@@ -97,17 +97,21 @@ class Q(tree.Node):
         """
         if manager is None:
             manager = instance._default_manager
-        if not isinstance(instance, manager.model):
-            raise ValueError("invalid manager given for {}".format(instance))
 
         if self._compiled_matcher is None:
             # we are evaluating the first model, or are uncompiled
             self._compile_matcher(manager)
-        if self._compiled_matcher.manager.model != manager.model:
+        if self._compiled_matcher.manager != manager:
             # the pre-compiled matcher was compiled for a different manager
             self._compile_matcher(manager)
         return self._compiled_matcher.matches(instance)
 
+    def match_compile(self, manager):
+        """
+        Return the precompiled evaluator tree.
+        """
+        self._compile_matcher(manager)
+        return self._compiled_matcher
 
 class DeferredAttribute(object):
     """
@@ -245,6 +249,9 @@ class LookupExpression(tree.Node):
         Evaluates an instance against the lookup we were created with.
         Return true if the instance matches the condiiton.
         """
+        if not isinstance(instance, self.manager.model):
+            raise ValueError("invalid manager given for {}".format(instance))
+
         evaluators = {"AND": all, "OR": any}
         evaluator = evaluators[self.connector]
         if self.children:
