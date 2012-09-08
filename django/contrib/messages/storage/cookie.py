@@ -46,10 +46,10 @@ class CookieStorage(BaseStorage):
     Stores messages in a cookie.
     """
     cookie_name = 'messages'
-    # We should be able to store 4K in a cookie, but Internet Explorer
-    # imposes 4K as the *total* limit for a domain.  To allow other
-    # cookies, we go for 3/4 of 4K.
-    max_cookie_size = 3072
+    # uwsgi's default configuration enforces a maximum size of 4kb for all the
+    # HTTP headers. In order to leave some room for other cookies and headers,
+    # restrict the session cookie to 1/2 of 4kb. See #18781.
+    max_cookie_size = 2048
     not_finished = '__messagesnotfinished__'
 
     def _get(self, *args, **kwargs):

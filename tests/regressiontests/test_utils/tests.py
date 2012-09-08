@@ -137,15 +137,15 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 

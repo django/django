@@ -983,10 +983,10 @@ define the details of how the relation works.
     this with functions from the Python ``datetime`` module to limit choices of
     objects by date. For example::
 
-        limit_choices_to = {'pub_date__lte': datetime.now}
+        limit_choices_to = {'pub_date__lte': datetime.date.today}
 
     only allows the choice of related objects with a ``pub_date`` before the
-    current date/time to be chosen.
+    current date to be chosen.
 
     Instead of a dictionary this can also be a :class:`~django.db.models.Q`
     object for more :ref:`complex queries <complex-lookups-with-q>`. However,

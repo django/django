@@ -1576,7 +1576,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "Destination directory '%s' does not exist, please create it first." % testproject_dir)
         self.assertFalse(os.path.exists(testproject_dir))
 
-
     def test_custom_project_template_with_non_ascii_templates(self):
         "Ticket 18091: Make sure the startproject management command is able to render templates with non-ASCII content"
         template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template')
@@ -1588,5 +1587,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
-        self.assertEqual(codecs.open(path, 'r', 'utf-8').read(),
-                         'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
+        with codecs.open(path, 'r', 'utf-8') as f:
+            self.assertEqual(f.read(),
+                'Some non-ASCII text for testing ticket #18091:\nüäö €\n')

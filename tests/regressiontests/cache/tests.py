@@ -15,7 +15,7 @@ import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
+from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import router
@@ -25,8 +25,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import (get_warnings_state, restore_warnings_state,
-    override_settings)
+from django.test.utils import override_settings, six
 from django.utils import timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
@@ -821,7 +820,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Cache table 'test cache table' could not be created"):
             management.call_command(
                'createcachetable',
