@@ -10,8 +10,7 @@ from __future__ import unicode_literals
 from django.db.backends import util
 from django.utils import six
 from django.utils import tree
-from django.db.sql.constance import LOOKUP_SEP
-
+from django.db.models.sql.constants import LOOKUP_SEP
 
 class InvalidQuery(Exception):
     """
