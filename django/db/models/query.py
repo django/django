@@ -8,6 +8,7 @@ import sys
 
 from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
@@ -1613,8 +1614,6 @@ def prefetch_related_objects(result_cache, related_lookups):
     Populates prefetched objects caches for a list of results
     from a QuerySet
     """
-    from django.db.models.sql.constants import LOOKUP_SEP
-
     if len(result_cache) == 0:
         return # nothing to do
 

@@ -3,9 +3,10 @@ from django.utils.six.moves import zip
 from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
-    LOOKUP_SEP, GET_ITERATOR_CHUNK_SIZE)
+        GET_ITERATOR_CHUNK_SIZE)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
