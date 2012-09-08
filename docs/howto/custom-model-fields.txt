@@ -181,10 +181,10 @@ card values plus their suits; 104 characters in total.
     Many of Django's model fields accept options that they don't do anything
     with. For example, you can pass both
     :attr:`~django.db.models.Field.editable` and
-    :attr:`~django.db.models.Field.auto_now` to a
+    :attr:`~django.db.models.DateField.auto_now` to a
     :class:`django.db.models.DateField` and it will simply ignore the
     :attr:`~django.db.models.Field.editable` parameter
-    (:attr:`~django.db.models.Field.auto_now` being set implies
+    (:attr:`~django.db.models.DateField.auto_now` being set implies
     ``editable=False``). No error is raised in this case.
 
     This behavior simplifies the field classes, because they don't need to
@@ -524,8 +524,8 @@ for the first time, the ``add`` parameter will be ``True``, otherwise it will be
 You only need to override this method if you want to preprocess the value
 somehow, just before saving. For example, Django's
 :class:`~django.db.models.DateTimeField` uses this method to set the attribute
-correctly in the case of :attr:`~django.db.models.Field.auto_now` or
-:attr:`~django.db.models.Field.auto_now_add`.
+correctly in the case of :attr:`~django.db.models.DateField.auto_now` or
+:attr:`~django.db.models.DateField.auto_now_add`.
 
 If you do override this method, you must return the value of the attribute at
 the end. You should also update the model's attribute if you make any changes
