@@ -5,6 +5,7 @@ from optparse import OptionParser, NO_DEFAULT
 import imp
 import warnings
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
 from django.utils.importlib import import_module
@@ -105,7 +106,7 @@ def get_commands():
         try:
             from django.conf import settings
             apps = settings.INSTALLED_APPS
-        except (AttributeError, EnvironmentError, ImportError):
+        except (AttributeError, ImproperlyConfigured):
             apps = []
 
         # Find and load the management module for each installed app.
