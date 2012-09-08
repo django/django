@@ -31,6 +31,9 @@ You can evaluate a ``QuerySet`` in the following ways:
       for e in Entry.objects.all():
           print(e.headline)
 
+  Note: Don't use this if all you want to do is determine if at least one
+  result exists. It's more efficient to use :meth:`~QuerySet.exists`.
+
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
@@ -75,7 +78,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
   Note: *Don't* use this if all you want to do is determine if at least one
   result exists, and don't need the actual objects. It's more efficient to
-  use :meth:`exists() <QuerySet.exists>` (see below).
+  use :meth:`~QuerySet.exists` (see below).
 
 .. _pickling QuerySets:
 
@@ -1268,7 +1271,7 @@ The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
         e = Entry.objects.get(id=3)
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
-        print("Either the entry or blog doesn't exist.")
+        print "Either the entry or blog doesn't exist."
 
 create
 ~~~~~~
@@ -1523,9 +1526,40 @@ exists
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
-possible, but it *does* execute nearly the same query. This means that calling
-:meth:`.QuerySet.exists` is faster than ``bool(some_query_set)``, but not by
-a large degree. If ``some_query_set`` has not yet been evaluated, but you know
+possible, but it *does* execute nearly the same query as a normal
+:class:`.QuerySet` query.
+
+:meth:`~.QuerySet.exists` is useful for searches relating to both
+object membership in a :class:`.QuerySet` and to the existence of any objects in
+a :class:`.QuerySet`, particularly in the context of a large :class:`.QuerySet`.
+
+The most efficient method of finding whether a model with a unique field
+(e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
+
+    entry = Entry.objects.get(pk=123)
+    if some_query_set.filter(pk=entry.pk).exists():
+        print "Entry contained in queryset"
+
+Which will be faster than the following which requires evaluating and iterating
+through the entire queryset::
+
+    if entry in some_query_set:
+       print "Entry contained in QuerySet"
+
+And to find whether a queryset contains any items::
+
+    if some_query_set.exists():
+        print "There is at least one object in some_query_set"
+
+Which will be faster than::
+
+    if some_query_set:
+        print "There is at least one object in some_query_set"
+
+... but not by a large degree (hence needing a large queryset for efficiency
+gains).
+
+Additionally, if a ``some_query_set`` has not yet been evaluated, but you know
 that it will be at some point, then using ``some_query_set.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than simply using ``bool(some_query_set)``, which
