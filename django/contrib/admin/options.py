@@ -1456,8 +1456,10 @@ class InlineModelAdmin(BaseModelAdmin):
         return request.user.has_perm(
             self.opts.app_label + '.' + self.opts.get_delete_permission())
 
+
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'
+
 
 class TabularInline(InlineModelAdmin):
     template = 'admin/edit_inline/tabular.html'

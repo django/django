@@ -8,10 +8,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 # local test models
-from .admin import InnerInline
+from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
-    ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2)
+    ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
+    Title)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -408,6 +409,47 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     fixtures = ['admin-views-users.xml']
     urls = "regressiontests.admin_inlines.urls"
 
+    def test_add_stackeds(self):
+        """
+        Ensure that the "Add another XXX" link correctly adds items to the
+        stacked formset.
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+
+        self.assertEqual(rows_length(), 4)
+
+    def test_delete_stackeds(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+        add_button.click()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+        for delete_link in self.selenium.find_elements_by_css_selector(
+                '%s .inline-deletelink' % inline_id):
+            delete_link.click()
+        self.assertEqual(rows_length(), 3)
+
     def test_add_inlines(self):
         """
         Ensure that the "Add another XXX" link correctly adds items to the
@@ -515,6 +557,21 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
+
+    def test_alternating_rows(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/profilecollection/add/'))
+
+        # Add a few inlines
+        self.selenium.find_element_by_link_text('Add another Profile').click()
+        self.selenium.find_element_by_link_text('Add another Profile').click()
+
+        row_selector = 'form#profilecollection_form tr.dynamic-profile_set'
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            "%s.row1" % row_selector)), 2, msg="Expect two row1 styled rows")
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            "%s.row2" % row_selector)), 1, msg="Expect one row2 styled row")
 
 
 class SeleniumChromeTests(SeleniumFirefoxTests):
