@@ -8,6 +8,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
+from django.shortcuts import resolve_url
 
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
@@ -23,11 +24,10 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
-            # urlparse chokes on lazy objects in Python 3
-            login_url_as_str = force_str(login_url or settings.LOGIN_URL)
+            resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url.
-            login_scheme, login_netloc = urlparse(login_url_as_str)[:2]
+            login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
             current_scheme, current_netloc = urlparse(path)[:2]
             if ((not login_scheme or login_scheme == current_scheme) and
                 (not login_netloc or login_netloc == current_netloc)):
