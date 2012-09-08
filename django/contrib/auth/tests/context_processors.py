@@ -3,11 +3,11 @@ import os
 from django.conf import global_settings
 from django.contrib.auth import authenticate
 from django.db.models import Q
-from django.template import context
-from django.test import TestCase
+from django.test import TestCase, skipIfCustomUser
 from django.test.utils import override_settings
 
 
+@skipIfCustomUser
 @override_settings(
     TEMPLATE_DIRS=(
             os.path.join(os.path.dirname(__file__), 'templates'),

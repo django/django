@@ -7,12 +7,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests import CustomUser
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.test import TestCase, skipIfCustomUser
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
 
+@skipIfCustomUser
 class GetDefaultUsernameTestCase(TestCase):
 
     def setUp(self):
@@ -41,6 +42,7 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
+@skipIfCustomUser
 class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
@@ -76,6 +78,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
 
 
+@skipIfCustomUser
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_createsuperuser(self):

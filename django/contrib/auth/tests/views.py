@@ -10,7 +10,7 @@ from django.http import QueryDict
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
-from django.test import TestCase
+from django.test import TestCase, skipIfCustomUser
 from django.test.utils import override_settings
 
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
@@ -49,6 +49,7 @@ class AuthViewsTestCase(TestCase):
         return self.assertContains(response, escape(force_text(text)), **kwargs)
 
 
+@skipIfCustomUser
 class AuthViewNamedURLTests(AuthViewsTestCase):
     urls = 'django.contrib.auth.urls'
 
@@ -74,6 +75,7 @@ class AuthViewNamedURLTests(AuthViewsTestCase):
                 self.fail("Reversal of url named '%s' failed with NoReverseMatch" % name)
 
 
+@skipIfCustomUser
 class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
@@ -171,6 +173,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContainsEscaped(response, SetPasswordForm.error_messages['password_mismatch'])
 
 
+@skipIfCustomUser
 class ChangePasswordTest(AuthViewsTestCase):
 
     def fail_login(self, password='password'):
@@ -230,6 +233,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             self.assertTrue(response['Location'].endswith('/login/?next=/password_change/done/'))
 
 
+@skipIfCustomUser
 class LoginTest(AuthViewsTestCase):
 
     def test_current_site_in_context_after_login(self):
@@ -288,6 +292,7 @@ class LoginTest(AuthViewsTestCase):
                             "%s should be allowed" % good_url)
 
 
+@skipIfCustomUser
 class LoginURLSettings(AuthViewsTestCase):
 
     def setUp(self):
@@ -346,6 +351,7 @@ class LoginURLSettings(AuthViewsTestCase):
                                                     querystring.urlencode('/')))
 
 
+@skipIfCustomUser
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):

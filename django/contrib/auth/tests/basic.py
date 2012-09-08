@@ -3,10 +3,11 @@ import locale
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, skipIfCustomUser
 from django.utils.six import StringIO
 
 
+@skipIfCustomUser
 class BasicTestCase(TestCase):
     def test_user(self):
         "Check that users can be created and can set their password"

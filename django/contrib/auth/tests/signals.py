@@ -1,8 +1,9 @@
-from django.test import TestCase
+from django.test import TestCase, skipIfCustomUser
 from django.test.utils import override_settings
 from django.contrib.auth import signals
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SignalTestCase(TestCase):
     urls = 'django.contrib.auth.tests.urls'
