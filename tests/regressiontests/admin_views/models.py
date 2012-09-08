@@ -649,3 +649,9 @@ class UndeletableObject(models.Model):
     Refs #10057.
     """
     name = models.CharField(max_length=255)
+
+
+class Simple(models.Model):
+    """
+    Simple model with nothing on it for use in testing
+    """
