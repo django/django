@@ -1271,7 +1271,7 @@ The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
         e = Entry.objects.get(id=3)
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
-        print "Either the entry or blog doesn't exist."
+        print("Either the entry or blog doesn't exist.")
 
 create
 ~~~~~~
@@ -1538,23 +1538,23 @@ The most efficient method of finding whether a model with a unique field
 
     entry = Entry.objects.get(pk=123)
     if some_query_set.filter(pk=entry.pk).exists():
-        print "Entry contained in queryset"
+        print("Entry contained in queryset")
 
 Which will be faster than the following which requires evaluating and iterating
 through the entire queryset::
 
     if entry in some_query_set:
-       print "Entry contained in QuerySet"
+       print("Entry contained in QuerySet")
 
 And to find whether a queryset contains any items::
 
     if some_query_set.exists():
-        print "There is at least one object in some_query_set"
+        print("There is at least one object in some_query_set")
 
 Which will be faster than::
 
     if some_query_set:
-        print "There is at least one object in some_query_set"
+        print("There is at least one object in some_query_set")
 
 ... but not by a large degree (hence needing a large queryset for efficiency
 gains).

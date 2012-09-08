@@ -7,9 +7,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_str
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
+from django.shortcuts import resolve_url
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -38,16 +38,16 @@ def login(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
-            netloc = urlparse(redirect_to)[1]
-
             # Use default setting if redirect_to is empty
             if not redirect_to:
                 redirect_to = settings.LOGIN_REDIRECT_URL
+            redirect_to = resolve_url(redirect_to)
 
+            netloc = urlparse(redirect_to)[1]
             # Heavier security check -- don't allow redirection to a different
             # host.
-            elif netloc and netloc != request.get_host():
-                redirect_to = settings.LOGIN_REDIRECT_URL
+            if netloc and netloc != request.get_host():
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security checks complete. Log the user in.
             auth_login(request, form.get_user())
@@ -110,6 +110,7 @@ def logout_then_login(request, login_url=None, current_app=None, extra_context=N
     """
     if not login_url:
         login_url = settings.LOGIN_URL
+    login_url = resolve_url(login_url)
     return logout(request, login_url, current_app=current_app, extra_context=extra_context)
 
 def redirect_to_login(next, login_url=None,
@@ -117,10 +118,9 @@ def redirect_to_login(next, login_url=None,
     """
     Redirects the user to the login page, passing the given 'next' page
     """
-    # urlparse chokes on lazy objects in Python 3
-    login_url_as_str = force_str(login_url or settings.LOGIN_URL)
+    resolved_url = resolve_url(login_url or settings.LOGIN_URL)
 
-    login_url_parts = list(urlparse(login_url_as_str))
+    login_url_parts = list(urlparse(resolved_url))
     if redirect_field_name:
         querystring = QueryDict(login_url_parts[4], mutable=True)
         querystring[redirect_field_name] = next
@@ -229,7 +229,7 @@ def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):
     context = {
-        'login_url': settings.LOGIN_URL
+        'login_url': resolve_url(settings.LOGIN_URL)
     }
     if extra_context is not None:
         context.update(extra_context)

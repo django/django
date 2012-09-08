@@ -195,6 +195,14 @@ support tablespaces for indexes, this option is ignored.
 The default value for the field. This can be a value or a callable object. If
 callable it will be called every time a new object is created.
 
+The default cannot be a mutable object (model instance, list, set, etc.), as a
+reference to the same instance of that object would be used as the default
+value in all new model instances. Instead, wrap the desired default in a
+callable.  For example, if you had a custom ``JSONField`` and wanted to specify
+a dictionary as the default, use a ``lambda`` as follows::
+
+    contact_info = JSONField("ContactInfo", default=lambda:{"email": "to1@example.com"})
+
 ``editable``
 ------------
 

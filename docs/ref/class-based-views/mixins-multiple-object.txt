@@ -86,7 +86,8 @@ MultipleObjectMixin
 
     .. method:: get_queryset()
 
-        Returns the queryset that represents the data this view will display.
+        Get the list of items for this view. This must be an iterable and may
+        be a queryset (in which queryset-specific behavior will be enabled).
 
     .. method:: paginate_queryset(queryset, page_size)
 
