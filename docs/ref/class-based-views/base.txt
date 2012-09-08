@@ -71,6 +71,11 @@ View
         delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
         and so on.
 
+        By default, a ``HEAD`` request will be delegated to :meth:`~View.get()`.
+        If you need to handle ``HEAD`` requests in a different way than ``GET``,
+        you can override the :meth:`~View.head()` method. See
+        :ref:`supporting-other-http-methods` for an example.
+
         The default implementation also sets ``request``, ``args`` and
         ``kwargs`` as instance variables, so any method on the view can know
         the full details of the request that was made to invoke the view.
