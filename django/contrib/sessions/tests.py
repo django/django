@@ -302,11 +302,10 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             self.assertTrue(self.session.exists(self.session.session_key))
 
     def test_load_overlong_key(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+        # Some backends might issue a warning
+        with warnings.catch_warnings():
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
-            self.assertEqual(len(w), 1)
 
 
 @override_settings(USE_TZ=True)
@@ -352,11 +351,10 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
     backend = CacheSession
 
     def test_load_overlong_key(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+        # Some backends might issue a warning
+        with warnings.catch_warnings():
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
-            self.assertEqual(len(w), 1)
 
 
 class SessionMiddlewareTests(unittest.TestCase):
