@@ -177,7 +177,7 @@
             dependency_list = input.data('dependency_list') || [],
             dependencies = [];
         $.each(dependency_list, function(i, field_name) {
-          dependencies.push('#' + row.find(field_name).find('input, select, textarea').attr('id'));
+          dependencies.push('#' + row.find('.field-' + field_name).find('input, select, textarea').attr('id'));
         });
         if (dependencies.length) {
           input.prepopulate(dependencies, input.attr('maxlength'));
