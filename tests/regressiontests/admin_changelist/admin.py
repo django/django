@@ -50,6 +50,16 @@ class FilteredChildAdmin(admin.ModelAdmin):
             name__contains='filtered')
 
 
+class BrokenChildAdmin(ChildAdmin):
+    list_display = ['name', 'broken']
+
+    def broken(self, child):
+        """
+        Cause an AttributeError.
+        """
+        return self.bork
+
+
 class BandAdmin(admin.ModelAdmin):
     list_filter = ['genres']
 

@@ -16,7 +16,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin)
+    SwallowAdmin, BrokenChildAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject)
@@ -48,14 +48,12 @@ class ChangeListTests(TestCase):
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
 
-    def test_result_list_empty_changelist_value(self):
+    def _render_child_result_list(self, model_admin=ChildAdmin):
         """
-        Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored
-        for relationship fields
+        Helper to render the Child model admin's result_list.
         """
-        new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
+        m = model_admin(Child, admin.site)
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
@@ -64,7 +62,15 @@ class ChangeListTests(TestCase):
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
-        table_output = template.render(context)
+        return template.render(context)
+
+    def test_result_list_empty_changelist_value(self):
+        """
+        Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored
+        for relationship fields
+        """
+        new_child = Child.objects.create(name='name', parent=None)
+        table_output = self._render_child_result_list()
         row_html = '<tbody><tr class="row1"><th><a href="%d/">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % new_child.id
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
@@ -76,20 +82,19 @@ class ChangeListTests(TestCase):
         """
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
-        request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
-        list_display = m.get_list_display(request)
-        list_display_links = m.get_list_display_links(request, list_display)
-        cl = ChangeList(request, Child, list_display, list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
-        cl.formset = None
-        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
-        table_output = template.render(context)
+        table_output = self._render_child_result_list()
         row_html = '<tbody><tr class="row1"><th><a href="%d/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % new_child.id
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
+
+    def test_result_list_errors_propagate(self):
+        """
+        Regression test for #18593: user AttributeErrors from callable
+        display fields should not be swallowed.
+        """
+        new_child = Child.objects.create(name='name', parent=None)
+        self.assertRaises(AttributeError, lambda:
+                self._render_child_result_list(BrokenChildAdmin))
 
     def test_result_list_editable_html(self):
         """

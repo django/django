@@ -30,8 +30,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     RelatedPrepopulated, UndeletableObject)
 
 
-def callable_year(dt_value):
-    return dt_value.year
+def callable_year(obj):
+    return obj.date.year
 callable_year.admin_order_field = 'date'
 
 
