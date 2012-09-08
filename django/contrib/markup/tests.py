@@ -3,6 +3,7 @@ import re
 import warnings
 
 from django.template import Template, Context
+from django import test
 from django.utils import unittest
 from django.utils.html import escape
 
@@ -22,7 +23,7 @@ try:
 except ImportError:
     docutils = None
 
-class Templates(unittest.TestCase):
+class Templates(test.TestCase):
 
     textile_content = """Paragraph 1
 
