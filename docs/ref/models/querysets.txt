@@ -27,9 +27,13 @@ You can evaluate a ``QuerySet`` in the following ways:
 * **Iteration.** A ``QuerySet`` is iterable, and it executes its database
   query the first time you iterate over it. For example, this will print
   the headline of all entries in the database::
-
+  
       for e in Entry.objects.all():
           print(e.headline)
+
+  Note: *Don't* use this if all you want to do is determine if at least one
+  result exists, and don't need the actual objects. It's more efficient to
+  use :meth:`exists() <QuerySet.exists>` (see below).
 
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
@@ -1523,13 +1527,41 @@ exists
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
-possible, but it *does* execute nearly the same query. This means that calling
-:meth:`.QuerySet.exists` is faster than ``bool(some_query_set)``, but not by
-a large degree. If ``some_query_set`` has not yet been evaluated, but you know
-that it will be at some point, then using ``some_query_set.exists()`` will do
-more overall work (one query for the existence check plus an extra one to later
-retrieve the results) than simply using ``bool(some_query_set)``, which
-retrieves the results and then checks if any were returned.
+possible, but it *does* execute nearly the same query as a normal :class:`.QuerySet` query.
+
+The usage of :meth:`.QuerySet.exists` is useful for searches relating to both object membership and to the existence of specific :class:`.QuerySet`\s, particularly in the context of large :class:`.QuerySet`\s.
+
+The most efficient method of finding whether a model with a known unique characteristic (e.g. ``primary_key``) is a member of a :class:`.QuerySet`, is::
+
+   known_entry_id = 123
+   if some_query_set.filter(pk=known_entry_id).exists():
+       print ("Entry contained in queryset")
+
+Which will be faster than::
+
+   if e in some_query_set:
+       print("Entry contained in QuerySet")
+
+And to find whether a returned queryset contains any items::
+
+   if some_query_set.exists():
+       print("There is at least one Entry with the headline Test")
+
+Which will be faster than::
+
+   if some_query_set:
+       print("There is at least one Entry with the headline Test")
+
+...but not by a large degree (hence needing a large queryset for
+efficiency gains).
+
+Additionally, if a ``some_query_set`` has not yet been evaluated, but you know that
+it will be at some point, then using ``some_query_set.exists()`` 
+will do more overall work (one query for the existence check plus 
+an extra one to later retrieve the results) than simply using
+``bool(some_query_set)``, which retrieves the results and then
+checks if any were returned.
+
 
 update
 ~~~~~~
