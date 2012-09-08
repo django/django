@@ -10,7 +10,7 @@ from django.core.management import call_command
 from django import db
 from django.test import simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
-from django.test.runner import DiscoveryRunner
+from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
 from django.utils.importlib import import_module
@@ -22,8 +22,8 @@ from .models import Person
 
 TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
 TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
-DISCOVERY_APP_TESTS = 'regressiontests.test_runner.discovery_app'
-DISCOVERY_APP_MODEL_TESTS = 'regressiontests.test_runner.discovery_app.models'
+DISCOVER_APP_TESTS = 'regressiontests.test_runner.discovery_app'
+DISCOVER_APP_MODEL_TESTS = 'regressiontests.test_runner.discovery_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -285,20 +285,20 @@ class AutoIncrementResetTest(TransactionTestCase):
         self.assertEqual(p.pk, 1)
 
 
-class DiscoveryTestRunnerTests(AdminScriptTestCase):
+class DiscoverTestRunnerTests(AdminScriptTestCase):
 
     def test_discovery_of_tests_default_settings(self):
-        suite = DiscoveryRunner().build_suite((DISCOVERY_APP_TESTS, ))
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_TESTS, ))
         discovered_tests = suite.countTestCases()
         self.assertEqual(3, discovered_tests)
 
     def test_discovery_of_tests_inside_module(self):
-        suite = DiscoveryRunner().build_suite((DISCOVERY_APP_MODEL_TESTS, ))
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_MODEL_TESTS, ))
         discovered_tests = suite.countTestCases()
         self.assertEqual(1, discovered_tests)
 
-    @override_settings(TEST_DISCOVERY_PATTERN = '*_test.py')
+    @override_settings(TEST_DISCOVER_PATTERN='*_test.py')
     def test_discovery_of_tests_with_pattern(self):
-        suite = DiscoveryRunner().build_suite((DISCOVERY_APP_TESTS, ))
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_TESTS, ))
         discovered_tests = suite.countTestCases()
         self.assertEqual(4, discovered_tests)

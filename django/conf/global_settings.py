@@ -589,13 +589,13 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 # The root directory to discover tests within
-TEST_DISCOVERY_ROOT = '.'
+TEST_DISCOVER_ROOT = '.'
 
 # The pattern used for discovering tests
-TEST_DISCOVERY_PATTERN = 'test*.py'
+TEST_DISCOVER_PATTERN = 'test*.py'
 
 # The top level directory to discover tests within
-TEST_DISCOVERY_TOP_LEVEL = None
+TEST_DISCOVER_TOP_LEVEL = None
 
 ############
 # FIXTURES #

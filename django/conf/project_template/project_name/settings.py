@@ -124,7 +124,7 @@ INSTALLED_APPS = (
 
 
 # Test runner to be used for testing
-TEST_RUNNER = 'django.test.runner.DiscoveryRunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
 # A sample logging configuration. The only tangible logging

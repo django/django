@@ -1,19 +1,28 @@
 import os
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.simple import DjangoTestSuiteRunner, reorder_suite
 from django.utils.importlib import import_module
-from django.utils.unittest.loader import defaultTestLoader
+
+try:
+    from django.utils.unittest.loader import defaultTestLoader
+except ImportError:
+    try:
+        from unittest2 import defaultTestLoader
+    except ImportError:
+        raise ImproperlyConfigured("Couldn't import unittest2 default "
+                                   "test loader, install the unittest2 library.")
 
 
-class DiscoveryRunner(DjangoTestSuiteRunner):
+class DiscoverRunner(DjangoTestSuiteRunner):
     """A test suite runner that uses unittest2 test discovery."""
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
         suite = None
-        root = settings.TEST_DISCOVERY_ROOT
-        pattern = settings.TEST_DISCOVERY_PATTERN
-        top_level = settings.TEST_DISCOVERY_TOP_LEVEL
+        root = settings.TEST_DISCOVER_ROOT
+        pattern = settings.TEST_DISCOVER_PATTERN
+        top_level = settings.TEST_DISCOVER_TOP_LEVEL
 
         if test_labels:
             suite = defaultTestLoader.loadTestsFromNames(test_labels)
