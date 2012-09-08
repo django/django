@@ -54,14 +54,14 @@ The various cache middlewares are an exception:
 Even when using database caching, Django's cache backend uses its own
 database cursor (which is mapped to its own database connection internally).
 
-.. _transaction-management-functions:
-
 .. note::
 
     The ``TransactionMiddleware`` only affects the database aliased
     as "default" within your :setting:`DATABASES` setting.  If you are using
     multiple databases and want transaction control over databases other than
     "default", you will need to write your own transaction middleware.
+
+.. _transaction-management-functions:
 
 Controlling transaction management in views
 ===========================================

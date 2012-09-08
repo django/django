@@ -1473,7 +1473,7 @@ Applying permissions to generic views
 -------------------------------------
 
 To apply a permission to a :doc:`class-based generic view
-</ref/class-based-views/index>`, decorate the :meth:`View.dispatch
+</ref/class-based-views>`, decorate the :meth:`View.dispatch
 <django.views.generic.base.View.dispatch>` method on the class. See
 :ref:`decorating-class-based-views` for details.
 

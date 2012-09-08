@@ -191,6 +191,8 @@ You can get a local copy of the HTML documentation following a few easy steps:
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
 
+.. _differences-between-doc-versions:
+
 Differences between versions
 ============================
 
