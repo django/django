@@ -40,7 +40,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig, value in ordered]
+        ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -60,7 +60,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig, value in ordered]
+        ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -81,13 +81,13 @@ class DependencyOrderingTests(unittest.TestCase):
             ('s4', ('s4_db', ['delta'])),
         ]
         dependencies = {
-            'alpha': ['bravo', 'delta'],
+            'alpha': ['bravo','delta'],
             'bravo': ['charlie'],
             'delta': ['charlie'],
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig, aliases in ordered]
+        ordered_sigs = [sig for sig,aliases in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -156,9 +156,9 @@ class ManageCommandTests(unittest.TestCase):
 
 class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
     option_list = (
-        make_option('--option_a', '-a', action='store', dest='option_a', default='1'),
-        make_option('--option_b', '-b', action='store', dest='option_b', default='2'),
-        make_option('--option_c', '-c', action='store', dest='option_c', default='3'),
+        make_option('--option_a','-a', action='store', dest='option_a', default='1'),
+        make_option('--option_b','-b', action='store', dest='option_b', default='2'),
+        make_option('--option_c','-c', action='store', dest='option_c', default='3'),
     )
 
     def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
