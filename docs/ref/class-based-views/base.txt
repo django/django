@@ -8,6 +8,11 @@ themselves or inherited from. They may not provide all the capabilities
 required for projects, in which case there are Mixins and Generic class-based
 views.
 
+Many of Django's built-in class-based views inherit from other class-based
+views or various mixins. Because this inheritence chain is very important, the
+ancestor classes are  documented under the section title of **Ancestors (MRO)**.
+MRO is an acronym for Method Resolution Order.
+
 View
 ----
 
@@ -20,6 +25,7 @@ View
 
     1. :meth:`dispatch()`
     2. :meth:`http_method_not_allowed()`
+    3. :meth:`options()`
 
     **Example views.py**::
 
@@ -40,6 +46,12 @@ View
         urlpatterns = patterns('',
             url(r'^mine/$', MyView.as_view(), name='my-view'),
         )
+
+    **Attributes**
+
+    .. attribute:: http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+
+        The default list of HTTP method names that this view will accept.
 
     **Methods**
 
@@ -68,14 +80,13 @@ View
         If the view was called with a HTTP method it doesn't support, this
         method is called instead.
 
-        The default implementation returns ``HttpResponseNotAllowed`` with list
-        of allowed methods in plain text.
+        The default implementation returns ``HttpResponseNotAllowed`` with a
+        list of allowed methods in plain text.
 
-    .. note::
+    .. method:: options(request, *args, **kwargs)
 
-        Documentation on class-based views is a work in progress. As yet, only the
-        methods defined directly on the class are documented here, not methods
-        defined on superclasses.
+        Handles responding to requests for the OPTIONS HTTP verb.  Returns a
+        list of the allowed HTTP method names for the view.
 
 TemplateView
 ------------
@@ -86,6 +97,8 @@ TemplateView
     which is a dictionary of the parameters captured in the URL.
 
     **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
@@ -122,27 +135,10 @@ TemplateView
             url(r'^$', HomePageView.as_view(), name='home'),
         )
 
-    **Methods and Attributes**
-
-    .. attribute:: template_name
-
-        The full name of a template to use.
-
-    .. method:: get_context_data(**kwargs)
-
-        Return a context data dictionary consisting of the contents of
-        ``kwargs`` stored in the context variable ``params``.
-
     **Context**
 
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
-
-    .. note::
-
-        Documentation on class-based views is a work in progress. As yet, only the
-        methods defined directly on the class are documented here, not methods
-        defined on superclasses.
 
 RedirectView
 ------------
@@ -161,6 +157,8 @@ RedirectView
     (410).
 
     **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following view:
 
     * :class:`django.views.generic.base.View`
 
@@ -200,7 +198,7 @@ RedirectView
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
-    **Methods and Attributes**
+    **Attributes**
 
     .. attribute:: url
 
@@ -221,6 +219,8 @@ RedirectView
         then the query string is discarded. By default, ``query_string`` is
         ``False``.
 
+    **Methods**
+
     .. method:: get_redirect_url(**kwargs)
 
         Constructs the target URL for redirection.
@@ -231,9 +231,3 @@ RedirectView
         :attr:`~RedirectView.query_string`. Subclasses may implement any
         behavior they wish, as long as the method returns a redirect-ready URL
         string.
-
-    .. note::
-
-        Documentation on class-based views is a work in progress. As yet, only the
-        methods defined directly on the class are documented here, not methods
-        defined on superclasses.
