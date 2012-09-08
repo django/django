@@ -51,8 +51,8 @@ class CommentsAdmin(admin.ModelAdmin):
 
     def remove_comments(self, request, queryset):
         self._bulk_flag(request, queryset, perform_delete,
-                        lambda n: ungettext('removed', 'removed', n))
-    remove_comments.short_description = _("Remove selected comments")
+                        lambda n: ungettext('unpublished', 'unpublished', n))
+    remove_comments.short_description = _("Unpublish selected comments")
 
     def _bulk_flag(self, request, queryset, action, done_message):
         """

@@ -63,7 +63,7 @@ class Comment(BaseCommentAbstractModel):
     is_public   = models.BooleanField(_('is public'), default=True,
                     help_text=_('Uncheck this box to make the comment effectively ' \
                                 'disappear from the site.'))
-    is_removed  = models.BooleanField(_('is removed'), default=False,
+    is_removed  = models.BooleanField(_('is unpublished'), default=False,
                     help_text=_('Check this box if the comment is inappropriate. ' \
                                 'A "This comment has been removed" message will ' \
                                 'be displayed instead.'))
