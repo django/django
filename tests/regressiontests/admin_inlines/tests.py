@@ -163,45 +163,6 @@ class TestInline(TestCase):
         self.assertContains(response, child2_shortcut)
 
 
-class TestTabularInlineSubclass(TestCase):
-    def test_custom_js_is_present(self):
-        """Verify that the expected JavaScript is added"""
-        instance = TitleInline(Title, site)
-        self.assertTrue("admin/js/django.admin.inlineTabularFormSet.js" in
-                instance.media._js, msg="Found tabular formset JavaScript code")
-
-    def test_custom_js_is_present_in_subclasses(self):
-        """Verify that additional JS on subclasses is preserved"""
-        class CustomTitleInline(TitleInline):
-            class Media:
-                js = ["extra.js", ]
-        instance = CustomTitleInline(Title, site)
-        self.assertTrue("admin/js/django.admin.inlineTabularFormSet.js" in
-                instance.media._js, msg="Did not find tabular JavaScript code")
-        self.assertTrue("extra.js" in instance.media._js,
-                msg="Additional JavaScript not found")
-
-
-class TestStackedInlineSubclass(TestCase):
-    def test_custom_js_is_present(self):
-        """Verify that the expected JavaScript is added"""
-        instance = InnerInline(Inner, site)
-        self.assertTrue("admin/js/django.admin.inlineStackedFormSet.js" in
-                instance.media._js, msg="Did not find stacked JavaScript code")
-
-    def test_custom_js_is_present_in_subclasses(self):
-        """Verify that additional JS on subclasses is preserved"""
-        class CustomInnerInline(InnerInline):
-            class Media:
-                js = ["extra.js", ]
-
-        instance = CustomInnerInline(Inner, site)
-        self.assertTrue("admin/js/django.admin.inlineStackedFormSet.js" in
-                instance.media._js, msg="Found stacked formset JavaScript code")
-        self.assertTrue("extra.js" in instance.media._js,
-                msg="Additional JavaScript not found")
-
-
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineMedia(TestCase):
     urls = "regressiontests.admin_inlines.urls"
