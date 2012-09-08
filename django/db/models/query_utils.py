@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 from django.db.backends import util
 from django.utils import six
 from django.utils import tree
-from django.db.models.sql.constants import LOOKUP_SEP
 
 class InvalidQuery(Exception):
     """
@@ -207,6 +206,11 @@ class LookupExpression(tree.Node):
         Validates a lookup string as a traversable sequence of attributes,
         storing them for for future use
         """
+        # This function roughly re-implements the behavior of
+        # db.models.sql.query.add_filter
+
+        # lookup_sep is defined here to avoid a circular import on sql.constants
+        LOOKUP_SEP = '__'
 
         parts = self.lookup.split(LOOKUP_SEP)
         num_parts = len(parts)
