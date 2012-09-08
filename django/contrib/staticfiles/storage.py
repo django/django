@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_text, smart_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 
@@ -51,8 +51,8 @@ class CachedFilesMixin(object):
     default_template = """url("%s")"""
     patterns = (
         ("*.css", (
-            br"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (br"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
+            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
 
@@ -87,6 +87,7 @@ class CachedFilesMixin(object):
     def hashed_name(self, name, content=None):
         parsed_name = urlsplit(unquote(name))
         clean_name = parsed_name.path.strip()
+        opened = False
         if content is None:
             if not self.exists(clean_name):
                 raise ValueError("The file '%s' could not be found with %r." %
@@ -96,9 +97,14 @@ class CachedFilesMixin(object):
             except IOError:
                 # Handle directory paths and fragments
                 return name
+            opened = True
+        try:
+            file_hash = self.file_hash(clean_name, content)
+        finally:
+            if opened:
+                content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = self.file_hash(clean_name, content)
         if file_hash is not None:
             file_hash = ".%s" % file_hash
         hashed_name = os.path.join(path, "%s%s%s" %
@@ -112,7 +118,7 @@ class CachedFilesMixin(object):
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
-        return 'staticfiles:%s' % hashlib.md5(smart_bytes(name)).hexdigest()
+        return 'staticfiles:%s' % hashlib.md5(force_bytes(name)).hexdigest()
 
     def url(self, name, force=False):
         """
@@ -248,7 +254,7 @@ class CachedFilesMixin(object):
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(smart_bytes(content))
+                    content_file = ContentFile(force_bytes(content))
                     saved_name = self._save(hashed_name, content_file)
                     hashed_name = force_text(saved_name.replace('\\', '/'))
                     processed = True

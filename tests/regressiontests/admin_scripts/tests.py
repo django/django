@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 A series of tests to establish that the command-line managment tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
+from __future__ import unicode_literals
 
 import os
 import re
@@ -10,6 +12,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import codecs
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -1573,3 +1576,17 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "Destination directory '%s' does not exist, please create it first." % testproject_dir)
         self.assertFalse(os.path.exists(testproject_dir))
 
+    def test_custom_project_template_with_non_ascii_templates(self):
+        "Ticket 18091: Make sure the startproject management command is able to render templates with non-ASCII content"
+        template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template')
+        args = ['startproject', '--template', template_path, '--extension=txt', 'customtestproject']
+        testproject_dir = os.path.join(test_dir, 'customtestproject')
+
+        out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
+        with codecs.open(path, 'r', 'utf-8') as f:
+            self.assertEqual(f.read(),
+                'Some non-ASCII text for testing ticket #18091:\nüäö €\n')

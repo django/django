@@ -513,11 +513,12 @@ Here's what happens if a user goes to "/polls/34/" in this system:
   further processing.
 
 Now that we've decoupled that, we need to decouple the ``polls.urls``
-URLconf by removing the leading "polls/" from each line, and removing the
-lines registering the admin site. Your ``polls/urls.py`` file should now look like
+URLconf by removing the leading "polls/" from each line, removing the
+lines registering the admin site, and removing the ``include`` import which
+is no longer used. Your ``polls/urls.py`` file should now look like
 this::
 
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import patterns, url
 
     urlpatterns = patterns('polls.views',
         url(r'^$', 'index'),
@@ -549,6 +550,17 @@ with the :ttag:`url` template tag:
 .. code-block:: html+django
 
     <li><a href="{% url 'polls.views.detail' poll.id %}">{{ poll.question }}</a></li>
+
+.. note::
+
+    If ``{% url 'polls.views.detail' poll.id %}`` (with quotes) doesn't work,
+    but ``{% url polls.views.detail poll.id %}`` (without quotes) does, that
+    means you're using a version of Django ≤ 1.4. In this case, add the
+    following declaration at the top of your template:
+
+    .. code-block:: html+django
+
+        {% load url from future %}
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
 </intro/tutorial04>` to learn about simple form processing and generic views.

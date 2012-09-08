@@ -1,4 +1,9 @@
 from django.db.models.sql import compiler
+# The izip_longest was renamed to zip_longest in py3
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 
 
 class SQLCompiler(compiler.SQLCompiler):
@@ -13,7 +18,7 @@ class SQLCompiler(compiler.SQLCompiler):
         index_start = rn_offset + len(self.query.extra_select)
         values = [self.query.convert_values(v, None, connection=self.connection)
                   for v in row[rn_offset:index_start]]
-        for value, field in map(None, row[index_start:], fields):
+        for value, field in zip_longest(row[index_start:], fields):
             values.append(self.query.convert_values(value, field, connection=self.connection))
         return tuple(values)
 

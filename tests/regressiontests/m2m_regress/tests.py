@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
+from django.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
     SelfReferChildSibling, Worksheet)
@@ -35,7 +36,7 @@ class M2MRegressionTests(TestCase):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
 
-        self.assertRaisesRegexp(FieldError,
+        six.assertRaisesRegex(self, FieldError,
             "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )
@@ -70,7 +71,7 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create(name='t2')
 
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1,t2]
+        c1.tags = [t1, t2]
         c1 = TagCollection.objects.get(name='c1')
 
         self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"])

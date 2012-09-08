@@ -41,6 +41,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return self.__str__()
+
 @python_2_unicode_compatible
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
@@ -194,6 +197,9 @@ class Inventory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return self.__str__()
 
 class Book(models.Model):
     title = models.CharField(max_length=40)

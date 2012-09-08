@@ -11,7 +11,7 @@ from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
-from django.utils.encoding import smart_text, force_text, smart_str
+from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
@@ -116,7 +116,7 @@ class Template(object):
     def __init__(self, template_string, origin=None,
                  name='<Unknown Template>'):
         try:
-            template_string = smart_text(template_string)
+            template_string = force_text(template_string)
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
@@ -848,7 +848,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<Text Node: '%s'>" % smart_str(self.s[:25], 'ascii',
+        return force_str("<Text Node: '%s'>" % self.s[:25], 'ascii',
                 errors='replace')
 
     def render(self, context):

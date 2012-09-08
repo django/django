@@ -19,7 +19,8 @@ test_suites = [test_driver.suite(),
 def suite():
     "Builds a test suite for the GDAL tests."
     s = TestSuite()
-    map(s.addTest, test_suites)
+    for test_suite in test_suites:
+        s.addTest(test_suite)
     return s
 
 def run(verbosity=1):

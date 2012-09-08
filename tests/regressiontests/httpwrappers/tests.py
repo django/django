@@ -6,9 +6,12 @@ import pickle
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
-                         HttpResponsePermanentRedirect,
+                         HttpResponsePermanentRedirect, HttpResponseNotAllowed,
+                         HttpResponseNotModified,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
+from django.test import TestCase
+from django.utils.encoding import smart_str
 from django.utils import six
 from django.utils import unittest
 
@@ -226,33 +229,52 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
 
 class HttpResponseTests(unittest.TestCase):
-    def test_unicode_headers(self):
+
+    def test_headers_type(self):
         r = HttpResponse()
 
-        # If we insert a unicode value it will be converted to an ascii
-        r['value'] = 'test value'
-        self.assertTrue(isinstance(r['value'], str))
+        # The following tests explicitly test types in addition to values
+        # because in Python 2 u'foo' == b'foo'.
 
-        # An error is raised when a unicode object with non-ascii is assigned.
-        self.assertRaises(UnicodeEncodeError, r.__setitem__, 'value', 't\xebst value')
+        # ASCII unicode or bytes values are converted to native strings.
+        r['key'] = 'test'
+        self.assertEqual(r['key'], str('test'))
+        self.assertIsInstance(r['key'], str)
+        r['key'] = 'test'.encode('ascii')
+        self.assertEqual(r['key'], str('test'))
+        self.assertIsInstance(r['key'], str)
 
-        # An error is raised when  a unicode object with non-ASCII format is
-        # passed as initial mimetype or content_type.
-        self.assertRaises(UnicodeEncodeError, HttpResponse,
-                content_type='t\xebst value')
+        # Latin-1 unicode or bytes values are also converted to native strings.
+        r['key'] = 'café'
+        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertIsInstance(r['key'], str)
+        r['key'] = 'café'.encode('latin-1')
+        self.assertEqual(r['key'], smart_str('café', 'latin-1'))
+        self.assertIsInstance(r['key'], str)
 
-        # HttpResponse headers must be convertible to ASCII.
-        self.assertRaises(UnicodeEncodeError, HttpResponse,
-                content_type='t\xebst value')
+        # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
+        r['key'] = '†'
+        self.assertEqual(r['key'], str('=?utf-8?b?4oCg?='))
+        self.assertIsInstance(r['key'], str)
 
-        # The response also converts unicode keys to strings.)
-        r['test'] = 'testing key'
+        # The response also converts unicode or bytes keys to strings, but requires
+        # them to contain ASCII
+        r = HttpResponse()
+        r['foo'] = 'bar'
         l = list(r.items())
-        l.sort()
-        self.assertEqual(l[1], ('test', 'testing key'))
+        self.assertEqual(l[0], ('foo', 'bar'))
+        self.assertIsInstance(l[0][0], str)
 
-        # It will also raise errors for keys with non-ascii data.
-        self.assertRaises(UnicodeEncodeError, r.__setitem__, 't\xebst key', 'value')
+        r = HttpResponse()
+        r[b'foo'] = 'bar'
+        l = list(r.items())
+        self.assertEqual(l[0], ('foo', 'bar'))
+        self.assertIsInstance(l[0][0], str)
+
+        r = HttpResponse()
+        self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
+        self.assertRaises(UnicodeError, r.__setitem__, 'føø'.encode('utf-8'), 'bar')
+
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -296,7 +318,7 @@ class HttpResponseTests(unittest.TestCase):
         my_iter = r.__iter__()
         result = list(my_iter)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
-        self.assertEqual(result, ['1', '2', '3', b'\xde\x9e'])
+        self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header
@@ -329,6 +351,33 @@ class HttpResponseTests(unittest.TestCase):
             self.assertRaises(SuspiciousOperation,
                               HttpResponsePermanentRedirect, url)
 
+
+class HttpResponseSubclassesTests(TestCase):
+    def test_redirect(self):
+        response = HttpResponseRedirect('/redirected/')
+        self.assertEqual(response.status_code, 302)
+        # Test that standard HttpResponse init args can be used
+        response = HttpResponseRedirect('/redirected/',
+            content='The resource has temporarily moved',
+            content_type='text/html')
+        self.assertContains(response, 'The resource has temporarily moved', status_code=302)
+
+    def test_not_modified(self):
+        response = HttpResponseNotModified()
+        self.assertEqual(response.status_code, 304)
+        # 304 responses should not have content/content-type
+        with self.assertRaises(AttributeError):
+            response.content = "Hello dear"
+        self.assertNotIn('content-type', response)
+
+    def test_not_allowed(self):
+        response = HttpResponseNotAllowed(['GET'])
+        self.assertEqual(response.status_code, 405)
+        # Test that standard HttpResponse init args can be used
+        response = HttpResponseNotAllowed(['GET'],
+            content='Only the GET method is allowed',
+            content_type='text/html')
+        self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from datetime import date
 
-from django.db.models.sql.query import InvalidQuery
+from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
 from .models import Author, Book, Coffee, Reviewer, FriendlyAuthor

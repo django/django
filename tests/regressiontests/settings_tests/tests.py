@@ -71,16 +71,18 @@ class SettingGetter(object):
     def __init__(self):
         self.test = getattr(settings, 'TEST', 'undefined')
 
-testvalue = None
-
-def signal_callback(sender, setting, value, **kwargs):
-    if setting == 'TEST':
-        global testvalue
-        testvalue = value
-
-signals.setting_changed.connect(signal_callback)
 
 class SettingsTests(TestCase):
+    def setUp(self):
+        self.testvalue = None
+        signals.setting_changed.connect(self.signal_callback)
+
+    def tearDown(self):
+        signals.setting_changed.disconnect(self.signal_callback)
+
+    def signal_callback(self, sender, setting, value, **kwargs):
+        if setting == 'TEST':
+            self.testvalue = value
 
     def test_override(self):
         settings.TEST = 'test'
@@ -128,12 +130,12 @@ class SettingsTests(TestCase):
     def test_signal_callback_context_manager(self):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         with self.settings(TEST='override'):
-            self.assertEqual(testvalue, 'override')
-        self.assertEqual(testvalue, None)
+            self.assertEqual(self.testvalue, 'override')
+        self.assertEqual(self.testvalue, None)
 
     @override_settings(TEST='override')
     def test_signal_callback_decorator(self):
-        self.assertEqual(testvalue, 'override')
+        self.assertEqual(self.testvalue, 'override')
 
     #
     # Regression tests for #10130: deleting settings.
@@ -147,6 +149,16 @@ class SettingsTests(TestCase):
 
     def test_settings_delete_wrapped(self):
         self.assertRaises(TypeError, delattr, settings, '_wrapped')
+
+    def test_override_settings_delete(self):
+        """
+        Allow deletion of a setting in an overriden settings set (#18824)
+        """
+        previous_i18n = settings.USE_I18N
+        with self.settings(USE_I18N=False):
+            del settings.USE_I18N
+            self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
+        self.assertEqual(settings.USE_I18N, previous_i18n)
 
     def test_allowed_include_roots_string(self):
         """

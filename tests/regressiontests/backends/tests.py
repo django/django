@@ -584,7 +584,7 @@ class ThreadTests(TestCase):
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")
-                except DatabaseError as e:
+                except Exception as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
             t.start()
@@ -594,21 +594,21 @@ class ThreadTests(TestCase):
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to False
         connections['default'].allow_thread_sharing = False
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to True
         connections['default'].allow_thread_sharing = True
         exceptions = []
         do_thread()
         # All good
-        self.assertEqual(len(exceptions), 0)
+        self.assertEqual(exceptions, [])
 
     def test_closing_non_shared_connections(self):
         """
@@ -655,7 +655,7 @@ class ThreadTests(TestCase):
 
 class BackendLoadingTests(TestCase):
     def test_old_style_backends_raise_useful_exception(self):
-        self.assertRaisesRegexp(ImproperlyConfigured,
+        six.assertRaisesRegex(self, ImproperlyConfigured,
             "Try using django.db.backends.sqlite3 instead",
             load_backend, 'sqlite3')
 

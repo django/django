@@ -2,8 +2,9 @@
 Convenience routines for creating non-trivial Field subclasses, as well as
 backwards compatibility utilities.
 
-Add SubfieldBase as the __metaclass__ for your Field subclass, implement
-to_python() and the other necessary methods and everything will work seamlessly.
+Add SubfieldBase as the metaclass for your Field subclass, implement
+to_python() and the other necessary methods and everything will work
+seamlessly.
 """
 
 class SubfieldBase(type):

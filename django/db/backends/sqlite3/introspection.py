@@ -1,6 +1,14 @@
 import re
 from django.db.backends import BaseDatabaseIntrospection
 
+field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+
+def get_field_size(name):
+    """ Extract the size number from a "varchar(11)" type name """
+    m = field_size_re.search(name)
+    return int(m.group(1)) if m else None
+
+
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
@@ -32,10 +40,9 @@ class FlexibleFieldLookupDict(object):
         try:
             return self.base_data_types_reverse[key]
         except KeyError:
-            import re
-            m = re.search(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$', key)
-            if m:
-                return ('CharField', {'max_length': int(m.group(1))})
+            size = get_field_size(key)
+            if size is not None:
+                return ('CharField', {'max_length': size})
             raise KeyError
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -53,7 +60,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
-        return [(info['name'], info['type'], None, None, None, None,
+        return [(info['name'], info['type'], None, info['size'], None, None,
                  info['null_ok']) for info in self._table_info(cursor, table_name)]
 
     def get_relations(self, cursor, table_name):
@@ -171,6 +178,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # cid, name, type, notnull, dflt_value, pk
         return [{'name': field[1],
                  'type': field[2],
+                 'size': get_field_size(field[2]),
                  'null_ok': not field[3],
                  'pk': field[5]     # undocumented
                  } for field in cursor.fetchall()]

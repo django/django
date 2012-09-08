@@ -196,6 +196,10 @@ class Command(BaseCommand):
                                     loaded_object_count += loaded_objects_in_fixture
                                     fixture_object_count += objects_in_fixture
                                     label_found = True
+                                except Exception as e:
+                                    if not isinstance(e, CommandError):
+                                        e.args = ("Problem installing fixture '%s': %s" % (full_path, e),)
+                                    raise
                                 finally:
                                     fixture.close()
 
@@ -209,7 +213,11 @@ class Command(BaseCommand):
             # Since we disabled constraint checks, we must manually check for
             # any invalid keys that might have been added
             table_names = [model._meta.db_table for model in models]
-            connection.check_constraints(table_names=table_names)
+            try:
+                connection.check_constraints(table_names=table_names)
+            except Exception as e:
+                e.args = ("Problem installing fixtures: %s" % e,)
+                raise
 
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -217,8 +225,6 @@ class Command(BaseCommand):
             if commit:
                 transaction.rollback(using=using)
                 transaction.leave_transaction_management(using=using)
-            if not isinstance(e, CommandError):
-                e.args = ("Problem installing fixture '%s': %s" % (full_path, e),)
             raise
 
         # If we found even one object in a fixture, we need to reset the

@@ -12,7 +12,6 @@ import json
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
-from django.utils.encoding import smart_bytes
 from django.utils import six
 from django.utils.timezone import is_aware
 

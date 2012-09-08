@@ -182,7 +182,7 @@ def items_for_result(cl, result, form):
         row_class = ''
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
-        except (AttributeError, ObjectDoesNotExist):
+        except ObjectDoesNotExist:
             result_repr = EMPTY_CHANGELIST_VALUE
         else:
             if f is None:

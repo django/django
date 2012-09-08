@@ -3,6 +3,9 @@ Date-based mixins
 =================
 
 
+YearMixin
+---------
+
 .. class:: django.views.generic.dates.YearMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -35,6 +38,9 @@ Date-based mixins
         * The value of the `year` GET query argument.
 
         Raises a 404 if no valid year specification can be found.
+
+MonthMixin
+----------
 
 .. class:: django.views.generic.dates.MonthMixin
 
@@ -82,6 +88,9 @@ Date-based mixins
         date provided. If ``allow_empty = False``, returns the previous month
         that contained data.
 
+DayMixin
+--------
+
 .. class:: django.views.generic.dates.DayMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -127,6 +136,9 @@ Date-based mixins
         Returns a date object containing the previous day. If
         ``allow_empty = False``, returns the previous day that contained data.
 
+WeekMixin
+---------
+
 .. class:: django.views.generic.dates.WeekMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -160,6 +172,9 @@ Date-based mixins
 
         Raises a 404 if no valid week specification can be found.
 
+
+DateMixin
+---------
 
 .. class:: django.views.generic.dates.DateMixin
 
@@ -203,6 +218,9 @@ Date-based mixins
         "future" means objects in which the field specified in ``date_field``
         is greater than the current date/time. Returns
         :attr:`DateMixin.allow_future` by default.
+
+BaseDateListView
+----------------
 
 .. class:: django.views.generic.dates.BaseDateListView
 

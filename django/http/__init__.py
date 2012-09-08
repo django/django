@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import copy
 import datetime
+from email.header import Header
 import os
 import re
 import sys
@@ -61,14 +62,14 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(smart_str(rawdata))
+                super(SimpleCookie, self).load(force_str(rawdata))
                 for key in self.bad_cookies:
                     del self[key]
 
             # override private __set() method:
             # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
-                key = smart_str(key)
+                key = force_str(key)
                 try:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
@@ -85,7 +86,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_bytes, smart_str, iri_to_uri, force_text
+from django.utils.encoding import force_bytes, force_str, force_text, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils import six
 from django.utils import timezone
@@ -137,7 +138,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
     except Exception:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
-    return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+    return force_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
                       six.text_type(get),
@@ -243,7 +244,12 @@ class HttpRequest(object):
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-    def _set_encoding(self, val):
+    @property
+    def encoding(self):
+        return self._encoding
+
+    @encoding.setter
+    def encoding(self, val):
         """
         Sets the encoding used for GET/POST accesses. If the GET or POST
         dictionary has already been created, it is removed and recreated on the
@@ -255,27 +261,22 @@ class HttpRequest(object):
         if hasattr(self, '_post'):
             del self._post
 
-    def _get_encoding(self):
-        return self._encoding
-
-    encoding = property(_get_encoding, _set_encoding)
-
     def _initialize_handlers(self):
         self._upload_handlers = [uploadhandler.load_handler(handler, self)
                                  for handler in settings.FILE_UPLOAD_HANDLERS]
 
-    def _set_upload_handlers(self, upload_handlers):
-        if hasattr(self, '_files'):
-            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
-        self._upload_handlers = upload_handlers
-
-    def _get_upload_handlers(self):
+    @property
+    def upload_handlers(self):
         if not self._upload_handlers:
             # If there are no upload handlers defined, initialize them from settings.
             self._initialize_handlers()
         return self._upload_handlers
 
-    upload_handlers = property(_get_upload_handlers, _set_upload_handlers)
+    @upload_handlers.setter
+    def upload_handlers(self, upload_handlers):
+        if hasattr(self, '_files'):
+            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
+        self._upload_handlers = upload_handlers
 
     def parse_file_upload(self, META, post_data):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
@@ -397,15 +398,15 @@ class QueryDict(MultiValueDict):
                                 force_text(value, encoding, errors='replace'))
         self._mutable = mutable
 
-    def _get_encoding(self):
+    @property
+    def encoding(self):
         if self._encoding is None:
             self._encoding = settings.DEFAULT_CHARSET
         return self._encoding
 
-    def _set_encoding(self, value):
+    @encoding.setter
+    def encoding(self, value):
         self._encoding = value
-
-    encoding = property(_get_encoding, _set_encoding)
 
     def _assert_mutable(self):
         if not self._mutable:
@@ -489,13 +490,13 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
-            safe = smart_bytes(safe, self.encoding)
+            safe = force_bytes(safe, self.encoding)
             encode = lambda k, v: '%s=%s' % ((quote(k, safe), quote(v, safe)))
         else:
             encode = lambda k, v: urlencode({k: v})
         for k, list_ in self.lists():
-            k = smart_bytes(k, self.encoding)
-            output.extend([encode(k, smart_bytes(v, self.encoding))
+            k = force_bytes(k, self.encoding)
+            output.extend([encode(k, force_bytes(v, self.encoding))
                            for v in list_])
         return '&'.join(output)
 
@@ -539,7 +540,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        # content is a bytestring. See _get_content / _set_content.
+        # content is a bytestring. See the content property methods.
         self.content = content
         self.cookies = SimpleCookie()
         if status:
@@ -550,7 +551,7 @@ class HttpResponse(object):
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
         headers = [
-            b'%s: %s' % (key.encode('us-ascii'), value.encode('us-ascii'))
+            ('%s: %s' % (key, value)).encode('us-ascii')
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers) + b'\r\n\r\n' + self.content
@@ -560,31 +561,44 @@ class HttpResponse(object):
     else:
         __str__ = serialize
 
-    def _convert_to_ascii(self, *values):
-        """Converts all values to ascii strings."""
-        for value in values:
-            if not isinstance(value, six.string_types):
-                value = str(value)
-            try:
-                if six.PY3:
-                    # Ensure string only contains ASCII
-                    value.encode('us-ascii')
+    def _convert_to_charset(self, value, charset, mime_encode=False):
+        """Converts headers key/value to ascii/latin1 native strings.
+
+        `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
+        `value` value can't be represented in the given charset, MIME-encoding
+        is applied.
+        """
+        if not isinstance(value, (bytes, six.text_type)):
+            value = str(value)
+        try:
+            if six.PY3:
+                if isinstance(value, str):
+                    # Ensure string is valid in given charset
+                    value.encode(charset)
                 else:
-                    if isinstance(value, str):
-                        # Ensure string only contains ASCII
-                        value.decode('us-ascii')
-                    else:
-                        # Convert unicode to an ASCII string
-                        value = value.encode('us-ascii')
-            except UnicodeError as e:
-                e.reason += ', HTTP response headers must be in US-ASCII format'
+                    # Convert bytestring using given charset
+                    value = value.decode(charset)
+            else:
+                if isinstance(value, str):
+                    # Ensure string is valid in given charset
+                    value.decode(charset)
+                else:
+                    # Convert unicode string to given charset
+                    value = value.encode(charset)
+        except UnicodeError as e:
+            if mime_encode:
+                # Wrapping in str() is a workaround for #12422 under Python 2.
+                value = str(Header(value, 'utf-8').encode())
+            else:
+                e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
-            if '\n' in value or '\r' in value:
-                raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
-            yield value
+        if str('\n') in value or str('\r') in value:
+            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
+        return value
 
     def __setitem__(self, header, value):
-        header, value = self._convert_to_ascii(header, value)
+        header = self._convert_to_charset(header, 'ascii')
+        value = self._convert_to_charset(value, 'latin1', mime_encode=True)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
@@ -669,13 +683,21 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
-    def _get_content(self):
+    @property
+    def content(self):
         if self.has_header('Content-Encoding'):
-            # XXX this doesn't work under Python 3 when e is an integer (#18764)
-            return b''.join([bytes(e) for e in self._container])
-        return b''.join([smart_bytes(e, self._charset) for e in self._container])
+            def make_bytes(value):
+                if isinstance(value, int):
+                    value = six.text_type(value)
+                if isinstance(value, six.text_type):
+                    value = value.encode('ascii')
+                # force conversion to bytes in case chunk is a subclass
+                return bytes(value)
+            return b''.join(make_bytes(e) for e in self._container)
+        return b''.join(force_bytes(e, self._charset) for e in self._container)
 
-    def _set_content(self, value):
+    @content.setter
+    def content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             self._container = value
             self._base_content_is_iter = True
@@ -683,16 +705,17 @@ class HttpResponse(object):
             self._container = [value]
             self._base_content_is_iter = False
 
-    content = property(_get_content, _set_content)
-
     def __iter__(self):
         self._iterator = iter(self._container)
         return self
 
     def __next__(self):
         chunk = next(self._iterator)
+        if isinstance(chunk, int):
+            chunk = six.text_type(chunk)
         if isinstance(chunk, six.text_type):
             chunk = chunk.encode(self._charset)
+        # force conversion to bytes in case chunk is a subclass
         return bytes(chunk)
 
     next = __next__             # Python 2 compatibility
@@ -719,11 +742,11 @@ class HttpResponse(object):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
-    def __init__(self, redirect_to):
+    def __init__(self, redirect_to, *args, **kwargs):
         parsed = urlparse(redirect_to)
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
-        super(HttpResponseRedirectBase, self).__init__()
+        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
@@ -734,6 +757,16 @@ class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
 
 class HttpResponseNotModified(HttpResponse):
     status_code = 304
+
+    def __init__(self, *args, **kwargs):
+        super(HttpResponseNotModified, self).__init__(*args, **kwargs)
+        del self['content-type']
+
+    @HttpResponse.content.setter
+    def content(self, value):
+        if value:
+            raise AttributeError("You cannot set content to a 304 (Not Modified) response")
+        self._container = []
 
 class HttpResponseBadRequest(HttpResponse):
     status_code = 400
@@ -747,8 +780,8 @@ class HttpResponseForbidden(HttpResponse):
 class HttpResponseNotAllowed(HttpResponse):
     status_code = 405
 
-    def __init__(self, permitted_methods):
-        super(HttpResponseNotAllowed, self).__init__()
+    def __init__(self, permitted_methods, *args, **kwargs):
+        super(HttpResponseNotAllowed, self).__init__(*args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
 
 class HttpResponseGone(HttpResponse):

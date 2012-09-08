@@ -119,9 +119,10 @@ Settings
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
 
-Only relevant when using a SpatiaLite version older than 3.0.
+Only relevant when using a SpatiaLite version 2.3.
 
-By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
+By default, the GeoDjango test runner looks for the :ref:`file containing the
+SpatiaLite dababase-initialization SQL code <create_spatialite_db>` in the
 same directory where it was invoked (by default the same directory where
 ``manage.py`` is located). To use a different location, add the following to
 your settings::

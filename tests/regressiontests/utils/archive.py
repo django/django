@@ -27,12 +27,14 @@ class ArchiveTester(object):
         os.chdir(self.old_cwd)
 
     def test_extract_method(self):
-        Archive(self.archive).extract(self.tmpdir)
+        with Archive(self.archive) as archive:
+            archive.extract(self.tmpdir)
         self.check_files(self.tmpdir)
 
     def test_extract_method_no_to_path(self):
         os.chdir(self.tmpdir)
-        Archive(self.archive_path).extract()
+        with Archive(self.archive_path) as archive:
+            archive.extract()
         self.check_files(self.tmpdir)
 
     def test_extract_function(self):

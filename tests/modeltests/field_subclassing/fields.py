@@ -20,13 +20,12 @@ class Small(object):
     def __str__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
-class SmallField(models.Field):
+class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Turns the "Small" class into a Django field. Because of the similarities
     with normal character fields and the fact that Small.__unicode__ does
     something sensible, we don't need to implement a lot here.
     """
-    __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 2
@@ -56,8 +55,7 @@ class SmallerField(SmallField):
     pass
 
 
-class JSONField(models.TextField):
-    __metaclass__ = models.SubfieldBase
+class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 
     description = ("JSONField automatically serializes and desializes values to "
         "and from JSON.")

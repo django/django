@@ -19,9 +19,7 @@ from django.utils.html import conditional_escape, format_html, format_html_join
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils import datetime_safe, formats
-from django.utils import six
+from django.utils import datetime_safe, formats, six
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -509,11 +507,7 @@ class CheckboxInput(Widget):
 
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        try:
-            result = self.check_test(value)
-        except: # Silently catch exceptions
-            result = False
-        if result:
+        if self.check_test(value):
             final_attrs['checked'] = 'checked'
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
@@ -527,7 +521,7 @@ class CheckboxInput(Widget):
             return False
         value = data.get(name)
         # Translate true and false strings to boolean values.
-        values =  {'true': True, 'false': False}
+        values = {'true': True, 'false': False}
         if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
         return value

@@ -6,13 +6,14 @@ Class-based views API reference. For introductory material, see
 :doc:`/topics/class-based-views/index`.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
    base
    generic-display
    generic-editing
    generic-date-based
    mixins
+   flattened-index
 
 Specification
 -------------

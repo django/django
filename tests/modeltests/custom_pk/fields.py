@@ -22,8 +22,7 @@ class MyWrapper(object):
             return self.value == other.value
         return self.value == other
 
-class MyAutoField(models.CharField):
-    __metaclass__ = models.SubfieldBase
+class MyAutoField(six.with_metaclass(models.SubfieldBase, models.CharField)):
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 10
@@ -32,7 +31,7 @@ class MyAutoField(models.CharField):
     def pre_save(self, instance, add):
         value = getattr(instance, self.attname, None)
         if not value:
-            value = MyWrapper(''.join(random.sample(string.lowercase, 10)))
+            value = MyWrapper(''.join(random.sample(string.ascii_lowercase, 10)))
             setattr(instance, self.attname, value)
         return value
 

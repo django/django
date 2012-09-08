@@ -6,7 +6,9 @@ file upload handlers for processing.
 """
 from __future__ import unicode_literals
 
+import base64
 import cgi
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
@@ -66,11 +68,10 @@ class MultiPartParser(object):
         if not boundary or not cgi.valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
 
-
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH',0)))
+            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH', 0)))
         except (ValueError, TypeError):
             content_length = 0
 
@@ -176,7 +177,7 @@ class MultiPartParser(object):
 
                     content_type = meta_data.get('content-type', ('',))[0].strip()
                     try:
-                        charset = meta_data.get('content-type', (0,{}))[1].get('charset', None)
+                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
                     except:
                         charset = None
 
@@ -199,7 +200,7 @@ class MultiPartParser(object):
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
                                 try:
-                                    chunk = str(chunk).decode('base64')
+                                    chunk = base64.b64decode(chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     raise MultiPartParserError("Could not decode base64 data: %r" % e)

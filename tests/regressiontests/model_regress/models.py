@@ -63,9 +63,8 @@ class BrokenUnicodeMethod(models.Model):
     name = models.CharField(max_length=7)
 
     def __str__(self):
-        # Intentionally broken (trying to insert a unicode value into a str
-        # object).
-        return 'Názov: %s' % self.name
+        # Intentionally broken (invalid start byte in byte string).
+        return b'Name\xff: %s'.decode() % self.name
 
 
 class NonAutoPK(models.Model):

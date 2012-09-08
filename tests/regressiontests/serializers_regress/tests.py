@@ -10,7 +10,6 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
-from io import BytesIO
 
 try:
     import yaml
@@ -23,6 +22,7 @@ from django.core.serializers.base import DeserializationError
 from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase
+from django.utils import six
 from django.utils.functional import curry
 from django.utils.unittest import skipUnless
 
@@ -502,17 +502,17 @@ def streamTest(format, self):
     obj.save_base(raw=True)
 
     # Serialize the test database to a stream
-    for stream in (BytesIO(), HttpResponse()):
+    for stream in (six.StringIO(), HttpResponse()):
         serializers.serialize(format, [obj], indent=2, stream=stream)
 
         # Serialize normally for a comparison
         string_data = serializers.serialize(format, [obj], indent=2)
 
         # Check that the two are the same
-        if isinstance(stream, BytesIO):
+        if isinstance(stream, six.StringIO):
             self.assertEqual(string_data, stream.getvalue())
         else:
-            self.assertEqual(string_data, stream.content)
+            self.assertEqual(string_data, stream.content.decode('utf-8'))
         stream.close()
 
 for format in serializers.get_serializer_formats():
