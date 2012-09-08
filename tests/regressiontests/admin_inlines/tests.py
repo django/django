@@ -448,6 +448,47 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     fixtures = ['admin-views-users.xml']
     urls = "regressiontests.admin_inlines.urls"
 
+    def test_add_stackeds(self):
+        """
+        Ensure that the "Add another XXX" link correctly adds items to the
+        stacked formset.
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+
+        self.assertEqual(rows_length(), 4)
+
+    def test_delete_stackeds(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+        add_button.click()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+        for delete_link in self.selenium.find_elements_by_css_selector(
+                '%s .inline-deletelink' % inline_id):
+            delete_link.click()
+        self.assertEqual(rows_length(), 3)
+
     def test_add_inlines(self):
         """
         Ensure that the "Add another XXX" link correctly adds items to the
