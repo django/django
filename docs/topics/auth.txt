@@ -1790,6 +1790,11 @@ definitions:
     some kind, but it can also be an email address, or any other unique
     identifier.
 
+.. attribute:: User.REQUIRED_FIELDS
+
+    A list of the field names that *must* be provided when creating
+    a user.
+
 .. method:: User.get_full_name():
 
     A longer formal identifier for the user. A common interpretation
@@ -1917,6 +1922,7 @@ required date of birth; it provides no permission checking, beyond a simple
         objects = MyUserManager()
 
         USERNAME_FIELD = 'email'
+        REQUIRED_FIELDS = ['date_of_birth']
 
         def get_full_name(self):
             # The user is identified by their email address
