@@ -17,6 +17,8 @@
 (function($) {
   $.fn.formset = function(opts) {
     var options = $.extend({}, $.fn.formset.defaults, opts);
+    var $this = $(this);
+    var $parent = $this.parent();
     var updateElementIndex = function(el, prefix, ndx) {
       var id_regex = new RegExp("(" + prefix + "-(\\d+|__prefix__))");
       var replacement = prefix + "-" + ndx;
@@ -36,21 +38,21 @@
     // only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
     var showAddButton = maxForms.val() === '' || (maxForms.val()-totalForms.val()) > 0;
-    $(this).each(function(i) {
+    $this.each(function(i) {
       $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
     });
-    if ($(this).length && showAddButton) {
+    if ($this.length && showAddButton) {
       var addButton;
-      if ($(this).attr("tagName") == "TR") {
+      if ($this.attr("tagName") == "TR") {
         // If forms are laid out as table rows, insert the
         // "add" button in a new table row:
         var numCols = this.eq(-1).children().length;
-        $(this).parent().append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
-        addButton = $(this).parent().find("tr:last a");
+        $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
+        addButton = $parent.find("tr:last a");
       } else {
         // Otherwise, insert it immediately after the last form:
-        $(this).filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
-        addButton = $(this).filter(":last").next().find("a");
+        $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
+        addButton = $this.filter(":last").next().find("a");
       }
       addButton.click(function(e) {
         e.preventDefault();
@@ -121,6 +123,7 @@
     }
     return this;
   };
+
   /* Setup plugin defaults */
   $.fn.formset.defaults = {
     prefix: "form",          // The form prefix for your django formset
