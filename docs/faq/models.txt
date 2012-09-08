@@ -11,7 +11,7 @@ Then, just do this::
 
     >>> from django.db import connection
     >>> connection.queries
-    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
+    [{'sql': 'SELECT polls_polls.id, polls_polls.question, polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
 
 ``connection.queries`` is only available if :setting:`DEBUG` is ``True``.
