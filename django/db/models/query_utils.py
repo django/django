@@ -75,17 +75,14 @@ class Q(tree.Node):
                     branch_root = LookupExpression(connector=child.connector,
                             manager=manager)
                     parent.children.append(branch_root)
-
                     descend(branch_root, child.children)
-
                 else:
-                    # in a properly formed Q, could only be a tuple
-                    parent.children.append(LookupExpression(
-                        expr=child, manager=manager))
+                    # assuming we are in a properly formed Q, could only be a tuple
+                    child_le = LookupExpression(expr=child, manager=manager)
+                    parent.children.append(child_le)
 
-        root = LookupExpression(connector=self.connector)
-        for child in self.children:
-            descend(root, self.children)
+        root = LookupExpression(connector=self.connector, manager=manager)
+        descend(root, self.children)
 
         self._compiled_matcher = root
 
