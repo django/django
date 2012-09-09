@@ -8,6 +8,7 @@ circular import difficulties.
 from __future__ import unicode_literals
 
 from django.db.backends import util
+from django.db.models.constants import LOOKUP_SEP
 from django.utils import six
 from django.utils import tree
 
@@ -203,12 +204,11 @@ class LookupExpression(tree.Node):
         Validates a lookup string as a traversable sequence of attributes,
         storing them for for future use
         """
+        # avoiding a circular import
         from django.db.models.fields import FieldDoesNotExist
+
         # This function roughly re-implements the behavior of
         # db.models.sql.query.add_filter
-
-        # lookup_sep is defined here to avoid a circular import on sql.constants
-        LOOKUP_SEP = '__'
 
         parts = self.lookup.split(LOOKUP_SEP)
         num_parts = len(parts)
