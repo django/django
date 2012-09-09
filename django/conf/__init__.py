@@ -7,7 +7,6 @@ a list of all possible variables.
 """
 
 import os
-import re
 import time     # Needed for Windows
 import warnings
 
@@ -26,7 +25,7 @@ class LazySettings(LazyObject):
     The user can manually configure settings prior to using them. Otherwise,
     Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
-    def _setup(self):
+    def _setup(self, name):
         """
         Load the settings module pointed to by the environment variable. This
         is used the first time we need any settings at all, if the user has not
@@ -37,11 +36,20 @@ class LazySettings(LazyObject):
             if not settings_module: # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
-            # NOTE: This is arguably an EnvironmentError, but that causes
-            # problems with Python's interactive help.
-            raise ImportError("Settings cannot be imported, because environment variable %s is undefined." % ENVIRONMENT_VARIABLE)
+            raise ImproperlyConfigured(
+                "Requested setting %s, but settings are not configured. "
+                "You must either define the environment variable %s "
+                "or call settings.configure() before accessing settings."
+                % (name, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
+
+
+    def __getattr__(self, name):
+        if self._wrapped is empty:
+            self._setup(name)
+        return getattr(self._wrapped, name)
+
 
     def configure(self, default_settings=global_settings, **options):
         """

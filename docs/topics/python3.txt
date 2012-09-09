@@ -25,10 +25,11 @@ free to chose another strategy for your own code, especially if you don't need
 to stay compatible with Python 2. But authors of pluggable applications are
 encouraged to use the same porting strategy as Django itself.
 
-Writing compatible code is much easier if you target Python ≥ 2.6. You will
-most likely take advantage of the compatibility functions introduced in Django
-1.5, like :mod:`django.utils.six`, so your application will also require
-Django ≥ 1.5.
+Writing compatible code is much easier if you target Python ≥ 2.6. Django 1.5
+introduces compatibility tools such as :mod:`django.utils.six`. For
+convenience, forwards-compatible aliases were introduced in Django 1.4.2. If
+your application takes advantage of these tools, it will require Django ≥
+1.4.2.
 
 Obviously, writing compatible source code adds some overhead, and that can
 cause frustration. Django's developers have found that attempting to write
@@ -102,6 +103,8 @@ Old name            New name
 For backwards compatibility, the old names still work on Python 2. Under
 Python 3, ``smart_str`` is an alias for ``smart_text``.
 
+For forwards compatibility, the new names work as of Django 1.4.2.
+
 .. note::
 
     :mod:`django.utils.encoding` was deeply refactored in Django 1.5 to
@@ -125,6 +128,8 @@ Old name            New name
 For backwards compatibility, the old names still work on Python 2. Under
 Python 3, ``EscapeString`` and ``SafeString`` are aliases for ``EscapeText``
 and ``SafeText`` respectively.
+
+For forwards compatibility, the new names work as of Django 1.4.2.
 
 :meth:`__str__` and :meth:`__unicode__` methods
 -----------------------------------------------
@@ -165,6 +170,8 @@ On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
             return "Instance of my class"
 
 This technique is the best match for Django's porting philosophy.
+
+For forwards compatibility, this decorator is available as of Django 1.4.2.
 
 Finally, note that :meth:`__repr__` must return a :class:`str` on all versions
 of Python.
@@ -317,7 +324,8 @@ Writing compatible code with six
 six_ is the canonical compatibility library for supporting Python 2 and 3 in
 a single codebase. Read its documentation!
 
-:mod:`six` is bundled with Django: you can import it as :mod:`django.utils.six`.
+:mod:`six` is bundled with Django as of version 1.4.2. You can import it as
+:mod:`django.utils.six`.
 
 Here are the most common changes required to write compatible code.
 
@@ -391,6 +399,13 @@ The version of six bundled with Django includes one extra function:
     :meth:`~django.utils.datastructures.MultiValueDict.iterlists()` on Python
     2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
     Python 3.
+
+.. function:: assertRaisesRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
+    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
+    exists in current Python3 versions, but issues a warning.
+
 
 In addition to six' defaults moves, Django's version provides ``thread`` as
 ``_thread`` and ``dummy_thread`` as ``_dummy_thread``.

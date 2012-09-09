@@ -2,7 +2,6 @@ import re
 from .base import FIELD_TYPE
 
 from django.db.backends import BaseDatabaseIntrospection
-from django.utils import six
 
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
@@ -87,15 +86,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 AND referenced_column_name IS NOT NULL""", [table_name])
         key_columns.extend(cursor.fetchall())
         return key_columns
-
-    def get_primary_key_column(self, cursor, table_name):
-        """
-        Returns the name of the primary key column for the given table
-        """
-        for column in six.iteritems(self.get_indexes(cursor, table_name)):
-            if column[1]['primary_key']:
-                return column[0]
-        return None
 
     def get_indexes(self, cursor, table_name):
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))

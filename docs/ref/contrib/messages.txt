@@ -5,14 +5,16 @@ The messages framework
 .. module:: django.contrib.messages
    :synopsis: Provides cookie- and session-based temporary message storage.
 
-Quite commonly in web applications, you may need to display a one-time
-notification message (also know as "flash message") to the user after
-processing a form or some other types of user input. For this, Django provides
-full support for cookie- and session-based messaging, for both anonymous and
-authenticated users. The messages framework allows you to temporarily store
-messages in one request and retrieve them for display in a subsequent request
-(usually the next one). Every message is tagged with a specific ``level`` that
-determines its priority (e.g., ``info``, ``warning``, or ``error``).
+Quite commonly in web applications, you need to display a one-time
+notification message (also known as "flash message") to the user after
+processing a form or some other types of user input.
+
+For this, Django provides full support for cookie- and session-based
+messaging, for both anonymous and authenticated users. The messages framework
+allows you to temporarily store messages in one request and retrieve them for
+display in a subsequent request (usually the next one). Every message is
+tagged with a specific ``level`` that determines its priority (e.g., ``info``,
+``warning``, or ``error``).
 
 Enabling messages
 =================
@@ -20,32 +22,27 @@ Enabling messages
 Messages are implemented through a :doc:`middleware </ref/middleware>`
 class and corresponding :doc:`context processor </ref/templates/api>`.
 
-To enable message functionality, do the following:
+The default ``settings.py`` created by ``django-admin.py startproject``
+already contains all the settings required to enable message functionality:
 
-* Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
-  it contains ``'django.contrib.messages.middleware.MessageMiddleware'``.
+* ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
 
-  If you are using a :ref:`storage backend <message-storage-backends>` that
-  relies on :doc:`sessions </topics/http/sessions>` (the default),
-  ``'django.contrib.sessions.middleware.SessionMiddleware'`` must be
-  enabled and appear before ``MessageMiddleware`` in your
+* :setting:`MIDDLEWARE_CLASSES` contains
+  ``'django.contrib.sessions.middleware.SessionMiddleware'`` and
+  ``'django.contrib.messages.middleware.MessageMiddleware'``.
+
+  The default :ref:`storage backend <message-storage-backends>` relies on
+  :doc:`sessions </topics/http/sessions>`. That's why ``SessionMiddleware``
+  must be enabled and appear before ``MessageMiddleware`` in
   :setting:`MIDDLEWARE_CLASSES`.
 
-* Edit the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and make sure
-  it contains ``'django.contrib.messages.context_processors.messages'``.
+* :setting:`TEMPLATE_CONTEXT_PROCESSORS`   contains
+  ``'django.contrib.messages.context_processors.messages'``.
 
-* Add ``'django.contrib.messages'`` to your :setting:`INSTALLED_APPS`
-  setting
-
-The default ``settings.py`` created by ``django-admin.py startproject`` has
-``MessageMiddleware`` activated and the ``django.contrib.messages`` app
-installed. Also, the default value for :setting:`TEMPLATE_CONTEXT_PROCESSORS`
-contains ``'django.contrib.messages.context_processors.messages'``.
-
-If you don't want to use messages, you can remove the
-``MessageMiddleware`` line from :setting:`MIDDLEWARE_CLASSES`, the ``messages``
-context processor from :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
-``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`.
+If you don't want to use messages, you can remove
+``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`, the
+``MessageMiddleware`` line from :setting:`MIDDLEWARE_CLASSES`, and the
+``messages`` context processor from :setting:`TEMPLATE_CONTEXT_PROCESSORS`.
 
 Configuring the message engine
 ==============================
@@ -56,34 +53,35 @@ Storage backends
 ----------------
 
 The messages framework can use different backends to store temporary messages.
-If the default FallbackStorage isn't suitable to your needs, you can change
-which backend is being used by adding a `MESSAGE_STORAGE`_ to your
-settings, referencing the module and class of the storage class. For
-example::
 
-    MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+Django provides three built-in storage classes:
 
-The value should be the full path of the desired storage class.
+.. class:: django.contrib.messages.storage.session.SessionStorage
 
-Three storage classes are available:
+    This class stores all messages inside of the request's session. Therefore
+    it requires Django's ``contrib.sessions`` application.
 
-``'django.contrib.messages.storage.session.SessionStorage'``
-    This class stores all messages inside of the request's session. It
-    requires Django's ``contrib.sessions`` application.
+.. class:: django.contrib.messages.storage.cookie.CookieStorage
 
-``'django.contrib.messages.storage.cookie.CookieStorage'``
     This class stores the message data in a cookie (signed with a secret hash
     to prevent manipulation) to persist notifications across requests. Old
-    messages are dropped if the cookie data size would exceed 4096 bytes.
+    messages are dropped if the cookie data size would exceed 2048 bytes.
 
-``'django.contrib.messages.storage.fallback.FallbackStorage'``
-    This is the default storage class.
+.. class:: django.contrib.messages.storage.fallback.FallbackStorage
 
-    This class first uses CookieStorage for all messages, falling back to using
-    SessionStorage for the messages that could not fit in a single cookie.
+    This class first uses ``CookieStorage``, and falls back to using
+    ``SessionStorage`` for the messages that could not fit in a single cookie.
+    It also requires Django's ``contrib.sessions`` application.
 
-    Since it is uses SessionStorage, it also requires Django's
-    ``contrib.sessions`` application.
+    This behavior avoids writing to the session whenever possible. It should
+    provide the best performance in the general case.
+
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` is the
+default storage class. If it isn't suitable to your needs, you can select
+another storage class by setting `MESSAGE_STORAGE`_ to its full import path,
+for example::
+
+    MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
@@ -97,8 +95,8 @@ to that of the Python logging module. Message levels allow you to group
 messages by type so they can be filtered or displayed differently in views and
 templates.
 
-The built-in levels (which can be imported from ``django.contrib.messages``
-directly) are:
+The built-in levels, which can be imported from ``django.contrib.messages``
+directly, are:
 
 =========== ========
 Constant    Purpose

@@ -80,7 +80,7 @@ geospatial libraries:
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ==========================
 :ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.3, 3.2, 3.1, 3.0
-`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
+`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.8, 4.7, 4.6, 4.5, 4.4
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.9, 1.8, 1.7, 1.6, 1.5
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
@@ -140,16 +140,16 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.3.0 from the refractions Web site and untar the source
+First, download GEOS 3.3.5 from the refractions Web site and untar the source
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.3.0.tar.bz2
-    $ tar xjf geos-3.3.0.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.3.5.tar.bz2
+    $ tar xjf geos-3.3.5.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.3.0
+    $ cd geos-3.3.5
     $ ./configure
     $ make
     $ sudo make install
@@ -203,15 +203,15 @@ reference systems.
 
 First, download the PROJ.4 source code and datum shifting files [#]_::
 
-    $ wget http://download.osgeo.org/proj/proj-4.7.0.tar.gz
-    $ wget http://download.osgeo.org/proj/proj-datumgrid-1.5.zip
+    $ wget http://download.osgeo.org/proj/proj-4.8.0.tar.gz
+    $ wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``nad`` subdirectory.  This must be done *prior* to configuration::
 
-    $ tar xzf proj-4.7.0.tar.gz
-    $ cd proj-4.7.0/nad
-    $ unzip ../../proj-datumgrid-1.5.zip
+    $ tar xzf proj-4.8.0.tar.gz
+    $ cd proj-4.8.0/nad
+    $ tar xzf ../../proj-datumgrid-1.5.tar.gz
     $ cd ..
 
 Finally, configure, make and install PROJ.4::
@@ -239,9 +239,9 @@ installed prior to building PostGIS.
 
 First download the source archive, and extract::
 
-    $ wget http://postgis.refractions.net/download/postgis-1.5.2.tar.gz
-    $ tar xzf postgis-1.5.2.tar.gz
-    $ cd postgis-1.5.2
+    $ wget http://postgis.refractions.net/download/postgis-1.5.5.tar.gz
+    $ tar xzf postgis-1.5.5.tar.gz
+    $ cd postgis-1.5.5
 
 Next, configure, make and install PostGIS::
 
@@ -959,15 +959,15 @@ Ubuntu & Debian GNU/Linux
 Ubuntu
 ^^^^^^
 
-11.10
-~~~~~
+11.10 through 12.04
+~~~~~~~~~~~~~~~~~~~
 
-In Ubuntu 11.10, PostgreSQL was upgraded to 9.1. The installation commands are:
+In Ubuntu 11.10, PostgreSQL was upgraded to 9.1. The installation command is:
 
 .. code-block:: bash
 
-    $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-9.1-postgis \
-         postgresql-server-dev-9.1 python-psycopg2
+    $ sudo apt-get install binutils gdal-bin libproj-dev \
+         postgresql-9.1-postgis postgresql-server-dev-9.1 python-psycopg2
 
 .. _ubuntu10:
 
@@ -976,7 +976,7 @@ In Ubuntu 11.10, PostgreSQL was upgraded to 9.1. The installation commands are:
 
 In Ubuntu 10.04, PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
 Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
-geography support).  The installation commands are:
+geography support).  The installation command is:
 
 .. code-block:: bash
 

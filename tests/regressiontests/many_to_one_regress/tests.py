@@ -2,8 +2,9 @@ from __future__ import absolute_import
 
 from django.db import models
 from django.test import TestCase
+from django.utils import six
 
-from .models import First, Second, Third, Parent, Child, Category, Record, Relation
+from .models import First, Third, Parent, Child, Category, Record, Relation
 
 
 class ManyToOneRegressionTests(TestCase):
@@ -59,7 +60,7 @@ class ManyToOneRegressionTests(TestCase):
         self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
 
         # Trying to assign to unbound attribute raises AttributeError
-        self.assertRaisesRegexp(AttributeError, "must be accessed via instance",
+        six.assertRaisesRegex(self, AttributeError, "must be accessed via instance",
             Child.parent.__set__, None, p)
 
         # Creation using keyword argument should cache the related object.

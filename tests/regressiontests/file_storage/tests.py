@@ -73,7 +73,7 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             ImproperlyConfigured,
             ('Error importing storage module django.core.files.non_existing_'
                 'storage: "No module named .*non_existing_storage"'),
