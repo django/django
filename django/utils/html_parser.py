@@ -5,8 +5,7 @@ import sys
 current_version = sys.version_info
 
 use_workaround = (
-    (current_version < (2, 6, 8)) or
-    (current_version >= (2, 7) and current_version < (2, 7, 3)) or
+    (current_version < (2, 7, 3)) or
     (current_version >= (3, 0) and current_version < (3, 2, 3))
 )
 
