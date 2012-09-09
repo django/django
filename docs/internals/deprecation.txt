@@ -264,6 +264,9 @@ these changes.
   in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
 
+* ``django.contrib.markup`` will be removed following an accelerated
+  deprecation.
+
 1.7
 ---
 

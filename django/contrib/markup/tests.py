@@ -1,7 +1,9 @@
 # Quick tests for the markup templatetags (django.contrib.markup)
 import re
+import warnings
 
 from django.template import Template, Context
+from django import test
 from django.utils import unittest
 from django.utils.html import escape
 
@@ -21,7 +23,7 @@ try:
 except ImportError:
     docutils = None
 
-class Templates(unittest.TestCase):
+class Templates(test.TestCase):
 
     textile_content = """Paragraph 1
 
@@ -36,6 +38,13 @@ Paragraph 2 with "quotes" and @code@"""
 Paragraph 2 with a link_
 
 .. _link: http://www.example.com/"""
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.contrib.markup')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     @unittest.skipUnless(textile, 'textile not installed')
     def test_textile(self):

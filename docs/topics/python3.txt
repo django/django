@@ -324,8 +324,8 @@ Writing compatible code with six
 six_ is the canonical compatibility library for supporting Python 2 and 3 in
 a single codebase. Read its documentation!
 
-:mod`six` is bundled with Django as of version 1.4.2. You can import it as
-:mod`django.utils.six`.
+:mod:`six` is bundled with Django as of version 1.4.2. You can import it as
+:mod:`django.utils.six`.
 
 Here are the most common changes required to write compatible code.
 

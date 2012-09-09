@@ -46,7 +46,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    UndeletableObject)
+    Simple, UndeletableObject)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -577,6 +577,20 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/undeletableobject/%d/' %
                                    (self.urlbit, instance.pk))
         self.assertNotContains(response, 'deletelink')
+
+    def test_allows_attributeerror_to_bubble_up(self):
+        """
+        Ensure that AttributeErrors are allowed to bubble when raised inside
+        a change list view.
+
+        Requires a model to be created so there's something to be displayed
+
+        Refs: #16655, #18593, and #18747
+        """
+        Simple.objects.create()
+        with self.assertRaises(AttributeError):
+            self.client.get('/test_admin/%s/admin_views/simple/' % self.urlbit)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):

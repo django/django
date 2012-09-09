@@ -181,11 +181,11 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
     "A series of tests for django-admin.py when there is no settings.py file."
 
     def test_builtin_command(self):
-        "no settings: django-admin builtin commands fail with an import error when no settings provided"
+        "no settings: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
         "no settings: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -213,11 +213,11 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "default: django-admin builtin commands fail with an import error when no settings provided"
+        "default: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "default: django-admin builtin commands succeed if settings are provided as argument"
@@ -279,11 +279,11 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "fulldefault: django-admin builtin commands fail with an import error when no settings provided"
+        "fulldefault: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "fulldefault: django-admin builtin commands succeed if a settings file is provided"
@@ -345,11 +345,11 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "minimal: django-admin builtin commands fail with an import error when no settings provided"
+        "minimal: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "minimal: django-admin builtin commands fail if settings are provided as argument"
@@ -411,11 +411,11 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an import error when no settings provided"
+        "alternate: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
@@ -482,11 +482,11 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an import error when no settings provided"
+        "alternate: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
@@ -570,11 +570,11 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
     def test_builtin_command(self):
-        "directory: django-admin builtin commands fail with an import error when no settings provided"
+        "directory: django-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'environment variable DJANGO_SETTINGS_MODULE is undefined')
+        self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
         "directory: django-admin builtin commands fail if settings file (from argument) doesn't exist"
@@ -621,7 +621,7 @@ class ManageNoSettings(AdminScriptTestCase):
     "A series of tests for manage.py when there is no settings.py file."
 
     def test_builtin_command(self):
-        "no settings: manage.py builtin commands fail with an import error when no settings provided"
+        "no settings: manage.py builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -786,7 +786,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "minimal: manage.py builtin commands fail with an import error when no settings provided"
+        "minimal: manage.py builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -852,7 +852,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: manage.py builtin commands fail with an import error when no default settings provided"
+        "alternate: manage.py builtin commands fail with an error when no default settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
@@ -895,7 +895,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
+        self.assertOutput(err, "Could not import settings 'regressiontests.settings'")
 
     def test_custom_command_with_settings(self):
         "alternate: manage.py can execute user commands if settings are provided as argument"
@@ -927,7 +927,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "multiple: manage.py builtin commands fail with an import error when no settings provided"
+        "multiple: manage.py builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
