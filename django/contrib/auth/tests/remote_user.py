@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.utils import timezone
 
@@ -94,6 +94,20 @@ class RemoteUserTest(TestCase):
         user.save()
         response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
         self.assertEqual(default_login, response.context['user'].last_login)
+
+    def test_header_disappears(self):
+        """
+        Tests that a logged in user is logged out automatically when
+        the REMOTE_USER header disappears during the same browser session.
+        """
+        User.objects.create(username='knownuser')
+        # Known user authenticates
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        self.assertEqual(response.context['user'].username, 'knownuser')
+        # During the session, the REMOTE_USER header disappears. Should trigger logout.
+        response = self.client.get('/remote_user/')
+        self.assertEqual(type(response.context['user']), AnonymousUser)
+
 
     def tearDown(self):
         """Restores settings to avoid breaking other tests."""
