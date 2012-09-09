@@ -182,8 +182,8 @@ class LookupExpression(tree.Node):
     OR = 'OR'
     default = AND
 
-    def __init__(self, expr=None, manager=None):
-        super(LookupExpression, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+    def __init__(self, expr=None, manager=None, *args, **kwargs):
+        super(LookupExpression, self).__init__(**kwargs)
         self.manager = manager
         if expr:
             # if we don't get a expr - we are just a root node
