@@ -255,6 +255,18 @@ class LookupExpression(tree.Node):
         evaluator = evaluators[self.connector]
         if self.children:
             return (evaluator(c.matches(instance) for c in self.children))
+        try:
+            instance_value = self.get_instance_value(instance)
+        except AttributeError:
+            # this is raised when we were not able to traverse the full
+            # attribute route. In nearly all cases this means the match failed
+            # as it specified a longer relationship chain then exists for this
+            # instance.
+            if (hasattr(self.lookup_function, 'none_is_true')
+                and self.lookup_function.none_is_true):
+                return True
+            else:
+                return False
         return self.lookup_function(instance, self.get_instance_value(instance), self.value)
 
 

@@ -61,6 +61,11 @@ def _isnull(model, instance_value, value):
     else:
         return instance_value != None
 
+# This is a special attr/flag to designate that when None is the instance_value
+# due to an inability to follow a set of relationships, True should be returned
+# for the match, as in most cases, the match would be considered False
+_isnull.none_is_true = True
+
 def _search(model, instance_value, value):
     return model._contains(instance_value, instance_value)
 
