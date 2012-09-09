@@ -296,6 +296,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   you to test equality for XML content at a semantic level, without caring for
   syntax differences (spaces, attribute order, etc.).
 
+* RemoteUserMiddleware now forces logout when the REMOTE_USER header
+  disappears during the same browser session.
+
 Backwards incompatible changes in 1.5
 =====================================
 
