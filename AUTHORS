@@ -31,6 +31,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Claude Paroz
     * Anssi Kääriäinen
     * Florian Apolloner
+    * Jeremy Dunck
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -167,7 +168,6 @@ answer newbie questions, and generally made Django that much better:
     dready <wil@mojipage.com>
     Maximillian Dornseif <md@hudora.de>
     Daniel Duan <DaNmarner@gmail.com>
-    Jeremy Dunck <http://dunck.us/>
     Andrew Durdin <adurdin@gmail.com>
     dusk@woofle.net
     Andy Dustman <farcepest@gmail.com>
