@@ -304,6 +304,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     def test_load_overlong_key(self):
         # Some backends might issue a warning
         with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
 
@@ -353,6 +354,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
     def test_load_overlong_key(self):
         # Some backends might issue a warning
         with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
 
