@@ -203,6 +203,7 @@ class LookupExpression(tree.Node):
         Validates a lookup string as a traversable sequence of attributes,
         storing them for for future use
         """
+        from django.db.models.fields import FieldDoesNotExist
         # This function roughly re-implements the behavior of
         # db.models.sql.query.add_filter
 
@@ -217,21 +218,19 @@ class LookupExpression(tree.Node):
             lookup_model = model
             for counter, field_name in enumerate(parts):
                 try:
-                    lookup_field = getattr(lookup_model, field_name)
+                    lookup_field = lookup_model._meta.get_field(field_name)
                     self.attr_route.append(field_name)
-                except AttributeError:
+                except FieldDoesNotExist:
                     # Not a field. Bail out.
-                    self.attr_route.append(field_name)
                     self.lookup_type = parts.pop()
                     return
                 # Unless we're at the end of the list of lookups, let's attempt
                 # to continue traversing relations.
                 if (counter + 1) < num_parts:
                     try:
-                        dummy = lookup_model._meta.get_field(field_name).rel.to
-                        lookup_model = lookup_field
+                        lookup_model = lookup_field.rel.to
                     except AttributeError:
-                        # # Not a related field. Bail out.
+                        # Not a related field. Bail out.
                         self.lookup_type = parts.pop()
                         return
         else:
