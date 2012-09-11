@@ -66,30 +66,30 @@ class GBPhoneNumberField(CharField):
             return ''
 
         number_parts = {'prefix': '+44', 'NSN': '', 'extension': None}
-        gb_number_parts = re.compile(r'^(\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?)?\(?0?(?:\)[\s-]?)?([1-9]\d{1,4}\)?[\d\s-]+)((?:x|ext\.?|\#)\d{3,4})?$', re.X)
-        valid_gb_pattern = re.compile(r'^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$', re.X)
+        gb_number_parts = re.compile(r'^(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?|\(?0)([1-9]\d{1,4}\)?[\s-\d]+)(?:((?:x|ext\.?|\#)\d+)?)$', re.X)
+        valid_gb_pattern = re.compile(r'^(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?|\(?0)(?:\d{5}\)?[\s-]?\d{4,5}|\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3})|\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4}|\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}|8(?:00[\s-]?11[\s-]?11|45[\s-]?46[\s-]?4\d))(?:(?:[\s-]?(?:x|ext\.?|\#)\d+)?)$', re.X)
 
         # Check if number entered matches a valid format
         if not re.search(valid_gb_pattern, value):
             raise ValidationError(self.default_error_messages['number_format'])
 
         # Extract number parts: prefix, NSN, extension
-        # group(2) contains "44" or None depending on whether number entered in
-        #  international or national format
-        # group(3) contains NSN
-        # group(4) contains extension
+        # group(1) contains "44" or None depending on whether number entered in
+        # international or national format
+        # group(2) contains NSN
+        # group(3) contains extension
         m = re.search(gb_number_parts, value)
         if m.group:
             # Extract NSN part of GB number
-            if m.group(3):
+            if m.group(2):
                 # Trim NSN and remove space, hyphen or ')' if present
                 translate_table = dict((ord(char), u'') for char in u')- ')
-                number_parts['NSN'] = m.group(3).translate(
+                number_parts['NSN'] = m.group(2).translate(
                     translate_table).strip()
 
                 # Extract extension
-                if m.group(4):
-                    number_parts['extension'] = m.group(4)
+                if m.group(3):
+                    number_parts['extension'] = m.group(3)
         if not number_parts:
             raise ValidationError(self.default_error_messages['number_format'])
 
@@ -231,7 +231,7 @@ def format_gb_phone_number(number_parts):
     3+7, 4+6, 4+5, 5+5, 5+4 and 3+6 formats by number range.
 
     @param dict number_parts must be a valid nine or ten-digit number split
-        into it's constituent parts
+        into its constituent parts
     @return string phone_number
     """
     phone_number = number_parts['prefix'] + number_parts['NSN'] + \
