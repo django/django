@@ -184,40 +184,40 @@ def format_gb_nsn(phone_number_nsn):
     if nsn_length is 10 and re.match(pattern28, phone_number_nsn):
         m = (re.search(capture28, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2) + m.group(3)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2) += ' ' + m.group(3)
     elif nsn_length is 10 and re.match(pattern37, phone_number_nsn):
         m = (re.search(capture37, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2) + m.group(3)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2) += ' ' + m.group(3)
     elif nsn_length is 10 and re.match(pattern55, phone_number_nsn):
         m = (re.search(capture55, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length is 9  and re.match(pattern54, phone_number_nsn):
         m = (re.search(capture54, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length is 10 and re.match(pattern46, phone_number_nsn):
         m = (re.search(capture46, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length is 9  and re.match(pattern45, phone_number_nsn):
         m = (re.search(capture45, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length is 9  and re.match(pattern36, phone_number_nsn):
         m = (re.search(capture36, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length is 7  and re.match(pattern34, phone_number_nsn):
         m = (re.search(capture34, phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2)
     elif nsn_length > 5:
         # Default format for non-valid numbers (shouldn't ever get here)
         m = (re.search("^(\d)(\d{4})(\d*)$", phone_number_nsn))
         if m.group:
-            phone_number_nsn = m.group(1) + m.group(2) + m.group(3)
+            phone_number_nsn = m.group(1) += ' ' + m.group(2) += ' ' + m.group(3)
 
     return phone_number_nsn
 
