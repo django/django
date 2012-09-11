@@ -17,7 +17,7 @@ def geo_apps(namespace=True, runtests=False):
     from django.contrib.gis.geos import GEOS_PREPARE
     from django.contrib.gis.gdal import HAS_GDAL
 
-    apps = ['geoapp', 'relatedapp']
+    apps = ['geoapp', 'relatedapp', 'geo_q_predicate']
 
     # No distance queries on MySQL.
     if not connection.ops.mysql:
