@@ -7,6 +7,7 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 from django.contrib.localflavor.gb.gb_regions import GB_NATIONS_CHOICES, GB_REGION_CHOICES
+from django.core.validators import EMPTY_VALUES
 from django.forms.fields import CharField, Select
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -31,8 +32,8 @@ class GBPostcodeField(CharField):
 
     def clean(self, value):
         value = super(GBPostcodeField, self).clean(value)
-        if value == '':
-            return value
+        if value in EMPTY_VALUES:
+            return ''
         postcode = value.upper().strip()
         # Put a single space before the incode (second part).
         postcode = self.space_regex.sub(r' \1', postcode)
@@ -54,43 +55,22 @@ class GBNationSelect(Select):
     def __init__(self, attrs=None):
         super(GBNationSelect, self).__init__(attrs, choices=GB_NATIONS_CHOICES)
 
+class GBPhoneNumberField(CharField):
+    message = _('Phone numbers must be in +XXXXXXXXXXX format.')
+    default_error_messages = {'number_format': message,
+                              'number_range': message}
 
+    def clean(self, value):
+        super(GBPhoneNumberField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return ''
+        error = gb_phone_number_validation(value)
+        if not error:
+            return format_gb_phone_number(value)
+        else:
+            raise ValidationError(self.default_error_messages[error])
 
-
-
-
-
-
-
-
-
-
-
-class UKPhoneNumberField(phonenumber):
-    default_error_messages = {
-        'digit_count': _('incorrect number of digits'),
-        'number_format': _('non-valid number format'),
-        'number_range': _('non-valid number range')
-    }
-
-
-
-
-
-  //  MAIN FUNCTIONALITY
-
-    if valid_gb_phone_number(phonenumber):
-        format_gb_phone_number(phonenumber)
-    else:
-        raise error
-
-
-
-
-
-  //  CHECK IF INPUT FORMAT IS VALID THEN CHECK IF RANGE IS VALID
-
-def valid_gb_phone_number(phonenumber):
+def gb_phone_number_validation(phone_number):
     """
     Verifies that phonenumber is a United Kingdom phone number in a valid
     number range. Rejects numbers that are too long or too short or are in
@@ -98,34 +78,28 @@ def valid_gb_phone_number(phonenumber):
     of different dial prefixes.
     created by @g1smd
     @param string phonenumber
-    @return boolean Returns boolean FALSE if the phone number is not valid
+    @return string Returns a string containing the error code, if any
     """
     # Check if number entered matches a valid format
-    if (!valid_gb_phone_pattern(phonenumber)):
-        return FALSE
+    if not valid_gb_phone_pattern(phone_number):
+        return 'number_format'
     else:
         # Extract number parts: prefix, NSN, extension
-        phonenumberPartsArray = (extract_gb_phone_parts(phonenumber))
-        if (empty(phonenumberPartsArray)):
-            return FALSE
+        phone_number_parts = extract_gb_phone_parts(phone_number)
+        if not phone_number_parts:
+            return 'number_format'
         else:
-            phonenumberNSN = phonenumberPartsArray['NSN']
+            phone_number_nsn = phone_number_parts['NSN']
             # Check if NSN entered is in a valid range
-            if (!valid_gb_phone_range(phonenumberNSN)):
-                return FALSE
+            if not valid_gb_phone_range(phone_number_nsn):
+                return 'number_range'
             else:
-                return TRUE
-
-
-
-
-
-  //  FORMAT GB PHONE NUMBER
+                return ''
 
 def format_gb_phone_number(phonenumber):
     """
     Convert a valid United Kingdom phone number into standard +44 20 3000 5555 #0001,
-    +44 121 555 7788, +44 1970 223344, +44 1750 62555, +44 19467 55555 or +44 16977 2333 
+    +44 121 555 7788, +44 1970 223344, +44 1750 62555, +44 19467 55555 or +44 16977 2333
     international format or into national format with 0, according to entry format.
     Accepts a wide range of input formats and prefixes and re-formats the number taking
     into account the required 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 and 3+6 formats by number range.
@@ -140,43 +114,37 @@ def format_gb_phone_number(phonenumber):
 
     # Extract optional country prefix, NSN, and optional extension
     phonenumberPartsArray = extract_gb_phone_parts(phonenumber)
-    if (!empty(phonenumberPartsArray)):
+    if phonenumberPartsArray:
         # Grab the NSN part of GB number
         phonenumberNSN = phonenumberPartsArray['NSN']
-        if (phonenumberNSN == null):
+        if not phonenumberNSN:
             return phonenumber
 
         # Remove spaces, hyphens, and brackets from NSN part of GB number
-        arrayReplace = array(")", "-", " ")
-        phonenumberNSN = trim(str_replace(arrayReplace, "", phonenumberNSN))
+        translate_table = dict((ord(char), u'') for char in u')- ')
+        phonenumberNSN = phonenumberNSN.translate(translate_table).strip()
         # Format NSN part of GB number
         phonenumberNSNformatted = format_gb_nsn(phonenumberNSN)
 
         # Set prefix (will be +44 or 0)
-        if (isset(phonenumberPartsArray['prefix']) && phonenumberPartsArray['prefix'] != null):
+        if 'prefix' in phonenumberPartsArray and phonenumberPartsArray['prefix'] is not None:
             phonenumberPrefix = phonenumberPartsArray['prefix']
 
         # Grab extension and trim it
-        phonenumberHasExtension = false
-        phonenumberExtension = null
-        if (isset(phonenumberPartsArray['extension']) && phonenumberPartsArray['extension'] != null):
+        phonenumberHasExtension = False
+        phonenumberExtension = None
+        if 'extension' in phonenumberPartsArray and phonenumberPartsArray['extension'] is not None:
             phonenumberHasExtension = true
-            phonenumberExtension = " " + trim(phonenumberPartsArray['extension'])
+            phonenumberExtension = " " + phonenumberPartsArray['extension'].strip()
 
         # Add prefix back on to NSN
         phonenumber = phonenumberPrefix + phonenumberNSNformatted
 
         # Add extension back on to number
-        if (phonenumberHasExtension):
+        if phonenumberHasExtension:
             phonenumber += phonenumberExtension
 
     return phonenumber
-
-
-
-
-
-  //  VALID INPUT FORMAT (CHECKS ONLY FORMAT, NOT NUMBER RANGE):
 
 def valid_gb_phone_pattern(phonenumber):
     """
@@ -190,39 +158,10 @@ def valid_gb_phone_pattern(phonenumber):
     @param string phonenumber
     @return boolean Returns boolean FALSE if the phone number is not valid.
     """
-    validGBpattern = re.compile(r"^
-    (?:
-        (?:\(?(?:0(?:0|11)\)?\s?\(?|\+)44\)?\s?(?:\(?0\)?\s?)?)   # leading 00, 011 or + before 44 with optional (0); parentheses and spaces optional
-        |
-        (?:\(?0)                                 # leading (0, 0
-    )
-    (?:
-        (?:\d{5}\)?\s?\d{4,5})                   # [5+4][5+5]
-        |
-        (?:\d{4}\)?\s?(?:\d{5}|\d{3}\s?\d{3}))   # [4+5][4+6]
-        |
-        (?:\d{3}\)?\s?\d{3}\s?\d{3,4})           # [3+6][3+7]
-        |
-        (?:\d{2}\)?\s?\d{4}\s?\d{4})             # [2+8]
-        |
-        (?:8(?:00\s?11\s?11|45\s?46\s?4\d))      # [0+7]
-    )
-    (?:
-        (?:\s?\#\d+)?                            # optional extension number shown with a hash divider
-    )
-    $", re.X)
+    validGBpattern = re.compile(r'^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$', re.X)
 
     # Test number entered for matching format
-    if (!re.search(validGBpattern, phonenumber)):
-        return FALSE
-    else:
-        return TRUE
-
-
-
-
-
-  //  EXTRACT GB NUMBER PARTS:
+    return re.search(validGBpattern, phonenumber)
 
 def extract_gb_phone_parts(phonenumber):
     """
@@ -234,51 +173,26 @@ def extract_gb_phone_parts(phonenumber):
     @param string phonenumber must be a valid UK phone number (with optional extension)
     @return array phonenumberPartsArray Returns prefix, NSN and extension in array.
     """
-    patternGBnumberparts = re.compile(r"^
-    (\(?(?:0(?:0|11)\)?\s?\(?|\+)(44)\)?\s?)?\(?0?(?:\)\s?)?   # country or trunk prefix
-    (
-        [1-9]\d{1,4}\)?[\s\d]+                                 # NSN
-    )
-    (\#\d+)?                                                   # optional extension
-    $", re.X)
+    result = {'NSN': '', 'prefix': '+44', 'extension': None}
+    patternGBnumberparts = re.compile(r'^(\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?)?\(?0?(?:\)[\s-]?)?([1-9]\d{1,4}\)?[\d\s-]+)((?:x|ext\.?|\#)\d{3,4})?$', re.X)
 
-    #  group(2) contains "44" or NULL depending on whether number entered in international or national format
-    #  group(3) contains NSN
-    #  group(4) contains extension
-
-    m = (re.search(patternGBnumberparts, phonenumber))
+    # group(2) contains "44" or None depending on whether number entered in
+    #  international or national format
+    # group(3) contains NSN
+    # group(4) contains extension
+    m = re.search(patternGBnumberparts, phonenumber)
     if m.group:
         # Extract NSN part of GB number
         if m.group(3):
-            phonenumberNSNraw = m.group(3)
             # Trim NSN and remove space, hyphen or ')' if present
-            arrayReplace = array(")", "-", " ")
-            phonenumberNSN = trim(str_replace(arrayReplace, "", phonenumberNSNraw))
-
-            # Extract 44 prefix if present and set prefix as 0 or as +44 and space
-            if (m.group(2) && m.group(2) == '44'):
-                phonenumberPrefix = '+44 '
-            else:
-                phonenumberPrefix = '0'
+            translate_table = dict((ord(char), u'') for char in u')- ')
+            result['NSN'] = m.group(3).translate(translate_table).strip()
 
             # Extract extension
-            phonenumberExtension = null
             if m.group(4):
-                phonenumberExtension = m.group(4)
+                result['extension'] = m.group(4)
 
-    phonenumberPartsArray = array(
-            'NSN'       => phonenumberNSN,
-            'prefix'    => phonenumberPrefix,
-            'extension' => phonenumberExtension,
-        )
-
-    return phonenumberPartsArray
-
-
-
-
-
-  //  TEST THE NSN TO SEE IF NUMBER IS IN A VALID RANGE WITH RIGHT NUMBER OF DIGITS:
+    return result
 
 def valid_gb_phone_range(phonenumberNSN):
     """
@@ -290,7 +204,8 @@ def valid_gb_phone_range(phonenumberNSN):
     @param string phonenumberNSN
     @return boolean Returns boolean FALSE if the phone number is not valid.
     """
-    patternGBvalidrange = re.compile(r"^
+    patternGBvalidrange = re.compile(r"""
+    ^
     (         # 2d with 10 digits [2+8] Landlines
         2(?:0[01378]|3[0189]|4[017]|8[0-46-9]|9[012])\d{7}
         |     # 11d, 1d1 with 10 digits [3+7] Landlines
@@ -322,19 +237,11 @@ def valid_gb_phone_range(phonenumberNSN):
         |     # 800 1111, 845 46 4d with 7 digits [3+4] Freephone helplines
         8(?:001111|45464\d)
     )
-    $", re.X)
+    $
+    """, re.X)
 
     # Test NSN to see if it matches a valid number range
-    if (!re.match(patternGBvalidrange, phonenumberNSN)):
-        return FALSE
-    else:
-        return TRUE
-
-
-
-
-
-  //  FORMAT GB NUMBER BY INITIAL DIGITS AND LENGTH:
+    return re.match(patternGBvalidrange, phonenumberNSN)
 
 def format_gb_nsn(phonenumberNSN):
     """
@@ -372,43 +279,42 @@ def format_gb_nsn(phonenumberNSN):
     pattern34 = re.compile(r"^(?:8(?:001111|45464\d))")
     capture34 = re.compile(r"^(\d{3})(\d{4})$")
     # Format numbers by leading digits and length
-    if (phonenumberNSNLength == 10 && re.match(pattern28, phonenumberNSN)):
+    if phonenumberNSNLength is 10 and re.match(pattern28, phonenumberNSN):
         m = (re.search(capture28, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2) + " " + m.group(3)
-    elif (phonenumberNSNLength == 10 && re.match(pattern37, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2) + m.group(3)
+    elif phonenumberNSNLength is 10 and re.match(pattern37, phonenumberNSN):
         m = (re.search(capture37, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2) + " " + m.group(3)
-    elif (phonenumberNSNLength == 10 && re.match(pattern55, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2) + m.group(3)
+    elif phonenumberNSNLength is 10 and re.match(pattern55, phonenumberNSN):
         m = (re.search(capture55, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength == 9  && re.match(pattern54, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength is 9  and re.match(pattern54, phonenumberNSN):
         m = (re.search(capture54, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength == 10 && re.match(pattern46, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength is 10 and re.match(pattern46, phonenumberNSN):
         m = (re.search(capture46, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength == 9  && re.match(pattern45, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength is 9  and re.match(pattern45, phonenumberNSN):
         m = (re.search(capture45, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength == 9  && re.match(pattern36, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength is 9  and re.match(pattern36, phonenumberNSN):
         m = (re.search(capture36, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength == 7  && re.match(pattern34, phonenumberNSN)):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength is 7  and re.match(pattern34, phonenumberNSN):
         m = (re.search(capture34, phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2)
-    elif (phonenumberNSNLength > 5):
+            phonenumberNSN = m.group(1) + m.group(2)
+    elif phonenumberNSNLength > 5:
         # Default format for non-valid numbers (shouldn't ever get here)
         m = (re.search("^(\d)(\d{4})(\d*)$", phonenumberNSN))
         if m.group:
-            phonenumberNSN = m.group(1) + " " + m.group(2) + " " + m.group(3)
+            phonenumberNSN = m.group(1) + m.group(2) + m.group(3)
 
     return phonenumberNSN
-
