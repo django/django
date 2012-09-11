@@ -126,13 +126,13 @@ class GBPhoneNumberField(CharField):
                 [1-9]\d{1,4}\)?[\s-\d]+     # NSN
             )
             (?:
-                ((?:x|ext\.?|\#)\d+)\d+)?   # optional extension number
+                ((?:x|ext\.?|\#)\d+)?       # optional extension number
             )
         $', re.X)
 
         valid_gb_pattern = re.compile(r'
         ^
-            (?:         # leading 00, 011 or + before 44 with optional (0);
+            (?:         # leading 00, 011 or + before 44 with optional (0)
                         # parentheses, hyphens and spaces optional
                 \(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?
                 |
