@@ -1,6 +1,7 @@
 import datetime
 
 from django.db.models.query import Q
+from django.utils import six, unittest
 from django import test
 
 from .models import Item
@@ -100,3 +101,50 @@ class QasPredicateTest(test.TestCase):
 
     def test_iregex(self):
         self.assertTrue(Q(name__iregex='Hel*o').matches(self.testobj))
+
+    def test_invalid_lookup(self):
+        """
+        Test that an invalid lookup raises an exception
+        """
+        predicate = Q(name__hazawat=5)
+        with six.assertRaisesRegex(self,
+                ValueError,
+                'invalid lookup'):
+
+                predicate.matches(self.testobj)
+
+class RelationshipFollowTest(test.TestCase):
+
+    def setUp(self):
+        self.testobj = Item.objects.create(
+                name="hello world",
+                int_value=50,
+                created=datetime.datetime.now(),
+                )
+
+        self.testobj2 = Item.objects.create(
+                name="bye world",
+                int_value=10,
+                created=datetime.datetime.now(),
+                parent=self.testobj
+                )
+
+        self.testobj3 = Item.objects.create(
+                name="strange world",
+                int_value=1000,
+                created=datetime.datetime.now(),
+                parent=self.testobj2
+                )
+
+    def test_simple_follow(self):
+        self.assertTrue(Q(parent__parent__name='hello world').matches(self.testobj3))
+
+    def test_nonexist_follow(self):
+        self.assertFalse(Q(parent__parent__name='hello world').matches(self.testobj))
+
+    def test_follow_isnull(self):
+        """
+        Following a non-existant relationship, but testing for isnull
+        should return True
+        """
+        self.assertTrue(Q(parent__int_value__isnull=True).matches(self.testobj))
