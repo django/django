@@ -94,7 +94,7 @@ class Q(tree.Node):
         if manager is None:
             manager = instance._default_manager
 
-        if self._compiled_matcher is None:
+        if not self._compiled_matcher:
             # we are evaluating the first model, or are uncompiled
             self._compile_matcher(manager)
         if self._compiled_matcher.manager != manager:
@@ -194,7 +194,7 @@ class LookupExpression(tree.Node):
             self.lookup_type = 'exact' # Default lookup type
             self.query = manager.get_query_set().query
             self.traverse_lookup(manager.model)
-            if self.lookup_type not in self.query.match_functions:
+            if self.lookup_type not in self.query.query_terms:
                 raise ValueError("invalid lookup: {}".format(self.lookup))
             self.lookup_function = self.query.match_functions[self.lookup_type]
 
@@ -212,7 +212,8 @@ class LookupExpression(tree.Node):
 
         parts = self.lookup.split(LOOKUP_SEP)
         num_parts = len(parts)
-        if (len(parts) > 1 and parts[-1] in self.query.query_terms):
+
+        if (len(parts) > 1):
             # Traverse the lookup query to distinguish related fields from
             # lookup types.
             lookup_model = model
@@ -234,6 +235,8 @@ class LookupExpression(tree.Node):
                         self.lookup_type = parts.pop()
                         return
         else:
+            # presumably we have a simple <field>=x with no lookup term
+            # so we just use our default of exact
             self.attr_route.append(parts[0])
             return
 
