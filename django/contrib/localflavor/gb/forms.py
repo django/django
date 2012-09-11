@@ -60,6 +60,53 @@ class GBPhoneNumberField(CharField):
     default_error_messages = {'number_format': message,
                               'number_range': message}
 
+"""
+ ==ACCEPTS==
+ This table lists the valid accepted input formats for GB numbers.
+ International:
+    +          44_        null      20_3000_5000        null
+   (+          44_(       0)_       20)_3000_5000       #5555
+    00_        44)_       0)_(      121_555_7777       _#5555
+    00_(       44)_(      0_        121)_555_7777       #555
+   (00_                   0_(       1750_615_777       _#555
+   (00)_                            1750)_615_777
+   (00)_(                           19467_55555
+    011_                            19467)_55555
+    011_(                           1750_62555
+   (011_                            1750)_62555
+   (011)_                           16977_3555
+   (011)_(                          16977)_3555
+                                    500_777_888
+                                    500)_777_888
+ National:
+    ->         ->         0         ^as above           ^as above
+    ->         ->        (0         ^                   ^
+ Pick one item from each column. Underscores represent spaces or hyphens.
+ All number formats can also be matched without spaces or hyphens.
+
+ "Be conservative in what you do, be liberal in what you accept from others."
+ (Postel's Law)
+
+ ==REJECTS==
+ The following inputs are rejected:
+ - international format numbers that do not begin with an item from column 1 above,
+ - international format numbers with country code other than 44,
+ - national format numbers that do not begin with item in column 3 above,
+ - numbers with more than 10 digits in NSN part,
+ - numbers with less than 9 digits in NSN part (except for two special cases),
+ - numbers with incorrect number of digits in NSN for number range,
+ - numbers in ranges with NSN beginning 4 or 6 and other such non-valid ranges,
+ - numbers with obviously non-GB formatting,
+ - numbers with multiple contiguous spaces,
+ - entries with letters and/or punctuation other than hyphens or brackets,
+ - 116xxx, 118xxx, 1xx, 999.
+
+ ==OUTPUTS==
+ Irrespective of the format used for input, all valid numbers are output with
+ a +44 prefix followed by a space and the 10 or 9 digit national number arranged
+ in the correct 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 or 3+6 format.
+"""
+
     def clean(self, value):
         super(GBPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
