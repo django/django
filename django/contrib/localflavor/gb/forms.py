@@ -66,8 +66,46 @@ class GBPhoneNumberField(CharField):
             return ''
 
         number_parts = {'prefix': '+44', 'NSN': '', 'extension': None}
-        gb_number_parts = re.compile(r'^(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?|\(?0)([1-9]\d{1,4}\)?[\s-\d]+)(?:((?:x|ext\.?|\#)\d+)?)$', re.X)
-        valid_gb_pattern = re.compile(r'^(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?|\(?0)(?:\d{5}\)?[\s-]?\d{4,5}|\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3})|\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4}|\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}|8(?:00[\s-]?11[\s-]?11|45[\s-]?46[\s-]?4\d))(?:(?:[\s-]?(?:x|ext\.?|\#)\d+)?)$', re.X)
+
+        gb_number_parts = re.compile(r'
+        ^
+            (?:         # leading 00, 011 or + before 44 with optional (0);
+                        # parentheses, hyphens and spaces optional
+                \(?(?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?  
+                |
+                \(?0                        # leading (0, 0
+            )
+            (
+                [1-9]\d{1,4}\)?[\s-\d]+     # NSN
+            )
+            (?:
+                ((?:x|ext\.?|\#)\d+)\d+)?   # optional extension number
+            )
+        $', re.X)
+
+        valid_gb_pattern = re.compile(r'
+        ^
+            (?:         # leading 00, 011 or + before 44 with optional (0);
+                        # parentheses, hyphens and spaces optional
+                \(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?\(?
+                |
+                \(?0                                         # leading (0, 0
+            )
+            (?:
+                \d{5}\)?[\s-]?\d{4,5}                        # [5+4][5+5]
+                |
+                \d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3})     # [4+5][4+6]
+                |
+                \d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4}             # [3+6][3+7]
+                |
+                \d{2}\)?[\s-]?\d{4}[\s-]?\d{4}               # [2+8]
+                |
+                8(?:00[\s-]?11[\s-]?11|45[\s-]?46[\s-]?4\d)  # [0+7]
+            )
+            (?:
+                (?:[\s-]?(?:x|ext\.?|\#)\d+)?    # optional extension number
+            )
+        $', re.X)
 
         # Check if number entered matches a valid format
         if not re.search(valid_gb_pattern, value):
