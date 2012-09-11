@@ -174,7 +174,7 @@ class GBPhoneNumberField(CharField):
 
                 # Extract extension
                 if m.group(3):
-                    number_parts['extension'] = m.group(3)
+                    number_parts['extension'] = '#' + m.group(3)
         if not number_parts:
             raise ValidationError(self.default_error_messages['number_format'])
 
