@@ -23,6 +23,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils import unittest
+from django.test.utils import override_settings
 from ..servers.tests import LiveServerBase
 
 # Try to import PIL in either of the two ways it can end up installed.
@@ -435,33 +436,21 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
-        self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0o666
+        self.old_umask = os.umask(000)
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
     def tearDown(self):
-        settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
         shutil.rmtree(self.storage_dir)
+        os.umask(self.old_umask)
 
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o666)
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile("data"))
         actual_mode = os.stat(self.storage.path(name))[0] & 0o777
         self.assertEqual(actual_mode, 0o666)
 
-class FileStorageDefaultPermissions(unittest.TestCase):
-    def setUp(self):
-        self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        self.old_umask = os.umask(000)
-        settings.FILE_UPLOAD_PERMISSIONS = None
-        self.storage_dir = tempfile.mkdtemp()
-        self.storage = FileSystemStorage(self.storage_dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.storage_dir)
-        settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
-        os.umask(self.old_umask)
-
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
     def test_file_upload_default_permissions(self):
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
