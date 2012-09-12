@@ -236,23 +236,30 @@ class UserChangeFormTest(TestCase):
         # Just check we can create it
         form = MyUserForm({})
 
+    def test_unsuable_password(self):
+        user = User.objects.get(username='empty_password')
+        user.set_unusable_password()
+        user.save()
+        form = UserChangeForm(instance=user)
+        self.assertIn(_("No password set."), form.as_table())
+
     def test_bug_17944_empty_password(self):
         user = User.objects.get(username='empty_password')
         form = UserChangeForm(instance=user)
-        # Just check that no error is raised.
-        form.as_table()
+        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
+            form.as_table())
 
     def test_bug_17944_unmanageable_password(self):
         user = User.objects.get(username='unmanageable_password')
         form = UserChangeForm(instance=user)
-        # Just check that no error is raised.
-        form.as_table()
+        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
+            form.as_table())
 
     def test_bug_17944_unknown_password_algorithm(self):
         user = User.objects.get(username='unknown_password')
         form = UserChangeForm(instance=user)
-        # Just check that no error is raised.
-        form.as_table()
+        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
+            form.as_table())
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

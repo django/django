@@ -28,7 +28,13 @@ def reset_hashers(**kwargs):
 
 
 def is_password_usable(encoded):
-    return (encoded is not None and encoded != UNUSABLE_PASSWORD)
+    if encoded is None or encoded == UNUSABLE_PASSWORD:
+        return False
+    try:
+        hasher = identify_hasher(encoded)
+    except ValueError:
+        return False
+    return True
 
 
 def check_password(password, encoded, setter=None, preferred='default'):
