@@ -445,11 +445,11 @@ class FileStoragePermissions(unittest.TestCase):
         shutil.rmtree(self.storage_dir)
         os.umask(self.old_umask)
 
-    @override_settings(FILE_UPLOAD_PERMISSIONS=0o666)
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o654)
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile("data"))
         actual_mode = os.stat(self.storage.path(name))[0] & 0o777
-        self.assertEqual(actual_mode, 0o666)
+        self.assertEqual(actual_mode, 0o654)
 
     @override_settings(FILE_UPLOAD_PERMISSIONS=None)
     def test_file_upload_default_permissions(self):
