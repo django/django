@@ -1,11 +1,5 @@
 from django.contrib.gis.geos import GEOSGeometry, Polygon
 
-def get_bb(geo):
-    xmin, ymin, xmax, ymax = geo.extent
-    bbox = Polygon((xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin),
-            (xmin, ymin))
-    return bbox
-
 def _bbcontains(model, instance_value, value):
     bbox = Polygon.from_bbox(instance_value.extent)
     return bbox.contains(value)
