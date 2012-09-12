@@ -5,7 +5,7 @@
 Django documentation
 ====================
 
-.. rubric:: Everything you need to know about Django (and then some).
+.. rubric:: Everything you need to know about Django.
 
 Getting help
 ============

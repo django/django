@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import copy
 import datetime
+from email.header import Header
 import os
 import re
 import sys
@@ -560,31 +561,44 @@ class HttpResponse(object):
     else:
         __str__ = serialize
 
-    def _convert_to_ascii(self, *values):
-        """Converts all values to ascii strings."""
-        for value in values:
-            if not isinstance(value, six.string_types):
-                value = str(value)
-            try:
-                if six.PY3:
-                    # Ensure string only contains ASCII
-                    value.encode('us-ascii')
+    def _convert_to_charset(self, value, charset, mime_encode=False):
+        """Converts headers key/value to ascii/latin1 native strings.
+
+        `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
+        `value` value can't be represented in the given charset, MIME-encoding
+        is applied.
+        """
+        if not isinstance(value, (bytes, six.text_type)):
+            value = str(value)
+        try:
+            if six.PY3:
+                if isinstance(value, str):
+                    # Ensure string is valid in given charset
+                    value.encode(charset)
                 else:
-                    if isinstance(value, str):
-                        # Ensure string only contains ASCII
-                        value.decode('us-ascii')
-                    else:
-                        # Convert unicode to an ASCII string
-                        value = value.encode('us-ascii')
-            except UnicodeError as e:
-                e.reason += ', HTTP response headers must be in US-ASCII format'
+                    # Convert bytestring using given charset
+                    value = value.decode(charset)
+            else:
+                if isinstance(value, str):
+                    # Ensure string is valid in given charset
+                    value.decode(charset)
+                else:
+                    # Convert unicode string to given charset
+                    value = value.encode(charset)
+        except UnicodeError as e:
+            if mime_encode:
+                # Wrapping in str() is a workaround for #12422 under Python 2.
+                value = str(Header(value, 'utf-8').encode())
+            else:
+                e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
-            if '\n' in value or '\r' in value:
-                raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
-            yield value
+        if str('\n') in value or str('\r') in value:
+            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
+        return value
 
     def __setitem__(self, header, value):
-        header, value = self._convert_to_ascii(header, value)
+        header = self._convert_to_charset(header, 'ascii')
+        value = self._convert_to_charset(value, 'latin1', mime_encode=True)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):

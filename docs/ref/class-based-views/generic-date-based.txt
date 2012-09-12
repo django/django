@@ -2,13 +2,15 @@
 Generic date views
 ==================
 
-Date-based generic views (in the module :mod:`django.views.generic.dates`)
-are views for displaying drilldown pages for date-based data.
+.. module:: django.views.generic.dates
+
+Date-based generic views, provided in :mod:`django.views.generic.dates`, are
+views for displaying drilldown pages for date-based data.
 
 ArchiveIndexView
 ----------------
 
-.. class:: django.views.generic.dates.ArchiveIndexView
+.. class:: ArchiveIndexView
 
     A top-level index page showing the "latest" objects, by date. Objects with
     a date in the *future* are not included unless you set ``allow_future`` to
@@ -36,7 +38,7 @@ ArchiveIndexView
 YearArchiveView
 ---------------
 
-.. class:: django.views.generic.dates.YearArchiveView
+.. class:: YearArchiveView
 
     A yearly archive page showing all available months in a given year. Objects
     with a date in the *future* are not displayed unless you set
@@ -58,13 +60,15 @@ YearArchiveView
 
         A boolean specifying whether to retrieve the full list of objects for
         this year and pass those to the template. If ``True``, the list of
-        objects will be made available to the context. By default, this is
+        objects will be made available to the context. If ``False``, the
+        ``None`` queryset will be used as the object list. By default, this is
         ``False``.
 
     .. method:: get_make_object_list()
 
-        Determine if an object list will be returned as part of the context. If
-        ``False``, the ``None`` queryset will be used as the object list.
+        Determine if an object list will be returned as part of the context.
+        Returns :attr:`~YearArchiveView.make_object_list` by default.
+
 
     **Context**
 
@@ -80,16 +84,18 @@ YearArchiveView
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
       ascending order.
 
-    * ``year``: A :class:`datetime.date<python:datetime.date>` object
+    * ``year``: A :class:`~datetime.date` object
       representing the given year.
 
-    * ``next_year``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the next year. If the next year is in the
-      future, this will be ``None``.
+    * ``next_year``: A :class:`~datetime.date` object
+      representing the first day of the next year, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``previous_year``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the previous year. Unlike ``next_year``,
-      this will never be ``None``.
+    * ``previous_year``: A :class:`~datetime.date` object
+      representing the first day of the previous year, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
     **Notes**
 
@@ -98,7 +104,7 @@ YearArchiveView
 MonthArchiveView
 ----------------
 
-.. class:: django.views.generic.dates.MonthArchiveView
+.. class:: MonthArchiveView
 
     A monthly archive page showing all objects in a given month. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
@@ -131,16 +137,18 @@ MonthArchiveView
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
       ascending order.
 
-    * ``month``: A :class:`datetime.date<python:datetime.date>` object
+    * ``month``: A :class:`~datetime.date` object
       representing the given month.
 
-    * ``next_month``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the next month. If the next month is in the
-      future, this will be ``None``.
+    * ``next_month``: A :class:`~datetime.date` object
+      representing the first day of the next month, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``previous_month``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the previous month. Unlike ``next_month``,
-      this will never be ``None``.
+    * ``previous_month``: A :class:`~datetime.date` object
+      representing the first day of the previous month, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
     **Notes**
 
@@ -149,7 +157,7 @@ MonthArchiveView
 WeekArchiveView
 ---------------
 
-.. class:: django.views.generic.dates.WeekArchiveView
+.. class:: WeekArchiveView
 
     A weekly archive page showing all objects in a given week. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
@@ -175,16 +183,18 @@ WeekArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``week``: A :class:`datetime.date<python:datetime.date>` object
+    * ``week``: A :class:`~datetime.date` object
       representing the first day of the given week.
 
-    * ``next_week``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the next week. If the next week is in the
-      future, this will be ``None``.
+    * ``next_week``: A :class:`~datetime.date` object
+      representing the first day of the next week, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``previous_week``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the previous week. Unlike ``next_week``,
-      this will never be ``None``.
+    * ``previous_week``: A :class:`~datetime.date` object
+      representing the first day of the previous week, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
     **Notes**
 
@@ -193,7 +203,7 @@ WeekArchiveView
 DayArchiveView
 --------------
 
-.. class:: django.views.generic.dates.DayArchiveView
+.. class:: DayArchiveView
 
     A day archive page showing all objects in a given day. Days in the future
     throw a 404 error, regardless of whether any objects exist for future days,
@@ -220,24 +230,28 @@ DayArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``day``: A :class:`datetime.date<python:datetime.date>` object
+    * ``day``: A :class:`~datetime.date` object
       representing the given day.
 
-    * ``next_day``: A :class:`datetime.date<python:datetime.date>` object
-      representing the next day. If the next day is in the future, this will be
-      ``None``.
+    * ``next_day``: A :class:`~datetime.date` object
+      representing the next day, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``previous_day``: A :class:`datetime.date<python:datetime.date>` object
-      representing the previous day. Unlike ``next_day``, this will never be
-      ``None``.
+    * ``previous_day``: A :class:`~datetime.date` object
+      representing the previous day, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``next_month``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the next month. If the next month is in the
-      future, this will be ``None``.
+    * ``next_month``: A :class:`~datetime.date` object
+      representing the first day of the next month, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
-    * ``previous_month``: A :class:`datetime.date<python:datetime.date>` object
-      representing the first day of the previous month. Unlike ``next_month``,
-      this will never be ``None``.
+    * ``previous_month``: A :class:`~datetime.date` object
+      representing the first day of the previous month, according to
+      :attr:`~BaseDateListView.allow_empty` and
+      :attr:`~DateMixin.allow_future`.
 
     **Notes**
 
@@ -246,7 +260,7 @@ DayArchiveView
 TodayArchiveView
 ----------------
 
-.. class:: django.views.generic.dates.TodayArchiveView
+.. class:: TodayArchiveView
 
     A day archive page showing all objects for *today*. This is exactly the
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
@@ -271,7 +285,7 @@ TodayArchiveView
 DateDetailView
 --------------
 
-.. class:: django.views.generic.dates.DateDetailView
+.. class:: DateDetailView
 
     A page representing an individual object. If the object has a date value in
     the future, the view will throw a 404 error by default, unless you set
@@ -293,6 +307,22 @@ DateDetailView
 
 .. note::
 
-    All of the generic views listed above have matching Base* views that only
-    differ in that the they do not include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+    All of the generic views listed above have matching ``Base`` views that
+    only differ in that the they do not include the
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`:
+
+    .. class:: BaseArchiveIndexView
+
+    .. class:: BaseYearArchiveView
+
+    .. class:: BaseMonthArchiveView
+
+    .. class:: BaseWeekArchiveView
+
+    .. class:: BaseDayArchiveView
+
+    .. class:: BaseTodayArchiveView
+
+    .. class:: BaseDateDetailView
+
+

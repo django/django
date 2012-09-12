@@ -358,7 +358,7 @@ class SimpleTestCase(ut2.TestCase):
             args: Extra args.
             kwargs: Extra kwargs.
         """
-        return self.assertRaisesRegexp(expected_exception,
+        return six.assertRaisesRegex(self, expected_exception,
                 re.escape(expected_message), callable_obj, *args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,

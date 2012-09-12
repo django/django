@@ -17,10 +17,8 @@ class HandlerTests(unittest.TestCase):
         # Try running the handler, it will fail in load_middleware
         handler = WSGIHandler()
         self.assertEqual(handler.initLock.locked(), False)
-        try:
+        with self.assertRaises(Exception):
             handler(None, None)
-        except:
-            pass
         self.assertEqual(handler.initLock.locked(), False)
         # Reset settings
         settings.MIDDLEWARE_CLASSES = old_middleware_classes

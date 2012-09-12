@@ -17,7 +17,7 @@ CT = ContentType.objects.get_for_model
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',))
 class CommentTestCase(TestCase):
     fixtures = ["comment_tests"]
-    urls = 'django.contrib.comments.urls'
+    urls = 'regressiontests.comment_tests.urls_default'
 
     def createSomeComments(self):
         # Two anonymous comments on two different objects

@@ -16,8 +16,9 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_, specifically Python 2.6.5 - 2.7.x.  No other Python
-libraries are required for basic Django usage.
+Django requires Python, specifically Python 2.6.5 - 2.7.x. No other Python
+libraries are required for basic Django usage. Django 1.5 also has
+experimental support for Python 3.2 and above.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -50,15 +51,12 @@ aren't available under older versions of Python.
 Third-party applications for use with Django are, of course, free to set their
 own version requirements.
 
-Over the next year or two Django will begin dropping support for older Python
-versions as part of a migration which will end with Django running on Python 3
-(see below for details).
-
 All else being equal, we recommend that you use the latest 2.x release
 (currently Python 2.7). This will let you take advantage of the numerous
-improvements and optimizations to the Python language since version 2.6, and
-will help ease the process of dropping support for older Python versions on
-the road to Python 3.
+improvements and optimizations to the Python language since version 2.6.
+
+Generally speaking, we don't recommend running Django on Python 3 yet; see
+below for more.
 
 What Python version can I use with Django?
 ------------------------------------------
@@ -71,25 +69,21 @@ Django version Python versions
 1.2            2.4, 2.5, 2.6, 2.7
 1.3            2.4, 2.5, 2.6, 2.7
 **1.4**        **2.5, 2.6, 2.7**
-*1.5 (future)* *2.6, 2.7, 3.x (experimental)*
+*1.5 (future)* *2.6, 2.7* and *3.2, 3.3 (experimental)*
 ============== ===============
 
 Can I use Django with Python 3?
 -------------------------------
 
-Not at the moment. Python 3.0 introduced a number of
-backwards-incompatible changes to the Python language, and although
-these changes are generally a good thing for Python's future, it will
-be a while before most Python software catches up and is able to run
-on Python 3.0. For larger Python-based software like Django, the
-transition is expected to take at least a year or two (since it
-involves dropping support for older Python releases and so must be
-done gradually).
+Django 1.5 introduces experimental support for Python 3.2 and 3.3. However, we
+don't yet suggest that you use Django and Python 3 in production.
 
-In the meantime, Python 2.x releases will be supported and provided
-with bug fixes and security updates by the Python development team, so
-continuing to use a Python 2.x release during the transition should
-not present any risk.
+Python 3 support should be considered a "preview". It's offered to bootstrap
+the transition of the Django ecosystem to Python 3, and to help you start
+porting your apps for future Python 3 compatibility. But we're not yet
+confident enough to promise stability in production.
+
+Our current plan is to make Django 1.6 suitable for general use with Python 3.
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
