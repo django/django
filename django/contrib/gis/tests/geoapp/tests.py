@@ -766,6 +766,11 @@ class GeoPredicateTest(TestCase):
         predicate = Q(mpoly__bbcontains=okcity.point)
         self.assertTrue(predicate.matches(texas))
 
+    def test_bboverlaps(self):
+        assert False
+
+    def test_contained(self):
+        assert False
 
     def test_contains(self):
         texas = Country.objects.get(name='Texas')
@@ -778,4 +783,53 @@ class GeoPredicateTest(TestCase):
         self.assertTrue(predicate.matches(texas))
         self.assertFalse(predicate2.matches(texas))
 
+
+    def test_contains_properly(self):
+        assert False
+
+    def test_coveredby(self):
+        assert False
+
+    def test_covers(self):
+        assert False
+
+    def test_crosses(self):
+        assert False
+
+    def test_disjoint(self):
+        assert False
+
+    def test_equals(self):
+        assert False
+
+    def test_exact(self):
+        assert False
+
+    def test_intersects(self):
+        assert False
+
+    def test_overlaps(self):
+        assert False
+
+    def test_relate(self):
+        assert False
+
+    def same_as(self):
+        assert False
+
+    def touches(self):
+        assert False
+
+    def within(self):
+        assert False
+
+# Don't think these can be done:
+    # 'left': None,
+    # 'right': None,
+    # 'overlaps_left': None,
+    # 'overlaps_right': None,
+    # 'overlaps_above': None,
+    # 'overlaps_below': None,
+    # 'strictly_above': None,
+    # 'strictly_below': None}
 
