@@ -370,12 +370,19 @@ def with_metaclass(meta, base=object):
 
 if PY3:
     _iterlists = "lists"
+    _assertRaisesRegex = "assertRaisesRegex"
 else:
     _iterlists = "iterlists"
+    _assertRaisesRegex = "assertRaisesRegexp"
+
 
 def iterlists(d):
     """Return an iterator over the values of a MultiValueDict."""
     return getattr(d, _iterlists)()
+
+
+def assertRaisesRegex(self, *args, **kwargs):
+    return getattr(self, _assertRaisesRegex)(*args, **kwargs)
 
 
 add_move(MovedModule("_dummy_thread", "dummy_thread"))

@@ -947,6 +947,13 @@ The login_required decorator
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
+    .. versionchanged:: 1.5
+    
+    As of version 1.5 :setting:`settings.LOGIN_URL <LOGIN_URL>` now also accepts
+    view function names and :ref:`named URL patterns <naming-url-patterns>`.
+    This allows you to freely remap your login view within your URLconf
+    without having to update the setting.
+
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
     **URL name:** ``login``

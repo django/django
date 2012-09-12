@@ -1,4 +1,5 @@
 from optparse import make_option
+from datetime import datetime
 import os
 import re
 import sys
@@ -90,10 +91,12 @@ class Command(BaseCommand):
         self.stdout.write("Validating models...\n\n")
         self.validate(display_num_errors=True)
         self.stdout.write((
+            "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
             "Development server is running at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
+            "started_at": datetime.now().strftime('%B %d, %Y - %X'),
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "addr": self._raw_ipv6 and '[%s]' % self.addr or self.addr,

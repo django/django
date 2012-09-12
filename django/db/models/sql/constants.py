@@ -1,7 +1,13 @@
+"""
+Constants specific to the SQL storage portion of the ORM.
+"""
+
 from collections import namedtuple
 import re
 
-# Valid query types (a set is used for speedy lookups).
+# Valid query types (a set is used for speedy lookups). These are (currently)
+# considered SQL-specific; other storage systems may choose to use different
+# lookup types.
 QUERY_TERMS = set([
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
@@ -11,9 +17,6 @@ QUERY_TERMS = set([
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
-
-# Separator used to split filter strings apart.
-LOOKUP_SEP = '__'
 
 # Constants to make looking up tuple values clearer.
 # Join lists (indexes into the tuples that are values in the alias_map

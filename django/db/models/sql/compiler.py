@@ -3,8 +3,10 @@ from django.utils.six.moves import zip
 from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend
-from django.db.models.sql.constants import *
+from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
+        GET_ITERATOR_CHUNK_SIZE)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
@@ -811,7 +813,7 @@ class SQLCompiler(object):
                 raise EmptyResultSet
         except EmptyResultSet:
             if result_type == MULTI:
-                return empty_iter()
+                return iter([])
             else:
                 return
 
@@ -1086,13 +1088,6 @@ class SQLDateCompiler(SQLCompiler):
                 elif needs_string_cast:
                     date = typecast_timestamp(str(date))
                 yield date
-
-
-def empty_iter():
-    """
-    Returns an iterator containing no results.
-    """
-    yield next(iter([]))
 
 
 def order_modified_iter(cursor, trim, sentinel):

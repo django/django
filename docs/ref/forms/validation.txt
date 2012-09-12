@@ -70,9 +70,8 @@ overridden:
   formfield-specific piece of validation and, possibly,
   cleaning/normalizing the data.
 
-  Just like the general field ``clean()`` method, above, this method
-  should return the cleaned data, regardless of whether it changed
-  anything or not.
+  This method should return the cleaned value obtained from cleaned_data,
+  regardless of whether it changed anything or not.
 
 * The Form subclass's ``clean()`` method. This method can perform
   any validation that requires access to multiple fields from the form at

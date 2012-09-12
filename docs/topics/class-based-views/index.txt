@@ -84,6 +84,50 @@ function-like entry to class-based views::
 For more information on how to use the built in generic views, consult the next
 topic on :doc:`generic class based views</topics/class-based-views/generic-display>`.
 
+.. _supporting-other-http-methods:
+
+Supporting other HTTP methods
+-----------------------------
+
+Suppose somebody wants to access our book library over HTTP using the views
+as an API. The API client would connect every now and then and download book
+data for the books published since last visit. But if no new books appeared
+since then, it is a waste of CPU time and bandwidth to fetch the books from the
+database, render a full response and send it to the client. It might be
+preferable to ask the API when the most recent book was published.
+
+We map the URL to book list view in the URLconf::
+
+    from django.conf.urls import patterns
+    from books.views import BookListView
+
+    urlpatterns = patterns('',
+        (r'^books/$', BookListView.as_view()),
+    )
+
+And the view::
+
+    from django.http import HttpResponse
+    from django.views.generic import ListView
+    from books.models import Book
+
+    class BookListView(ListView):
+        model = Book
+
+        def head(self, *args, **kwargs):
+            last_book = self.get_queryset().latest('publication_date')
+            response = HttpResponse('')
+            # RFC 1123 date format
+            response['Last-Modified'] = last_book.publication_date.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            return response
+
+If the view is accessed from a ``GET`` request, a plain-and-simple object
+list is returned in the response (using ``book_list.html`` template). But if
+the client issues a ``HEAD`` request, the response has an empty body and
+the ``Last-Modified`` header indicates when the most recent book was published.
+Based on this information, the client may or may not download the full object
+list.
+
 Decorating class-based views
 ============================
 

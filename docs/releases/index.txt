@@ -14,6 +14,7 @@ up to and including the new version.
 Final releases
 ==============
 
+.. _development_release_notes:
 
 1.5 release
 -----------

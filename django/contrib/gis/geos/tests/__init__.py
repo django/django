@@ -16,7 +16,8 @@ test_suites = [
 def suite():
     "Builds a test suite for the GEOS tests."
     s = TestSuite()
-    map(s.addTest, test_suites)
+    for suite in test_suites:
+        s.addTest(suite)
     return s
 
 def run(verbosity=1):

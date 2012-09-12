@@ -135,7 +135,7 @@ access to more than a single field::
             raise ValidationError('Draft entries may not have a publication date.')
         # Set the pub_date for published items if it hasn't been set already.
         if self.status == 'published' and self.pub_date is None:
-            self.pub_date = datetime.datetime.now()
+            self.pub_date = datetime.date.today()
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
