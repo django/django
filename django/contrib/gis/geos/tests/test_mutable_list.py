@@ -55,14 +55,14 @@ class ListMixinTest(unittest.TestCase):
 
     def lists_of_len(self, length=None):
         if length is None: length = self.limit
-        pl = range(length)
+        pl = list(range(length))
         return pl, self.listType(pl)
 
     def limits_plus(self, b):
         return range(-self.limit - b, self.limit + b)
 
     def step_range(self):
-        return range(-1 - self.limit, 0) + range(1, 1 + self.limit)
+        return list(range(-1 - self.limit, 0)) + list(range(1, 1 + self.limit))
 
     def test01_getslice(self):
         'Slice retrieval'
@@ -160,13 +160,13 @@ class ListMixinTest(unittest.TestCase):
                     del pl[i:j]
                     del ul[i:j]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d:%d]' % (i,j))
-                    for k in range(-Len - 1,0) + range(1,Len):
+                    for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
                         pl, ul = self.lists_of_len(Len)
                         del pl[i:j:k]
                         del ul[i:j:k]
                         self.assertEqual(pl[:], ul[:], 'del slice [%d:%d:%d]' % (i,j,k))
 
-                for k in range(-Len - 1,0) + range(1,Len):
+                for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
                     pl, ul = self.lists_of_len(Len)
                     del pl[:i:k]
                     del ul[:i:k]
@@ -177,7 +177,7 @@ class ListMixinTest(unittest.TestCase):
                     del ul[i::k]
                     self.assertEqual(pl[:], ul[:], 'del slice [%d::%d]' % (i,k))
 
-            for k in range(-Len - 1,0) + range(1,Len):
+            for k in list(range(-Len - 1, 0)) + list(range(1, Len)):
                 pl, ul = self.lists_of_len(Len)
                 del pl[::k]
                 del ul[::k]
@@ -320,7 +320,7 @@ class ListMixinTest(unittest.TestCase):
         pl.sort()
         ul.sort()
         self.assertEqual(pl[:], ul[:], 'sort')
-        mid = pl[len(pl) / 2]
+        mid = pl[len(pl) // 2]
         pl.sort(key=lambda x: (mid-x)**2)
         ul.sort(key=lambda x: (mid-x)**2)
         self.assertEqual(pl[:], ul[:], 'sort w/ key')
@@ -330,7 +330,7 @@ class ListMixinTest(unittest.TestCase):
         pl.sort(reverse=True)
         ul.sort(reverse=True)
         self.assertEqual(pl[:], ul[:], 'sort w/ reverse')
-        mid = pl[len(pl) / 2]
+        mid = pl[len(pl) // 2]
         pl.sort(key=lambda x: (mid-x)**2)
         ul.sort(key=lambda x: (mid-x)**2)
         self.assertEqual(pl[:], ul[:], 'sort w/ key')
@@ -338,7 +338,7 @@ class ListMixinTest(unittest.TestCase):
     def test_12_arithmetic(self):
         'Arithmetic'
         pl, ul = self.lists_of_len()
-        al = range(10,14)
+        al = list(range(10,14))
         self.assertEqual(list(pl + al), list(ul + al), 'add')
         self.assertEqual(type(ul), type(ul + al), 'type of add result')
         self.assertEqual(list(al + pl), list(al + ul), 'radd')
