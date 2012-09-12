@@ -436,7 +436,8 @@ class FileSaveRaceConditionTest(unittest.TestCase):
 
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
-        self.old_umask = os.umask(000)
+        self.umask = 0o027
+        self.old_umask = os.umask(self.umask)
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
@@ -454,7 +455,7 @@ class FileStoragePermissions(unittest.TestCase):
     def test_file_upload_default_permissions(self):
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
-        self.assertEqual(mode, 0o666)
+        self.assertEqual(mode, 0o666 & ~self.umask)
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):
