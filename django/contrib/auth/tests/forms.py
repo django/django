@@ -246,8 +246,7 @@ class UserChangeFormTest(TestCase):
     def test_bug_17944_empty_password(self):
         user = User.objects.get(username='empty_password')
         form = UserChangeForm(instance=user)
-        self.assertIn(_("Invalid password format or unknown hashing algorithm."),
-            form.as_table())
+        self.assertIn(_("No password set."), form.as_table())
 
     def test_bug_17944_unmanageable_password(self):
         user = User.objects.get(username='unmanageable_password')
