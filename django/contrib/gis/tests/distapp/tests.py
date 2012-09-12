@@ -356,3 +356,20 @@ class DistanceTest(TestCase):
         z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
         self.assertEqual(None, z.distance)
         self.assertEqual(None, z.area)
+
+class GeoPredicateDistanceTest(TestCase):
+
+    def test_distance_gt(self):
+        assert False
+
+    def test_distance_gte(self):
+        assert False
+
+    def test_distance_lt(self):
+        assert False
+
+    def test_distance_lte(self):
+        assert False
+
+    def test_dwithin(self):
+        assert False
