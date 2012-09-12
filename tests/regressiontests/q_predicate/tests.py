@@ -107,10 +107,7 @@ class QasPredicateTest(test.TestCase):
         Test that an invalid lookup raises an exception
         """
         predicate = Q(name__hazawat=5)
-        with six.assertRaisesRegex(self,
-                ValueError,
-                'invalid lookup'):
-
+        with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
                 predicate.matches(self.testobj)
 
 class RelationshipFollowTest(test.TestCase):

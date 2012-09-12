@@ -10,6 +10,7 @@ from django.contrib.gis.geos import (fromstr, GEOSGeometry,
 from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
+from django.db.models import Q
 from django.test import TestCase
 from django.utils import six
 
@@ -756,3 +757,25 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(True, union.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
+
+class GeoPredicateTest(TestCase):
+
+    def test_bbcontains(self):
+        texas = Country.objects.get(name='Texas')
+        okcity = City.objects.get(name='Oklahoma City')
+        predicate = Q(mpoly__bbcontains=okcity.point)
+        self.assertTrue(predicate.matches(texas))
+
+
+    def test_contains(self):
+        texas = Country.objects.get(name='Texas')
+        # Pulling out some cities.
+        houston = City.objects.get(name='Houston')
+        wellington = City.objects.get(name='Wellington')
+        predicate = Q(mpoly__contains=houston.point)
+        predicate2 = Q(mpoly__contains=wellington.point)
+        # Now testing contains on the countries using the points for
+        self.assertTrue(predicate.matches(texas))
+        self.assertFalse(predicate2.matches(texas))
+
+

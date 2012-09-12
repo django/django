@@ -4,6 +4,7 @@ from django.db.models.query import sql
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql import aggregates as gis_aggregates
 from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField, GeomField
+from django.contrib.gis.db.models.sql.matching import match_functions
 from django.contrib.gis.db.models.sql.where import GeoWhereNode
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
@@ -21,6 +22,13 @@ ALL_TERMS = set([
             ])
 ALL_TERMS.update(sql.constants.QUERY_TERMS)
 
+ALL_MATCHES = sql.matching.match_functions
+
+# we update match functions in the reverse of query_terms, as we want the
+# gis version to be the one in the final lookup ie 'contains' should be gis
+# contains
+ALL_MATCHES.update(match_functions)
+
 class GeoQuery(sql.Query):
     """
     A single spatial SQL query.
@@ -28,6 +36,7 @@ class GeoQuery(sql.Query):
     # Overridding the valid query terms.
     query_terms = ALL_TERMS
     aggregates_module = gis_aggregates
+    match_functions = ALL_MATCHES
 
     compiler = 'GeoSQLCompiler'
 
