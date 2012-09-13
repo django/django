@@ -181,7 +181,11 @@ class DataSourceTest(unittest.TestCase):
 
                     # Making sure the SpatialReference is as expected.
                     if hasattr(source, 'srs_wkt'):
-                        self.assertEqual(source.srs_wkt, g.srs.wkt)
+                        self.assertEqual(
+                            source.srs_wkt,
+                            # Depending on lib versions, WGS_84 might be WGS_1984
+                            g.srs.wkt.replace('SPHEROID["WGS_84"', 'SPHEROID["WGS_1984"')
+                        )
 
     def test06_spatial_filter(self):
         "Testing the Layer.spatial_filter property."
