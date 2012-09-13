@@ -100,6 +100,7 @@ class BaseHandler(object):
                         urlconf = request.urlconf
                         urlresolvers.set_urlconf(urlconf)
                         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+
                 # Use generators and try to resolve matching URL patterns one by
                 # one
                 url_patterns = (pattern for pattern in resolver.url_patterns)
@@ -114,11 +115,10 @@ class BaseHandler(object):
                         response = middleware_method(request, callback, callback_args, callback_kwargs)
                         if response:
                             break
-
-                    if response is None:
+                    else:
                         try:
                             response = callback(request, *callback_args, **callback_kwargs)
-                        except urlresolvers.DoesNotResolve, e:
+                        except urlresolvers.DoesNotResolve:
                             # Continue resolve URLs if the view raises 
                             # urlresolvers.DoesNotResolve exception to indicate
                             # the url pattern does not match.
@@ -131,7 +131,7 @@ class BaseHandler(object):
                                 response = middleware_method(request, e)
                                 if response:
                                     break
-                            if response is None:
+                            else:
                                 raise
 
                 # Complain if the view returned None (a common error).

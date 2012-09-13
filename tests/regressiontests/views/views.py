@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import sys
 
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import get_resolver, DoesNotResolve
+from django.core.urlresolvers import DoesNotResolve, get_resolver
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
@@ -237,7 +237,6 @@ def overlapping_view3(request, keywords=None):
 
 def no_overlapping_view(request, keywords=None):
     raise DoesNotResolve
-
 
 def sensitive_method_view(request):
     return Klass().method(request)
