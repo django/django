@@ -531,11 +531,9 @@ def cycle(parser, token):
     The optional flag "silent" can be used to prevent the cycle declaration
     from returning any value::
 
-        {% cycle 'row1' 'row2' as rowcolors silent %}{# no value here #}
         {% for o in some_list %}
-            <tr class="{% cycle rowcolors %}">{# first value will be "row1" #}
-                ...
-            </tr>
+            {% cycle 'row1' 'row2' as rowcolors silent %}
+            <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
         {% endfor %}
 
     """
