@@ -239,13 +239,14 @@ def find(path, all=False):
         result = finder.find(path, all=all)
         if not all and result:
             return result
-        if not isinstance(result, (list, tuple)):
-            result = [result]
-        matches.extend(result)
+        if result:
+            if not isinstance(result, (list, tuple)):
+                result = [result]
+            matches.extend(result)
     if matches:
         return matches
     # No match.
-    return all and [] or None
+    return [] if all else None
 
 
 def get_finders():

@@ -43,6 +43,18 @@ TEST_SETTINGS = {
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
+class EmptyFinder(finders.BaseFinder):
+    """
+    A finder that returns None if finding a single file, or [] if finding all
+    files matching a path.
+    """
+    def find(self, path, all=False):
+        return [] if all else None
+
+    def list(self, ignore_patterns=[]):
+        return []
+
+
 class BaseStaticFilesTestCase(object):
     """
     Test case with a couple utility assertions.
@@ -736,6 +748,12 @@ class TestMiscFinder(TestCase):
     @override_settings(MEDIA_ROOT='')
     def test_location_empty(self):
         self.assertRaises(ImproperlyConfigured, finders.DefaultStorageFinder)
+
+    @override_settings(STATICFILES_FINDERS=(
+            'regressiontests.staticfiles_tests.tests.EmptyFinder',))
+    def test_find_no_results(self):
+        self.assertEqual(finders.find('does/not/exist.png'), None)
+        self.assertEqual(finders.find('does/not/exist.png', all=True), [])
 
 
 class TestTemplateTag(StaticFilesTestCase):
