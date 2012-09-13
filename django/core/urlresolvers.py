@@ -73,6 +73,9 @@ class ResolverMatch(object):
 class Resolver404(Http404):
     pass
 
+class DoesNotResolve(Http404):
+    pass
+
 class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
     silent_variable_failure = True
