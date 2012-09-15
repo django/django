@@ -1339,9 +1339,6 @@ Default: ``'/accounts/logout/'``
 
 LOGIN_URL counterpart.
 
-.. note::
-    See the `note on LOGIN_REDIRECT_URL setting`_
-
 .. setting:: MANAGERS
 
 MANAGERS
