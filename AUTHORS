@@ -32,6 +32,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Anssi Kääriäinen
     * Florian Apolloner
     * Jeremy Dunck
+    * Bryan Veloso
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
