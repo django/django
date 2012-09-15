@@ -31,9 +31,9 @@ class FormsWidgetTestCase(TestCase):
         self.assertHTMLEqual(w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'}), '<input type="text" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" class="fun" />')
 
         # You can also pass 'attrs' to the constructor:
-        w = TextInput(attrs={'class': 'fun'})
-        self.assertHTMLEqual(w.render('email', ''), '<input type="text" class="fun" name="email" />')
-        self.assertHTMLEqual(w.render('email', 'foo@example.com'), '<input type="text" class="fun" value="foo@example.com" name="email" />')
+        w = TextInput(attrs={'class': 'fun', 'type': 'email'})
+        self.assertHTMLEqual(w.render('email', ''), '<input type="email" class="fun" name="email" />')
+        self.assertHTMLEqual(w.render('email', 'foo@example.com'), '<input type="email" class="fun" value="foo@example.com" name="email" />')
 
         # 'attrs' passed to render() get precedence over those passed to the constructor:
         w = TextInput(attrs={'class': 'pretty'})
@@ -915,8 +915,8 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="text" name="date" value="2007-09-17 12:51:00" />')
 
         # Use 'format' to change the way a value is displayed.
-        w = DateTimeInput(format='%d/%m/%Y %H:%M')
-        self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007 12:51" />')
+        w = DateTimeInput(format='%d/%m/%Y %H:%M', attrs={'type': 'datetime'})
+        self.assertHTMLEqual(w.render('date', d), '<input type="datetime" name="date" value="17/09/2007 12:51" />')
         self.assertFalse(w._has_changed(d, '17/09/2007 12:51'))
 
         # Make sure a custom format works with _has_changed. The hidden input will use
@@ -938,8 +938,8 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('date', '2007-09-17'), '<input type="text" name="date" value="2007-09-17" />')
 
         # Use 'format' to change the way a value is displayed.
-        w = DateInput(format='%d/%m/%Y')
-        self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007" />')
+        w = DateInput(format='%d/%m/%Y', attrs={'type': 'date'})
+        self.assertHTMLEqual(w.render('date', d), '<input type="date" name="date" value="17/09/2007" />')
         self.assertFalse(w._has_changed(d, '17/09/2007'))
 
         # Make sure a custom format works with _has_changed. The hidden input will use
@@ -963,8 +963,8 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('time', '13:12:11'), '<input type="text" name="time" value="13:12:11" />')
 
         # Use 'format' to change the way a value is displayed.
-        w = TimeInput(format='%H:%M')
-        self.assertHTMLEqual(w.render('time', t), '<input type="text" name="time" value="12:51" />')
+        w = TimeInput(format='%H:%M', attrs={'type': 'time'})
+        self.assertHTMLEqual(w.render('time', t), '<input type="time" name="time" value="12:51" />')
         self.assertFalse(w._has_changed(t, '12:51'))
 
         # Make sure a custom format works with _has_changed. The hidden input will use

@@ -1,4 +1,5 @@
 import ctypes
+import json
 import random
 
 from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
@@ -204,8 +205,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.json_geoms:
             geom = GEOSGeometry(g.wkt)
             if not hasattr(g, 'not_equal'):
-                self.assertEqual(g.json, geom.json)
-                self.assertEqual(g.json, geom.geojson)
+                # Loading jsons to prevent decimal differences
+                self.assertEqual(json.loads(g.json), json.loads(geom.json))
+                self.assertEqual(json.loads(g.json), json.loads(geom.geojson))
             self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
 
     def test_fromfile(self):

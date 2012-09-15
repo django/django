@@ -126,8 +126,9 @@ provided for each widget will be rendered exactly the same::
 
 On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
-'name' widget to have some special CSS class. To do this, you use the
-:attr:`Widget.attrs` argument when creating the widget:
+'name' widget to have some special CSS class. It is also possible to specify
+the 'type' attribute to take advantage of the new HTML5 input types.  To do
+this, you use the :attr:`Widget.attrs` argument when creating the widget:
 
 For example::
 
@@ -245,7 +246,7 @@ commonly used groups of widgets:
 
     Date input as a simple text box: ``<input type='text' ...>``
 
-    Takes one optional argument:
+    Takes same arguments as :class:`TextInput`, with one more optional argument:
 
     .. attribute:: DateInput.format
 
@@ -262,7 +263,7 @@ commonly used groups of widgets:
 
     Date/time input as a simple text box: ``<input type='text' ...>``
 
-    Takes one optional argument:
+    Takes same arguments as :class:`TextInput`, with one more optional argument:
 
     .. attribute:: DateTimeInput.format
 
@@ -279,7 +280,7 @@ commonly used groups of widgets:
 
     Time input as a simple text box: ``<input type='text' ...>``
 
-    Takes one optional argument:
+    Takes same arguments as :class:`TextInput`, with one more optional argument:
 
     .. attribute:: TimeInput.format
 

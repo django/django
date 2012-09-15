@@ -13,6 +13,7 @@ from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
+from django.utils.encoding import force_str
 from django.utils.log import getLogger
 from django.utils.safestring import SafeText, SafeBytes
 from django.utils import six
@@ -172,7 +173,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings_dict['USER']:
                 conn_params['user'] = settings_dict['USER']
             if settings_dict['PASSWORD']:
-                conn_params['password'] = settings_dict['PASSWORD']
+                conn_params['password'] = force_str(settings_dict['PASSWORD'])
             if settings_dict['HOST']:
                 conn_params['host'] = settings_dict['HOST']
             if settings_dict['PORT']:
