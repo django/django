@@ -586,6 +586,12 @@ correct path and environment for you.
 Storing additional information about users
 ------------------------------------------
 
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
 If you'd like to store additional information related to your users, Django
 provides a method to specify a site-specific related model -- termed a "user
 profile" -- for this purpose.
@@ -952,7 +958,7 @@ The login_required decorator
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
     .. versionchanged:: 1.5
-    
+
     As of version 1.5 :setting:`settings.LOGIN_URL <LOGIN_URL>` now also accepts
     view function names and :ref:`named URL patterns <naming-url-patterns>`.
     This allows you to freely remap your login view within your URLconf

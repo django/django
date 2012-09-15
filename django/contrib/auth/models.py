@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import re
-import urllib
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
@@ -405,6 +405,8 @@ class User(AbstractBaseUser):
         Returns site-specific profile for this user. Raises
         SiteProfileNotAvailable if this site does not allow profiles.
         """
+        warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
+            PendingDeprecationWarning)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
