@@ -13,7 +13,7 @@ def ensure_default_manager(sender, **kwargs):
     _default_manager if it's not a subclass of Manager).
     """
     cls = sender
-    if cls._meta.abstract:
+    if cls._meta.abstract or cls._meta.swapped:
         return
     if not getattr(cls, '_default_manager', None):
         # Create the default manager, if needed.
@@ -42,6 +42,7 @@ def ensure_default_manager(sender, **kwargs):
 
 signals.class_prepared.connect(ensure_default_manager)
 
+
 class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
@@ -56,7 +57,9 @@ class Manager(object):
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
-        setattr(model, name, ManagerDescriptor(self))
+        # Only contribute the manager if the model is concrete
+        if not model._meta.abstract and not model._meta.swapped:
+            setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
@@ -208,6 +211,7 @@ class Manager(object):
     def raw(self, raw_query, params=None, *args, **kwargs):
         return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
 
+
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
     # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
@@ -218,6 +222,7 @@ class ManagerDescriptor(object):
         if instance != None:
             raise AttributeError("Manager isn't accessible via %s instances" % type.__name__)
         return self.manager
+
 
 class EmptyManager(Manager):
     def get_query_set(self):

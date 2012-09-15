@@ -222,10 +222,15 @@ class Options(object):
 
     def _swapped(self):
         """
-        Has this model been swapped out for another?
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
         """
-        model_label = '%s.%s' % (self.app_label, self.object_name)
-        return self.swappable and getattr(settings, self.swappable, None) not in (None, model_label)
+        if self.swappable:
+            model_label = '%s.%s' % (self.app_label, self.object_name)
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for not in (None, model_label):
+                return swapped_for
+        return None
     swapped = property(_swapped)
 
     def _fields(self):
