@@ -395,7 +395,7 @@ Jeremy Dunck
 
 `Bryan Veloso`_
     Bryan found Django 0.96 through a fellow designer who was evangelizing
-    its use. It was his for foray outside of the land that was PHP-based
+    its use. It was his first foray outside of the land that was PHP-based
     templating. Although he has only ever used Django for personal projects,
     it is the very reason he considers himself a designer/developer
     hybrid and is working to further design within the Django community.
