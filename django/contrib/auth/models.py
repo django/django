@@ -277,7 +277,7 @@ class AbstractBaseUser(models.Model):
 
 
 @python_2_unicode_compatible
-class User(AbstractBaseUser):
+class AbstractUser(AbstractBaseUser):
     """
     Users within the Django authentication system are represented by this
     model.
@@ -317,7 +317,7 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        swappable = 'AUTH_USER_MODEL'
+        abstract = True
 
     def __str__(self):
         return self.username
@@ -434,6 +434,9 @@ class User(AbstractBaseUser):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
+class User(AbstractUser):
+    class Meta:
+        swappable = 'AUTH_USER_MODEL'
 
 @python_2_unicode_compatible
 class AnonymousUser(object):
