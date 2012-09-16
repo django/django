@@ -108,6 +108,11 @@ class ModelBase(type):
 
         is_proxy = new_class._meta.proxy
 
+        # If the model is a proxy, ensure that the base class
+        # hasn't been swapped out.
+        if is_proxy and base_meta.swapped:
+            raise TypeError("%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped))
+
         if getattr(new_class, '_default_manager', None):
             if not is_proxy:
                 # Multi-table inheritance doesn't inherit default manager from

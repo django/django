@@ -1953,6 +1953,18 @@ control access of the User to admin content:
     the given app.
 
 
+Custom users and Proxy models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One limitation of custom User models is that installing a custom User model
+will break any proxy model extending :class:`~django.contrib.auth.models.User`.
+Proxy models must be based on a concrete base class; by defining a custom User
+model, you remove the ability of Django to reliably identify the base class.
+
+If your project uses proxy models, you must either modify the proxy to extend
+the User model that is currently in use in your project, or merge your proxy's
+behavior into your User subclass.
+
 A full example
 --------------
 
