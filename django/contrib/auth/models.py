@@ -228,9 +228,10 @@ def _user_has_module_perms(user, app_label):
 
 
 class AbstractBaseUser(models.Model):
-    REQUIRED_FIELDS = []
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
+
+    REQUIRED_FIELDS = []
 
     class Meta:
         abstract = True
@@ -279,12 +280,11 @@ class AbstractBaseUser(models.Model):
 @python_2_unicode_compatible
 class AbstractUser(AbstractBaseUser):
     """
-    Users within the Django authentication system are represented by this
-    model.
+    An abstract base class implementing a fully featured User model with
+    admin-compliant permissions.
 
-    Username and password are required. Other fields are optional.
+    Username, password and email are required. Other fields are optional.
     """
-    REQUIRED_FIELDS = ['email']
     username = models.CharField(_('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
@@ -313,6 +313,8 @@ class AbstractUser(AbstractBaseUser):
         help_text='Specific permissions for this user.')
 
     objects = UserManager()
+
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = _('user')
@@ -434,9 +436,17 @@ class AbstractUser(AbstractBaseUser):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
+
 class User(AbstractUser):
+    """
+    Users within the Django authentication system are represented by this
+    model.
+
+    Username, password and email are required. Other fields are optional.
+    """
     class Meta:
         swappable = 'AUTH_USER_MODEL'
+
 
 @python_2_unicode_compatible
 class AnonymousUser(object):

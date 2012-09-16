@@ -1918,6 +1918,14 @@ additional methods:
     Unlike `create_user()`, `create_superuser()` *must* require the caller
     to provider a password.
 
+Extending Django's default User
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
+model and you just want to add some additional profile information, you can
+simply subclass :class:`~django.contrib.auth.models.AbstractUser` and add your
+custom profile fields.
+
 Custom users and django.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
