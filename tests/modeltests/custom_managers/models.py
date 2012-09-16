@@ -77,7 +77,7 @@ class User(models.Model):
     firstname = models.CharField(max_length=10)
     middlename = models.CharField(max_length=10)
     lastname = models.CharField(max_length=10)
-    objects = models.Manager(QuerySetClass=UserQuerySet)
+    objects = models.Manager(query_set_class=UserQuerySet)
 
     def __str__(self):
         return self.firstname
