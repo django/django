@@ -1,6 +1,7 @@
-from django.test import TestCase, skipIfCustomUser
-from django.test.utils import override_settings
 from django.contrib.auth import signals
+from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.test import TestCase
+from django.test.utils import override_settings
 
 
 @skipIfCustomUser

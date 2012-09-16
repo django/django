@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.test.utils import override_settings
 
 

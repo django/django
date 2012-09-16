@@ -5,9 +5,10 @@ from django.contrib.auth import models, management
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
 from django.contrib.auth.tests import CustomUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.six import StringIO

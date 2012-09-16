@@ -2,8 +2,9 @@ import os
 
 from django.conf import global_settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.db.models import Q
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.test.utils import override_settings
 
 

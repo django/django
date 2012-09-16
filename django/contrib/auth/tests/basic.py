@@ -2,8 +2,9 @@ import locale
 
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.management import call_command
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.utils.six import StringIO
 
 

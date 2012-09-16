@@ -48,12 +48,12 @@ from django.utils.unittest import skipIf
 from django.views.static import serve
 
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
-           'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature',
-           'skipIfCustomUser')
+           'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)",
                                 lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
+
 
 def to_list(value):
     """
@@ -906,13 +906,6 @@ def skipUnlessDBFeature(feature):
     """
     return _deferredSkip(lambda: not getattr(connection.features, feature),
                          "Database doesn't support feature %s" % feature)
-
-
-def skipIfCustomUser(test_func):
-    """
-    Skip a test if a custom user model is in use.
-    """
-    return skipIf(settings.AUTH_USER_MODEL != 'auth.User', 'Custom user model in use')(test_func)
 
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):

@@ -4,9 +4,10 @@ import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils import translation

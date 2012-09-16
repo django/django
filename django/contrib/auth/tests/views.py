@@ -10,12 +10,13 @@ from django.http import QueryDict
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
-from django.test import TestCase, skipIfCustomUser
+from django.test import TestCase
 from django.test.utils import override_settings
 
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm, PasswordResetForm)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 
 
 @override_settings(

@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tests.views import AuthViewsTestCase
-from django.test import skipIfCustomUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 
 
 @skipIfCustomUser
