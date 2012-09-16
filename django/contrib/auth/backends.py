@@ -13,9 +13,7 @@ class ModelBackend(object):
     def authenticate(self, username=None, password=None):
         try:
             UserModel = get_user_model()
-            user = UserModel.objects.get(**{
-                getattr(UserModel, 'USERNAME_FIELD', 'username'): username
-            })
+            user = UserModel.objects.get_by_natural_key(username)
             if user.check_password(password):
                 return user
         except UserModel.DoesNotExist:
@@ -111,9 +109,7 @@ class RemoteUserBackend(ModelBackend):
                 user = self.configure_user(user)
         else:
             try:
-                user = UserModel.objects.get(**{
-                    getattr(UserModel, 'USERNAME_FIELD', 'username'): username
-                })
+                user = UserModel.objects.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
         return user
