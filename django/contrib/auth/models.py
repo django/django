@@ -165,7 +165,7 @@ class BaseUserManager(models.Manager):
         return get_random_string(length, allowed_chars)
 
     def get_by_natural_key(self, username):
-        return self.get(**{getattr(self, 'USERNAME_FIELD', 'username'): username})
+        return self.get(**{getattr(self.model, 'USERNAME_FIELD', 'username'): username})
 
 
 class UserManager(BaseUserManager):
