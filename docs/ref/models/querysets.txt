@@ -1050,7 +1050,7 @@ defer
 In some complex data-modeling situations, your models might contain a lot of
 fields, some of which could contain a lot of data (for example, text fields),
 or require expensive processing to convert them to Python objects. If you are
-using the results of a queryset in some situation where you know you don't know
+using the results of a queryset in some situation where you don't know
 if you need those particular fields when you initially fetch the data, you can
 tell Django not to retrieve them from the database.
 
