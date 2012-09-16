@@ -29,7 +29,7 @@ class Command(BaseCommand):
     ) + tuple(
         make_option('--%s' % field, dest=field, default=None,
             help='Specifies the %s for the superuser.' % field)
-        for field in getattr(get_user_model(), 'REQUIRED_FIELDS', ['email'])
+        for field in get_user_model().REQUIRED_FIELDS
     )
 
     help = 'Used to create a superuser.'
@@ -43,7 +43,7 @@ class Command(BaseCommand):
         UserModel = get_user_model()
 
         username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
-        other_fields = getattr(UserModel, 'REQUIRED_FIELDS', ['email'])
+        other_fields = UserModel.REQUIRED_FIELDS
 
         # If not provided, create the user with an unusable password
         password = None

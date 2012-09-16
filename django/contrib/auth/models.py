@@ -170,7 +170,7 @@ class BaseUserManager(models.Manager):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email=None, password=None):
+    def create_user(self, username, email=None, password=None, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
         """
@@ -180,14 +180,14 @@ class UserManager(BaseUserManager):
         email = UserManager.normalize_email(email)
         user = self.model(username=username, email=email,
                           is_staff=False, is_active=True, is_superuser=False,
-                          last_login=now, date_joined=now)
+                          last_login=now, date_joined=now, **extra_fields)
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password):
-        u = self.create_user(username, email, password)
+    def create_superuser(self, username, email, password, **extra_fields):
+        u = self.create_user(username, email, password, **extra_fields)
         u.is_staff = True
         u.is_active = True
         u.is_superuser = True
@@ -228,6 +228,7 @@ def _user_has_module_perms(user, app_label):
 
 
 class AbstractBaseUser(models.Model):
+    REQUIRED_FIELDS = []
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
 
@@ -276,13 +277,14 @@ class AbstractBaseUser(models.Model):
 
 
 @python_2_unicode_compatible
-class User(AbstractBaseUser):
+class AbstractUser(AbstractBaseUser):
     """
     Users within the Django authentication system are represented by this
     model.
 
     Username and password are required. Other fields are optional.
     """
+    REQUIRED_FIELDS = ['email']
     username = models.CharField(_('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
@@ -315,7 +317,7 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        swappable = 'AUTH_USER_MODEL'
+        abstract = True
 
     def __str__(self):
         return self.username
@@ -432,6 +434,9 @@ class User(AbstractBaseUser):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
+class User(AbstractUser):
+    class Meta:
+        swappable = 'AUTH_USER_MODEL'
 
 @python_2_unicode_compatible
 class AnonymousUser(object):
