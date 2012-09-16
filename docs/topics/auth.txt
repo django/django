@@ -57,10 +57,6 @@ API reference
 Fields
 ~~~~~~
 
-TODO document which attributes/methods come from AbstractBaseUser
-TODO tone down references to get_profile - it's not the best way of doing things
-any more.
-
 .. class:: models.User
 
     :class:`~django.contrib.auth.models.User` objects have the following
@@ -253,6 +249,12 @@ Methods
         uses the :setting:`DEFAULT_FROM_EMAIL`.
 
     .. method:: models.User.get_profile()
+
+        .. deprecated:: 1.5
+            With the introduction of :ref:`custom User models <auth-custom-user>`,
+            the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+            model is no longer supported. See the
+            :doc:`Django 1.5 release notes</releases/1.5>` for more information.
 
         Returns a site-specific profile for this user. Raises
         :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
@@ -1784,6 +1786,12 @@ model that you wish to use as your User model.
    to set :setting:`AUTH_USER_MODEL`, you should set it before running
    ``manage.py syncdb`` for the first time.
 
+   If you have an existing project and you want to migrate to using a custom
+   User model, you may need to look into using a migration tool like South_
+   to ease the transition.
+
+.. _South: http://south.aeracode.org
+
 Referencing the User model
 --------------------------
 
@@ -1821,22 +1829,50 @@ Specifying a custom User model
     apps. On the other hand, queries to retrieve this related information
     will involve a database join, which may have an effect on performance.
 
-Django expects your custom User model to meet some minimum requirements. The
-easiest way to construct a compliant custom User model is to inherit from
-:class:`~django.contrib.auth.models.AbstractBaseUser` and provide some key
-definitions:
+Django expects your custom User model to meet some minimum requirements.
+
+1. Your model must have a single unique field that can be used for
+   identification purposes. This can be a username, an email address,
+   or any other unique attribute.
+
+2. Your model must provide a way to address the user in a "short" and
+   "long" form. The most common interpretation of this would be to use
+   the user's given name as the "short" identifier, and the user's full
+   name as the "long" identifier. However, there are no constraints on
+   what these two methods return - if you want, they can return exactly
+   the same value.
+
+The easiest way to construct a compliant custom User model is to inherit from
+:class:`~django.contrib.auth.models.AbstractBaseUser`.
+:class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
+implementation of a `User` model, including hashed passwords and tokenized
+password resets. You must then provide some key implementation details:
 
 .. attribute:: User.USERNAME_FIELD
 
     A string describing the name of the field on the User model that is
     used as the unique identifier. This will usually be a username of
     some kind, but it can also be an email address, or any other unique
-    identifier.
+    identifier. In the following example, the field `identifier` is used
+    as the identifying field::
+
+        class MyUser(AbstractBaseUser):
+            identfier = models.CharField(max_length=40, unique=True, db_index=True)
+            ...
+            USERNAME_FIELD = 'identifier'
 
 .. attribute:: User.REQUIRED_FIELDS
 
     A list of the field names that *must* be provided when creating
-    a user.
+    a user. For example, here is the partial definition for a User model
+    that defines two required fields - a date of birth and height::
+
+        class MyUser(AbstractBaseUser):
+            ...
+            date_of_birth = models.DateField()
+            height = models.FloatField()
+            ...
+            REQUIRED_FIELDS = ['date_of_birth', 'height']
 
 .. method:: User.get_full_name():
 
@@ -1855,8 +1891,9 @@ You should also define a custom manager for your User model. If your User
 model defines `username` and `email` fields the same as Django's default User,
 you can just install Django's
 :class:`~django.contrib.auth.models.UserManager`; however, if your User model
-defines different fields, you will need to define a custom manager with 2
-methods.
+defines different fields, you will need to define a custom manager that
+extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
+additional methods:
 
 .. method:: UserManager.create_user(username, password=None, **other_fields)
 
@@ -1890,7 +1927,7 @@ control access of the User to admin content:
 
 .. attribute:: User.is_staff
 
-    Returns True if the user is a member of staff.
+    Returns True if the user is allowed to have access to the admin site.
 
 .. attribute:: User.is_active
 
@@ -1908,10 +1945,10 @@ control access of the User to admin content:
     the given app.
 
 
-Worked Example
-~~~~~~~~~~~~~~
+A full example
+--------------
 
-As a worked example, here is a full models.py for an admin-compliant custom
+Here is an example of a full models.py for an admin-compliant custom
 user app. This user model uses an email address as the username, and has a
 required date of birth; it provides no permission checking, beyond a simple
 `admin` flag on the user account::
