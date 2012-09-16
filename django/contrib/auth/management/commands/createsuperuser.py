@@ -62,7 +62,7 @@ class Command(BaseCommand):
                         other_data[field_name] = field.clean(options[field_name], None)
                     else:
                         raise CommandError("You must use --%s with --noinput." % field_name)
-            except exceptions.ValidationError, e:
+            except exceptions.ValidationError as e:
                 raise CommandError('; '.join(e.messages))
 
         else:
@@ -84,7 +84,7 @@ class Command(BaseCommand):
                         username = default_username
                     try:
                         username = username_field.clean(raw_value, None)
-                    except exceptions.ValidationError, e:
+                    except exceptions.ValidationError as e:
                         self.stderr.write("Error: %s" % '; '.join(e.messages))
                         username = None
                         continue
@@ -105,7 +105,7 @@ class Command(BaseCommand):
                         raw_value = input(capfirst(field.verbose_name + ': '))
                         try:
                             other_data[field_name] = field.clean(raw_value, None)
-                        except exceptions.ValidationError, e:
+                        except exceptions.ValidationError as e:
                             self.stderr.write("Error: %s" % '; '.join(e.messages))
                             other_data[field_name] = None
 
