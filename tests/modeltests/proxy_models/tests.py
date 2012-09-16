@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.core.exceptions import FieldError
@@ -12,6 +13,7 @@ from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
     Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement)
+
 
 class ProxyModelTests(TestCase):
     def test_same_manager_queries(self):
@@ -91,7 +93,7 @@ class ProxyModelTests(TestCase):
         )
         self.assertRaises(Person.MultipleObjectsReturned,
             MyPersonProxy.objects.get,
-            id__lt=max_id+1
+            id__lt=max_id + 1
         )
         self.assertRaises(Person.DoesNotExist,
             StatusPerson.objects.get,
@@ -104,7 +106,7 @@ class ProxyModelTests(TestCase):
 
         self.assertRaises(Person.MultipleObjectsReturned,
             StatusPerson.objects.get,
-            id__lt=max_id+1
+            id__lt=max_id + 1
         )
 
     def test_abc(self):
@@ -138,9 +140,31 @@ class ProxyModelTests(TestCase):
         def build_new_fields():
             class NoNewFields(Person):
                 newfield = models.BooleanField()
+
                 class Meta:
                     proxy = True
         self.assertRaises(FieldError, build_new_fields)
+
+    def test_swappable(self):
+        try:
+            settings.TEST_SWAPPABLE_MODEL = 'proxy_models.AlternateModel'
+
+            class SwappableModel(models.Model):
+
+                class Meta:
+                    swappable = 'TEST_SWAPPABLE_MODEL'
+
+            class AlternateModel(models.Model):
+                pass
+
+            # You can't proxy a swapped model
+            with self.assertRaises(TypeError):
+                class ProxyModel(SwappableModel):
+
+                    class Meta:
+                        proxy = True
+        finally:
+            del settings.TEST_SWAPPABLE_MODEL
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
