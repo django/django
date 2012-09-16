@@ -108,7 +108,6 @@ class RemoteUserTest(TestCase):
         response = self.client.get('/remote_user/')
         self.assertEqual(type(response.context['user']), AnonymousUser)
 
-
     def tearDown(self):
         """Restores settings to avoid breaking other tests."""
         settings.MIDDLEWARE_CLASSES = self.curr_middleware
