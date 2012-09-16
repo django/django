@@ -277,6 +277,18 @@ Session not saved on 500 responses
 Django's session middleware will skip saving the session data if the
 response's status code is 500.
 
+Email checks on failed admin login
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.5, if you attempted to log into the admin interface and
+mistakenly used your email address instead of your username, the admin
+interface would provide a warning advising that your email address was
+not your username. In Django 1.5, the introduction of
+:ref:`custom User models <auth-custom-user>` has required the removal of this
+warning. This doesn't change the login behavior of the admin site; it only
+affects the warning message that is displayed under one particular mode of
+login failure.
+
 Changes in tests execution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
