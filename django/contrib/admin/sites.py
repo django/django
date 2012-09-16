@@ -2,14 +2,13 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
-from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -18,11 +17,14 @@ from django.conf import settings
 
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
+
 class AlreadyRegistered(Exception):
     pass
 
+
 class NotRegistered(Exception):
     pass
+
 
 class AdminSite(object):
     """
@@ -41,7 +43,7 @@ class AdminSite(object):
     password_change_done_template = None
 
     def __init__(self, name='admin', app_name='admin'):
-        self._registry = {} # model_class class -> admin_class instance
+        self._registry = {}  # model_class class -> admin_class instance
         self.name = name
         self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
