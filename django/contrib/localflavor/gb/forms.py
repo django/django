@@ -41,12 +41,14 @@ class GBPostcodeField(CharField):
             raise ValidationError(self.error_messages['invalid'])
         return postcode
 
+
 class GBCountySelect(Select):
     """
     A Select widget that uses a list of UK Counties/Regions as its choices.
     """
     def __init__(self, attrs=None):
         super(GBCountySelect, self).__init__(attrs, choices=GB_REGION_CHOICES)
+
 
 class GBNationSelect(Select):
     """
@@ -55,57 +57,61 @@ class GBNationSelect(Select):
     def __init__(self, attrs=None):
         super(GBNationSelect, self).__init__(attrs, choices=GB_NATIONS_CHOICES)
 
+
 class GBPhoneNumberField(CharField):
+    """
+     ==ACCEPTS==
+     This table lists the valid accepted input formats for GB numbers.
+     International:
+        +          44_        null      20_3000_5000        null
+       (+          44_(       0)_       20)_3000_5000       #5555
+        00_        44)_       0)_(      121_555_7777       _#5555
+        00_(       44)_(      0_        121)_555_7777       #555
+       (00)_                  0_(       1750_615_777       _#555
+       (00)_(                           1750)_615_777
+       (00_                             19467_55555
+        011_                            19467)_55555
+        011_(                           1750_62555
+       (011)_                           1750)_62555
+       (011)_(                          16977_3555
+       (011_                            16977)_3555
+                                        500_777_888
+                                        500)_777_888
+     National:
+        ->         ->         0         ^as above           ^as above
+        ->         ->        (0         ^                   ^
+     Pick one item from each column. Underscores represent spaces or hyphens.
+     All number formats can also be matched without spaces or hyphens.
+
+     "Be conservative in what you do, be liberal in what you accept from
+      others."
+     (Postel's Law)
+
+     ==REJECTS==
+     The following inputs are rejected:
+     - international format numbers that do not begin with an item from column
+       1 above,
+     - international format numbers with country code other than 44,
+     - national format numbers that do not begin with item in column 3 above,
+     - numbers with more than 10 digits in NSN part,
+     - numbers with less than 9 digits in NSN part (except for two special
+       cases),
+     - numbers with incorrect number of digits in NSN for number range,
+     - numbers in ranges with NSN beginning 4 or 6 and other such non-valid
+       ranges,
+     - numbers with obviously non-GB formatting,
+     - numbers with multiple contiguous spaces,
+     - entries with letters and/or punctuation other than hyphens or brackets,
+     - 116xxx, 118xxx, 1xx, 999.
+
+     ==OUTPUTS==
+     Irrespective of the format used for input, all valid numbers are output
+     with a +44 prefix followed by a space and the 10 or 9 digit national
+     number arranged in the correct 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 or 3+6 format.
+    """
     message = _('Phone numbers must be in +XXXXXXXXXXX format.')
     default_error_messages = {'number_format': message,
                               'number_range': message}
-
-"""
- ==ACCEPTS==
- This table lists the valid accepted input formats for GB numbers.
- International:
-    +          44_        null      20_3000_5000        null
-   (+          44_(       0)_       20)_3000_5000       #5555
-    00_        44)_       0)_(      121_555_7777       _#5555
-    00_(       44)_(      0_        121)_555_7777       #555
-   (00)_                  0_(       1750_615_777       _#555
-   (00)_(                           1750)_615_777
-   (00_                             19467_55555
-    011_                            19467)_55555
-    011_(                           1750_62555
-   (011)_                           1750)_62555
-   (011)_(                          16977_3555
-   (011_                            16977)_3555
-                                    500_777_888
-                                    500)_777_888
- National:
-    ->         ->         0         ^as above           ^as above
-    ->         ->        (0         ^                   ^
- Pick one item from each column. Underscores represent spaces or hyphens.
- All number formats can also be matched without spaces or hyphens.
-
- "Be conservative in what you do, be liberal in what you accept from others."
- (Postel's Law)
-
- ==REJECTS==
- The following inputs are rejected:
- - international format numbers that do not begin with an item from column 1 above,
- - international format numbers with country code other than 44,
- - national format numbers that do not begin with item in column 3 above,
- - numbers with more than 10 digits in NSN part,
- - numbers with less than 9 digits in NSN part (except for two special cases),
- - numbers with incorrect number of digits in NSN for number range,
- - numbers in ranges with NSN beginning 4 or 6 and other such non-valid ranges,
- - numbers with obviously non-GB formatting,
- - numbers with multiple contiguous spaces,
- - entries with letters and/or punctuation other than hyphens or brackets,
- - 116xxx, 118xxx, 1xx, 999.
-
- ==OUTPUTS==
- Irrespective of the format used for input, all valid numbers are output with
- a +44 prefix followed by a space and the 10 or 9 digit national number arranged
- in the correct 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 or 3+6 format.
-"""
 
     def clean(self, value):
         super(GBPhoneNumberField, self).clean(value)
@@ -185,6 +191,7 @@ class GBPhoneNumberField(CharField):
 
         return format_gb_phone_number(number_parts)
 
+
 def valid_gb_phone_range(phone_number_nsn):
     """
     Verifies that phone_number_nsn is a valid UK phone number range by initial
@@ -227,6 +234,7 @@ def valid_gb_phone_range(phone_number_nsn):
         8(?:001111|45464\d)
     )$
     """, re.X), phone_number_nsn)
+
 
 def format_gb_nsn(phone_number_nsn):
     """
@@ -278,7 +286,7 @@ def format_gb_nsn(phone_number_nsn):
         m = (re.search(capture55, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
-    elif nsn_length is 9  and re.match(pattern54, phone_number_nsn):
+    elif nsn_length is 9 and re.match(pattern54, phone_number_nsn):
         m = (re.search(capture54, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
@@ -286,15 +294,15 @@ def format_gb_nsn(phone_number_nsn):
         m = (re.search(capture46, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
-    elif nsn_length is 9  and re.match(pattern45, phone_number_nsn):
+    elif nsn_length is 9 and re.match(pattern45, phone_number_nsn):
         m = (re.search(capture45, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
-    elif nsn_length is 9  and re.match(pattern36, phone_number_nsn):
+    elif nsn_length is 9 and re.match(pattern36, phone_number_nsn):
         m = (re.search(capture36, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
-    elif nsn_length is 7  and re.match(pattern34, phone_number_nsn):
+    elif nsn_length is 7 and re.match(pattern34, phone_number_nsn):
         m = (re.search(capture34, phone_number_nsn))
         if m.group:
             phone_number_nsn = m.group(1) + ' ' + m.group(2)
@@ -305,6 +313,7 @@ def format_gb_nsn(phone_number_nsn):
             phone_number_nsn = m.group(1) + ' ' + m.group(2) + ' ' + m.group(3)
 
     return phone_number_nsn
+
 
 def format_gb_phone_number(number_parts):
     """
@@ -339,7 +348,8 @@ def format_gb_phone_number(number_parts):
         phone_number += format_gb_nsn(phone_number_nsn)
 
         # Grab extension and trim it
-        if 'extension' in number_parts and number_parts['extension'] is not None:
+        if 'extension' in number_parts and \
+                number_parts['extension'] is not None:
             phone_number += ' ' + number_parts['extension'].strip()
 
     return phone_number
