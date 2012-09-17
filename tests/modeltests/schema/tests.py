@@ -103,7 +103,7 @@ class SchemaTests(TestCase):
         # Check that it's there
         try:
             list(Author.objects.all())
-        except DatabaseError, e:
+        except DatabaseError as e:
             self.fail("Table not created: %s" % e)
         # Clean up that table
         editor.start()
@@ -128,11 +128,11 @@ class SchemaTests(TestCase):
         # Check that initial tables are there
         try:
             list(Author.objects.all())
-        except DatabaseError, e:
+        except DatabaseError as e:
             self.fail("Author table not created: %s" % e)
         try:
             list(Book.objects.all())
-        except DatabaseError, e:
+        except DatabaseError as e:
             self.fail("Book table not created: %s" % e)
         # Make sure the FK constraint is present
         with self.assertRaises(IntegrityError):
