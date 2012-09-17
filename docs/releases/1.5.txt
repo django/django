@@ -333,6 +333,11 @@ Miscellaneous
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
   available at :func:`django.utils.html.remove_tags`.
 
+* Uploaded files are no longer created as executable by default. If you need
+  them to be executeable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
+  needs. The new default value is `0666` (octal) and the current umask value
+  is first masked out.
+
 Features deprecated in 1.5
 ==========================
 
