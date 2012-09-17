@@ -71,8 +71,10 @@ class Command(NoArgsCommand):
         def model_installed(model):
             opts = model._meta
             converter = connection.introspection.table_name_converter
-            return not ((converter(opts.db_table) in tables) or
+            # Note that if a model is unmanaged we short-circuit and never try to install it
+            return opts.managed and not ((converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
+
 
         manifest = SortedDict(
             (app_name, list(filter(model_installed, model_list)))

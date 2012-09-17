@@ -252,13 +252,14 @@ class AppCache(object):
         return {
             "app_store": SortedDict(self.app_store.items()),
             "app_labels": dict(self.app_labels.items()),
-            "app_models": SortedDict(self.app_models.items()),
+            "app_models": SortedDict((k, SortedDict(v.items())) for k, v in self.app_models.items()),
             "app_errors": dict(self.app_errors.items()),
         }
 
     def restore_state(self, state):
         """
         Restores the AppCache to a previous state from save_state.
+        Note that the state is used by reference, not copied in.
         """
         self.app_store = state['app_store']
         self.app_labels = state['app_labels']

@@ -31,20 +31,18 @@ class SchemaTests(TestCase):
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
         self.cache_state = cache.save_state()
-        cache.load_app("modeltests.schema")
         for model in self.models:
             model._meta.managed = True
 
     def tearDown(self):
-        # Rollback anything that may have happened
-        connection.rollback()
         # Delete any tables made for our models
         self.delete_tables()
+        # Rollback anything that may have happened
+        connection.rollback()
+        connection.leave_transaction_management()
         # Unhook our models
         for model in self.models:
             model._meta.managed = False
-        if "schema" in self.cache_state['app_labels']:
-            del self.cache_state['app_labels']['schema']
         cache.restore_state(self.cache_state)
 
     def delete_tables(self):
@@ -280,31 +278,36 @@ class SchemaTests(TestCase):
         # Create an M2M field
         new_field = ManyToManyField("schema.Tag", related_name="authors")
         new_field.contribute_to_class(AuthorWithM2M, "tags")
-        # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
-        connection.rollback()
-        # Add the field
-        editor = connection.schema_editor()
-        editor.start()
-        editor.create_field(
-            Author,
-            new_field,
-        )
-        editor.commit()
-        # Ensure there is now an m2m table there
-        columns = self.column_classes(new_field.rel.through)
-        self.assertEqual(columns['tag_id'][0], "IntegerField")
-        # Remove the M2M table again
-        editor = connection.schema_editor()
-        editor.start()
-        editor.delete_field(
-            Author,
-            new_field,
-        )
-        editor.commit()
-        # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
-        connection.rollback()
+        try:
+            # Ensure there's no m2m table there
+            self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+            connection.rollback()
+            # Add the field
+            editor = connection.schema_editor()
+            editor.start()
+            editor.create_field(
+                Author,
+                new_field,
+            )
+            editor.commit()
+            # Ensure there is now an m2m table there
+            columns = self.column_classes(new_field.rel.through)
+            self.assertEqual(columns['tag_id'][0], "IntegerField")
+            # Remove the M2M table again
+            editor = connection.schema_editor()
+            editor.start()
+            editor.delete_field(
+                Author,
+                new_field,
+            )
+            editor.commit()
+            # Ensure there's no m2m table there
+            self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+            connection.rollback()
+        finally:
+            # Cleanup model states
+            AuthorWithM2M._meta.local_many_to_many.remove(new_field)
+            del AuthorWithM2M._meta._m2m_cache
 
     def test_m2m_repoint(self):
         """
@@ -330,26 +333,31 @@ class SchemaTests(TestCase):
         # Repoint the M2M
         new_field = ManyToManyField(UniqueTest)
         new_field.contribute_to_class(BookWithM2M, "uniques")
-        editor = connection.schema_editor()
-        editor.start()
-        editor.alter_field(
-            Author,
-            BookWithM2M._meta.get_field_by_name("tags")[0],
-            new_field,
-        )
-        editor.commit()
-        # Ensure old M2M is gone
-        self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
-        connection.rollback()
-        # Ensure the new M2M exists and points to UniqueTest
-        constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
-        if connection.features.supports_foreign_keys:
-            for name, details in constraints.items():
-                if details['columns'] == set(["uniquetest_id"]) and details['foreign_key']:
-                    self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
-                    break
-            else:
-                self.fail("No FK constraint for tag_id found")
+        try:
+            editor = connection.schema_editor()
+            editor.start()
+            editor.alter_field(
+                Author,
+                BookWithM2M._meta.get_field_by_name("tags")[0],
+                new_field,
+            )
+            editor.commit()
+            # Ensure old M2M is gone
+            self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
+            connection.rollback()
+            # Ensure the new M2M exists and points to UniqueTest
+            constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
+            if connection.features.supports_foreign_keys:
+                for name, details in constraints.items():
+                    if details['columns'] == set(["uniquetest_id"]) and details['foreign_key']:
+                        self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
+                        break
+                else:
+                    self.fail("No FK constraint for tag_id found")
+        finally:
+            # Cleanup model states
+            BookWithM2M._meta.local_many_to_many.remove(new_field)
+            del BookWithM2M._meta._m2m_cache
 
     @skipUnless(connection.features.supports_check_constraints, "No check constraints")
     def test_check_constraints(self):
