@@ -102,6 +102,24 @@ def _overlaps_below(model, instance_value, value):
     return (_overlaps(model, instance_value, value) or
             _below(model, instance_value, value))
 
+def _distance_gt(model, instance_value, value):
+    other, measure = value
+    print 'distance_gt matching func'
+    print measure
+    return instance_value.distance(other) > measure
+
+def _distance_gte(model, instance_value, value):
+    other, measure = value
+    return instance_value.distance(other) >= measure
+
+def _distance_lt(model, instance_value, value):
+    other, measure = value
+    return instance_value.distance(other) < measure
+
+def _distance_lte(model, instance_value, value):
+    other, measure = value
+    return instance_value.distance(other) <= measure
+
 match_functions = {
     'bbcontains': _bbcontains,
     'bboverlaps': _bboverlaps,
@@ -112,10 +130,10 @@ match_functions = {
     'covers': _covers,
     'crosses': _crosses,
     'disjoint': _disjoint,
-    'distance_gt': None,
-    'distance_gte': None,
-    'distance_lt': None,
-    'distance_lte': None,
+    'distance_gt': _distance_gt,
+    'distance_gte': _distance_gte,
+    'distance_lt': _distance_lt,
+    'distance_lte': _distance_lte,
     'dwithin': None,
     'equals': _equals,
     'exact': _exact,

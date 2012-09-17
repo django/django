@@ -359,8 +359,15 @@ class DistanceTest(TestCase):
 
 class GeoPredicateDistanceTest(TestCase):
 
+    stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+    # qs1 = SouthTexasCity.objects.filter(point__distance_gte=(stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+
     def test_distance_gt(self):
-        assert False
+        qs1 = SouthTexasCity.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+        predicate = Q(point__distance_gt=(self.stx_pnt, D(km=7)))
+        obj = SouthTexasCity.objects.get(name='Pearland')
+        print obj.point.distance(self.stx_pnt)
+        self.assertTrue(predicate.matches(obj))
 
     def test_distance_gte(self):
         assert False
