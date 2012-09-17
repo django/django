@@ -1,9 +1,9 @@
 from django.db.utils import DatabaseError
 
 try:
-    import thread
+    from django.utils.six.moves import _thread as thread
 except ImportError:
-    import dummy_thread as thread
+    from django.utils.six.moves import _dummy_thread as thread
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -12,6 +12,7 @@ from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
+from django.utils import six
 from django.utils.timezone import is_aware
 
 
@@ -45,6 +46,8 @@ class BaseDatabaseWrapper(object):
 
     def __ne__(self, other):
         return not self == other
+
+    __hash__ = object.__hash__
 
     def _commit(self):
         if self.connection is not None:
@@ -475,6 +478,14 @@ class BaseDatabaseOperations(object):
         """
         return None
 
+    def bulk_batch_size(self, fields, objs):
+        """
+        Returns the maximum allowed batch size for the backend. The fields
+        are the fields going to be inserted in the batch, the objs contains
+        all the objects to be inserted.
+        """
+        return len(objs)
+
     def cache_key_culling_sql(self):
         """
         Returns a SQL query that retrieves the first cache key greater than the
@@ -521,6 +532,17 @@ class BaseDatabaseOperations(object):
         during a CREATE TABLE statement.
         """
         return ''
+
+    def distinct_sql(self, fields):
+        """
+        Returns an SQL DISTINCT clause which removes duplicate rows from the
+        result set. If any fields are given, only the given fields are being
+        checked for duplicates.
+        """
+        if fields:
+            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+        else:
+            return 'DISTINCT'
 
     def drop_foreignkey_sql(self):
         """
@@ -577,17 +599,6 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
 
-    def distinct_sql(self, fields):
-        """
-        Returns an SQL DISTINCT clause which removes duplicate rows from the
-        result set. If any fields are given, only the given fields are being
-        checked for duplicates.
-        """
-        if fields:
-            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
-        else:
-            return 'DISTINCT'
-
     def last_executed_query(self, cursor, sql, params):
         """
         Returns a string of the query last executed by the given cursor, with
@@ -598,16 +609,16 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        from django.utils.encoding import smart_unicode, force_unicode
+        from django.utils.encoding import force_text
 
         # Convert params to contain Unicode values.
-        to_unicode = lambda s: force_unicode(s, strings_only=True, errors='replace')
+        to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple([to_unicode(val) for val in params])
         else:
             u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
 
-        return smart_unicode(sql) % u_params
+        return force_text(sql) % u_params
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -739,10 +750,23 @@ class BaseDatabaseOperations(object):
         the given database tables (without actually removing the tables
         themselves).
 
+        The returned value also includes SQL statements required to reset DB
+        sequences passed in :param sequences:.
+
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
         raise NotImplementedError()
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        """
+        Returns a list of the SQL statements required to reset sequences
+        passed in :param sequences:.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return []
 
     def sequence_reset_sql(self, style, model_list):
         """
@@ -778,8 +802,8 @@ class BaseDatabaseOperations(object):
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        from django.utils.encoding import smart_unicode
-        return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        from django.utils.encoding import force_text
+        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.
@@ -800,7 +824,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_datetime(self, value):
         """
@@ -809,7 +833,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         """
@@ -820,7 +844,7 @@ class BaseDatabaseOperations(object):
             return None
         if is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):
         """
@@ -856,19 +880,21 @@ class BaseDatabaseOperations(object):
         return self.year_lookup_bounds(value)
 
     def convert_values(self, value, field):
-        """Coerce the value returned by the database backend into a consistent type that
-        is compatible with the field type.
+        """
+        Coerce the value returned by the database backend into a consistent type
+        that is compatible with the field type.
         """
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
             return value
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
+        elif internal_type == 'FloatField':
+            return float(value)
+        elif (internal_type and (internal_type.endswith('IntegerField')
+                                 or internal_type == 'AutoField')):
             return int(value)
         elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
             return value
-        # No field, or the field isn't known to be a decimal or integer
-        # Default to a float
-        return float(value)
+        return value
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -967,7 +993,7 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if router.allow_syncdb(self.connection.alias, model):
                     all_models.append(model)
-        tables = map(self.table_name_converter, tables)
+        tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
             if self.table_name_converter(m._meta.db_table) in tables
@@ -1008,9 +1034,12 @@ class BaseDatabaseIntrospection(object):
 
     def get_primary_key_column(self, cursor, table_name):
         """
-        Backends can override this to return the column name of the primary key for the given table.
+        Returns the name of the primary key column for the given table.
         """
-        raise NotImplementedError
+        for column in six.iteritems(self.get_indexes(cursor, table_name)):
+            if column[1]['primary_key']:
+                return column[0]
+        return None
 
     def get_indexes(self, cursor, table_name):
         """

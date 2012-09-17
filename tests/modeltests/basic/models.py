@@ -5,8 +5,10 @@
 This is a basic model with only two non-primary-key fields.
 """
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -14,5 +16,5 @@ class Article(models.Model):
     class Meta:
         ordering = ('pub_date','headline')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline

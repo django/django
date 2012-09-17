@@ -200,7 +200,9 @@ The first time you call ``is_valid()`` or access the ``errors`` attribute of a
 well as :ref:`model validation <validating-objects>`. This has the side-effect
 of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
 calling ``is_valid()`` on your form will convert any date fields on your model
-to actual date objects.
+to actual date objects. If form validation fails, only some of the updates
+may be applied. For this reason, you'll probably want to avoid reusing the
+model instance.
 
 
 The ``save()`` method
@@ -436,6 +438,10 @@ parameter when declaring the form field::
 
             class Meta:
                 model = Article
+
+    You must ensure that the type of the form field can be used to set the
+    contents of the corresponding model field. When they are not compatible,
+    you will get a ``ValueError`` as no implicit conversion takes place.
 
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.

@@ -1,26 +1,30 @@
 from django.contrib import databrowse
 from django.db import models
 from django.test import TestCase
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class SomeModel(models.Model):
     some_field = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.some_field
 
 
+@python_2_unicode_compatible
 class SomeOtherModel(models.Model):
     some_other_field = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.some_other_field
 
 
+@python_2_unicode_compatible
 class YetAnotherModel(models.Model):
     yet_another_field = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.yet_another_field
 
 

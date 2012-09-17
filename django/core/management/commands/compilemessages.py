@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import codecs
 import os
 import sys
@@ -7,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 def has_bom(fn):
     with open(fn, 'rb') as f:
         sample = f.read(4)
-    return sample[:3] == '\xef\xbb\xbf' or \
+    return sample[:3] == b'\xef\xbb\xbf' or \
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
 

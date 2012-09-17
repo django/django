@@ -3,7 +3,7 @@
 # settings.USE_I18N = False can use this module rather than trans_real.py.
 
 from django.conf import settings
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe, SafeData
 
 def ngettext(singular, plural, number):
@@ -12,7 +12,7 @@ def ngettext(singular, plural, number):
 ngettext_lazy = ngettext
 
 def ungettext(singular, plural, number):
-    return force_unicode(ngettext(singular, plural, number))
+    return force_text(ngettext(singular, plural, number))
 
 def pgettext(context, message):
     return ugettext(message)
@@ -44,7 +44,7 @@ def gettext(message):
     return result
 
 def ugettext(message):
-    return force_unicode(gettext(message))
+    return force_text(gettext(message))
 
 gettext_noop = gettext_lazy = _ = gettext
 

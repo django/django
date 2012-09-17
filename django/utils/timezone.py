@@ -13,6 +13,7 @@ except ImportError:
     pytz = None
 
 from django.conf import settings
+from django.utils import six
 
 __all__ = [
     'utc', 'get_default_timezone', 'get_current_timezone',
@@ -107,7 +108,7 @@ def get_default_timezone():
     """
     global _localtime
     if _localtime is None:
-        if isinstance(settings.TIME_ZONE, basestring) and pytz is not None:
+        if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
             _localtime = pytz.timezone(settings.TIME_ZONE)
         else:
             _localtime = LocalTimezone()
@@ -160,7 +161,7 @@ def activate(timezone):
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, basestring) and pytz is not None:
+    elif isinstance(timezone, six.string_types) and pytz is not None:
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)

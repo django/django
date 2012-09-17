@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
+from django.utils import six
 
 from .models import Author, Article
 
@@ -22,13 +23,13 @@ class CustomColumnsTests(TestCase):
             Author.objects.all(), [
                 "Peter Jones", "John Smith",
             ],
-            unicode
+            six.text_type
         )
         self.assertQuerysetEqual(
             Author.objects.filter(first_name__exact="John"), [
                 "John Smith",
             ],
-            unicode
+            six.text_type
         )
         self.assertEqual(
             Author.objects.get(first_name__exact="John"),
@@ -55,7 +56,7 @@ class CustomColumnsTests(TestCase):
                 "Peter Jones",
                 "John Smith",
             ],
-            unicode
+            six.text_type
         )
         # Get the articles for an author
         self.assertQuerysetEqual(
@@ -69,5 +70,5 @@ class CustomColumnsTests(TestCase):
             art.authors.filter(last_name='Jones'), [
                 "Peter Jones"
             ],
-            unicode
+            six.text_type
         )

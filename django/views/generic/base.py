@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
 from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod
+from django.utils import six
 
 logger = getLogger('django.request')
 
@@ -17,6 +18,8 @@ class ContextMixin(object):
     """
 
     def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
         return kwargs
 
 
@@ -35,7 +38,7 @@ class View(object):
         """
         # Go through keyword arguments, and either save their values to our
         # instance, or raise an error.
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             setattr(self, key, value)
 
     @classonlymethod
@@ -139,11 +142,11 @@ class TemplateResponseMixin(object):
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.  This view is different from all the others
-    insofar as it also passes ``kwargs`` as ``params`` to the template context.
+    A view that renders a template.  This view will also pass into the context
+    any keyword arguments passed by the url conf.
     """
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(params=kwargs)
+        context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
 

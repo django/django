@@ -12,9 +12,10 @@ from django.db import models
 from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_text, force_text
 from django.template import Library
 from django.template.loader import get_template
 from django.template.context import Context
@@ -125,7 +126,7 @@ def result_headers(cl):
         if i in ordering_field_columns:
             sorted = True
             order_type = ordering_field_columns.get(i).lower()
-            sort_priority = ordering_field_columns.keys().index(i) + 1
+            sort_priority = list(ordering_field_columns).index(i) + 1
             th_classes.append('sorted %sending' % order_type)
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
@@ -209,7 +210,7 @@ def items_for_result(cl, result, form):
                     result_repr = display_for_field(value, f)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_class = mark_safe(' class="nowrap"')
-        if force_unicode(result_repr) == '':
+        if force_text(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.list_display_links) or field_name in cl.list_display_links:
@@ -223,7 +224,7 @@ def items_for_result(cl, result, form):
             else:
                 attr = pk
             value = result.serializable_value(attr)
-            result_id = repr(force_unicode(value))[1:]
+            result_id = repr(force_text(value))[1:]
             yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
                               table_tag,
                               row_class,
@@ -240,10 +241,10 @@ def items_for_result(cl, result, form):
                     field_name == cl.model._meta.pk.name and
                         form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
-                result_repr = mark_safe(force_unicode(bf.errors) + force_unicode(bf))
+                result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
             yield format_html('<td{0}>{1}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield format_html('<td>{0}</td>', force_unicode(form[cl.model._meta.pk.name]))
+        yield format_html('<td>{0}</td>', force_text(form[cl.model._meta.pk.name]))
 
 class ResultList(list):
     # Wrapper class used to return items in a list_editable
@@ -266,7 +267,7 @@ def result_hidden_fields(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
             if form[cl.model._meta.pk.name].is_hidden:
-                yield mark_safe(force_unicode(form[cl.model._meta.pk.name]))
+                yield mark_safe(force_text(form[cl.model._meta.pk.name]))
 
 @register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):

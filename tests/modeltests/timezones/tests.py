@@ -20,6 +20,7 @@ from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
 from django.utils.unittest import skipIf, skipUnless
@@ -466,6 +467,7 @@ class NewDatabaseTests(TestCase):
                 [event],
                 transform=lambda d: d)
 
+    @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
         day = datetime.date(2011, 9, 1)
@@ -690,8 +692,8 @@ class TemplateTests(TestCase):
             }
         }
 
-        for k1, dt in datetimes.iteritems():
-            for k2, tpl in templates.iteritems():
+        for k1, dt in six.iteritems(datetimes):
+            for k2, tpl in six.iteritems(templates):
                 ctx = Context({'dt': dt, 'ICT': ICT})
                 actual = tpl.render(ctx)
                 expected = results[k1][k2]
@@ -703,8 +705,8 @@ class TemplateTests(TestCase):
         results['ict']['notag'] = t('ict', 'eat', 'utc', 'ict')
 
         with self.settings(USE_TZ=False):
-            for k1, dt in datetimes.iteritems():
-                for k2, tpl in templates.iteritems():
+            for k1, dt in six.iteritems(datetimes):
+                for k2, tpl in six.iteritems(templates):
                     ctx = Context({'dt': dt, 'ICT': ICT})
                     actual = tpl.render(ctx)
                     expected = results[k1][k2]

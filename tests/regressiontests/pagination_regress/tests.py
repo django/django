@@ -17,14 +17,16 @@ class PaginatorTests(TestCase):
         paginator = Paginator(*params)
         self.check_attribute('count', paginator, count, params)
         self.check_attribute('num_pages', paginator, num_pages, params)
-        self.check_attribute('page_range', paginator, page_range, params)
+        self.check_attribute('page_range', paginator, page_range, params, coerce=list)
 
-    def check_attribute(self, name, paginator, expected, params):
+    def check_attribute(self, name, paginator, expected, params, coerce=None):
         """
         Helper method that checks a single attribute and gives a nice error
         message upon test failure.
         """
         got = getattr(paginator, name)
+        if coerce is not None:
+            got = coerce(got)
         self.assertEqual(expected, got,
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
             % (name, expected, got, params))

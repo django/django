@@ -1,13 +1,11 @@
-from django.test import TestCase
-from django.utils.unittest import skipUnless
+import locale
+import traceback
+
+from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.management import call_command
-from StringIO import StringIO
-
-try:
-    import crypt as crypt_module
-except ImportError:
-    crypt_module = None
+from django.test import TestCase
+from django.utils.six import StringIO
 
 
 class BasicTestCase(TestCase):
@@ -111,3 +109,37 @@ class BasicTestCase(TestCase):
         u = User.objects.get(username="joe+admin@somewhere.org")
         self.assertEqual(u.email, 'joe@somewhere.org')
         self.assertFalse(u.has_usable_password())
+
+    def test_createsuperuser_nolocale(self):
+        """
+        Check that createsuperuser does not break when no locale is set. See
+        ticket #16017.
+        """
+
+        old_getdefaultlocale = locale.getdefaultlocale
+        old_getpass = createsuperuser.getpass
+        try:
+            # Temporarily remove locale information
+            locale.getdefaultlocale = lambda: (None, None)
+
+            # Temporarily replace getpass to allow interactive code to be used
+            # non-interactively
+            class mock_getpass: pass
+            mock_getpass.getpass = staticmethod(lambda p=None: "nopasswd")
+            createsuperuser.getpass = mock_getpass
+
+            # Call the command in this new environment
+            new_io = StringIO()
+            call_command("createsuperuser", interactive=True, username="nolocale@somewhere.org", email="nolocale@somewhere.org", stdout=new_io)
+
+        except TypeError as e:
+            self.fail("createsuperuser fails if the OS provides no information about the current locale")
+
+        finally:
+            # Re-apply locale and getpass information
+            createsuperuser.getpass = old_getpass
+            locale.getdefaultlocale = old_getdefaultlocale
+
+        # If we were successful, a user should have been created
+        u = User.objects.get(username="nolocale@somewhere.org")
+        self.assertEqual(u.email, 'nolocale@somewhere.org')

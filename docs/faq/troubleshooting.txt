@@ -1,0 +1,16 @@
+===============
+Troubleshooting
+===============
+
+This page contains some advice about errors and problems commonly encountered
+during the development of Django applications.
+
+"command not found: django-admin.py"
+------------------------------------
+
+:doc:`django-admin.py </ref/django-admin>` should be on your system path if you
+installed Django via ``python setup.py``. If it's not on your path, you can
+find it in ``site-packages/django/bin``, where ``site-packages`` is a directory
+within your Python installation. Consider symlinking to :doc:`django-admin.py
+</ref/django-admin>` from some place on your path, such as
+:file:`/usr/local/bin`.

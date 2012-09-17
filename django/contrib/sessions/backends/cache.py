@@ -1,5 +1,6 @@
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.cache import cache
+from django.utils.six.moves import xrange
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 

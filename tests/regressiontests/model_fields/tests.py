@@ -8,10 +8,11 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields.files import FieldFile
+from django.utils import six
 from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, Document, RenamedField)
+    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField)
 
 from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
     TwoImageFieldTests, ImageFieldNoDimensionsTests,
@@ -62,6 +63,14 @@ class BasicFieldTests(test.TestCase):
         instance = RenamedField()
         self.assertTrue(hasattr(instance, 'get_fieldname_display'))
         self.assertFalse(hasattr(instance, 'get_modelname_display'))
+
+    def test_field_verbose_name(self):
+        m = VerboseNameField
+        for i in range(1, 23):
+            self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
+                    'verbose field%d' % i)
+
+        self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
@@ -273,6 +282,10 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, None, None)
         self.assertRaises(ValidationError, f.clean, '', None)
 
+    def test_integerfield_validates_zero_against_choices(self):
+        f = models.IntegerField(choices=((1, 1),))
+        self.assertRaises(ValidationError, f.clean, '0', None)
+
     def test_charfield_raises_error_on_empty_input(self):
         f = models.CharField(null=False)
         self.assertRaises(ValidationError, f.clean, None, None)
@@ -303,11 +316,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')

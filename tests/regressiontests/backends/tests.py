@@ -16,6 +16,8 @@ from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 from . import models
@@ -50,7 +52,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([unicode(x) for x in xrange(4000)])
+        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
         c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()
@@ -154,7 +156,7 @@ class LastExecutedQueryTest(TestCase):
         sql, params = tags.query.sql_with_params()
         cursor = tags.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertTrue(isinstance(last_sql, unicode))
+        self.assertTrue(isinstance(last_sql, six.text_type))
 
 
 class ParameterHandlingTest(TestCase):
@@ -530,7 +532,7 @@ class ThreadTests(TestCase):
             from django.db import connection
             connection.cursor()
             connections_set.add(connection.connection)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
@@ -557,7 +559,7 @@ class ThreadTests(TestCase):
                 # main thread.
                 conn.allow_thread_sharing = True
                 connections_set.add(conn)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
@@ -582,7 +584,7 @@ class ThreadTests(TestCase):
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")
-                except DatabaseError as e:
+                except Exception as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
             t.start()
@@ -592,21 +594,21 @@ class ThreadTests(TestCase):
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to False
         connections['default'].allow_thread_sharing = False
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to True
         connections['default'].allow_thread_sharing = True
         exceptions = []
         do_thread()
         # All good
-        self.assertEqual(len(exceptions), 0)
+        self.assertEqual(exceptions, [])
 
     def test_closing_non_shared_connections(self):
         """
@@ -653,7 +655,7 @@ class ThreadTests(TestCase):
 
 class BackendLoadingTests(TestCase):
     def test_old_style_backends_raise_useful_exception(self):
-        self.assertRaisesRegexp(ImproperlyConfigured,
+        six.assertRaisesRegex(self, ImproperlyConfigured,
             "Try using django.db.backends.sqlite3 instead",
             load_backend, 'sqlite3')
 

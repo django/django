@@ -1,7 +1,7 @@
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import smart_str
 from django.utils.functional import lazy_property
+from django.utils import six
 
 from django.contrib.formtools.wizard.storage.exceptions import NoFileStorageConfigured
 
@@ -72,9 +72,8 @@ class BaseStorage(object):
             raise NoFileStorageConfigured
 
         files = {}
-        for field, field_dict in wizard_files.iteritems():
-            field_dict = dict((smart_str(k), v)
-                              for k, v in field_dict.iteritems())
+        for field, field_dict in six.iteritems(wizard_files):
+            field_dict = field_dict.copy()
             tmp_name = field_dict.pop('tmp_name')
             files[field] = UploadedFile(
                 file=self.file_storage.open(tmp_name), **field_dict)
@@ -87,7 +86,7 @@ class BaseStorage(object):
         if step not in self.data[self.step_files_key]:
             self.data[self.step_files_key][step] = {}
 
-        for field, field_file in (files or {}).iteritems():
+        for field, field_file in six.iteritems(files or {}):
             tmp_filename = self.file_storage.save(field_file.name, field_file)
             file_dict = {
                 'tmp_name': tmp_filename,

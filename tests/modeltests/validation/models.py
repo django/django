@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def validate_answer_to_universe(value):
@@ -66,13 +67,14 @@ class Article(models.Model):
         if self.pub_date is None:
             self.pub_date = datetime.now()
 
+@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class FlexibleDatePost(models.Model):
@@ -89,6 +91,8 @@ class GenericIPAddressTestModel(models.Model):
     generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)
     v4_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv4")
     v6_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv6")
+    ip_verbose_name = models.GenericIPAddressField("IP Address Verbose",
+            blank=True, null=True)
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)
@@ -101,6 +105,6 @@ try:
     class MultipleAutoFields(models.Model):
         auto1 = models.AutoField(primary_key=True)
         auto2 = models.AutoField(primary_key=True)
-except AssertionError as assertion_error:
-    pass # Fail silently
+except AssertionError as exc:
+    assertion_error = exc
 assert str(assertion_error) == "A model can't have more than one AutoField."

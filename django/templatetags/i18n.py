@@ -5,6 +5,7 @@ from django.template import (Node, Variable, TemplateSyntaxError,
     TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
 from django.template.base import _render_value_in_context
 from django.template.defaulttags import token_kwargs
+from django.utils import six
 from django.utils import translation
 
 
@@ -76,7 +77,7 @@ class TranslateNode(Node):
         self.asvar = asvar
         self.message_context = message_context
         self.filter_expression = filter_expression
-        if isinstance(self.filter_expression.var, basestring):
+        if isinstance(self.filter_expression.var, six.string_types):
             self.filter_expression.var = Variable("'%s'" %
                                                   self.filter_expression.var)
 
@@ -424,7 +425,7 @@ def do_block_translate(parser, token):
         options[option] = value
 
     if 'count' in options:
-        countervar, counter = options['count'].items()[0]
+        countervar, counter = list(six.iteritems(options['count']))[0]
     else:
         countervar, counter = None, None
     if 'context' in options:

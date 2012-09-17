@@ -4,6 +4,7 @@ from functools import update_wrapper
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.utils import six
 
 from .models import Reporter, Article
 
@@ -35,8 +36,7 @@ class IgnoreNotimplementedError(type):
                 attrs[k] = ignore_not_implemented(v)
         return type.__new__(cls, name, bases, attrs)
 
-class IntrospectionTests(TestCase):
-    __metaclass__ = IgnoreNotimplementedError
+class IntrospectionTests(six.with_metaclass(IgnoreNotimplementedError, TestCase)):
 
     def test_table_names(self):
         tl = connection.introspection.table_names()
@@ -88,6 +88,11 @@ class IntrospectionTests(TestCase):
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
             ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
+        )
+        # Check also length of CharFields
+        self.assertEqual(
+            [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
+            [30, 30, 75]
         )
 
     # Oracle forces null=True under the hood in some cases (see

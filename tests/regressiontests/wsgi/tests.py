@@ -6,7 +6,7 @@ from django.core.wsgi import get_wsgi_application
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils import unittest
+from django.utils import six, unittest
 
 
 class WSGITest(TestCase):
@@ -39,8 +39,8 @@ class WSGITest(TestCase):
             response_data["headers"],
             [('Content-Type', 'text/html; charset=utf-8')])
         self.assertEqual(
-            unicode(response),
-            "Content-Type: text/html; charset=utf-8\n\nHello World!")
+            bytes(response),
+            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
 
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):
@@ -83,7 +83,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
     @override_settings(WSGI_APPLICATION="regressiontests.wsgi.noexist.app")
     def test_bad_module(self):
-        with self.assertRaisesRegexp(
+        with six.assertRaisesRegex(self,
             ImproperlyConfigured,
             r"^WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; could not import module 'regressiontests.wsgi.noexist':"):
 
@@ -92,7 +92,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
     @override_settings(WSGI_APPLICATION="regressiontests.wsgi.wsgi.noexist")
     def test_bad_name(self):
-        with self.assertRaisesRegexp(
+        with six.assertRaisesRegex(self,
             ImproperlyConfigured,
             r"^WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; can't find 'noexist' in module 'regressiontests.wsgi.wsgi':"):
 

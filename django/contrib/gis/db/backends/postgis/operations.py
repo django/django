@@ -10,6 +10,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
 from django.db.utils import DatabaseError
+from django.utils import six
 
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
@@ -161,11 +162,13 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'overlaps' : PostGISFunction(prefix, 'Overlaps'),
             'contains' : PostGISFunction(prefix, 'Contains'),
             'intersects' : PostGISFunction(prefix, 'Intersects'),
-            'relate' : (PostGISRelate, basestring),
-            }
+            'relate' : (PostGISRelate, six.string_types),
+            'coveredby' : PostGISFunction(prefix, 'CoveredBy'),
+            'covers' : PostGISFunction(prefix, 'Covers'),
+        }
 
         # Valid distance types and substitutions
-        dtypes = (Decimal, Distance, float, int, long)
+        dtypes = (Decimal, Distance, float) + six.integer_types
         def get_dist_ops(operator):
             "Returns operations for both regular and spherical distances."
             return {'cartesian' : PostGISDistance(prefix, operator),
@@ -177,32 +180,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'distance_gte' : (get_dist_ops('>='), dtypes),
             'distance_lt' : (get_dist_ops('<'), dtypes),
             'distance_lte' : (get_dist_ops('<='), dtypes),
-            }
-
-        # Versions 1.2.2+ have KML serialization support.
-        if version < (1, 2, 2):
-            ASKML = False
-        else:
-            ASKML = 'ST_AsKML'
-            self.geometry_functions.update(
-                {'coveredby' : PostGISFunction(prefix, 'CoveredBy'),
-                 'covers' : PostGISFunction(prefix, 'Covers'),
-                 })
-            self.distance_functions['dwithin'] = (PostGISFunctionParam(prefix, 'DWithin'), dtypes)
+            'dwithin' : (PostGISFunctionParam(prefix, 'DWithin'), dtypes)
+        }
 
         # Adding the distance functions to the geometries lookup.
         self.geometry_functions.update(self.distance_functions)
-
-        # The union aggregate and topology operation use the same signature
-        # in versions 1.3+.
-        if version < (1, 3, 0):
-            UNIONAGG = 'GeomUnion'
-            UNION = 'Union'
-            MAKELINE = False
-        else:
-            UNIONAGG = 'ST_Union'
-            UNION = 'ST_Union'
-            MAKELINE = 'ST_MakeLine'
 
         # Only PostGIS versions 1.3.4+ have GeoJSON serialization support.
         if version < (1, 3, 4):
@@ -235,8 +217,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         gis_terms = ['isnull']
-        gis_terms += self.geometry_operators.keys()
-        gis_terms += self.geometry_functions.keys()
+        gis_terms += list(self.geometry_operators)
+        gis_terms += list(self.geometry_functions)
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
         self.area = prefix + 'Area'
@@ -255,11 +237,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.geojson = GEOJSON
         self.gml = prefix + 'AsGML'
         self.intersection = prefix + 'Intersection'
-        self.kml = ASKML
+        self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
         self.length3d = prefix + 'Length3D'
         self.length_spheroid = prefix + 'length_spheroid'
-        self.makeline = MAKELINE
+        self.makeline = prefix + 'MakeLine'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points =prefix + 'npoints'
@@ -274,8 +256,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.sym_difference = prefix + 'SymDifference'
         self.transform = prefix + 'Transform'
         self.translate = prefix + 'Translate'
-        self.union = UNION
-        self.unionagg = UNIONAGG
+        self.union = prefix + 'Union'
+        self.unionagg = prefix + 'Union'
 
     def check_aggregate_support(self, aggregate):
         """

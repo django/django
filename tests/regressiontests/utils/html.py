@@ -36,13 +36,13 @@ class TestUtilsHtml(unittest.TestCase):
 
     def test_format_html(self):
         self.assertEqual(
-            html.format_html(u"{0} {1} {third} {fourth}",
-                             u"< Dangerous >",
-                             html.mark_safe(u"<b>safe</b>"),
+            html.format_html("{0} {1} {third} {fourth}",
+                             "< Dangerous >",
+                             html.mark_safe("<b>safe</b>"),
                              third="< dangerous again",
-                             fourth=html.mark_safe(u"<i>safe again</i>")
+                             fourth=html.mark_safe("<i>safe again</i>")
                              ),
-            u"&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
+            "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
             )
 
     def test_linebreaks(self):
@@ -146,3 +146,12 @@ class TestUtilsHtml(unittest.TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+    def test_remove_tags(self):
+        f = html.remove_tags
+        items = (
+            ("<b><i>Yes</i></b>", "b i", "Yes"),
+            ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
+        )
+        for value, tags, output in items:
+            self.assertEquals(f(value, tags), output)

@@ -5,8 +5,10 @@ from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import Media, HiddenInput
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils.translation import ugettext as _
 
 
@@ -31,7 +33,8 @@ class ManagementForm(Form):
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
-class BaseFormSet(StrAndUnicode):
+@python_2_unicode_compatible
+class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
@@ -49,7 +52,7 @@ class BaseFormSet(StrAndUnicode):
         # construct the forms in the formset
         self._construct_forms()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.as_table()
 
     def __iter__(self):
@@ -63,11 +66,13 @@ class BaseFormSet(StrAndUnicode):
     def __len__(self):
         return len(self.forms)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """All formsets have a management form which is not included in the length"""
         return True
+    __nonzero__ = __bool__ # Python 2
 
-    def _management_form(self):
+    @property
+    def management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
@@ -80,7 +85,6 @@ class BaseFormSet(StrAndUnicode):
                 MAX_NUM_FORM_COUNT: self.max_num
             })
         return form
-    management_form = property(_management_form)
 
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
@@ -91,10 +95,11 @@ class BaseFormSet(StrAndUnicode):
             total_forms = initial_forms + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
-            if initial_forms > self.max_num >= 0:
-                total_forms = initial_forms
-            elif total_forms > self.max_num >= 0:
-                total_forms = self.max_num
+            if self.max_num is not None:
+                if initial_forms > self.max_num >= 0:
+                    total_forms = initial_forms
+                elif total_forms > self.max_num >= 0:
+                    total_forms = self.max_num
         return total_forms
 
     def initial_form_count(self):
@@ -104,7 +109,7 @@ class BaseFormSet(StrAndUnicode):
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num >= 0:
+            if self.max_num is not None and (initial_forms > self.max_num >= 0):
                 initial_forms = self.max_num
         return initial_forms
 
@@ -135,17 +140,18 @@ class BaseFormSet(StrAndUnicode):
         self.add_fields(form, i)
         return form
 
-    def _get_initial_forms(self):
+    @property
+    def initial_forms(self):
         """Return a list of all the initial forms in this formset."""
         return self.forms[:self.initial_form_count()]
-    initial_forms = property(_get_initial_forms)
 
-    def _get_extra_forms(self):
+    @property
+    def extra_forms(self):
         """Return a list of all the extra forms in this formset."""
         return self.forms[self.initial_form_count():]
-    extra_forms = property(_get_extra_forms)
 
-    def _get_empty_form(self, **kwargs):
+    @property
+    def empty_form(self, **kwargs):
         defaults = {
             'auto_id': self.auto_id,
             'prefix': self.add_prefix('__prefix__'),
@@ -155,19 +161,19 @@ class BaseFormSet(StrAndUnicode):
         form = self.form(**defaults)
         self.add_fields(form, None)
         return form
-    empty_form = property(_get_empty_form)
 
     # Maybe this should just go away?
-    def _get_cleaned_data(self):
+    @property
+    def cleaned_data(self):
         """
         Returns a list of form.cleaned_data dicts for every form in self.forms.
         """
         if not self.is_valid():
             raise AttributeError("'%s' object has no attribute 'cleaned_data'" % self.__class__.__name__)
         return [form.cleaned_data for form in self.forms]
-    cleaned_data = property(_get_cleaned_data)
 
-    def _get_deleted_forms(self):
+    @property
+    def deleted_forms(self):
         """
         Returns a list of forms that have been marked for deletion. Raises an
         AttributeError if deletion is not allowed.
@@ -186,9 +192,9 @@ class BaseFormSet(StrAndUnicode):
                 if self._should_delete_form(form):
                     self._deleted_form_indexes.append(i)
         return [self.forms[i] for i in self._deleted_form_indexes]
-    deleted_forms = property(_get_deleted_forms)
 
-    def _get_ordered_forms(self):
+    @property
+    def ordered_forms(self):
         """
         Returns a list of form in the order specified by the incoming data.
         Raises an AttributeError if ordering is not allowed.
@@ -223,7 +229,6 @@ class BaseFormSet(StrAndUnicode):
         # Return a list of form.cleaned_data dicts in the order specified by
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]
-    ordered_forms = property(_get_ordered_forms)
 
     @classmethod
     def get_default_prefix(cls):
@@ -239,23 +244,20 @@ class BaseFormSet(StrAndUnicode):
             return self._non_form_errors
         return self.error_class()
 
-    def _get_errors(self):
+    @property
+    def errors(self):
         """
         Returns a list of form.errors for every form in self.forms.
         """
         if self._errors is None:
             self.full_clean()
         return self._errors
-    errors = property(_get_errors)
 
     def _should_delete_form(self, form):
-        # The way we lookup the value of the deletion field here takes
-        # more code than we'd like, but the form's cleaned_data will
-        # not exist if the form is invalid.
-        field = form.fields[DELETION_FIELD_NAME]
-        raw_value = form._raw_value(DELETION_FIELD_NAME)
-        should_delete = field.clean(raw_value)
-        return should_delete
+        """
+        Returns whether or not the form was marked for deletion.
+        """
+        return form.cleaned_data.get(DELETION_FIELD_NAME, False)
 
     def is_valid(self):
         """
@@ -330,14 +332,14 @@ class BaseFormSet(StrAndUnicode):
         """
         return self.forms and self.forms[0].is_multipart()
 
-    def _get_media(self):
+    @property
+    def media(self):
         # All the forms on a FormSet are the same, so you only need to
         # interrogate the first form for media.
         if self.forms:
             return self.forms[0].media
         else:
             return Media()
-    media = property(_get_media)
 
     def as_table(self):
         "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."
@@ -345,17 +347,17 @@ class BaseFormSet(StrAndUnicode):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join([form.as_table() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
         forms = ' '.join([form.as_p() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
         forms = ' '.join([form.as_ul() for form in self])
-        return mark_safe('\n'.join([unicode(self.management_form), forms]))
+        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
@@ -363,7 +365,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num}
-    return type(form.__name__ + b'FormSet', (formset,), attrs)
+    return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

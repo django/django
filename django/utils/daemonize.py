@@ -3,7 +3,7 @@ import sys
 
 if os.name == 'posix':
     def become_daemon(our_home_dir='.', out_log='/dev/null',
-                      err_log='/dev/null', umask=022):
+                      err_log='/dev/null', umask=0o022):
         "Robustly turn into a UNIX daemon, running in our_home_dir."
         # First fork
         try:
@@ -33,7 +33,7 @@ if os.name == 'posix':
         # Set custom file descriptors so that they get proper buffering.
         sys.stdout, sys.stderr = so, se
 else:
-    def become_daemon(our_home_dir='.', out_log=None, err_log=None, umask=022):
+    def become_daemon(our_home_dir='.', out_log=None, err_log=None, umask=0o022):
         """
         If we're not running under a POSIX system, just simulate the daemon
         mode by doing redirections and directory changing.

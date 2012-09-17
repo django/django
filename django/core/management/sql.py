@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import codecs
 import os
 import re
 
@@ -98,7 +99,7 @@ def sql_delete(app, style, connection):
 
     return output[::-1] # Reverse it, to deal with table dependencies.
 
-def sql_flush(style, connection, only_django=False):
+def sql_flush(style, connection, only_django=False, reset_sequences=True):
     """
     Returns a list of the SQL statements used to flush the database.
 
@@ -109,9 +110,8 @@ def sql_flush(style, connection, only_django=False):
         tables = connection.introspection.django_table_names(only_existing=True)
     else:
         tables = connection.introspection.table_names()
-    statements = connection.ops.sql_flush(
-        style, tables, connection.introspection.sequence_list()
-    )
+    seqs = connection.introspection.sequence_list() if reset_sequences else ()
+    statements = connection.ops.sql_flush(style, tables, seqs)
     return statements
 
 def sql_custom(app, style, connection):
@@ -136,6 +136,20 @@ def sql_all(app, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
 
+def _split_statements(content):
+    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+    statements = []
+    statement = ""
+    for line in content.split("\n"):
+        cleaned_line = comment_re.sub(r"\1", line).strip()
+        if not cleaned_line:
+            continue
+        statement += cleaned_line
+        if statement.endswith(";"):
+            statements.append(statement)
+            statement = ""
+    return statements
+
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
     app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
@@ -149,23 +163,16 @@ def custom_sql_for_model(model, style, connection):
         for f in post_sql_fields:
             output.extend(f.post_create_sql(style, model._meta.db_table))
 
-    # Some backends can't execute more than one SQL statement at a time,
-    # so split into separate statements.
-    statements = re.compile(r";[ \t]*$", re.M)
-
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
     sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            with open(sql_file, 'U') as fp:
-                for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
-                    # Remove any comments from the file
-                    statement = re.sub(r"--.*([\n\Z]|$)", "", statement)
-                    if statement.strip():
-                        output.append(statement + ";")
-
+            with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
+                # Some backends can't execute more than one SQL statement at a time,
+                # so split into separate statements.
+                output.extend(_split_statements(fp.read()))
     return output
 
 

@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
-from io import BytesIO
 
 from django.core import management
 from django.core.management.base import CommandError
@@ -14,24 +13,23 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
+from django.utils import six
+from django.utils.six import PY3, StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
     ExternalDependency, Thingy)
 
 
-pre_save_checks = []
-def animal_pre_save_check(signal, sender, instance, **kwargs):
-    "A signal that is used to check the type of data loaded from fixtures"
-    pre_save_checks.append(
-        (
-            'Count = %s (%s)' % (instance.count, type(instance.count)),
-            'Weight = %s (%s)' % (instance.weight, type(instance.weight)),
-        )
-    )
-
-
 class TestFixtures(TestCase):
+    def animal_pre_save_check(self, signal, sender, instance, **kwargs):
+        self.pre_save_checks.append(
+            (
+                'Count = %s (%s)' % (instance.count, type(instance.count)),
+                'Weight = %s (%s)' % (instance.weight, type(instance.weight)),
+            )
+        )
+
     def test_duplicate_pk(self):
         """
         This is a regression test for ticket #3790.
@@ -110,15 +108,28 @@ class TestFixtures(TestCase):
         )
         self.assertEqual(Absolute.load_count, 1)
 
-
     def test_unknown_format(self):
         """
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Problem installing fixture 'bad_fixture1': "
                 "unkn is not a known serialization format."):
+            management.call_command(
+                'loaddata',
+                'bad_fixture1.unkn',
+                verbosity=0,
+                commit=False,
+            )
+
+    @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
+    def test_unimportable_serializer(self):
+        """
+        Test that failing serializer import raises the proper error
+        """
+        with six.assertRaisesRegex(self, ImportError,
+                "No module named unexistent.path"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -132,7 +143,7 @@ class TestFixtures(TestCase):
         using explicit filename.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -147,7 +158,7 @@ class TestFixtures(TestCase):
         without file extension.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -161,7 +172,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading a fixture file with no data returns an error.
         Validate that error conditions are caught correctly
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No fixture data found for 'empty'. \(File format may be invalid.\)"):
             management.call_command(
                 'loaddata',
@@ -174,7 +185,7 @@ class TestFixtures(TestCase):
         """
         (Regression for #9011 - error message is correct)
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "^No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)$"):
             management.call_command(
                 'loaddata',
@@ -231,9 +242,8 @@ class TestFixtures(TestCase):
         Test for tickets #8298, #9942 - Field values should be coerced into the
         correct type by the deserializer, not as part of the database write.
         """
-        global pre_save_checks
-        pre_save_checks = []
-        signals.pre_save.connect(animal_pre_save_check)
+        self.pre_save_checks = []
+        signals.pre_save.connect(self.animal_pre_save_check)
         try:
             management.call_command(
                 'loaddata',
@@ -242,13 +252,14 @@ class TestFixtures(TestCase):
                 commit=False,
             )
             self.assertEqual(
-                pre_save_checks,
+                self.pre_save_checks,
                 [
-                    ("Count = 42 (<type 'int'>)", "Weight = 1.2 (<type 'float'>)")
+                    ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
+                     "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
                 ]
             )
         finally:
-            signals.pre_save.disconnect(animal_pre_save_check)
+            signals.pre_save.disconnect(self.animal_pre_save_check)
 
     def test_dumpdata_uses_default_manager(self):
         """
@@ -276,7 +287,7 @@ class TestFixtures(TestCase):
         )
         animal.save()
 
-        stdout = BytesIO()
+        stdout = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.animal',
@@ -305,7 +316,7 @@ class TestFixtures(TestCase):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
         """
-        stdout = BytesIO()
+        stdout = StringIO()
         # Create an instance of the concrete class
         widget = Widget.objects.create(name='grommet')
         management.call_command(
@@ -338,7 +349,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        with self.assertRaisesRegexp(IntegrityError,
+        with six.assertRaisesRegex(self, IntegrityError,
                 "Problem installing fixture"):
             management.call_command(
                 'loaddata',
@@ -370,7 +381,7 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "No database fixture specified. Please provide the path of "
                 "at least one fixture in the command line."):
             management.call_command(
@@ -380,7 +391,7 @@ class TestFixtures(TestCase):
             )
 
     def test_loaddata_not_existant_fixture_file(self):
-        stdout_output = BytesIO()
+        stdout_output = StringIO()
         management.call_command(
             'loaddata',
             'this_fixture_doesnt_exist',
@@ -465,7 +476,7 @@ class NaturalKeyFixtureTests(TestCase):
             commit=False
             )
 
-        stdout = BytesIO()
+        stdout = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.book',

@@ -152,7 +152,7 @@ class BaseTest(TestCase):
         cycle.
         """
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(5)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -170,7 +170,7 @@ class BaseTest(TestCase):
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_with_template_response(self):
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(5)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
         for level in self.levels.keys():
@@ -194,7 +194,7 @@ class BaseTest(TestCase):
         before a GET.
         """
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(5)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
@@ -226,7 +226,7 @@ class BaseTest(TestCase):
         when one attempts to store a message.
         """
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(5)],
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
@@ -251,7 +251,7 @@ class BaseTest(TestCase):
         raised if 'fail_silently' = True
         """
         data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
+            'messages': ['Test message %d' % x for x in range(5)],
             'fail_silently': True,
         }
         show_url = reverse('django.contrib.messages.tests.urls.show')

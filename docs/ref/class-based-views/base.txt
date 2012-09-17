@@ -8,6 +8,9 @@ themselves or inherited from. They may not provide all the capabilities
 required for projects, in which case there are Mixins and Generic class-based
 views.
 
+View
+----
+
 .. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
@@ -31,13 +34,13 @@ views.
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
-        
+
         from myapp.views import MyView
-        
+
         urlpatterns = patterns('',
             url(r'^mine/$', MyView.as_view(), name='my-view'),
         )
-        
+
     **Methods**
 
     .. method:: dispatch(request, *args, **kwargs)
@@ -61,12 +64,15 @@ views.
 
         The default implementation returns ``HttpResponseNotAllowed`` with list
         of allowed methods in plain text.
-        
-    .. note:: 
+
+    .. note::
 
         Documentation on class-based views is a work in progress. As yet, only the
         methods defined directly on the class are documented here, not methods
         defined on superclasses.
+
+TemplateView
+------------
 
 .. class:: django.views.generic.base.TemplateView
 
@@ -84,22 +90,22 @@ views.
     1. :meth:`dispatch()`
     2. :meth:`http_method_not_allowed()`
     3. :meth:`get_context_data()`
-      
+
     **Example views.py**::
 
         from django.views.generic.base import TemplateView
-        
+
         from articles.models import Article
 
         class HomePageView(TemplateView):
 
             template_name = "home.html"
-            
+
             def get_context_data(self, **kwargs):
                 context = super(HomePageView, self).get_context_data(**kwargs)
                 context['latest_articles'] = Article.objects.all()[:5]
                 return context
-                
+
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
@@ -126,11 +132,14 @@ views.
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
 
-    .. note:: 
+    .. note::
 
         Documentation on class-based views is a work in progress. As yet, only the
         methods defined directly on the class are documented here, not methods
         defined on superclasses.
+
+RedirectView
+------------
 
 .. class:: django.views.generic.base.RedirectView
 
@@ -159,7 +168,7 @@ views.
 
         from django.shortcuts import get_object_or_404
         from django.views.generic.base import RedirectView
-        
+
         from articles.models import Article
 
         class ArticleCounterRedirectView(RedirectView):
@@ -176,7 +185,7 @@ views.
 
         from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
-        
+
         from article.views import ArticleCounterRedirectView
 
         urlpatterns = patterns('',
@@ -217,7 +226,7 @@ views.
         behavior they wish, as long as the method returns a redirect-ready URL
         string.
 
-    .. note:: 
+    .. note::
 
         Documentation on class-based views is a work in progress. As yet, only the
         methods defined directly on the class are documented here, not methods

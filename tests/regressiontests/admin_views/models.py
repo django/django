@@ -10,6 +10,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Section(models.Model):
@@ -20,6 +21,7 @@ class Section(models.Model):
     name = models.CharField(max_length=100)
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     """
     A simple article to test admin views. Test backwards compatibility.
@@ -29,7 +31,7 @@ class Article(models.Model):
     date = models.DateTimeField()
     section = models.ForeignKey(Section, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def model_year(self):
@@ -38,30 +40,33 @@ class Article(models.Model):
     model_year.short_description = ''
 
 
+@python_2_unicode_compatible
 class Book(models.Model):
     """
     A simple book that has chapters.
     """
     name = models.CharField(max_length=100, verbose_name='¿Name?')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Promo(models.Model):
     name = models.CharField(max_length=100, verbose_name='¿Name?')
     book = models.ForeignKey(Book)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Chapter(models.Model):
     title = models.CharField(max_length=100, verbose_name='¿Title?')
     content = models.TextField()
     book = models.ForeignKey(Book)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -69,19 +74,21 @@ class Chapter(models.Model):
         verbose_name = '¿Chapter?'
 
 
+@python_2_unicode_compatible
 class ChapterXtra1(models.Model):
     chap = models.OneToOneField(Chapter, verbose_name='¿Chap?')
     xtra = models.CharField(max_length=100, verbose_name='¿Xtra?')
 
-    def __unicode__(self):
+    def __str__(self):
         return '¿Xtra1: %s' % self.xtra
 
 
+@python_2_unicode_compatible
 class ChapterXtra2(models.Model):
     chap = models.OneToOneField(Chapter, verbose_name='¿Chap?')
     xtra = models.CharField(max_length=100, verbose_name='¿Xtra?')
 
-    def __unicode__(self):
+    def __str__(self):
         return '¿Xtra2: %s' % self.xtra
 
 
@@ -94,20 +101,22 @@ class CustomArticle(models.Model):
     date = models.DateTimeField()
 
 
+@python_2_unicode_compatible
 class ModelWithStringPrimaryKey(models.Model):
     string_pk = models.CharField(max_length=255, primary_key=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.string_pk
 
     def get_absolute_url(self):
         return '/dummy/%s/' % self.string_pk
 
 
+@python_2_unicode_compatible
 class Color(models.Model):
     value = models.CharField(max_length=10)
     warm = models.BooleanField()
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 # we replicate Color to register with another ModelAdmin
@@ -115,29 +124,33 @@ class Color2(Color):
     class Meta:
         proxy = True
 
+@python_2_unicode_compatible
 class Thing(models.Model):
     title = models.CharField(max_length=20)
     color = models.ForeignKey(Color, limit_choices_to={'warm': True})
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
+@python_2_unicode_compatible
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Inquisition(models.Model):
     expected = models.BooleanField()
     leader = models.ForeignKey(Actor)
     country = models.CharField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return "by %s from %s" % (self.leader, self.country)
 
 
+@python_2_unicode_compatible
 class Sketch(models.Model):
     title = models.CharField(max_length=100)
     inquisition = models.ForeignKey(Inquisition, limit_choices_to={'leader__name': 'Palin',
@@ -145,7 +158,7 @@ class Sketch(models.Model):
                                                                    'expected': False,
                                                                    })
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -161,6 +174,7 @@ class Fabric(models.Model):
     surface = models.CharField(max_length=20, choices=NG_CHOICES)
 
 
+@python_2_unicode_compatible
 class Person(models.Model):
     GENDER_CHOICES = (
         (1, "Male"),
@@ -171,20 +185,22 @@ class Person(models.Model):
     age = models.IntegerField(default=21)
     alive = models.BooleanField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Persona(models.Model):
     """
     A simple persona associated with accounts, to test inlining of related
     accounts which inherit from a common accounts class.
     """
     name = models.CharField(blank=False,  max_length=80)
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Account(models.Model):
     """
     A simple, generic account encapsulating the information shared by all
@@ -194,7 +210,7 @@ class Account(models.Model):
     persona = models.ForeignKey(Persona, related_name="accounts")
     servicename = 'generic service'
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s" % (self.servicename, self.username)
 
 
@@ -208,11 +224,12 @@ class BarAccount(Account):
     servicename = 'bar'
 
 
+@python_2_unicode_compatible
 class Subscriber(models.Model):
     name = models.CharField(blank=False, max_length=80)
     email = models.EmailField(blank=False, max_length=175)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s (%s)" % (self.name, self.email)
 
 
@@ -249,8 +266,9 @@ class Child(models.Model):
     name = models.CharField(max_length=30, blank=True)
 
 
+@python_2_unicode_compatible
 class EmptyModel(models.Model):
-    def __unicode__(self):
+    def __str__(self):
         return "Primary key = %s" % self.id
 
 
@@ -332,6 +350,7 @@ class FancyDoodad(Doodad):
     expensive = models.BooleanField(default=True)
 
 
+@python_2_unicode_compatible
 class Category(models.Model):
     collector = models.ForeignKey(Collector)
     order = models.PositiveIntegerField()
@@ -339,7 +358,7 @@ class Category(models.Model):
     class Meta:
         ordering = ('order',)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s:o%s' % (self.id, self.order)
 
 
@@ -376,17 +395,19 @@ class Post(models.Model):
         return "Very awesome."
 
 
+@python_2_unicode_compatible
 class Gadget(models.Model):
     name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Villain(models.Model):
     name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -394,6 +415,7 @@ class SuperVillain(Villain):
     pass
 
 
+@python_2_unicode_compatible
 class FunkyTag(models.Model):
     "Because we all know there's only one real use case for GFKs."
     name = models.CharField(max_length=25)
@@ -401,59 +423,65 @@ class FunkyTag(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Plot(models.Model):
     name = models.CharField(max_length=100)
     team_leader = models.ForeignKey(Villain, related_name='lead_plots')
     contact = models.ForeignKey(Villain, related_name='contact_plots')
     tags = generic.GenericRelation(FunkyTag)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class PlotDetails(models.Model):
     details = models.CharField(max_length=100)
     plot = models.OneToOneField(Plot)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.details
 
 
+@python_2_unicode_compatible
 class SecretHideout(models.Model):
     """ Secret! Not registered with the admin! """
     location = models.CharField(max_length=100)
     villain = models.ForeignKey(Villain)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.location
 
 
+@python_2_unicode_compatible
 class SuperSecretHideout(models.Model):
     """ Secret! Not registered with the admin! """
     location = models.CharField(max_length=100)
     supervillain = models.ForeignKey(SuperVillain)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.location
 
 
+@python_2_unicode_compatible
 class CyclicOne(models.Model):
     name = models.CharField(max_length=25)
     two = models.ForeignKey('CyclicTwo')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class CyclicTwo(models.Model):
     name = models.CharField(max_length=25)
     one = models.ForeignKey(CyclicOne)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -484,11 +512,12 @@ class Question(models.Model):
     question = models.CharField(max_length=20)
 
 
+@python_2_unicode_compatible
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
     answer = models.CharField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.answer
 
 
@@ -523,11 +552,12 @@ class Paper(models.Model):
     author = models.CharField(max_length=30, blank=True, null=True)
 
 
+@python_2_unicode_compatible
 class CoverLetter(models.Model):
     author = models.CharField(max_length=30)
     date_written = models.DateField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.author
 
 
@@ -575,10 +605,11 @@ class AdminOrderedCallable(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
 
+@python_2_unicode_compatible
 class Report(models.Model):
     title = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -611,3 +642,10 @@ class UnorderedObject(models.Model):
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
+
+class UndeletableObject(models.Model):
+    """
+    Model whose show_delete in admin change_view has been disabled
+    Refs #10057.
+    """
+    name = models.CharField(max_length=255)

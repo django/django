@@ -10,6 +10,7 @@ from django.contrib.gis.geos.linestring import LineString, LinearRing
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos import prototypes as capi
+from django.utils.six.moves import xrange
 
 class GeometryCollection(GEOSGeometry):
     _typeid = 7
@@ -100,11 +101,11 @@ class MultiLineString(GeometryCollection):
 
     @property
     def merged(self):
-        """ 
-        Returns a LineString representing the line merge of this 
+        """
+        Returns a LineString representing the line merge of this
         MultiLineString.
-        """ 
-        return self._topology(capi.geos_linemerge(self.ptr))         
+        """
+        return self._topology(capi.geos_linemerge(self.ptr))
 
 class MultiPolygon(GeometryCollection):
     _allowed = Polygon

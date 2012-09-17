@@ -7,6 +7,9 @@ should be good enough for a large class of URLS, however.
 """
 from __future__ import unicode_literals
 
+from django.utils import six
+from django.utils.six.moves import zip
+
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
 # this sequence. Any missing key is mapped to itself.
@@ -42,8 +45,8 @@ class NonCapture(list):
 
 def normalize(pattern):
     """
-    Given a reg-exp pattern, normalizes it to a list of forms that suffice for
-    reverse matching. This does the following:
+    Given a reg-exp pattern, normalizes it to an iterable of forms that
+    suffice for reverse matching. This does the following:
 
     (1) For any repeating sections, keeps the minimum number of occurrences
         permitted (this means zero for optional groups).
@@ -78,7 +81,7 @@ def normalize(pattern):
     try:
         ch, escaped = next(pattern_iter)
     except StopIteration:
-        return zip([''],  [[]])
+        return [('', [])]
 
     try:
         while True:
@@ -191,9 +194,9 @@ def normalize(pattern):
         pass
     except NotImplementedError:
         # A case of using the disjunctive form. No results for you!
-        return zip([''],  [[]])
+        return [('', [])]
 
-    return zip(*flatten_result(result))
+    return list(zip(*flatten_result(result)))
 
 def next_char(input_iter):
     """
@@ -302,7 +305,7 @@ def flatten_result(source):
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
-        if isinstance(elt, basestring):
+        if isinstance(elt, six.string_types):
             continue
         piece = ''.join(source[last:pos])
         if isinstance(elt, Group):

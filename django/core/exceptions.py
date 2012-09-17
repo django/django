@@ -43,7 +43,7 @@ class ValidationError(Exception):
     """An error while validating data."""
     def __init__(self, message, code=None, params=None):
         import operator
-        from django.utils.encoding import force_unicode
+        from django.utils.encoding import force_text
         """
         ValidationError can be passed any object that can be printed (usually
         a string), a list of objects or a dictionary.
@@ -54,11 +54,11 @@ class ValidationError(Exception):
             message = reduce(operator.add, message.values())
 
         if isinstance(message, list):
-            self.messages = [force_unicode(msg) for msg in message]
+            self.messages = [force_text(msg) for msg in message]
         else:
             self.code = code
             self.params = params
-            message = force_unicode(message)
+            message = force_text(message)
             self.messages = [message]
 
     def __str__(self):

@@ -6,7 +6,7 @@ from email.errors import HeaderParseError
 
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_bytes
 try:
     import docutils.core
     import docutils.nodes
@@ -66,7 +66,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         "link_base" : reverse('django-admindocs-docroot').rstrip('/')
     }
     if thing_being_parsed:
-        thing_being_parsed = smart_str("<%s>" % thing_being_parsed)
+        thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)
     parts = docutils.core.publish_parts(text, source_path=thing_being_parsed,
                 destination_path=None, writer_name='html',
                 settings_overrides=overrides)

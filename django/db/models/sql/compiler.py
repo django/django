@@ -1,14 +1,16 @@
-from future_builtins import zip
+from django.utils.six.moves import zip
 
 from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
 from django.db.models.query_utils import select_related_descend
-from django.db.models.sql.constants import *
+from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
+    LOOKUP_SEP, GET_ITERATOR_CHUNK_SIZE)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
 from django.db.utils import DatabaseError
+from django.utils import six
 
 
 class SQLCompiler(object):
@@ -82,7 +84,7 @@ class SQLCompiler(object):
         where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
         having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
         params = []
-        for val in self.query.extra_select.itervalues():
+        for val in six.itervalues(self.query.extra_select):
             params.extend(val[1])
 
         result = ['SELECT']
@@ -177,7 +179,7 @@ class SQLCompiler(object):
         """
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.query.extra_select.iteritems()]
+        result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -469,9 +471,7 @@ class SQLCompiler(object):
         # Must use left outer joins for nullable fields and their relations.
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
-        if joins_to_promote:
-            self.query.promote_alias_chain(joins_to_promote,
-                self.query.alias_map[joins_to_promote[0]].join_type == self.query.LOUTER)
+        self.query.promote_joins(joins_to_promote)
         return field, col, alias, joins, opts
 
     def _final_join_removal(self, col, alias):
@@ -553,7 +553,7 @@ class SQLCompiler(object):
             group_by = self.query.group_by or []
 
             extra_selects = []
-            for extra_select, extra_params in self.query.extra_select.itervalues():
+            for extra_select, extra_params in six.itervalues(self.query.extra_select):
                 extra_selects.append(extra_select)
                 params.extend(extra_params)
             cols = (group_by + self.query.select +
@@ -644,8 +644,6 @@ class SQLCompiler(object):
                     alias_chain.append(alias)
                     for (dupe_opts, dupe_col) in dupe_set:
                         self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
-                if self.query.alias_map[root_alias].join_type == self.query.LOUTER:
-                    self.query.promote_alias_chain(alias_chain, True)
             else:
                 alias = root_alias
 
@@ -662,8 +660,6 @@ class SQLCompiler(object):
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(columns)
-            if self.query.alias_map[alias].join_type == self.query.LOUTER:
-                self.query.promote_alias_chain(aliases, True)
             self.query.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:
                 next = requested.get(f.name, {})
@@ -737,7 +733,9 @@ class SQLCompiler(object):
                 self.query.related_select_fields.extend(model._meta.fields)
 
                 next = requested.get(f.related_query_name(), {})
-                new_nullable = f.null or None
+                # Use True here because we are looking at the _reverse_ side of
+                # the relation, which is always nullable.
+                new_nullable = True
 
                 self.fill_related_selections(model._meta, table, cur_depth+1,
                     used, next, restricted, new_nullable)
@@ -785,7 +783,7 @@ class SQLCompiler(object):
                     row = self.resolve_columns(row, fields)
 
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select.keys()) + len(self.query.select)
+                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.query.resolve_aggregate(value, aggregate, self.connection)
@@ -814,7 +812,7 @@ class SQLCompiler(object):
                 raise EmptyResultSet
         except EmptyResultSet:
             if result_type == MULTI:
-                return empty_iter()
+                return iter([])
             else:
                 return
 
@@ -1089,13 +1087,6 @@ class SQLDateCompiler(SQLCompiler):
                 elif needs_string_cast:
                     date = typecast_timestamp(str(date))
                 yield date
-
-
-def empty_iter():
-    """
-    Returns an iterator containing no results.
-    """
-    yield next(iter([]))
 
 
 def order_modified_iter(cursor, trim, sentinel):

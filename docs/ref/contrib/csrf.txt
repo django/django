@@ -84,47 +84,94 @@ AJAX
 While the above method can be used for AJAX POST requests, it has some
 inconveniences: you have to remember to pass the CSRF token in as POST data with
 every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom `X-CSRFToken` header to the value of the CSRF
+XMLHttpRequest, set a custom ``X-CSRFToken`` header to the value of the CSRF
 token. This is often easier, because many javascript frameworks provide hooks
-that allow headers to be set on every request. In jQuery, you can use the
-``ajaxSend`` event as follows:
+that allow headers to be set on every request.
+
+As a first step, you must get the CSRF token itself. The recommended source for
+the token is the ``csrftoken`` cookie, which will be set if you've enabled CSRF
+protection for your views as outlined above.
+
+.. note::
+
+    The CSRF token cookie is named ``csrftoken`` by default, but you can control
+    the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
+
+Acquiring the token is straightforward:
 
 .. code-block:: javascript
 
-    jQuery(document).ajaxSend(function(event, xhr, settings) {
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
             }
-            return cookieValue;
         }
-        function sameOrigin(url) {
-            // url could be relative or scheme relative or absolute
-            var host = document.location.host; // host + port
-            var protocol = document.location.protocol;
-            var sr_origin = '//' + host;
-            var origin = protocol + sr_origin;
-            // Allow absolute or scheme relative URLs to same origin
-            return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-                (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-                // or any other URL that isn't scheme relative or absolute i.e relative.
-                !(/^(\/\/|http:|https:).*/.test(url));
-        }
-        function safeMethod(method) {
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
 
-        if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
-            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+The above code could be simplified by using the `jQuery cookie plugin
+<http://plugins.jquery.com/project/Cookie>`_ to replace ``getCookie``:
+
+.. code-block:: javascript
+
+    var csrftoken = $.cookie('csrftoken');
+
+.. note::
+
+    The CSRF token is also present in the DOM, but only if explicitly included
+    using :ttag:`csrf_token` in a template. The cookie contains the canonical
+    token; the ``CsrfViewMiddleware`` will prefer the cookie to the token in
+    the DOM. Regardless, you're guaranteed to have the cookie if the token is
+    present in the DOM, so you should use the cookie!
+
+.. warning::
+
+    If your view is not rendering a template containing the :ttag:`csrf_token`
+    template tag, Django might not set the CSRF token cookie. This is common in
+    cases where forms are dynamically added to the page. To address this case,
+    Django provides a view decorator which forces setting of the cookie:
+    :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
+
+Finally, you'll have to actually set the header on your AJAX request, while
+protecting the CSRF token from being sent to other domains.
+
+.. code-block:: javascript
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    function sameOrigin(url) {
+        // test that a given url is a same-origin URL
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                // Send the token to same-origin, relative URLs only.
+                // Send the token only if the method warrants CSRF protection
+                // Using the CSRFToken value acquired earlier
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
         }
     });
 
@@ -133,18 +180,32 @@ that allow headers to be set on every request. In jQuery, you can use the
     Due to a bug introduced in jQuery 1.5, the example above will not work
     correctly on that version. Make sure you are running at least jQuery 1.5.1.
 
-Adding this to a javascript file that is included on your site will ensure that
-AJAX POST requests that are made via jQuery will not be caught by the CSRF
-protection.
+You can use `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in
+jQuery 1.5 and newer in order to replace the `sameOrigin` logic above:
 
-The above code could be simplified by using the `jQuery cookie plugin
-<http://plugins.jquery.com/project/Cookie>`_ to replace ``getCookie``, and
-`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5 and
-later to replace ``sameOrigin``.
+.. code-block:: javascript
 
-In addition, if the CSRF cookie has not been sent to the client by use of
-:ttag:`csrf_token`, you may need to ensure the client receives the cookie by
-using :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+.. note::
+
+    In a `security release blogpost`_, a simpler "same origin test" example
+    was provided which only checked for a relative URL. The ``sameOrigin``
+    test above supersedes that example—it works for edge cases like
+    scheme-relative or absolute URLs for the same domain.
+
+.. _security release blogpost: https://www.djangoproject.com/weblog/2011/feb/08/security/
 
 Other template engines
 ----------------------

@@ -158,10 +158,12 @@ For example::
 
 .. warning::
 
-    There's a known bug in Safari/Webkit which causes the named anchor to be
+    There's a `known bug`_ in Safari/Webkit which causes the named anchor to be
     forgotten following a redirect. The practical impact for comments is that
     the Safari/webkit browsers will arrive at the correct page but will not
     scroll to the named anchor.
+
+.. _`known bug`: https://bugs.webkit.org/show_bug.cgi?id=24175
 
 .. templatetag:: get_comment_count
 
@@ -250,7 +252,7 @@ Redirecting after the comment post
 To specify the URL you want to redirect to after the comment has been posted,
 you can include a hidden form input called ``next`` in your comment form. For example::
 
-    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
+    <input type="hidden" name="next" value="{% url 'my_comment_was_posted' %}" />
 
 .. _notes-on-the-comment-form:
 

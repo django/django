@@ -18,7 +18,9 @@ from django.utils.formats import (get_format, date_format, time_format,
     number_format)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import mark_safe, SafeString, SafeUnicode
+from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
+from django.utils import six
+from django.utils.six import PY3
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
     deactivate, gettext_lazy, pgettext, npgettext, to_locale,
     get_language_info, get_language, get_language_from_request)
@@ -80,9 +82,9 @@ class TranslationTests(TestCase):
 
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
-        self.assertEqual(unicode(s1), "test")
+        self.assertEqual(six.text_type(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
-        self.assertEqual(unicode(s2), "test")
+        self.assertEqual(six.text_type(s2), "test")
 
     def test_pgettext(self):
         # Reset translation catalog to include other/locale/de
@@ -221,21 +223,21 @@ class TranslationTests(TestCase):
 
     def test_string_concat(self):
         """
-        unicode(string_concat(...)) should not raise a TypeError - #4796
+        six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
         import django.utils.translation
-        self.assertEqual('django', unicode(django.utils.translation.string_concat("dja", "ngo")))
+        self.assertEqual('django', six.text_type(django.utils.translation.string_concat("dja", "ngo")))
 
     def test_safe_status(self):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
         """
-        s = mark_safe(b'Password')
+        s = mark_safe(str('Password'))
         self.assertEqual(SafeString, type(s))
         with translation.override('de', deactivate=True):
-            self.assertEqual(SafeUnicode, type(ugettext(s)))
-        self.assertEqual('aPassword', SafeString('a') + s)
-        self.assertEqual('Passworda', s + SafeString('a'))
+            self.assertEqual(SafeText, type(ugettext(s)))
+        self.assertEqual('aPassword', SafeText('a') + s)
+        self.assertEqual('Passworda', s + SafeText('a'))
         self.assertEqual('Passworda', s + mark_safe('a'))
         self.assertEqual('aPassword', mark_safe('a') + s)
         self.assertEqual('as', mark_safe('a') + mark_safe('s'))
@@ -309,7 +311,7 @@ class FormattingTests(TestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000L
+        self.l = 10000 if PY3 else long(10000)
         self.ctxt = Context({
             'n': self.n,
             't': self.t,
@@ -806,13 +808,13 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-cn')
 
-    def test_get_language_from_path(self):
+    def test_get_language_from_path_real(self):
         from django.utils.translation.trans_real import get_language_from_path as g
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertEqual(g('/xyz/'), None)
 
-    def test_get_language_from_path(self):
+    def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
         self.assertEqual(g('/pl/'), None)
         self.assertEqual(g('/pl'), None)
@@ -895,9 +897,9 @@ class TestModels(TestCase):
 
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
-        c.name = SafeUnicode('Iñtërnâtiônàlizætiøn1')
+        c.name = SafeText('Iñtërnâtiônàlizætiøn1')
         c.save()
-        c.name = SafeString('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
+        c.name = SafeBytes('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
         c.save()
 
 

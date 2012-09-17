@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import python_2_unicode_compatible
 
 class ContentTypeManager(models.Manager):
 
@@ -37,13 +38,13 @@ class ContentTypeManager(models.Manager):
         try:
             ct = self._get_from_cache(opts)
         except KeyError:
-            # Load or create the ContentType entry. The smart_unicode() is
+            # Load or create the ContentType entry. The smart_text() is
             # needed around opts.verbose_name_raw because name_raw might be a
             # django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
                 app_label = opts.app_label,
                 model = opts.object_name.lower(),
-                defaults = {'name': smart_unicode(opts.verbose_name_raw)},
+                defaults = {'name': smart_text(opts.verbose_name_raw)},
             )
             self._add_to_cache(self.db, ct)
 
@@ -86,7 +87,7 @@ class ContentTypeManager(models.Manager):
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.object_name.lower(),
-                name=smart_unicode(opts.verbose_name_raw),
+                name=smart_text(opts.verbose_name_raw),
             )
             self._add_to_cache(self.db, ct)
             results[ct.model_class()] = ct
@@ -122,6 +123,7 @@ class ContentTypeManager(models.Manager):
         self.__class__._cache.setdefault(using, {})[key] = ct
         self.__class__._cache.setdefault(using, {})[ct.id] = ct
 
+@python_2_unicode_compatible
 class ContentType(models.Model):
     name = models.CharField(max_length=100)
     app_label = models.CharField(max_length=100)
@@ -135,7 +137,7 @@ class ContentType(models.Model):
         ordering = ('name',)
         unique_together = (('app_label', 'model'),)
 
-    def __unicode__(self):
+    def __str__(self):
         # self.name is deprecated in favor of using model's verbose_name, which
         # can be translated. Formal deprecation is delayed until we have DB
         # migration to be able to remove the field from the database along with
@@ -147,7 +149,7 @@ class ContentType(models.Model):
         if not model or self.name != model._meta.verbose_name_raw:
             return self.name
         else:
-            return force_unicode(model._meta.verbose_name)
+            return force_text(model._meta.verbose_name)
 
     def model_class(self):
         "Returns the Python model class for this type of content."

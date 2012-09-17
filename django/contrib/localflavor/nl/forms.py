@@ -10,7 +10,7 @@ from django.contrib.localflavor.nl.nl_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -61,7 +61,7 @@ class NLPhoneNumberField(Field):
         if value in EMPTY_VALUES:
             return ''
 
-        phone_nr = re.sub('[\-\s\(\)]', '', smart_unicode(value))
+        phone_nr = re.sub('[\-\s\(\)]', '', smart_text(value))
 
         if len(phone_nr) == 10 and numeric_re.search(phone_nr):
             return value

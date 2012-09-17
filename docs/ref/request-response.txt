@@ -731,10 +731,11 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseRedirect
 
-    The constructor takes a single argument -- the path to redirect to. This
-    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or
-    an absolute path with no domain (e.g. ``'/search/'``). Note that this
-    returns an HTTP status code 302.
+    The first argument to the constructor is required -- the path to redirect
+    to. This can be a fully qualified URL
+    (e.g. ``'http://www.yahoo.com/search/'``) or an absolute path with no
+    domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
+    constructor arguments. Note that this returns an HTTP status code 302.
 
 .. class:: HttpResponsePermanentRedirect
 
@@ -743,8 +744,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseNotModified
 
-    The constructor doesn't take any arguments. Use this to designate that a
-    page hasn't been modified since the user's last request (status code 304).
+    The constructor doesn't take any arguments and no content should be added
+    to this response. Use this to designate that a page hasn't been modified
+    since the user's last request (status code 304).
 
 .. class:: HttpResponseBadRequest
 
@@ -760,8 +762,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseNotAllowed
 
-    Like :class:`HttpResponse`, but uses a 405 status code. Takes a single,
-    required argument: a list of permitted methods (e.g. ``['GET', 'POST']``).
+    Like :class:`HttpResponse`, but uses a 405 status code. The first argument
+    to the constructor is required: a list of permitted methods (e.g.
+    ``['GET', 'POST']``).
 
 .. class:: HttpResponseGone
 

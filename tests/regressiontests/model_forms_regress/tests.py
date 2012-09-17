@@ -7,6 +7,7 @@ from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import (modelform_factory, ModelChoiceField,
     fields_for_model, construct_instance, ModelFormMetaclass)
+from django.utils import six
 from django.utils import unittest
 from django.test import TestCase
 
@@ -392,14 +393,14 @@ class FileFieldTests(unittest.TestCase):
 
         """
         form = DocumentForm()
-        self.assertTrue('name="myfile"' in unicode(form))
-        self.assertTrue('myfile-clear' not in unicode(form))
+        self.assertTrue('name="myfile"' in six.text_type(form))
+        self.assertTrue('myfile-clear' not in six.text_type(form))
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
         form = DocumentForm(instance=doc)
-        self.assertTrue('myfile-clear' in unicode(form))
+        self.assertTrue('myfile-clear' in six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
         self.assertEqual(bool(doc.myfile), False)
@@ -420,7 +421,7 @@ class FileFieldTests(unittest.TestCase):
         self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],
                          ['Please either submit a file or check the clear checkbox, not both.'])
-        rendered = unicode(form)
+        rendered = six.text_type(form)
         self.assertTrue('something.txt' in rendered)
         self.assertTrue('myfile-clear' in rendered)
 
@@ -484,9 +485,8 @@ class CustomMetaclass(ModelFormMetaclass):
         new.base_fields = {}
         return new
 
-class CustomMetaclassForm(forms.ModelForm):
-    __metaclass__ = CustomMetaclass
-
+class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
+    pass
 
 class CustomMetaclassTestCase(TestCase):
     def test_modelform_factory_metaclass(self):

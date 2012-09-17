@@ -9,6 +9,8 @@ import unicodedata
 from django.contrib.auth import models as auth_app
 from django.db.models import get_models, signals
 from django.contrib.auth.models import User
+from django.utils import six
+from django.utils.six.moves import input
 
 
 def _get_permission_codename(action, opts):
@@ -66,10 +68,10 @@ def create_superuser(app, created_models, verbosity, db, **kwargs):
         msg = ("\nYou just installed Django's auth system, which means you "
             "don't have any superusers defined.\nWould you like to create one "
             "now? (yes/no): ")
-        confirm = raw_input(msg)
+        confirm = input(msg)
         while 1:
             if confirm not in ('yes', 'no'):
-                confirm = raw_input('Please enter either "yes" or "no": ')
+                confirm = input('Please enter either "yes" or "no": ')
                 continue
             if confirm == 'yes':
                 call_command("createsuperuser", interactive=True, database=db)
@@ -84,13 +86,22 @@ def get_system_username():
         username could not be determined.
     """
     try:
-        return getpass.getuser().decode(locale.getdefaultlocale()[1])
-    except (ImportError, KeyError, UnicodeDecodeError):
+        result = getpass.getuser()
+    except (ImportError, KeyError):
         # KeyError will be raised by os.getpwuid() (called by getuser())
         # if there is no corresponding entry in the /etc/passwd file
         # (a very restricted chroot environment, for example).
-        # UnicodeDecodeError - preventive treatment for non-latin Windows.
         return ''
+    if not six.PY3:
+        default_locale = locale.getdefaultlocale()[1]
+        if not default_locale:
+            return ''
+        try:
+            result = result.decode(default_locale)
+        except UnicodeDecodeError:
+            # UnicodeDecodeError - preventive treatment for non-latin Windows.
+            return ''
+    return result
 
 
 def get_default_username(check_db=True):
@@ -107,7 +118,7 @@ def get_default_username(check_db=True):
     default_username = get_system_username()
     try:
         default_username = unicodedata.normalize('NFKD', default_username)\
-            .encode('ascii', 'ignore').replace(' ', '').lower()
+            .encode('ascii', 'ignore').decode('ascii').replace(' ', '').lower()
     except UnicodeDecodeError:
         return ''
     if not RE_VALID_USERNAME.match(default_username):

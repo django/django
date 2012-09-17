@@ -69,7 +69,7 @@ class ViewTest(unittest.TestCase):
 
     def _assert_simple(self, response):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'This is a simple view')
+        self.assertEqual(response.content, b'This is a simple view')
 
     def test_no_init_kwargs(self):
         """
@@ -173,15 +173,6 @@ class ViewTest(unittest.TestCase):
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
-    def test_head_no_get(self):
-        """
-        Test that a view class with no get responds to a HEAD request with HTTP
-        405.
-        """
-        request = self.rf.head('/')
-        view = PostOnlyView.as_view()
-        self.assertEqual(405, view(request).status_code)
-
     def test_options(self):
         """
         Test that views respond to HTTP OPTIONS requests with an Allow header
@@ -275,7 +266,8 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/simple/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_extra_template_params(self):
         """
@@ -283,8 +275,9 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/custom/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
         self.assertEqual(response.context['key'], 'value')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_cached_views(self):
         """

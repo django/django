@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.utils.html import format_html, format_html_join
-from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -22,47 +22,49 @@ def flatatt(attrs):
     """
     return format_html_join('', ' {0}="{1}"', attrs.items())
 
-class ErrorDict(dict, StrAndUnicode):
+@python_2_unicode_compatible
+class ErrorDict(dict):
     """
     A collection of errors that knows how to display itself in various formats.
 
     The dictionary keys are the field names, and the values are the errors.
     """
-    def __unicode__(self):
+    def __str__(self):
         return self.as_ul()
 
     def as_ul(self):
         if not self: return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}{1}</li>',
-                                            ((k, force_unicode(v))
+                                            ((k, force_text(v))
                                              for k, v in self.items())
                            ))
 
     def as_text(self):
-        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
+        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_text(i) for i in v])) for k, v in self.items()])
 
-class ErrorList(list, StrAndUnicode):
+@python_2_unicode_compatible
+class ErrorList(list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
-    def __unicode__(self):
+    def __str__(self):
         return self.as_ul()
 
     def as_ul(self):
         if not self: return ''
         return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}</li>',
-                                            ((force_unicode(e),) for e in self)
+                                            ((force_text(e),) for e in self)
                                             )
                            )
 
     def as_text(self):
         if not self: return ''
-        return '\n'.join(['* %s' % force_unicode(e) for e in self])
+        return '\n'.join(['* %s' % force_text(e) for e in self])
 
     def __repr__(self):
-        return repr([force_unicode(e) for e in self])
+        return repr([force_text(e) for e in self])
 
 # Utilities for time zone support in DateTimeField et al.
 

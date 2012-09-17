@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.test import TestCase
+from django.utils import six
 
 from .models import Article
 
@@ -27,12 +28,12 @@ class PaginationTests(TestCase):
         paginator = Paginator(Article.objects.all(), 5)
         self.assertEqual(9, paginator.count)
         self.assertEqual(2, paginator.num_pages)
-        self.assertEqual([1, 2], paginator.page_range)
+        self.assertEqual([1, 2], list(paginator.page_range))
 
     def test_first_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(1)
-        self.assertEqual("<Page 1 of 2>", unicode(p))
+        self.assertEqual("<Page 1 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 1>",
                 "<Article: Article 2>",
@@ -52,7 +53,7 @@ class PaginationTests(TestCase):
     def test_last_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 2>", unicode(p))
+        self.assertEqual("<Page 2 of 2>", six.text_type(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 6>",
                 "<Article: Article 7>",
@@ -77,13 +78,13 @@ class PaginationTests(TestCase):
         paginator = Paginator(Article.objects.filter(id=0), 5, allow_empty_first_page=True)
         self.assertEqual(0, paginator.count)
         self.assertEqual(1, paginator.num_pages)
-        self.assertEqual([1], paginator.page_range)
+        self.assertEqual([1], list(paginator.page_range))
 
         # Empty paginators with allow_empty_first_page=False.
         paginator = Paginator(Article.objects.filter(id=0), 5, allow_empty_first_page=False)
         self.assertEqual(0, paginator.count)
         self.assertEqual(0, paginator.num_pages)
-        self.assertEqual([], paginator.page_range)
+        self.assertEqual([], list(paginator.page_range))
 
     def test_invalid_page(self):
         paginator = Paginator(Article.objects.all(), 5)
@@ -107,9 +108,9 @@ class PaginationTests(TestCase):
         paginator = Paginator([1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
         self.assertEqual(9, paginator.count)
         self.assertEqual(3, paginator.num_pages)
-        self.assertEqual([1, 2, 3], paginator.page_range)
+        self.assertEqual([1, 2, 3], list(paginator.page_range))
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 3>", unicode(p))
+        self.assertEqual("<Page 2 of 3>", six.text_type(p))
         self.assertEqual([4, 5, 6], p.object_list)
         self.assertTrue(p.has_next())
         self.assertTrue(p.has_previous())
@@ -124,10 +125,10 @@ class PaginationTests(TestCase):
         paginator = Paginator(CountContainer(), 10)
         self.assertEqual(42, paginator.count)
         self.assertEqual(5, paginator.num_pages)
-        self.assertEqual([1, 2, 3, 4, 5], paginator.page_range)
+        self.assertEqual([1, 2, 3, 4, 5], list(paginator.page_range))
 
         # Paginator can be passed other objects that implement __len__.
         paginator = Paginator(LenContainer(), 10)
         self.assertEqual(42, paginator.count)
         self.assertEqual(5, paginator.num_pages)
-        self.assertEqual([1, 2, 3, 4, 5], paginator.page_range)
+        self.assertEqual([1, 2, 3, 4, 5], list(paginator.page_range))

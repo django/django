@@ -8,6 +8,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.utils import six
 
 from .models import Author, Book, Publisher, Clues, Entries, HardbackBook
 
@@ -16,7 +17,7 @@ class AggregationTests(TestCase):
     fixtures = ["aggregation_regress.json"]
 
     def assertObjectAttrs(self, obj, **kwargs):
-        for attr, value in kwargs.iteritems():
+        for attr, value in six.iteritems(kwargs):
             self.assertEqual(getattr(obj, attr), value)
 
     def test_aggregates_in_where_clause(self):
@@ -864,4 +865,16 @@ class AggregationTests(TestCase):
             qs,
             ['Peter Norvig'],
             lambda b: b.name
+        )
+
+    def test_type_conversion(self):
+        # The database backend convert_values function should not try to covert
+        # CharFields to float. Refs #13844.
+        from django.db.models import CharField
+        from django.db import connection
+        testData = 'not_a_float_value'
+        testField = CharField()
+        self.assertEqual(
+            connection.ops.convert_values(testData, testField),
+            testData
         )

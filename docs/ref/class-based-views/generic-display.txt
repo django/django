@@ -5,6 +5,9 @@ Generic display views
 The two following generic class-based views are designed to display data. On
 many projects they are typically the most commonly used views.
 
+DetailView
+----------
+
 .. class:: django.views.generic.detail.DetailView
 
     While this view is executing, ``self.object`` will contain the object that
@@ -39,7 +42,7 @@ many projects they are typically the most commonly used views.
         from articles.models import Article
 
         class ArticleDetailView(DetailView):
-        
+
             model = Article
 
             def get_context_data(self, **kwargs):
@@ -54,8 +57,11 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleDetailView
 
         urlpatterns = patterns('',
-            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), 'article-detail'),
-        )    
+            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
+        )
+
+ListView
+--------
 
 .. class:: django.views.generic.list.ListView
 

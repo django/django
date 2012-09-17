@@ -13,6 +13,8 @@ import tempfile
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
@@ -30,23 +32,29 @@ ARTICLE_STATUS_CHAR = (
     ('l', 'Live'),
 )
 
+@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
     slug = models.SlugField(max_length=20)
     url = models.CharField('The URL', max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return self.__str__()
+
+@python_2_unicode_compatible
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
 
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=50)
     slug = models.SlugField()
@@ -63,7 +71,7 @@ class Article(models.Model):
             self.created = datetime.date.today()
         return super(Article, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
 class ImprovedArticle(models.Model):
@@ -75,26 +83,29 @@ class ImprovedArticleWithParentLink(models.Model):
 class BetterWriter(Writer):
     score = models.IntegerField()
 
+@python_2_unicode_compatible
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
     age = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s is %s" % (self.writer, self.age)
 
 from django.contrib.localflavor.us.models import PhoneNumberField
+@python_2_unicode_compatible
 class PhoneNumber(models.Model):
     phone = PhoneNumberField()
     description = models.CharField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.phone
 
+@python_2_unicode_compatible
 class TextFile(models.Model):
     description = models.CharField(max_length=20)
     file = models.FileField(storage=temp_storage, upload_to='tests', max_length=15)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
 try:
@@ -109,6 +120,7 @@ try:
 
     test_images = True
 
+    @python_2_unicode_compatible
     class ImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or 'tests'
@@ -124,9 +136,10 @@ try:
                                   width_field='width', height_field='height')
         path = models.CharField(max_length=16, blank=True, default='')
 
-        def __unicode__(self):
+        def __str__(self):
             return self.description
 
+    @python_2_unicode_compatible
     class OptionalImageFile(models.Model):
         def custom_upload_path(self, filename):
             path = self.path or 'tests'
@@ -140,28 +153,31 @@ try:
         height = models.IntegerField(editable=False, null=True)
         path = models.CharField(max_length=16, blank=True, default='')
 
-        def __unicode__(self):
+        def __str__(self):
             return self.description
 except ImportError:
     test_images = False
 
+@python_2_unicode_compatible
 class CommaSeparatedInteger(models.Model):
     field = models.CommaSeparatedIntegerField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.field
 
+@python_2_unicode_compatible
 class Product(models.Model):
     slug = models.SlugField(unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
+@python_2_unicode_compatible
 class Price(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s for %s" % (self.quantity, self.price)
 
     class Meta:
@@ -170,6 +186,7 @@ class Price(models.Model):
 class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
 
+@python_2_unicode_compatible
 class Inventory(models.Model):
     barcode = models.PositiveIntegerField(unique=True)
     parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
@@ -178,8 +195,11 @@ class Inventory(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return self.__str__()
 
 class Book(models.Model):
     title = models.CharField(max_length=40)
@@ -201,32 +221,35 @@ class BookXtra(models.Model):
 class DerivedBook(Book, BookXtra):
     pass
 
+@python_2_unicode_compatible
 class ExplicitPK(models.Model):
     key = models.CharField(max_length=20, primary_key=True)
     desc = models.CharField(max_length=20, blank=True, unique=True)
     class Meta:
         unique_together = ('key', 'desc')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.key
 
+@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class DerivedPost(Post):
     pass
 
+@python_2_unicode_compatible
 class BigInt(models.Model):
     biggie = models.BigIntegerField()
 
-    def __unicode__(self):
-        return unicode(self.biggie)
+    def __str__(self):
+        return six.text_type(self.biggie)
 
 class MarkupField(models.CharField):
     def __init__(self, *args, **kwargs):

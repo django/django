@@ -1,8 +1,11 @@
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
 from django.utils.functional import total_ordering
 from django.utils.safestring import mark_safe
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class GEvent(object):
     """
     A Python wrapper for the Google GEvent object.
@@ -47,10 +50,11 @@ class GEvent(object):
         self.event = event
         self.action = action
 
-    def __unicode__(self):
+    def __str__(self):
         "Returns the parameter part of a GEvent."
         return mark_safe('"%s", %s' %(self.event, self.action))
 
+@python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
         self.events = []
@@ -63,7 +67,7 @@ class GOverlayBase(object):
         "Attaches a GEvent to the overlay object."
         self.events.append(event)
 
-    def __unicode__(self):
+    def __str__(self):
         "The string representation is the JavaScript API call."
         return mark_safe('%s(%s)' % (self.__class__.__name__, self.js_params))
 
@@ -98,7 +102,7 @@ class GPolygon(GOverlayBase):
           fill_opacity:
             The opacity of the polygon fill.  Defaults to 0.4.
         """
-        if isinstance(poly, basestring): poly = fromstr(poly)
+        if isinstance(poly, six.string_types): poly = fromstr(poly)
         if isinstance(poly, (tuple, list)): poly = Polygon(poly)
         if not isinstance(poly, Polygon):
             raise TypeError('GPolygon may only initialize on GEOS Polygons.')
@@ -148,7 +152,7 @@ class GPolyline(GOverlayBase):
             The opacity of the polyline, between 0 and 1.  Defaults to 1.
         """
         # If a GEOS geometry isn't passed in, try to contsruct one.
-        if isinstance(geom, basestring): geom = fromstr(geom)
+        if isinstance(geom, six.string_types): geom = fromstr(geom)
         if isinstance(geom, (tuple, list)): geom = Polygon(geom)
         # Generating the lat/lng coordinate pairs.
         if isinstance(geom, (LineString, LinearRing)):
@@ -239,9 +243,9 @@ class GIcon(object):
 
     def __lt__(self, other):
         return self.varname < other.varname
-    
+
     def __hash__(self):
-        # XOR with hash of GIcon type so that hash('varname') won't 
+        # XOR with hash of GIcon type so that hash('varname') won't
         # equal hash(GIcon('varname')).
         return hash(self.__class__) ^ hash(self.varname)
 
@@ -278,7 +282,7 @@ class GMarker(GOverlayBase):
            Draggable option for GMarker, disabled by default.
         """
         # If a GEOS geometry isn't passed in, try to construct one.
-        if isinstance(geom, basestring): geom = fromstr(geom)
+        if isinstance(geom, six.string_types): geom = fromstr(geom)
         if isinstance(geom, (tuple, list)): geom = Point(geom)
         if isinstance(geom, Point):
             self.latlng = self.latlng_from_coords(geom.coords)

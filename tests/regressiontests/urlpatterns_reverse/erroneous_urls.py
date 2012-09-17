@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'uncallable/$', 'regressiontests.urlpatterns_reverse.views.uncallable'),
     # Module does not exist
     url(r'missing_outer/$', 'regressiontests.urlpatterns_reverse.missing_module.missing_view'),
+    # Regex contains an error (refs #6170)
+    url(r'(regex_error/$', 'regressiontestes.urlpatterns_reverse.views.empty_view'),
 )

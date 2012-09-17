@@ -30,6 +30,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Aymeric Augustin
     * Claude Paroz
     * Anssi Kääriäinen
+    * Florian Apolloner
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -61,7 +62,6 @@ answer newbie questions, and generally made Django that much better:
     andy@jadedplanet.net
     Fabrice Aneche <akh@nobugware.com>
     ant9000@netwise.it
-    Florian Apolloner <florian@apolloner.eu>
     arien <regexbot@gmail.com>
     David Ascher <http://ascher.ca/>
     atlithorn <atlithorn@gmail.com>
@@ -373,6 +373,7 @@ answer newbie questions, and generally made Django that much better:
     michael.mcewan@gmail.com
     Paul McLanahan <paul@mclanahan.net>
     Tobias McNulty <http://www.caktusgroup.com/blog>
+    Andrews Medina <andrewsmedina@gmail.com>
     Zain Memon
     Christian Metts
     michal@plovarna.cz
@@ -467,6 +468,7 @@ answer newbie questions, and generally made Django that much better:
     Vinay Sajip <vinay_sajip@yahoo.co.uk>
     Bartolome Sanchez Salado <i42sasab@uco.es>
     Kadesarin Sanjek
+    Tim Saylor <tim.saylor@gmail.com>
     Massimo Scamarcia <massimo.scamarcia@gmail.com>
     Paulo Scardine <paulo@scardine.com.br>
     David Schein

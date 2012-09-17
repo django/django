@@ -9,10 +9,8 @@ Install Python
 
 Being a Python Web framework, Django requires Python.
 
-It works with any Python version from 2.6 to 2.7 (due to backwards
-incompatibilities in Python 3.0, Django does not currently work with
-Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
-information on supported Python versions and the 3.0 transition).
+It works with any Python version from 2.6.5 to 2.7. It also features
+experimental support for versions 3.2 and 3.3.
 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
@@ -62,7 +60,7 @@ for information on how to configure mod_wsgi once you have it
 installed.
 
 If you can't use mod_wsgi for some reason, fear not: Django supports many other
-deployment options. One is :doc:`uWSGI </howto/deployment/fastcgi>`; it works
+deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Another is :doc:`FastCGI </howto/deployment/fastcgi>`,
 perfect for using Django with servers other than Apache. Additionally, Django
 follows the WSGI spec (:pep:`3333`), which allows it to run on a variety of

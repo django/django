@@ -1,20 +1,23 @@
 from __future__ import unicode_literals
 
-from StringIO import StringIO
-
 from django.contrib.auth import models, management
 from django.contrib.auth.management.commands import changepassword
 from django.core.management.base import CommandError
 from django.test import TestCase
+from django.utils import six
+from django.utils.six import StringIO
 
 
 class GetDefaultUsernameTestCase(TestCase):
 
     def setUp(self):
-        self._getpass_getuser = management.get_system_username
+        self.old_get_system_username = management.get_system_username
 
     def tearDown(self):
-        management.get_system_username = self._getpass_getuser
+        management.get_system_username = self.old_get_system_username
+
+    def test_actual_implementation(self):
+        self.assertIsInstance(management.get_system_username(), six.text_type)
 
     def test_simple(self):
         management.get_system_username = lambda: 'joe'

@@ -14,9 +14,10 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils import six
 from django.utils import timezone
 
 register = Library()
@@ -103,7 +104,7 @@ class FirstOfNode(Node):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return smart_unicode(value)
+                return smart_text(value)
         return ''
 
 class ForNode(Node):
@@ -392,7 +393,7 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_unicode(k, 'ascii'), v.resolve(context))
+        kwargs = dict([(smart_text(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
 
         view_name = self.view_name.resolve(context)
@@ -447,7 +448,7 @@ class WidthRatioNode(Node):
             max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ''
-        except ValueError:
+        except (ValueError, TypeError):
             raise TemplateSyntaxError("widthratio final argument must be an number")
         try:
             value = float(value)
@@ -455,7 +456,7 @@ class WidthRatioNode(Node):
             ratio = (value / max_value) * max_width
         except ZeroDivisionError:
             return '0'
-        except ValueError:
+        except (ValueError, TypeError):
             return ''
         return str(int(round(ratio)))
 
@@ -473,7 +474,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
-                       self.extra_context.iteritems()])
+                       six.iteritems(self.extra_context)])
         context.update(values)
         output = self.nodelist.render(context)
         context.pop()
@@ -1188,7 +1189,7 @@ def templatetag(parser, token):
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError("Invalid templatetag argument: '%s'."
                                   " Must be one of: %s" %
-                                  (tag, TemplateTagNode.mapping.keys()))
+                                  (tag, list(TemplateTagNode.mapping)))
     return TemplateTagNode(tag)
 
 @register.tag

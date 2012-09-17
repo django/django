@@ -2,6 +2,7 @@
 # Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
+from django.utils.six.moves import xrange
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
         error_message="This is not a valid IPv6 address"):
@@ -262,6 +263,6 @@ def _is_shorthand_ip(ip_str):
     """
     if ip_str.count('::') == 1:
         return True
-    if filter(lambda x: len(x) < 4, ip_str.split(':')):
+    if any(len(x) < 4 for x in ip_str.split(':')):
         return True
     return False

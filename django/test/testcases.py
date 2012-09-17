@@ -7,7 +7,10 @@ import re
 import sys
 from copy import copy
 from functools import wraps
-from urlparse import urlsplit, urlunsplit
+try:
+    from urllib.parse import urlsplit, urlunsplit
+except ImportError:     # Python 2
+    from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 import select
 import socket
@@ -20,6 +23,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
+from django.core.management.color import no_style
 from django.core.signals import request_started
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
@@ -37,7 +41,8 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
@@ -353,7 +358,7 @@ class SimpleTestCase(ut2.TestCase):
             args: Extra args.
             kwargs: Extra kwargs.
         """
-        return self.assertRaisesRegexp(expected_exception,
+        return six.assertRaisesRegex(self, expected_exception,
                 re.escape(expected_message), callable_obj, *args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
@@ -393,7 +398,7 @@ class SimpleTestCase(ut2.TestCase):
                 optional.clean(input)
             self.assertEqual(context_manager.exception.messages, errors)
         # test required inputs
-        error_required = [force_unicode(required.error_messages['required'])]
+        error_required = [force_text(required.error_messages['required'])]
         for e in EMPTY_VALUES:
             with self.assertRaises(ValidationError) as context_manager:
                 required.clean(e)
@@ -421,8 +426,8 @@ class SimpleTestCase(ut2.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                           unicode(dom1).splitlines(),
-                           unicode(dom2).splitlines())))
+                           six.text_type(dom1).splitlines(),
+                           six.text_type(dom2).splitlines())))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
 
@@ -440,9 +445,14 @@ class SimpleTestCase(ut2.TestCase):
 
 
 class TransactionTestCase(SimpleTestCase):
+
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+
+    # Subclasses can ask for resetting of auto increment sequence before each
+    # test case
+    reset_sequences = False
 
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
@@ -458,22 +468,36 @@ class TransactionTestCase(SimpleTestCase):
         self._urlconf_setup()
         mail.outbox = []
 
+    def _reset_sequences(self, db_name):
+        conn = connections[db_name]
+        if conn.features.supports_sequence_reset:
+            sql_list = \
+                conn.ops.sequence_reset_by_name_sql(no_style(),
+                                                    conn.introspection.sequence_list())
+            if sql_list:
+                try:
+                    cursor = conn.cursor()
+                    for sql in sql_list:
+                        cursor.execute(sql)
+                except Exception:
+                    transaction.rollback_unless_managed(using=db_name)
+                    raise
+                transaction.commit_unless_managed(using=db_name)
+
     def _fixture_setup(self):
-        # If the test case has a multi_db=True flag, flush all databases.
-        # Otherwise, just flush default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
-        for db in databases:
-            call_command('flush', verbosity=0, interactive=False, database=db,
-                         skip_validation=True)
+        # If the test case has a multi_db=True flag, act on all databases.
+        # Otherwise, just on the default DB.
+        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
+        for db_name in db_names:
+            # Reset sequences
+            if self.reset_sequences:
+                self._reset_sequences(db_name)
 
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db, 'skip_validation': True})
+                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -530,7 +554,12 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        pass
+        # If the test case has a multi_db=True flag, flush all databases.
+        # Otherwise, just flush default.
+        databases = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
+        for db in databases:
+            call_command('flush', verbosity=0, interactive=False, database=db,
+                         skip_validation=True, reset_sequences=False)
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
@@ -618,14 +647,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_str(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 "Second argument is not valid HTML:")
-        real_count = content.count(enc_text)
+        real_count = content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of '%s' in response"
@@ -654,14 +682,13 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        enc_text = smart_str(text, response._charset)
-        content = response.content
+        content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 'Response\'s content is not valid HTML:')
-            enc_text = assert_and_parse_html(self, enc_text, None,
+            text = assert_and_parse_html(self, text, None,
                 'Second argument is not valid HTML:')
-        self.assertEqual(content.count(enc_text), 0,
+        self.assertEqual(content.count(text), 0,
             msg_prefix + "Response should not contain '%s'" % text)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
@@ -767,9 +794,10 @@ class TransactionTestCase(SimpleTestCase):
             " the response" % template_name)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
+        items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(map(transform, qs)), set(values))
-        return self.assertEqual(map(transform, qs), values)
+            return self.assertEqual(set(items), set(values))
+        return self.assertEqual(list(items), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
@@ -804,22 +832,21 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
 
+        assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
+
         # If the test case has a multi_db=True flag, setup all databases.
         # Otherwise, just use default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
+        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
 
-        for db in databases:
-            transaction.enter_transaction_management(using=db)
-            transaction.managed(True, using=db)
+        for db_name in db_names:
+            transaction.enter_transaction_management(using=db_name)
+            transaction.managed(True, using=db_name)
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
         Site.objects.clear_cache()
 
-        for db in databases:
+        for db in db_names:
             if hasattr(self, 'fixtures'):
                 call_command('loaddata', *self.fixtures,
                              **{
@@ -890,23 +917,26 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _ImprovedEvent(threading._Event):
-    """
-    Does the same as `threading.Event` except it overrides the wait() method
-    with some code borrowed from Python 2.7 to return the set state of the
-    event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
-    to know whether the wait() method exited normally or because of the
-    timeout. This class can be removed when Django supports only Python >= 2.7.
-    """
+if sys.version_info >= (2, 7, 0):
+    _ImprovedEvent = threading._Event
+else:
+    class _ImprovedEvent(threading._Event):
+        """
+        Does the same as `threading.Event` except it overrides the wait() method
+        with some code borrowed from Python 2.7 to return the set state of the
+        event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
+        to know whether the wait() method exited normally or because of the
+        timeout. This class can be removed when Django supports only Python >= 2.7.
+        """
 
-    def wait(self, timeout=None):
-        self._Event__cond.acquire()
-        try:
-            if not self._Event__flag:
-                self._Event__cond.wait(timeout)
-            return self._Event__flag
-        finally:
-            self._Event__cond.release()
+        def wait(self, timeout=None):
+            self._Event__cond.acquire()
+            try:
+                if not self._Event__flag:
+                    self._Event__cond.wait(timeout)
+                return self._Event__flag
+            finally:
+                self._Event__cond.release()
 
 
 class StoppableWSGIServer(WSGIServer):
@@ -1107,7 +1137,7 @@ class LiveServerTestCase(TransactionTestCase):
             host, port_ranges = specified_address.split(':')
             for port_range in port_ranges.split(','):
                 # A port range can be of either form: '8000' or '8000-8010'.
-                extremes = map(int, port_range.split('-'))
+                extremes = list(map(int, port_range.split('-')))
                 assert len(extremes) in [1, 2]
                 if len(extremes) == 1:
                     # Port range of the form '8000'
@@ -1138,4 +1168,11 @@ class LiveServerTestCase(TransactionTestCase):
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
             cls.server_thread.join()
+
+        # Restore sqlite connections' non-sharability
+        for conn in connections.all():
+            if (conn.settings_dict['ENGINE'] == 'django.db.backends.sqlite3'
+                and conn.settings_dict['NAME'] == ':memory:'):
+                conn.allow_thread_sharing = False
+
         super(LiveServerTestCase, cls).tearDownClass()

@@ -14,11 +14,12 @@ from threading import local
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import iri_to_uri, force_unicode, smart_str
+from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
+from django.utils import six
 from django.utils.translation import get_language
 
 
@@ -88,18 +89,11 @@ def get_callable(lookup_view, can_fail=False):
     """
     if not callable(lookup_view):
         mod_name, func_name = get_mod_func(lookup_view)
+        if func_name == '':
+            return lookup_view
+
         try:
-            if func_name != '':
-                lookup_view = getattr(import_module(mod_name), func_name)
-                if not callable(lookup_view):
-                    raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable." %
-                        (mod_name, func_name))
-        except AttributeError:
-            if not can_fail:
-                raise ViewDoesNotExist(
-                    "Could not import %s. View does not exist in module %s." %
-                    (lookup_view, mod_name))
+            mod = import_module(mod_name)
         except ImportError:
             parentmod, submod = get_mod_func(mod_name)
             if (not can_fail and submod != '' and
@@ -109,6 +103,18 @@ def get_callable(lookup_view, can_fail=False):
                     (lookup_view, mod_name))
             if not can_fail:
                 raise
+        else:
+            try:
+                lookup_view = getattr(mod, func_name)
+                if not callable(lookup_view):
+                    raise ViewDoesNotExist(
+                        "Could not import %s.%s. View is not callable." %
+                        (mod_name, func_name))
+            except AttributeError:
+                if not can_fail:
+                    raise ViewDoesNotExist(
+                        "Could not import %s. View does not exist in module %s." %
+                        (lookup_view, mod_name))
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache, 1)
 
@@ -159,11 +165,17 @@ class LocaleRegexProvider(object):
         """
         language_code = get_language()
         if language_code not in self._regex_dict:
-            if isinstance(self._regex, basestring):
-                compiled_regex = re.compile(self._regex, re.UNICODE)
+            if isinstance(self._regex, six.string_types):
+                regex = self._regex
             else:
-                regex = force_unicode(self._regex)
+                regex = force_text(self._regex)
+            try:
                 compiled_regex = re.compile(regex, re.UNICODE)
+            except re.error as e:
+                raise ImproperlyConfigured(
+                    '"%s" is not a valid regular expression: %s' %
+                    (regex, six.text_type(e)))
+
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
 
@@ -183,7 +195,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return smart_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -222,7 +234,7 @@ class RegexURLResolver(LocaleRegexProvider):
         LocaleRegexProvider.__init__(self, regex)
         # urlconf_name is a string representing the module containing URLconfs.
         self.urlconf_name = urlconf_name
-        if not isinstance(urlconf_name, basestring):
+        if not isinstance(urlconf_name, six.string_types):
             self._urlconf_module = self.urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
@@ -233,7 +245,14 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
-        return smart_str('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
+        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+            # Don't bother to output the whole list, it can be huge
+            urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
+        else:
+            urlconf_repr = repr(self.urlconf_name)
+        return force_str('<%s %s (%s:%s) %s>' % (
+            self.__class__.__name__, urlconf_repr, self.app_name,
+            self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()
@@ -366,10 +385,10 @@ class RegexURLResolver(LocaleRegexProvider):
                 if args:
                     if len(args) != len(params) + len(prefix_args):
                         continue
-                    unicode_args = [force_unicode(val) for val in args]
+                    unicode_args = [force_text(val) for val in args]
                     candidate =  (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
-                    if set(kwargs.keys() + defaults.keys()) != set(params + defaults.keys() + prefix_args):
+                    if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
                     matches = True
                     for k, v in defaults.items():
@@ -378,7 +397,7 @@ class RegexURLResolver(LocaleRegexProvider):
                             break
                     if not matches:
                         continue
-                    unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
+                    unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
                     candidate = (prefix_norm + result) % unicode_kwargs
                 if re.search('^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
                     return candidate
@@ -428,7 +447,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
     if prefix is None:
         prefix = get_script_prefix()
 
-    if not isinstance(viewname, basestring):
+    if not isinstance(viewname, six.string_types):
         view = viewname
     else:
         parts = viewname.split(':')

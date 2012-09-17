@@ -48,7 +48,7 @@ that, you need to :meth:`~Model.save()`.
     2. Add a method on a custom manager (usually preferred)::
 
         class BookManager(models.Manager):
-            def create_book(title):
+            def create_book(self, title):
                 book = self.create(title=title)
                 # do something with the book
                 return book
@@ -386,6 +386,12 @@ perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
 
+When saving a model fetched through deferred model loading
+(:meth:`~Model.only()` or :meth:`~Model.defer()`) only the fields loaded from
+the DB will get updated. In effect there is an automatic ``update_fields`` in
+this case. If you assign or change any deferred field value, these fields will
+be added to the updated fields.
+
 Deleting objects
 ================
 
@@ -453,9 +459,9 @@ using ``__str__()`` like this::
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            # Note use of django.utils.encoding.smart_str() here because
+            # Note use of django.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
-            return smart_str('%s %s' % (self.first_name, self.last_name))
+            return force_bytes('%s %s' % (self.first_name, self.last_name))
 
 ``get_absolute_url``
 --------------------

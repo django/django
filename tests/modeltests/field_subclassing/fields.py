@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 import json
 
 from django.db import models
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Small(object):
     """
     A simple class to show that non-trivial Python objects can be used as
@@ -14,19 +17,15 @@ class Small(object):
     def __init__(self, first, second):
         self.first, self.second = first, second
 
-    def __unicode__(self):
-        return '%s%s' % (force_unicode(self.first), force_unicode(self.second))
-
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return '%s%s' % (force_text(self.first), force_text(self.second))
 
-class SmallField(models.Field):
+class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Turns the "Small" class into a Django field. Because of the similarities
     with normal character fields and the fact that Small.__unicode__ does
     something sensible, we don't need to implement a lot here.
     """
-    __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 2
@@ -41,13 +40,13 @@ class SmallField(models.Field):
         return Small(value[0], value[1])
 
     def get_db_prep_save(self, value, connection):
-        return unicode(value)
+        return six.text_type(value)
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'exact':
-            return force_unicode(value)
+            return force_text(value)
         if lookup_type == 'in':
-            return [force_unicode(v) for v in value]
+            return [force_text(v) for v in value]
         if lookup_type == 'isnull':
             return []
         raise TypeError('Invalid lookup type: %r' % lookup_type)
@@ -56,8 +55,7 @@ class SmallerField(SmallField):
     pass
 
 
-class JSONField(models.TextField):
-    __metaclass__ = models.SubfieldBase
+class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 
     description = ("JSONField automatically serializes and desializes values to "
         "and from JSON.")
@@ -66,7 +64,7 @@ class JSONField(models.TextField):
         if not value:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             value = json.loads(value)
         return value
 

@@ -17,7 +17,7 @@ from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 class GenericForeignKey(object):
     """
@@ -169,7 +169,7 @@ class GenericRelation(RelatedField, Field):
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
-        return smart_unicode([instance._get_pk_val() for instance in qs])
+        return smart_text([instance._get_pk_val() for instance in qs])
 
     def m2m_db_table(self):
         return self.rel.to._meta.db_table

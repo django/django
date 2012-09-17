@@ -9,7 +9,8 @@ from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.db.models.deletion import CASCADE
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _, string_concat
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -104,7 +105,7 @@ class RelatedField(object):
                 }
 
         other = self.rel.to
-        if isinstance(other, basestring) or other._meta.pk is None:
+        if isinstance(other, six.string_types) or other._meta.pk is None:
             def resolve_related_class(field, model, cls):
                 field.rel.to = model
                 field.do_related_class(model, cls)
@@ -240,7 +241,7 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        params = {'%s__pk__in' % self.related.field.name: instances_dict.keys()}
+        params = {'%s__pk__in' % self.related.field.name: list(instances_dict)}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -334,9 +335,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__pk__in' % self.field.rel.field_name: list(instances_dict)}
         else:
-            params = {'%s__in' % self.field.rel.field_name: instances_dict.keys()}
+            params = {'%s__in' % self.field.rel.field_name: list(instances_dict)}
         qs = self.get_query_set(instance=instances[0]).filter(**params)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -487,7 +488,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname): instances_dict.keys()}
+                query = {'%s__%s__in' % (rel_field.name, attname): list(instances_dict)}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.
@@ -865,7 +866,7 @@ class ManyToOneRel(object):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, six.string_types), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
         self.related_name = related_name
         if limit_choices_to is None:
@@ -933,7 +934,7 @@ class ForeignKey(RelatedField, Field):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
             # For backwards compatibility purposes, we need to *try* and set
@@ -998,13 +999,13 @@ class ForeignKey(RelatedField, Field):
             if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
-                    return smart_unicode(choice_list[1][0])
+                    return smart_text(choice_list[1][0])
         return Field.value_to_string(self, obj)
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             target = self.rel.to
         else:
             target = self.rel.to._meta.db_table
@@ -1022,7 +1023,7 @@ class ForeignKey(RelatedField, Field):
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.rel.to))
@@ -1079,13 +1080,13 @@ class OneToOneField(ForeignKey):
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
     managed = True
-    if isinstance(field.rel.to, basestring) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
+    if isinstance(field.rel.to, six.string_types) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
         to_model = field.rel.to
         to = to_model.split('.')[-1]
         def set_managed(field, model, cls):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
         add_lazy_relation(klass, field, to_model, set_managed)
-    elif isinstance(field.rel.to, basestring):
+    elif isinstance(field.rel.to, six.string_types):
         to = klass._meta.object_name
         to_model = klass
         managed = klass._meta.managed
@@ -1124,7 +1125,7 @@ class ManyToManyField(RelatedField, Field):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
             # Python 2.6 and earlier require dictionary keys to be of str type,
             # not unicode and class names must be ASCII (in Python 2.x), so we
             # forcibly coerce it here (breaks early if there's a problem).
@@ -1204,7 +1205,7 @@ class ManyToManyField(RelatedField, Field):
                 choices_list = self.get_choices_default()
                 if len(choices_list) == 1:
                     data = [choices_list[0][0]]
-        return smart_unicode(data)
+        return smart_text(data)
 
     def contribute_to_class(self, cls, name):
         # To support multiple relations to self, it's useful to have a non-None
@@ -1232,12 +1233,12 @@ class ManyToManyField(RelatedField, Field):
 
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
-        if isinstance(self.rel.through, basestring):
+        if isinstance(self.rel.through, six.string_types):
             def resolve_through_model(field, model, cls):
                 field.rel.through = model
             add_lazy_relation(cls, self, self.rel.through, resolve_through_model)
 
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             target = self.rel.to
         else:
             target = self.rel.to._meta.db_table

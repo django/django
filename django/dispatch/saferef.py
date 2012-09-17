@@ -149,12 +149,15 @@ class BoundMethodWeakref(object):
             self.selfName,
             self.funcName,
         )
-    
+
     __repr__ = __str__
-    
-    def __nonzero__( self ):
+
+    __hash__ = object.__hash__
+
+    def __bool__( self ):
         """Whether we are still a valid reference"""
         return self() is not None
+    __nonzero__ = __bool__ # Python 2
 
     def __eq__(self, other):
         """Compare with another reference"""

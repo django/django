@@ -20,7 +20,8 @@ import datetime
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 from django.utils.timezone import is_aware, is_naive
 
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
@@ -29,9 +30,9 @@ re_escaped = re.compile(r'\\(.)')
 class Formatter(object):
     def format(self, formatstr):
         pieces = []
-        for i, piece in enumerate(re_formatchars.split(force_unicode(formatstr))):
+        for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):
             if i % 2:
-                pieces.append(force_unicode(getattr(self, piece)()))
+                pieces.append(force_text(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return ''.join(pieces)
@@ -236,7 +237,7 @@ class DateFormat(TimeFormat):
         name = self.timezone and self.timezone.tzname(self.data) or None
         if name is None:
             name = self.format('O')
-        return unicode(name)
+        return six.text_type(name)
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
@@ -277,7 +278,7 @@ class DateFormat(TimeFormat):
 
     def y(self):
         "Year, 2 digits; e.g. '99'"
-        return unicode(self.data.year)[2:]
+        return six.text_type(self.data.year)[2:]
 
     def Y(self):
         "Year, 4 digits; e.g. '1999'"

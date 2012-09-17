@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -327,6 +327,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     Abstract base class for date-based views displaying a list of objects.
     """
     allow_empty = False
+    date_list_period = 'year'
 
     def get(self, request, *args, **kwargs):
         self.date_list, self.object_list, extra_context = self.get_dated_items()
@@ -365,22 +366,27 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
             is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
-                        'verbose_name_plural': force_unicode(qs.model._meta.verbose_name_plural)
+                        'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
                 })
 
         return qs
 
-    def get_date_list(self, queryset, date_type):
+    def get_date_list_period(self):
+        return self.date_list_period
+
+    def get_date_list(self, queryset, date_type=None):
         """
         Get a date list by calling `queryset.dates()`, checking along the way
         for empty lists that aren't allowed.
         """
         date_field = self.get_date_field()
         allow_empty = self.get_allow_empty()
+        if date_type is None:
+            date_type = self.get_date_list_period()
 
         date_list = queryset.dates(date_field, date_type)[::-1]
         if date_list is not None and not date_list and not allow_empty:
-            name = force_unicode(queryset.model._meta.verbose_name_plural)
+            name = force_text(queryset.model._meta.verbose_name_plural)
             raise Http404(_("No %(verbose_name_plural)s available") %
                           {'verbose_name_plural': name})
 
@@ -400,7 +406,7 @@ class BaseArchiveIndexView(BaseDateListView):
         Return (date_list, items, extra_context) for this request.
         """
         qs = self.get_dated_queryset(ordering='-%s' % self.get_date_field())
-        date_list = self.get_date_list(qs, 'year')
+        date_list = self.get_date_list(qs)
 
         if not date_list:
             qs = qs.none()
@@ -419,6 +425,7 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
     """
     List of objects published in a given year.
     """
+    date_list_period = 'month'
     make_object_list = False
 
     def get_dated_items(self):
@@ -438,7 +445,7 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
         }
 
         qs = self.get_dated_queryset(ordering='-%s' % date_field, **lookup_kwargs)
-        date_list = self.get_date_list(qs, 'month')
+        date_list = self.get_date_list(qs)
 
         if not self.get_make_object_list():
             # We need this to be a queryset since parent classes introspect it
@@ -470,6 +477,8 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
     """
     List of objects published in a given year.
     """
+    date_list_period = 'day'
+
     def get_dated_items(self):
         """
         Return (date_list, items, extra_context) for this request.
@@ -489,7 +498,7 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
-        date_list = self.get_date_list(qs, 'day')
+        date_list = self.get_date_list(qs)
 
         return (date_list, qs, {
             'month': date,

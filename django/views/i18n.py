@@ -6,8 +6,9 @@ from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
+from django.utils import six
 
 def set_language(request):
     """
@@ -52,10 +53,10 @@ def get_formats():
             result[attr] = get_format(attr)
     src = []
     for k, v in result.items():
-        if isinstance(v, (basestring, int)):
-            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
+        if isinstance(v, (six.string_types, int)):
+            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_text(v))))
         elif isinstance(v, (tuple, list)):
-            v = [javascript_quote(smart_unicode(value)) for value in v]
+            v = [javascript_quote(smart_text(value)) for value in v]
             src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
     return ''.join(src)
 
@@ -184,7 +185,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 activate(request.GET['language'])
     if packages is None:
         packages = ['django.conf']
-    if isinstance(packages, basestring):
+    if isinstance(packages, six.string_types):
         packages = packages.split('+')
     packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
     default_locale = to_locale(settings.LANGUAGE_CODE)
@@ -258,7 +259,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     for k, v in t.items():
         if k == '':
             continue
-        if isinstance(k, basestring):
+        if isinstance(k, six.string_types):
             csrc.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
         elif isinstance(k, tuple):
             if k[0] not in pdict:

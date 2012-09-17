@@ -70,9 +70,8 @@ overridden:
   formfield-specific piece of validation and, possibly,
   cleaning/normalizing the data.
 
-  Just like the general field ``clean()`` method, above, this method
-  should return the cleaned data, regardless of whether it changed
-  anything or not.
+  This method should return the cleaned value obtained from cleaned_data,
+  regardless of whether it changed anything or not.
 
 * The Form subclass's ``clean()`` method. This method can perform
   any validation that requires access to multiple fields from the form at
@@ -362,7 +361,9 @@ Secondly, once we have decided that the combined data in the two fields we are
 considering aren't valid, we must remember to remove them from the
 ``cleaned_data``.
 
-In fact, Django will currently completely wipe out the ``cleaned_data``
-dictionary if there are any errors in the form. However, this behavior may
-change in the future, so it's not a bad idea to clean up after yourself in the
-first place.
+.. versionchanged:: 1.5
+
+Django used to remove the ``cleaned_data`` attribute entirely if there were
+any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
+the form doesn't validate, but it contains only field values that did
+validate.

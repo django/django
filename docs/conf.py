@@ -94,6 +94,7 @@ pygments_style = 'trac'
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
     'sphinx': ('http://sphinx.pocoo.org/', None),
+    'six': ('http://packages.python.org/six/', None),
 }
 
 # Python's docs don't change every week.
@@ -189,11 +190,10 @@ modindex_common_prefix = ["django."]
 
 # -- Options for LaTeX output --------------------------------------------------
 
-# The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
-
-# The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+latex_elements = {
+    'preamble': ('\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'
+                 '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}')
+}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
@@ -216,9 +216,6 @@ latex_documents = [
 
 # If true, show URL addresses after external links.
 #latex_show_urls = False
-
-# Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []

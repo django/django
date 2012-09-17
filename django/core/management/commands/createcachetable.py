@@ -4,7 +4,7 @@ from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import LabelCommand, CommandError
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 class Command(LabelCommand):
@@ -60,7 +60,7 @@ class Command(LabelCommand):
             transaction.rollback_unless_managed(using=db)
             raise CommandError(
                 "Cache table '%s' could not be created.\nThe error was: %s." %
-                    (tablename, force_unicode(e)))
+                    (tablename, force_text(e)))
         for statement in index_output:
             curs.execute(statement)
         transaction.commit_unless_managed(using=db)

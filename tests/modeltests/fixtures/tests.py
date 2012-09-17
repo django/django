@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 
-import StringIO
-
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils import six
 
 from .models import Article, Book, Spy, Tag, Visa
 
@@ -22,16 +21,17 @@ class TestCaseFixtureLoadingTests(TestCase):
             '<Article: Poker has no place on ESPN>',
         ])
 
+
 class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
                          use_base_manager=False, exclude_list=[]):
-        new_io = StringIO.StringIO()
-        management.call_command('dumpdata', *args, **{'format':format,
-                                                      'stdout':new_io,
-                                                      'stderr':new_io,
-                                                      'use_natural_keys':natural_keys,
-                                                      'use_base_manager':use_base_manager,
+        new_io = six.StringIO()
+        management.call_command('dumpdata', *args, **{'format': format,
+                                                      'stdout': new_io,
+                                                      'stderr': new_io,
+                                                      'use_natural_keys': natural_keys,
+                                                      'use_base_manager': use_base_manager,
                                                       'exclude': exclude_list})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
@@ -43,8 +43,6 @@ class FixtureLoadingTests(TestCase):
         ])
 
     def test_loading_and_dumping(self):
-        new_io = StringIO.StringIO()
-
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
         management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
@@ -185,12 +183,12 @@ class FixtureLoadingTests(TestCase):
             exclude_list=['fixtures.Article', 'fixtures.Book', 'sites'])
 
         # Excluding a bogus app should throw an error
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Unknown app in excludes: foo_app"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Unknown model in excludes: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
@@ -200,7 +198,7 @@ class FixtureLoadingTests(TestCase):
         self.assertQuerysetEqual(Spy.objects.all(),
                                  ['<Spy: Paul>'])
         # Use the default manager
-        self._dumpdata_assert(['fixtures.Spy'],'[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % spy1.pk)
+        self._dumpdata_assert(['fixtures.Spy'], '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % spy1.pk)
         # Dump using Django's base manager. Should return all objects,
         # even those normally filtered by the manager
         self._dumpdata_assert(['fixtures.Spy'], '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": true}}, {"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % (spy2.pk, spy1.pk), use_base_manager=True)
@@ -228,7 +226,7 @@ class FixtureLoadingTests(TestCase):
 
     def test_ambiguous_compressed_fixture(self):
         # The name "fixture5" is ambigous, so loading it will raise an error
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Multiple fixtures named 'fixture5'"):
             management.call_command('loaddata', 'fixture5', verbosity=0, commit=False)
 
@@ -252,7 +250,7 @@ class FixtureLoadingTests(TestCase):
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
             connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
-        with self.assertRaisesRegexp(IntegrityError,
+        with six.assertRaisesRegex(self, IntegrityError,
                 "Could not load fixtures.Article\(pk=1\): .*$"):
             management.call_command('loaddata', 'invalid.json', verbosity=0, commit=False)
 
@@ -291,10 +289,11 @@ class FixtureLoadingTests(TestCase):
         self._dumpdata_assert(['fixtures'], """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field><field type="DateTimeField" name="pub_date">2006-06-16T12:00:00</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field><field type="DateTimeField" name="pub_date">2006-06-16T13:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Prince</field></object><object pk="10" model="fixtures.book"><field type="CharField" name="name">Achieving self-awareness of Python programs</field><field to="fixtures.person" name="authors" rel="ManyToManyRel"></field></object></django-objects>""", format='xml', natural_keys=True)
 
+
 class FixtureTransactionTests(TransactionTestCase):
     def _dumpdata_assert(self, args, output, format='json'):
-        new_io = StringIO.StringIO()
-        management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
+        new_io = six.StringIO()
+        management.call_command('dumpdata', *args, **{'format': format, 'stdout': new_io})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
 
@@ -309,7 +308,7 @@ class FixtureTransactionTests(TransactionTestCase):
 
         # Try to load fixture 2 using format discovery; this will fail
         # because there are two fixture2's in the fixtures directory
-        with self.assertRaisesRegexp(management.CommandError,
+        with six.assertRaisesRegex(self, management.CommandError,
                 "Multiple fixtures named 'fixture2'"):
             management.call_command('loaddata', 'fixture2', verbosity=0)
 

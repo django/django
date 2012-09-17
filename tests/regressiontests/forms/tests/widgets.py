@@ -10,8 +10,10 @@ from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
 from django.utils import formats
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import activate, deactivate
 from django.test import TestCase
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class FormsWidgetTestCase(TestCase):
@@ -214,13 +216,9 @@ class FormsWidgetTestCase(TestCase):
         self.assertHTMLEqual(w.render('greeting', 'hello there'), '<input checked="checked" type="checkbox" name="greeting" value="hello there" />')
         self.assertHTMLEqual(w.render('greeting', 'hello & goodbye'), '<input checked="checked" type="checkbox" name="greeting" value="hello &amp; goodbye" />')
 
-        # A subtlety: If the 'check_test' argument cannot handle a value and raises any
-        # exception during its __call__, then the exception will be swallowed and the box
-        # will not be checked. In this example, the 'check_test' assumes the value has a
-        # startswith() method, which fails for the values True, False and None.
-        self.assertHTMLEqual(w.render('greeting', True), '<input type="checkbox" name="greeting" />')
-        self.assertHTMLEqual(w.render('greeting', False), '<input type="checkbox" name="greeting" />')
-        self.assertHTMLEqual(w.render('greeting', None), '<input type="checkbox" name="greeting" />')
+        # Ticket #17888: calling check_test shouldn't swallow exceptions
+        with self.assertRaises(AttributeError):
+            w.render('greeting', True)
 
         # The CheckboxInput widget will return False if the key is not found in the data
         # dictionary (because HTML form submission doesn't send any result for unchecked
@@ -676,7 +674,7 @@ beatle J R Ringo False""")
         # You can create your own custom renderers for RadioSelect to use.
         class MyRenderer(RadioFieldRenderer):
            def render(self):
-               return '<br />\n'.join([unicode(choice) for choice in self])
+               return '<br />\n'.join([six.text_type(choice) for choice in self])
         w = RadioSelect(renderer=MyRenderer)
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
@@ -716,7 +714,7 @@ beatle J R Ringo False""")
 
         # Unicode choices are correctly rendered as HTML
         w = RadioSelect()
-        self.assertHTMLEqual(unicode(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])), '<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>')
+        self.assertHTMLEqual(six.text_type(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])), '<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>')
 
         # Attributes provided at instantiation are passed to the constituent inputs
         w = RadioSelect(attrs={'id':'foo'})
@@ -1095,6 +1093,7 @@ class WidgetTests(TestCase):
         self.assertFalse(form.is_valid())
 
 
+@python_2_unicode_compatible
 class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
@@ -1103,7 +1102,7 @@ class FakeFieldFile(object):
     """
     url = 'something'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.url
 
 class ClearableFileInputTests(TestCase):
@@ -1124,10 +1123,11 @@ class ClearableFileInputTests(TestCase):
         rendering HTML. Refs #15182.
         """
 
+        @python_2_unicode_compatible
         class StrangeFieldFile(object):
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
-            def __unicode__(self):
+            def __str__(self):
                 return '''something<div onclick="alert('oops')">.jpg'''
 
         widget = ClearableFileInput()
@@ -1135,7 +1135,7 @@ class ClearableFileInputTests(TestCase):
         output = widget.render('my<div>file', field)
         self.assertFalse(field.url in output)
         self.assertTrue('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
-        self.assertFalse(unicode(field) in output)
+        self.assertFalse(six.text_type(field) in output)
         self.assertTrue('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
         self.assertTrue('my&lt;div&gt;file' in output)
         self.assertFalse('my<div>file' in output)

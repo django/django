@@ -1,252 +1,411 @@
-======================
-Python 3 compatibility
-======================
+===================
+Porting to Python 3
+===================
 
-Django 1.5 introduces a compatibility layer that allows the code to be run both
-in Python 2 (2.6/2.7) and Python 3 (>= 3.2) (*work in progress*).
+Django 1.5 is the first version of Django to support Python 3. The same code
+runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
+compatibility layer.
 
-This document is not meant as a complete Python 2 to Python 3 migration guide.
-There are many existing resources you can read. But we describe some utilities
-and guidelines that we recommend you should use when you want to ensure your
-code can be run with both Python 2 and 3.
+.. _six: http://packages.python.org/six/
 
-* http://docs.python.org/py3k/howto/pyporting.html
-* http://python3porting.com/
+This document is primarily targeted at authors of pluggable application
+who want to support both Python 2 and 3. It also describes guidelines that
+apply to Django's code.
 
-django.utils.py3
-================
+Philosophy
+==========
 
-Whenever a symbol or module has different semantics or different locations on
-Python 2 and Python 3, you can import it from ``django.utils.py3`` where it
-will be automatically converted depending on your current Python version.
+This document assumes that you are familiar with the changes between Python 2
+and Python 3. If you aren't, read `Python's official porting guide`_ first.
+Refreshing your knowledge of unicode handling on Python 2 and 3 will help; the
+`Pragmatic Unicode`_ presentation is a good resource.
 
-PY3
----
+Django uses the *Python 2/3 Compatible Source* strategy. Of course, you're
+free to chose another strategy for your own code, especially if you don't need
+to stay compatible with Python 2. But authors of pluggable applications are
+encouraged to use the same porting strategy as Django itself.
 
-If you need to know anywhere in your code if you are running Python 3 or a
-previous Python 2 version, you can check the ``PY3`` boolean variable::
+Writing compatible code is much easier if you target Python ≥ 2.6. Django 1.5
+introduces compatibility tools such as :mod:`django.utils.six`. For
+convenience, forwards-compatible aliases were introduced in Django 1.4.2. If
+your application takes advantage of these tools, it will require Django ≥
+1.4.2.
 
-    from django.utils.py3 import PY3
+Obviously, writing compatible source code adds some overhead, and that can
+cause frustration. Django's developers have found that attempting to write
+Python 3 code that's compatible with Python 2 is much more rewarding than the
+opposite. Not only does that make your code more future-proof, but Python 3's
+advantages (like the saner string handling) start shining quickly. Dealing
+with Python 2 becomes a backwards compatibility requirement, and we as
+developers are used to dealing with such constraints.
 
-    if PY3:
-        # Do stuff Python 3-wise
-    else:
-        # Do stuff Python 2-wise
+Porting tools provided by Django are inspired by this philosophy, and it's
+reflected throughout this guide.
 
-This should be considered as a last resort solution when it is not possible
-to import a compatible name from django.utils.py3, as described in the sections
-below.
+.. _Python's official porting guide: http://docs.python.org/py3k/howto/pyporting.html
+.. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
+
+Porting tips
+============
+
+Unicode literals
+----------------
+
+This step consists in:
+
+- Adding ``from __future__ import unicode_literals`` at the top of your Python
+  modules -- it's best to put it in each and every module, otherwise you'll
+  keep checking the top of your files to see which mode is in effect;
+- Removing the ``u`` prefix before unicode strings;
+- Adding a ``b`` prefix before bytestrings.
+
+Performing these changes systematically guarantees backwards compatibility.
+
+However, Django applications generally don't need bytestrings, since Django
+only exposes unicode interfaces to the programmer. Python 3 discourages using
+bytestrings, except for binary data or byte-oriented interfaces. Python 2
+makes bytestrings and unicode strings effectively interchangeable, as long as
+they only contain ASCII data. Take advantage of this to use unicode strings
+wherever possible and avoid the ``b`` prefixes.
+
+.. note::
+
+    Python 2's ``u`` prefix is a syntax error in Python 3.2 but it will be
+    allowed again in Python 3.3 thanks to :pep:`414`. Thus, this
+    transformation is optional if you target Python ≥ 3.3. It's still
+    recommended, per the "write Python 3 code" philosophy.
 
 String handling
-===============
+---------------
 
-In Python 3, all strings are considered Unicode strings by default. Byte strings
-have to be prefixed with the letter 'b'. To mimic the same behaviour in Python 2,
-we recommend you import ``unicode_literals`` from the ``__future__`` library::
+Python 2's :class:`unicode` type was renamed :class:`str` in Python 3,
+:class:`str` was renamed :class:`bytes`, and :class:`basestring` disappeared.
+six_ provides :ref:`tools <string-handling-with-six>` to deal with these
+changes.
+
+Django also contains several string related classes and functions in the
+:mod:`django.utils.encoding` and :mod:`django.utils.safestring` modules. Their
+names used the words ``str``, which doesn't mean the same thing in Python 2
+and Python 3, and ``unicode``, which doesn't exist in Python 3. In order to
+avoid ambiguity and confusion these concepts were renamed ``bytes`` and
+``text``.
+
+Here are the name changes in :mod:`django.utils.encoding`:
+
+==================  ==================
+Old name            New name
+==================  ==================
+``smart_str``       ``smart_bytes``
+``smart_unicode``   ``smart_text``
+``force_unicode``   ``force_text``
+==================  ==================
+
+For backwards compatibility, the old names still work on Python 2. Under
+Python 3, ``smart_str`` is an alias for ``smart_text``.
+
+For forwards compatibility, the new names work as of Django 1.4.2.
+
+.. note::
+
+    :mod:`django.utils.encoding` was deeply refactored in Django 1.5 to
+    provide a more consistent API. Check its documentation for more
+    information.
+
+:mod:`django.utils.safestring` is mostly used via the
+:func:`~django.utils.safestring.mark_safe` and
+:func:`~django.utils.safestring.mark_for_escaping` functions, which didn't
+change. In case you're using the internals, here are the name changes:
+
+==================  ==================
+Old name            New name
+==================  ==================
+``EscapeString``    ``EscapeBytes``
+``EscapeUnicode``   ``EscapeText``
+``SafeString``      ``SafeBytes``
+``SafeUnicode``     ``SafeText``
+==================  ==================
+
+For backwards compatibility, the old names still work on Python 2. Under
+Python 3, ``EscapeString`` and ``SafeString`` are aliases for ``EscapeText``
+and ``SafeText`` respectively.
+
+For forwards compatibility, the new names work as of Django 1.4.2.
+
+:meth:`__str__` and :meth:`__unicode__` methods
+-----------------------------------------------
+
+In Python 2, the object model specifies :meth:`__str__` and
+:meth:`__unicode__` methods. If these methods exist, they must return
+:class:`str` (bytes) and :class:`unicode` (text) respectively.
+
+The ``print`` statement and the :func:`str` built-in call :meth:`__str__` to
+determine the human-readable representation of an object. The :func:`unicode`
+built-in calls :meth:`__unicode__` if it exists, and otherwise falls back to
+:meth:`__str__` and decodes the result with the system encoding. Conversely,
+the :class:`~django.db.models.Model` base class automatically derives
+:meth:`__str__` from :meth:`__unicode__` by encoding to UTF-8.
+
+In Python 3, there's simply :meth:`__str__`, which must return :class:`str`
+(text).
+
+(It is also possible to define :meth:`__bytes__`, but Django application have
+little use for that method, because they hardly ever deal with
+:class:`bytes`.)
+
+Django provides a simple way to define :meth:`__str__` and :meth:`__unicode__`
+methods that work on Python 2 and 3: you must define a :meth:`__str__` method
+returning text and to apply the
+:func:`~django.utils.encoding.python_2_unicode_compatible` decorator.
+
+On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
+:meth:`__unicode__` and :meth:`__str__` methods (replacing the original
+:meth:`__str__` method in the process). Here's an example::
+
+    from __future__ import unicode_literals
+    from django.utils.encoding import python_2_unicode_compatible
+
+    @python_2_unicode_compatible
+    class MyClass(object):
+        def __str__(self):
+            return "Instance of my class"
+
+This technique is the best match for Django's porting philosophy.
+
+For forwards compatibility, this decorator is available as of Django 1.4.2.
+
+Finally, note that :meth:`__repr__` must return a :class:`str` on all versions
+of Python.
+
+:class:`dict` and :class:`dict`-like classes
+--------------------------------------------
+
+:meth:`dict.keys`, :meth:`dict.items` and :meth:`dict.values` return lists in
+Python 2 and iterators in Python 3. :class:`~django.http.QueryDict` and the
+:class:`dict`-like classes defined in :mod:`django.utils.datastructures`
+behave likewise in Python 3.
+
+six_ provides compatibility functions to work around this change:
+:func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
+Django's bundled version adds :func:`~django.utils.six.iterlists` for
+:class:`~django.utils.datastructures.MultiValueDict` and its subclasses.
+
+:class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
+--------------------------------------------------------------------------------
+
+According to :pep:`3333`:
+
+- headers are always :class:`str` objects,
+- input and output streams are always :class:`bytes` objects.
+
+Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
+contains :class:`bytes`, which may become an issue if you compare it with a
+:class:`str` in your tests. The preferred solution is to rely on
+:meth:`~django.test.TestCase.assertContains` and
+:meth:`~django.test.TestCase.assertNotContains`. These methods accept a
+response and a unicode string as arguments.
+
+Coding guidelines
+=================
+
+The following guidelines are enforced in Django's source code. They're also
+recommended for third-party application who follow the same porting strategy.
+
+Syntax requirements
+-------------------
+
+Unicode
+~~~~~~~
+
+In Python 3, all strings are considered Unicode by default. The ``unicode``
+type from Python 2 is called ``str`` in Python 3, and ``str`` becomes
+``bytes``.
+
+You mustn't use the ``u`` prefix before a unicode string literal because it's
+a syntax error in Python 3.2. You must prefix byte strings with ``b``.
+
+In order to enable the same behavior in Python 2, every module must import
+``unicode_literals`` from ``__future__``::
 
     from __future__ import unicode_literals
 
     my_string = "This is an unicode literal"
     my_bytestring = b"This is a bytestring"
 
-Be cautious if you have to slice bytestrings.
-See http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
+If you need a byte string literal under Python 2 and a unicode string literal
+under Python 3, use the :func:`str` builtin::
 
-Different expected strings
---------------------------
+    str('my string')
 
-Some method parameters have changed the expected string type of a parameter.
-For example, ``strftime`` format parameter expects a bytestring on Python 2 but
-a normal (Unicode) string on Python 3. For these cases, ``django.utils.py3``
-provides a ``n()`` function which encodes the string parameter only with
-Python 2.
+In Python 3, there aren't any automatic conversions between :class:`str` and
+:class:`bytes`, and the :mod:`codecs` module became more strict.
+:meth:`str.decode` always returns :class:`bytes`, and :meth:`bytes.decode`
+always returns :class:`str`. As a consequence, the following pattern is
+sometimes necessary::
 
-    >>> from __future__ import unicode_literals
-    >>> from datetime import datetime
+    value = value.encode('ascii', 'ignore').decode('ascii')
 
-    >>> print(datetime.date(2012, 5, 21).strftime(n("%m → %Y")))
-    05 → 2012
+Be cautious if you have to `index bytestrings`_.
 
-Renamed types
-=============
+.. _index bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
 
-Several types are named differently in Python 2 and Python 3. In order to keep
-compatibility while using those types, import their corresponding aliases from
-``django.utils.py3``.
+Exceptions
+~~~~~~~~~~
 
-===========  =========  =====================
-Python 2     Python 3   django.utils.py3
-===========  =========  =====================
-basestring,  str,       string_types (tuple)
-unicode      str        text_type
-int, long    int,       integer_types (tuple)
-long         int        long_type
-===========  =========  =====================
-
-String aliases
---------------
-
-Code sample::
-
-    if isinstance(foo, basestring):
-        print("foo is a string")
-
-    # I want to convert a number to a Unicode string
-    bar = 45
-    bar_string = unicode(bar)
-
-Should be replaced by::
-
-    from django.utils.py3 import string_types, text_type
-
-    if isinstance(foo, string_types):
-        print("foo is a string")
-
-    # I want to convert a number to a Unicode string
-    bar = 45
-    bar_string = text_type(bar)
-
-No more long type
------------------
-
-``long`` and ``int`` types have been unified in Python 3, meaning that  ``long``
-is no longer available. ``django.utils.py3`` provides both ``long_type`` and
-``integer_types`` aliases. For example:
-
-.. code-block:: python
-
-    # Old Python 2 code
-    my_var = long(333463247234623)
-    if isinstance(my_var, (int, long)):
-        # ...
-
-Should be replaced by:
-
-.. code-block:: python
-
-    from django.utils.py3 import long_type, integer_types
-
-    my_var = long_type(333463247234623)
-    if isinstance(my_var, integer_types):
-        # ...
-
-
-Changed module locations
-========================
-
-The following modules have changed their location in Python 3. Therefore, it is
-recommended to import them from the ``django.utils.py3`` compatibility layer:
-
-=============================== ======================================  ======================
-Python 2                        Python3                                 django.utils.py3
-=============================== ======================================  ======================
-Cookie                          http.cookies                            cookies
-
-urlparse.urlparse               urllib.parse.urlparse                   urlparse
-urlparse.urlunparse             urllib.parse.urlunparse                 urlunparse
-urlparse.urljoin                urllib.parse.urljoin                    urljoin
-urlparse.urlsplit               urllib.parse.urlsplit                   urlsplit
-urlparse.urlunsplit             urllib.parse.urlunsplit                 urlunsplit
-urlparse.urldefrag              urllib.parse.urldefrag                  urldefrag
-urlparse.parse_qsl              urllib.parse.parse_qsl                  parse_qsl
-urllib.quote                    urllib.parse.quote                      quote
-urllib.unquote                  urllib.parse.unquote                    unquote
-urllib.quote_plus               urllib.parse.quote_plus                 quote_plus
-urllib.unquote_plus             urllib.parse.unquote_plus               unquote_plus
-urllib.urlencode                urllib.parse.urlencode                  urlencode
-urllib.urlopen                  urllib.request.urlopen                  urlopen
-urllib.url2pathname             urllib.request.url2pathname             url2pathname
-urllib.urlretrieve              urllib.request.urlretrieve              urlretrieve
-urllib2                         urllib.request                          urllib2
-urllib2.Request                 urllib.request.Request                  Request
-urllib2.OpenerDirector          urllib.request.OpenerDirector           OpenerDirector
-urllib2.UnknownHandler          urllib.request.UnknownHandler           UnknownHandler
-urllib2.HTTPHandler             urllib.request.HTTPHandler              HTTPHandler
-urllib2.HTTPSHandler            urllib.request.HTTPSHandler             HTTPSHandler
-urllib2.HTTPDefaultErrorHandler urllib.request.HTTPDefaultErrorHandler  HTTPDefaultErrorHandler
-urllib2.FTPHandler              urllib.request.FTPHandler               FTPHandler
-urllib2.HTTPError               urllib.request.HTTPError                HTTPError
-urllib2.HTTPErrorProcessor      urllib.request.HTTPErrorProcessor       HTTPErrorProcessor
-
-htmlentitydefs.name2codepoint   html.entities.name2codepoint            name2codepoint
-HTMLParser                      html.parser                             HTMLParser
-cPickle/pickle                  pickle                                  pickle
-thread/dummy_thread             _thread/_dummy_thread                   thread
-
-os.getcwdu                      os.getcwd                               getcwdu
-itertools.izip                  zip                                     zip
-sys.maxint                      sys.maxsize                             maxsize
-unichr                          chr                                     unichr
-xrange                          range                                   xrange
-=============================== ======================================  ======================
-
-
-Output encoding now Unicode
-===========================
-
-If you want to catch stdout/stderr output, the output content is UTF-8 encoded
-in Python 2, while it is Unicode strings in Python 3. You can use the OutputIO
-stream to capture this output::
-
-    from django.utils.py3 import OutputIO
+When you capture exceptions, use the ``as`` keyword::
 
     try:
-        old_stdout = sys.stdout
-        out = OutputIO()
-        sys.stdout = out
-        # Do stuff which produces standard output
-        result = out.getvalue()
-    finally:
-        sys.stdout = old_stdout
+        ...
+    except MyException as exc:
+        ...
 
-Dict iteritems/itervalues/iterkeys
-==================================
+This older syntax was removed in Python 3::
 
-The iteritems(), itervalues() and iterkeys() methods of dictionaries do not
-exist any more in Python 3, simply because they represent the default items()
-values() and keys() behavior in Python 3. Therefore, to keep compatibility,
-use similar functions from ``django.utils.py3``::
+    try:
+        ...
+    except MyException, exc:    # Don't do that!
+        ...
 
-    from django.utils.py3 import iteritems, itervalues, iterkeys
+The syntax to reraise an exception with a different traceback also changed.
+Use :func:`six.reraise`.
 
-    my_dict = {'a': 21, 'b': 42}
-    for key, value in iteritems(my_dict):
-        # ...
-    for value in itervalues(my_dict):
-        # ...
-    for key in iterkeys(my_dict):
-        # ...
+Magic methods
+-------------
 
-Note that in Python 3, dict.keys(), dict.items() and dict.values() return
-"views" instead of lists. Wrap them into list() if you really need their return
-values to be in a list.
+Use the patterns below to handle magic methods renamed in Python 3.
 
-http://docs.python.org/release/3.0.1/whatsnew/3.0.html#views-and-iterators-instead-of-lists
+Iterators
+~~~~~~~~~
 
-Metaclass
-=========
+::
 
-The syntax for declaring metaclasses has changed in Python 3.
-``django.utils.py3`` offers a compatible way to declare metaclasses::
+    class MyIterator(object):
+        def __iter__(self):
+            return self             # implement some logic here
 
-    from django.utils.py3 import with_metaclass
+        def __next__(self):
+            raise StopIteration     # implement some logic here
 
-    class MyClass(with_metaclass(SubClass1, SubClass2,...)):
-        # ...
+        next = __next__             # Python 2 compatibility
 
-Re-raising exceptions
-=====================
+Boolean evaluation
+~~~~~~~~~~~~~~~~~~
 
-One of the syntaxes to raise exceptions (raise E, V, T) is gone in Python 3.
-This is especially used in very specific cases where you want to re-raise a
-different exception that the initial one, while keeping the original traceback.
-So, instead of::
+::
 
-    raise Exception, Exception(msg), traceback
+    class MyBoolean(object):
 
-Use::
+        def __bool__(self):
+            return True             # implement some logic here
 
-    from django.utils.py3 import reraise
+        __nonzero__ = __bool__      # Python 2 compatibility
 
-    reraise(Exception, Exception(msg), traceback)
+Division
+~~~~~~~~
 
+::
+
+    class MyDivisible(object):
+
+        def __truediv__(self, other):
+            return self / other     # implement some logic here
+
+        __div__ = __truediv__           # Python 2 compatibility
+
+        def __itruediv__(self, other):
+            return self // other    # implement some logic here
+
+        __idiv__ = __itruediv__         # Python 2 compatibility
+
+.. module: django.utils.six
+
+Writing compatible code with six
+--------------------------------
+
+six_ is the canonical compatibility library for supporting Python 2 and 3 in
+a single codebase. Read its documentation!
+
+:mod`six` is bundled with Django as of version 1.4.2. You can import it as
+:mod`django.utils.six`.
+
+Here are the most common changes required to write compatible code.
+
+.. _string-handling-with-six:
+
+String handling
+~~~~~~~~~~~~~~~
+
+The ``basestring`` and ``unicode`` types were removed in Python 3, and the
+meaning of ``str`` changed. To test these types, use the following idioms::
+
+    isinstance(myvalue, six.string_types)       # replacement for basestring
+    isinstance(myvalue, six.text_type)          # replacement for unicode
+    isinstance(myvalue, bytes)                  # replacement for str
+
+Python ≥ 2.6 provides ``bytes`` as an alias for ``str``, so you don't need
+:attr:`six.binary_type`.
+
+``long``
+~~~~~~~~
+
+The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
+:data:`six.integer_types` check if a value is an integer or a long::
+
+    isinstance(myvalue, six.integer_types)      # replacement for (int, long)
+
+``xrange``
+~~~~~~~~~~
+
+Import :func:`six.moves.xrange` wherever you use ``xrange``.
+
+Moved modules
+~~~~~~~~~~~~~
+
+Some modules were renamed in Python 3. The :mod:`django.utils.six.moves
+<six.moves>` module provides a compatible location to import them.
+
+The ``urllib``, ``urllib2`` and ``urlparse`` modules were reworked in depth
+and :mod:`django.utils.six.moves <six.moves>` doesn't handle them. Django
+explicitly tries both locations, as follows::
+
+    try:
+        from urllib.parse import urlparse, urlunparse
+    except ImportError:     # Python 2
+        from urlparse import urlparse, urlunparse
+
+PY3
+~~~
+
+If you need different code in Python 2 and Python 3, check :data:`six.PY3`::
+
+    if six.PY3:
+        # do stuff Python 3-wise
+    else:
+        # do stuff Python 2-wise
+
+This is a last resort solution when :mod:`six` doesn't provide an appropriate
+function.
+
+.. module:: django.utils.six
+
+Customizations of six
+---------------------
+
+The version of six bundled with Django includes one extra function:
+
+.. function:: iterlists(MultiValueDict)
+
+    Returns an iterator over the lists of values of a
+    :class:`~django.utils.datastructures.MultiValueDict`. This replaces
+    :meth:`~django.utils.datastructures.MultiValueDict.iterlists()` on Python
+    2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
+    Python 3.
+
+.. function:: assertRaisesRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
+    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
+    exists in current Python3 versions, but issues a warning.
+
+
+In addition to six' defaults moves, Django's version provides ``thread`` as
+``_thread`` and ``dummy_thread`` as ``_dummy_thread``.

@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import pickle
-from StringIO import StringIO
+from operator import attrgetter
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,6 +11,7 @@ from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase
+from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 
@@ -873,10 +874,10 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
             published=datetime.date(2009, 5, 4))
         val = Book.objects.db_manager("other").raw('SELECT id FROM multiple_database_book')
-        self.assertEqual(map(lambda o: o.pk, val), [dive.pk])
+        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
         val = Book.objects.raw('SELECT id FROM multiple_database_book').using('other')
-        self.assertEqual(map(lambda o: o.pk, val), [dive.pk])
+        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
         "Database assignment is retained if an object is retrieved with select_related()"
@@ -1544,6 +1545,21 @@ class RouterTestCase(TestCase):
 
         # If you evaluate the query, it should work, running on 'other'
         self.assertEqual(list(qs.values_list('title', flat=True)), ['Dive into Python'])
+
+    def test_deferred_models(self):
+        mark_def = Person.objects.using('default').create(name="Mark Pilgrim")
+        mark_other = Person.objects.using('other').create(name="Mark Pilgrim")
+        orig_b = Book.objects.using('other').create(title="Dive into Python",
+                                                    published=datetime.date(2009, 5, 4),
+                                                    editor=mark_other)
+        b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
+        self.assertEqual(b.published, datetime.date(2009, 5, 4))
+        b = Book.objects.using('other').only('title').get(pk=orig_b.pk)
+        b.editor = mark_def
+        b.save(using='default')
+        self.assertEqual(Book.objects.using('default').get(pk=b.pk).published,
+                         datetime.date(2009, 5, 4))
+
 
 class AuthTestCase(TestCase):
     multi_db = True

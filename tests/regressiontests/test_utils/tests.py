@@ -5,6 +5,7 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.utils import six
 from django.utils.unittest import skip
 
 from .models import Person
@@ -136,15 +137,15 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
@@ -493,13 +494,7 @@ __test__ = {"API_TEST": r"""
 # Standard doctests do fairly
 >>> import json
 >>> from django.utils.xmlutils import SimplerXMLGenerator
->>> from StringIO import StringIO
-
->>> def produce_long():
-...     return 42L
-
->>> def produce_int():
-...     return 42
+>>> from django.utils.six import StringIO
 
 >>> def produce_json():
 ...     return json.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
@@ -529,14 +524,6 @@ __test__ = {"API_TEST": r"""
 ...     xml.endElement("bar")
 ...     return stream.getvalue()
 
-# Long values are normalized and are comparable to normal integers ...
->>> produce_long()
-42
-
-# ... and vice versa
->>> produce_int()
-42L
-
 # JSON output is normalized for field order, so it doesn't matter
 # which order json dictionary attributes are listed in output
 >>> produce_json()
@@ -560,3 +547,21 @@ __test__ = {"API_TEST": r"""
 '<foo bbb="2.0" aaa="1.0">Hello</foo><bar ddd="4.0" ccc="3.0"></bar>'
 
 """}
+
+if not six.PY3:
+    __test__["API_TEST"] += """
+>>> def produce_long():
+...     return 42L
+
+>>> def produce_int():
+...     return 42
+
+# Long values are normalized and are comparable to normal integers ...
+>>> produce_long()
+42
+
+# ... and vice versa
+>>> produce_int()
+42L
+
+"""
