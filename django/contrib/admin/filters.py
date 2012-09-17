@@ -8,13 +8,13 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-
 from django.contrib.admin.util import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
+from django.contrib.admin.options import IncorrectLookupParameters
 
 class ListFilter(object):
     title = None  # Human-readable title to appear in the right sidebar.
@@ -129,7 +129,10 @@ class FieldListFilter(ListFilter):
         return True
 
     def queryset(self, request, queryset):
-        return queryset.filter(**self.used_parameters)
+        try:
+            return queryset.filter(**self.used_parameters)
+        except ValidationError as e:
+            raise IncorrectLookupParameters(e)
 
     @classmethod
     def register(cls, test, list_filter_class, take_priority=False):

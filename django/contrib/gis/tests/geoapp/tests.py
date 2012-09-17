@@ -191,7 +191,8 @@ class GeoModelTest(TestCase):
         cities1 = City.objects.all()
         # Only PostGIS would support a 'select *' query because of its recognized
         # HEXEWKB format for geometry fields
-        cities2 = City.objects.raw('select id, name, asText(point) from geoapp_city')
+        as_text = 'ST_AsText' if postgis else 'asText'
+        cities2 = City.objects.raw('select id, name, %s(point) from geoapp_city' % as_text)
         self.assertEqual(len(cities1), len(list(cities2)))
         self.assertTrue(isinstance(cities2[0].point, Point))
 

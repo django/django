@@ -257,15 +257,14 @@ Installing the development version
 
     If you decide to use the latest development version of Django,
     you'll want to pay close attention to `the development timeline`_,
-    and you'll want to keep an eye on `the list of
-    backwards-incompatible changes`_. This will help you stay on top
-    of any new features you might want to use, as well as any changes
+    and you'll want to keep an eye on the :ref:`release notes for the
+    upcoming release <development_release_notes>`. This will help you stay
+    on top of any new features you might want to use, as well as any changes
     you'll need to make to your code when updating your copy of Django.
     (For stable releases, any necessary changes are documented in the
     release notes.)
 
 .. _the development timeline: https://code.djangoproject.com/timeline
-.. _the list of backwards-incompatible changes: https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:

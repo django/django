@@ -201,73 +201,129 @@ An example
     write to propagate to the slaves). It also doesn't consider the
     interaction of transactions with the database utilization strategy.
 
-So - what does this mean in practice? Say you want ``myapp`` to
-exist on the ``other`` database, and you want all other models in a
-master/slave relationship between the databases ``master``, ``slave1`` and
-``slave2``. To implement this, you would need 2 routers::
+So - what does this mean in practice? Let's consider another sample
+configuration. This one will have several databases: one for the
+``auth`` application, and all other apps using a master/slave setup
+with two read slaves. Here are the settings specifying these
+databases::
 
-    class MyAppRouter(object):
-        """A router to control all database operations on models in
-        the myapp application"""
+    DATABASES = {
+        'auth_db': {
+            'NAME': 'auth_db',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'swordfish',
+        },
+        'master': {
+            'NAME': 'master',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'spam',
+        },
+        'slave1': {
+            'NAME': 'slave1',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'eggs',
+        },
+        'slave2': {
+            'NAME': 'slave2',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'bacon',
+        },
+    }
 
+Now we'll need to handle routing. First we want a router that knows to
+send queries for the ``auth`` app to ``auth_db``::
+
+    class AuthRouter(object):
+        """
+        A router to control all database operations on models in the
+        auth application.
+        """
         def db_for_read(self, model, **hints):
-            "Point all operations on myapp models to 'other'"
-            if model._meta.app_label == 'myapp':
-                return 'other'
+            """
+            Attempts to read auth models go to auth_db.
+            """
+            if model._meta.app_label == 'auth':
+                return 'auth_db'
             return None
 
         def db_for_write(self, model, **hints):
-            "Point all operations on myapp models to 'other'"
-            if model._meta.app_label == 'myapp':
-                return 'other'
+            """
+            Attempts to write auth models go to auth_db.
+            """
+            if model._meta.app_label == 'auth':
+                return 'auth_db'
             return None
 
         def allow_relation(self, obj1, obj2, **hints):
-            "Allow any relation if a model in myapp is involved"
-            if obj1._meta.app_label == 'myapp' or obj2._meta.app_label == 'myapp':
-                return True
+            """
+            Allow relations if a model in the auth app is involved.
+            """
+            if obj1._meta.app_label == 'auth' or \
+               obj2._meta.app_label == 'auth':
+               return True
             return None
 
         def allow_syncdb(self, db, model):
-            "Make sure the myapp app only appears on the 'other' db"
-            if db == 'other':
-                return model._meta.app_label == 'myapp'
-            elif model._meta.app_label == 'myapp':
+            """
+            Make sure the auth app only appears in the 'auth_db'
+            database.
+            """
+            if db == 'auth_db':
+                return model._meta.app_label == 'auth'
+            elif model._meta.app_label == 'auth':
                 return False
             return None
 
-    class MasterSlaveRouter(object):
-        """A router that sets up a simple master/slave configuration"""
+And we also want a router that sends all other apps to the
+master/slave configuration, and randomly chooses a slave to read
+from::
 
+    import random
+
+    class MasterSlaveRouter(object):
         def db_for_read(self, model, **hints):
-            "Point all read operations to a random slave"
-            return random.choice(['slave1','slave2'])
+            """
+            Reads go to a randomly-chosen slave.
+            """
+            return random.choice(['slave1', 'slave2'])
 
         def db_for_write(self, model, **hints):
-            "Point all write operations to the master"
+            """
+            Writes always go to master.
+            """
             return 'master'
 
         def allow_relation(self, obj1, obj2, **hints):
-            "Allow any relation between two objects in the db pool"
-            db_list = ('master','slave1','slave2')
-            if obj1._state.db in db_list and obj2._state.db in db_list:
+            """
+            Relations between objects are allowed if both objects are
+            in the master/slave pool.
+            """
+            db_list = ('master', 'slave1', 'slave2')
+            if obj1.state.db in db_list and obj2.state.db in db_list:
                 return True
             return None
 
         def allow_syncdb(self, db, model):
-            "Explicitly put all models on all databases."
+            """
+            All non-auth models end up in this pool.
+            """
             return True
 
-Then, in your settings file, add the following (substituting ``path.to.`` with
-the actual python path to the module where you define the routers)::
+Finally, in the settings file, we add the following (substituting
+``path.to.`` with the actual python path to the module(s) where the
+routers are defined)::
 
-    DATABASE_ROUTERS = ['path.to.MyAppRouter', 'path.to.MasterSlaveRouter']
+    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.MasterSlaveRouter']
 
 The order in which routers are processed is significant. Routers will
 be queried in the order the are listed in the
 :setting:`DATABASE_ROUTERS` setting . In this example, the
-``MyAppRouter`` is processed before the ``MasterSlaveRouter``, and as a
-result, decisions concerning the models in ``myapp`` are processed
+``AuthRouter`` is processed before the ``MasterSlaveRouter``, and as a
+result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
 ``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
@@ -276,11 +332,11 @@ that all models would be available on all databases.
 
 With this setup installed, lets run some Django code::
 
-    >>> # This retrieval will be performed on the 'credentials' database
+    >>> # This retrieval will be performed on the 'auth_db' database
     >>> fred = User.objects.get(username='fred')
     >>> fred.first_name = 'Frederick'
 
-    >>> # This save will also be directed to 'credentials'
+    >>> # This save will also be directed to 'auth_db'
     >>> fred.save()
 
     >>> # These retrieval will be randomly allocated to a slave database

@@ -42,8 +42,8 @@ Create a few Reporters::
 
 Create an Article::
 
-    >>> from datetime import datetime
-    >>> a = Article(id=None, headline="This is a test", pub_date=datetime(2005, 7, 27), reporter=r)
+    >>> from datetime import date
+    >>> a = Article(id=None, headline="This is a test", pub_date=date(2005, 7, 27), reporter=r)
     >>> a.save()
 
     >>> a.reporter.id
@@ -65,7 +65,7 @@ database, which always returns unicode strings)::
 
 Create an Article via the Reporter object::
 
-    >>> new_article = r.article_set.create(headline="John's second story", pub_date=datetime(2005, 7, 29))
+    >>> new_article = r.article_set.create(headline="John's second story", pub_date=date(2005, 7, 29))
     >>> new_article
     <Article: John's second story>
     >>> new_article.reporter
@@ -75,7 +75,7 @@ Create an Article via the Reporter object::
 
 Create a new article, and add it to the article set::
 
-    >>> new_article2 = Article(headline="Paul's story", pub_date=datetime(2006, 1, 17))
+    >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
     >>> r.article_set.add(new_article2)
     >>> new_article2.reporter
     <Reporter: John Smith>

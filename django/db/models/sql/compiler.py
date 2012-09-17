@@ -3,9 +3,10 @@ from django.utils.six.moves import zip
 from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
-    LOOKUP_SEP, GET_ITERATOR_CHUNK_SIZE)
+        GET_ITERATOR_CHUNK_SIZE)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
@@ -608,8 +609,12 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
+            # The get_fields_with_model() returns None for fields that live
+            # in the field's local model. So, for those fields we want to use
+            # the f.model - that is the field's local model.
+            field_model = model or f.model
             if not select_related_descend(f, restricted, requested,
-                                          only_load.get(model or self.query.model)):
+                                          only_load.get(field_model)):
                 continue
             # The "avoid" set is aliases we want to avoid just for this
             # particular branch of the recursion. They aren't permanently

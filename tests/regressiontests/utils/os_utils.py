@@ -1,21 +1,26 @@
+import os
+
 from django.utils import unittest
 from django.utils._os import safe_join
 
 
 class SafeJoinTests(unittest.TestCase):
     def test_base_path_ends_with_sep(self):
+        drive, path = os.path.splitdrive(safe_join("/abc/", "abc"))
         self.assertEqual(
-            safe_join("/abc/", "abc"),
-            "/abc/abc",
+            path,
+            "{0}abc{0}abc".format(os.path.sep)
         )
 
     def test_root_path(self):
+        drive, path = os.path.splitdrive(safe_join("/", "path"))
         self.assertEqual(
-            safe_join("/", "path"),
-            "/path",
+            path,
+            "{0}path".format(os.path.sep),
         )
 
+        drive, path = os.path.splitdrive(safe_join("/", ""))
         self.assertEqual(
-            safe_join("/", ""),
-            "/",
+            path,
+            os.path.sep,
         )

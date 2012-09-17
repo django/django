@@ -674,8 +674,8 @@ __ http://spatialreference.org/ref/epsg/32140/
 .. admonition:: Raw queries
 
     When using :doc:`raw queries </topics/db/sql>`, you should generally wrap
-    your geometry fields with the ``asText()`` SQL function so as the field
-    value will be recognized by GEOS::
+    your geometry fields with the ``asText()`` SQL function (or ``ST_AsText``
+    for PostGIS) so as the field value will be recognized by GEOS::
 
         City.objects.raw('SELECT id, name, asText(point) from myapp_city')
 

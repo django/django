@@ -35,8 +35,8 @@ models, which comprise a Weblog application:
         blog = models.ForeignKey(Blog)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
-        pub_date = models.DateTimeField()
-        mod_date = models.DateTimeField()
+        pub_date = models.DateField()
+        mod_date = models.DateField()
         authors = models.ManyToManyField(Author)
         n_comments = models.IntegerField()
         n_pingbacks = models.IntegerField()
@@ -233,7 +233,7 @@ refinements together. For example::
     >>> Entry.objects.filter(
     ...     headline__startswith='What'
     ... ).exclude(
-    ...     pub_date__gte=datetime.now()
+    ...     pub_date__gte=datetime.date.today()
     ... ).filter(
     ...     pub_date__gte=datetime(2005, 1, 30)
     ... )
@@ -258,8 +258,8 @@ stored, used and reused.
 Example::
 
     >> q1 = Entry.objects.filter(headline__startswith="What")
-    >> q2 = q1.exclude(pub_date__gte=datetime.now())
-    >> q3 = q1.filter(pub_date__gte=datetime.now())
+    >> q2 = q1.exclude(pub_date__gte=datetime.date.today())
+    >> q3 = q1.filter(pub_date__gte=datetime.date.today())
 
 These three ``QuerySets`` are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
@@ -282,7 +282,7 @@ actually run the query until the :class:`~django.db.models.query.QuerySet` is
 *evaluated*. Take a look at this example::
 
     >>> q = Entry.objects.filter(headline__startswith="What")
-    >>> q = q.filter(pub_date__lte=datetime.now())
+    >>> q = q.filter(pub_date__lte=datetime.date.today())
     >>> q = q.exclude(body_text__icontains="food")
     >>> print(q)
 

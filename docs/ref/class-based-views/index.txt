@@ -23,7 +23,7 @@ it is safe to store state variables on the instance (i.e., ``self.foo = 3`` is
 a thread-safe operation).
 
 A class-based view is deployed into a URL pattern using the
-:meth:`~View.as_view()` classmethod::
+:meth:`~django.views.generic.base.View.as_view()` classmethod::
 
     urlpatterns = patterns('',
         (r'^view/$', MyView.as_view(size=42)),
@@ -37,9 +37,10 @@ A class-based view is deployed into a URL pattern using the
     is modified, the actions of one user visiting your view could have an
     effect on subsequent users visiting the same view.
 
-Any argument passed into :meth:`~View.as_view()` will be assigned onto the
-instance that is used to service a request. Using the previous example,
-this means that every request on ``MyView`` is able to use ``self.size``.
+Any argument passed into :meth:`~django.views.generic.base.View.as_view()` will
+be assigned onto the instance that is used to service a request. Using the
+previous example, this means that every request on ``MyView`` is able to use
+``self.size``.
 
 Base vs Generic views
 ---------------------

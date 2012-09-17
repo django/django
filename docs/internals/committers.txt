@@ -379,6 +379,34 @@ Florian Apolloner
 .. _Graz University of Technology: http://tugraz.at/
 .. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
 
+Jeremy Dunck
+    Jeremy was rescued from corporate IT drudgery by Free Software and, in part, 
+    Django.  Many of Jeremy's interests center around access to information.
+
+    Jeremy was the lead developer of Pegasus News, one of the first uses of 
+    Django outside World Online, and has since joined Votizen, a startup intent 
+    on reducing the influence of money in politics.
+
+    He serves as DSF Secretary, organizes and helps organize sprints, cares 
+    about the health and equity of the Django community.  He has gone an 
+    embarrassingly long time without a working blog.
+    
+    Jeremy lives in Mountain View, CA, USA.
+
+`Bryan Veloso`_
+    Bryan found Django 0.96 through a fellow designer who was evangelizing
+    its use. It was his first foray outside of the land that was PHP-based
+    templating. Although he has only ever used Django for personal projects,
+    it is the very reason he considers himself a designer/developer
+    hybrid and is working to further design within the Django community.
+
+    Bryan works as a designer at GitHub by day, and masquerades as a `vlogger`_
+    and `shoutcaster`_ in the after-hours. Bryan lives in Los Angeles, CA, USA.
+
+.. _bryan veloso: http://avalonstar.com/
+.. _vlogger: http://youtube.com/bryanveloso/
+.. _shoutcaster: http://twitch.tv/vlogalonstar/
+
 Specialists
 -----------
 
@@ -402,16 +430,6 @@ Ian Kelly
 
 Matt Boersma
     Matt is also responsible for Django's Oracle support.
-
-Jeremy Dunck
-    Jeremy is the lead developer of Pegasus News, a personalized local site based
-    in Dallas, Texas. An early contributor to Greasemonkey and Django, he sees
-    technology as a tool for communication and access to knowledge.
-
-    Jeremy helped kick off GeoDjango development, and is mostly responsible for
-    the serious speed improvements that signals received in Django 1.0.
-
-    Jeremy lives in Dallas, Texas, USA.
 
 `Simon Meers`_
     Simon discovered Django 0.96 during his Computer Science PhD research and
