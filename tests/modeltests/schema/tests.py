@@ -7,7 +7,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.models.loading import cache
-from .models import Author, Book, BookWithSlug, BookWithM2M, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest
+from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TestCase):
@@ -19,7 +19,7 @@ class SchemaTests(TestCase):
     as the code it is testing.
     """
 
-    models = [Author, Book, BookWithSlug, BookWithM2M, AuthorWithM2M, Tag, TagUniqueRename, UniqueTest]
+    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest]
 
     # Utility functions
 
@@ -30,8 +30,8 @@ class SchemaTests(TestCase):
         connection.managed(True)
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
+        self.cache_state = cache.save_state()
+        cache.load_app("modeltests.schema")
         for model in self.models:
             model._meta.managed = True
 
@@ -39,6 +39,16 @@ class SchemaTests(TestCase):
         # Rollback anything that may have happened
         connection.rollback()
         # Delete any tables made for our models
+        self.delete_tables()
+        # Unhook our models
+        for model in self.models:
+            model._meta.managed = False
+        if "schema" in self.cache_state['app_labels']:
+            del self.cache_state['app_labels']['schema']
+        cache.restore_state(self.cache_state)
+
+    def delete_tables(self):
+        "Deletes all model tables for our models for a clean test environment"
         cursor = connection.cursor()
         connection.disable_constraint_checking()
         for model in self.models:
@@ -62,12 +72,6 @@ class SchemaTests(TestCase):
             else:
                 connection.commit()
         connection.enable_constraint_checking()
-        # Unhook our models
-        for model in self.models:
-            model._meta.managed = False
-        cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
-        cache._get_models_cache = {}
 
     def column_classes(self, model):
         cursor = connection.cursor()

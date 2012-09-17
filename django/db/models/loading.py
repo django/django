@@ -251,7 +251,7 @@ class AppCache(object):
         """
         return {
             "app_store": SortedDict(self.app_store.items()),
-            "app_labels": dict(self.app_errors.items()),
+            "app_labels": dict(self.app_labels.items()),
             "app_models": SortedDict(self.app_models.items()),
             "app_errors": dict(self.app_errors.items()),
         }
@@ -264,6 +264,7 @@ class AppCache(object):
         self.app_labels = state['app_labels']
         self.app_models = state['app_models']
         self.app_errors = state['app_errors']
+        self._get_models_cache.clear()
 
     def temporary_state(self):
         "Returns a context manager that restores the state on exit"
