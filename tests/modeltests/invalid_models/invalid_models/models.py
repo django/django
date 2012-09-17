@@ -310,6 +310,26 @@ class SwappedModel(models.Model):
         swappable = 'TEST_SWAPPED_MODEL'
 
 
+class BadSwappableValue(models.Model):
+    """A model that can be swapped out; during testing, the swappable
+    value is not of the format app.model
+    """
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        swappable = 'TEST_SWAPPED_MODEL_BAD_VALUE'
+
+
+class BadSwappableModel(models.Model):
+    """A model that can be swapped out; during testing, the swappable
+    value references an unknown model.
+    """
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
+
+
 class HardReferenceModel(models.Model):
     fk_1 = models.ForeignKey(SwappableModel, related_name='fk_hardref1')
     fk_2 = models.ForeignKey('invalid_models.SwappableModel', related_name='fk_hardref2')
@@ -433,6 +453,8 @@ invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'inv
 invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
+invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 """
 
 if not connection.features.interprets_empty_strings_as_nulls:

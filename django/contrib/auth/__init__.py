@@ -97,7 +97,10 @@ def get_user_model():
     from django.conf import settings
     from django.db.models import get_model
 
-    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    try:
+        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    except ValueError:
+        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
     return get_model(app_label, model_name)
 
 
