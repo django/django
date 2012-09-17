@@ -15,11 +15,12 @@ from django.utils.tree import Node
 from django.utils import six
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import signals
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql import aggregates as base_aggregates_module
-from django.db.models.sql.constants import (QUERY_TERMS, LOOKUP_SEP, ORDER_DIR,
-    SINGLE, ORDER_PATTERN, JoinInfo)
+from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
+        ORDER_PATTERN, JoinInfo)
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,

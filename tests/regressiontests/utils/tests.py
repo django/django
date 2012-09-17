@@ -21,6 +21,7 @@ from .http import TestUtilsHttp
 from .ipv6 import TestUtilsIPv6
 from .jslex import JsToCForGettextTest, JsTokensTest
 from .module_loading import CustomLoader, DefaultLoader, EggLoader
+from .os_utils import SafeJoinTests
 from .regex_helper import NormalizeTests
 from .simplelazyobject import TestUtilsSimpleLazyObject
 from .termcolors import TermColorTests

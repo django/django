@@ -47,6 +47,9 @@ def markdown(value, arg=''):
     they will be silently ignored.
 
     """
+    import warnings
+    warnings.warn('The markdown filter has been deprecated',
+                  category=DeprecationWarning)
     try:
         import markdown
     except ImportError:
@@ -72,6 +75,9 @@ def markdown(value, arg=''):
 
 @register.filter(is_safe=True)
 def restructuredtext(value):
+    import warnings
+    warnings.warn('The restructuredtext filter has been deprecated',
+                  category=DeprecationWarning)
     try:
         from docutils.core import publish_parts
     except ImportError:

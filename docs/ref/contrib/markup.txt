@@ -5,6 +5,9 @@ django.contrib.markup
 .. module:: django.contrib.markup
    :synopsis: A collection of template filters that implement common markup languages.
 
+.. deprecated:: 1.5
+    This module has been deprecated.
+
 Django provides template filters that implement the following markup
 languages:
 

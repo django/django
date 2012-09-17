@@ -9,10 +9,8 @@ Install Python
 
 Being a Python Web framework, Django requires Python.
 
-It works with any Python version from 2.6.5 to 2.7 (due to backwards
-incompatibilities in Python 3.0, Django does not currently work with
-Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
-information on supported Python versions and the 3.0 transition).
+It works with any Python version from 2.6.5 to 2.7. It also features
+experimental support for versions 3.2 and 3.3.
 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
@@ -259,15 +257,14 @@ Installing the development version
 
     If you decide to use the latest development version of Django,
     you'll want to pay close attention to `the development timeline`_,
-    and you'll want to keep an eye on `the list of
-    backwards-incompatible changes`_. This will help you stay on top
-    of any new features you might want to use, as well as any changes
+    and you'll want to keep an eye on the :ref:`release notes for the
+    upcoming release <development_release_notes>`. This will help you stay
+    on top of any new features you might want to use, as well as any changes
     you'll need to make to your code when updating your copy of Django.
     (For stable releases, any necessary changes are documented in the
     release notes.)
 
 .. _the development timeline: https://code.djangoproject.com/timeline
-.. _the list of backwards-incompatible changes: https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:

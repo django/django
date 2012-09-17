@@ -1,35 +1,26 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
 import sys
 
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, RequestFactory
-from django.test.utils import (setup_test_template_loader,
-                               restore_template_loaders)
-from django.core.urlresolvers import reverse
-from django.views.debug import ExceptionReporter
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
+from django.test import TestCase, RequestFactory
+from django.test.utils import (override_settings, setup_test_template_loader,
+    restore_template_loaders)
+from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view)
 
 
+@override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
 class DebugViewTests(TestCase):
     urls = "regressiontests.views.urls"
-
-    def setUp(self):
-        self.old_debug = settings.DEBUG
-        settings.DEBUG = True
-        self.old_template_debug = settings.TEMPLATE_DEBUG
-        settings.TEMPLATE_DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
-        settings.TEMPLATE_DEBUG = self.old_template_debug
 
     def test_files(self):
         response = self.client.get('/raises/')

@@ -11,7 +11,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, is_password_usable, identify_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -24,22 +24,22 @@ mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p
 class ReadOnlyPasswordHashWidget(forms.Widget):
     def render(self, name, value, attrs):
         encoded = value
-
-        if not is_password_usable(encoded):
-            return "None"
-
         final_attrs = self.build_attrs(attrs)
 
-        try:
-            hasher = identify_hasher(encoded)
-        except ValueError:
-            summary = mark_safe("<strong>Invalid password format or unknown hashing algorithm.</strong>")
+        if encoded == '' or encoded == UNUSABLE_PASSWORD:
+            summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
-            summary = format_html_join('',
-                                       "<strong>{0}</strong>: {1} ",
-                                       ((ugettext(key), value)
-                                        for key, value in hasher.safe_summary(encoded).items())
-                                       )
+            try:
+                hasher = identify_hasher(encoded)
+            except ValueError:
+                summary = mark_safe("<strong>%s</strong>" % ugettext(
+                    "Invalid password format or unknown hashing algorithm."))
+            else:
+                summary = format_html_join('',
+                                           "<strong>{0}</strong>: {1} ",
+                                           ((ugettext(key), value)
+                                            for key, value in hasher.safe_summary(encoded).items())
+                                           )
 
         return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
 

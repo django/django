@@ -1054,9 +1054,12 @@ class BaseDatabaseIntrospection(object):
 
     def get_primary_key_column(self, cursor, table_name):
         """
-        Backends can override this to return the column name of the primary key for the given table.
+        Returns the name of the primary key column for the given table.
         """
-        raise NotImplementedError
+        for column in six.iteritems(self.get_indexes(cursor, table_name)):
+            if column[1]['primary_key']:
+                return column[0]
+        return None
 
     def get_indexes(self, cursor, table_name):
         """

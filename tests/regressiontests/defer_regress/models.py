@@ -52,6 +52,9 @@ class SimpleItem(models.Model):
 class Feature(models.Model):
     item = models.ForeignKey(SimpleItem)
 
+class SpecialFeature(models.Model):
+    feature = models.ForeignKey(Feature)
+
 class ItemAndSimpleItem(models.Model):
     item = models.ForeignKey(Item)
     simple = models.ForeignKey(SimpleItem)

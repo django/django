@@ -324,8 +324,8 @@ Writing compatible code with six
 six_ is the canonical compatibility library for supporting Python 2 and 3 in
 a single codebase. Read its documentation!
 
-:mod`six` is bundled with Django as of version 1.4.2. You can import it as
-:mod`django.utils.six`.
+:mod:`six` is bundled with Django as of version 1.4.2. You can import it as
+:mod:`django.utils.six`.
 
 Here are the most common changes required to write compatible code.
 
@@ -399,6 +399,13 @@ The version of six bundled with Django includes one extra function:
     :meth:`~django.utils.datastructures.MultiValueDict.iterlists()` on Python
     2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
     Python 3.
+
+.. function:: assertRaisesRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
+    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
+    exists in current Python3 versions, but issues a warning.
+
 
 In addition to six' defaults moves, Django's version provides ``thread`` as
 ``_thread`` and ``dummy_thread`` as ``_dummy_thread``.

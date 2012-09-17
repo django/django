@@ -311,18 +311,18 @@ model fields:
    to exclude from the form.
 
 For example, if you want a form for the ``Author`` model (defined
-above) that includes only the ``name`` and ``title`` fields, you would
+above) that includes only the ``name`` and ``birth_date`` fields, you would
 specify ``fields`` or ``exclude`` like this::
 
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ('name', 'title')
+            fields = ('name', 'birth_date')
 
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
-            exclude = ('birth_date',)
+            exclude = ('title',)
 
 Since the Author model has only 3 fields, 'name', 'title', and
 'birth_date', the forms above will contain exactly the same fields.

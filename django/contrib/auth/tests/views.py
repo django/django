@@ -1,7 +1,7 @@
 import os
 import re
 
-from django.conf import settings
+from django.conf import global_settings, settings
 from django.contrib.sites.models import Site, RequestSite
 from django.contrib.auth.models import User
 from django.core import mail
@@ -23,7 +23,8 @@ from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
         ('en', 'English'),
     ),
     LANGUAGE_CODE='en',
-    TEMPLATE_DIRS = (
+    TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
+    TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
     USE_TZ=False,

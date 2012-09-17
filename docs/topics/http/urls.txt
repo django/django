@@ -20,18 +20,18 @@ Overview
 ========
 
 To design URLs for an app, you create a Python module informally called a
-**URLconf** (URL configuration). This module is pure Python code and
-is a simple mapping between URL patterns (as simple regular expressions) to
-Python callback functions (your views).
+**URLconf** (URL configuration). This module is pure Python code and is a
+simple mapping between URL patterns (simple regular expressions) to Python
+functions (your views).
 
 This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
 .. versionadded:: 1.4
-    Django also allows to translate URLs according to the active language.
-    This process is described in the
-    :ref:`internationalization docs <url-internationalization>`.
+    Django also provides a way to translate URLs according to the active
+    language. See the :ref:`internationalization documentation
+    <url-internationalization>` for more information.
 
 .. _how-django-processes-a-request:
 
@@ -154,11 +154,12 @@ The matching/grouping algorithm
 Here's the algorithm the URLconf parser follows, with respect to named groups
 vs. non-named groups in a regular expression:
 
-If there are any named arguments, it will use those, ignoring non-named arguments.
-Otherwise, it will pass all non-named arguments as positional arguments.
+1. If there are any named arguments, it will use those, ignoring non-named
+   arguments.
 
-In both cases, it will pass any extra keyword arguments as keyword arguments.
-See "Passing extra options to view functions" below.
+2. Otherwise, it will pass all non-named arguments as positional arguments.
+
+In both cases, any extra keyword arguments that have been given as per `Passing extra options to view functions`_ (below) will also be passed to the view.
 
 What the URLconf searches against
 =================================
@@ -175,6 +176,44 @@ for ``myapp/``.
 The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
 function for the same URL.
+
+Notes on capturing text in URLs
+===============================
+
+Each captured argument is sent to the view as a plain Python string, regardless
+of what sort of match the regular expression makes. For example, in this
+URLconf line::
+
+    (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+
+...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
+an integer, even though the ``\d{4}`` will only match integer strings.
+
+A convenient trick is to specify default parameters for your views' arguments.
+Here's an example URLconf and view::
+
+    # URLconf
+    urlpatterns = patterns('',
+        (r'^blog/$', 'blog.views.page'),
+        (r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
+    )
+
+    # View (in blog/views.py)
+    def page(request, num="1"):
+        # Output the appropriate page of blog entries, according to num.
+
+In the above example, both URL patterns point to the same view --
+``blog.views.page`` -- but the first pattern doesn't capture anything from the
+URL. If the first pattern matches, the ``page()`` function will use its
+default argument for ``num``, ``"1"``. If the second pattern matches,
+``page()`` will use whatever ``num`` value was captured by the regex.
+
+Performance
+===========
+
+Each regular expression in a ``urlpatterns`` is compiled the first time it's
+accessed. This makes the system blazingly fast.
+
 
 Syntax of the urlpatterns variable
 ==================================
@@ -209,10 +248,10 @@ The first argument to ``patterns()`` is a string ``prefix``. See
 
 The remaining arguments should be tuples in this format::
 
-    (regular expression, Python callback function [, optional dictionary [, optional name]])
+    (regular expression, Python callback function [, optional_dictionary [, optional_name]])
 
-...where ``optional dictionary`` and ``optional name`` are optional. (See
-`Passing extra options to view functions`_ below.)
+The ``optional_dictionary`` and ``optional_name`` parameters are described in
+`Passing extra options to view functions`_ below.
 
 .. note::
     Because `patterns()` is a function call, it accepts a maximum of 255
@@ -331,43 +370,6 @@ value should suffice.
 
 See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
 <http_internal_server_error_view>` for more information.
-
-Notes on capturing text in URLs
-===============================
-
-Each captured argument is sent to the view as a plain Python string, regardless
-of what sort of match the regular expression makes. For example, in this
-URLconf line::
-
-    (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-
-...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
-an integer, even though the ``\d{4}`` will only match integer strings.
-
-A convenient trick is to specify default parameters for your views' arguments.
-Here's an example URLconf and view::
-
-    # URLconf
-    urlpatterns = patterns('',
-        (r'^blog/$', 'blog.views.page'),
-        (r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
-    )
-
-    # View (in blog/views.py)
-    def page(request, num="1"):
-        # Output the appropriate page of blog entries, according to num.
-
-In the above example, both URL patterns point to the same view --
-``blog.views.page`` -- but the first pattern doesn't capture anything from the
-URL. If the first pattern matches, the ``page()`` function will use its
-default argument for ``num``, ``"1"``. If the second pattern matches,
-``page()`` will use whatever ``num`` value was captured by the regex.
-
-Performance
-===========
-
-Each regular expression in a ``urlpatterns`` is compiled the first time it's
-accessed. This makes the system blazingly fast.
 
 The view prefix
 ===============

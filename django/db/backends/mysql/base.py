@@ -38,6 +38,7 @@ from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
@@ -392,7 +393,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings_dict['NAME']:
                 kwargs['db'] = settings_dict['NAME']
             if settings_dict['PASSWORD']:
-                kwargs['passwd'] = settings_dict['PASSWORD']
+                kwargs['passwd'] = force_str(settings_dict['PASSWORD'])
             if settings_dict['HOST'].startswith('/'):
                 kwargs['unix_socket'] = settings_dict['HOST']
             elif settings_dict['HOST']:

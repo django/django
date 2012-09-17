@@ -90,8 +90,6 @@ class BaseSpatialOperations(object):
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
-        if isinstance(name, six.text_type):
-            name = name.encode('ascii')
         return "'%s'" % name
 
     # GeometryField operations

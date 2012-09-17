@@ -67,8 +67,7 @@ different needs:
   whathaveyou.
 
 * Finally, there's some "specialized" documentation not usually relevant to
-  most developers. This includes the :doc:`release notes </releases/index>`,
-  :doc:`documentation of obsolete features </obsolete/index>`,
+  most developers. This includes the :doc:`release notes </releases/index>` and
   :doc:`internals documentation </internals/index>` for those who want to add
   code to Django itself, and a :doc:`few other things that simply don't fit
   elsewhere </misc/index>`.

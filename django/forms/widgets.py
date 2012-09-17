@@ -260,10 +260,17 @@ class Input(Widget):
             final_attrs['value'] = force_text(self._format_value(value))
         return format_html('<input{0} />', flatatt(final_attrs))
 
+
 class TextInput(Input):
     input_type = 'text'
 
-class PasswordInput(Input):
+    def __init__(self, attrs=None):
+        if attrs is not None:
+            self.input_type = attrs.pop('type', self.input_type)
+        super(TextInput, self).__init__(attrs)
+
+
+class PasswordInput(TextInput):
     input_type = 'password'
 
     def __init__(self, attrs=None, render_value=False):
@@ -400,9 +407,8 @@ class Textarea(Widget):
                            flatatt(final_attrs),
                            force_text(value))
 
-class DateInput(Input):
-    input_type = 'text'
 
+class DateInput(TextInput):
     def __init__(self, attrs=None, format=None):
         super(DateInput, self).__init__(attrs)
         if format:
@@ -431,9 +437,8 @@ class DateInput(Input):
             pass
         return super(DateInput, self)._has_changed(self._format_value(initial), data)
 
-class DateTimeInput(Input):
-    input_type = 'text'
 
+class DateTimeInput(TextInput):
     def __init__(self, attrs=None, format=None):
         super(DateTimeInput, self).__init__(attrs)
         if format:
@@ -462,9 +467,8 @@ class DateTimeInput(Input):
             pass
         return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
 
-class TimeInput(Input):
-    input_type = 'text'
 
+class TimeInput(TextInput):
     def __init__(self, attrs=None, format=None):
         super(TimeInput, self).__init__(attrs)
         if format:

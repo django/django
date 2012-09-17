@@ -650,6 +650,36 @@ the handler, if ``created`` is ``True``, create the associated user profile::
 .. seealso:: :doc:`/topics/signals` for more information on Django's signal
     dispatcher.
 
+Adding UserProfile fields to the admin
+--------------------------------------
+
+To add the UserProfile fields to the user page in the admin, define an
+:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+add it to a ``UserAdmin`` class which is registered with the
+:class:`~django.contrib.auth.models.User` class::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from my_user_profile_app.models import UserProfile
+
+    # Define an inline admin descriptor for UserProfile model
+    # which acts a bit like a singleton
+    class UserProfileInline(admin.StackedInline):
+        model = UserProfile
+        can_delete = False
+        verbose_name_plural = 'profile'
+
+    # Define a new User admin
+    class UserAdmin(UserAdmin):
+        inlines = (UserProfileInline, )
+
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
+
 Authentication in Web requests
 ==============================
 
@@ -946,6 +976,13 @@ The login_required decorator
     example, using the defaults, add the following line to your URLconf::
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+    .. versionchanged:: 1.5
+
+    As of version 1.5 :setting:`settings.LOGIN_URL <LOGIN_URL>` now also accepts
+    view function names and :ref:`named URL patterns <naming-url-patterns>`.
+    This allows you to freely remap your login view within your URLconf
+    without having to update the setting.
 
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 

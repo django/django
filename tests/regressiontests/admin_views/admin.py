@@ -27,11 +27,14 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject)
+    RelatedPrepopulated, UndeletableObject, Simple)
 
 
 def callable_year(dt_value):
-    return dt_value.year
+    try:
+        return dt_value.year
+    except AttributeError:
+        return None
 callable_year.admin_order_field = 'date'
 
 
@@ -127,7 +130,7 @@ class CustomArticleAdmin(admin.ModelAdmin):
 
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ('color__warm', 'color__value')
+    list_filter = ('color__warm', 'color__value', 'pub_date',)
 
 
 class InquisitionAdmin(admin.ModelAdmin):
@@ -575,6 +578,14 @@ class UndeletableObjectAdmin(admin.ModelAdmin):
         return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
 
 
+def callable_on_unknown(obj):
+    return obj.unknown
+
+
+class AttributeErrorRaisingAdmin(admin.ModelAdmin):
+    list_display = [callable_on_unknown, ]
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -648,6 +659,7 @@ site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
 site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
+site.register(Simple, AttributeErrorRaisingAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
