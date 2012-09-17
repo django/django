@@ -333,6 +333,8 @@ Miscellaneous
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
   available at :func:`django.utils.html.remove_tags`.
 
+* Uploaded files are no longer created executable by default
+
 Features deprecated in 1.5
 ==========================
 
