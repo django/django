@@ -5,11 +5,13 @@ import os
 import random
 import sys
 import time
-from email import charset as Charset, encoders as Encoders
+from email import charset as Charset, encoders as Encoders, message_from_string
 from email.generator import Generator
+from email.message import Message
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from email.mime.message import MIMEMessage
 from email.header import Header
 from email.utils import formatdate, getaddresses, formataddr, parseaddr
 
@@ -117,6 +119,30 @@ def sanitize_address(addr, encoding):
         else:
             addr = Header(addr, encoding).encode()
     return formataddr((nm, addr))
+
+
+class SafeMIMEMessage(MIMEMessage):
+
+    def __init__(self, text, subtype):
+        MIMEMessage.__init__(self, text, subtype)
+
+    def __setitem__(self, name, val):
+        # message/rfc822 attachments must be ASCII
+        name, val = forbid_multi_line_headers(name, val, 'ascii')
+        MIMEMessage.__setitem__(self, name, val)
+
+    def as_string(self, unixfrom=False):
+        """Return the entire formatted message as a string.
+        Optional `unixfrom' when True, means include the Unix From_ envelope
+        header.
+
+        This overrides the default as_string() implementation to not mangle
+        lines that begin with 'From '. See bug #13433 for details.
+        """
+        fp = six.StringIO()
+        g = Generator(fp, mangle_from_ = False)
+        g.flatten(self, unixfrom=unixfrom)
+        return fp.getvalue()
 
 
 class SafeMIMEText(MIMEText):
@@ -301,6 +327,15 @@ class EmailMessage(object):
         if basetype == 'text':
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
+        elif basetype == 'message':
+            # Bug #18967: per RFC2046 s5.2.1, message/rfc822 attachments
+            # must not be base64 encoded.
+            if not isinstance(content, Message):
+                # For compatibility with existing code, parse the message
+                # into a email.Message object if it is not one already.
+                content = message_from_string(content)
+            
+            attachment = SafeMIMEMessage(content, subtype)
         else:
             # Encode non-text attachments with base64.
             attachment = MIMEBase(basetype, subtype)
