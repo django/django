@@ -114,22 +114,6 @@ class GBPhoneNumberField(CharField):
 
         number_parts = {'prefix': '+44 ', 'NSN': '', 'extension': None}
 
-        gb_number_parts = re.compile(r"""
-        ^\(?
-            (?:         # leading 00, 011 or + before 44 with optional (0);
-                        # parentheses, hyphens and spaces optional
-                (?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?\(?(?:0\)?[\s-]?\(?)?
-                |
-                0                           # leading 0
-            )
-            (
-                [1-9]\d{1,4}\)?[\s-\d]+     # NSN
-            )
-            (?:
-                ((?:x|ext\.?|\#)\d+)?       # optional extension number
-            )
-        $""", re.X)
-
         valid_gb_pattern = re.compile(r"""
         ^\(?
             (?:         # leading 00, 011 or + before 44 with optional (0)
@@ -151,6 +135,22 @@ class GBPhoneNumberField(CharField):
             )
             (?:
                 (?:[\s-]?(?:x|ext\.?|\#)\d+)?    # optional extension number
+            )
+        $""", re.X)
+
+        gb_number_parts = re.compile(r"""
+        ^\(?
+            (?:         # leading 00, 011 or + before 44 with optional (0);
+                        # parentheses, hyphens and spaces optional
+                (?:0(?:0|11)\)?[\s-]?\(?|\+)(44)\)?[\s-]?\(?(?:0\)?[\s-]?\(?)?
+                |
+                0                           # leading 0
+            )
+            (
+                [1-9]\d{1,4}\)?[\s-\d]+     # NSN
+            )
+            (?:
+                ((?:x|ext\.?|\#)\d+)?       # optional extension number
             )
         $""", re.X)
 
