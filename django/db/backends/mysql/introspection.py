@@ -103,6 +103,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             if row[4] not in indexes:
                 indexes[row[4]] = {'primary_key': False, 'unique': False}
+            # It's possible to have the unique and PK constraints in separate indexes.
             if row[2] == 'PRIMARY':
                 indexes[row[4]]['primary_key'] = True
             if not bool(row[1]):

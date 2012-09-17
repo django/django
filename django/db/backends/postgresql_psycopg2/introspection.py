@@ -86,7 +86,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Here, we skip any indexes across multiple fields.
             if ' ' in row[1]:
                 continue
-            indexes[row[0]] = {'primary_key': row[3], 'unique': row[2]}
+            if row[0] not in indexes:
+                indexes[row[0]] = {'primary_key': False, 'unique': False}
+            # It's possible to have the unique and PK constraints in separate indexes.
+            if row[3]:
+                indexes[row[0]]['primary_key'] = True
+            if row[2]:
+                indexes[row[0]]['unique'] = True
         return indexes
 
     def get_constraints(self, cursor, table_name):
