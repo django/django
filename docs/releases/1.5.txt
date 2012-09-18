@@ -116,6 +116,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :ref:`receiver <connecting-receiver-functions>` decorator is now able to
   connect to more than one signal by supplying a list of signals.
 
+* In the admin, you can now filter users by groups which they are members of.
+
 * :meth:`QuerySet.bulk_create()
   <django.db.models.query.QuerySet.bulk_create>` now has a batch_size
   argument. By default the batch_size is unlimited except for SQLite where
