@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -14,9 +15,8 @@ class Artist(models.Model):
     def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('artist_detail', (), {'pk': self.id})
+        return reverse('artist_detail', kwargs={'pk': self.id})
 
 @python_2_unicode_compatible
 class Author(models.Model):
