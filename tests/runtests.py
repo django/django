@@ -9,9 +9,13 @@ import warnings
 from django import contrib
 from django.utils import six
 
+# Python 2.7+ (and 3.2+) have silenced DeprecationWarning by default, restore the old behavior
+warnings.simplefilter("default", DeprecationWarning)
+
 # databrowse is deprecated, but we still want to run its tests
 warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
                         DeprecationWarning, 'django.contrib.databrowse')
+
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'

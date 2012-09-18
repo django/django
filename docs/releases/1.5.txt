@@ -127,6 +127,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   configuration duplication. More information can be found in the
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
+* The default manage.py created by startproject will now include
+  ``warnings.simplefilter("default", DeprecationWarning)``. This is to restore
+  the DeprecationWarning output when running your project through manage.py.
+
 Backwards incompatible changes in 1.5
 =====================================
 
