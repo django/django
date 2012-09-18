@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import os
 from django import template
 from django.utils import six
 from django.utils.unittest import TestCase
@@ -110,50 +111,50 @@ class CustomTagTests(TestCase):
         c = template.Context({'value': 42})
 
         t = template.Template('{% load custom %}{% inclusion_no_params %}')
-        self.assertEqual(t.render(c), 'inclusion_no_params - Expected result\n')
+        self.assertEqual(t.render(c), 'inclusion_no_params - Expected result' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_param 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_param - Expected result: 37\n')
+        self.assertEqual(t.render(c), 'inclusion_one_param - Expected result: 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_explicit_no_context 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_explicit_no_context - Expected result: 37\n')
+        self.assertEqual(t.render(c), 'inclusion_explicit_no_context - Expected result: 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_no_params_with_context %}')
-        self.assertEqual(t.render(c), 'inclusion_no_params_with_context - Expected result (context value: 42)\n')
+        self.assertEqual(t.render(c), 'inclusion_no_params_with_context - Expected result (context value: 42)' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_params_and_context 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_params_and_context - Expected result (context value: 42): 37\n')
+        self.assertEqual(t.render(c), 'inclusion_params_and_context - Expected result (context value: 42): 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_two_params 37 42 %}')
-        self.assertEqual(t.render(c), 'inclusion_two_params - Expected result: 37, 42\n')
+        self.assertEqual(t.render(c), 'inclusion_two_params - Expected result: 37, 42' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_default 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hi\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hi' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_default 37 two="hello" %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hello\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hello' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_default one=99 two="hello" %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 99, hello\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 99, hello' + os.linesep)
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_one_default' received unexpected keyword argument 'three'",
             template.Template, '{% load custom %}{% inclusion_one_default 99 two="hello" three="foo" %}')
 
         t = template.Template('{% load custom %}{% inclusion_one_default 37 42 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, 42\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, 42' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_unlimited_args 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, hi\n')
+        self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, hi' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_unlimited_args 37 42 56 89 %}')
-        self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, 42, 56, 89\n')
+        self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, 42, 56, 89' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_only_unlimited_args %}')
-        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: \n')
+        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: ' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_only_unlimited_args 37 42 56 89 %}')
-        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: 37, 42, 56, 89\n')
+        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: 37, 42, 56, 89' + os.linesep)
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_two_params' received too many positional arguments",
@@ -172,7 +173,7 @@ class CustomTagTests(TestCase):
             template.Template, '{% load custom %}{% inclusion_unlimited_args %}')
 
         t = template.Template('{% load custom %}{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}')
-        self.assertEqual(t.render(c), 'inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4\n')
+        self.assertEqual(t.render(c), 'inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4' + os.linesep)
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_unlimited_args_kwargs' received some positional argument\(s\) after some keyword argument\(s\)",
@@ -192,40 +193,40 @@ class CustomTagTests(TestCase):
         c = template.Context({'value': 42})
 
         t = template.Template('{% load custom %}{% inclusion_no_params_from_template %}')
-        self.assertEqual(t.render(c), 'inclusion_no_params_from_template - Expected result\n')
+        self.assertEqual(t.render(c), 'inclusion_no_params_from_template - Expected result' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_param_from_template 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_param_from_template - Expected result: 37\n')
+        self.assertEqual(t.render(c), 'inclusion_one_param_from_template - Expected result: 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_explicit_no_context_from_template 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_explicit_no_context_from_template - Expected result: 37\n')
+        self.assertEqual(t.render(c), 'inclusion_explicit_no_context_from_template - Expected result: 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_no_params_with_context_from_template %}')
-        self.assertEqual(t.render(c), 'inclusion_no_params_with_context_from_template - Expected result (context value: 42)\n')
+        self.assertEqual(t.render(c), 'inclusion_no_params_with_context_from_template - Expected result (context value: 42)' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_params_and_context_from_template 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_params_and_context_from_template - Expected result (context value: 42): 37\n')
+        self.assertEqual(t.render(c), 'inclusion_params_and_context_from_template - Expected result (context value: 42): 37' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_two_params_from_template 37 42 %}')
-        self.assertEqual(t.render(c), 'inclusion_two_params_from_template - Expected result: 37, 42\n')
+        self.assertEqual(t.render(c), 'inclusion_two_params_from_template - Expected result: 37, 42' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_default_from_template 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, hi\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, hi' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_one_default_from_template 37 42 %}')
-        self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, 42\n')
+        self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, 42' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_unlimited_args_from_template 37 %}')
-        self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, hi\n')
+        self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, hi' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_unlimited_args_from_template 37 42 56 89 %}')
-        self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n')
+        self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, 42, 56, 89' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_only_unlimited_args_from_template %}')
-        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: \n')
+        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: ' + os.linesep)
 
         t = template.Template('{% load custom %}{% inclusion_only_unlimited_args_from_template 37 42 56 89 %}')
-        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n')
+        self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: 37, 42, 56, 89' + os.linesep)
 
     def test_inclusion_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.
