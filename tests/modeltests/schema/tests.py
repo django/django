@@ -101,10 +101,7 @@ class SchemaTests(TestCase):
         editor.create_model(Author)
         editor.commit()
         # Check that it's there
-        try:
-            list(Author.objects.all())
-        except DatabaseError as e:
-            self.fail("Table not created: %s" % e)
+        list(Author.objects.all())
         # Clean up that table
         editor.start()
         editor.delete_model(Author)
@@ -126,14 +123,8 @@ class SchemaTests(TestCase):
         editor.create_model(Tag)
         editor.commit()
         # Check that initial tables are there
-        try:
-            list(Author.objects.all())
-        except DatabaseError as e:
-            self.fail("Author table not created: %s" % e)
-        try:
-            list(Book.objects.all())
-        except DatabaseError as e:
-            self.fail("Book table not created: %s" % e)
+        list(Author.objects.all())
+        list(Book.objects.all())
         # Make sure the FK constraint is present
         with self.assertRaises(IntegrityError):
             Book.objects.create(
