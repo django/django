@@ -54,4 +54,8 @@ urlpatterns += patterns('regressiontests.views.views',
     (r'^shortcuts/render/status/$', 'render_view_with_status'),
     (r'^shortcuts/render/current_app/$', 'render_view_with_current_app'),
     (r'^shortcuts/render/current_app_conflict/$', 'render_view_with_current_app_conflict'),
+    url(r'^overlapping_view/(?P<title>[a-z]+)/$', 'overlapping_view1', name='overlapping_view1'),
+    url(r'^overlapping_view/(?P<author>[a-z]+)/$', 'overlapping_view2', name='overlapping_view2'),
+    url(r'^overlapping_view/(?P<keywords>[a-z]+)/$', 'overlapping_view3', name='overlapping_view3'),
+    url(r'^no_overlapping_view/(?P<keywords>[a-z]+)/$', 'no_overlapping_view', name='no_overlapping_view'),
 )

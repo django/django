@@ -37,3 +37,17 @@ class URLHandling(TestCase):
         response = self.client.get('/permanent_nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target, status_code=301)
 
+    def test_overlapping_urls_reverse(self):
+        from django.core import urlresolvers
+        url = urlresolvers.reverse('overlapping_view1', kwargs={'title':'sometitle'})
+        self.assertEqual(url, '/overlapping_view/sometitle/')
+        url = urlresolvers.reverse('overlapping_view2', kwargs={'author':'someauthor'})
+        self.assertEqual(url, '/overlapping_view/someauthor/')
+
+    def test_overlapping_urls_resolve(self):
+        response = self.client.get('/overlapping_view/sometitle/')
+        self.assertContains(response, 'overlapping_view2')
+
+    def test_overlapping_urls_not_resolve(self):
+        response = self.client.get('/no_overlapping_view/sometitle/')
+        self.assertEqual(response.status_code, 404)

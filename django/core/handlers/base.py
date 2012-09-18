@@ -101,6 +101,12 @@ class BaseHandler(object):
                         urlresolvers.set_urlconf(urlconf)
                         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
+                # Use generators and try to resolve matching URL patterns one by
+                # one
+                url_patterns = (pattern for pattern in resolver.url_patterns)
+                resolver = urlresolvers.RegexURLResolver(r'^/', url_patterns)
+
+                while response is None:
                     callback, callback_args, callback_kwargs = resolver.resolve(
                             request.path_info)
 
@@ -109,20 +115,24 @@ class BaseHandler(object):
                         response = middleware_method(request, callback, callback_args, callback_kwargs)
                         if response:
                             break
-
-                if response is None:
-                    try:
-                        response = callback(request, *callback_args, **callback_kwargs)
-                    except Exception as e:
-                        # If the view raised an exception, run it through exception
-                        # middleware, and if the exception middleware returns a
-                        # response, use that. Otherwise, reraise the exception.
-                        for middleware_method in self._exception_middleware:
-                            response = middleware_method(request, e)
-                            if response:
-                                break
-                        if response is None:
-                            raise
+                    else:
+                        try:
+                            response = callback(request, *callback_args, **callback_kwargs)
+                        except urlresolvers.DoesNotResolve:
+                            # Continue resolve URLs if the view raises 
+                            # urlresolvers.DoesNotResolve exception to indicate
+                            # the url pattern does not match.
+                            continue
+                        except Exception as e:
+                            # If the view raised an exception, run it through exception
+                            # middleware, and if the exception middleware returns a
+                            # response, use that. Otherwise, reraise the exception.
+                            for middleware_method in self._exception_middleware:
+                                response = middleware_method(request, e)
+                                if response:
+                                    break
+                            else:
+                                raise
 
                 # Complain if the view returned None (a common error).
                 if response is None:
