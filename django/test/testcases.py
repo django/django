@@ -647,6 +647,7 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
+        text = force_text(text, encoding=response._charset)
         content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
@@ -682,6 +683,7 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
+        text = force_text(text, encoding=response._charset)
         content = response.content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
