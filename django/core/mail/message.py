@@ -322,18 +322,25 @@ class EmailMessage(object):
     def _create_mime_attachment(self, content, mimetype):
         """
         Converts the content, mimetype pair into a MIME attachment object.
+
+        If the mimetype is message/rfc822, content may be an
+        email.Message or EmailMessage object, as well as a str.
         """
         basetype, subtype = mimetype.split('/', 1)
         if basetype == 'text':
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
-        elif basetype == 'message':
+        elif basetype == 'message' and subtype == 'rfc822':
             # Bug #18967: per RFC2046 s5.2.1, message/rfc822 attachments
             # must not be base64 encoded.
             if not isinstance(content, Message):
-                # For compatibility with existing code, parse the message
-                # into a email.Message object if it is not one already.
-                content = message_from_string(content)
+                if isinstance(content, EmailMessage):
+                    # convert content into an email.Message first
+                    content = content.message()
+                else:
+                    # For compatibility with existing code, parse the message
+                    # into a email.Message object if it is not one already.
+                    content = message_from_string(content)
             
             attachment = SafeMIMEMessage(content, subtype)
         else:
