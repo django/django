@@ -527,11 +527,16 @@ The ``permalink`` decorator
 
 .. deprecated:: 1.5
 
-The way we wrote ``get_absolute_url()`` above is a slightly violation of the
-DRY principle: the URL for this object is defined both in the URLconf file and
-in the model.
+The ``permalink`` decorator has been deprecated and you should use
+:func:`reverse()<django.core.urlresolvers.reverse>` in the body of your
+``get_absolute_url`` method instead.
 
-You can decouple your models from the URLconf using the ``permalink`` decorator:
+In early versions of Django there wasn't an easy way to use URLs defined in
+URLconf file inside get_absolute_url(). That meant you would need to define the
+URL both in URLConf and get_absolute_url(). The ``permalink`` decorator was added
+to overcome this DRY principle violation. However since the inclusion of
+:func:`reverse()<django.core.urlresolvers.reverse>` there is no reason to use
+``permalink`` any more.
 
 .. function:: permalink()
 
