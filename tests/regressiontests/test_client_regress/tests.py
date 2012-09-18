@@ -16,6 +16,7 @@ from django.test import Client, TestCase
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, override_settings, str_prefix
 from django.template.response import SimpleTemplateResponse
+from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
 
 
@@ -128,6 +129,14 @@ class AssertContainsTests(TestCase):
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertNotContains(r, 'はたけ')
         self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
+
+    def test_nontext_contains(self):
+        r = self.client.get('/test_client_regress/no_template_view/')
+        self.assertContains(r, ugettext_lazy('once'))
+
+    def test_nontext_not_contains(self):
+        r = self.client.get('/test_client_regress/no_template_view/')
+        self.assertNotContains(r, ugettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
         """ Test that we can pass in an unrendered SimpleTemplateReponse
