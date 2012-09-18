@@ -26,6 +26,9 @@ def permalink(func):
         (viewname, viewargs)
         (viewname, viewargs, viewkwargs)
     """
+    import warnings
+    warnings.warn('The permalink decorator has been deprecated. Use reverse instead.', PendingDeprecationWarning)
+
     from django.core.urlresolvers import reverse
     @wraps(func)
     def inner(*args, **kwargs):
