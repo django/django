@@ -8,7 +8,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
-        "Shortcut to transform a model from old_model into new_model"
+        """
+        Shortcut to transform a model from old_model into new_model
+        """
         # Work out the new fields dict / mapping
         body = dict((f.name, f) for f in model._meta.local_fields)
         mapping = dict((f.column, f.column) for f in model._meta.local_fields)
@@ -98,7 +100,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self._remake_table(model, delete_fields=[field])
 
     def alter_field(self, model, old_field, new_field, strict=False):
-        # Ensure this field is even column-based
+        """
+        Allows a field's type, uniqueness, nullability, default, column,
+        constraints etc. to be modified.
+        Requires a copy of the old field as well so we can only perform
+        changes that are required.
+        If strict is true, raises errors if the old column does not match old_field precisely.
+        """
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
@@ -114,10 +122,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
+        """
+        Deals with a model changing its unique_together.
+        Note: The input unique_togethers must be doubly-nested, not the single-
+        nested ["foo", "bar"] format.
+        """
         self._remake_table(model, override_uniques=new_unique_together)
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
-        "Alters M2Ms to repoint their to= endpoints."
+        """
+        Alters M2Ms to repoint their to= endpoints.
+        """
         # Make a new through table
         self.create_model(new_field.rel.through)
         # Copy the data across

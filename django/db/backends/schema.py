@@ -59,21 +59,27 @@ class BaseDatabaseSchemaEditor(object):
     # State-managing methods
 
     def start(self):
-        "Marks the start of a schema-altering run"
+        """
+        Marks the start of a schema-altering run.
+        """
         self.deferred_sql = []
         self.connection.commit_unless_managed()
         self.connection.enter_transaction_management()
         self.connection.managed(True)
 
     def commit(self):
-        "Finishes a schema-altering run"
+        """
+        Finishes a schema-altering run.
+        """
         for sql in self.deferred_sql:
             self.execute(sql)
         self.connection.commit()
         self.connection.leave_transaction_management()
 
     def rollback(self):
-        "Tries to roll back a schema-altering run. Call instead of commit()"
+        """
+        Tries to roll back a schema-altering run. Call instead of commit().
+        """
         if not self.connection.features.can_rollback_ddl:
             raise RuntimeError("Cannot rollback schema changes on this backend")
         self.connection.rollback()
@@ -137,7 +143,9 @@ class BaseDatabaseSchemaEditor(object):
         return sql, params
 
     def effective_default(self, field):
-        "Returns a field's effective database default value"
+        """
+        Returns a field's effective database default value
+        """
         if field.has_default():
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
@@ -580,7 +588,9 @@ class BaseDatabaseSchemaEditor(object):
             )
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
-        "Alters M2Ms to repoint their to= endpoints."
+        """
+        Alters M2Ms to repoint their to= endpoints.
+        """
         # Rename the through table
         self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table, new_field.rel.through._meta.db_table)
         # Repoint the FK to the other side
@@ -591,7 +601,9 @@ class BaseDatabaseSchemaEditor(object):
         )
 
     def _create_index_name(self, model, column_names, suffix=""):
-        "Generates a unique name for an index/unique constraint."
+        """
+        Generates a unique name for an index/unique constraint.
+        """
         # If there is just one column in the index, use a default algorithm from Django
         if len(column_names) == 1 and not suffix:
             return truncate_name(
@@ -609,7 +621,9 @@ class BaseDatabaseSchemaEditor(object):
         return index_name
 
     def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None, check=None):
-        "Returns all constraint names matching the columns and conditions"
+        """
+        Returns all constraint names matching the columns and conditions
+        """
         column_names = set(column_names) if column_names else None
         constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
         result = []

@@ -207,10 +207,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:
+            # SQLite doesn't actually give a name to the PK constraint,
+            # so we invent one. This is fine, as the SQLite backend never
+            # deletes PK constraints by name.
             constraints["__primary__"] = {
                 "columns": set([pk_column]),
                 "primary_key": True,
-                "unique": False,  # It's not actually a unique constraint
+                "unique": False,  # It's not actually a unique constraint.
                 "foreign_key": False,
                 "check": False,
                 "index": False,
