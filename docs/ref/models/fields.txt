@@ -1081,6 +1081,9 @@ the model is related. This works exactly the same as it does for
 :class:`ForeignKey`, including all the options regarding :ref:`recursive
 <recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
 
+Related objects can be added, removed, or created with the field's
+:class:`~django.db.models.fields.related.RelatedManager`.
+
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
