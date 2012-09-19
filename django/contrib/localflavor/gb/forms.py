@@ -109,9 +109,11 @@ class GBPhoneNumberField(CharField):
      with a +44 prefix followed by a space and the 10 or 9 digit national
      number arranged in the correct 2+8, 3+7, 4+6, 4+5, 5+5, 5+4 or 3+6 format.
     """
-    message = _('Phone numbers must be in +XXXXXXXXXXX format.')
-    default_error_messages = {'number_format': message,
-                              'number_range': message}
+    default_error_messages = {
+        'number_format': _('Not a valid format and/or number length.'),
+        'number_range': _('Not a valid range or not a valid number length for '
+                         'this range')
+    }
 
     def clean(self, value):
         super(GBPhoneNumberField, self).clean(value)

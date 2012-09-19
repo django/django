@@ -34,7 +34,6 @@ class GBLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(GBPostcodeField, valid, invalid, field_kwargs=kwargs)
 
     def test_GBPhoneNumberField(self):
-        error_format = ['Phone numbers must be in +XXXXXXXXXXX format.']
         valid = {
             '020 3000 5555': '+44 20 3000 5555',
             '(020) 3000 5555': '+44 20 3000 5555',
@@ -75,16 +74,21 @@ class GBLocalFlavorTests(SimpleTestCase):
             '016977 3555': '+44 16977 3555',
             '0500 777888': '+44 500 777888'
         }
+        errors = GBPhoneNumberField.default_error_messages
+        messages = {
+            'number_format': [errors['number_format'].translate('gb')],
+            'number_range': [errors['number_range'].translate('gb')]
+        }
         invalid = {
-            '011 44 203 000 5555 5': error_format,
-            '+44 20 300 5555': error_format,
-            '025 4555 6777': error_format,
-            '0119 456 4567': error_format,
-            '0623 111 3456': error_format,
-            '0756 334556': error_format,
-            '020 5000 5000': error_format,
-            '0171 555 7777': error_format,
-            '01999 777888': error_format,
-            '01750 61777': error_format
+            '011 44 203 000 5555 5': messages['number_format'],
+            '+44 20 300 5555': messages['number_format'],
+            '025 4555 6777': messages['number_range'],
+            '0119 456 4567': messages['number_range'],
+            '0623 111 3456': messages['number_range'],
+            '0756 334556': messages['number_range'],
+            '020 5000 5000': messages['number_range'],
+            '0171 555 7777': messages['number_range'],
+            '01999 777888': messages['number_range'],
+            '01750 61777': messages['number_range']
         }
         self.assertFieldOutput(GBPhoneNumberField, valid, invalid)
