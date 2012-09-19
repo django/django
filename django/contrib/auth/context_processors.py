@@ -32,6 +32,17 @@ class PermWrapper(object):
         # I am large, I contain multitudes.
         raise TypeError("PermWrapper is not iterable.")
 
+    def __contains__(self, perm_name):
+        """
+        Lookup by "someapp" or "someapp.someperm" in perms.
+        """
+        if '.' not in perm_name:
+            # The name refers to module.
+            return bool(self[perm_name])
+        module_name, perm_name = perm_name.split('.', 1)
+        return self[module_name][perm_name]
+
+
 def auth(request):
     """
     Returns context variables required by apps that use Django's authentication

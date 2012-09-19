@@ -155,6 +155,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   objects fetched into memory. See :meth:`QuerySet.delete()
   <django.db.models.query.QuerySet.delete>` for details.
 
+* If using :class:`~django.template.RequestContext`, it is now possible to
+  look up permissions by using
+  ``{% if 'someapp.someperm' in perms %}`` in templates.
+
 Backwards incompatible changes in 1.5
 =====================================
 
