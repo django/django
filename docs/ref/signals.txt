@@ -277,13 +277,22 @@ like this::
         # ...
         toppings = models.ManyToManyField(Topping)
 
-If we would do something like this:
+If we connected a handler like this::
+
+    def toppings_changed(sender, **kwargs):
+        # Do something
+        pass
+
+    m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
+
+and then did something like this::
 
     >>> p = Pizza.object.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
-the arguments sent to a :data:`m2m_changed` handler would be:
+the arguments sent to a :data:`m2m_changed` handler (``topppings_changed`` in
+the example above) would be:
 
 ==============  ============================================================
 Argument        Value
