@@ -455,9 +455,9 @@ class QuerySet(object):
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
         try:
+            self._for_write = True
             return self.get(**lookup), False
         except self.model.DoesNotExist:
-            self._for_write = True
             try:
                 params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
                 params.update(defaults)
