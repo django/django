@@ -423,8 +423,6 @@ pointing at it will be deleted as well. In the example above, this means that
 if a ``Bookmark`` object were deleted, any ``TaggedItem`` objects pointing at
 it would be deleted at the same time.
 
-.. versionadded:: 1.3
-
 Unlike :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey` does not accept
 an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this

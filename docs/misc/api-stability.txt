@@ -155,8 +155,6 @@ Certain APIs are explicitly marked as "internal" in a couple of ways:
 Local flavors
 -------------
 
-.. versionchanged:: 1.3
-
 :mod:`django.contrib.localflavor` contains assorted pieces of code
 that are useful for particular countries or cultures. This data is
 local in nature, and is subject to change on timelines that will

@@ -980,13 +980,6 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 
     func, args, kwargs = resolve('/some/path/')
 
-.. versionchanged:: 1.3
-    Triple-assignment exists for backwards-compatibility. Prior to
-    Django 1.3, :func:`~django.core.urlresolvers.resolve` returned a
-    triple containing (view function, arguments, keyword arguments);
-    the :class:`ResolverMatch` object (as well as the namespace and pattern
-    information it provides) is not available in earlier Django releases.
-
 One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
 whether a view would raise a ``Http404`` error before redirecting to it::
 

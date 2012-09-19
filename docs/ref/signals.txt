@@ -118,8 +118,6 @@ Arguments sent with this signal:
     records in the database as the database might not be in a
     consistent state yet.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -155,8 +153,6 @@ Arguments sent with this signal:
     records in the database as the database might not be in a
     consistent state yet.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -183,8 +179,6 @@ Arguments sent with this signal:
 ``instance``
     The actual instance being deleted.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -208,8 +202,6 @@ Arguments sent with this signal:
 
     Note that the object will no longer be in the database, so be very
     careful what you do with this instance.
-
-.. versionadded:: 1.3
 
 ``using``
     The database alias being used.
@@ -270,8 +262,6 @@ Arguments sent with this signal:
     or removed from the relation.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
-
-.. versionadded:: 1.3
 
 ``using``
     The database alias being used.

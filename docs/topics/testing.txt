@@ -73,8 +73,6 @@ module defines tests in class-based approach.
 
 .. admonition:: unittest2
 
-    .. versionchanged:: 1.3
-
     Python 2.7 introduced some major changes to the unittest library,
     adding some extremely useful features. To ensure that every Django
     project can benefit from these new features, Django ships with a
@@ -435,8 +433,6 @@ two databases.
 
 Controlling creation order for test databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 By default, Django will always create the ``default`` database first.
 However, no guarantees are made on the creation order of any other
@@ -1001,8 +997,6 @@ Specifically, a ``Response`` object has the following attributes:
         The HTTP status of the response, as an integer. See
         :rfc:`2616#section-10` for a full list of HTTP status codes.
 
-    .. versionadded:: 1.3
-
     .. attribute:: templates
 
         A list of ``Template`` instances used to render the final content, in
@@ -1088,8 +1082,6 @@ The request factory
 -------------------
 
 .. class:: RequestFactory
-
-.. versionadded:: 1.3
 
 The :class:`~django.test.client.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
@@ -1326,8 +1318,6 @@ This means, instead of instantiating a ``Client`` in each test::
 
 Customizing the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 .. attribute:: TestCase.client_class
 
@@ -1708,8 +1698,6 @@ your test suite.
 
 .. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
 
-    .. versionadded:: 1.3
-
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
     The comparison of the contents of ``qs`` and ``values`` is performed using
@@ -1729,8 +1717,6 @@ your test suite.
 
 
 .. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
-
-    .. versionadded:: 1.3
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
     ``num`` database queries are executed.
@@ -1853,8 +1839,6 @@ Skipping tests
 --------------
 
 .. currentmodule:: django.test
-
-.. versionadded:: 1.3
 
 The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
 :func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests

@@ -42,8 +42,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
 
-    .. versionadded:: 1.3
-
     You can also read from an HttpRequest using a file-like interface. See
     :meth:`HttpRequest.read()`.
 
@@ -305,8 +303,6 @@ Methods
 .. method:: HttpRequest.xreadlines()
 .. method:: HttpRequest.__iter__()
 
-    .. versionadded:: 1.3
-
     Methods implementing a file-like interface for reading from an
     HttpRequest instance. This makes it possible to consume an incoming
     request in a streaming fashion. A common use-case would be to process a
@@ -509,9 +505,6 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
-    .. versionchanged:: 1.3
-       The ``safe`` parameter was added.
-
     Optionally, urlencode can be passed characters which
     do not require encoding. For example::
 
@@ -647,12 +640,6 @@ Methods
     header with the given name.
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
-
-    .. versionchanged:: 1.3
-
-    The possibility of specifying a ``datetime.datetime`` object in
-    ``expires``, and the auto-calculation of ``max_age`` in such case
-    was added. The ``httponly`` argument was also added.
 
     .. versionchanged:: 1.4
 

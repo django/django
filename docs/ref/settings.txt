@@ -125,8 +125,6 @@ The site-specific user profile model used by this site. See
 CACHES
 ------
 
-.. versionadded:: 1.3
-
 Default::
 
     {
@@ -166,12 +164,6 @@ You can use a cache backend that doesn't ship with Django by setting
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 Writing a whole new cache backend from scratch is left as an exercise
 to the reader; see the other backends for examples.
-
-.. note::
-    Prior to Django 1.3, you could use a URI based version of the backend
-    name to reference the built-in cache backends (e.g., you could use
-    ``'db://tablename'`` to refer to the database backend). This format has
-    been deprecated, and will be removed in Django 1.5.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -533,8 +525,6 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 TEST_DEPENDENCIES
 ~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
@@ -1262,8 +1252,6 @@ the ``locale`` directory (i.e. ``'/path/to/locale'``).
 LOGGING
 -------
 
-.. versionadded:: 1.3
-
 Default: A logging configuration dictionary.
 
 A data structure containing configuration information. The contents of
@@ -1277,8 +1265,6 @@ email log handler; all other log messages are given to a NullHandler.
 
 LOGGING_CONFIG
 --------------
-
-.. versionadded:: 1.3
 
 Default: ``'django.utils.log.dictConfig'``
 
@@ -1371,12 +1357,10 @@ MEDIA_URL
 Default: ``''`` (Empty string)
 
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
-for :doc:`managing stored files </topics/files>`.
+for :doc:`managing stored files </topics/files>`. It must end in a slash if set
+to a non-empty value.
 
 Example: ``"http://media.example.com/"``
-
-.. versionchanged:: 1.3
-   It must end in a slash if set to a non-empty value.
 
 MESSAGE_LEVEL
 -------------
@@ -1896,10 +1880,6 @@ A tuple of callables that are used to populate the context in ``RequestContext``
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
 
-.. versionadded:: 1.3
-    The ``django.core.context_processors.static`` context processor
-    was added in this release.
-
 .. versionadded:: 1.4
     The ``django.core.context_processors.tz`` context processor
     was added in this release.
@@ -2159,8 +2139,6 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 USE_X_FORWARDED_HOST
 --------------------
-
-.. versionadded:: 1.3.1
 
 Default: ``False``
 

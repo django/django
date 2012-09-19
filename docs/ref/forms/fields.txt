@@ -704,8 +704,6 @@ For each field, we describe the default widget used if you don't specify
 ``TypedMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.3
-
 .. class:: TypedMultipleChoiceField(**kwargs)
 
     Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`

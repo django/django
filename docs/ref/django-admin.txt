@@ -176,8 +176,6 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
-.. versionadded:: 1.3
-
 The :djadminopt:`--all` option may be provided to specify that
 ``dumpdata`` should use Django's base manager, dumping records which
 might otherwise be filtered or modified by a custom manager.
@@ -195,18 +193,10 @@ easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
-applications from being dumped.
-
-.. versionadded:: 1.3
-
-The :djadminopt:`--exclude` option may also be provided to prevent specific
-models (specified as in the form of ``appname.ModelName``) from being dumped.
-
-In addition to specifying application names, you can provide a list of
-individual models, in the form of ``appname.Model``. If you specify a model
-name to ``dumpdata``, the dumped output will be restricted to that model,
-rather than the entire application. You can also mix application names and
-model names.
+applications or models (specified as in the form of ``appname.ModelName``) from
+being dumped. If you specify a model name to ``dumpdata``, the dumped output
+will be restricted to that model, rather than the entire application. You can
+also mix application names and model names.
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
@@ -463,8 +453,6 @@ Use the ``--no-default-ignore`` option to disable the default values of
 
 .. django-admin-option:: --no-wrap
 
-.. versionadded:: 1.3
-
 Use the ``--no-wrap`` option to disable breaking long message lines into
 several lines in language files.
 
@@ -640,14 +628,10 @@ machines on your network. To make your development server viewable to other
 machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
 ``0.0.0.0`` or ``::`` (with IPv6 enabled).
 
-.. versionchanged:: 1.3
-
 You can provide an IPv6 address surrounded by brackets
 (e.g. ``[200a::1]:8000``). This will automatically enable IPv6 support.
 
 A hostname containing ASCII-only characters can also be used.
-
-.. versionchanged:: 1.3
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overriden
@@ -673,8 +657,6 @@ Use the ``--nothreading`` option to disable the use of threading in the
 development server.
 
 .. django-admin-option:: --ipv6, -6
-
-.. versionadded:: 1.3
 
 Use the ``--ipv6`` (or shorter ``-6``) option to tell Django to use IPv6 for
 the development server. This changes the default IP address from
@@ -1112,8 +1094,6 @@ arguments.)
 To run on 1.2.3.4:7000 with a ``test`` fixture::
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
-
-.. versionadded:: 1.3
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.

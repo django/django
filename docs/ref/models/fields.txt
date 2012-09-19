@@ -1023,8 +1023,6 @@ define the details of how the relation works.
     The field on the related object that the relation is to. By default, Django
     uses the primary key of the related object.
 
-.. versionadded:: 1.3
-
 .. attribute:: ForeignKey.on_delete
 
     When an object referenced by a :class:`ForeignKey` is deleted, Django by
