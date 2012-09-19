@@ -64,3 +64,27 @@ class GetOrCreateTests(TestCase):
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)
 
+
+    def test_initial_get_on_read_db(self):
+        """
+        get_or_create should only set _for_write when it's actually doing a
+        create action. This makes sure that the initial .get() will be able to
+        use a slave database. Specially when some form of database pinning is
+        in place this will help to not put all the SELECT queries on the
+        master. Refs #16865.
+
+        """
+        qs = Person.objects.get_query_set()
+        p, created = qs.get_or_create(
+            first_name="Stuart", last_name="Sutcliffe", defaults={
+                "birthday": date(1940, 6, 23),
+                }
+            )
+        self.assertTrue(created)
+        self.assertTrue(qs._for_write)
+
+        qs = Person.objects.get_query_set()
+        p, created = qs.get_or_create(
+            first_name="Stuart", last_name="Sutcliffe")
+        self.assertFalse(created)
+        self.assertFalse(qs._for_write)

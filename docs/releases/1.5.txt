@@ -338,6 +338,15 @@ Miscellaneous
   needs. The new default value is `0666` (octal) and the current umask value
   is first masked out.
 
+* In a multi-database situation, ``get_or_create()`` will now use a read
+  database for the initial ``get`` attempt (previously, it used only the write
+  database for all queries). This change reduces load on the write (master)
+  database, in exchange for slightly more frequent false-negatives on the
+  initial ``get`` due to replication lag. In those cases the subsequent insert
+  will still go to the master and fail, after which the existing object will be
+  fetched from the master.
+
+
 Features deprecated in 1.5
 ==========================
 
