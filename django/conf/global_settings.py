@@ -588,15 +588,6 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 # The name of the class to use to run the test suite
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
-# The root directory to discover tests within
-TEST_DISCOVER_ROOT = '.'
-
-# The pattern used for discovering tests
-TEST_DISCOVER_PATTERN = 'test*.py'
-
-# The top level directory to discover tests within
-TEST_DISCOVER_TOP_LEVEL = None
-
 ############
 # FIXTURES #
 ############

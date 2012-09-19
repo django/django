@@ -286,6 +286,10 @@ these changes.
 * The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
   will be removed (``content_type`` should be used instead).
 
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
+  `django.test.runner.DjangoTestDiscoverRunner`.
+
 2.0
 ---
 

@@ -123,7 +123,6 @@ INSTALLED_APPS = (
 )
 
 
-# Test runner to be used for testing
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 

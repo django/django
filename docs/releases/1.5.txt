@@ -49,24 +49,23 @@ field will also get updated on save.
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
 
-New Django Discovery Test Runner
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Django 1.5 ships with the new discovery test runner. Traditionally when running
-tests you would need to specify each app in the manage.py test command. 
 
-Now if you run::
+Discovery of tests in any test module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    manage.py test
+Django 1.5 ships with a new test runner that allows more flexibility in the
+location of tests. With the previous runner
+(``django.test.simple.DjangoTestSuiteRunner``), Django would look for tests
+only in the ``models.py`` and ``tests.py`` modules of any Python package in
+:setting:`INSTALLED_APPS`, and specific tests to be run had to be specified by
+app-label and testcase-class name.
 
-It will discover all the tests anywhere inside the root of your django project
-that begin with ``test*.py``. 
+The new runner (``django.test.runner.DjangoTestDiscoverRunner``) will find
+tests by default in any module whose name begins with ``test``, anywhere
+beneath a given root directory. When running ``manage.py test``, the default
+root directory is the current working directory.
 
-This can be changed if your tests begin with another prefix but specifying the
-prefix in your django settings like so::
-
-    TEST_DISOVERY_PATTERN = "tests*.py"
-
-For more information, see the :testing`test` documentation.
+For more information, see :doc:`topics/testing`.
 
 Caching of related model instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
