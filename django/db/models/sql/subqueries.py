@@ -49,24 +49,30 @@ class DeleteQuery(Query):
 
     def delete_qs(self, query, using):
         innerq = query.query
-        self.tables = [self.get_initial_alias()]
+        # Make sure the inner query has at least one table in use.
+        innerq.get_initial_alias()
+        # The same for our new query.
+        self.get_initial_alias()
         innerq_used_tables = [t for t in innerq.tables
                               if innerq.alias_refcount[t]]
-        if innerq_used_tables == self.tables and not innerq.having:
+        if ((not innerq_used_tables or innerq_used_tables == self.tables)
+            and not len(innerq.having)):
             # There is only the base table in use in the query, and there are
             # no aggregate filtering going on.
             self.where = innerq.where
         else:
-            values = query.values_list('pk', flat=True)
-            # MySQL for example can do:
-            #   "delete from tbl where id in (select id from tbl)"
-            # The name update_can_self_select is a bit wrong, though...
+            pk = query.model._meta.pk
             if not connections[using].features.update_can_self_select:
-                values = list(values)
+                # We can't do the delete using subquery.
+                values = list(query.values_list('pk', flat=True))
                 if not values:
                     return
+                self.delete_batch(values, using)
+                return
+            else:
+                values = innerq
+                innerq.select = [(self.get_initial_alias(), pk.column)]
             where = self.where_class()
-            pk = query.model._meta.pk
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
             self.where = where
         self.get_compiler(using).execute_sql(None)
