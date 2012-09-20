@@ -163,6 +163,11 @@ WKB / EWKB     ``buffer``
 GeoJSON        ``str`` or ``unicode``
 =============  ======================
 
+.. note::
+
+    The new 3D/4D WKT notation with an intermediary Z or M (like
+    ``POINT Z (3, 4, 5)``) is only supported with GEOS 3.3.0 or later.
+
 Properties
 ~~~~~~~~~~
 
