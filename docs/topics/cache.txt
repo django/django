@@ -673,11 +673,26 @@ dictionaries, lists of model objects, and so forth. (Most common Python objects
 can be pickled; refer to the Python documentation for more information about
 pickling.)
 
+Accessing the cache
+-------------------
+
 The cache module, ``django.core.cache``, has a ``cache`` object that's
 automatically created from the ``'default'`` entry in the :setting:`CACHES`
 setting::
 
     >>> from django.core.cache import cache
+
+If you have multiple caches defined in :setting:`CACHES`, then you can use
+:func:`django.core.cache.get_cache` to retrieve a cache object for any key::
+
+    >>> from django.core.cache import get_cache
+    >>> cache = get_cache('alternate')
+
+If the named key does not exist, :exc:`InvalidCacheBackendError` will be raised.
+
+
+Basic usage
+-----------
 
 The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
 
@@ -686,7 +701,7 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     'hello, world!'
 
 The ``timeout`` argument is optional and defaults to the ``timeout``
-argument of the ``'default'`` backend in :setting:`CACHES` setting
+argument of the appropriate backend in the :setting:`CACHES` setting
 (explained above). It's the number of seconds the value should be stored
 in the cache.
 
