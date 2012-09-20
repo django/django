@@ -109,10 +109,12 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
 {% autoescape off %}{% for item in map_options.items %}      '{{ item.0 }}' : {{ item.1 }}{% if not forloop.last %},{% endif %}
 {% endfor %}{% endautoescape %}    };{% endblock %}
     // The admin map for this geometry field.
+    {% block map_creation %}
     {{ module }}.map = new OpenLayers.Map('{{ id }}_map', options);
     // Base Layer
     {{ module }}.layers.base = {% block base_layer %}new OpenLayers.Layer.WMS("{{ wms_name }}", "{{ wms_url }}", {layers: '{{ wms_layer }}'{{ wms_options|safe }}});{% endblock %}
     {{ module }}.map.addLayer({{ module }}.layers.base);
+    {% endblock %}
     {% block extra_layers %}{% endblock %}
     {% if is_linestring %}OpenLayers.Feature.Vector.style["default"]["strokeWidth"] = 3; // Default too thin for linestrings. {% endif %}
     {{ module }}.layers.vector = new OpenLayers.Layer.Vector(" {{ field_name }}");
