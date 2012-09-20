@@ -363,20 +363,15 @@ class GeoPredicateDistanceTest(TestCase):
     # qs1 = SouthTexasCity.objects.filter(point__distance_gte=(stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
 
     def test_distance_gt(self):
-        qs1 = SouthTexasCity.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
         predicate = Q(point__distance_gt=(self.stx_pnt, D(km=7)))
         obj = SouthTexasCity.objects.get(name='Pearland')
-        print obj.point.distance(self.stx_pnt)
         self.assertTrue(predicate.matches(obj))
 
-    def test_distance_gte(self):
-        assert False
-
     def test_distance_lt(self):
-        assert False
-
-    def test_distance_lte(self):
-        assert False
-
-    def test_dwithin(self):
-        assert False
+        # based on test04 above
+        z_ref = SouthTexasZipcode.objects.get(name='77005')
+        z_near = SouthTexasZipcode.objects.get(name='77025')
+        z_far = SouthTexasZipcode.objects.get(name='77002')
+        predicate = Q(poly__distance_lte=(z_ref.poly, D(m=275)))
+        self.assertTrue(predicate.matches(z_near))
+        self.assertFalse(predicate.matches(z_far))

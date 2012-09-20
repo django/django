@@ -104,21 +104,23 @@ def _overlaps_below(model, instance_value, value):
 
 def _distance_gt(model, instance_value, value):
     other, measure = value
-    print 'distance_gt matching func'
-    print measure
-    return instance_value.distance(other) > measure
+    return instance_value.distance(other) > measure.standard
 
 def _distance_gte(model, instance_value, value):
     other, measure = value
-    return instance_value.distance(other) >= measure
+    return instance_value.distance(other) >= measure.standard
 
 def _distance_lt(model, instance_value, value):
     other, measure = value
-    return instance_value.distance(other) < measure
+    return instance_value.distance(other) < measure.standard
 
 def _distance_lte(model, instance_value, value):
     other, measure = value
-    return instance_value.distance(other) <= measure
+    return instance_value.distance(other) <= measure.standard
+
+def _dwithin(model, instance_value, value):
+    # TODO - unclear if there is any difference between lte and within
+    return _distance_lte(model, instance_value, value)
 
 match_functions = {
     'bbcontains': _bbcontains,
