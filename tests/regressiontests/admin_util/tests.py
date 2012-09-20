@@ -17,7 +17,7 @@ from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
 
-from .models import Article, Count, Event, Location
+from .models import Article, Count, Event, Location, EventGuide
 
 
 class NestedObjectsTests(TestCase):
@@ -70,6 +70,17 @@ class NestedObjectsTests(TestCase):
         # 1 query to fetch all children of 1 and 2 (none)
         # Should not require additional queries to populate the nested graph.
         self.assertNumQueries(2, self._collect, 0)
+
+    def test_on_delete_do_nothing(self):
+        """
+        Check that the nested collector doesn't query for DO_NOTHING objects.
+        """
+        n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        objs = [Event.objects.create()]
+        EventGuide.objects.create(event=objs[0])
+        with self.assertNumQueries(2):
+            # One for Location, one for Guest, and no query for EventGuide
+            n.collect(objs)
 
 class UtilTests(unittest.TestCase):
     def test_values_from_lookup_field(self):

@@ -3,6 +3,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
@@ -45,6 +46,37 @@ class DeleteQuery(Query):
             where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
+
+    def delete_qs(self, query, using):
+        innerq = query.query
+        # Make sure the inner query has at least one table in use.
+        innerq.get_initial_alias()
+        # The same for our new query.
+        self.get_initial_alias()
+        innerq_used_tables = [t for t in innerq.tables
+                              if innerq.alias_refcount[t]]
+        if ((not innerq_used_tables or innerq_used_tables == self.tables)
+            and not len(innerq.having)):
+            # There is only the base table in use in the query, and there are
+            # no aggregate filtering going on.
+            self.where = innerq.where
+        else:
+            pk = query.model._meta.pk
+            if not connections[using].features.update_can_self_select:
+                # We can't do the delete using subquery.
+                values = list(query.values_list('pk', flat=True))
+                if not values:
+                    return
+                self.delete_batch(values, using)
+                return
+            else:
+                values = innerq
+                innerq.select = [(self.get_initial_alias(), pk.column)]
+            where = self.where_class()
+            where.add((Constraint(None, pk.column, pk), 'in', values), AND)
+            self.where = where
+        self.get_compiler(using).execute_sql(None)
+
 
 class UpdateQuery(Query):
     """
