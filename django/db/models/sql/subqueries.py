@@ -3,6 +3,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
@@ -45,6 +46,31 @@ class DeleteQuery(Query):
             where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
+
+    def delete_qs(self, query, using):
+        innerq = query.query
+        self.tables = [self.get_initial_alias()]
+        innerq_used_tables = [t for t in innerq.tables
+                              if innerq.alias_refcount[t]]
+        if innerq_used_tables == self.tables and not innerq.having:
+            # There is only the base table in use in the query, and there are
+            # no aggregate filtering going on.
+            self.where = innerq.where
+        else:
+            values = query.values_list('pk', flat=True)
+            # MySQL for example can do:
+            #   "delete from tbl where id in (select id from tbl)"
+            # The name update_can_self_select is a bit wrong, though...
+            if not connections[using].features.update_can_self_select:
+                values = list(values)
+                if not values:
+                    return
+            where = self.where_class()
+            pk = query.model._meta.pk
+            where.add((Constraint(None, pk.column, pk), 'in', values), AND)
+            self.where = where
+        self.get_compiler(using).execute_sql(None)
+
 
 class UpdateQuery(Query):
     """

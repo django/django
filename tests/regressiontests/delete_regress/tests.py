@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import datetime
 
 from django.conf import settings
-from django.db import backend, transaction, DEFAULT_DB_ALIAS
+from django.db import backend, transaction, DEFAULT_DB_ALIAS, models
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
@@ -139,15 +139,22 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
         eaten = Eaten.objects.create(food=apple, meal="lunch")
 
         apple.delete()
+        self.assertFalse(Food.objects.exists())
+        self.assertFalse(Eaten.objects.exists())
+
 
 class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
         "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
         for x in range(300):
             track = Book.objects.create(pagecount=x+100)
+        # attach a signal to make sure we will not fast-delete
+        def noop(*args, **kwargs):
+            pass
+        models.signals.post_delete.connect(noop, sender=Book)
         Book.objects.all().delete()
+        models.signals.post_delete.disconnect(noop, sender=Book)
         self.assertEqual(Book.objects.count(), 0)
-
 
 
 class ProxyDeleteTest(TestCase):
