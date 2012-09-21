@@ -382,7 +382,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w().write(self).decode()
+        return wkt_w(self.hasz and 3 or 2).write(self).decode()
 
     @property
     def hex(self):

@@ -80,7 +80,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing WKT output."
         for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
-            self.assertEqual(g.ewkt, geom.wkt)
+            if geom.hasz and geos_version_info()['version'] >= '3.3.0':
+                self.assertEqual(g.ewkt, geom.wkt)
 
     def test_hex(self):
         "Testing HEX output."
