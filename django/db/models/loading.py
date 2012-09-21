@@ -236,69 +236,49 @@ class AppCache(object):
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
-    def save_state(self):
-        """
-        Returns an object that contains the current AppCache state.
-        Can be provided to restore_state to undo actions.
-        """
-        return {
-            "app_store": SortedDict(self.app_store.items()),
-            "app_labels": dict(self.app_labels.items()),
-            "app_models": SortedDict((k, SortedDict(v.items())) for k, v in self.app_models.items()),
-            "app_errors": dict(self.app_errors.items()),
-        }
-
-    def restore_state(self, state):
-        """
-        Restores the AppCache to a previous state from save_state.
-        Note that the state is used by reference, not copied in.
-        """
-        self.app_store = state['app_store']
-        self.app_labels = state['app_labels']
-        self.app_models = state['app_models']
-        self.app_errors = state['app_errors']
-        self._get_models_cache.clear()
-
-    def temporary_state(self):
-        "Returns a context manager that restores the state on exit"
-        return StateContextManager(self)
-
-    def unregister_all(self):
-        """
-        Wipes the AppCache clean of all registered models.
-        Used for things like migration libraries' fake ORMs.
-        """
-        self.app_store = SortedDict()
-        self.app_labels = {}
-        self.app_models = SortedDict()
-        self.app_errors = {}
+    def copy_from(self, other):
+        "Registers all models from the other cache into this one"
+        cache._populate()
+        for app_label, models in other.app_models.items():
+            self.register_models(app_label, *models.values())
 
 
-class StateContextManager(object):
+class AppCacheWrapper(object):
     """
-    Context manager for locking cache state.
-    Useful for making temporary models you don't want to stay in the cache.
+    As AppCache can be changed at runtime, this class wraps it so any
+    imported references to 'cache' are changed along with it.
     """
 
     def __init__(self, cache):
-        self.cache = cache
+        self._cache = cache
 
-    def __enter__(self):
-        self.state = self.cache.save_state()
+    def set_cache(self, cache):
+        self._cache = cache
 
-    def __exit__(self, type, value, traceback):
-        self.cache.restore_state(self.state)
+    def __getattr__(self, attr):
+        if attr in ("_cache", "set_cache"):
+            return self.__dict__[attr]
+        return getattr(self._cache, attr)
+
+    def __setattr__(self, attr, value):
+        if attr in ("_cache", "set_cache"):
+            self.__dict__[attr] = value
+            return
+        return setattr(self._cache, attr, value)
 
 
-cache = AppCache()
+default_cache = AppCache()
+cache = AppCacheWrapper(default_cache)
+
 
 # These methods were always module level, so are kept that way for backwards
-# compatibility.
-get_apps = cache.get_apps
-get_app = cache.get_app
-get_app_errors = cache.get_app_errors
-get_models = cache.get_models
-get_model = cache.get_model
-register_models = cache.register_models
-load_app = cache.load_app
-app_cache_ready = cache.app_cache_ready
+# compatibility. These are wrapped with lambdas to stop the attribute
+# access resolving directly to a method on a single cache instance.
+get_apps = lambda *x, **y: cache.get_apps(*x, **y)
+get_app = lambda *x, **y: cache.get_app(*x, **y)
+get_app_errors = lambda *x, **y: cache.get_app_errors(*x, **y)
+get_models = lambda *x, **y: cache.get_models(*x, **y)
+get_model = lambda *x, **y: cache.get_model(*x, **y)
+register_models = lambda *x, **y: cache.register_models(*x, **y)
+load_app = lambda *x, **y: cache.load_app(*x, **y)
+app_cache_ready = lambda *x, **y: cache.app_cache_ready(*x, **y)

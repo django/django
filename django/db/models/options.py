@@ -21,7 +21,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'auto_created')
+                 'abstract', 'managed', 'proxy', 'auto_created', 'auto_register')
 
 @python_2_unicode_compatible
 class Options(object):
@@ -67,6 +67,9 @@ class Options(object):
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
+
+        # If we should auto-register with the AppCache
+        self.auto_register = True
 
     def contribute_to_class(self, cls, name):
         from django.db import connection

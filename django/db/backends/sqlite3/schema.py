@@ -1,5 +1,5 @@
 from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.models.loading import cache
+from django.db.models.loading import cache, default_cache, AppCache
 from django.db.models.fields.related import ManyToManyField
 
 
@@ -46,10 +46,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         }
         meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
-        body['__module__'] = "__fake__"
-        with cache.temporary_state():
-            del cache.app_models[model._meta.app_label][model._meta.object_name.lower()]
-            temp_model = type(model._meta.object_name, model.__bases__, body)
+        body['__module__'] = model.__module__
+        self.app_cache = AppCache()
+        cache.set_cache(self.app_cache)
+        cache.copy_from(default_cache)
+        temp_model = type(model._meta.object_name, model.__bases__, body)
+        cache.set_cache(default_cache)
         # Create a new table with that format
         self.create_model(temp_model)
         # Copy data from the old table

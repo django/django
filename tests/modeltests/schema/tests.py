@@ -6,7 +6,7 @@ from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
-from django.db.models.loading import cache
+from django.db.models.loading import cache, default_cache, AppCache
 from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
@@ -30,9 +30,12 @@ class SchemaTests(TestCase):
         connection.managed(True)
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
-        self.cache_state = cache.save_state()
+        self.app_cache = AppCache()
+        cache.set_cache(self.app_cache)
+        cache.copy_from(default_cache)
         for model in self.models:
-            model._meta.managed = True
+            cache.register_models("schema", model)
+            model._prepare()
 
     def tearDown(self):
         # Delete any tables made for our models
@@ -40,10 +43,8 @@ class SchemaTests(TestCase):
         # Rollback anything that may have happened
         connection.rollback()
         connection.leave_transaction_management()
-        # Unhook our models
-        for model in self.models:
-            model._meta.managed = False
-        cache.restore_state(self.cache_state)
+        cache.set_cache(default_cache)
+        cache.app_models['schema'] = {}  # One M2M gets left in the old cache
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"

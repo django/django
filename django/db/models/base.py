@@ -228,14 +228,17 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        register_models(new_class._meta.app_label, new_class)
-
-        # Because of the way imports happen (recursively), we may or may not be
-        # the first time this model tries to register with the framework. There
-        # should only be one class for each model, so we always return the
-        # registered version.
-        return get_model(new_class._meta.app_label, name,
-                         seed_cache=False, only_installed=False)
+        
+        if new_class._meta.auto_register:
+            register_models(new_class._meta.app_label, new_class)
+            # Because of the way imports happen (recursively), we may or may not be
+            # the first time this model tries to register with the framework. There
+            # should only be one class for each model, so we always return the
+            # registered version.
+            return get_model(new_class._meta.app_label, name,
+                             seed_cache=False, only_installed=False)
+        else:
+            return new_class
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.

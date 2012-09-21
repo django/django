@@ -10,14 +10,14 @@ class Author(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
-        managed = False
+        auto_register = False
 
 
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        managed = False
+        auto_register = False
 
 
 class Book(models.Model):
@@ -27,7 +27,7 @@ class Book(models.Model):
     #tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        managed = False
+        auto_register = False
 
 
 class BookWithM2M(models.Model):
@@ -37,7 +37,7 @@ class BookWithM2M(models.Model):
     tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        managed = False
+        auto_register = False
 
 
 class BookWithSlug(models.Model):
@@ -47,7 +47,7 @@ class BookWithSlug(models.Model):
     slug = models.CharField(max_length=20, unique=True)
 
     class Meta:
-        managed = False
+        auto_register = False
         db_table = "schema_book"
 
 
@@ -56,7 +56,7 @@ class Tag(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        managed = False
+        auto_register = False
 
 
 class TagUniqueRename(models.Model):
@@ -64,7 +64,7 @@ class TagUniqueRename(models.Model):
     slug2 = models.SlugField(unique=True)
 
     class Meta:
-        managed = False
+        auto_register = False
         db_table = "schema_tag"
 
 
@@ -73,5 +73,5 @@ class UniqueTest(models.Model):
     slug = models.SlugField(unique=False)
 
     class Meta:
-        managed = False
+        auto_register = False
         unique_together = ["year", "slug"]
