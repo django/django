@@ -1,0 +1,156 @@
+Complex lookups with Q objects
+==============================
+
+.. currentmodule:: django.db.models
+
+.. class:: Q(lookup_keyword_arguments)
+
+.. comment: Link to Q does not work, since this documentation does not exist yet.
+
+A Q object is an object used to encapsulate a set of conditions which may be
+applied to model objects.
+
+In plain language these conditions might take the form "cars that are blue and
+made after the year 1987" or "employees in the shipping department who are full
+time or who have worked at the company for more than 10 years", etc.
+
+The condition is composed from a set of field lookups keyword arguments as
+specified for QuerySet methods::
+
+    my_condition = Q(color='blue', year_produced__gt=1998)
+
+Q objects, once composed, can be used to generate QuerySets containing objects
+(model instances) that match the condition, and can also be used to test
+whether a given object matches the condition. The same Q object can be used
+in both capacities.
+
+To query the database for cars matching the condition::
+
+    cars = Car.objects.filter(my_condition)
+
+In the case where you already have an instance in hand, and you want to test
+whether it matches the specified condition, you pass it to the
+:meth:`Q.matches()` method::
+
+    if my_condition.matches(me_car_object):
+        print "we have a recent blue car"
+
+``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
+operator is used on two ``Q`` objects, it yields a new ``Q`` object.
+
+You can compose statements of arbitrary complexity by combining ``Q`` objects
+with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
+objects can be negated using the ``~`` operator, allowing for combined lookups
+that combine both a normal query and a negated (``NOT``) query::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
+
+Using Q objects with QuerySets
+------------------------------
+
+Each QuerySet lookup function that takes keyword-arguments
+(e.g. :meth:`~django.db.models.query.QuerySet.filter`,
+:meth:`~django.db.models.query.QuerySet.exclude`,
+:meth:`~django.db.models.query.QuerySet.get`) can also be passed one or more
+``Q`` objects as positional (not-named) arguments.
+
+When Q objects are used with QuerySets, the condition they represent is
+ultimately converted to SQL as appropriate for the database backend in use.
+
+For example, this ``Q`` object encapsulates a single ``LIKE`` query::
+
+    from django.db.models import Q
+    Q(question__startswith='What')
+
+When complex compound Q objects are used (those created with ``&`` or ``|``)
+the logic is likewise represented in the resulting SQL.
+
+For example, this statement yields a single ``Q`` object that represents the
+"OR" of two ``"question__startswith"`` queries::
+
+    Q(question__startswith='Who') | Q(question__startswith='What')
+
+This is equivalent to the following SQL ``WHERE`` clause::
+
+    WHERE question LIKE 'Who%' OR question LIKE 'What%'
+
+If you provide multiple ``Q`` object arguments to a lookup function, the
+arguments will be "AND"ed together. For example::
+
+    Poll.objects.get(
+        Q(question__startswith='Who'),
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+    )
+
+... roughly translates into the SQL::
+
+    SELECT * from polls WHERE question LIKE 'Who%'
+        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+
+Lookup functions can mix the use of ``Q`` objects and keyword arguments. All
+arguments provided to a lookup function (be they keyword arguments or ``Q``
+objects) are "AND"ed together. However, if a ``Q`` object is provided, it must
+precede the definition of any keyword arguments. For example::
+
+    Poll.objects.get(
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
+        question__startswith='Who')
+
+... would be a valid query, equivalent to the previous example; but::
+
+    # INVALID QUERY
+    Poll.objects.get(
+        question__startswith='Who',
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+
+... would not be valid.
+
+.. seealso::
+
+    The `OR lookups examples`_ in the Django unit tests show some possible uses
+    of ``Q``.
+
+    .. _OR lookups examples: https://github.com/django/django/blob/master/tests/modeltests/or_lookups/tests.py
+
+Using Q objects to model objects against a condition
+----------------------------------------------------
+
+.. versionadded:: 1.5
+
+There may be times when you already have a model object in hand. This may be
+a model from a QuerySet, or a newly created model instance not yet saved to the
+database. Q objects can be used to test whether that object matches the
+condition defined by the Q object.
+
+.. method:: Q.matches(instance, [manager=None])
+
+    Returns ``True`` or ``False`` based on whether the instance matches the
+    condition specified by the Q object. If an object specifies multiple
+    managers, a specific manager can be specified, otherwise the default
+    manager is used. The need to specify a specific manager is uncommon - see
+    blah blah below.
+
+.. admonition:: Choose the right tool
+
+    When to use Q objects to test against some set of objects instead of
+    issuing a separate query to the database will depend on a number of
+    factors, including the number of different conditions you are testing, the
+    number of objects to be tested, and whether a QuerySet may already be
+    evaluated. Profiling and architectural necessity will be your best guides
+    in making the right choice.
+    (https://docs.djangoproject.com/en/dev/ref/models/querysets/#when-querysets-are-evaluated)
+
+Match Compiling and alternate managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Testing whether an instance matches a condition requires evaluating the lookups
+in the context of the Model and Manager classes associated with that instance.
+This information is not necessarily required or available at the time the Q object is
+created. The first match of a Q object that 
+
+- manager kwarg to matches
+- match_compile
+- recompiling
+
+
+
