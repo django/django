@@ -187,17 +187,20 @@ class LookupExpression(tree.Node):
         super(LookupExpression, self).__init__(**kwargs)
         self.manager = manager
         if expr:
-            # if we don't get a expr - we are just a root node
+            # if we get a expr we need to be able to evaluate,
+            # otherwise we are just a root node and a simple container
             self.lookup, self.value = expr
+            # attr_route is a sequence of fields following relationships
+            # ending in the field to perform the match on
             self.attr_route = []
-            self.field = None
             self.lookup_type = 'exact' # Default lookup type
             self.query = manager.get_query_set().query
             self.traverse_lookup(manager.model)
-            if self.lookup_type not in self.query.query_terms:
+            if (len(self.attr_route) == 0 or
+                    self.lookup_type not in self.query.query_terms):
+                # we have no valid field or no valid lookup type
                 raise ValueError("invalid lookup: {}".format(self.lookup))
             self.lookup_function = self.query.match_functions[self.lookup_type]
-
 
     def traverse_lookup(self, model):
         """

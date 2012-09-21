@@ -110,6 +110,11 @@ class QasPredicateTest(test.TestCase):
         with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
                 predicate.matches(self.testobj)
 
+    def test_invalid_field_name(self):
+        predicate = Q(flubber__contains='foo')
+        with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
+                predicate.matches(self.testobj)
+
 class RelationshipFollowTest(test.TestCase):
 
     def setUp(self):
