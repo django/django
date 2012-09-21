@@ -46,7 +46,7 @@ pre_init
 
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
-Whenever you instantiate a Django model,, this signal is sent at the beginning
+Whenever you instantiate a Django model, this signal is sent at the beginning
 of the model's :meth:`~django.db.models.Model.__init__` method.
 
 Arguments sent with this signal:
