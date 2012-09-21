@@ -1,10 +1,11 @@
 import datetime
 
+from django.contrib.sessions.models import Session, SessionManager
 from django.db.models.query import Q
 from django.utils import six, unittest
 from django import test
 
-from .models import Item
+from .models import Item, OtherItem
 
 class QasPredicateTest(test.TestCase):
     def setUp(self):
@@ -108,12 +109,12 @@ class QasPredicateTest(test.TestCase):
         """
         predicate = Q(name__hazawat=5)
         with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
-                predicate.matches(self.testobj)
+            predicate.matches(self.testobj)
 
     def test_invalid_field_name(self):
         predicate = Q(flubber__contains='foo')
         with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
-                predicate.matches(self.testobj)
+            predicate.matches(self.testobj)
 
 class RelationshipFollowTest(test.TestCase):
 
@@ -150,3 +151,32 @@ class RelationshipFollowTest(test.TestCase):
         should return True
         """
         self.assertTrue(Q(parent__int_value__isnull=True).matches(self.testobj))
+
+class ManagerTests(test.TestCase):
+
+    def setUp(self):
+        self.testobj = Item.objects.create(
+                name="hello world",
+                int_value=50,
+                created=datetime.datetime.now(),
+                )
+
+        self.testobj2 = OtherItem.objects.create(
+                name="bye world",
+                int_value=10,
+                created=datetime.datetime.now(),
+                )
+
+    def test_wrong_manager(self):
+        predicate = Q(name__contains='world')
+
+        pmatch = predicate.match_compile(manager=Item.alt_manager)
+        pmatch.matches(self.testobj)
+        pmatch.matches(self.testobj2)
+        with six.assertRaisesRegex(self, ValueError, 'invalid manager'):
+            pmatch.matches(self.testobj2)
+        # test that predicat recompiles when used with predicate
+        # by testing no problem with match
+        # then introspect what the manager is
+
+
