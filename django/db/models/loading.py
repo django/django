@@ -14,37 +14,29 @@ import os
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+
 class AppCache(object):
     """
     A cache that stores installed applications and their models. Used to
     provide reverse-relations and for app introspection (e.g. admin).
     """
-    # Use the Borg pattern to share state between all instances. Details at
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
-    __shared_state = dict(
-        # Keys of app_store are the model modules for each application.
-        app_store = SortedDict(),
-
-        # Mapping of installed app_labels to model modules for that app.
-        app_labels = {},
-
-        # Mapping of app_labels to a dictionary of model names to model code.
-        # May contain apps that are not installed.
-        app_models = SortedDict(),
-
-        # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
-
-        # -- Everything below here is only used when populating the cache --
-        loaded = False,
-        handled = {},
-        postponed = [],
-        nesting_level = 0,
-        _get_models_cache = {},
-    )
 
     def __init__(self):
-        self.__dict__ = self.__shared_state
+        # Keys of app_store are the model modules for each application.
+        self.app_store = SortedDict()
+        # Mapping of installed app_labels to model modules for that app.
+        self.app_labels = {}
+        # Mapping of app_labels to a dictionary of model names to model code.
+        # May contain apps that are not installed.
+        self.app_models = SortedDict()
+        # Mapping of app_labels to errors raised when trying to import the app.
+        self.app_errors = {}
+        # -- Everything below here is only used when populating the cache --
+        self.loaded = False
+        self.handled = {}
+        self.postponed = []
+        self.nesting_level = 0
+        self._get_models_cache = {}
 
     def _populate(self):
         """
