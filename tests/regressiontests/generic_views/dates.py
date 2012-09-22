@@ -23,29 +23,30 @@ requires_tz_support = skipUnless(TZ_SUPPORT,
         "time zone, but your operating system isn't able to do that.")
 
 
+def _make_books(n, base_date):
+    for i in range(n):
+        b = Book.objects.create(
+            name='Book %d' % i,
+            slug='book-%d' % i,
+            pages=100+i,
+            pubdate=base_date - datetime.timedelta(days=i))
+
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'regressiontests.generic_views.urls'
 
-    def _make_books(self, n, base_date):
-        for i in range(n):
-            b = Book.objects.create(
-                name='Book %d' % i,
-                slug='book-%d' % i,
-                pages=100+i,
-                pubdate=base_date - datetime.timedelta(days=1))
 
     def test_archive_view(self):
         res = self.client.get('/dates/books/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
     def test_archive_view_context_object_name(self):
         res = self.client.get('/dates/books/context_object_name/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['thingies']), list(Book.objects.all()))
         self.assertFalse('latest' in res.context)
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
@@ -65,14 +66,14 @@ class ArchiveIndexViewTests(TestCase):
     def test_archive_view_template(self):
         res = self.client.get('/dates/books/template_name/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()))
         self.assertTemplateUsed(res, 'generic_views/list.html')
 
     def test_archive_view_template_suffix(self):
         res = self.client.get('/dates/books/template_name_suffix/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()))
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
@@ -82,13 +83,13 @@ class ArchiveIndexViewTests(TestCase):
     def test_archive_view_by_month(self):
         res = self.client.get('/dates/books/by_month/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'month')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'month', 'DESC')))
 
     def test_paginated_archive_view(self):
-        self._make_books(20, base_date=datetime.date.today())
+        _make_books(20, base_date=datetime.date.today())
         res = self.client.get('/dates/books/paginated/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()[0:10]))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
@@ -99,7 +100,7 @@ class ArchiveIndexViewTests(TestCase):
 
     def test_paginated_archive_view_does_not_load_entire_table(self):
         # Regression test for #18087
-        self._make_books(20, base_date=datetime.date.today())
+        _make_books(20, base_date=datetime.date.today())
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
             self.client.get('/dates/books/')
@@ -123,6 +124,13 @@ class ArchiveIndexViewTests(TestCase):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
         res = self.client.get('/dates/booksignings/')
         self.assertEqual(res.status_code, 200)
+
+    def test_date_list_order(self):
+        """date_list should be sorted descending in index"""
+        _make_books(5, base_date=datetime.date(2011, 12, 25))
+        res = self.client.get('/dates/books/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), list(reversed(sorted(res.context['date_list']))))
 
 
 class YearArchiveViewTests(TestCase):
@@ -201,6 +209,12 @@ class YearArchiveViewTests(TestCase):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
         res = self.client.get('/dates/booksignings/2008/')
         self.assertEqual(res.status_code, 200)
+
+    def test_date_list_order(self):
+        """date_list should be sorted ascending in year view"""
+        _make_books(10, base_date=datetime.date(2011, 12, 25))
+        res = self.client.get('/dates/books/2011/')
+        self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
 class MonthArchiveViewTests(TestCase):
@@ -321,6 +335,12 @@ class MonthArchiveViewTests(TestCase):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 6, 3, 12, 0, tzinfo=timezone.utc))
         res = self.client.get('/dates/booksignings/2008/apr/')
         self.assertEqual(res.status_code, 200)
+
+    def test_date_list_order(self):
+        """date_list should be sorted ascending in month view"""
+        _make_books(10, base_date=datetime.date(2011, 12, 25))
+        res = self.client.get('/dates/books/2011/dec/')
+        self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
 class WeekArchiveViewTests(TestCase):

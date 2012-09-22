@@ -117,8 +117,6 @@ middleware is always called on every response.
 ``process_template_response``
 -----------------------------
 
-.. versionadded:: 1.3
-
 .. method:: process_template_response(self, request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is a

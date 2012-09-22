@@ -2,8 +2,6 @@
 Logging
 =======
 
-.. versionadded:: 1.3
-
 .. module:: django.utils.log
    :synopsis: Logging tools for Django applications
 
@@ -255,12 +253,12 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
         },
         'handlers': {
             'null': {
-                'level':'DEBUG',
-                'class':'django.utils.log.NullHandler',
+                'level': 'DEBUG',
+                'class': 'django.utils.log.NullHandler',
             },
             'console':{
-                'level':'DEBUG',
-                'class':'logging.StreamHandler',
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
                 'formatter': 'simple'
             },
             'mail_admins': {
@@ -271,9 +269,9 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
         },
         'loggers': {
             'django': {
-                'handlers':['null'],
+                'handlers': ['null'],
                 'propagate': True,
-                'level':'INFO',
+                'level': 'INFO',
             },
             'django.request': {
                 'handlers': ['mail_admins'],

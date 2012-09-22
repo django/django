@@ -239,8 +239,6 @@ template.
 Getting a list of :class:`~django.contrib.flatpages.models.FlatPage` objects in your templates
 ==============================================================================================
 
-.. versionadded:: 1.3
-
 The flatpages app provides a template tag that allows you to iterate
 over all of the available flatpages on the :ref:`current site
 <hooking-into-current-site-from-views>`.

@@ -8,6 +8,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
     InvalidDecimal, MissingForeignKey)
+from django.db import router
 from django.test import TestCase
 
 from .models import (
@@ -25,6 +26,7 @@ invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
 NAMES  = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
 NUMS   = [1, 2, 1, 19, 1] # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
+
 
 class LayerMapTest(TestCase):
 
@@ -281,3 +283,31 @@ class LayerMapTest(TestCase):
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 3)
         self.assertEqual(City.objects.all().order_by('name_txt')[0].name_txt, "Houston")
+
+
+class OtherRouter(object):
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return self.db_for_read(model, **hints)
+
+    def allow_relation(self, obj1, obj2, **hints):
+        return None
+
+    def allow_syncdb(self, db, model):
+        return True
+
+
+class LayerMapRouterTest(TestCase):
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [OtherRouter()]
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    def test_layermapping_default_db(self):
+        lm = LayerMapping(City, city_shp, city_mapping)
+        self.assertEqual(lm.using, 'other')

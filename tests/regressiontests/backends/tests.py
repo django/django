@@ -401,6 +401,19 @@ class BackendTestCase(TestCase):
         self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
         self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
 
+    def test_unicode_password(self):
+        old_password = connection.settings_dict['PASSWORD']
+        connection.settings_dict['PASSWORD'] = "françois"
+        try:
+            cursor = connection.cursor()
+        except backend.Database.DatabaseError:
+            # As password is probably wrong, a database exception is expected
+            pass
+        except Exception as e:
+            self.fail("Unexpected error raised with unicode password: %s" % e)
+        finally:
+            connection.settings_dict['PASSWORD'] = old_password
+
     def test_database_operations_helper_class(self):
         # Ticket #13630
         self.assertTrue(hasattr(connection, 'ops'))

@@ -66,9 +66,6 @@ database cursor (which is mapped to its own database connection internally).
 Controlling transaction management in views
 ===========================================
 
-.. versionchanged:: 1.3
-   Transaction management context managers are new in Django 1.3.
-
 For most people, implicit request-based transactions work wonderfully. However,
 if you need more fine-grained control over how transactions are managed, you can
 use a set of functions in ``django.db.transaction`` to control transactions on a
@@ -194,8 +191,6 @@ managers, too.
 
 Requirements for transaction handling
 =====================================
-
-.. versionadded:: 1.3
 
 Django requires that every transaction that is opened is closed before
 the completion of a request. If you are using :func:`autocommit` (the

@@ -42,29 +42,26 @@ def escape(text):
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, six.text_type)
 
-_base_js_escapes = (
-    ('\\', '\\u005C'),
-    ('\'', '\\u0027'),
-    ('"', '\\u0022'),
-    ('>', '\\u003E'),
-    ('<', '\\u003C'),
-    ('&', '\\u0026'),
-    ('=', '\\u003D'),
-    ('-', '\\u002D'),
-    (';', '\\u003B'),
-    ('\u2028', '\\u2028'),
-    ('\u2029', '\\u2029')
-)
+_js_escapes = {
+    ord('\\'): '\\u005C',
+    ord('\''): '\\u0027',
+    ord('"'): '\\u0022',
+    ord('>'): '\\u003E',
+    ord('<'): '\\u003C',
+    ord('&'): '\\u0026',
+    ord('='): '\\u003D',
+    ord('-'): '\\u002D',
+    ord(';'): '\\u003B',
+    ord('\u2028'): '\\u2028',
+    ord('\u2029'): '\\u2029'
+}
 
 # Escape every ASCII character with a value less than 32.
-_js_escapes = (_base_js_escapes +
-               tuple([('%c' % z, '\\u%04X' % z) for z in range(32)]))
+_js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
-    for bad, good in _js_escapes:
-        value = mark_safe(force_text(value).replace(bad, good))
-    return value
+    return mark_safe(force_text(value).translate(_js_escapes))
 escapejs = allow_lazy(escapejs, six.text_type)
 
 def conditional_escape(text):

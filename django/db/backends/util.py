@@ -3,15 +3,15 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import hashlib
+import logging
 from time import time
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
-from django.utils.log import getLogger
 from django.utils.timezone import utc
 
 
-logger = getLogger('django.db.backends')
+logger = logging.getLogger('django.db.backends')
 
 
 class CursorWrapper(object):

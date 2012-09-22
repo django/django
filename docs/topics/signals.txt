@@ -132,10 +132,6 @@ Now, our ``my_callback`` function will be called each time a request finishes.
 Note that ``receiver`` can also take a list of signals to connect a function
 to.
 
-.. versionadded:: 1.3
-
-The ``receiver`` decorator was added in Django 1.3.
-
 .. versionchanged:: 1.5
 
 The ability to pass a list of signals was added.

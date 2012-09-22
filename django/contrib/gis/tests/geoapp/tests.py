@@ -192,7 +192,8 @@ class GeoModelTest(TestCase):
         cities1 = City.objects.all()
         # Only PostGIS would support a 'select *' query because of its recognized
         # HEXEWKB format for geometry fields
-        cities2 = City.objects.raw('select id, name, asText(point) from geoapp_city')
+        as_text = 'ST_AsText' if postgis else 'asText'
+        cities2 = City.objects.raw('select id, name, %s(point) from geoapp_city' % as_text)
         self.assertEqual(len(cities1), len(list(cities2)))
         self.assertTrue(isinstance(cities2[0].point, Point))
 
@@ -520,8 +521,8 @@ class GeoQuerySetTest(TestCase):
         if oracle:
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
-        elif spatialite:
-            # Spatialite has extra colon in SrsName
+        elif spatialite and connection.ops.spatial_version < (3, 0, 0):
+            # Spatialite before 3.0 has extra colon in SrsName
             gml_regex = re.compile(r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>')
         else:
             gml_regex = re.compile(r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>')

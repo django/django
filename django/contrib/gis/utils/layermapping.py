@@ -9,7 +9,7 @@
 import sys
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (CoordTransform, DataSource,
     OGRException, OGRGeometry, OGRGeomType, SpatialReference)
@@ -67,7 +67,7 @@ class LayerMapping(object):
     def __init__(self, model, data, mapping, layer=0,
                  source_srs=None, encoding=None,
                  transaction_mode='commit_on_success',
-                 transform=True, unique=None, using=DEFAULT_DB_ALIAS):
+                 transform=True, unique=None, using=None):
         """
         A LayerMapping object is initialized using the given Model (not an instance),
         a DataSource (or string path to an OGR-supported data file), and a mapping
@@ -81,8 +81,8 @@ class LayerMapping(object):
             self.ds = data
         self.layer = self.ds[layer]
 
-        self.using = using
-        self.spatial_backend = connections[using].ops
+        self.using = using if using is not None else router.db_for_write(model)
+        self.spatial_backend = connections[self.using].ops
 
         # Setting the mapping & model attributes.
         self.mapping = mapping

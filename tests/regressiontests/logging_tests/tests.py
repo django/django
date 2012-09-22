@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
 import copy
+import logging
 import warnings
 
 from django.conf import compat_patch_logging_config
 from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
-from django.utils.log import CallbackFilter, RequireDebugFalse, getLogger
+from django.utils.log import CallbackFilter, RequireDebugFalse
 
 
 # logging config prior to using filter with mail_admins
@@ -153,7 +154,7 @@ class AdminEmailHandlerTest(TestCase):
         token1 = 'ping'
         token2 = 'pong'
 
-        logger = getLogger('django.request')
+        logger = logging.getLogger('django.request')
         admin_email_handler = self.get_admin_email_handler(logger)
         # Backup then override original filters
         orig_filters = admin_email_handler.filters
@@ -184,7 +185,7 @@ class AdminEmailHandlerTest(TestCase):
         token1 = 'ping'
         token2 = 'pong'
 
-        logger = getLogger('django.request')
+        logger = logging.getLogger('django.request')
         admin_email_handler = self.get_admin_email_handler(logger)
         # Backup then override original filters
         orig_filters = admin_email_handler.filters
@@ -222,7 +223,7 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 0)
 
-        logger = getLogger('django.request')
+        logger = logging.getLogger('django.request')
         logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)
@@ -247,7 +248,7 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 0)
 
-        logger = getLogger('django.request')
+        logger = logging.getLogger('django.request')
         logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)

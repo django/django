@@ -609,8 +609,12 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
+            # The get_fields_with_model() returns None for fields that live
+            # in the field's local model. So, for those fields we want to use
+            # the f.model - that is the field's local model.
+            field_model = model or f.model
             if not select_related_descend(f, restricted, requested,
-                                          only_load.get(model or self.query.model)):
+                                          only_load.get(field_model)):
                 continue
             # The "avoid" set is aliases we want to avoid just for this
             # particular branch of the recursion. They aren't permanently
