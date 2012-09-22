@@ -152,6 +152,21 @@ year|date:"Y" }}``.
 ``next_year`` and ``previous_year`` were also added in the context. They are
 calculated according to ``allow_empty`` and ``allow_future``.
 
+Context in year and month archive class-based views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.views.generic.dates.YearArchiveView` and
+:class:`~django.views.generic.dates.MonthArchiveView` were documented to
+provide a ``date_list`` sorted in ascending order in the context, like their
+function-based predecessors, but it actually was in descending order. In 1.5,
+the documented order was restored. You may want to add (or remove) the
+``reversed`` keyword when you're iterating on ``date_list`` in a template::
+
+    {% for date in date_list reversed %}
+
+:class:`~django.views.generic.dates.ArchiveIndexView` still provides a
+``date_list`` in descending order.
+
 Context in TemplateView
 ~~~~~~~~~~~~~~~~~~~~~~~
 
