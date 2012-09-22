@@ -90,6 +90,13 @@ In all :doc:`generic class-based views </topics/class-based-views/index>`
 (or any class-based view inheriting from ``ContextMixin``), the context dictionary
 contains a ``view`` variable that points to the ``View`` instance.
 
+Use of Q objects as a predicate test for model instances
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Q objects now provide a :meth:`~django.db.models.Q.matches()
+<django.db.models.Q.matches>` method that will determine whether matches the
+condition specified in the Q object. See `Q objects </topics/q-objects>`.
+
 Minor features
 ~~~~~~~~~~~~~~
 
