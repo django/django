@@ -498,6 +498,11 @@ class LocmemBackendTests(BaseEmailBackendTests, TestCase):
         connection2.send_messages([email])
         self.assertEqual(len(mail.outbox), 2)
 
+    def test_validate_multiline_headers(self):
+        # Ticket #18861 - Validate emails when using the locmem backend
+        with self.assertRaises(BadHeaderError):
+            send_mail('Subject\nMultiline', 'Content', 'from@example.com', ['to@example.com'])
+
 
 class FileBackendTests(BaseEmailBackendTests, TestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
