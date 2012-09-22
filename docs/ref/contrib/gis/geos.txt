@@ -273,14 +273,18 @@ Essentially the SRID is prepended to the WKT representation, for example
 .. attribute:: GEOSGeometry.hex
 
 Returns the WKB of this Geometry in hexadecimal form.  Please note
-that the SRID and Z values are not included in this representation
+that the SRID value is not included in this representation
 because it is not a part of the OGC specification (use the
 :attr:`GEOSGeometry.hexewkb` property instead).
+
+.. versionchanged:: 1.5
+
+    Prior to Django 1.5, the Z value of the geometry was dropped.
 
 .. attribute:: GEOSGeometry.hexewkb
 
 Returns the EWKB of this Geometry in hexadecimal form.  This is an
-extension of the WKB specification that includes SRID and Z values
+extension of the WKB specification that includes the SRID value
 that are a part of this geometry.
 
 .. note::
@@ -319,8 +323,12 @@ correspondg to the GEOS geometry.
 .. attribute:: GEOSGeometry.wkb
 
 Returns the WKB (Well-Known Binary) representation of this Geometry
-as a Python buffer.  SRID and Z values are not included, use the
+as a Python buffer.  SRID value is not included, use the
 :attr:`GEOSGeometry.ewkb` property instead.
+
+.. versionchanged:: 1.5
+
+    Prior to Django 1.5, the Z value of the geometry was dropped.
 
 .. _ewkb:
 
@@ -328,7 +336,7 @@ as a Python buffer.  SRID and Z values are not included, use the
 
 Return the EWKB representation of this Geometry as a Python buffer.
 This is an extension of the WKB specification that includes any SRID
-and Z values that are a part of this geometry.
+value that are a part of this geometry.
 
 .. note::
 
@@ -822,7 +830,7 @@ Writer Objects
 All writer objects have a ``write(geom)`` method that returns either the
 WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
 also have properties that may be used to change the byte order, and or
-include the SRID and 3D values (in other words, EWKB).
+include the SRID value (in other words, EWKB).
 
 .. class:: WKBWriter
 
@@ -884,7 +892,7 @@ so that the Z value is included in the WKB.
 Outdim Value Description
 ============ ===========================
 2            The default, output 2D WKB.
-3            Output 3D EWKB.
+3            Output 3D WKB.
 ============ ===========================
 
 Example::

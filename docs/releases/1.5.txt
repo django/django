@@ -117,6 +117,8 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
+* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+
 * Support for GDAL < 1.5 has been dropped.
 
 Minor features

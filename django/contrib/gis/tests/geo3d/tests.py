@@ -4,7 +4,7 @@ import os
 import re
 
 from django.contrib.gis.db.models import Union, Extent3D
-from django.contrib.gis.geos import GEOSGeometry, Point, Polygon
+from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.contrib.gis.utils import LayerMapping, LayerMapError
 from django.test import TestCase
 
@@ -67,8 +67,7 @@ class Geo3DTest(TestCase):
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:
             line_3d = GEOSGeometry(line, srid=4269)
-            # Using `hex` attribute because it omits 3D.
-            line_2d = GEOSGeometry(line_3d.hex, srid=4269)
+            line_2d = LineString([l[:2] for l in line_3d.coords], srid=4269)
 
             # Creating a geographic and projected version of the
             # interstate in both 2D and 3D.

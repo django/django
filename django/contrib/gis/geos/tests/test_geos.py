@@ -92,6 +92,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing (HEX)EWKB output."
         # For testing HEX(EWKB).
         ogc_hex = b'01010000000000000000000000000000000000F03F'
+        ogc_hex_3d = b'01010000800000000000000000000000000000F03F0000000000000040'
         # `SELECT ST_AsHEXEWKB(ST_GeomFromText('POINT(0 1)', 4326));`
         hexewkb_2d = b'0101000020E61000000000000000000000000000000000F03F'
         # `SELECT ST_AsHEXEWKB(ST_GeomFromEWKT('SRID=4326;POINT(0 1 2)'));`
@@ -100,9 +101,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         pnt_2d = Point(0, 1, srid=4326)
         pnt_3d = Point(0, 1, 2, srid=4326)
 
-        # OGC-compliant HEX will not have SRID nor Z value.
+        # OGC-compliant HEX will not have SRID value.
         self.assertEqual(ogc_hex, pnt_2d.hex)
-        self.assertEqual(ogc_hex, pnt_3d.hex)
+        self.assertEqual(ogc_hex_3d, pnt_3d.hex)
 
         # HEXEWKB should be appropriate for its dimension -- have to use an
         # a WKBWriter w/dimension set accordingly, else GEOS will insert
@@ -830,12 +831,17 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."
         g1 = fromstr('POINT(5 23)')
-        self.assertEqual(True, isinstance(g1.ogr, gdal.OGRGeometry))
-        self.assertEqual(g1.srs, None)
+        self.assertIsInstance(g1.ogr, gdal.OGRGeometry)
+        self.assertIsNone(g1.srs)
+
+        if GEOS_PREPARE:
+            g1_3d = fromstr('POINT(5 23 8)')
+            self.assertIsInstance(g1_3d.ogr, gdal.OGRGeometry)
+            self.assertEqual(g1_3d.ogr.z, 8)
 
         g2 = fromstr('LINESTRING(0 0, 5 5, 23 23)', srid=4326)
-        self.assertEqual(True, isinstance(g2.ogr, gdal.OGRGeometry))
-        self.assertEqual(True, isinstance(g2.srs, gdal.SpatialReference))
+        self.assertIsInstance(g2.ogr, gdal.OGRGeometry)
+        self.assertIsInstance(g2.srs, gdal.SpatialReference)
         self.assertEqual(g2.hex, g2.ogr.hex)
         self.assertEqual('WGS 84', g2.srs.name)
 
@@ -848,7 +854,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertNotEqual(poly._ptr, cpy1._ptr)
         self.assertNotEqual(poly._ptr, cpy2._ptr)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
+    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
     def test_transform(self):
         "Testing `transform` method."
         orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
@@ -872,6 +878,15 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
+
+    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
+    def test_transform_3d(self):
+        p3d = GEOSGeometry('POINT (5 23 100)', 4326)
+        p3d.transform(2774)
+        if GEOS_PREPARE:
+            self.assertEqual(p3d.z, 100)
+        else:
+            self.assertIsNone(p3d.z)
 
     def test_transform_noop(self):
         """ Testing `transform` method (SRID match) """
