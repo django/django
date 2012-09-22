@@ -1,17 +1,15 @@
-Complex lookups with Q objects
-==============================
+Q objects
+=========
 
 .. currentmodule:: django.db.models
 
 .. class:: Q(lookup_keyword_arguments)
 
-.. comment: Link to Q does not work, since this documentation does not exist yet.
-
 A Q object is an object used to encapsulate a set of conditions which may be
 applied to model objects.
 
 In plain language these conditions might take the form "cars that are blue and
-made after the year 1987" or "employees in the shipping department who are full
+made after the year 1998" or "employees in the shipping department who are full
 time or who have worked at the company for more than 10 years", etc.
 
 The condition is composed from a set of field lookups keyword arguments as
@@ -112,15 +110,16 @@ precede the definition of any keyword arguments. For example::
 
     .. _OR lookups examples: https://github.com/django/django/blob/master/tests/modeltests/or_lookups/tests.py
 
-Using Q objects to model objects against a condition
-----------------------------------------------------
+Using Q objects to test whether objects match a condition
+---------------------------------------------------------
 
 .. versionadded:: 1.5
 
-There may be times when you already have a model object in hand. This may be
-a model from a QuerySet, or a newly created model instance not yet saved to the
-database. Q objects can be used to test whether that object matches the
-condition defined by the Q object.
+There may be times when you already have a model object in hand and want to
+know if it matches some defined condition. This may be a model from a QuerySet,
+or a newly created model instance not yet saved to the database. Q objects can
+be used to test whether that object matches the condition defined by the
+Q object.
 
 .. method:: Q.matches(instance, [manager=None])
 
@@ -128,7 +127,7 @@ condition defined by the Q object.
     condition specified by the Q object. If an object specifies multiple
     managers, a specific manager can be specified, otherwise the default
     manager is used. The need to specify a specific manager is uncommon - see
-    blah blah below.
+    details on alternate managers below.
 
 .. admonition:: Choose the right tool
 
@@ -146,8 +145,11 @@ Match Compiling and alternate managers
 Testing whether an instance matches a condition requires evaluating the lookups
 in the context of the Model and Manager classes associated with that instance.
 This information is not necessarily required or available at the time the Q object is
-created. The first match of a Q object that 
+created. The first call to a Q object verifies that the lookups are valid, and
+traverses any related objects, storing this information for subsequent matches.
+The manager provides information
 
+Remaining:
 - manager kwarg to matches
 - match_compile
 - recompiling
