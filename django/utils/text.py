@@ -288,6 +288,24 @@ def compress_string(s):
     zfile.close()
     return zbuf.getvalue()
 
+# WARNING - be aware that compress_sequence does not achieve the same
+# level of compression as compress_string.
+def compress_sequence(sequence):
+    import cStringIO, gzip
+    zbuf = cStringIO.StringIO()
+    zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
+    yield zbuf.getvalue()
+    for item in sequence:
+        position = zbuf.tell()
+        zfile.write(item)
+        zfile.flush()
+        zbuf.seek(position)
+        yield zbuf.read()
+    position = zbuf.tell()
+    zfile.close()
+    zbuf.seek(position)
+    yield zbuf.read()
+
 ustring_re = re.compile("([\u0080-\uffff])")
 
 def javascript_quote(s, quote_double_quotes=False):

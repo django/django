@@ -19,7 +19,8 @@ from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import router
-from django.http import HttpResponse, HttpRequest, QueryDict
+from django.http import (HttpResponse, HttpRequest, HttpStreamingResponse,
+    QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
@@ -1415,6 +1416,34 @@ class CacheI18nTest(TestCase):
         self.assertEqual(get_cache_data.content, es_message.encode())
         # reset the language
         translation.deactivate()
+
+    @override_settings(
+            CACHE_MIDDLEWARE_KEY_PREFIX="test",
+            CACHE_MIDDLEWARE_SECONDS=60,
+            USE_ETAGS=True,
+    )
+    def test_middleware_with_streaming_response(self):
+        def set_cache(request, lang, msg):
+            translation.activate(lang)
+            response = HttpStreamingResponse(msg)
+            return UpdateCacheMiddleware().process_response(request, response)
+
+        # cache with non empty request.GET
+        request = self._get_request_cache(query_string='foo=baz&other=true')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        # first access, cache must return None
+        self.assertEqual(get_cache_data, None)
+        content = 'Check for cache with QUERY_STRING and streaming content'
+        response = HttpStreamingResponse(content)
+        UpdateCacheMiddleware().process_response(request, response)
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        # cache must return content
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(list(get_cache_data), [six.binary_type(content)])
+        # different QUERY_STRING, cache must be empty
+        request = self._get_request_cache(query_string='foo=baz&somethingelse=true')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data, None)
 
 
 @override_settings(

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import collections
 import copy
 import datetime
 from email.header import Header
@@ -521,18 +522,23 @@ def parse_cookie(cookie):
 class BadHeaderError(ValueError):
     pass
 
-class HttpResponse(object):
-    """A basic HTTP response, with content and dictionary-accessed headers."""
+class HttpResponseBase(object):
+    """
+    A base HTTP response class with dictionary-accessed headers.
+
+    This should not be used directly. Use the HttpResponse and
+    HttpStreamingResponse subclasses, instead.
+    """
 
     status_code = 200
 
-    def __init__(self, content='', content_type=None, status=None,
-            mimetype=None):
+    def __init__(self, content_type=None, status=None, mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
+        self._iterable_content = []
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
                           " content_type instead", PendingDeprecationWarning)
@@ -540,26 +546,19 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        # content is a bytestring. See the content property methods.
-        self.content = content
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
 
         self['Content-Type'] = content_type
 
-    def serialize(self):
-        """Full HTTP message, including headers, as a bytestring."""
+    def serialize_headers(self):
+        """HTTP headers as a bytestring."""
         headers = [
             ('%s: %s' % (key, value)).encode('us-ascii')
             for key, value in self._headers.values()
         ]
-        return b'\r\n'.join(headers) + b'\r\n\r\n' + self.content
-
-    if six.PY3:
-        __bytes__ = serialize
-    else:
-        __str__ = serialize
+        return b'\r\n'.join(headers)
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
         """Converts headers key/value to ascii/latin1 native strings.
@@ -683,61 +682,140 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
-    @property
-    def content(self):
-        if self.has_header('Content-Encoding'):
-            def make_bytes(value):
-                if isinstance(value, int):
-                    value = six.text_type(value)
-                if isinstance(value, six.text_type):
-                    value = value.encode('ascii')
-                # force conversion to bytes in case chunk is a subclass
-                return bytes(value)
-            return b''.join(make_bytes(e) for e in self._container)
-        return b''.join(force_bytes(e, self._charset) for e in self._container)
-
-    @content.setter
-    def content(self, value):
-        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
-            self._container = value
-            self._base_content_is_iter = True
+    def _set_container(self, value, consume_iterable):
+        if isinstance(value, collections.Iterable) \
+                and not isinstance(value, six.text_type):
+            # keep a reference to the iterable, so we can close it later,
+            # if necessary (e.g. file objects).
+            self._iterable_content.append(value)
+            if consume_iterable:
+                # convert iterable to list, so we can iterate over it many
+                # times and append to it.
+                self._container = list(value)
+            else:
+                # convert sequence to an iterable, so we can only iterate over
+                # it once.
+                self._container = iter(value)
         else:
             self._container = [value]
-            self._base_content_is_iter = False
+
+    def make_bytes(self, value):
+        if isinstance(value, int):
+            value = six.text_type(value)
+        if isinstance(value, six.text_type):
+            if self.has_header('Content-Encoding'):
+                value = value.encode('ascii')
+            else:
+                value = value.encode(self._charset)
+        # force conversion to bytes in case value is a subclass
+        return bytes(value)
 
     def __iter__(self):
         self._iterator = iter(self._container)
         return self
 
     def __next__(self):
-        chunk = next(self._iterator)
-        if isinstance(chunk, int):
-            chunk = six.text_type(chunk)
-        if isinstance(chunk, six.text_type):
-            chunk = chunk.encode(self._charset)
-        # force conversion to bytes in case chunk is a subclass
-        return bytes(chunk)
+        return self.make_bytes(next(self._iterator))
 
     next = __next__             # Python 2 compatibility
 
     def close(self):
-        if hasattr(self._container, 'close'):
-            self._container.close()
+        for value in self._iterable_content:
+            if hasattr(value, 'close'):
+                value.close()
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
+
     def write(self, content):
-        if self._base_content_is_iter:
-            raise Exception("This %s instance is not writable" % self.__class__)
-        self._container.append(content)
+        raise Exception("This %s instance is not writable" % self.__class__)
 
     def flush(self):
         pass
 
     def tell(self):
-        if self._base_content_is_iter:
-            raise Exception("This %s instance cannot tell its position" % self.__class__)
+        raise Exception(
+            "This %s instance cannot tell its position" % self.__class__)
+
+class HttpResponse(HttpResponseBase):
+    """
+    An HTTP response class with content that can be read, appended to or
+    replaced. Converts iterator content to a list, so that it can be iterated
+    multiple times.
+    """
+
+    def __init__(self, content='', *args, **kwargs):
+        super(HttpResponse, self).__init__(*args, **kwargs)
+        # content is a bytestring. See the content property methods.
+        self.content = content
+
+    def serialize(self):
+        """Full HTTP message, including headers, as a bytestring."""
+        return self.serialize_headers() + b'\r\n\r\n' + self.content
+
+    if six.PY3:
+        __bytes__ = serialize
+    else:
+        __str__ = serialize
+
+    @property
+    def content(self):
+        # We must iterate over `self._container` and call `self.make_bytes()`
+        # on each chunk instead of just joining on `self`, which does the same
+        # thing, to avoid creating an iterator at `self._iterator`. Thus, the
+        # response can still be pickled after the content has been accessed,
+        # which is required by cache middleware.
+        return b''.join(self.make_bytes(chunk) for chunk in self._container)
+
+    @content.setter
+    def content(self, value):
+        self._set_container(value, consume_iterable=True)
+
+    def write(self, content):
+        self._container.append(content)
+
+    def tell(self):
         return sum([len(chunk) for chunk in self])
+
+class HttpStreamingResponse(HttpResponseBase):
+    """
+    A streaming HTTP response class with an iterator as content that should
+    only be iterated once, when the response is streamed to the client.
+
+    However, the content can be appended to or replaced with a new iterator
+    that wraps the original content (or yields entirely new content).
+    """
+
+    def __init__(self, content='', *args, **kwargs):
+        super(HttpStreamingResponse, self).__init__(*args, **kwargs)
+        # streaming_content is an iterator that yields bytestrings.
+        # See the streaming_content property methods.
+        self.streaming_content = content
+
+    @property
+    def content(self):
+        raise AttributeError(
+            "This %s instance has no `content` attribute. Use "
+            "`streaming_content` instead." % self.__class__)
+
+    @property
+    def streaming_content(self):
+        # we must iterate over `self._container` and call `self.make_bytes()`
+        # on each chunk instead of just returning `iter(self)`, which does the
+        # same thing. Thus, we can safely wrap `streaming_content` with a new
+        # generator.
+        return (self.make_bytes(chunk) for chunk in self._container)
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._set_container(value, consume_iterable=False)
+
+    def write(self, content):
+        def appended_iterator(iterator, content):
+            for chunk in iterator:
+                yield chunk
+            yield content
+        self.streaming_content = appended_iterator(self._container, content)
 
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']

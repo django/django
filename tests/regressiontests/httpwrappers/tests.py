@@ -2,12 +2,14 @@
 from __future__ import unicode_literals
 
 import copy
+import os
 import pickle
+import tempfile
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
-                         HttpResponseNotModified,
+                         HttpResponseNotModified, HttpStreamingResponse,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
 from django.test import TestCase
@@ -329,6 +331,15 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
 
+        # content can safely be accessed multiple times.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.content, r.content)
+        self.assertEqual(r.content, b'helloworld')
+
+        # additional content can be written to the response.
+        r.write('!')
+        self.assertEqual(r.content, b'helloworld!')
+
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")
@@ -337,7 +348,9 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.tell(), 17)
 
         r = HttpResponse(['abc'])
-        self.assertRaises(Exception, r.write, 'def')
+        r.write('def')
+        self.assertEqual(r.tell(), 6)
+        self.assertEqual(r.content, b'abcdef')
 
     def test_unsafe_redirect(self):
         bad_urls = [
@@ -350,7 +363,6 @@ class HttpResponseTests(unittest.TestCase):
                               HttpResponseRedirect, url)
             self.assertRaises(SuspiciousOperation,
                               HttpResponsePermanentRedirect, url)
-
 
 class HttpResponseSubclassesTests(TestCase):
     def test_redirect(self):
@@ -378,6 +390,103 @@ class HttpResponseSubclassesTests(TestCase):
             content='Only the GET method is allowed',
             content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
+
+class HttpStreamingResponseTests(TestCase):
+    def test_streaming_response(self):
+        r = HttpStreamingResponse(iter(['hello', 'world']))
+
+        # iterating over the response itself yields bytestring chunks.
+        chunks = list(r)
+        self.assertEqual(chunks, [b'hello', b'world'])
+        for chunk in chunks:
+            self.assertIsInstance(chunk, six.binary_type)
+
+        # and the response can only be iterated once.
+        self.assertEqual(list(r), [])
+
+        # even when a sequence that can be iterated many times, like a list,
+        # is given as content.
+        r = HttpStreamingResponse(['abc', 'def'])
+        self.assertEqual(list(r), [b'abc', b'def'])
+        self.assertEqual(list(r), [])
+
+        # streaming responses don't have a `content` attribute.
+        self.assertFalse(hasattr(r, 'content'))
+
+        # and you can't accidentally assign to a `content` attribute.
+        with self.assertRaises(AttributeError):
+            r.content = 'xyz'
+
+        # but they do have a `streaming_content` attribute.
+        self.assertTrue(hasattr(r, 'streaming_content'))
+
+        # that exists so we can check if a response is streaming, and wrap or
+        # replace the content iterator.
+        r.streaming_content = iter(['abc', 'def'])
+        r.streaming_content = (chunk.upper() for chunk in r.streaming_content)
+        self.assertEqual(list(r), [b'ABC', b'DEF'])
+
+        # coercing a streaming response to bytes doesn't return an HTTP
+        # message like a regular response does.
+        r = HttpStreamingResponse(iter(['hello', 'world']))
+        self.assertEqual(repr(r), six.binary_type(r))
+
+        # and won't consume it's content.
+        self.assertEqual(list(r), [b'hello', b'world'])
+
+        # additional content can be written to the response.
+        r = HttpStreamingResponse(iter(['hello', 'world']))
+        r.write('!')
+        self.assertEqual(b''.join(r), b'helloworld!')
+
+        # but we can't tell the current position.
+        with self.assertRaises(Exception):
+            r.tell()
+
+class FileCloseTests(TestCase):
+    def test_response(self):
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+
+        # file isn't closed until we close the response.
+        file1 = open(filename)
+        r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # when multiple file are assigned as content, make sure they are all
+        # closed with the response.
+        file1 = open(filename)
+        file2 = open(filename)
+        r = HttpResponse(file1)
+        r.content = file2
+        self.assertFalse(file1.closed)
+        self.assertFalse(file2.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+        self.assertTrue(file2.closed)
+
+    def test_streaming_response(self):
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+
+        # file isn't closed until we close the response.
+        file1 = open(filename)
+        r = HttpStreamingResponse(file1)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # when multiple file are assigned as content, make sure they are all
+        # closed with the response.
+        file1 = open(filename)
+        file2 = open(filename)
+        r = HttpStreamingResponse(file1)
+        r.streaming_content = file2
+        self.assertFalse(file1.closed)
+        self.assertFalse(file2.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+        self.assertTrue(file2.closed)
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):

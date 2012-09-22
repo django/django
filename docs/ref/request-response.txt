@@ -560,12 +560,17 @@ Passing iterators
 ~~~~~~~~~~~~~~~~~
 
 Finally, you can pass ``HttpResponse`` an iterator rather than passing it
-hard-coded strings. If you use this technique, follow these guidelines:
+hard-coded strings. If you use this technique, the iterator should return
+strings.
 
-* The iterator should return strings.
-* If an :class:`HttpResponse` has been initialized with an iterator as its
-  content, you can't use the :class:`HttpResponse` instance as a file-like
-  object. Doing so will raise ``Exception``.
+.. versionchanged:: 1.5
+
+When an iterator is assigned as content to an :class:`HttpResponse`, Django
+will consume the iterator immediately. If you want to stream your response, use
+the new :class:`HttpStreamingResponse` class, instead.
+
+As a result, you can now use the :class:`HttpResponse` as a file-like object
+even when the content was given as an iterator.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -778,3 +783,47 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+HttpStreamingResponse objects
+=============================
+
+.. versionadded:: 1.5
+
+.. class:: HttpStreamingResponse
+
+The :class:`HttpStreamingResponse` class should be used when you need to stream
+a response. You might want to do this because your content takes a long time to
+generate, and you want to progressively deliver it to avoid a browser timeout,
+and to avoid bringing the entire content into memory.
+
+It is not a subclass of :class:`HttpResponse`, because it features a very
+slightly different API. However, it is almost identical, with the following
+notable differences:
+
+* It should be given an iterator that yields strings as content. Any other
+  content will be converted to an iterator for consistent behaviour.
+
+* You cannot access it's content, except by iterating the response, which
+  should only occur when the response is returned to the client.
+
+* It has no ``content`` attribute. Instead, it has a
+  :attr:`~HttpStreamingResponse.streaming_content` attribute.
+
+* You cannot use the file-like object ``tell()`` method. Doing so will raise
+  ``Exception``.
+
+Attributes
+----------
+
+.. attribute:: HttpStreamingResponse.streaming_content
+
+    An iterator representing the content. It yields strings, encoded from
+    Unicode objects if necessary.
+
+    This attribute exists so that you can determine the capabilities of a
+    response object, and wrap or replace the content. For example::
+
+        if hasattr(response, 'content'):
+            response.content = wrap_content(response.content)
+        elif hasattr(response, 'streaming_content'):
+            response.streaming_content = wrap_streaming_content(response.streaming_content)

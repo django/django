@@ -121,6 +121,37 @@ GeoDjango
 
 * Support for GDAL < 1.5 has been dropped.
 
+Explicit support for streaming responses with ``HttpStreamingResponse`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, you could generate a streaming response by passing an iterator as
+content to :class:`~django.http.HttpResponse`. This was not explicitly 
+documented, and was not always guaranteed to generate a streaming response
+because any middleware that accessed the :attr:`~django.http.HttpResponse.content`
+attribute would consume the iterator prematurely.
+
+In Django 1.5 you can explicitly generate a streaming response with the new
+:class:`~django.http.HttpStreamingResponse` class. This new class exposes a
+:class:`~django.http.HttpStreamingResponse.streaming_content` attribute. You
+can safely wrap or replace the ``streaming_content``.
+
+Unlike the :class:`~django.http.HttpResponse` class, the new response class
+does not have a ``content`` attribute.
+
+As a result, middleware can no longer be guaranteed that all responses will
+have a ``content`` attribute. Middleware should inspect the response and
+behave accordingly if they need access to content::
+
+    if hasattr(response, 'content'):
+        response.content = wrap_content(response.content)
+    elif hasattr(response, 'streaming_content'):
+        response.streaming_content = wrap_streaming_content(response.streaming_content)
+
+When passing an iterator as content to the :class:`~django.http.HttpResponse`
+class, Django will consume the iterator immediately to prevent buggy behaviour
+when the :attr:`~django.http.HttpResponse.content` attribute is accessed
+multiple times.
+
 Minor features
 ~~~~~~~~~~~~~~
 
