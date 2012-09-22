@@ -103,6 +103,28 @@ class QasPredicateTest(test.TestCase):
     def test_iregex(self):
         self.assertTrue(Q(name__iregex='Hel*o').matches(self.testobj))
 
+    def test_simple_negation(self):
+        predicate = ~Q(name__contains='world')
+        self.assertFalse(predicate.matches(self.testobj))
+
+    def test_negation2(self):
+        p1 = ~Q(name__contains='y')
+        p2 = ~Q(name__contains='b')
+        p2_2 = ~Q(name__contains='h')
+        p3 = p1 & p2
+        self.assertTrue(p3.matches(self.testobj))
+        # Note you can't invert Q at the same time you call .matches
+        p3_2 = ~p3
+        self.assertFalse(p3_2.matches(self.testobj))
+        self.assertFalse(p3.matches(self.testobj2))
+        p4 = Q(name__contains='e')
+        p5 = p1 | p4
+        self.assertTrue(p5.matches(self.testobj))
+        self.assertTrue(p5.matches(self.testobj2))
+        p6 = p1 & p5
+        self.assertTrue(p6.matches(self.testobj))
+        self.assertFalse(p6.matches(self.testobj2))
+
     def test_invalid_lookup(self):
         """
         Test that an invalid lookup raises an exception

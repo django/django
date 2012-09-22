@@ -74,7 +74,8 @@ class Q(tree.Node):
                 if isinstance(child, type(self)):
                     # a Q subtree
                     branch_root = LookupExpression(connector=child.connector,
-                            manager=manager)
+                            manager=manager, negated=child.negated)
+
                     parent.children.append(branch_root)
                     descend(branch_root, child.children)
                 else:
@@ -84,6 +85,7 @@ class Q(tree.Node):
 
         root = LookupExpression(connector=self.connector, manager=manager)
         descend(root, self.children)
+        root.negated = self.negated
 
         self._compiled_matcher = root
 
@@ -100,7 +102,15 @@ class Q(tree.Node):
         if self._compiled_matcher.manager != manager:
             # the pre-compiled matcher was compiled for a different manager
             self._compile_matcher(manager)
-        return self._compiled_matcher.matches(instance)
+        return_val = self._compiled_matcher.matches(instance)
+        if self.negated:
+            # It is extremely unlikely (impossible?) to end up with a root
+            # Q object that is negated, given the implementation of __invert__
+            # we should be able to return _compiled_matcher.matches() directly
+            # but in case we encounter an unforseen edgecase, we check again
+            return not return_val
+        else:
+            return return_val
 
     def match_compile(self, manager):
         """
@@ -259,21 +269,28 @@ class LookupExpression(tree.Node):
 
         evaluators = {"AND": all, "OR": any}
         evaluator = evaluators[self.connector]
+        return_val = None
         if self.children:
-            return (evaluator(c.matches(instance) for c in self.children))
-        try:
-            instance_value = self.get_instance_value(instance)
-        except AttributeError:
-            # this is raised when we were not able to traverse the full
-            # attribute route. In nearly all cases this means the match failed
-            # as it specified a longer relationship chain then exists for this
-            # instance.
-            if (hasattr(self.lookup_function, 'none_is_true')
-                and self.lookup_function.none_is_true):
-                return True
+            return_val = (evaluator(c.matches(instance) for c in self.children))
+        else:
+            try:
+                instance_value = self.get_instance_value(instance)
+            except AttributeError:
+                # this is raised when we were not able to traverse the full
+                # attribute route. In nearly all cases this means the match failed
+                # as it specified a longer relationship chain then exists for this
+                # instance.
+                if (hasattr(self.lookup_function, 'none_is_true')
+                    and self.lookup_function.none_is_true):
+                    return_val = True
+                else:
+                    return_val =  False
             else:
-                return False
-        return self.lookup_function(instance, self.get_instance_value(instance), self.value)
+                return_val = self.lookup_function(instance, self.get_instance_value(instance), self.value)
+        if self.negated:
+            return not return_val
+        else:
+            return return_val
 
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):
