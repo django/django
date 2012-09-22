@@ -21,8 +21,8 @@ specified for QuerySet methods::
 
 Q objects, once composed, can be used to generate QuerySets containing objects
 (model instances) that match the condition, and can also be used to test
-whether a given object matches the condition. The same Q object can be used
-in both capacities.
+whether a given instance matches the condition. The same Q object can generally
+be used in both capacities.
 
 To query the database for cars matching the condition::
 
@@ -160,9 +160,10 @@ Match Compiling and alternate managers
 
 Testing whether an instance matches)a condition requires evaluating the lookups
 in the context of the Model and Manager classes associated with that instance.
-This information is not necessarily required or available at the time the Q object is
-created. The first call to a Q object's ``matches`` method verifies that the lookups are valid, and
-traverses any related objects, storing this information for subsequent matches.
+This information is not necessarily required or available at the time the
+Q object is created. The first call to a Q object's ``matches`` method verifies
+that the lookups are valid, and traverses any related objects, storing this
+information for subsequent matches.
 
 The manager provides information about supported lookup types. For example the
 contrib.gis GeoManager provides details about the geographic specific lookup

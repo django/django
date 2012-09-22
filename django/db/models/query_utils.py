@@ -12,6 +12,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.utils import six
 from django.utils import tree
 
+
 class InvalidQuery(Exception):
     """
     The query passed to raw isn't a safe query to use with raw.
@@ -30,6 +31,7 @@ class QueryWrapper(object):
     def as_sql(self, qn=None, connection=None):
         return self.data
 
+
 class Q(tree.Node):
     """
     Encapsulates filters as objects that can then be combined logically (using
@@ -41,7 +43,8 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        super(Q, self).__init__(children=list(args)
+                + list(six.iteritems(kwargs)))
         self._compiled_matcher = None
 
     def _combine(self, other, conn):
@@ -66,8 +69,8 @@ class Q(tree.Node):
 
     def _compile_matcher(self, manager):
         """
-        Create a mirrored version of self, but where leaves are LookupExpressions
-        that understand a call to .matches().
+        Create a mirrored version of self, but where leaves are
+        LookupExpressions that understand a call to .matches().
         """
         def descend(parent, children):
             for child in children:
@@ -79,7 +82,8 @@ class Q(tree.Node):
                     parent.children.append(branch_root)
                     descend(branch_root, child.children)
                 else:
-                    # assuming we are in a properly formed Q, could only be a tuple
+                    # assuming we are in a properly formed Q, could only be
+                    # a tuple
                     child_le = LookupExpression(expr=child, manager=manager)
                     parent.children.append(child_le)
 
@@ -118,6 +122,7 @@ class Q(tree.Node):
         """
         self._compile_matcher(manager)
         return self._compiled_matcher
+
 
 class DeferredAttribute(object):
     """
@@ -203,7 +208,7 @@ class LookupExpression(tree.Node):
             # attr_route is a sequence of fields following relationships
             # ending in the field to perform the match on
             self.attr_route = []
-            self.lookup_type = 'exact' # Default lookup type
+            self.lookup_type = 'exact'  # Default lookup type
             self.query = manager.get_query_set().query
             self.traverse_lookup(manager.model)
             if (len(self.attr_route) == 0 or
@@ -271,29 +276,32 @@ class LookupExpression(tree.Node):
         evaluator = evaluators[self.connector]
         return_val = None
         if self.children:
-            return_val = (evaluator(c.matches(instance) for c in self.children))
+            return_val = (
+                    evaluator(c.matches(instance) for c in self.children)
+                    )
         else:
             try:
                 instance_value = self.get_instance_value(instance)
+                return_val = self.lookup_function(instance, instance_value,
+                        self.value)
             except AttributeError:
                 # this is raised when we were not able to traverse the full
-                # attribute route. In nearly all cases this means the match failed
-                # as it specified a longer relationship chain then exists for this
-                # instance.
+                # attribute route. In nearly all cases this means the match
+                # failed as it specified a longer relationship chain then
+                # exists for this instance.
                 if (hasattr(self.lookup_function, 'none_is_true')
                     and self.lookup_function.none_is_true):
                     return_val = True
                 else:
-                    return_val =  False
-            else:
-                return_val = self.lookup_function(instance, self.get_instance_value(instance), self.value)
+                    return_val = False
         if self.negated:
             return not return_val
         else:
             return return_val
 
 
-def select_related_descend(field, restricted, requested, load_fields, reverse=False):
+def select_related_descend(field, restricted, requested, load_fields,
+        reverse=False):
     """
     Returns True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
@@ -331,6 +339,7 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
 
 # This function is needed because data descriptors must be defined on a class
 # object, not an instance, to have any effect.
+
 
 def deferred_class_factory(model, attrs):
     """

@@ -1,11 +1,11 @@
 import datetime
 
-from django.contrib.sessions.models import Session, SessionManager
 from django.db.models.query import Q
-from django.utils import six, unittest
+from django.utils import six
 from django import test
 
 from .models import Item, OtherItem
+
 
 class QasPredicateTest(test.TestCase):
     def setUp(self):
@@ -110,7 +110,6 @@ class QasPredicateTest(test.TestCase):
     def test_negation2(self):
         p1 = ~Q(name__contains='y')
         p2 = ~Q(name__contains='b')
-        p2_2 = ~Q(name__contains='h')
         p3 = p1 & p2
         self.assertTrue(p3.matches(self.testobj))
         # Note you can't invert Q at the same time you call .matches
@@ -137,6 +136,7 @@ class QasPredicateTest(test.TestCase):
         predicate = Q(flubber__contains='foo')
         with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
             predicate.matches(self.testobj)
+
 
 class RelationshipFollowTest(test.TestCase):
 
@@ -173,6 +173,7 @@ class RelationshipFollowTest(test.TestCase):
         should return True
         """
         self.assertTrue(Q(parent__int_value__isnull=True).matches(self.testobj))
+
 
 class ManagerTests(test.TestCase):
 
