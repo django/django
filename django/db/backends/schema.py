@@ -159,14 +159,11 @@ class BaseDatabaseSchemaEditor(object):
 
     # Actions
 
-    def create_model(self, model, force=False):
+    def create_model(self, model):
         """
         Takes a model and creates a table for it in the database.
         Will also create any accompanying indexes or unique constraints.
         """
-        # Do nothing if this is an unmanaged or proxy model
-        if not force and (not model._meta.managed or model._meta.proxy):
-            return
         # Create column SQL, add FK deferreds if needed
         column_sqls = []
         params = []
@@ -226,15 +223,12 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            self.create_model(field.rel.through, force=True)
+            self.create_model(field.rel.through)
 
-    def delete_model(self, model, force=False):
+    def delete_model(self, model):
         """
         Deletes a model from the database.
         """
-        # Do nothing if this is an unmanaged or proxy model
-        if not force and (not model._meta.managed or model._meta.proxy):
-            return
         # Delete the table
         self.execute(self.sql_delete_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -300,7 +294,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
-            return self.create_model(field.rel.through, force=True)
+            return self.create_model(field.rel.through)
         # Get the column's definition
         definition, params = self.column_sql(model, field, include_default=True)
         # It might not actually have a column behind it
