@@ -72,7 +72,7 @@ class Command(NoArgsCommand):
             opts = model._meta
             converter = connection.introspection.table_name_converter
             # Note that if a model is unmanaged we short-circuit and never try to install it
-            return opts.managed and not ((converter(opts.db_table) in tables) or
+            return not ((converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
 
 
