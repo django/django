@@ -209,7 +209,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if pk_column:
             # SQLite doesn't actually give a name to the PK constraint,
             # so we invent one. This is fine, as the SQLite backend never
-            # deletes PK constraints by name.
+            # deletes PK constraints by name, as you can't delete constraints
+            # in SQLite; we remake the table with a new PK instead.
             constraints["__primary__"] = {
                 "columns": set([pk_column]),
                 "primary_key": True,
