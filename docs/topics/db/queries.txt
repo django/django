@@ -742,11 +742,10 @@ Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for
 example, queries with ``OR`` statements), you can use ``Q`` objects.
 
-.. comment: Link to Q does not work, since this documentation does not exist yet.
-
-A :class:`~django.db.models.Q` object (``django.db.models.Q``) is an object
+A :class:`Q object <django.db.models.Q>` (``django.db.models.Q``) is an object
 used to encapsulate a collection of keyword arguments. These keyword arguments
-are specified as in "Field lookups" above.
+are specified as in "Field lookups" above. See the :doc:`documentation for
+Q objects </topics/q-objects>` for more details.
 
 Comparing objects
 =================

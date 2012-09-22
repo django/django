@@ -1,3 +1,4 @@
+=========
 Q objects
 =========
 
@@ -6,7 +7,7 @@ Q objects
 .. class:: Q(lookup_keyword_arguments)
 
 A Q object is an object used to encapsulate a set of conditions which may be
-applied to model objects.
+used to query or filter a set of model objects.
 
 In plain language these conditions might take the form "cars that are blue and
 made after the year 1998" or "employees in the shipping department who are full
@@ -15,6 +16,7 @@ time or who have worked at the company for more than 10 years", etc.
 The condition is composed from a set of field lookups keyword arguments as
 specified for QuerySet methods::
 
+    from django.db.models import Q
     my_condition = Q(color='blue', year_produced__gt=1998)
 
 Q objects, once composed, can be used to generate QuerySets containing objects
@@ -119,7 +121,9 @@ There may be times when you already have a model object in hand and want to
 know if it matches some defined condition. This may be a model from a QuerySet,
 or a newly created model instance not yet saved to the database. Q objects can
 be used to test whether that object matches the condition defined by the
-Q object.
+Q object. Unlike Q objects used with QuerySet methods - a Q object can define
+lookups on any attribute of a model, not just those that define database
+fields.
 
 .. method:: Q.matches(instance, [manager=None])
 
@@ -128,6 +132,14 @@ Q object.
     managers, a specific manager can be specified, otherwise the default
     manager is used. The need to specify a specific manager is uncommon - see
     details on alternate managers below.
+
+.. note::
+
+    When negating a Q object, the result is a new Q object, it is not negated
+    in place. That means it is invalid to both negate a Q object and call
+    matches on it in a simple statement. ie this won't work as expected:
+    ``~my_q.matches(some_instance)``. Instead, assign the negated Q to a new
+    local variable, then call the matches method on that.
 
 .. admonition:: Choose the right tool
 
@@ -142,17 +154,41 @@ Q object.
 Match Compiling and alternate managers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Testing whether an instance matches a condition requires evaluating the lookups
+.. note::
+
+    This section covers API details that aren't commonly used.
+
+Testing whether an instance matches)a condition requires evaluating the lookups
 in the context of the Model and Manager classes associated with that instance.
 This information is not necessarily required or available at the time the Q object is
-created. The first call to a Q object verifies that the lookups are valid, and
+created. The first call to a Q object's ``matches`` method verifies that the lookups are valid, and
 traverses any related objects, storing this information for subsequent matches.
-The manager provides information
 
-Remaining:
-- manager kwarg to matches
-- match_compile
-- recompiling
+The manager provides information about supported lookup types. For example the
+contrib.gis GeoManager provides details about the geographic specific lookup
+types.
 
+Like regex expressions, there may be times when there is some optimization to
+precompiling the lookup evaluation. This requires information about the manager
+at that time.
 
+.. method:: Q.match_compile(manager)
 
+    The ``match_compile`` method will return a compiled matcher object with any
+    Model class and Manager specific information already evaluated. This
+    matcher object then has a ``matches`` method that mirrors the method
+    documented above (and in fact is what gets called privately in Q.matches)
+
+If a precompiled matcher is called with an object that uses a different manager
+than was specified at compile time, a ValueError is raised.
+
+If a model has multiple managers, where these would result in different lookup
+evaluations, the specific manager can be specified as an optional keyword
+argument to ``Q.matches``
+
+If, after the first call to ``Q.matches``, a subsequent call is made with an
+instance using a different manager, the Q object recompiles it's internal
+matcher object using the manager of the current instance. This means that if
+you want to use the same Q object to match a variety different classes of model
+objects, it would be more efficient to test all of one type, then all of
+another etc.
