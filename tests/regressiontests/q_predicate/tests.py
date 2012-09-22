@@ -194,11 +194,10 @@ class ManagerTests(test.TestCase):
 
         pmatch = predicate.match_compile(manager=Item.alt_manager)
         pmatch.matches(self.testobj)
-        pmatch.matches(self.testobj2)
         with six.assertRaisesRegex(self, ValueError, 'invalid manager'):
             pmatch.matches(self.testobj2)
         # test that predicat recompiles when used with predicate
-        # by testing no problem with match
-        # then introspect what the manager is
-
-
+        predicate.matches(self.testobj2)
+        # test that the newly compiled matcher uses the instance manager
+        self.assertEquals(predicate._compiled_matcher.manager,
+                self.testobj2._default_manager)
