@@ -1251,7 +1251,7 @@ S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, 
                   month, 2 characters.
 t                 Number of days in the given month.        ``28`` to ``31``
 T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-u                 Microseconds.                             ``0`` to ``999999``
+u                 Microseconds.                             ``000000`` to ``999999``
 U                 Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
