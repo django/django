@@ -22,7 +22,7 @@ ALL_TERMS = set([
             ])
 ALL_TERMS.update(sql.constants.QUERY_TERMS)
 
-ALL_MATCHES = sql.matching.match_functions
+ALL_MATCHES = sql.matching.match_functions.copy()
 
 # we update match functions in the reverse of query_terms, as we want the
 # gis version to be the one in the final lookup ie 'contains' should be gis
