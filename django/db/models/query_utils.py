@@ -106,11 +106,11 @@ class Q(tree.Node):
             # the pre-compiled matcher was compiled for a different manager
             self._compile_matcher(manager)
         return_val = self._compiled_matcher.matches(instance)
-        if self.negated:
-            # It is extremely unlikely (impossible?) to end up with a root
-            # Q object that is negated, given the implementation of __invert__
-            # we should be able to return _compiled_matcher.matches() directly
-            # but in case we encounter an unforseen edgecase, we check again
+        if self.negated != self._compiled_matcher.negated:
+            # It is extremely unlikely to end up with a root Q object that has
+            # a different negated state than the already compiled matcher root,
+            # but if one manually changed the negated attribute after an
+            # initial match, this will catch that scenario
             return not return_val
         else:
             return return_val

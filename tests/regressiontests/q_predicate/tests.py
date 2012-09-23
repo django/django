@@ -124,6 +124,15 @@ class QasPredicateTest(test.TestCase):
         self.assertTrue(p6.matches(self.testobj))
         self.assertFalse(p6.matches(self.testobj2))
 
+
+    def test_explicit_negate(self):
+        p1 = ~Q(name__contains='y')
+        self.assertTrue(p1.matches(self.testobj))
+        # explicitly negate the Q - not documented API - but easily possible
+        p1.negated = True
+        self.assertFalse(p1.matches(self.testobj))
+
+
     def test_invalid_lookup(self):
         """
         Test that an invalid lookup raises an exception
