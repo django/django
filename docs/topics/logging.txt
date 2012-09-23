@@ -2,8 +2,6 @@
 Logging
 =======
 
-.. versionadded:: 1.3
-
 .. module:: django.utils.log
    :synopsis: Logging tools for Django applications
 

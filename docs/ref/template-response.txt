@@ -2,8 +2,6 @@
 TemplateResponse and SimpleTemplateResponse
 ===========================================
 
-.. versionadded:: 1.3
-
 .. module:: django.template.response
    :synopsis: Classes dealing with lazy-rendered HTTP responses.
 

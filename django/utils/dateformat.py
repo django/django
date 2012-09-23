@@ -110,8 +110,8 @@ class TimeFormat(Formatter):
         return '%02d' % self.data.second
 
     def u(self):
-        "Microseconds"
-        return self.data.microsecond
+        "Microseconds; i.e. '000000' to '999999'"
+        return '%06d' %self.data.microsecond
 
 
 class DateFormat(TimeFormat):

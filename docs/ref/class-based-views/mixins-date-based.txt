@@ -318,12 +318,16 @@ BaseDateListView
         Returns the aggregation period for ``date_list``. Returns
         :attr:`~BaseDateListView.date_list_period` by default.
 
-    .. method:: get_date_list(queryset, date_type=None)
+    .. method:: get_date_list(queryset, date_type=None, ordering='ASC')
 
         Returns the list of dates of type ``date_type`` for which ``queryset``
         contains entries. For example, ``get_date_list(qs, 'year')`` will
         return the list of years for which ``qs`` has entries. If
         ``date_type`` isn't provided, the result of
-        :meth:`BaseDateListView.get_date_list_period` is used. See
-        :meth:`~django.db.models.query.QuerySet.dates()` for the ways that the
-        ``date_type`` argument can be used.
+        :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
+        and ``ordering`` are simply passed to
+        :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.
+
+        .. versionchanged:: 1.5
+            The ``ordering`` parameter was added, and the default order was
+            changed to ascending.

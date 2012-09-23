@@ -195,8 +195,6 @@ return values for dynamic media properties.
 Paths in media definitions
 --------------------------
 
-.. versionchanged:: 1.3
-
 Paths used to specify media can be either relative or absolute. If a path
 starts with ``/``, ``http://`` or ``https://``, it will be interpreted as an
 absolute path, and left as-is. All other paths will be prepended with the value

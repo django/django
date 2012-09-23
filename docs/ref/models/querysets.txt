@@ -505,15 +505,8 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-.. versionchanged:: 1.3
-
-The ``values()`` method previously did not return anything for
-:class:`~django.db.models.ManyToManyField` attributes and would raise an error
-if you tried to pass this type of field to it.
-
-This restriction has been lifted, and you can now also refer to fields on
-related models with reverse relations through ``OneToOneField``, ``ForeignKey``
-and ``ManyToManyField`` attributes::
+You can also refer to fields on related models with reverse relations through
+``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
     Blog.objects.values('name', 'entry__headline')
     [{'name': 'My blog', 'entry__headline': 'An entry'},
@@ -1664,10 +1657,9 @@ For example::
     # This will delete all Blogs and all of their Entry objects.
     blogs.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the

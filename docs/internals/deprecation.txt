@@ -134,7 +134,7 @@ these changes.
 
 * The function-based generic view modules will be removed in favor of their
   class-based equivalents, outlined :doc:`here
-  </topics/class-based-views/index>`:
+  </topics/class-based-views/index>`.
 
 * The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
   removed.  In its place use

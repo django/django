@@ -377,7 +377,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         """
         return self.date_list_period
 
-    def get_date_list(self, queryset, date_type=None):
+    def get_date_list(self, queryset, date_type=None, ordering='ASC'):
         """
         Get a date list by calling `queryset.dates()`, checking along the way
         for empty lists that aren't allowed.
@@ -387,7 +387,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         if date_type is None:
             date_type = self.get_date_list_period()
 
-        date_list = queryset.dates(date_field, date_type)[::-1]
+        date_list = queryset.dates(date_field, date_type, ordering)
         if date_list is not None and not date_list and not allow_empty:
             name = force_text(queryset.model._meta.verbose_name_plural)
             raise Http404(_("No %(verbose_name_plural)s available") %
@@ -409,7 +409,7 @@ class BaseArchiveIndexView(BaseDateListView):
         Return (date_list, items, extra_context) for this request.
         """
         qs = self.get_dated_queryset(ordering='-%s' % self.get_date_field())
-        date_list = self.get_date_list(qs)
+        date_list = self.get_date_list(qs, ordering='DESC')
 
         if not date_list:
             qs = qs.none()

@@ -45,7 +45,7 @@ GeoDjango's admin site
    .. attribute:: openlayers_url
 
    Link to the URL of the OpenLayers JavaScript.  Defaults to
-   ``'http://openlayers.org/api/2.8/OpenLayers.js'``.
+   ``'http://openlayers.org/api/2.11/OpenLayers.js'``.
 
 
    .. attribute:: modifiable

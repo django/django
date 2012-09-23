@@ -1023,8 +1023,6 @@ define the details of how the relation works.
     The field on the related object that the relation is to. By default, Django
     uses the primary key of the related object.
 
-.. versionadded:: 1.3
-
 .. attribute:: ForeignKey.on_delete
 
     When an object referenced by a :class:`ForeignKey` is deleted, Django by
@@ -1080,6 +1078,9 @@ A many-to-many relationship. Requires a positional argument: the class to which
 the model is related. This works exactly the same as it does for
 :class:`ForeignKey`, including all the options regarding :ref:`recursive
 <recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
+
+Related objects can be added, removed, or created with the field's
+:class:`~django.db.models.fields.related.RelatedManager`.
 
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~

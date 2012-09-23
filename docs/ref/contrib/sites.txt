@@ -159,8 +159,6 @@ the :class:`~django.contrib.sites.models.Site` model's manager has a
         else:
             # Do something else.
 
-.. versionchanged:: 1.3
-
 For code which relies on getting the current domain but cannot be certain
 that the sites framework will be installed for any given project, there is a
 utility function :func:`~django.contrib.sites.models.get_current_site` that
@@ -169,12 +167,10 @@ the sites framework is installed) or a RequestSite instance (if it is not).
 This allows loose coupling with the sites framework and provides a usable
 fallback for cases where it is not installed.
 
-.. versionadded:: 1.3
-
 .. function:: get_current_site(request)
 
     Checks if contrib.sites is installed and returns either the current
-    :class:`~django.contrib.sites.models.Site` object or a 
+    :class:`~django.contrib.sites.models.Site` object or a
     :class:`~django.contrib.sites.models.RequestSite` object based on
     the request.
 
@@ -437,7 +433,7 @@ fallback when the database-backed sites framework is not available.
 
         Sets the ``name`` and ``domain`` attributes to the value of
         :meth:`~django.http.HttpRequest.get_host`.
-        
+
 
 A :class:`~django.contrib.sites.models.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object, except

@@ -658,8 +658,6 @@ those classes as an argument::
 
 .. method:: BoundField.value()
 
-   .. versionadded:: 1.3
-
 Use this method to render the raw value of this field as it would be rendered
 by a ``Widget``::
 

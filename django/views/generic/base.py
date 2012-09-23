@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
+import logging
 from functools import update_wrapper
+
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
-from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod
 from django.utils import six
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 class ContextMixin(object):

@@ -2,18 +2,18 @@
 Decorators for views based on HTTP headers.
 """
 
+import logging
 from calendar import timegm
 from functools import wraps
 
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from django.utils.http import http_date, parse_http_date_safe, parse_etags, quote_etag
-from django.utils.log import getLogger
 from django.middleware.http import ConditionalGetMiddleware
 from django.http import HttpResponseNotAllowed, HttpResponseNotModified, HttpResponse
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 def require_http_methods(request_method_list):

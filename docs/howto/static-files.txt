@@ -2,8 +2,6 @@
 Managing static files
 =====================
 
-.. versionadded:: 1.3
-
 Django developers mostly concern themselves with the dynamic parts of web
 applications -- the views and templates that render anew for each request. But
 web applications have other parts: the static files (images, CSS,

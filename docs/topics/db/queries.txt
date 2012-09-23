@@ -633,8 +633,6 @@ issue the query::
 
     >>> Entry.objects.filter(authors__name=F('blog__name'))
 
-.. versionadded:: 1.3
-
 For date and date/time fields, you can add or subtract a
 :class:`~datetime.timedelta` object. The following would return all entries
 that were modified more than 3 days after they were published::
@@ -876,7 +874,6 @@ it. For example::
     # This will delete the Blog and all of its Entry objects.
     b.delete()
 
-.. versionadded:: 1.3
     This cascade behavior is customizable via the
     :attr:`~django.db.models.ForeignKey.on_delete` argument to the
     :class:`~django.db.models.ForeignKey`.

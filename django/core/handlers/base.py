@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import logging
 import sys
 import types
 
@@ -7,10 +8,9 @@ from django import http
 from django.core import signals
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
-from django.utils.log import getLogger
 from django.utils import six
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 class BaseHandler(object):
