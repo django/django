@@ -81,7 +81,8 @@ class GBPhoneNumberField(CharField):
         ->         ->         0         ^as above           ^as above
         ->         ->        (0         ^                   ^
      Pick one item from each column. Underscores represent spaces or hyphens.
-     All number formats can also be matched without spaces or hyphens.
+     All number formats can also be matched without spaces or hyphens. The
+     '#' character can also be an 'x'.
 
      "Be conservative in what you do, be liberal in what you accept from
       others."
@@ -182,7 +183,8 @@ class GBPhoneNumberField(CharField):
 
                 # Extract extension
                 if m.group(3):
-                    number_parts['extension'] = '#' + m.group(3)
+                    # Add a # and remove the x
+                    number_parts['extension'] = '#' + m.group(3)[1:]
         if not number_parts:
             raise ValidationError(self.default_error_messages['number_format'])
 

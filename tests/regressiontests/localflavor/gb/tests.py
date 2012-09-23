@@ -72,7 +72,9 @@ class GBLocalFlavorTests(SimpleTestCase):
             '019467 55555': '+44 19467 55555',
             '01750 62555': '+44 1750 62555',
             '016977 3555': '+44 16977 3555',
-            '0500 777888': '+44 500 777888'
+            '0500 777888': '+44 500 777888',
+            '020 7000 9000 x4567': '+44 20 7000 9000 #4567',
+            '020 7000 9000 #4567': '+44 20 7000 9000 #4567'
         }
         errors = GBPhoneNumberField.default_error_messages
         messages = {
@@ -89,6 +91,7 @@ class GBLocalFlavorTests(SimpleTestCase):
             '020 5000 5000': messages['number_range'],
             '0171 555 7777': messages['number_range'],
             '01999 777888': messages['number_range'],
-            '01750 61777': messages['number_range']
+            '01750 61777': messages['number_range'],
+            '020 7000 9000 ext. 4567': messages['number_format']
         }
         self.assertFieldOutput(GBPhoneNumberField, valid, invalid)
