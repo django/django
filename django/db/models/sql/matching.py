@@ -80,9 +80,12 @@ def _isnull(model, instance_value, value):
     else:
         return instance_value is not None
 
-# This is a special attr/flag to designate that when None is the instance_value
-# due to an inability to follow a set of relationships, True should be returned
-# for the match, as in most cases, the match would be considered False
+
+# When a relationship specified in a lookup can not be followed (due a null FK
+# for example) the instance value is an implicit None, and the resulting match
+# is false for any lookup type that tests a value.  In the case of isnull and
+# potentially other yet to be defined lookups - such an implicit None value
+# should be interpreted as True. This flag is used to denote such a situation.
 _isnull.none_is_true = True
 
 
