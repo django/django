@@ -5,6 +5,7 @@
 # Python, ctypes and types dependencies.
 from ctypes import addressof, byref, c_double
 
+from django.contrib.gis import memoryview
 # super-class for mutable list behavior
 from django.contrib.gis.geos.mutable_list import ListMixin
 
@@ -75,7 +76,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geomtry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, buffer):
+        elif isinstance(geo_input, memoryview):
             # When the input is a buffer (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
@@ -139,12 +140,12 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __getstate__(self):
         # The pickled state is simply a tuple of the WKB (in string form)
         # and the SRID.
-        return str(self.wkb), self.srid
+        return bytes(self.wkb), self.srid
 
     def __setstate__(self, state):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
-        ptr = wkb_r().read(buffer(wkb))
+        ptr = wkb_r().read(memoryview(wkb))
         if not ptr: raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
         self._post_init(srid)

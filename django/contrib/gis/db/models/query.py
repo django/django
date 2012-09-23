@@ -1,6 +1,7 @@
 from django.db import connections
 from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
 
+from django.contrib.gis import memoryview
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
@@ -676,7 +677,7 @@ class GeoQuerySet(QuerySet):
                     if not backend.geography:
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
-                        if not str(Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
+                        if not str(Geometry(memoryview(params[0].ewkb)).geom_type) == 'Point':
                             raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.

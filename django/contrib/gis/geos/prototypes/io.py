@@ -1,5 +1,6 @@
 import threading
 from ctypes import byref, c_char_p, c_int, c_char, c_size_t, Structure, POINTER
+from django.contrib.gis import memoryview
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string, check_sized_string
@@ -130,8 +131,8 @@ class _WKBReader(IOBase):
 
     def read(self, wkb):
         "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
-        if isinstance(wkb, buffer):
-            wkb_s = str(wkb)
+        if isinstance(wkb, memoryview):
+            wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
         elif isinstance(wkb, six.string_types):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
@@ -155,7 +156,7 @@ class WKBWriter(IOBase):
 
     def write(self, geom):
         "Returns the WKB representation of the given geometry."
-        return buffer(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
+        return memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
 
     def write_hex(self, geom):
         "Returns the HEXEWKB representation of the given geometry."

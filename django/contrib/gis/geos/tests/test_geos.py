@@ -2,6 +2,7 @@ import ctypes
 import json
 import random
 
+from django.contrib.gis import memoryview
 from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
     GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
     LineString, MultiLineString, fromfile, fromstr, geos_version_info)
@@ -118,9 +119,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.fail('Should have raised GEOSException.')
 
         # Same for EWKB.
-        self.assertEqual(buffer(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
+        self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
         if GEOS_PREPARE:
-            self.assertEqual(buffer(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+            self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
         else:
             try:
                 ewkb = pnt_3d.ewkb
@@ -150,7 +151,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 pass
 
         # Bad WKB
-        self.assertRaises(GEOSException, GEOSGeometry, buffer('0'))
+        self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))
 
         print("\nEND - expecting GEOS_ERROR; safe to ignore.\n")
 
@@ -182,7 +183,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing creation from WKB."
         from binascii import a2b_hex
         for g in self.geometries.hex_wkt:
-            wkb = buffer(a2b_hex(g.hex))
+            wkb = memoryview(a2b_hex(g.hex))
             geom_h = GEOSGeometry(wkb)
             # we need to do this so decimal places get normalised
             geom_t = fromstr(g.wkt)

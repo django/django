@@ -1,3 +1,4 @@
+from django.contrib.gis import memoryview
 from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
 
 from django.utils import six
@@ -18,7 +19,7 @@ def fromfile(file_h):
     if wkt_regex.match(buf) or hex_regex.match(buf):
         return GEOSGeometry(buf)
     else:
-        return GEOSGeometry(buffer(buf))
+        return GEOSGeometry(memoryview(buf))
 
 def fromstr(string, **kwargs):
     "Given a string value, returns a GEOSGeometry object."
