@@ -231,7 +231,6 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.distance_spheroid = prefix + 'distance_spheroid'
         self.envelope = prefix + 'Envelope'
         self.extent = prefix + 'Extent'
-        self.extent3d = prefix + 'Extent3D'
         self.force_rhr = prefix + 'ForceRHR'
         self.geohash = GEOHASH
         self.geojson = GEOJSON
@@ -239,14 +238,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.intersection = prefix + 'Intersection'
         self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
-        self.length3d = prefix + 'Length3D'
         self.length_spheroid = prefix + 'length_spheroid'
         self.makeline = prefix + 'MakeLine'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points =prefix + 'npoints'
         self.perimeter = prefix + 'Perimeter'
-        self.perimeter3d = prefix + 'Perimeter3D'
         self.point_on_surface = prefix + 'PointOnSurface'
         self.polygonize = prefix + 'Polygonize'
         self.reverse = prefix + 'Reverse'
@@ -258,6 +255,15 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.translate = prefix + 'Translate'
         self.union = prefix + 'Union'
         self.unionagg = prefix + 'Union'
+
+        if version >= (2, 0, 0):
+            self.extent3d = prefix + '3DExtent'
+            self.length3d = prefix + '3DLength'
+            self.perimeter3d = prefix + '3DPerimeter'
+        else:
+            self.extent3d = prefix + 'Extent3D'
+            self.length3d = prefix + 'Length3D'
+            self.perimeter3d = prefix + 'Perimeter3D'
 
     def check_aggregate_support(self, aggregate):
         """
