@@ -356,6 +356,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(datetime.date(2006, 10, 25), f.clean(' 25 October 2006 '))
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, '   ')
 
+    def test_nul_bytes(self):
+        f = DateField()
+        self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
+
     # TimeField ###################################################################
 
     def test_timefield_1(self):

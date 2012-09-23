@@ -343,6 +343,10 @@ class BaseTemporalField(Field):
                     return self.strptime(value, format)
                 except ValueError:
                     continue
+                except TypeError:
+                    # When value contains NUL bytes, strptime raises TypeError.
+                    # Treat it as an invalid value.
+                    continue
         raise ValidationError(self.error_messages['invalid'])
 
     def strptime(self, value, format):
