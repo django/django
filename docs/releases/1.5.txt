@@ -94,8 +94,9 @@ Use of Q objects as a predicate test for model instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Q objects now provide a :meth:`~django.db.models.Q.matches()
-<django.db.models.Q.matches>` method that will determine whether matches the
-condition specified in the Q object. See `Q objects </topics/q-objects>`.
+<django.db.models.Q.matches>` method which can be used to test whether a model
+instance matches the condition specified in the Q object without issuing any DB
+query.  See `Q objects </topics/q-objects>` for more information.
 
 Minor features
 ~~~~~~~~~~~~~~
