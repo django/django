@@ -319,6 +319,7 @@ class BaseDatabaseWrapper(object):
     def make_debug_cursor(self, cursor):
         return util.CursorDebugWrapper(cursor, self)
 
+
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
     # True if django.db.backend.utils.typecast_timestamp is used on values
@@ -776,7 +777,7 @@ class BaseDatabaseOperations(object):
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
-        return [] # No sequence reset required by default.
+        return []  # No sequence reset required by default.
 
     def start_transaction_sql(self):
         """
@@ -915,6 +916,7 @@ class BaseDatabaseOperations(object):
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
 
+
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities
@@ -1010,12 +1012,14 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if not model._meta.managed:
                     continue
+                if model._meta.swapped:
+                    continue
                 if not router.allow_syncdb(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
                     if isinstance(f, models.AutoField):
                         sequence_list.append({'table': model._meta.db_table, 'column': f.column})
-                        break # Only one AutoField is allowed per model, so don't bother continuing.
+                        break  # Only one AutoField is allowed per model, so don't bother continuing.
 
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
@@ -1052,6 +1056,7 @@ class BaseDatabaseIntrospection(object):
         """
         raise NotImplementedError
 
+
 class BaseDatabaseClient(object):
     """
     This class encapsulates all backend-specific methods for opening a
@@ -1067,6 +1072,7 @@ class BaseDatabaseClient(object):
 
     def runshell(self):
         raise NotImplementedError()
+
 
 class BaseDatabaseValidation(object):
     """

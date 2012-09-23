@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+import copy
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -6,6 +7,7 @@ from django.core import management
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
+from django.db.models.loading import cache
 from django.test import TestCase
 
 
@@ -147,6 +149,12 @@ class ProxyModelTests(TestCase):
 
     def test_swappable(self):
         try:
+            # This test adds dummy applications to the app cache. These
+            # need to be removed in order to prevent bad interactions
+            # with the flush operation in other tests.
+            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_store = copy.deepcopy(cache.app_store)
+
             settings.TEST_SWAPPABLE_MODEL = 'proxy_models.AlternateModel'
 
             class SwappableModel(models.Model):
@@ -165,6 +173,8 @@ class ProxyModelTests(TestCase):
                         proxy = True
         finally:
             del settings.TEST_SWAPPABLE_MODEL
+            cache.app_models = old_app_models
+            cache.app_store = old_app_store
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
