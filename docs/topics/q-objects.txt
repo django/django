@@ -135,11 +135,12 @@ fields.
 
 .. note::
 
-    When negating a Q object, the result is a new Q object, it is not negated
-    in place. That means it is invalid to both negate a Q object and call
-    matches on it in a simple statement. ie this won't work as expected:
-    ``~my_q.matches(some_instance)``. Instead, assign the negated Q to a new
-    local variable, then call the matches method on that.
+    When negating a Q object with the ``~`` operator, a new Q object is
+    returned, not negated in place. Because of operator precedence, this won't
+    work as expected: ``~my_q.matches(some_instance)`` as the match is
+    evaluated before the bitwise operator ``~``. Instead, use Python's ``not``
+    logical operator directly with the result of matches: ``not
+    my_q.matches(some_instance)``.
 
 .. admonition:: Choose the right tool
 
@@ -158,7 +159,7 @@ Match Compiling and alternate managers
 
     This section covers API details that aren't commonly used.
 
-Testing whether an instance matches)a condition requires evaluating the lookups
+Testing whether an instance matches a condition requires evaluating the lookups
 in the context of the Model and Manager classes associated with that instance.
 This information is not necessarily required or available at the time the
 Q object is created. The first call to a Q object's ``matches`` method verifies
