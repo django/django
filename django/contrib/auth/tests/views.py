@@ -175,6 +175,29 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContainsEscaped(response, SetPasswordForm.error_messages['password_mismatch'])
 
 
+@override_settings(AUTH_USER_MODEL='auth.CustomUser')
+class CustomUserPasswordResetTest(AuthViewsTestCase):
+    fixtures = ['custom_user.json']
+
+    def _test_confirm_start(self):
+        # Start by creating the email
+        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        return self._read_signup_email(mail.outbox[0])
+
+    def _read_signup_email(self, email):
+        urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
+        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        return urlmatch.group(), urlmatch.groups()[0]
+
+    def test_confirm_valid_custom_user(self):
+        url, path = self._test_confirm_start()
+        response = self.client.get(path)
+        # redirect to a 'complete' page:
+        self.assertContains(response, "Please enter your new password")
+
+
 @skipIfCustomUser
 class ChangePasswordTest(AuthViewsTestCase):
 

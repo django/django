@@ -1357,6 +1357,9 @@ Helper functions
       URL to redirect to after log out. Overrides ``next`` if the given
       ``GET`` parameter is passed.
 
+
+.. _built-in-auth-forms:
+
 Built-in forms
 --------------
 
@@ -1915,6 +1918,51 @@ model and you just want to add some additional profile information, you can
 simply subclass :class:`~django.contrib.auth.models.AbstractUser` and add your
 custom profile fields.
 
+Custom users and the built-in auth forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As you may expect, built-in Django's :ref:`forms <_built-in-auth-forms>`
+and :ref:`views <other-built-in-views>` make certain assumptions about
+the user model that they are working with.
+
+If your user model doesn't follow the same assumptions, it may be necessary to define
+a replacement form, and pass that form in as part of the configuration of the
+auth views.
+
+* :class:`~django.contrib.auth.forms.UserCreationForm`
+
+  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Must be re-written for any custom user model.
+
+* :class:`~django.contrib.auth.forms.UserChangeForm`
+
+  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Must be re-written for any custom user model.
+
+* :class:`~django.contrib.auth.forms.AuthenticationForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
+  and will adapt to use the field defined in `USERNAME_FIELD`.
+
+* :class:`~django.contrib.auth.forms.PasswordResetForm`
+
+  Assumes that the user model has an integer primary key, has a field named
+  `email` that can be used to identify the user, and a boolean field
+  named `is_active` to prevent password resets for inactive users.
+
+* :class:`~django.contrib.auth.forms.SetPasswordForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+* :class:`~django.contrib.auth.forms.PasswordChangeForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+* :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+
 Custom users and django.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1960,7 +2008,11 @@ A full example
 Here is an example of a full models.py for an admin-compliant custom
 user app. This user model uses an email address as the username, and has a
 required date of birth; it provides no permission checking, beyond a simple
-`admin` flag on the user account::
+`admin` flag on the user account. This model would be compatible with all
+the built-in auth forms and views, except for the User creation forms.
+
+This code would all live in a ``models.py`` file for a custom
+authentication app::
 
     from django.db import models
     from django.contrib.auth.models import (
@@ -2006,6 +2058,7 @@ required date of birth; it provides no permission checking, beyond a simple
                             max_length=255
                         )
         date_of_birth = models.DateField()
+        is_active = models.BooleanField(default=True)
         is_admin = models.BooleanField(default=False)
 
         objects = MyUserManager()
@@ -2039,12 +2092,6 @@ required date of birth; it provides no permission checking, beyond a simple
             "Is the user a member of staff?"
             # Simplest possible answer: All admins are staff
             return self.is_admin
-
-        @property
-        def is_active(self):
-            "Is the user account currently active?"
-            # Simplest possible answer: User is always active
-            return True
 
 
 .. _authentication-backends:
