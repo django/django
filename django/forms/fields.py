@@ -341,7 +341,7 @@ class BaseTemporalField(Field):
             for format in self.input_formats:
                 try:
                     return self.strptime(value, format)
-                except ValueError:
+                except (ValueError, TypeError):
                     continue
         raise ValidationError(self.error_messages['invalid'])
 
