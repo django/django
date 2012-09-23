@@ -27,7 +27,6 @@ def _contains_properly(model, instance_value, value):
 
 
 def _coveredby(model, instance_value, value):
-    # T*F**F***, *TF**F***, **FT*F***, **F*TF***
     return any((
             instance_value.relate_pattern(value, 'T*F**F***'),
             instance_value.relate_pattern(value, '*TF**F***'),
@@ -37,7 +36,6 @@ def _coveredby(model, instance_value, value):
 
 
 def _covers(model, instance_value, value):
-    # T*****FF*, *T****FF*, ***T**FF*, ****T*FF*
     return any((
             instance_value.relate_pattern(value, 'T*****FF*'),
             instance_value.relate_pattern(value, '*T****FF*'),
