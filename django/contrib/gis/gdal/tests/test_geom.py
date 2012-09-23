@@ -92,7 +92,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing HEX input/output."
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
-            self.assertEqual(g.hex, geom1.hex)
+            self.assertEqual(g.hex.encode(), geom1.hex)
             # Constructing w/HEX
             geom2 = OGRGeometry(g.hex)
             self.assertEqual(geom1, geom2)
@@ -102,7 +102,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex)
+            self.assertEqual(b2a_hex(wkb).upper(), g.hex.encode())
             # Constructing w/WKB.
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)

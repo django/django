@@ -41,7 +41,7 @@ try:
     from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
     from django.contrib.gis.gdal.geometries import OGRGeometry
     HAS_GDAL = True
-except:
+except ImportError:
     HAS_GDAL = False
 
 try:

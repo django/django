@@ -57,6 +57,7 @@ lgeos = CDLL(lib_path)
 #  typedef void (*GEOSMessageHandler)(const char *fmt, ...);
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 def notice_h(fmt, lst, output_h=sys.stdout):
+    fmt, lst = fmt.decode(), lst.decode()
     try:
         warn_msg = fmt % lst
     except:
@@ -66,6 +67,7 @@ notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 def error_h(fmt, lst, output_h=sys.stderr):
+    fmt, lst = fmt.decode(), lst.decode()
     try:
         err_msg = fmt % lst
     except:

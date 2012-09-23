@@ -101,6 +101,6 @@ class TestDataMixin(object):
         if GEOMETRIES is None:
             # Load up the test geometry data from fixture into global.
             gzf = gzip.GzipFile(os.path.join(TEST_DATA, 'geometries.json.gz'))
-            geometries = json.loads(gzf.read())
+            geometries = json.loads(gzf.read().decode())
             GEOMETRIES = TestGeomSet(**strconvert(geometries))
         return GEOMETRIES

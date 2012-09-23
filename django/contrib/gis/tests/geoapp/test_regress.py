@@ -1,4 +1,5 @@
-from __future__ import absolute_import
+# -*- encoding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -26,7 +27,7 @@ class GeoRegressionTests(TestCase):
 
     def test_kmz(self):
         "Testing `render_to_kmz` with non-ASCII data. See #11624."
-        name = '\xc3\x85land Islands'.decode('iso-8859-1')
+        name = "Åland Islands"
         places = [{'name' : name,
                   'description' : name,
                   'kml' : '<Point><coordinates>5.0,23.0</coordinates></Point>'

@@ -555,7 +555,7 @@ with the :ttag:`url` template tag:
 
     If ``{% url 'polls.views.detail' poll.id %}`` (with quotes) doesn't work,
     but ``{% url polls.views.detail poll.id %}`` (without quotes) does, that
-    means you're using a version of Django ≤ 1.4. In this case, add the
+    means you're using a version of Django < 1.5. In this case, add the
     following declaration at the top of your template:
 
     .. code-block:: html+django

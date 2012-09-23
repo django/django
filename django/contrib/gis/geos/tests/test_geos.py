@@ -1,7 +1,12 @@
+from __future__ import unicode_literals
+
 import ctypes
 import json
 import random
+from binascii import a2b_hex, b2a_hex
+from io import BytesIO
 
+from django.contrib.gis import memoryview
 from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
     GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
     LineString, MultiLineString, fromfile, fromstr, geos_version_info)
@@ -9,6 +14,7 @@ from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
 from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
+from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
 from django.utils import unittest
@@ -64,7 +70,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # result in a TypeError when trying to assign it to the `ptr` property.
         # Thus, memmory addresses (integers) and pointers of the incorrect type
         # (in `bad_ptrs`) will not be allowed.
-        bad_ptrs = (5, ctypes.c_char_p('foobar'))
+        bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
         for bad_ptr in bad_ptrs:
             # Equivalent to `fg.ptr = bad_ptr`
             self.assertRaises(TypeError, fg1._set_ptr, bad_ptr)
@@ -80,18 +86,16 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing HEX output."
         for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
-            self.assertEqual(g.hex, geom.hex)
+            self.assertEqual(g.hex, geom.hex.decode())
 
     def test_hexewkb(self):
         "Testing (HEX)EWKB output."
-        from binascii import a2b_hex
-
         # For testing HEX(EWKB).
-        ogc_hex = '01010000000000000000000000000000000000F03F'
+        ogc_hex = b'01010000000000000000000000000000000000F03F'
         # `SELECT ST_AsHEXEWKB(ST_GeomFromText('POINT(0 1)', 4326));`
-        hexewkb_2d = '0101000020E61000000000000000000000000000000000F03F'
+        hexewkb_2d = b'0101000020E61000000000000000000000000000000000F03F'
         # `SELECT ST_AsHEXEWKB(ST_GeomFromEWKT('SRID=4326;POINT(0 1 2)'));`
-        hexewkb_3d = '01010000A0E61000000000000000000000000000000000F03F0000000000000040'
+        hexewkb_3d = b'01010000A0E61000000000000000000000000000000000F03F0000000000000040'
 
         pnt_2d = Point(0, 1, srid=4326)
         pnt_3d = Point(0, 1, 2, srid=4326)
@@ -118,9 +122,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.fail('Should have raised GEOSException.')
 
         # Same for EWKB.
-        self.assertEqual(buffer(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
+        self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
         if GEOS_PREPARE:
-            self.assertEqual(buffer(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+            self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
         else:
             try:
                 ewkb = pnt_3d.ewkb
@@ -150,7 +154,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 pass
 
         # Bad WKB
-        self.assertRaises(GEOSException, GEOSGeometry, buffer('0'))
+        self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))
 
         print("\nEND - expecting GEOS_ERROR; safe to ignore.\n")
 
@@ -164,11 +168,10 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_wkb(self):
         "Testing WKB output."
-        from binascii import b2a_hex
         for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             wkb = geom.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex)
+            self.assertEqual(b2a_hex(wkb).decode().upper(), g.hex)
 
     def test_create_hex(self):
         "Testing creation from HEX."
@@ -180,9 +183,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_create_wkb(self):
         "Testing creation from WKB."
-        from binascii import a2b_hex
         for g in self.geometries.hex_wkt:
-            wkb = buffer(a2b_hex(g.hex))
+            wkb = memoryview(a2b_hex(g.hex.encode()))
             geom_h = GEOSGeometry(wkb)
             # we need to do this so decimal places get normalised
             geom_t = fromstr(g.wkt)
@@ -212,13 +214,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_fromfile(self):
         "Testing the fromfile() factory."
-        from io import BytesIO
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
         wkt_f = BytesIO()
-        wkt_f.write(ref_pnt.wkt)
+        wkt_f.write(force_bytes(ref_pnt.wkt))
         wkb_f = BytesIO()
-        wkb_f.write(str(ref_pnt.wkb))
+        wkb_f.write(bytes(ref_pnt.wkb))
 
         # Other tests use `fromfile()` on string filenames so those
         # aren't tested here.
@@ -439,8 +440,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(r.geom_typeid, 2)
 
             # Testing polygon construction.
-            self.assertRaises(TypeError, Polygon.__init__, 0, [1, 2, 3])
-            self.assertRaises(TypeError, Polygon.__init__, 'foo')
+            self.assertRaises(TypeError, Polygon, 0, [1, 2, 3])
+            self.assertRaises(TypeError, Polygon, 'foo')
 
             # Polygon(shell, (hole1, ... holeN))
             rings = tuple(r for r in poly)
