@@ -8,6 +8,7 @@ from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 from django.utils import six
+from django.utils.encoding import force_bytes
 
 ### The WKB/WKT Reader/Writer structures and pointers ###
 class WKTReader_st(Structure): pass
@@ -121,8 +122,9 @@ class _WKTReader(IOBase):
     ptr_type = WKT_READ_PTR
 
     def read(self, wkt):
-        if not isinstance(wkt, six.string_types): raise TypeError
-        return wkt_reader_read(self.ptr, wkt)
+        if not isinstance(wkt, (bytes, six.string_types)):
+            raise TypeError
+        return wkt_reader_read(self.ptr, force_bytes(wkt))
 
 class _WKBReader(IOBase):
     _constructor = wkb_reader_create
@@ -134,7 +136,7 @@ class _WKBReader(IOBase):
         if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, six.string_types):
+        elif isinstance(wkb, (bytes, six.string_types)):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         else:
             raise TypeError
@@ -189,8 +191,8 @@ class WKBWriter(IOBase):
         return bool(ord(wkb_writer_get_include_srid(self.ptr)))
 
     def _set_include_srid(self, include):
-        if bool(include): flag = chr(1)
-        else: flag = chr(0)
+        if bool(include): flag = b'\x01'
+        else: flag = b'\x00'
         wkb_writer_set_include_srid(self.ptr, flag)
 
     srid = property(_get_include_srid, _set_include_srid)

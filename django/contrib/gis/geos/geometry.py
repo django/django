@@ -2,6 +2,8 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
+from __future__ import unicode_literals
+
 # Python, ctypes and types dependencies.
 from ctypes import addressof, byref, c_double
 
@@ -29,6 +31,8 @@ from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ew
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
 from django.utils import six
+from django.utils.encoding import force_bytes, force_text
+
 
 class GEOSGeometry(GEOSBase, ListMixin):
     "A class that, generally, encapsulates a GEOS geometry."
@@ -55,19 +59,17 @@ class GEOSGeometry(GEOSBase, ListMixin):
         The `srid` keyword is used to specify the Source Reference Identifier
         (SRID) number for this Geometry.  If not set, the SRID will be None.
         """
+        if isinstance(geo_input, bytes):
+            geo_input = force_text(geo_input)
         if isinstance(geo_input, six.string_types):
-            if isinstance(geo_input, six.text_type):
-                # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
-                geo_input = geo_input.encode('ascii')
-
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handling WKT input.
                 if wkt_m.group('srid'): srid = int(wkt_m.group('srid'))
-                g = wkt_r().read(wkt_m.group('wkt'))
+                g = wkt_r().read(force_bytes(wkt_m.group('wkt')))
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
-                g = wkb_r().read(geo_input)
+                g = wkb_r().read(force_bytes(geo_input))
             elif gdal.HAS_GDAL and json_regex.match(geo_input):
                 # Handling GeoJSON input.
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
@@ -217,7 +219,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def geom_type(self):
         "Returns a string representing the Geometry type, e.g. 'Polygon'"
-        return capi.geos_type(self.ptr)
+        return capi.geos_type(self.ptr).decode()
 
     @property
     def geom_typeid(self):
@@ -284,7 +286,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         if not GEOS_PREPARE:
             raise GEOSException('Upgrade GEOS to 3.1 to get validity reason.')
-        return capi.geos_isvalidreason(self.ptr)
+        return capi.geos_isvalidreason(self.ptr).decode()
 
     #### Binary predicates. ####
     def contains(self, other):
@@ -338,7 +340,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         if not isinstance(pattern, six.string_types) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
-        return capi.geos_relatepattern(self.ptr, other.ptr, pattern)
+        return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 
     def touches(self, other):
         """
@@ -380,7 +382,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w().write(self)
+        return wkt_w().write(self).decode()
 
     @property
     def hex(self):
@@ -590,7 +592,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this Geometry and the other."
-        return capi.geos_relate(self.ptr, other.ptr)
+        return capi.geos_relate(self.ptr, other.ptr).decode()
 
     def simplify(self, tolerance=0.0, preserve_topology=False):
         """

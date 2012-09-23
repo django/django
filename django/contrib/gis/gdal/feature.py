@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
 
+from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -107,6 +108,7 @@ class Feature(GDALBase):
 
     def index(self, field_name):
         "Returns the index of the given field name."
-        i = capi.get_field_index(self.ptr, field_name)
-        if i < 0: raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
+        i = capi.get_field_index(self.ptr, force_bytes(field_name))
+        if i < 0:
+            raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
         return i

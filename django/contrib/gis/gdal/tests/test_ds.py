@@ -9,7 +9,7 @@ ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='
                   fields={'dbl' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
                   extent=(-1.35011,0.166623,-0.524093,0.824508), # Got extent from QGIS
                   srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-                  field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : range(1, 6), 'str' : [str(i) for i in range(1, 6)]},
+                  field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : list(range(1, 6)), 'str' : [str(i) for i in range(1, 6)]},
                   fids=range(5)),
            TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
                   fields={'POINT_X' : OFTString, 'POINT_Y' : OFTString, 'NUM' : OFTString}, # VRT uses CSV, which all types are OFTString.
@@ -200,7 +200,7 @@ class DataSourceTest(unittest.TestCase):
 
         # Setting the spatial filter with a tuple/list with the extent of
         # a buffer centering around Pueblo.
-        self.assertRaises(ValueError, lyr._set_spatial_filter, range(5))
+        self.assertRaises(ValueError, lyr._set_spatial_filter, list(range(5)))
         filter_extent = (-105.609252, 37.255001, -103.609252, 39.255001)
         lyr.spatial_filter = (-105.609252, 37.255001, -103.609252, 39.255001)
         self.assertEqual(OGRGeometry.from_bbox(filter_extent), lyr.spatial_filter)

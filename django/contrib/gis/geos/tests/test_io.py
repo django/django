@@ -1,9 +1,12 @@
+from __future__ import unicode_literals
+
 import binascii
 import unittest
 
 from django.contrib.gis import memoryview
 from django.contrib.gis.geos import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
 from django.utils import six
+
 
 class GEOSIOTest(unittest.TestCase):
 
@@ -14,8 +17,8 @@ class GEOSIOTest(unittest.TestCase):
 
         # read() should return a GEOSGeometry
         ref = GEOSGeometry(wkt)
-        g1 = wkt_r.read(wkt)
-        g2 = wkt_r.read(six.text_type(wkt))
+        g1 = wkt_r.read(wkt.encode())
+        g2 = wkt_r.read(wkt)
 
         for geom in (g1, g2):
             self.assertEqual(ref, geom)
@@ -102,7 +105,7 @@ class GEOSIOTest(unittest.TestCase):
             self.assertEqual(hex3d, wkb_w.write_hex(g))
             self.assertEqual(wkb3d, wkb_w.write(g))
 
-            # Telling the WKBWriter to inlcude the srid in the representation.
+            # Telling the WKBWriter to include the srid in the representation.
             wkb_w.srid = True
             self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
             self.assertEqual(wkb3d_srid, wkb_w.write(g))

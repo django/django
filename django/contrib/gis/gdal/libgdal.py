@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import re
 from ctypes import c_char_p, CDLL
@@ -65,7 +67,7 @@ _version_info.restype = c_char_p
 
 def gdal_version():
     "Returns only the GDAL version number information."
-    return _version_info('RELEASE_NAME')
+    return _version_info(b'RELEASE_NAME')
 
 def gdal_full_version():
     "Returns the full GDAL version information."
@@ -86,7 +88,7 @@ def gdal_release_date(date=False):
 
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 def gdal_version_info():
-    ver = gdal_version()
+    ver = gdal_version().decode()
     m = version_regex.match(ver)
     if not m: raise OGRException('Could not parse GDAL version string "%s"' % ver)
     return dict([(key, m.group(key)) for key in ('major', 'minor', 'subminor')])

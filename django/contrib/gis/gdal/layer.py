@@ -14,6 +14,7 @@ from django.contrib.gis.gdal.srs import SpatialReference
 # GDAL ctypes function prototypes.
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
+from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -38,7 +39,7 @@ class Layer(GDALBase):
         self._ds = ds
         self._ldefn = capi.get_layer_defn(self._ptr)
         # Does the Layer support random reading?
-        self._random_read = self.test_capability('RandomRead')
+        self._random_read = self.test_capability(b'RandomRead')
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
@@ -212,4 +213,4 @@ class Layer(GDALBase):
           'FastFeatureCount', 'FastGetExtent', 'CreateField', 'Transactions',
           'DeleteFeature', and 'FastSetNextByIndex'.
         """
-        return bool(capi.test_capability(self.ptr, capability))
+        return bool(capi.test_capability(self.ptr, force_bytes(capability)))
