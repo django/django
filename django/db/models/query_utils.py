@@ -43,8 +43,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args)
-                + list(six.iteritems(kwargs)))
+        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
         self._compiled_matcher = None
 
     def _combine(self, other, conn):
@@ -276,9 +275,7 @@ class LookupExpression(tree.Node):
         evaluator = evaluators[self.connector]
         return_val = None
         if self.children:
-            return_val = (
-                    evaluator(c.matches(instance) for c in self.children)
-                    )
+            return_val = (evaluator(c.matches(instance) for c in self.children))
         else:
             try:
                 instance_value = self.get_instance_value(instance)
