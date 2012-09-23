@@ -286,11 +286,7 @@ class LookupExpression(tree.Node):
                 # attribute route. In nearly all cases this means the match
                 # failed as it specified a longer relationship chain then
                 # exists for this instance.
-                if (hasattr(self.lookup_function, 'none_is_true')
-                    and self.lookup_function.none_is_true):
-                    return_val = True
-                else:
-                    return_val = False
+                return_val = getattr(self.lookup_function, 'none_is_true', False)
         if self.negated:
             return not return_val
         else:
