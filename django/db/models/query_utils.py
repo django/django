@@ -204,12 +204,10 @@ class LookupExpression(tree.Node):
             # if we get a expr we need to be able to evaluate,
             # otherwise we are just a root node and a simple container
             self.lookup, self.value = expr
+            self.query = manager.get_query_set().query
             # attr_route is a sequence of fields following relationships
             # ending in the field to perform the match on
-            self.attr_route = []
-            self.lookup_type = 'exact'  # Default lookup type
-            self.query = manager.get_query_set().query
-            self.traverse_lookup(manager.model)
+            self.attr_route, self.lookup_type = self.traverse_lookup(manager.model)
             if (len(self.attr_route) == 0 or
                     self.lookup_type not in self.query.query_terms):
                 # we have no valid field or no valid lookup type
@@ -229,6 +227,8 @@ class LookupExpression(tree.Node):
 
         parts = self.lookup.split(LOOKUP_SEP)
         num_parts = len(parts)
+        attr_route = []
+        lookup_type = 'exact'
 
         if (len(parts) > 1):
             # Traverse the lookup query to distinguish related fields from
@@ -237,11 +237,11 @@ class LookupExpression(tree.Node):
             for counter, field_name in enumerate(parts):
                 try:
                     lookup_field = lookup_model._meta.get_field(field_name)
-                    self.attr_route.append(field_name)
+                    attr_route.append(field_name)
                 except FieldDoesNotExist:
                     # Not a field. Bail out.
-                    self.lookup_type = parts.pop()
-                    return
+                    lookup_type = parts.pop()
+                    break
                 # Unless we're at the end of the list of lookups, let's attempt
                 # to continue traversing relations.
                 if (counter + 1) < num_parts:
@@ -249,13 +249,14 @@ class LookupExpression(tree.Node):
                         lookup_model = lookup_field.rel.to
                     except AttributeError:
                         # Not a related field. Bail out.
-                        self.lookup_type = parts.pop()
-                        return
+                        lookup_type = parts.pop()
+                        break
         else:
             # presumably we have a simple <field>=x with no lookup term
             # so we just use our default of exact
-            self.attr_route.append(parts[0])
-            return
+            attr_route.append(parts[0])
+
+        return (attr_route, lookup_type)
 
     def get_instance_value(self, instance):
         current = instance
