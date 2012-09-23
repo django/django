@@ -1,10 +1,14 @@
 import locale
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.six import StringIO
 
 
@@ -149,3 +153,24 @@ class BasicTestCase(TestCase):
         # If we were successful, a user should have been created
         u = User.objects.get(username="nolocale@somewhere.org")
         self.assertEqual(u.email, 'nolocale@somewhere.org')
+
+    def test_get_user_model(self):
+        "The current user model can be retrieved"
+        self.assertEqual(get_user_model(), User)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    def test_swappable_user(self):
+        "The current user model can be swapped out for another"
+        self.assertEqual(get_user_model(), CustomUser)
+
+    @override_settings(AUTH_USER_MODEL='badsetting')
+    def test_swappable_user_bad_setting(self):
+        "The alternate user setting must point to something in the format app.model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_user_model()
+
+    @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
+    def test_swappable_user_nonexistent_model(self):
+        "The current user model must point to an installed model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_user_model()

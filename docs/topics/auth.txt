@@ -1791,7 +1791,7 @@ different User model.
 
 Instead of referring to :class:`~django.contrib.auth.models.User` directly,
 you should reference the user model using
-:meth:`~django.contrib.auth.get_user_model()`. This method will return the
+:func:`django.contrib.auth.get_user_model()`. This method will return the
 currently  active User model -- the custom User model if one is specified, or
 :class:`~django.contrib.auth.User` otherwise.
 
