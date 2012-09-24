@@ -591,6 +591,8 @@ class BaseDatabaseSchemaEditor(object):
         # Repoint the FK to the other side
         self.alter_field(
             new_field.rel.through,
+            # We need the field that points to the target model, so we can tell alter_field to change it -
+            # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
             old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
             new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
         )
