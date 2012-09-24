@@ -119,6 +119,7 @@ class SchemaTests(TestCase):
             DatabaseError,
             lambda: list(Author.objects.all()),
         )
+        connection.rollback()
 
     @skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_fk(self):
