@@ -1,3 +1,4 @@
+import hashlib
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 from django.utils.log import getLogger
@@ -615,6 +616,9 @@ class BaseDatabaseSchemaEditor(object):
         if len(index_name) > self.connection.features.max_index_name_length:
             part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
             index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
+        # If it's STILL too long, just hash it down
+        if len(index_name) > self.connection.features.max_index_name_length:
+            index_name = hashlib.md5(index_name).hexdigest()[:self.connection.features.max_index_name_length]
         return index_name
 
     def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None, check=None):
