@@ -694,6 +694,11 @@ Miscellaneous
 * :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
   attribute which allows it to choose the target by reversing the URL.
 
+* For Oracle support, Django requires the `cx_Oracle`_ Python driver. With
+  Django 1.6, the required version changed from 4.3.1 to 5.0.1.
+
+.. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
+
 Features deprecated in 1.6
 ==========================
 
