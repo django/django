@@ -384,7 +384,7 @@ class BaseDatabaseSchemaEditor(object):
             # Find the unique constraint for this field
             constraint_names = self._constraint_names(model, [old_field.column], unique=True)
             if strict and len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of constraints for %s.%s" % (
+                raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
                     len(constraint_names),
                     model._meta.db_table,
                     old_field.column,
