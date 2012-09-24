@@ -192,6 +192,8 @@ There are two other logging calls available:
 * ``logger.exception()``: Creates an ``ERROR`` level logging
   message wrapping the current exception stack frame.
 
+.. _configuring-logging:
+
 Configuring logging
 ===================
 
@@ -215,6 +217,14 @@ dictionary of logging settings. These settings describes the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
+
+Prior to Django 1.5, the :setting:`LOGGING` setting overwrote the :ref:`default
+Django logging configuration <default-logging-configuration>`. From Django
+1.5 forward, the project's logging configuration is merged with Django's
+defaults, hence you can decide if you want to add to, or replace the existing
+configuration. To completely override the default configuration, set the
+``disable_existing_loggers`` key to True in the :setting:`LOGGING`
+dictConfig. Alternatively you can redefine some or all of the loggers.
 
 Logging is configured as soon as settings have been loaded
 (either manually using :func:`~django.conf.settings.configure` or when at least
@@ -535,3 +545,15 @@ logging module.
                 'class': 'django.utils.log.AdminEmailHandler'
             }
         },
+
+.. _default-logging-configuration:
+
+Django's default logging configuration
+======================================
+
+By default, Django configures the ``django.request`` logger so that all messages
+with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
+long as the :setting:`DEBUG` setting is set to ``False``.
+
+All messages reaching the ``django`` catch-all logger are discarded
+(sent to ``NullHandler``).

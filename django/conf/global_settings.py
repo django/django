@@ -551,33 +551,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 # The callable to use to configure logging
 LOGGING_CONFIG = 'django.utils.log.dictConfig'
 
-# The default logging configuration. This sends an email to
-# the site admins on every HTTP 500 error. All other log
-# records are sent to the bit bucket.
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
+# Custom logging configuration.
+LOGGING = {}
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.

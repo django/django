@@ -55,16 +55,20 @@ class LazySettings(LazyObject):
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
         if self.LOGGING_CONFIG:
+            from django.utils.log import DEFAULT_LOGGING
             # First find the logging configuration function ...
             logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
             logging_config_module = importlib.import_module(logging_config_path)
             logging_config_func = getattr(logging_config_module, logging_config_func_name)
 
-            # Backwards-compatibility shim for #16288 fix
-            compat_patch_logging_config(self.LOGGING)
+            logging_config_func(DEFAULT_LOGGING)
 
-            # ... then invoke it with the logging settings
-            logging_config_func(self.LOGGING)
+            if self.LOGGING:
+                # Backwards-compatibility shim for #16288 fix
+                compat_patch_logging_config(self.LOGGING)
+
+                # ... then invoke it with the logging settings
+                logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
         """

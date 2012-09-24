@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core import mail
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
+
 # Make sure a NullHandler is available
 # This was added in Python 2.7/3.2
 try:
@@ -23,12 +24,38 @@ except ImportError:
 
 getLogger = logging.getLogger
 
-# Ensure the creation of the Django logger
-# with a null handler. This ensures we don't get any
-# 'No handlers could be found for logger "django"' messages
-logger = getLogger('django')
-if not logger.handlers:
-    logger.addHandler(NullHandler())
+# Default logging for Django. This sends an email to
+# the site admins on every HTTP 500 error. All other log
+# records are sent to the bit bucket.
+DEFAULT_LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
+    'handlers': {
+        'null': {
+            'class': 'django.utils.log.NullHandler',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['null'],
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
 
 
 class AdminEmailHandler(logging.Handler):
