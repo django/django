@@ -347,11 +347,11 @@ class BaseDatabaseSchemaEditor(object):
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
             return self.delete_model(field.rel.through)
+        # It might not actually have a column behind it
+        if field.db_parameters(connection=self.connection)['type'] is None:
+            return
         # Get the column's definition
         definition, params = self.column_sql(model, field)
-        # It might not actually have a column behind it
-        if definition is None:
-            return
         # Delete the column
         sql = self.sql_delete_column % {
             "table": self.quote_name(model._meta.db_table),
