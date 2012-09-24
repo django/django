@@ -146,6 +146,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   configuration duplication. More information can be found in the
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
+* Django now provides a mod_wsgi :doc:`auth handler
+  </howto/deployment/wsgi/apache-auth>`
+
 Backwards incompatible changes in 1.5
 =====================================
 
