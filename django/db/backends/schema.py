@@ -320,6 +320,7 @@ class BaseDatabaseSchemaEditor(object):
                     "column": self.quote_name(field.column),
                 }
             }
+            self.execute(sql)
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys:
             to_table = field.rel.to._meta.db_table
