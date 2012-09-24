@@ -397,7 +397,7 @@ class BaseDatabaseSchemaEditor(object):
                     },
                 )
         # Removed an index?
-        if old_field.db_index and not new_field.db_index and not old_field.unique and not new_field.unique:
+        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
             # Find the index for this field
             index_names = self._constraint_names(model, [old_field.column], index=True)
             if strict and len(index_names) != 1:
@@ -525,7 +525,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Added an index?
-        if not old_field.db_index and new_field.db_index and not old_field.unique and not new_field.unique:
+        if not old_field.db_index and new_field.db_index and not new_field.unique and not (not old_field.unique and new_field.unique):
             self.execute(
                 self.sql_create_index % {
                     "table": self.quote_name(model._meta.db_table),
