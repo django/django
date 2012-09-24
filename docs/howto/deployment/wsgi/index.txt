@@ -16,6 +16,7 @@ documentation for the following WSGI servers:
    :maxdepth: 1
 
    modwsgi
+   apache-auth
    gunicorn
    uwsgi
 

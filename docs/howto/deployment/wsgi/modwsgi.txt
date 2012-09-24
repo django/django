@@ -177,6 +177,13 @@ other approaches:
 3. Copy the admin static files so that they live within your Apache
    document root.
 
+Authenticating against Django's user database from Apache
+=========================================================
+
+Django provides a handler to allow Apache to authenticate users directly
+against Django's authentication backends. See the :doc:`mod_wsgi authentication
+documentation </howto/deployment/wsgi/apache-auth>`.
+
 If you get a UnicodeEncodeError
 ===============================
 
