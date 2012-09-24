@@ -20,6 +20,7 @@ class SchemaTests(TestCase):
     """
 
     models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest]
+    no_table_strings = ["no such table", "unknown table", "does not exist"]
 
     # Utility functions
 
@@ -57,8 +58,11 @@ class SchemaTests(TestCase):
                     cursor.execute(connection.schema_editor().sql_delete_table % {
                         "table": connection.ops.quote_name(field.rel.through._meta.db_table),
                     })
-                except DatabaseError:
-                    connection.rollback()
+                except DatabaseError as e:
+                    if any([s in str(e).lower() for s in self.no_table_strings]):
+                        connection.rollback()
+                    else:
+                        raise
                 else:
                     connection.commit()
             # Then remove the main tables
@@ -66,8 +70,11 @@ class SchemaTests(TestCase):
                 cursor.execute(connection.schema_editor().sql_delete_table % {
                     "table": connection.ops.quote_name(model._meta.db_table),
                 })
-            except DatabaseError:
-                connection.rollback()
+            except DatabaseError as e:
+                if any([s in str(e).lower() for s in self.no_table_strings]):
+                    connection.rollback()
+                else:
+                    raise
             else:
                 connection.commit()
         connection.enable_constraint_checking()
