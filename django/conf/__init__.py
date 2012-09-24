@@ -43,13 +43,28 @@ class LazySettings(LazyObject):
                 % (name, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
-
+        self._configure_logging()
 
     def __getattr__(self, name):
         if self._wrapped is empty:
             self._setup(name)
         return getattr(self._wrapped, name)
 
+    def _configure_logging(self):
+        """
+        Setup logging from LOGGING_CONFIG and LOGGING settings.
+        """
+        if self.LOGGING_CONFIG:
+            # First find the logging configuration function ...
+            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
+            logging_config_module = importlib.import_module(logging_config_path)
+            logging_config_func = getattr(logging_config_module, logging_config_func_name)
+
+            # Backwards-compatibility shim for #16288 fix
+            compat_patch_logging_config(self.LOGGING)
+
+            # ... then invoke it with the logging settings
+            logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -132,19 +147,6 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
-
-        # Settings are configured, so we can set up the logger if required
-        if self.LOGGING_CONFIG:
-            # First find the logging configuration function ...
-            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
-            logging_config_module = importlib.import_module(logging_config_path)
-            logging_config_func = getattr(logging_config_module, logging_config_func_name)
-
-            # Backwards-compatibility shim for #16288 fix
-            compat_patch_logging_config(self.LOGGING)
-
-            # ... then invoke it with the logging settings
-            logging_config_func(self.LOGGING)
 
 
 class UserSettingsHolder(BaseSettings):
