@@ -607,7 +607,7 @@ class BaseDatabaseSchemaEditor(object):
                 '%s_%s' % (model._meta.db_table, BaseDatabaseCreation._digest(column_names[0])),
                 self.connection.ops.max_name_length()
             )
-        # Else generate the name for the index by South
+        # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
         index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
         # If the index name is too long, truncate it
