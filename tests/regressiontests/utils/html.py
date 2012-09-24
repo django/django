@@ -154,4 +154,4 @@ class TestUtilsHtml(unittest.TestCase):
             ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
         )
         for value, tags, output in items:
-            self.assertEquals(f(value, tags), output)
+            self.assertEqual(f(value, tags), output)
