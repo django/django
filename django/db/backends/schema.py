@@ -199,11 +199,7 @@ class BaseDatabaseSchemaEditor(object):
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
                 self.deferred_sql.append(
                     self.sql_create_fk % {
-                        "name": '%s_refs_%s_%x' % (
-                            field.column,
-                            to_column,
-                            abs(hash((model._meta.db_table, to_table)))
-                        ),
+                        "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
                         "table": self.quote_name(model._meta.db_table),
                         "column": self.quote_name(field.column),
                         "to_table": self.quote_name(to_table),
