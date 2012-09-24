@@ -6,7 +6,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
-    sql_alter_column_not_null = "MODIFY %(column)s %(type)s NULL"
+    sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
