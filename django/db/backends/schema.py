@@ -495,7 +495,7 @@ class BaseDatabaseSchemaEditor(object):
                 ))
             else:
                 actions.append((
-                    self.sql_alter_column_null % {
+                    self.sql_alter_column_not_null % {
                         "column": self.quote_name(new_field.column),
                         "type": new_type,
                     },

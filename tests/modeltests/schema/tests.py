@@ -205,12 +205,28 @@ class SchemaTests(TestCase):
             Author._meta.get_field_by_name("name")[0],
             new_field,
             strict=True,
-          )
+        )
         editor.commit()
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(columns['name'][1][6], True)
+        # Change nullability again
+        new_field2 = TextField(null=False)
+        new_field2.set_attributes_from_name("name")
+        editor = connection.schema_editor()
+        editor.start()
+        editor.alter_field(
+            Author,
+            new_field,
+            new_field2,
+            strict=True,
+        )
+        editor.commit()
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['name'][0], "TextField")
+        self.assertEqual(columns['name'][1][6], False)
 
     def test_rename(self):
         """

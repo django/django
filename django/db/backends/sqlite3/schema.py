@@ -153,4 +153,4 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self.quote_name(old_field.rel.through._meta.db_table),
         ))
         # Delete the old through table
-        self.delete_model(old_field.rel.through, force=True)
+        self.delete_model(old_field.rel.through)
