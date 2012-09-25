@@ -1,5 +1,4 @@
 import locale
-import traceback
 
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
@@ -34,7 +33,7 @@ class BasicTestCase(TestCase):
 
         # Check API-based user creation with no password
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
-        self.assertFalse(u.has_usable_password())
+        self.assertFalse(u2.has_usable_password())
 
     def test_user_no_email(self):
         "Check that users can be created without an email"
@@ -69,7 +68,8 @@ class BasicTestCase(TestCase):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -85,7 +85,8 @@ class BasicTestCase(TestCase):
 
         # We can supress output on the management command
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -98,9 +99,9 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.email, 'joe2@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-
         new_io = StringIO()
-        call_command("createsuperuser",
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -124,7 +125,8 @@ class BasicTestCase(TestCase):
 
             # Temporarily replace getpass to allow interactive code to be used
             # non-interactively
-            class mock_getpass: pass
+            class mock_getpass:
+                pass
             mock_getpass.getpass = staticmethod(lambda p=None: "nopasswd")
             createsuperuser.getpass = mock_getpass
 
@@ -132,7 +134,7 @@ class BasicTestCase(TestCase):
             new_io = StringIO()
             call_command("createsuperuser", interactive=True, username="nolocale@somewhere.org", email="nolocale@somewhere.org", stdout=new_io)
 
-        except TypeError as e:
+        except TypeError:
             self.fail("createsuperuser fails if the OS provides no information about the current locale")
 
         finally:
