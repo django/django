@@ -256,6 +256,10 @@ WHEN (new.%(col_name)s IS NULL)
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % util.truncate_name(name.upper(),
                                                self.max_name_length())
+        # This backend puts the query text into a (query % args) construct,
+        # so % signs in names need to be protected.
+        # Because of this, we are also not really making the name longer here.
+        name = name.replace('%','%%')
         return name.upper()
 
     def random_function_sql(self):
