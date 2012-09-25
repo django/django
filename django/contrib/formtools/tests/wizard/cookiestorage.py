@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from django.core import signing
 from django.core.exceptions import SuspiciousOperation
@@ -41,4 +43,5 @@ class TestCookieStorage(TestStorage, TestCase):
         storage.init_data()
         storage.update_response(response)
         unsigned_cookie_data = cookie_signer.unsign(response.cookies[storage.prefix].value)
-        self.assertEqual(unsigned_cookie_data, '{"step_files":{},"step":null,"extra_data":{},"step_data":{}}')
+        self.assertEqual(json.loads(unsigned_cookie_data),
+            {"step_files": {}, "step": None, "extra_data": {}, "step_data": {}})

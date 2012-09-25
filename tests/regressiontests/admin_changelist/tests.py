@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -65,7 +66,8 @@ class ChangeListTests(TestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><th><a href="%d/">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % new_child.id
+        link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
+        row_html = '<tbody><tr class="row1"><th><a href="%s">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % link
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -87,7 +89,8 @@ class ChangeListTests(TestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><th><a href="%d/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % new_child.id
+        link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
+        row_html = '<tbody><tr class="row1"><th><a href="%s">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % link
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -425,7 +428,8 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/child/', superuser)
         response = m.changelist_view(request)
         for i in range(1, 10):
-            self.assertContains(response, '<a href="%s/">%s</a>' % (i, i))
+            link = reverse('admin:admin_changelist_child_change', args=(i,))
+            self.assertContains(response, '<a href="%s">%s</a>' % (link, i))
 
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)

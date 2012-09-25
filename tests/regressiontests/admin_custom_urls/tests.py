@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+from django.contrib.admin.util import quote
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase
@@ -67,7 +68,7 @@ class AdminCustomUrlsTest(TestCase):
 
         # Ditto, but use reverse() to build the URL
         url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=('add',))
+                args=(quote('add'),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
@@ -75,19 +76,8 @@ class AdminCustomUrlsTest(TestCase):
         # Should correctly get the change_view for the model instance with the
         # funny-looking PK (the one wth a 'path/to/html/document.html' value)
         url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=("path/to/html/document.html",))
+                args=(quote("path/to/html/document.html"),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
         self.assertContains(response, 'value="path/to/html/document.html"')
-
-    def testChangeViewHistoryButton(self):
-        url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=('The name of an action',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        expected_link = reverse('admin:%s_action_history' %
-                                Action._meta.app_label,
-                                args=('The name of an action',))
-        self.assertContains(response, '<a href="%s" class="historylink"' %
-                            expected_link)

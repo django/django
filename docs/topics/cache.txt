@@ -286,7 +286,7 @@ cache is multi-process and thread-safe. To use it, set
 
 The cache :setting:`LOCATION <CACHES-LOCATION>` is used to identify individual
 memory stores. If you only have one locmem cache, you can omit the
-:setting:`LOCATION <CACHES-LOCATION>`; however, if you have more that one local
+:setting:`LOCATION <CACHES-LOCATION>`; however, if you have more than one local
 memory cache, you will need to assign a name to at least one of them in
 order to keep them separate.
 

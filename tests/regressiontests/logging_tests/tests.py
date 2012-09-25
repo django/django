@@ -10,6 +10,8 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.log import CallbackFilter, RequireDebugFalse
 
+from ..admin_scripts.tests import AdminScriptTestCase
+
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {
@@ -253,3 +255,30 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
+
+
+class SettingsConfigTest(AdminScriptTestCase):
+    """
+    Test that accessing settings in a custom logging handler does not trigger
+    a circular import error.
+    """
+    def setUp(self):
+        log_config = """{
+    'version': 1,
+    'handlers': {
+        'custom_handler': {
+            'level': 'INFO',
+            'class': 'logging_tests.logconfig.MyHandler',
+        }
+    }
+}"""
+        self.write_settings('settings.py', sdict={'LOGGING': log_config})
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_circular_dependency(self):
+        # validate is just an example command to trigger settings configuration
+        out, err = self.run_manage(['validate'])
+        self.assertNoOutput(err)
+        self.assertOutput(out, "0 errors found")
