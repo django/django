@@ -260,19 +260,21 @@ class AdminViewBasicTest(TestCase):
         p1 = Person.objects.create(name="Chris", gender=1, alive=True)
         p2 = Person.objects.create(name="Chris", gender=2, alive=True)
         p3 = Person.objects.create(name="Bob", gender=1, alive=True)
-        link = '<a href="%s/'
+        link1 = reverse('admin:admin_views_person_change', args=(p1.pk,))
+        link2 = reverse('admin:admin_views_person_change', args=(p2.pk,))
+        link3 = reverse('admin:admin_views_person_change', args=(p3.pk,))
 
         # Sort by name, gender
         # This hard-codes the URL because it'll fail if it runs against the
         # 'admin2' custom admin (which doesn't have the Person model).
         response = self.client.get('/test_admin/admin/admin_views/person/', {'o': '1.2'})
-        self.assertContentBefore(response, link % p3.id, link % p1.id)
-        self.assertContentBefore(response, link % p1.id, link % p2.id)
+        self.assertContentBefore(response, link3, link1)
+        self.assertContentBefore(response, link1, link2)
 
         # Sort by gender descending, name
         response = self.client.get('/test_admin/admin/admin_views/person/', {'o': '-2.1'})
-        self.assertContentBefore(response, link % p2.id, link % p3.id)
-        self.assertContentBefore(response, link % p3.id, link % p1.id)
+        self.assertContentBefore(response, link2, link3)
+        self.assertContentBefore(response, link3, link1)
 
     def testChangeListSortingPreserveQuerySetOrdering(self):
         """
@@ -284,37 +286,41 @@ class AdminViewBasicTest(TestCase):
         p1 = Person.objects.create(name="Amy", gender=1, alive=True, age=80)
         p2 = Person.objects.create(name="Bob", gender=1, alive=True, age=70)
         p3 = Person.objects.create(name="Chris", gender=2, alive=False, age=60)
-        link = '<a href="%s/'
+        link1 = reverse('admin:admin_views_person_change', args=(p1.pk,))
+        link2 = reverse('admin:admin_views_person_change', args=(p2.pk,))
+        link3 = reverse('admin:admin_views_person_change', args=(p3.pk,))
 
         # This hard-codes the URL because it'll fail if it runs against the
         # 'admin2' custom admin (which doesn't have the Person model).
         response = self.client.get('/test_admin/admin/admin_views/person/', {})
-        self.assertContentBefore(response, link % p3.id, link % p2.id)
-        self.assertContentBefore(response, link % p2.id, link % p1.id)
+        self.assertContentBefore(response, link3, link2)
+        self.assertContentBefore(response, link2, link1)
 
     def testChangeListSortingModelMeta(self):
         # Test ordering on Model Meta is respected
 
         l1 = Language.objects.create(iso='ur', name='Urdu')
         l2 = Language.objects.create(iso='ar', name='Arabic')
-        link = '<a href="%s/'
+        link1 = reverse('admin:admin_views_language_change', args=(quote(l1.pk),))
+        link2 = reverse('admin:admin_views_language_change', args=(quote(l2.pk),))
 
         response = self.client.get('/test_admin/admin/admin_views/language/', {})
-        self.assertContentBefore(response, link % l2.pk, link % l1.pk)
+        self.assertContentBefore(response, link2, link1)
 
         # Test we can override with query string
         response = self.client.get('/test_admin/admin/admin_views/language/', {'o':'-1'})
-        self.assertContentBefore(response, link % l1.pk, link % l2.pk)
+        self.assertContentBefore(response, link1, link2)
 
     def testChangeListSortingOverrideModelAdmin(self):
         # Test ordering on Model Admin is respected, and overrides Model Meta
         dt = datetime.datetime.now()
         p1 = Podcast.objects.create(name="A", release_date=dt)
         p2 = Podcast.objects.create(name="B", release_date=dt - datetime.timedelta(10))
+        link1 = reverse('admin:admin_views_podcast_change', args=(p1.pk,))
+        link2 = reverse('admin:admin_views_podcast_change', args=(p2.pk,))
 
-        link = '<a href="%s/'
         response = self.client.get('/test_admin/admin/admin_views/podcast/', {})
-        self.assertContentBefore(response, link % p1.pk, link % p2.pk)
+        self.assertContentBefore(response, link1, link2)
 
     def testMultipleSortSameField(self):
         # Check that we get the columns we expect if we have two columns
@@ -322,14 +328,16 @@ class AdminViewBasicTest(TestCase):
         dt = datetime.datetime.now()
         p1 = Podcast.objects.create(name="A", release_date=dt)
         p2 = Podcast.objects.create(name="B", release_date=dt - datetime.timedelta(10))
+        link1 = reverse('admin:admin_views_podcast_change', args=(quote(p1.pk),))
+        link2 = reverse('admin:admin_views_podcast_change', args=(quote(p2.pk),))
 
-        link = '<a href="%s/'
         response = self.client.get('/test_admin/admin/admin_views/podcast/', {})
-        self.assertContentBefore(response, link % p1.pk, link % p2.pk)
+        self.assertContentBefore(response, link1, link2)
 
         p1 = ComplexSortedPerson.objects.create(name="Bob", age=10)
         p2 = ComplexSortedPerson.objects.create(name="Amy", age=20)
-        link = '<a href="%s/'
+        link1 = reverse('admin:admin_views_complexsortedperson_change', args=(p1.pk,))
+        link2 = reverse('admin:admin_views_complexsortedperson_change', args=(p2.pk,))
 
         response = self.client.get('/test_admin/admin/admin_views/complexsortedperson/', {})
         # Should have 5 columns (including action checkbox col)
@@ -342,7 +350,7 @@ class AdminViewBasicTest(TestCase):
         self.assertContentBefore(response, 'Name', 'Colored name')
 
         # Check sorting - should be by name
-        self.assertContentBefore(response, link % p2.id, link % p1.id)
+        self.assertContentBefore(response, link2, link1)
 
     def testSortIndicatorsAdminOrder(self):
         """
@@ -461,10 +469,12 @@ class AdminViewBasicTest(TestCase):
         for rows corresponding to instances of a model in which a named group
         has been used in the choices option of a field.
         """
+        link1 = reverse('admin:admin_views_fabric_change', args=(1,), current_app=self.urlbit)
+        link2 = reverse('admin:admin_views_fabric_change', args=(2,), current_app=self.urlbit)
         response = self.client.get('/test_admin/%s/admin_views/fabric/' % self.urlbit)
         fail_msg = "Changelist table isn't showing the right human-readable values set by a model field 'choices' option named group."
-        self.assertContains(response, '<a href="1/">Horizontal</a>', msg_prefix=fail_msg, html=True)
-        self.assertContains(response, '<a href="2/">Vertical</a>', msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="%s">Horizontal</a>' % link1, msg_prefix=fail_msg, html=True)
+        self.assertContains(response, '<a href="%s">Vertical</a>' % link2, msg_prefix=fail_msg, html=True)
 
     def testNamedGroupFieldChoicesFilter(self):
         """
@@ -1371,9 +1381,12 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_changelist_to_changeform_link(self):
-        "The link from the changelist referring to the changeform of the object should be quoted"
-        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
-        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (escape(quote(self.pk)), escape(self.pk))
+        "Link to the changeform of the object in changelist should use reverse() and be quoted -- #18072"
+        prefix = '/test_admin/admin/admin_views/modelwithstringprimarykey/'
+        response = self.client.get(prefix)
+        # this URL now comes through reverse(), thus iri_to_uri encoding
+        pk_final_url = escape(iri_to_uri(quote(self.pk)))
+        should_contain = """<th><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
@@ -1440,6 +1453,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(model.pk))
         should_contain = '/%s/" class="viewsitelink">' % model.pk
         self.assertContains(response, should_contain)
+
+    def test_change_view_history_link(self):
+        """Object history button link should work and contain the pk value quoted."""
+        url = reverse('admin:%s_modelwithstringprimarykey_change' %
+                          ModelWithStringPrimaryKey._meta.app_label,
+                      args=(quote(self.pk),))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        expected_link = reverse('admin:%s_modelwithstringprimarykey_history' %
+                                    ModelWithStringPrimaryKey._meta.app_label,
+                                args=(quote(self.pk),))
+        self.assertContains(response, '<a href="%s" class="historylink"' % expected_link)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -2023,12 +2048,14 @@ class AdminViewListEditable(TestCase):
         """
         story1 = OtherStory.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
         story2 = OtherStory.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        link1 = reverse('admin:admin_views_otherstory_change', args=(story1.pk,))
+        link2 = reverse('admin:admin_views_otherstory_change', args=(story2.pk,))
         response = self.client.get('/test_admin/admin/admin_views/otherstory/')
         self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
         self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
-        self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story1.id, story1.id), 1)
-        self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story2.id, story2.id), 1)
+        self.assertContains(response, '<th><a href="%s">%d</a></th>' % (link1, story1.id), 1)
+        self.assertContains(response, '<th><a href="%s">%d</a></th>' % (link2, story2.id), 1)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

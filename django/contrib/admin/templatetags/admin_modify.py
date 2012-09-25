@@ -28,7 +28,8 @@ def submit_row(context):
     change = context['change']
     is_popup = context['is_popup']
     save_as = context['save_as']
-    return {
+    ctx = {
+        'opts': opts,
         'onclick_attrib': (opts.get_ordered_objects() and change
                             and 'onclick="submitOrderForm();"' or ''),
         'show_delete_link': (not is_popup and context['has_delete_permission']
@@ -40,6 +41,9 @@ def submit_row(context):
         'is_popup': is_popup,
         'show_save': True
     }
+    if context.get('original') is not None:
+        ctx['original'] = context['original']
+    return ctx
 
 @register.filter
 def cell_count(inline_admin_form):
