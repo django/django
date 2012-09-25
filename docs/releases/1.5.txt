@@ -394,3 +394,10 @@ The markup contrib module has been deprecated and will follow an accelerated
 deprecation schedule. Direct use of python markup libraries or 3rd party tag
 libraries is preferred to Django maintaining this functionality in the
 framework.
+
+
+``django.db.models.permalink``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :func:`~django.db.models.permalink` decorator has been deprecated. Use
+:func:`~django.core.urlresolvers.reverse` instead.

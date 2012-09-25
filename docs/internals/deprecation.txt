@@ -286,6 +286,9 @@ these changes.
 * The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
   will be removed (``content_type`` should be used instead).
 
+* The ``django.db.models.permalink`` decorator will be removed. The
+  ``django.core.urlresolvers.reverse`` function should be used instead.
+
 2.0
 ---
 

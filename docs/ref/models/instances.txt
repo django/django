@@ -478,9 +478,13 @@ For example::
         return "/people/%i/" % self.id
 
 (Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`permalink() decorator <permalink>`,
-documented below, is usually the best approach and you should read that section
-before diving into code implementation.)
+write this kind of method. The :func:`reverse()<django.core.urlresolvers.reverse>`
+function is usually the best approach.)
+
+For example::
+
+    def get_absolute_url(self):
+        return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -521,11 +525,18 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The way we wrote ``get_absolute_url()`` above is a slightly violation of the
-DRY principle: the URL for this object is defined both in the URLconf file and
-in the model.
+.. deprecated:: 1.5
 
-You can decouple your models from the URLconf using the ``permalink`` decorator:
+The ``permalink`` decorator has been deprecated and you should use
+:func:`reverse()<django.core.urlresolvers.reverse>` in the body of your
+``get_absolute_url`` method instead.
+
+In early versions of Django there wasn't an easy way to use URLs defined in
+URLconf file inside get_absolute_url(). That meant you would need to define the
+URL both in URLConf and get_absolute_url(). The ``permalink`` decorator was added
+to overcome this DRY principle violation. However since the inclusion of
+:func:`reverse()<django.core.urlresolvers.reverse>` there is no reason to use
+``permalink`` any more.
 
 .. function:: permalink()
 
