@@ -997,8 +997,8 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: ``SelectMultiple``
-    * Empty value: ``[]`` (an empty list)
-    * Normalizes to: A list of model instances.
+    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
     * Error message keys: ``required``, ``list``, ``invalid_choice``,

@@ -35,6 +35,16 @@ class TestTicket12510(TestCase):
             self.assertEqual('a', field.clean(self.groups[0].pk).name)
 
 class ModelFormCallableModelDefault(TestCase):
+    def test_empty_queryset_return(self):
+        "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
+        option = ChoiceOptionModel.objects.create(id=1, name='default')
+        form = ChoiceFieldForm({'multi_choice_optional': '', 'choice': option.id, 'choice_int': 1,
+                              'multi_choice': ['1'], 'multi_choice_int': [1]})
+        self.assertEqual(form.is_valid(), True)
+        self.assertEqual(isinstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet), True)
+        # While we're at it, test whether a QuerySet is returned if there *is* a value.
+        self.assertEqual(isinstance(form.cleaned_data['multi_choice'], models.query.QuerySet), True)
+
     def test_no_empty_option(self):
         "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
         option = ChoiceOptionModel.objects.create(name='default')
@@ -67,7 +77,12 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<p><label for="id_multi_choice_optional">Multi choice optional:</label> <select multiple="multiple" name="multi_choice_optional" id="id_multi_choice_optional">
+<option value="1">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
@@ -100,7 +115,12 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0" />
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<p><label for="id_multi_choice_optional">Multi choice optional:</label> <select multiple="multiple" name="multi_choice_optional" id="id_multi_choice_optional">
+<option value="1">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
 
 
 
