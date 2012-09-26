@@ -433,7 +433,7 @@ django.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these three variables:
+``RequestContext`` will contain these variables:
 
 * ``user`` -- An ``auth.User`` instance representing the currently
   logged-in user (or an ``AnonymousUser`` instance, if the client isn't
