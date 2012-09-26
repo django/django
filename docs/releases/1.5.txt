@@ -172,6 +172,10 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
+* By default, all logging messages reaching the `django` logger when
+  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+  logger in your :setting:`LOGGING` setting).
+
 Backwards incompatible changes in 1.5
 =====================================
 

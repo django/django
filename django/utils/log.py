@@ -24,18 +24,25 @@ except ImportError:
 
 getLogger = logging.getLogger
 
-# Default logging for Django. This sends an email to
-# the site admins on every HTTP 500 error. All other log
-# records are sent to the bit bucket.
+# Default logging for Django. This sends an email to the site admins on every
+# HTTP 500 error. Depending on DEBUG, all other log records are either sent to
+# the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
 DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
-        }
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
     },
     'handlers': {
+        'console':{
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
         'null': {
             'class': 'django.utils.log.NullHandler',
         },
@@ -47,12 +54,13 @@ DEFAULT_LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['null'],
+            'handlers': ['console'],
+            'filters': ['require_debug_true'],
         },
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
-            'propagate': True,
+            'propagate': False,
         },
     }
 }
@@ -130,3 +138,8 @@ class CallbackFilter(logging.Filter):
 class RequireDebugFalse(logging.Filter):
     def filter(self, record):
         return not settings.DEBUG
+
+
+class RequireDebugTrue(logging.Filter):
+    def filter(self, record):
+       return settings.DEBUG

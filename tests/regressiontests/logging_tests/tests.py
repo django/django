@@ -9,6 +9,7 @@ from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.log import CallbackFilter, RequireDebugFalse
+from django.utils.six import StringIO
 
 from ..admin_scripts.tests import AdminScriptTestCase
 
@@ -109,6 +110,28 @@ class PatchLoggingConfigTest(TestCase):
         self.assertEqual(config, new_config)
 
 
+class DefaultLoggingTest(TestCase):
+    def setUp(self):
+        self.logger = logging.getLogger('django')
+        self.old_stream = self.logger.handlers[0].stream
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream
+
+    def test_django_logger(self):
+        """
+        The 'django' base logger only output anything when DEBUG=True.
+        """
+        output = StringIO()
+        self.logger.handlers[0].stream = output
+        self.logger.error("Hey, this is an error.")
+        self.assertEqual(output.getvalue(), '')
+
+        with self.settings(DEBUG=True):
+            self.logger.error("Hey, this is an error.")
+            self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+
+
 class CallbackFilterTest(TestCase):
     def test_sense(self):
         f_false = CallbackFilter(lambda r: False)
@@ -131,6 +154,7 @@ class CallbackFilterTest(TestCase):
 
 
 class AdminEmailHandlerTest(TestCase):
+    logger = logging.getLogger('django.request')
 
     def get_admin_email_handler(self, logger):
         # Inspired from regressiontests/views/views.py: send_log()
@@ -156,14 +180,13 @@ class AdminEmailHandlerTest(TestCase):
         token1 = 'ping'
         token2 = 'pong'
 
-        logger = logging.getLogger('django.request')
-        admin_email_handler = self.get_admin_email_handler(logger)
+        admin_email_handler = self.get_admin_email_handler(self.logger)
         # Backup then override original filters
         orig_filters = admin_email_handler.filters
         try:
             admin_email_handler.filters = []
 
-            logger.error(message, token1, token2)
+            self.logger.error(message, token1, token2)
 
             self.assertEqual(len(mail.outbox), 1)
             self.assertEqual(mail.outbox[0].to, ['admin@example.com'])
@@ -187,15 +210,14 @@ class AdminEmailHandlerTest(TestCase):
         token1 = 'ping'
         token2 = 'pong'
 
-        logger = logging.getLogger('django.request')
-        admin_email_handler = self.get_admin_email_handler(logger)
+        admin_email_handler = self.get_admin_email_handler(self.logger)
         # Backup then override original filters
         orig_filters = admin_email_handler.filters
         try:
             admin_email_handler.filters = []
             rf = RequestFactory()
             request = rf.get('/')
-            logger.error(message, token1, token2,
+            self.logger.error(message, token1, token2,
                 extra={
                     'status_code': 403,
                     'request': request,
@@ -225,8 +247,7 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 0)
 
-        logger = logging.getLogger('django.request')
-        logger.error(message)
+        self.logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertFalse('\n' in mail.outbox[0].subject)
@@ -250,8 +271,7 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 0)
 
-        logger = logging.getLogger('django.request')
-        logger.error(message)
+        self.logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
