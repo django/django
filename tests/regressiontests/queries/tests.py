@@ -1536,6 +1536,18 @@ class Queries6Tests(TestCase):
         q1 = Tag.objects.order_by('name')
         self.assertIsNot(q1, q1.all())
 
+    def test_ticket19029(self):
+        # A nested query with a QuerySet that has already been evaluated
+        # should not produce a subquery. The resulting query should only
+        # have one "SELECT".
+        notes = Note.objects.filter(note="n1")
+        list(notes)  # Force QuerySet evaluation
+        qs = Annotation.objects.filter(notes__in=notes)
+        self.assertEqual(
+            qs.query.get_compiler(qs.db).as_sql()[0].count('SELECT'),
+            1
+        )
+
 
 class RawQueriesTests(TestCase):
     def setUp(self):

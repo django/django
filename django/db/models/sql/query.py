@@ -1098,6 +1098,10 @@ class Query(object):
             # If value is a query expression, evaluate it
             value = SQLEvaluator(value, self)
             having_clause = value.contains_aggregate
+        if getattr(value, '_result_cache', None) is not None:
+            # If value is an already evaluated QuerySet,
+            # convert to a list to prevent a subquery
+            value = list(value)
 
         for alias, aggregate in self.aggregates.items():
             if alias in (parts[0], LOOKUP_SEP.join(parts)):
