@@ -455,7 +455,7 @@ This example illustrates all possible attributes and methods for a
 
         author_name = 'Sally Smith' # Hard-coded author name.
 
-        # AUTHOR E-MAIL --One of the following three is optional. The framework
+        # AUTHOR EMAIL --One of the following three is optional. The framework
         # looks for them in this order.
 
         def author_email(self, obj):
@@ -635,7 +635,7 @@ This example illustrates all possible attributes and methods for a
 
         item_author_name = 'Sally Smith' # Hard-coded author name.
 
-        # ITEM AUTHOR E-MAIL --One of the following three is optional. The
+        # ITEM AUTHOR EMAIL --One of the following three is optional. The
         # framework looks for them in this order.
         #
         # If you specify this, you must specify item_author_name.

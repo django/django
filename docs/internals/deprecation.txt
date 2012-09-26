@@ -23,7 +23,7 @@ these changes.
 * The :mod:`django.contrib.gis.db.backend` module will be removed in favor
   of the specific backends.
 
-* ``SMTPConnection`` will be removed in favor of a generic E-mail backend API.
+* ``SMTPConnection`` will be removed in favor of a generic Email backend API.
 
 * The many to many SQL generation functions on the database backends
   will be removed.

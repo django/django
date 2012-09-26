@@ -897,7 +897,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertFalse(login.context)
         self.client.get('/test_admin/admin/logout/')
 
-        # Test if user enters e-mail address
+        # Test if user enters email address
         response = self.client.get('/test_admin/admin/')
         self.assertEqual(response.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.super_email_login)
@@ -907,7 +907,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, ERROR_MESSAGE)
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
-        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
+        # check to ensure if there are multiple email addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
 
@@ -1556,7 +1556,7 @@ class SecureViewTests(TestCase):
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
 
-        # Test if user enters e-mail address
+        # Test if user enters email address
         response = self.client.get('/test_admin/admin/secure-view/')
         self.assertEqual(response.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
@@ -1566,7 +1566,7 @@ class SecureViewTests(TestCase):
         self.assertContains(login, ERROR_MESSAGE)
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
-        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
+        # check to ensure if there are multiple email addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
 

@@ -476,7 +476,7 @@ class AssertRaisesMsgTest(SimpleTestCase):
 class AssertFieldOutputTests(SimpleTestCase):
 
     def test_assert_field_output(self):
-        error_invalid = ['Enter a valid e-mail address.']
+        error_invalid = ['Enter a valid email address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
         self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
         self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})

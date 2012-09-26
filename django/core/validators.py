@@ -101,7 +101,7 @@ email_re = re.compile(
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'
     r')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$)'  # domain
     r'|\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$', re.IGNORECASE)  # literal form, ipv4 address (SMTP 4.1.3)
-validate_email = EmailValidator(email_re, _('Enter a valid e-mail address.'), 'invalid')
+validate_email = EmailValidator(email_re, _('Enter a valid email address.'), 'invalid')
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
 validate_slug = RegexValidator(slug_re, _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')

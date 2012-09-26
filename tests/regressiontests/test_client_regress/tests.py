@@ -499,11 +499,11 @@ class AssertFormErrorTests(TestCase):
         try:
             self.assertFormError(response, 'form', 'email', 'Some error.')
         except AssertionError as e:
-            self.assertIn(str_prefix("The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid e-mail address.'])"), str(e))
+            self.assertIn(str_prefix("The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid email address.'])"), str(e))
         try:
             self.assertFormError(response, 'form', 'email', 'Some error.', msg_prefix='abc')
         except AssertionError as e:
-            self.assertIn(str_prefix("abc: The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid e-mail address.'])"), str(e))
+            self.assertIn(str_prefix("abc: The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid email address.'])"), str(e))
 
     def test_unknown_nonfield_error(self):
         """

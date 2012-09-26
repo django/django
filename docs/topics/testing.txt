@@ -1622,7 +1622,7 @@ your test suite.
     "a@a.com" as a valid email address, but rejects "aaa" with a reasonable
     error message::
 
-        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid e-mail address.']})
+        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
 
 
 .. method:: TestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)

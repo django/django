@@ -613,7 +613,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         data = dict(email='invalid')
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
         self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
-<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" /></p>""")

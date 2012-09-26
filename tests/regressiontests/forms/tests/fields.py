@@ -507,16 +507,16 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual('person@example.com', f.clean('person@example.com'))
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo@')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo@bar')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'example@invalid-.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'example@-invalid.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'example@inv-.alid-.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'example@inv-.-alid.com')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@bar')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@invalid-.com')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@-invalid.com')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@inv-.alid-.com')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@inv-.-alid.com')
         self.assertEqual('example@valid-----hyphens.com', f.clean('example@valid-----hyphens.com'))
         self.assertEqual('example@valid-with-hyphens.com', f.clean('example@valid-with-hyphens.com'))
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'example@.com')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@.com')
         self.assertEqual('local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com', f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
 
     def test_email_regexp_for_performance(self):
@@ -525,7 +525,7 @@ class FieldsTests(SimpleTestCase):
         # if the security fix isn't in place.
         self.assertRaisesMessage(
                 ValidationError,
-                "'Enter a valid e-mail address.'",
+                "'Enter a valid email address.'",
                 f.clean,
                 'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
             )
@@ -536,9 +536,9 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual('', f.clean(None))
         self.assertEqual('person@example.com', f.clean('person@example.com'))
         self.assertEqual('example@example.com', f.clean('      example@example.com  \t   \t '))
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo@')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'foo@bar')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@bar')
 
     def test_emailfield_3(self):
         f = EmailField(min_length=10, max_length=15)
@@ -926,7 +926,7 @@ class FieldsTests(SimpleTestCase):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
         self.assertEqual('test@example.com', f.clean('test@example.com'))
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 28).'", f.clean, 'longemailaddress@example.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'not an e-mail')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'not an email')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
 
@@ -934,7 +934,7 @@ class FieldsTests(SimpleTestCase):
         f = ComboField(fields=[CharField(max_length=20), EmailField()], required=False)
         self.assertEqual('test@example.com', f.clean('test@example.com'))
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 28).'", f.clean, 'longemailaddress@example.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid e-mail address.'", f.clean, 'not an e-mail')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'not an email')
         self.assertEqual('', f.clean(''))
         self.assertEqual('', f.clean(None))
 

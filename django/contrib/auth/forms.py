@@ -193,12 +193,12 @@ class AuthenticationForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     error_messages = {
-        'unknown': _("That e-mail address doesn't have an associated "
+        'unknown': _("That email address doesn't have an associated "
                      "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this e-mail "
+        'unusable': _("The user account associated with this email "
                       "address cannot reset the password."),
     }
-    email = forms.EmailField(label=_("E-mail"), max_length=75)
+    email = forms.EmailField(label=_("Email"), max_length=75)
 
     def clean_email(self):
         """
