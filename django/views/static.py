@@ -138,7 +138,7 @@ def was_modified_since(header=None, mtime=0, size=0):
         header_len = matches.group(3)
         if header_len and int(header_len) != size:
             raise ValueError
-        if mtime > header_mtime:
+        if int(mtime) > header_mtime:
             raise ValueError
     except (AttributeError, ValueError, OverflowError):
         return True

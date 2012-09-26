@@ -2,11 +2,14 @@ from __future__ import absolute_import
 
 import mimetypes
 from os import path
+import unittest
 
 from django.conf import settings
 from django.conf.urls.static import static
-from django.test import TestCase
 from django.http import HttpResponseNotModified
+from django.test import TestCase
+from django.utils.http import http_date
+from django.views.static import was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -105,3 +108,14 @@ class StaticHelperTest(StaticTests):
     def tearDown(self):
         super(StaticHelperTest, self).tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
+
+
+class StaticUtilsTests(unittest.TestCase):
+    def test_was_modified_since_fp(self):
+        """
+        Test that a floating point mtime does not disturb was_modified_since.
+        (#18675)
+        """
+        mtime = 1343416141.107817
+        header = http_date(mtime)
+        self.assertFalse(was_modified_since(header, mtime))
