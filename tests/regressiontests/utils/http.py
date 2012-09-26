@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 
 from django.http import HttpResponse, utils
@@ -6,6 +7,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils import http
 from django.utils import six
 from django.utils import unittest
+
 
 class TestUtilsHttp(unittest.TestCase):
 
@@ -132,3 +134,30 @@ class TestUtilsHttp(unittest.TestCase):
         for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'django')]:
             self.assertEqual(http.int_to_base36(n), b36)
             self.assertEqual(http.base36_to_int(b36), n)
+
+
+class ETagProcessingTests(unittest.TestCase):
+    def testParsing(self):
+        etags = http.parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
+        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
+
+    def testQuoting(self):
+        quoted_etag = http.quote_etag(r'e\t"ag')
+        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
+
+
+class HttpDateProcessingTests(unittest.TestCase):
+    def testParsingRfc1123(self):
+        parsed = http.parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
+        self.assertEqual(datetime.utcfromtimestamp(parsed),
+                         datetime(1994, 11, 6, 8, 49, 37))
+
+    def testParsingRfc850(self):
+        parsed = http.parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
+        self.assertEqual(datetime.utcfromtimestamp(parsed),
+                         datetime(1994, 11, 6, 8, 49, 37))
+
+    def testParsingAsctime(self):
+        parsed = http.parse_http_date('Sun Nov  6 08:49:37 1994')
+        self.assertEqual(datetime.utcfromtimestamp(parsed),
+                         datetime(1994, 11, 6, 8, 49, 37))
