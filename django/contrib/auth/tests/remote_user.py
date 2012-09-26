@@ -3,10 +3,12 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.utils import timezone
 
 
+@skipIfCustomUser
 class RemoteUserTest(TestCase):
 
     urls = 'django.contrib.auth.tests.urls'
@@ -106,6 +108,7 @@ class RemoteUserNoCreateBackend(RemoteUserBackend):
     create_unknown_user = False
 
 
+@skipIfCustomUser
 class RemoteUserNoCreateTest(RemoteUserTest):
     """
     Contains the same tests as RemoteUserTest, but using a custom auth backend
@@ -142,6 +145,7 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         return user
 
 
+@skipIfCustomUser
 class RemoteUserCustomTest(RemoteUserTest):
     """
     Tests a custom RemoteUserBackend subclass that overrides the clean_username

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
-
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 
 
 class ModelBackend(object):
@@ -12,10 +12,11 @@ class ModelBackend(object):
     # configurable.
     def authenticate(self, username=None, password=None):
         try:
-            user = User.objects.get(username=username)
+            UserModel = get_user_model()
+            user = UserModel.objects.get_by_natural_key(username)
             if user.check_password(password):
                 return user
-        except User.DoesNotExist:
+        except UserModel.DoesNotExist:
             return None
 
     def get_group_permissions(self, user_obj, obj=None):
@@ -60,8 +61,9 @@ class ModelBackend(object):
 
     def get_user(self, user_id):
         try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+            UserModel = get_user_model()
+            return UserModel.objects.get(pk=user_id)
+        except UserModel.DoesNotExist:
             return None
 
 
@@ -94,17 +96,21 @@ class RemoteUserBackend(ModelBackend):
         user = None
         username = self.clean_username(remote_user)
 
+        UserModel = get_user_model()
+
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = User.objects.get_or_create(username=username)
+            user, created = UserModel.objects.get_or_create(**{
+                getattr(UserModel, 'USERNAME_FIELD', 'username'): username
+            })
             if created:
                 user = self.configure_user(user)
         else:
             try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
+                user = UserModel.objects.get_by_natural_key(username)
+            except UserModel.DoesNotExist:
                 pass
         return user
 

@@ -34,6 +34,23 @@ release featuring 2.7 support.
 What's new in Django 1.5
 ========================
 
+Configurable User model
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In Django 1.5, you can now use your own model as the store for user-related
+data. If your project needs a username with more than 30 characters, or if
+you want to store usernames in a format other than first name/last name, or
+you want to put custom profile information onto your User object, you can
+now do so.
+
+If you have a third-party reusable application that references the User model,
+you may need to make some changes to the way you reference User instances. You
+should also document any specific features of the User model that your
+application relies upon.
+
+See the :ref:`documentation on custom User models <auth-custom-user>` for
+more details.
+
 Support for saving a subset of model's fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -277,6 +294,18 @@ Session not saved on 500 responses
 Django's session middleware will skip saving the session data if the
 response's status code is 500.
 
+Email checks on failed admin login
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.5, if you attempted to log into the admin interface and
+mistakenly used your email address instead of your username, the admin
+interface would provide a warning advising that your email address was
+not your username. In Django 1.5, the introduction of
+:ref:`custom User models <auth-custom-user>` has required the removal of this
+warning. This doesn't change the login behavior of the admin site; it only
+affects the warning message that is displayed under one particular mode of
+login failure.
+
 Changes in tests execution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -394,3 +423,16 @@ The markup contrib module has been deprecated and will follow an accelerated
 deprecation schedule. Direct use of python markup libraries or 3rd party tag
 libraries is preferred to Django maintaining this functionality in the
 framework.
+
+:setting:`AUTH_PROFILE_MODULE`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the introduction of :ref:`custom User models <auth-custom-user>`, there is
+no longer any need for a built-in mechanism to store user profile data.
+
+You can still define user profiles models that have a one-to-one relation with
+the User model - in fact, for many applications needing to associate data with
+a User account, this will be an appropriate design pattern to follow. However,
+the :setting:`AUTH_PROFILE_MODULE` setting, and the
+:meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
+the user profile model, should not be used any longer.

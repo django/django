@@ -1,10 +1,12 @@
 from django.contrib.auth import signals
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SignalTestCase(TestCase):
     urls = 'django.contrib.auth.tests.urls'

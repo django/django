@@ -110,15 +110,14 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :doc:`authentication backends documentation
 </ref/authbackends>` for details.
 
-.. setting:: AUTH_PROFILE_MODULE
+.. setting:: AUTH_USER_MODEL
 
-AUTH_PROFILE_MODULE
--------------------
+AUTH_USER_MODEL
+---------------
 
-Default: Not defined
+Default: 'auth.User'
 
-The site-specific user profile model used by this site. See
-:ref:`auth-profiles`.
+The model to use to represent a User. See :ref:`auth-custom-user`.
 
 .. setting:: CACHES
 
@@ -2208,6 +2207,22 @@ ADMIN_MEDIA_PREFIX
    This setting has been obsoleted by the ``django.contrib.staticfiles`` app
    integration. See the :doc:`Django 1.4 release notes</releases/1.4>` for
    more information.
+
+.. setting:: AUTH_PROFILE_MODULE
+
+AUTH_PROFILE_MODULE
+-------------------
+
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See
+:ref:`auth-profiles`.
 
 .. setting:: IGNORABLE_404_ENDS
 

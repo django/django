@@ -250,6 +250,12 @@ Methods
 
     .. method:: models.User.get_profile()
 
+        .. deprecated:: 1.5
+            With the introduction of :ref:`custom User models <auth-custom-user>`,
+            the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+            model is no longer supported. See the
+            :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
         Returns a site-specific profile for this user. Raises
         :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
         current site doesn't allow profiles, or
@@ -581,6 +587,12 @@ correct path and environment for you.
 
 Storing additional information about users
 ------------------------------------------
+
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
 
 If you'd like to store additional information related to your users, Django
 provides a method to specify a site-specific related model -- termed a "user
@@ -1345,6 +1357,9 @@ Helper functions
       URL to redirect to after log out. Overrides ``next`` if the given
       ``GET`` parameter is passed.
 
+
+.. _built-in-auth-forms:
+
 Built-in forms
 --------------
 
@@ -1734,6 +1749,350 @@ Fields
         group.permissions.add(permission, permission, ...)
         group.permissions.remove(permission, permission, ...)
         group.permissions.clear()
+
+.. _auth-custom-user:
+
+Customizing the User model
+==========================
+
+.. versionadded:: 1.5
+
+Some kinds of projects may have authentication requirements for which Django's
+built-in :class:`~django.contrib.auth.models.User` model is not always
+appropriate. For instance, on some sites it makes more sense to use an email
+address as your identification token instead of a username.
+
+Django allows you to override the default User model by providing a value for
+the :setting:`AUTH_USER_MODEL` setting that references a custom model::
+
+     AUTH_USER_MODEL = 'myapp.MyUser'
+
+This dotted pair describes the name of the Django app, and the name of the Django
+model that you wish to use as your User model.
+
+.. admonition:: Warning
+
+   Changing :setting:`AUTH_USER_MODEL` has a big effect on your database
+   structure. It changes the tables that are available, and it will affect the
+   construction of foreign keys and many-to-many relationships. If you intend
+   to set :setting:`AUTH_USER_MODEL`, you should set it before running
+   ``manage.py syncdb`` for the first time.
+
+   If you have an existing project and you want to migrate to using a custom
+   User model, you may need to look into using a migration tool like South_
+   to ease the transition.
+
+.. _South: http://south.aeracode.org
+
+Referencing the User model
+--------------------------
+
+If you reference :class:`~django.contrib.auth.models.User` directly (for
+example, by referring to it in a foreign key), your code will not work in
+projects where the :setting:`AUTH_USER_MODEL` setting has been changed to a
+different User model.
+
+Instead of referring to :class:`~django.contrib.auth.models.User` directly,
+you should reference the user model using
+:func:`django.contrib.auth.get_user_model()`. This method will return the
+currently  active User model -- the custom User model if one is specified, or
+:class:`~django.contrib.auth.User` otherwise.
+
+In relations to the User model, you should specify the custom model using
+the :setting:`AUTH_USER_MODEL` setting. For example::
+
+    from django.conf import settings
+    from django.db import models
+
+    class Article(models.Model)
+        author = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+Specifying a custom User model
+------------------------------
+
+.. admonition:: Model design considerations
+
+    Think carefully before handling information not directly related to
+    authentication in your custom User Model.
+
+    It may be better to store app-specific user information in a model
+    that has a relation with the User model. That allows each app to specify
+    its own user data requirements without risking conflicts with other
+    apps. On the other hand, queries to retrieve this related information
+    will involve a database join, which may have an effect on performance.
+
+Django expects your custom User model to meet some minimum requirements.
+
+1. Your model must have a single unique field that can be used for
+   identification purposes. This can be a username, an email address,
+   or any other unique attribute.
+
+2. Your model must provide a way to address the user in a "short" and
+   "long" form. The most common interpretation of this would be to use
+   the user's given name as the "short" identifier, and the user's full
+   name as the "long" identifier. However, there are no constraints on
+   what these two methods return - if you want, they can return exactly
+   the same value.
+
+The easiest way to construct a compliant custom User model is to inherit from
+:class:`~django.contrib.auth.models.AbstractBaseUser`.
+:class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
+implementation of a `User` model, including hashed passwords and tokenized
+password resets. You must then provide some key implementation details:
+
+.. attribute:: User.USERNAME_FIELD
+
+    A string describing the name of the field on the User model that is
+    used as the unique identifier. This will usually be a username of
+    some kind, but it can also be an email address, or any other unique
+    identifier. In the following example, the field `identifier` is used
+    as the identifying field::
+
+        class MyUser(AbstractBaseUser):
+            identfier = models.CharField(max_length=40, unique=True, db_index=True)
+            ...
+            USERNAME_FIELD = 'identifier'
+
+.. attribute:: User.REQUIRED_FIELDS
+
+    A list of the field names that *must* be provided when creating
+    a user. For example, here is the partial definition for a User model
+    that defines two required fields - a date of birth and height::
+
+        class MyUser(AbstractBaseUser):
+            ...
+            date_of_birth = models.DateField()
+            height = models.FloatField()
+            ...
+            REQUIRED_FIELDS = ['date_of_birth', 'height']
+
+.. method:: User.get_full_name():
+
+    A longer formal identifier for the user. A common interpretation
+    would be the full name name of the user, but it can be any string that
+    identifies the user.
+
+.. method:: User.get_short_name():
+
+    A short, informal identifier for the user. A common interpretation
+    would be the first name of the user, but it can be any string that
+    identifies the user in an informal way. It may also return the same
+    value as :meth:`django.contrib.auth.User.get_full_name()`.
+
+You should also define a custom manager for your User model. If your User
+model defines `username` and `email` fields the same as Django's default User,
+you can just install Django's
+:class:`~django.contrib.auth.models.UserManager`; however, if your User model
+defines different fields, you will need to define a custom manager that
+extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
+additional methods:
+
+.. method:: UserManager.create_user(username, password=None, **other_fields)
+
+    The prototype of `create_user()` should accept all required fields
+    as arguments. For example, if your user model defines `username`,
+    and `date_of_birth` as required fields, then create_user should be
+    defined as::
+
+        def create_user(self, username, date_of_birth, password=None):
+            # create user here
+
+.. method:: UserManager.create_superuser(username, password, **other_fields)
+
+    The prototype of `create_superuser()` should accept all required fields
+    as arguments. For example, if your user model defines `username`,
+    and `date_of_birth` as required fields, then create_user should be
+    defined as::
+
+        def create_superuser(self, username, date_of_birth, password):
+            # create superuser here
+
+    Unlike `create_user()`, `create_superuser()` *must* require the caller
+    to provider a password.
+
+Extending Django's default User
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
+model and you just want to add some additional profile information, you can
+simply subclass :class:`~django.contrib.auth.models.AbstractUser` and add your
+custom profile fields.
+
+Custom users and the built-in auth forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As you may expect, built-in Django's :ref:`forms <_built-in-auth-forms>`
+and :ref:`views <other-built-in-views>` make certain assumptions about
+the user model that they are working with.
+
+If your user model doesn't follow the same assumptions, it may be necessary to define
+a replacement form, and pass that form in as part of the configuration of the
+auth views.
+
+* :class:`~django.contrib.auth.forms.UserCreationForm`
+
+  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Must be re-written for any custom user model.
+
+* :class:`~django.contrib.auth.forms.UserChangeForm`
+
+  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Must be re-written for any custom user model.
+
+* :class:`~django.contrib.auth.forms.AuthenticationForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
+  and will adapt to use the field defined in `USERNAME_FIELD`.
+
+* :class:`~django.contrib.auth.forms.PasswordResetForm`
+
+  Assumes that the user model has an integer primary key, has a field named
+  `email` that can be used to identify the user, and a boolean field
+  named `is_active` to prevent password resets for inactive users.
+
+* :class:`~django.contrib.auth.forms.SetPasswordForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+* :class:`~django.contrib.auth.forms.PasswordChangeForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+* :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+
+  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+
+
+Custom users and django.contrib.admin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want your custom User model to also work with Admin, your User model must
+define some additional attributes and methods. These methods allow the admin to
+control access of the User to admin content:
+
+.. attribute:: User.is_staff
+
+    Returns True if the user is allowed to have access to the admin site.
+
+.. attribute:: User.is_active
+
+    Returns True if the user account is currently active.
+
+.. method:: User.has_perm(perm, obj=None):
+
+    Returns True if the user has the named permission. If `obj` is
+    provided, the permission needs to be checked against a specific object
+    instance.
+
+.. method:: User.has_module_perms(app_label):
+
+    Returns True if the user has permission to access models in
+    the given app.
+
+
+Custom users and Proxy models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One limitation of custom User models is that installing a custom User model
+will break any proxy model extending :class:`~django.contrib.auth.models.User`.
+Proxy models must be based on a concrete base class; by defining a custom User
+model, you remove the ability of Django to reliably identify the base class.
+
+If your project uses proxy models, you must either modify the proxy to extend
+the User model that is currently in use in your project, or merge your proxy's
+behavior into your User subclass.
+
+A full example
+--------------
+
+Here is an example of a full models.py for an admin-compliant custom
+user app. This user model uses an email address as the username, and has a
+required date of birth; it provides no permission checking, beyond a simple
+`admin` flag on the user account. This model would be compatible with all
+the built-in auth forms and views, except for the User creation forms.
+
+This code would all live in a ``models.py`` file for a custom
+authentication app::
+
+    from django.db import models
+    from django.contrib.auth.models import (
+        BaseUserManager, AbstractBaseUser
+    )
+
+
+    class MyUserManager(BaseUserManager):
+        def create_user(self, email, date_of_birth, password=None):
+            """
+            Creates and saves a User with the given email, date of
+            birth and password.
+            """
+            if not email:
+                raise ValueError('Users must have an email address')
+
+            user = self.model(
+                email=MyUserManager.normalize_email(email),
+                date_of_birth=date_of_birth,
+            )
+
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
+
+        def create_superuser(self, username, date_of_birth, password):
+            """
+            Creates and saves a superuser with the given email, date of
+            birth and password.
+            """
+            u = self.create_user(username,
+                            password=password,
+                            date_of_birth=date_of_birth
+                        )
+            u.is_admin = True
+            u.save(using=self._db)
+            return u
+
+
+    class MyUser(AbstractBaseUser):
+        email = models.EmailField(
+                            verbose_name='email address',
+                            max_length=255
+                        )
+        date_of_birth = models.DateField()
+        is_active = models.BooleanField(default=True)
+        is_admin = models.BooleanField(default=False)
+
+        objects = MyUserManager()
+
+        USERNAME_FIELD = 'email'
+        REQUIRED_FIELDS = ['date_of_birth']
+
+        def get_full_name(self):
+            # The user is identified by their email address
+            return self.email
+
+        def get_short_name(self):
+            # The user is identified by their email address
+            return self.email
+
+        def __unicode__(self):
+            return self.email
+
+        def has_perm(self, perm, obj=None):
+            "Does the user have a specific permission?"
+            # Simplest possible answer: Yes, always
+            return True
+
+        def has_module_perms(self, app_label):
+            "Does the user have permissions to view the app `app_label`?"
+            # Simplest possible answer: Yes, always
+            return True
+
+        @property
+        def is_staff(self):
+            "Is the user a member of staff?"
+            # Simplest possible answer: All admins are staff
+            return self.is_admin
+
 
 .. _authentication-backends:
 

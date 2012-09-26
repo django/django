@@ -1,13 +1,20 @@
 from __future__ import unicode_literals
+from datetime import date
 
 from django.contrib.auth import models, management
 from django.contrib.auth.management.commands import changepassword
+from django.contrib.auth.models import User
+from django.contrib.auth.tests import CustomUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
 
+@skipIfCustomUser
 class GetDefaultUsernameTestCase(TestCase):
 
     def setUp(self):
@@ -36,6 +43,7 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
+@skipIfCustomUser
 class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
@@ -48,7 +56,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         self.stderr.close()
 
     def test_that_changepassword_command_changes_joes_password(self):
-        " Executing the changepassword management command should change joe's password "
+        "Executing the changepassword management command should change joe's password"
         self.assertTrue(self.user.check_password('qwerty'))
         command = changepassword.Command()
         command._get_pass = lambda *args: 'not qwerty'
@@ -69,3 +77,93 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
         with self.assertRaises(CommandError):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
+
+
+@skipIfCustomUser
+class CreatesuperuserManagementCommandTestCase(TestCase):
+
+    def test_createsuperuser(self):
+        "Check the operation of the createsuperuser management command"
+        # We can use the management command to create a superuser
+        new_io = StringIO()
+        call_command("createsuperuser",
+            interactive=False,
+            username="joe",
+            email="joe@somewhere.org",
+            stdout=new_io
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        u = User.objects.get(username="joe")
+        self.assertEqual(u.email, 'joe@somewhere.org')
+
+        # created password should be unusable
+        self.assertFalse(u.has_usable_password())
+
+    def test_verbosity_zero(self):
+        # We can supress output on the management command
+        new_io = StringIO()
+        call_command("createsuperuser",
+            interactive=False,
+            username="joe2",
+            email="joe2@somewhere.org",
+            verbosity=0,
+            stdout=new_io
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, '')
+        u = User.objects.get(username="joe2")
+        self.assertEqual(u.email, 'joe2@somewhere.org')
+        self.assertFalse(u.has_usable_password())
+
+    def test_email_in_username(self):
+        new_io = StringIO()
+        call_command("createsuperuser",
+            interactive=False,
+            username="joe+admin@somewhere.org",
+            email="joe@somewhere.org",
+            stdout=new_io
+        )
+        u = User.objects.get(username="joe+admin@somewhere.org")
+        self.assertEqual(u.email, 'joe@somewhere.org')
+        self.assertFalse(u.has_usable_password())
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    def test_swappable_user(self):
+        "A superuser can be created when a custom User model is in use"
+        # We can use the management command to create a superuser
+        # We skip validation because the temporary substitution of the
+        # swappable User model messes with validation.
+        new_io = StringIO()
+        call_command("createsuperuser",
+            interactive=False,
+            username="joe@somewhere.org",
+            date_of_birth="1976-04-01",
+            stdout=new_io,
+            skip_validation=True
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        u = CustomUser.objects.get(email="joe@somewhere.org")
+        self.assertEqual(u.date_of_birth, date(1976, 4, 1))
+
+        # created password should be unusable
+        self.assertFalse(u.has_usable_password())
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    def test_swappable_user_missing_required_field(self):
+        "A superuser can be created when a custom User model is in use"
+        # We can use the management command to create a superuser
+        # We skip validation because the temporary substitution of the
+        # swappable User model messes with validation.
+        new_io = StringIO()
+        with self.assertRaises(CommandError):
+            call_command("createsuperuser",
+                interactive=False,
+                username="joe@somewhere.org",
+                stdout=new_io,
+                stderr=new_io,
+                skip_validation=True
+            )
+
+        self.assertEqual(CustomUser.objects.count(), 0)

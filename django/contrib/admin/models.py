@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import User
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text
@@ -12,15 +12,17 @@ ADDITION = 1
 CHANGE = 2
 DELETION = 3
 
+
 class LogEntryManager(models.Manager):
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
         e = self.model(None, None, user_id, content_type_id, smart_text(object_id), object_repr[:200], action_flag, change_message)
         e.save()
 
+
 @python_2_unicode_compatible
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.TextField(_('object id'), blank=True, null=True)
     object_repr = models.CharField(_('object repr'), max_length=200)

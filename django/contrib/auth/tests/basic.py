@@ -1,13 +1,18 @@
 import locale
-import traceback
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.tests.custom_user import CustomUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.six import StringIO
 
 
+@skipIfCustomUser
 class BasicTestCase(TestCase):
     def test_user(self):
         "Check that users can be created and can set their password"
@@ -33,7 +38,7 @@ class BasicTestCase(TestCase):
         self.assertFalse(u.is_superuser)
 
         # Check API-based user creation with no password
-        u2 = User.objects.create_user('testuser2', 'test2@example.com')
+        User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u.has_usable_password())
 
     def test_user_no_email(self):
@@ -98,7 +103,6 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.email, 'joe2@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
-
         new_io = StringIO()
         call_command("createsuperuser",
             interactive=False,
@@ -124,15 +128,21 @@ class BasicTestCase(TestCase):
 
             # Temporarily replace getpass to allow interactive code to be used
             # non-interactively
-            class mock_getpass: pass
+            class mock_getpass:
+                pass
             mock_getpass.getpass = staticmethod(lambda p=None: "nopasswd")
             createsuperuser.getpass = mock_getpass
 
             # Call the command in this new environment
             new_io = StringIO()
-            call_command("createsuperuser", interactive=True, username="nolocale@somewhere.org", email="nolocale@somewhere.org", stdout=new_io)
+            call_command("createsuperuser",
+                interactive=True,
+                username="nolocale@somewhere.org",
+                email="nolocale@somewhere.org",
+                stdout=new_io
+            )
 
-        except TypeError as e:
+        except TypeError:
             self.fail("createsuperuser fails if the OS provides no information about the current locale")
 
         finally:
@@ -143,3 +153,24 @@ class BasicTestCase(TestCase):
         # If we were successful, a user should have been created
         u = User.objects.get(username="nolocale@somewhere.org")
         self.assertEqual(u.email, 'nolocale@somewhere.org')
+
+    def test_get_user_model(self):
+        "The current user model can be retrieved"
+        self.assertEqual(get_user_model(), User)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    def test_swappable_user(self):
+        "The current user model can be swapped out for another"
+        self.assertEqual(get_user_model(), CustomUser)
+
+    @override_settings(AUTH_USER_MODEL='badsetting')
+    def test_swappable_user_bad_setting(self):
+        "The alternate user setting must point to something in the format app.model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_user_model()
+
+    @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
+    def test_swappable_user_nonexistent_model(self):
+        "The current user model must point to an installed model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_user_model()

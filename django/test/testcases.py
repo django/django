@@ -44,6 +44,7 @@ from django.utils import unittest as ut2
 from django.utils.encoding import force_text
 from django.utils import six
 from django.utils.unittest.util import safe_repr
+from django.utils.unittest import skipIf
 from django.views.static import serve
 
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
@@ -52,6 +53,7 @@ __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)",
                                 lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
+
 
 def to_list(value):
     """

@@ -4,16 +4,17 @@ import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils import six
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserCreationFormTest(TestCase):
 
@@ -81,6 +82,7 @@ class UserCreationFormTest(TestCase):
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AuthenticationFormTest(TestCase):
 
@@ -133,6 +135,7 @@ class AuthenticationFormTest(TestCase):
         self.assertEqual(form.non_field_errors(), [])
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SetPasswordFormTest(TestCase):
 
@@ -160,6 +163,7 @@ class SetPasswordFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PasswordChangeFormTest(TestCase):
 
@@ -208,6 +212,7 @@ class PasswordChangeFormTest(TestCase):
                          ['old_password', 'new_password1', 'new_password2'])
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserChangeFormTest(TestCase):
 
@@ -261,6 +266,7 @@ class UserChangeFormTest(TestCase):
             form.as_table())
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PasswordResetFormTest(TestCase):
 

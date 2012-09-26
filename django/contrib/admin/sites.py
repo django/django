@@ -9,7 +9,6 @@ from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
-from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -18,11 +17,14 @@ from django.conf import settings
 
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
+
 class AlreadyRegistered(Exception):
     pass
 
+
 class NotRegistered(Exception):
     pass
+
 
 class AdminSite(object):
     """
@@ -41,7 +43,7 @@ class AdminSite(object):
     password_change_done_template = None
 
     def __init__(self, name='admin', app_name='admin'):
-        self._registry = {} # model_class class -> admin_class instance
+        self._registry = {}  # model_class class -> admin_class instance
         self.name = name
         self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
@@ -80,20 +82,23 @@ class AdminSite(object):
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
 
-            # If we got **options then dynamically construct a subclass of
-            # admin_class with those **options.
-            if options:
-                # For reasons I don't quite understand, without a __module__
-                # the created class appears to "live" in the wrong place,
-                # which causes issues later on.
-                options['__module__'] = __name__
-                admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
+            # Ignore the registration if the model has been
+            # swapped out.
+            if not model._meta.swapped:
+                # If we got **options then dynamically construct a subclass of
+                # admin_class with those **options.
+                if options:
+                    # For reasons I don't quite understand, without a __module__
+                    # the created class appears to "live" in the wrong place,
+                    # which causes issues later on.
+                    options['__module__'] = __name__
+                    admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-            # Validate (which might be a no-op)
-            validate(admin_class, model)
+                # Validate (which might be a no-op)
+                validate(admin_class, model)
 
-            # Instantiate the admin class to save in the registry
-            self._registry[model] = admin_class(model, self)
+                # Instantiate the admin class to save in the registry
+                self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
         """
@@ -319,6 +324,7 @@ class AdminSite(object):
             REDIRECT_FIELD_NAME: request.get_full_path(),
         }
         context.update(extra_context or {})
+
         defaults = {
             'extra_context': context,
             'current_app': self.name,

@@ -15,10 +15,9 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -74,6 +73,7 @@ def login(request, template_name='registration/login.html',
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
 def logout(request, next_page=None,
            template_name='registration/logged_out.html',
            redirect_field_name=REDIRECT_FIELD_NAME,
@@ -104,6 +104,7 @@ def logout(request, next_page=None,
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
 
+
 def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
     """
     Logs out the user if he is logged in. Then redirects to the log-in page.
@@ -112,6 +113,7 @@ def logout_then_login(request, login_url=None, current_app=None, extra_context=N
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
     return logout(request, login_url, current_app=current_app, extra_context=extra_context)
+
 
 def redirect_to_login(next, login_url=None,
                       redirect_field_name=REDIRECT_FIELD_NAME):
@@ -127,6 +129,7 @@ def redirect_to_login(next, login_url=None,
         login_url_parts[4] = querystring.urlencode(safe='/')
 
     return HttpResponseRedirect(urlunparse(login_url_parts))
+
 
 # 4 views for password reset:
 # - password_reset sends the mail
@@ -173,6 +176,7 @@ def password_reset(request, is_admin_site=False,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         current_app=None, extra_context=None):
@@ -181,6 +185,7 @@ def password_reset_done(request,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
 
 # Doesn't need csrf_protect since no-one can guess the URL
 @sensitive_post_parameters()
@@ -195,13 +200,14 @@ def password_reset_confirm(request, uidb36=None, token=None,
     View that checks the hash in a password reset link and presents a
     form for entering a new password.
     """
-    assert uidb36 is not None and token is not None # checked by URLconf
+    UserModel = get_user_model()
+    assert uidb36 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
         uid_int = base36_to_int(uidb36)
-        user = User.objects.get(id=uid_int)
-    except (ValueError, OverflowError, User.DoesNotExist):
+        user = UserModel.objects.get(id=uid_int)
+    except (ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):
@@ -225,6 +231,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):
@@ -235,6 +242,7 @@ def password_reset_complete(request,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -260,6 +268,7 @@ def password_change(request,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
 
 @login_required
 def password_change_done(request,

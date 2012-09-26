@@ -2,12 +2,14 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
 
 
+@skipIfCustomUser
 class BackendTest(TestCase):
 
     backend = 'django.contrib.auth.backends.ModelBackend'
@@ -151,6 +153,7 @@ class SimpleRowlevelBackend(object):
             return ['none']
 
 
+@skipIfCustomUser
 class RowlevelBackendTest(TestCase):
     """
     Tests for auth backend that supports object level permissions
@@ -223,6 +226,7 @@ class AnonymousUserBackendTest(TestCase):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), set(['anon']))
 
 
+@skipIfCustomUser
 @override_settings(AUTHENTICATION_BACKENDS=[])
 class NoBackendsTest(TestCase):
     """
@@ -235,6 +239,7 @@ class NoBackendsTest(TestCase):
         self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
 
 
+@skipIfCustomUser
 class InActiveUserBackendTest(TestCase):
     """
     Tests for a inactive user
