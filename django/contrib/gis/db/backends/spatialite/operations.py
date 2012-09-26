@@ -146,6 +146,8 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             except DatabaseError:
                 # we are using < 2.4.0-RC4
                 pass
+        if version >= (3, 0, 0):
+            self.geojson = 'AsGeoJSON'
 
     def check_aggregate_support(self, aggregate):
         """
