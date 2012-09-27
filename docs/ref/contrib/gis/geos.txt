@@ -584,6 +584,15 @@ is returned instead.
        >>> ls = LineString( ((0, 0), (1, 1)) )
        >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
 
+   The return value of some ``LineString`` methods and attributes will
+   vary depending on whether numpy is available on your system.
+
+   ``LineString.array`` will return a numpy.ndarray if numpy is
+   installed; if numpy is not installed a list will be returned an a
+   ``DeprecatedWarning`` will be issued.  If a list is the desired
+   type use ``list(LineString( ... ))`` instead.
+
+
 ``LinearRing``
 --------------
 

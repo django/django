@@ -5,6 +5,7 @@ from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
+import warnings
 
 class LineString(GEOSGeometry):
     _init_func = capi.create_linestring
@@ -114,12 +115,21 @@ class LineString(GEOSGeometry):
 
     def _listarr(self, func):
         """
-        Internal routine that returns a sequence (list) corresponding with
-        the given function.  Will return a numpy array if possible.
+        Internal routine that returns a sequence (list) corresponding
+        with the given function.  Will return a numpy.ndarray if Numpy
+        is installed, otherwise will issue a DeprecationWarning via
+        warnings.warn and return a list object.
+        
+        If the return of a list object is the desired behavior please 
+        consider using list(LineString(...)).
         """
         lst = [func(i) for i in xrange(len(self))]
-        if numpy: return numpy.array(lst) # ARRRR!
-        else: return lst
+        if numpy: return numpy.array(lst)
+        else:
+            warnings.warn((
+                    "numpy is not installed; returning a list instead of an "
+                    "numpy.array object"), DeprecationWarning)
+            return lst
 
     @property
     def array(self):
