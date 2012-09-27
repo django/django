@@ -459,6 +459,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
+        self.float_is_enough = self.settings_dict["OPTIONS"].get('float_is_enough', False)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
@@ -496,8 +497,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params = self.settings_dict['OPTIONS'].copy()
             if 'use_returning_into' in conn_params:
                 del conn_params['use_returning_into']
+            if 'float_is_enough' in conn_params:
+                del conn_params['float_is_enough']
             self.connection = Database.connect(conn_string, **conn_params)
-            cursor = FormatStylePlaceholderCursor(self.connection)
+            cursor = FormatStylePlaceholderCursor(self.connection, self.float_is_enough)
             # Set the territory first. The territory overrides NLS_DATE_FORMAT
             # and NLS_TIMESTAMP_FORMAT to the territory default. When all of
             # these are set in single statement it isn't clear what is supposed
@@ -547,7 +550,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 pass
             connection_created.send(sender=self.__class__, connection=self)
         if not cursor:
-            cursor = FormatStylePlaceholderCursor(self.connection)
+            cursor = FormatStylePlaceholderCursor(self.connection, self.float_is_enough)
         return cursor
 
     # Oracle doesn't support savepoint commits.  Ignore them.
@@ -668,12 +671,17 @@ class FormatStylePlaceholderCursor(object):
     """
     charset = 'utf-8'
 
-    def __init__(self, connection):
+    def __init__(self, connection, float_is_enough):
         self.cursor = connection.cursor()
-        # Necessary to retrieve decimal values without rounding error.
-        self.cursor.outputtypehandler = _outputtypehandler
         # Default arraysize of 1 is highly sub-optimal.
         self.cursor.arraysize = 100
+        if float_is_enough:
+            # Some conversions needed 
+            self.cursor.outputtypehandler = _outputtypehandler_float
+        else:
+            # Besides the above, return some numbers as strings so they
+            # may be transformed to Decimals
+            self.cursor.outputtypehandler = _outputtypehandler
 
     def _format_params(self, params):
         return tuple([OracleParam(p, self, True) for p in params])
@@ -797,6 +805,27 @@ def _outputtypehandler(cursor, name, default_type, length, precision, scale):
             # or Decimal based on whether it has a decimal point.
             return cursor.var(str, 100, cursor.arraysize,
                               outconverter=_decimal_or_int)
+    # datetimes are returned as TIMESTAMP, except the results
+    # of "dates" queries, which are returned as DATETIME.
+    elif default_type in (Database.TIMESTAMP, Database.DATETIME) and settings.USE_TZ:
+        return cursor.var(default_type, arraysize=cursor.arraysize,
+                          outconverter=_add_tzinfo)
+    elif default_type in (Database.STRING, Database.FIXED_CHAR,
+                          Database.LONG_STRING):
+        return cursor.var(default_type, length, cursor.arraysize,
+                          outconverter=_to_unicode)
+
+def _outputtypehandler_float(cursor, name, default_type, length, precision, scale):
+    # This version only uses Decimal when it knows it is necessary,
+    # and float or int otherwise
+    if default_type is Database.NUMBER:
+        if precision>0 and scale!=0 and scale!=-127:
+            # This probably came from a DecimalField
+            return cursor.var(str, 100, cursor.arraysize,
+                              outconverter=decimal.Decimal)
+        else:
+            # IntField, FloatField, sequences, expressions... Trust cx_Oracle
+            return None
     # datetimes are returned as TIMESTAMP, except the results
     # of "dates" queries, which are returned as DATETIME.
     elif default_type in (Database.TIMESTAMP, Database.DATETIME) and settings.USE_TZ:
