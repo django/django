@@ -150,27 +150,26 @@ class Collector(object):
         if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
             return False
         model = objs.model
-        has_signals = (signals.pre_delete.has_listeners(model)
-                       or signals.post_delete.has_listeners(model)
-                       or signals.m2m_changed.has_listeners(model))
+        if (signals.pre_delete.has_listeners(model)
+                or signals.post_delete.has_listeners(model)
+                or signals.m2m_changed.has_listeners(model)):
+            return False
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
-        has_parents = any(
-            True for m, link in model._meta.concrete_model._meta.parents.items()
-            if link != from_field
-        )
-        has_cascades = False
+        opts = model._meta
+        if any(link != from_field for link in opts.concrete_model._meta.parents.values()):
+            return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in model._meta.get_all_related_objects(
+        for related in opts.get_all_related_objects(
             include_hidden=True, include_proxy_eq=True):
             if related.field.rel.on_delete is not DO_NOTHING:
-                has_cascades = True
+                return False
         # GFK deletes
-        for relation in model._meta.many_to_many:
+        for relation in opts.many_to_many:
             if not relation.rel.through:
-                has_cascades = True
-        return not (has_signals or has_parents or has_cascades)
+                return False
+        return True
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
         source_attr=None, reverse_dependency=False):
@@ -204,8 +203,10 @@ class Collector(object):
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
-                # FIXME: This seems to be buggy and execute an query for each
-                # parent object fetch.
+                # FIXME: This seems to be buggy and execute a query for each
+                # parent object fetch. We have the parent data in the obj,
+                # but we don't have a nice way to turn that data into parent
+                # object instance.
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
                              source_attr=ptr.rel.related_name,
