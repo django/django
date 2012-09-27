@@ -1783,6 +1783,25 @@ your test suite.
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
+.. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are equal. The
+    comparison is based on XML semantics. Similarily to
+    :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
+    made on parsed content, hence only semantic differences are considered, not
+    syntax differences. When unvalid XML is passed in any parameter, an
+    ``AssertionError`` is always raised, even if both string are identical.
+
+.. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
+    comparison is based on XML semantics. See
+    :meth:`~SimpleTestCase.assertXMLEqual` for details.
+
 .. _topics-testing-email:
 
 Email services
