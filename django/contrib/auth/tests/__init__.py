@@ -12,5 +12,4 @@ from django.contrib.auth.tests.hashers import *
 from django.contrib.auth.tests.signals import *
 from django.contrib.auth.tests.tokens import *
 from django.contrib.auth.tests.views import *
-
 # The password for the fixture data users is 'password'
