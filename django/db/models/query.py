@@ -529,6 +529,14 @@ class QuerySet(object):
         self._result_cache = None
     delete.alters_data = True
 
+    def _raw_delete(self, using):
+        """
+        Deletes objects found from the given queryset in single direct SQL
+        query. No signals are sent, and there is no protection for cascades.
+        """
+        sql.DeleteQuery(self.model).delete_qs(self, using)
+    _raw_delete.alters_data = True
+
     def update(self, **kwargs):
         """
         Updates all elements in the current QuerySet, setting all the given

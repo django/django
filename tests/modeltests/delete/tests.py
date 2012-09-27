@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 from django.utils.six.moves import xrange
 
 from .models import (R, RChild, S, T, U, A, M, MR, MRNull,
-    create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile)
+    create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
+    M2MTo, M2MFrom, Parent, Child, Base)
 
 
 class OnDeleteTests(TestCase):
@@ -73,6 +74,16 @@ class OnDeleteTests(TestCase):
         a = A.objects.get(pk=a.pk)
         self.assertEqual(replacement_r, a.donothing)
         models.signals.pre_delete.disconnect(check_do_nothing)
+
+    def test_do_nothing_qscount(self):
+        """
+        Test that a models.DO_NOTHING relation doesn't trigger a query.
+        """
+        b = Base.objects.create()
+        with self.assertNumQueries(1):
+            # RelToBase should not be queried.
+            b.delete()
+        self.assertEqual(Base.objects.count(), 0)
 
     def test_inheritance_cascade_up(self):
         child = RChild.objects.create()
@@ -229,16 +240,34 @@ class DeletionTests(TestCase):
         # 1 query to delete the avatar
         # The important thing is that when we can defer constraint checks there
         # is no need to do an UPDATE on User.avatar to null it out.
+
+        # Attach a signal to make sure we will not do fast_deletes.
+        calls = []
+        def noop(*args, **kwargs):
+            calls.append('')
+        models.signals.post_delete.connect(noop, sender=User)
+
         self.assertNumQueries(3, a.delete)
         self.assertFalse(User.objects.exists())
         self.assertFalse(Avatar.objects.exists())
+        self.assertEquals(len(calls), 1)
+        models.signals.post_delete.disconnect(noop, sender=User)
 
     @skipIfDBFeature("can_defer_constraint_checks")
     def test_cannot_defer_constraint_checks(self):
         u = User.objects.create(
             avatar=Avatar.objects.create()
         )
+        # Attach a signal to make sure we will not do fast_deletes.
+        calls = []
+        def noop(*args, **kwargs):
+            calls.append('')
+        models.signals.post_delete.connect(noop, sender=User)
+
         a = Avatar.objects.get(pk=u.avatar_id)
+        # The below doesn't make sense... Why do we need to null out
+        # user.avatar if we are going to delete the user immediately after it,
+        # and there are no more cascades.
         # 1 query to find the users for the avatar.
         # 1 query to delete the user
         # 1 query to null out user.avatar, because we can't defer the constraint
@@ -246,6 +275,8 @@ class DeletionTests(TestCase):
         self.assertNumQueries(4, a.delete)
         self.assertFalse(User.objects.exists())
         self.assertFalse(Avatar.objects.exists())
+        self.assertEquals(len(calls), 1)
+        models.signals.post_delete.disconnect(noop, sender=User)
 
     def test_hidden_related(self):
         r = R.objects.create()
@@ -254,3 +285,69 @@ class DeletionTests(TestCase):
 
         r.delete()
         self.assertEqual(HiddenUserProfile.objects.count(), 0)
+
+class FastDeleteTests(TestCase):
+
+    def test_fast_delete_fk(self):
+        u = User.objects.create(
+            avatar=Avatar.objects.create()
+        )
+        a = Avatar.objects.get(pk=u.avatar_id)
+        # 1 query to fast-delete the user
+        # 1 query to delete the avatar
+        self.assertNumQueries(2, a.delete)
+        self.assertFalse(User.objects.exists())
+        self.assertFalse(Avatar.objects.exists())
+
+    def test_fast_delete_m2m(self):
+        t = M2MTo.objects.create()
+        f = M2MFrom.objects.create()
+        f.m2m.add(t)
+        # 1 to delete f, 1 to fast-delete m2m for f
+        self.assertNumQueries(2, f.delete)
+
+    def test_fast_delete_revm2m(self):
+        t = M2MTo.objects.create()
+        f = M2MFrom.objects.create()
+        f.m2m.add(t)
+        # 1 to delete t, 1 to fast-delete t's m_set
+        self.assertNumQueries(2, f.delete)
+
+    def test_fast_delete_qs(self):
+        u1 = User.objects.create()
+        u2 = User.objects.create()
+        self.assertNumQueries(1, User.objects.filter(pk=u1.pk).delete)
+        self.assertEquals(User.objects.count(), 1)
+        self.assertTrue(User.objects.filter(pk=u2.pk).exists())
+
+    def test_fast_delete_joined_qs(self):
+        a = Avatar.objects.create(desc='a')
+        User.objects.create(avatar=a)
+        u2 = User.objects.create()
+        expected_queries = 1 if connection.features.update_can_self_select else 2
+        self.assertNumQueries(expected_queries,
+                              User.objects.filter(avatar__desc='a').delete)
+        self.assertEquals(User.objects.count(), 1)
+        self.assertTrue(User.objects.filter(pk=u2.pk).exists())
+
+    def test_fast_delete_inheritance(self):
+        c = Child.objects.create()
+        p = Parent.objects.create()
+        # 1 for self, 1 for parent
+        # However, this doesn't work as child.parent access creates a query,
+        # and this means we will be generating extra queries (a lot for large
+        # querysets). This is not a fast-delete problem.
+        # self.assertNumQueries(2, c.delete)
+        c.delete()
+        self.assertFalse(Child.objects.exists())
+        self.assertEquals(Parent.objects.count(), 1)
+        self.assertEquals(Parent.objects.filter(pk=p.pk).count(), 1)
+        # 1 for self delete, 1 for fast delete of empty "child" qs.
+        self.assertNumQueries(2, p.delete)
+        self.assertFalse(Parent.objects.exists())
+        # 1 for self delete, 1 for fast delete of empty "child" qs.
+        c = Child.objects.create()
+        p = c.parent_ptr
+        self.assertNumQueries(2, p.delete)
+        self.assertFalse(Parent.objects.exists())
+        self.assertFalse(Child.objects.exists())

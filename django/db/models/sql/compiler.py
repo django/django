@@ -934,7 +934,8 @@ class SQLDeleteCompiler(SQLCompiler):
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
-        result.append('WHERE %s' % where)
+        if where:
+            result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
 
 class SQLUpdateCompiler(SQLCompiler):
