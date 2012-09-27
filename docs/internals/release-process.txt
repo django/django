@@ -68,8 +68,11 @@ So, for example, if we decided to remove a function that existed in Django 1.0:
   by default; you need to explicitly turn on display of these warnings.
 
 * Django 1.2 will contain the backwards-compatible replica, but the warning
-  will be promoted to a full-fledged ``DeprecationWarning``. This warning is
-  *loud* by default, and will likely be quite annoying.
+  will be promoted to a full-fledged ``DeprecationWarning``. In Python 2.6 this
+  warning is *loud* by default, and will likely be quite annoying. In order to
+  restore this loudness in Python 2.7+ simply add ``warnings.simplefilter("default", DeprecationWarning)``
+  to your project. Projects created with Django 1.5 will have this in their
+  manage.py by default.
 
 * Django 1.3 will remove the feature outright.
 
