@@ -356,3 +356,22 @@ class DistanceTest(TestCase):
         z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
         self.assertEqual(None, z.distance)
         self.assertEqual(None, z.area)
+
+class GeoPredicateDistanceTest(TestCase):
+
+    stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+    # qs1 = SouthTexasCity.objects.filter(point__distance_gte=(stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+
+    def test_distance_gt(self):
+        predicate = Q(point__distance_gt=(self.stx_pnt, D(km=7)))
+        obj = SouthTexasCity.objects.get(name='Pearland')
+        self.assertTrue(predicate.matches(obj))
+
+    def test_distance_lt(self):
+        # based on test04 above
+        z_ref = SouthTexasZipcode.objects.get(name='77005')
+        z_near = SouthTexasZipcode.objects.get(name='77025')
+        z_far = SouthTexasZipcode.objects.get(name='77002')
+        predicate = Q(poly__distance_lte=(z_ref.poly, D(m=275)))
+        self.assertTrue(predicate.matches(z_near))
+        self.assertFalse(predicate.matches(z_far))

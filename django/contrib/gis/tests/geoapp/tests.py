@@ -10,6 +10,7 @@ from django.contrib.gis.geos import (fromstr, GEOSGeometry,
 from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
+from django.db.models import Q
 from django.test import TestCase
 from django.utils import six
 
@@ -757,3 +758,168 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(True, union.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
+
+class GeoPredicateTest(TestCase):
+
+    def setUp(self):
+        self.A = Polygon([[15.66650390625, -70.4228515625], [18.966796875, -57.0556640625], [31.01318359375, -50.78515625], [28.2080078125, -72.732421875], [15.66650390625, -70.4228515625]])
+        self.model_A = State(poly=self.A, name='pseudoA')
+        self.B = Polygon([[34.5, -63.0], [34.5, -70.5], [51.0, -70.5], [34.5, -63.0]])
+        self.model_B = State(poly=self.B, name='pseudoB')
+        self.C = Polygon([[4.775390625, -76.5], [24.24755859375, -40.5], [59.396484375, -40.5], [35.3037109375, -76.5], [4.775390625, -76.5]])
+        self.model_C = State(poly=self.C, name='pseudoC')
+        self.D = Polygon([[32.5, -40.5], [44.5, -40.5], [44.5, -45.5], [32.5, -45.5], [32.5, -40.5]])
+        self.model_D = State(poly=self.D, name='pseudoD')
+        self.E = Polygon([[32.5, -31.5], [44.5, -31.5], [44.5, -40.5], [32.5, -40.5], [32.5, -31.5]])
+        self.model_E = State(poly=self.E, name='pseudoE')
+        self.F = Polygon([[32.5, -31.5], [44.5, -31.5], [44.5, -40.5], [32.5, -40.5], [32.5, -31.5]])
+        self.F_ring = LinearRing([[32.5, -31.5], [44.5, -31.5], [44.5, -40.5], [32.5, -40.5], [32.5, -31.5]])
+        self.model_F = State(poly=self.F, name='pseudoF')
+        self.G = Polygon([[67.775390625, -71.8134765625], [53.689453125, -86.5], [68.0, -86.5], [67.775390625, -71.8134765625]])
+        self.model_G = State(poly=self.G, name='pseudoG')
+        self.H = Polygon([[66.5, -64.5], [52.5, -64.5], [52.5, -58.5], [66.5, -58.5], [66.5, -64.5]])
+        self.model_H = State(poly=self.H, name='pseudoH')
+        self.I = Polygon([[91.5, -54.5], [77.5, -54.5], [77.5, -40.5], [91.5, -40.5], [91.5, -54.5]])
+        self.model_I = State(poly=self.I, name='pseudoI')
+        self.J = LineString([[47.583984375, -50.0], [56.66015625, -31.5], [73.4912109375, -24.41259765625]])
+
+    def test_bbcontains(self):
+        texas = Country.objects.get(name='Texas')
+        okcity = City.objects.get(name='Oklahoma City')
+        predicate = Q(mpoly__bbcontains=okcity.point)
+        self.assertTrue(predicate.matches(texas))
+
+    def test_bboverlaps(self):
+        predicate = Q(poly__bboverlaps=self.G)
+        self.assertTrue(predicate.matches(self.model_C))
+        self.assertFalse(predicate.matches(self.model_H))
+
+    def test_contained(self):
+        predicate = Q(poly__contained=self.C)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertTrue(predicate.matches(self.model_B))
+        self.assertFalse(predicate.matches(self.model_H))
+
+    def test_contains(self):
+        texas = Country.objects.get(name='Texas')
+        # Pulling out some cities.
+        houston = City.objects.get(name='Houston')
+        wellington = City.objects.get(name='Wellington')
+        predicate = Q(mpoly__contains=houston.point)
+        predicate2 = Q(mpoly__contains=wellington.point)
+        # Now testing contains on the countries using the points for
+        self.assertTrue(predicate.matches(texas))
+        self.assertFalse(predicate2.matches(texas))
+
+
+    def test_contains_properly(self):
+        predicate = Q(poly__contains_properly=self.D)
+        predicate2 = Q(poly__contains_properly=self.A)
+        self.assertTrue(predicate2.matches(self.model_C))
+        self.assertFalse(predicate.matches(self.model_C))
+
+    def test_coveredby(self):
+        predicate = Q(poly__coveredby=self.C)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertFalse(predicate.matches(self.model_B))
+
+    def test_covers(self):
+        predicate = Q(poly__covers=self.A)
+        predicate2 = Q(poly__covers=self.B)
+        self.assertTrue(predicate.matches(self.model_C))
+        self.assertFalse(predicate.matches(self.model_H))
+        self.assertFalse(predicate2.matches(self.model_C))
+
+    def test_crosses(self):
+        predicate = Q(poly__crosses=self.J)
+        self.assertTrue(predicate.matches(self.model_C))
+        self.assertFalse(predicate.matches(self.model_H))
+
+    def test_disjoint(self):
+        predicate = Q(poly__disjoint=self.C)
+        self.assertTrue(predicate.matches(self.model_I))
+        self.assertTrue(predicate.matches(self.model_G))
+        self.assertFalse(predicate.matches(self.model_B))
+        self.assertFalse(predicate.matches(self.model_A))
+
+    def test_equals(self):
+        predicate = Q(poly__equals=self.E)
+        self.assertTrue(predicate.matches(self.model_F))
+        self.assertFalse(predicate.matches(self.model_D))
+
+    def test_exact(self):
+        predicate = Q(poly__exact=self.F)
+        self.assertTrue(predicate.matches(self.model_E))
+        predicate2 = Q(poly__exact=self.F_ring)
+        self.assertFalse(predicate2.matches(self.model_F))
+
+    def test_intersects(self):
+        predicate = Q(poly__intersects=self.C)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertTrue(predicate.matches(self.model_B))
+        self.assertFalse(predicate.matches(self.model_I))
+
+    def test_overlaps(self):
+        predicate = Q(poly__overlaps=self.C)
+        self.assertTrue(predicate.matches(self.model_B))
+        self.assertFalse(predicate.matches(self.model_A))
+        self.assertFalse(predicate.matches(self.model_I))
+
+    def test_relate(self):
+        predicate = Q(poly__relate=(self.C, 'TT*T*****'))
+        self.assertTrue(predicate.matches(self.model_B))
+        self.assertFalse(predicate.matches(self.model_I))
+
+    def test_touches(self):
+        predicate = Q(poly__touches=self.D)
+        self.assertTrue(predicate.matches(self.model_E))
+        self.assertFalse(predicate.matches(self.model_C))
+
+    def test_within(self):
+        predicate = Q(poly__within=self.C)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertFalse(predicate.matches(self.model_B))
+
+    def test_left(self):
+        predicate = Q(poly__left=self.H)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertFalse(predicate.matches(self.model_I))
+
+    def test_right(self):
+        predicate = Q(poly__right=self.H)
+        self.assertFalse(predicate.matches(self.model_A))
+        self.assertTrue(predicate.matches(self.model_I))
+
+    def test_overlaps_left(self):
+        predicate = Q(poly__overlaps_left=self.B)
+        self.assertTrue(predicate.matches(self.model_A))
+        self.assertFalse(predicate.matches(self.model_I))
+        self.assertTrue(predicate.matches(self.model_C))
+
+    def test_overlaps_right(self):
+        predicate = Q(poly__overlaps_right=self.B)
+        self.assertFalse(predicate.matches(self.model_A))
+        self.assertTrue(predicate.matches(self.model_I))
+        self.assertTrue(predicate.matches(self.model_C))
+
+    def test_above(self):
+        predicate = Q(poly__strictly_above=self.B)
+        self.assertFalse(predicate.matches(self.model_G))
+        self.assertTrue(predicate.matches(self.model_D))
+
+    def test_below(self):
+        predicate = Q(poly__strictly_below=self.B)
+        self.assertTrue(predicate.matches(self.model_G))
+        self.assertFalse(predicate.matches(self.model_D))
+
+    def test_overlaps_above(self):
+        predicate = Q(poly__overlaps_above=self.B)
+        self.assertFalse(predicate.matches(self.model_G))
+        self.assertTrue(predicate.matches(self.model_D))
+        self.assertTrue(predicate.matches(self.model_C))
+
+    def test_overlaps_below(self):
+        predicate = Q(poly__overlaps_below=self.B)
+        self.assertTrue(predicate.matches(self.model_G))
+        self.assertFalse(predicate.matches(self.model_D))
+        self.assertTrue(predicate.matches(self.model_C))
