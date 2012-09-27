@@ -38,8 +38,8 @@ class BasicTestCase(TestCase):
         self.assertFalse(u.is_superuser)
 
         # Check API-based user creation with no password
-        User.objects.create_user('testuser2', 'test2@example.com')
-        self.assertFalse(u.has_usable_password())
+        u2 = User.objects.create_user('testuser2', 'test2@example.com')
+        self.assertFalse(u2.has_usable_password())
 
     def test_user_no_email(self):
         "Check that users can be created without an email"
