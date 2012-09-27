@@ -199,6 +199,14 @@ class RelationshipFollowTest(test.TestCase):
         """
         self.assertTrue(Q(parent__int_value__isnull=True).matches(self.testobj))
 
+    def test_reverse_follow(self):
+        # FIXME a model in memory may not have reverse relationships available
+        # without going to the db
+        print self.testobj.children
+        print self.testobj.children.all()
+        self.assertTrue(Q(children__name__contains='bye').matches(self.testobj))
+        self.assertFalse(Q(children__name__contains='bye').matches(self.testobj2))
+
 
 class ManagerTests(test.TestCase):
 

@@ -244,13 +244,20 @@ class LookupExpression(tree.Node):
             # lookup types.
             lookup_model = model
             for counter, field_name in enumerate(parts):
+                print field_name
                 try:
                     lookup_field = lookup_model._meta.get_field(field_name)
+                    print lookup_field
                     attr_route.append(field_name)
                 except FieldDoesNotExist:
-                    # Not a field. Bail out.
-                    lookup_type = parts.pop()
-                    break
+                    print "fielddoesnotexist"
+                    if (counter + 1) == num_parts:
+                        # Not a field. Bail out.
+                        lookup_type = parts.pop()
+                        break
+                    else:
+                        lookup_field = getattr(lookup_model, field_name)
+                        print lookup_field.all()
                 # Unless we're at the end of the list of lookups, let's attempt
                 # to continue traversing relations.
                 if (counter + 1) < num_parts:
