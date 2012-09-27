@@ -68,6 +68,18 @@ For example, if your ``list_filter`` includes ``sites``, and there's only one
 site in your database, it won't display a "Site" filter. In that case,
 filtering by site would be meaningless.
 
+Some objects aren't appearing in the admin.
+-------------------------------------------
+
+Inconsistent row counts may be caused by missing foreign key values or a
+foreign key field incorrectly set to :attr:`null=False
+<django.db.models.Field.null>`. If you have a record with a
+:class:`~django.db.models.ForeignKey` pointing to a non-existent object and
+that foreign key is included is
+:attr:`~django.contrib.admin.ModelAdmin.list_display`, the record will not be
+shown in the admin changelist because the Django model is declaring an
+integrity constraint that is not implemented at the database level.
+
 How can I customize the functionality of the admin interface?
 -------------------------------------------------------------
 
@@ -104,4 +116,3 @@ example, some browsers may not support rounded corners. These are considered
 acceptable variations in rendering.
 
 .. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
-
