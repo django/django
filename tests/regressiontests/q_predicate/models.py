@@ -6,6 +6,7 @@ class AltManager(models.Manager):
 class Item(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
+    day_field = models.DateField(blank=True, null=True)
     int_value = models.IntegerField(blank=True, null=True)
     parent = models.ForeignKey('self', related_name='children', null=True)
     objects = models.Manager()

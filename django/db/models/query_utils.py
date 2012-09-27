@@ -212,6 +212,15 @@ class LookupExpression(tree.Node):
                     self.lookup_type not in self.query.query_terms):
                 # we have no valid field or no valid lookup type
                 raise ValueError("invalid lookup: {}".format(self.lookup))
+            # the field is used for it's to_python and get_prep_lookup methods
+            self.field = manager.model._meta.get_field(self.attr_route[-1])
+            if self.lookup_type == 'isnull':
+                # we don't use get_prep_value for isnull
+                # because it's representation for SQL as [] isn't useful
+                # in python matching
+                self.value = bool(self.value)
+            else:
+                self.value = self.field.get_prep_lookup(self.lookup_type, self.value)
             self.lookup_function = self.query.match_functions[self.lookup_type]
 
     def traverse_lookup(self, model):
@@ -260,9 +269,12 @@ class LookupExpression(tree.Node):
 
     def get_instance_value(self, instance):
         current = instance
-        for attr in self.attr_route:
+        for i, attr in enumerate(self.attr_route):
             current = getattr(current, attr)
-        return current
+            if i == len(self.attr_route) - 1:
+                # we have the instance value
+                # but it may require field specific conversions
+                return self.field.to_python(current)
 
     def matches(self, instance):
         """

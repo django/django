@@ -75,10 +75,7 @@ def _week_day(model, instance_value, value):
 
 
 def _isnull(model, instance_value, value):
-    if value:
-        return instance_value is None
-    else:
-        return instance_value is not None
+    return bool(instance_value) != bool(value)
 
 
 # When a relationship specified in a lookup can not be followed (due a null FK

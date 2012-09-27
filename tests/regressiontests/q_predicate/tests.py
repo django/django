@@ -93,8 +93,8 @@ class QasPredicateTest(test.TestCase):
         self.assertFalse(Q(created__week_day=today.weekday() + 1).matches(self.testobj))
 
     def test_null(self):
-        self.assertTrue(Q(parent__isnull=True).matches(self.testobj))
         self.assertFalse(Q(parent__isnull=False).matches(self.testobj))
+        self.assertTrue(Q(parent__isnull=True).matches(self.testobj))
 
     def test_regex(self):
         self.assertTrue(Q(name__regex='hel*o').matches(self.testobj))
@@ -143,6 +143,24 @@ class QasPredicateTest(test.TestCase):
         predicate = Q(flubber__contains='foo')
         with six.assertRaisesRegex(self, ValueError, 'invalid lookup'):
             predicate.matches(self.testobj)
+
+    def test_value_modify(self):
+        dt = datetime.datetime.now()
+        dt_date = dt.date()
+        obj = Item(name="date world",
+                int_value=5550,
+                created= dt,
+                day_field = dt)
+        predicate = Q(day_field=dt)
+        predicate_date = Q(day_field=dt_date)
+        obj.save()
+        retrieved_obj = Item.objects.get(int_value=5550)
+        # date value == instance value as datetime.date
+        self.assertTrue(predicate_date.matches(retrieved_obj))
+        # a datetime will match a date if valid
+        self.assertTrue(predicate.matches(obj))
+        # the date value matches a date after conversion
+        self.assertTrue(predicate_date.matches(obj))
 
 
 class RelationshipFollowTest(test.TestCase):
