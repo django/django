@@ -127,6 +127,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   configuration duplication. More information can be found in the
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
+* An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
+  the request as ``resolver_match``.
+
 Backwards incompatible changes in 1.5
 =====================================
 

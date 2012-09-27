@@ -95,14 +95,15 @@ class BaseHandler(object):
                         break
 
                 if response is None:
-                    if hasattr(request, "urlconf"):
+                    if hasattr(request, 'urlconf'):
                         # Reset url resolver with a custom urlconf.
                         urlconf = request.urlconf
                         urlresolvers.set_urlconf(urlconf)
                         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
-                    callback, callback_args, callback_kwargs = resolver.resolve(
-                            request.path_info)
+                    resolver_match = resolver.resolve(request.path_info)
+                    callback, callback_args, callback_kwargs = resolver_match
+                    request.resolver_match = resolver_match
 
                     # Apply view middleware
                     for middleware_method in self._view_middleware:
