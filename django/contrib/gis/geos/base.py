@@ -12,11 +12,15 @@ except ImportError:
         HAS_GDAL = False
     gdal = GDALInfo()
 
-# NumPy supported?
-try:
-    import numpy
-except ImportError:
+# NumPy supported or desired?
+GEOS_USE_NUMPY = getattr(settings, 'GEOS_USE_NUMPY', True)
+if not GEOS_USE_NUMPY:
     numpy = False
+else:
+    try:
+        import numpy
+    except ImportError:
+        numpy = False
 
 class GEOSBase(object):
     """
