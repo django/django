@@ -1678,17 +1678,17 @@ methods on your models. It does, however, emit the
 .. versionadded:: 1.5
     Allow fast-path deletion of objects
 
-To send signals and handle cascades Django needs to fetch the objects into
-memory. However, if there are no cascades and no signals, then Django may
-take a fast-path and delete the objects without fetch to memory. For large
-deletes this can result in significantly reduced memory usage, and reduced
-the amount of executed queries, too.
+Django needs to fetch objects into memory to send signals and handle cascades
+However, if there are no cascades and no signals, then Django may take a
+fast-path and delete objects without fetching into memory. For large
+deletes this can result in significantly reduced memory usage. The amount of
+executed queries can be reduced, too.
 
-Cascades which are on_delete=DO_NOTHING are not counted as cascades that
-prevent taking the fast-path in delete().
+ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
+DO_NOTHING do not prevent taking the fast-path in deletion.
 
-Note that the way objects are deleted is an implementation detail and is
-subject to change.
+Note that the queries generated be object deletion are an implementation
+detail subject to change.
 
 .. _field-lookups:
 
