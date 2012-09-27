@@ -216,12 +216,11 @@ class Collector(object):
             for related in model._meta.get_all_related_objects(
                     include_hidden=True, include_proxy_eq=True):
                 field = related.field
+                if field.rel.on_delete == DO_NOTHING:
+                    continue
                 sub_objs = self.related_objects(related, new_objs)
                 if self.can_fast_delete(sub_objs, from_field=field):
                     self.fast_deletes.append(sub_objs)
-                elif field.rel.on_delete == DO_NOTHING:
-                    # The below if check would execute a query. Avoid that.
-                    continue
                 elif sub_objs:
                     field.rel.on_delete(self, field, sub_objs, self.using)
 

@@ -6,7 +6,7 @@ from django.utils.six.moves import xrange
 
 from .models import (R, RChild, S, T, U, A, M, MR, MRNull,
     create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
-    M2MTo, M2MFrom, Parent, Child)
+    M2MTo, M2MFrom, Parent, Child, Base)
 
 
 class OnDeleteTests(TestCase):
@@ -74,6 +74,16 @@ class OnDeleteTests(TestCase):
         a = A.objects.get(pk=a.pk)
         self.assertEqual(replacement_r, a.donothing)
         models.signals.pre_delete.disconnect(check_do_nothing)
+
+    def test_do_nothing_qscount(self):
+        """
+        Test that a models.DO_NOTHING relation doesn't trigger a query.
+        """
+        b = Base.objects.create()
+        with self.assertNumQueries(1):
+            # RelToBase should not be queried.
+            b.delete()
+        self.assertEqual(Base.objects.count(), 0)
 
     def test_inheritance_cascade_up(self):
         child = RChild.objects.create()

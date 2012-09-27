@@ -120,3 +120,9 @@ class Parent(models.Model):
 
 class Child(Parent):
     pass
+
+class Base(models.Model):
+    pass
+
+class RelToBase(models.Model):
+    base = models.ForeignKey(Base, on_delete=models.DO_NOTHING)
