@@ -146,6 +146,11 @@ Django 1.5 also includes several smaller improvements worth noting:
   configuration duplication. More information can be found in the
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
+* :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
+  you to test equality for XML content at a semantic level, without caring for
+  syntax differences (spaces, attribute order, etc.).
+
 Backwards incompatible changes in 1.5
 =====================================
 
