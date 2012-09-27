@@ -256,6 +256,10 @@ WHEN (new.%(col_name)s IS NULL)
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % util.truncate_name(name.upper(),
                                                self.max_name_length())
+        # This backend puts the query text into a (query % args) construct,
+        # so % signs in names need to be protected.
+        # Because of this, we are also not really making the name longer here.
+        name = name.replace('%','%%')
         return name.upper()
 
     def random_function_sql(self):
@@ -455,6 +459,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
+        self.float_is_enough = self.settings_dict["OPTIONS"].get('float_is_enough', False)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
@@ -492,8 +497,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params = self.settings_dict['OPTIONS'].copy()
             if 'use_returning_into' in conn_params:
                 del conn_params['use_returning_into']
+            if 'float_is_enough' in conn_params:
+                del conn_params['float_is_enough']
             self.connection = Database.connect(conn_string, **conn_params)
-            cursor = FormatStylePlaceholderCursor(self.connection)
+            cursor = FormatStylePlaceholderCursor(self.connection, self.float_is_enough)
             # Set the territory first. The territory overrides NLS_DATE_FORMAT
             # and NLS_TIMESTAMP_FORMAT to the territory default. When all of
             # these are set in single statement it isn't clear what is supposed
@@ -543,7 +550,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 pass
             connection_created.send(sender=self.__class__, connection=self)
         if not cursor:
-            cursor = FormatStylePlaceholderCursor(self.connection)
+            cursor = FormatStylePlaceholderCursor(self.connection, self.float_is_enough)
         return cursor
 
     # Oracle doesn't support savepoint commits.  Ignore them.
@@ -664,12 +671,17 @@ class FormatStylePlaceholderCursor(object):
     """
     charset = 'utf-8'
 
-    def __init__(self, connection):
+    def __init__(self, connection, float_is_enough):
         self.cursor = connection.cursor()
-        # Necessary to retrieve decimal values without rounding error.
-        self.cursor.numbersAsStrings = True
         # Default arraysize of 1 is highly sub-optimal.
         self.cursor.arraysize = 100
+        if float_is_enough:
+            # Some conversions needed 
+            self.cursor.outputtypehandler = _outputtypehandler_float
+        else:
+            # Besides the above, return some numbers as strings so they
+            # may be transformed to Decimals
+            self.cursor.outputtypehandler = _outputtypehandler
 
     def _format_params(self, params):
         return tuple([OracleParam(p, self, True) for p in params])
@@ -739,20 +751,15 @@ class FormatStylePlaceholderCursor(object):
             six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
 
     def fetchone(self):
-        row = self.cursor.fetchone()
-        if row is None:
-            return row
-        return _rowfactory(row, self.cursor)
+        return self.cursor.fetchone()
 
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchmany(size)])
+        return tuple(self.cursor.fetchmany(size))
 
     def fetchall(self):
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchall()])
+        return tuple(self.cursor.fetchall())
 
     def var(self, *args):
         return VariableWrapper(self.cursor.var(*args))
@@ -767,74 +774,70 @@ class FormatStylePlaceholderCursor(object):
             return getattr(self.cursor, attr)
 
     def __iter__(self):
-        return CursorIterator(self.cursor)
+        return iter(self.cursor)
 
-
-class CursorIterator(object):
-
-    """Cursor iterator wrapper that invokes our custom row factory."""
-
-    def __init__(self, cursor):
-        self.cursor = cursor
-        self.iter = iter(cursor)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return _rowfactory(next(self.iter), self.cursor)
-
-    next = __next__             # Python 2 compatibility
-
-
-def _rowfactory(row, cursor):
-    # Cast numeric values as the appropriate Python type based upon the
-    # cursor description, and convert strings to unicode.
-    casted = []
-    for value, desc in zip(row, cursor.description):
-        if value is not None and desc[1] is Database.NUMBER:
-            precision, scale = desc[4:6]
-            if scale == -127:
-                if precision == 0:
-                    # NUMBER column: decimal-precision floating point
-                    # This will normally be an integer from a sequence,
-                    # but it could be a decimal value.
-                    if '.' in value:
-                        value = decimal.Decimal(value)
-                    else:
-                        value = int(value)
-                else:
-                    # FLOAT column: binary-precision floating point.
-                    # This comes from FloatField columns.
-                    value = float(value)
-            elif precision > 0:
-                # NUMBER(p,s) column: decimal-precision fixed point.
-                # This comes from IntField and DecimalField columns.
-                if scale == 0:
-                    value = int(value)
-                else:
-                    value = decimal.Decimal(value)
-            elif '.' in value:
-                # No type information. This normally comes from a
-                # mathematical expression in the SELECT list. Guess int
-                # or Decimal based on whether it has a decimal point.
-                value = decimal.Decimal(value)
+def _outputtypehandler(cursor, name, default_type, length, precision, scale):
+    if default_type is Database.NUMBER:
+        if scale == -127:
+            if precision == 0:
+                # NUMBER column: decimal-precision floating point
+                # This will normally be an integer from a sequence,
+                # but it could be a decimal value.
+                return cursor.var(str, 100, cursor.arraysize,
+                                  outconverter=_decimal_or_int)
             else:
-                value = int(value)
-        # datetimes are returned as TIMESTAMP, except the results
-        # of "dates" queries, which are returned as DATETIME.
-        elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
-            # Confirm that dt is naive before overwriting its tzinfo.
-            if settings.USE_TZ and value is not None and timezone.is_naive(value):
-                value = value.replace(tzinfo=timezone.utc)
-        elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
-                         Database.LONG_STRING):
-            value = to_unicode(value)
-        casted.append(value)
-    return tuple(casted)
+                # FLOAT column: binary-precision floating point.
+                # This comes from FloatField columns.
+                return cursor.var(default_type, arraysize=cursor.arraysize,
+                                  outconverter=float)
+        elif precision > 0:
+            # NUMBER(p,s) column: decimal-precision fixed point.
+            # This comes from IntField and DecimalField columns.
+            if scale == 0:
+                return cursor.var(default_type, arraysize=cursor.arraysize,
+                                  outconverter=int)
+            else:
+                return cursor.var(str, 100, cursor.arraysize,
+                                  outconverter=decimal.Decimal)
+        else:
+            # No type information. This normally comes from a
+            # mathematical expression in the SELECT list. Guess int
+            # or Decimal based on whether it has a decimal point.
+            return cursor.var(str, 100, cursor.arraysize,
+                              outconverter=_decimal_or_int)
+    # datetimes are returned as TIMESTAMP, except the results
+    # of "dates" queries, which are returned as DATETIME.
+    elif default_type in (Database.TIMESTAMP, Database.DATETIME) and settings.USE_TZ:
+        return cursor.var(default_type, arraysize=cursor.arraysize,
+                          outconverter=_add_tzinfo)
+    elif default_type in (Database.STRING, Database.FIXED_CHAR,
+                          Database.LONG_STRING):
+        return cursor.var(default_type, length, cursor.arraysize,
+                          outconverter=_to_unicode)
+
+def _outputtypehandler_float(cursor, name, default_type, length, precision, scale):
+    # This version only uses Decimal when it knows it is necessary,
+    # and float or int otherwise
+    if default_type is Database.NUMBER:
+        if precision>0 and scale!=0 and scale!=-127:
+            # This probably came from a DecimalField
+            return cursor.var(str, 100, cursor.arraysize,
+                              outconverter=decimal.Decimal)
+        else:
+            # IntField, FloatField, sequences, expressions... Trust cx_Oracle
+            return None
+    # datetimes are returned as TIMESTAMP, except the results
+    # of "dates" queries, which are returned as DATETIME.
+    elif default_type in (Database.TIMESTAMP, Database.DATETIME) and settings.USE_TZ:
+        return cursor.var(default_type, arraysize=cursor.arraysize,
+                          outconverter=_add_tzinfo)
+    elif default_type in (Database.STRING, Database.FIXED_CHAR,
+                          Database.LONG_STRING):
+        return cursor.var(default_type, length, cursor.arraysize,
+                          outconverter=_to_unicode)
 
 
-def to_unicode(s):
+def _to_unicode(s):
     """
     Convert strings to Unicode objects (and return all other data types
     unchanged).
@@ -842,6 +845,20 @@ def to_unicode(s):
     if isinstance(s, six.string_types):
         return force_text(s)
     return s
+
+
+def _decimal_or_int(value):
+    if '.' in value:
+        return decimal.Decimal(value)
+    else:
+        return int(value)
+
+
+def _add_tzinfo(value):
+    # Confirm that dt is naive before overwriting its tzinfo.
+    if value is not None and timezone.is_naive(value):
+        value = value.replace(tzinfo=timezone.utc)
+    return value
 
 
 def _get_sequence_reset_sql():

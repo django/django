@@ -372,6 +372,8 @@ Miscellaneous
 
 * GeoDjango dropped support for GDAL < 1.5
 
+* The Oracle database backend dropped support for cx_Oracle < 5.0.1
+
 * :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
   instead of :exc:`ValueError` for non-integer inputs.
 
@@ -383,6 +385,7 @@ Miscellaneous
   them to be executeable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
   needs. The new default value is `0666` (octal) and the current umask value
   is first masked out.
+
 
 Features deprecated in 1.5
 ==========================
