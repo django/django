@@ -202,7 +202,7 @@ class Collector(object):
         # Recursively collect concrete model's parent models, but not their
         # related objects. These will be found by meta.get_all_related_objects()
         concrete_model = model._meta.concrete_model
-        for ptr in concrete_model._meta.parents.values():
+        for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
                 # FIXME: This seems to be buggy and execute an query for each
                 # parent object fetch.
