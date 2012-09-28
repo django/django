@@ -176,13 +176,23 @@ class Parser(HTMLParser):
         else:
             return self.root
 
+    def normalize_class_order(self, attrs):
+        # we don't care about the order of CSS classes
+        normalized_attrs = []
+        for (attrname, attrvalue) in attrs:
+            if attrname.lower() == 'class':
+                normalized_attrs.append((attrname, ' '.join(sorted(attrvalue.split(' ')))))
+            else:
+                normalized_attrs.append((attrname, attrvalue))
+        return normalized_attrs
+
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
         if tag not in self.SELF_CLOSING_TAGS:
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
-        element = Element(tag, attrs)
+        element = Element(tag, self.normalize_class_order(attrs))
         self.current.append(element)
         if tag not in self.SELF_CLOSING_TAGS:
             self.open_tags.append(element)
