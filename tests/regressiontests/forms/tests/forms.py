@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.safestring import mark_safe
+from django.utils import six
 
 
 class Person(Form):
@@ -136,11 +137,7 @@ class FormsTestCase(TestCase):
         self.assertEqual(p.errors['first_name'], ['This field is required.'])
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertFalse(p.is_valid())
-        self.assertHTMLEqual(p.errors.as_ul(), '<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is required.</li></ul></li><li>birthday<ul class="errorlist"><li>This field is required.</li></ul></li></ul>')
-        self.assertEqual(p.errors.as_text(), """* first_name
-  * This field is required.
-* birthday
-  * This field is required.""")
+        self.assertDictEqual(p.errors, {'birthday': ['This field is required.'], 'first_name': ['This field is required.']})
         self.assertEqual(p.cleaned_data, {'last_name': 'Lennon'})
         self.assertEqual(p['first_name'].errors, ['This field is required.'])
         self.assertHTMLEqual(p['first_name'].errors.as_ul(), '<ul class="errorlist"><li>This field is required.</li></ul>')
@@ -1495,7 +1492,7 @@ class FormsTestCase(TestCase):
                 form = UserRegistration(auto_id=False)
 
             if form.is_valid():
-                return 'VALID: %r' % form.cleaned_data
+                return 'VALID: %r' % sorted(six.iteritems(form.cleaned_data))
 
             t = Template('<form action="" method="post">\n<table>\n{{ form }}\n</table>\n<input type="submit" />\n</form>')
             return t.render(Context({'form': form}))
@@ -1520,7 +1517,8 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         # Case 3: POST with valid data (the success message).)
-        self.assertHTMLEqual(my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}), str_prefix("VALID: {'username': %(_)s'adrian', 'password1': %(_)s'secret', 'password2': %(_)s'secret'}"))
+        self.assertEqual(my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}),
+                    str_prefix("VALID: [('password1', %(_)s'secret'), ('password2', %(_)s'secret'), ('username', %(_)s'adrian')]"))
 
     def test_templates_with_forms(self):
         class UserRegistration(Form):
