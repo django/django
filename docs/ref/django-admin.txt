@@ -635,7 +635,7 @@ A hostname containing ASCII-only characters can also be used.
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overriden
-with an own :djadmin:`runserver<staticfiles-runserver>` command.
+with its own :ref:`runserver<staticfiles-runserver>` command.
 
 .. django-admin-option:: --noreload
 
