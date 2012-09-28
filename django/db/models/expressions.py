@@ -18,6 +18,17 @@ class ExpressionNode(tree.Node):
     AND = '&'
     OR = '|'
 
+    # Unary operator (needs special attention in combine_expression)
+    NOT = 'NOT'
+
+    # Comparison operators
+    EQ = '='
+    GE = '>='
+    GT = '>'
+    LE = '<='
+    LT = '<'
+    NE = '<>'
+
     def __init__(self, children=None, connector=None, negated=False):
         if children is not None and len(children) > 1 and connector is None:
             raise TypeError('You have to specify a connector.')
@@ -92,6 +103,32 @@ class ExpressionNode(tree.Node):
 
     def __ror__(self, other):
         return self._combine(other, self.OR, True)
+
+    def __invert__(self):
+        obj = ExpressionNode([self], connector=self.NOT, negated=True)
+        return obj
+
+    def __eq__(self, other):
+        return self._combine(other, self.EQ, False)
+
+    def __ge__(self, other):
+        return self._combine(other, self.GE, False)
+
+    def __gt__(self, other):
+        return self._combine(other, self.GT, False)
+
+    def __le__(self, other):
+        return self._combine(other, self.LE, False)
+
+    def __lt__(self, other):
+        return self._combine(other, self.LT, False)
+
+    def __ne__(self, other):
+        return self._combine(other, self.NE, False)
+
+    def __bool__(self):
+        raise TypeError('Boolean operators should be avoided. Use bitwise operators.')
+    __nonzero__ = __bool__
 
     def prepare_database_save(self, unused):
         return self

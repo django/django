@@ -155,6 +155,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   objects fetched into memory. See :meth:`QuerySet.delete()
   <django.db.models.query.QuerySet.delete>` for details.
 
+* :ref:`F() expressions <query-expressions>` now support comparison operations
+  and inversion, expanding the types of expressions that can be passed to the
+  database.
+
 Backwards incompatible changes in 1.5
 =====================================
 
