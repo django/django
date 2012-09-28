@@ -20,7 +20,7 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    return format_html_join('', ' {0}="{1}"', attrs.items())
+    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
 @python_2_unicode_compatible
 class ErrorDict(dict):

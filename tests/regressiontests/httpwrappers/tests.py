@@ -127,10 +127,10 @@ class QueryDictTests(unittest.TestCase):
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
 
-        self.assertEqual(list(six.iteritems(q)),  [('foo', 'another'), ('name', 'john')])
-        self.assertEqual(list(six.iterlists(q)), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertEqual(list(six.iterkeys(q)), ['foo', 'name'])
-        self.assertEqual(list(six.itervalues(q)), ['another', 'john'])
+        self.assertListEqual(sorted(list(six.iteritems(q))),  [('foo', 'another'), ('name', 'john')])
+        self.assertListEqual(sorted(list(six.iterlists(q))), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertListEqual(sorted(list(six.iterkeys(q))), ['foo', 'name'])
+        self.assertListEqual(sorted(list(six.itervalues(q))), ['another', 'john'])
         self.assertEqual(len(q), 2)
 
         q.update({'foo': 'hello'})
@@ -143,7 +143,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(q['foo'], 'bar')
         self.assertEqual(q.getlist('foo'), ['bar'])
-        self.assertEqual(q.urlencode(), 'foo=bar&name=john')
+        self.assertListEqual(sorted(q.urlencode().split('&')), ['foo=bar','name=john'])
 
         q.clear()
         self.assertEqual(len(q), 0)
@@ -261,15 +261,15 @@ class HttpResponseTests(unittest.TestCase):
         # them to contain ASCII
         r = HttpResponse()
         r['foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        l = sorted(list(r.items()))
+        self.assertEqual(l[1], ('foo', 'bar'))
+        self.assertIsInstance(l[1][0], str)
 
         r = HttpResponse()
         r[b'foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        l = sorted(list(r.items()))
+        self.assertEqual(l[1], ('foo', 'bar'))
+        self.assertIsInstance(l[1][0], str)
 
         r = HttpResponse()
         self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
