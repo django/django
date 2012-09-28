@@ -358,7 +358,7 @@ class TestFixtures(TestCase):
             format='json',
             stdout=stdout
         )
-        self.assertEqual(
+        self.assertJSONEqual(
             stdout.getvalue(),
             """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
             % widget.pk
@@ -519,7 +519,7 @@ class NaturalKeyFixtureTests(TestCase):
             use_natural_keys=True,
             stdout=stdout,
         )
-        self.assertEqual(
+        self.assertJSONEqual(
             stdout.getvalue(),
             """[{"pk": 2, "model": "fixtures_regress.store", "fields": {"main": null, "name": "Amazon"}}, {"pk": 3, "model": "fixtures_regress.store", "fields": {"main": null, "name": "Borders"}}, {"pk": 4, "model": "fixtures_regress.person", "fields": {"name": "Neal Stephenson"}}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
         )
