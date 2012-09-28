@@ -259,9 +259,8 @@ class ModelTest(TestCase):
              "datetime.datetime(2005, 7, 28, 0, 0)"])
 
         # dates() requires valid arguments.
-        six.assertRaisesRegex(self,
+        self.assertRaises(
             TypeError,
-            "dates\(\) takes at least 3 arguments \(1 given\)",
             Article.objects.dates,
         )
 
