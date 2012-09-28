@@ -1710,6 +1710,20 @@ Thus, you can check permissions in template ``{% if %}`` statements:
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
 
+.. versionadded:: 1.5
+    Permission lookup by "if in".
+
+It is possible to also look permissions up by ``{% if in %}`` statements.
+For example:
+
+.. code-block:: html+django
+
+    {% if 'foo' in perms %}
+        {% if 'foo.can_vote' in perms %}
+            <p>In lookup works, too.</p>
+        {% endif %}
+    {% endif %}
+
 Groups
 ======
 
