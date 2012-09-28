@@ -56,6 +56,15 @@ for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
 documentation</howto/deployment/wsgi/index>` for the default contents you
 should put in this file, and what else you can add to it.
 
+.. warning::
+
+   If multiple Django sites are run in a single mod_wsgi process, all of them
+   will use the settings of whichever one happens to run first. This can be
+   solved with a minor edit to ``wsgi.py`` (see comment in the file for
+   details), or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring
+   that each site runs in its own daemon process.
+
+
 Using a virtualenv
 ==================
 
@@ -70,6 +79,8 @@ Make sure you give the correct path to your virtualenv, and replace
 ``python2.X`` with the correct Python version (e.g. ``python2.7``).
 
 .. _virtualenv: http://www.virtualenv.org
+
+.. _daemon-mode:
 
 Using mod_wsgi daemon mode
 ==========================
