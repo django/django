@@ -13,6 +13,7 @@ except ImportError:     # Python 2
 
 
 from email.utils import formatdate
+from operator import itemgetter
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
@@ -68,6 +69,8 @@ def urlunquote_plus(quoted_url):
     return force_text(urllib_parse.unquote_plus(force_str(quoted_url)))
 urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
+_getfirst = itemgetter(0)
+
 def urlencode(query, doseq=0):
     """
     A version of Python's urllib.urlencode() function that can operate on
@@ -81,7 +84,7 @@ def urlencode(query, doseq=0):
     return urllib_parse.urlencode(
         [(force_str(k),
          [force_str(i) for i in v] if isinstance(v, (list,tuple)) else force_str(v))
-            for k, v in query],
+            for k, v in sorted(query, key=_getfirst)],
         doseq)
 
 def cookie_date(epoch_seconds=None):
