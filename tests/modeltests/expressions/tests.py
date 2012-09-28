@@ -9,7 +9,7 @@ from .models import Company, Employee
 
 
 class ExpressionsTests(TestCase):
-    def test_filter(self):
+    def setUp(self):
         Company.objects.create(
             name="Example Inc.", num_employees=2300, num_chairs=5, is_large=False,
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
@@ -23,6 +23,8 @@ class ExpressionsTests(TestCase):
             ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
         )
 
+
+    def test_filter(self):
         company_query = Company.objects.values(
             "name", "num_employees", "num_chairs", "is_large"
         ).order_by(
@@ -158,6 +160,13 @@ class ExpressionsTests(TestCase):
             ],
             lambda o: o,
         )
+
+    def test_comparisons(self):
+        company_query = Company.objects.values(
+            "name", "num_employees", "num_chairs", "is_large"
+        ).order_by(
+            "name", "num_employees", "num_chairs", "is_large"
+        )
         # The comparison operators and the bitwise unary not can be used
         # to assign to boolean fields
         for expression in (
@@ -180,19 +189,19 @@ class ExpressionsTests(TestCase):
             self.assertQuerysetEqual(
                 company_query, [
                     {
-                        'num_chairs': 5294600,
+                        'num_chairs': 5,
                         'name': 'Example Inc.',
                         'num_employees': 2300,
                         'is_large': True
                     },
                     {
-                        'num_chairs': 15,
+                        'num_chairs': 4,
                         'name': 'Foobar Ltd.',
                         'num_employees': 3,
                         'is_large': False
                     },
                     {
-                        'num_chairs': 1088,
+                        'num_chairs': 1,
                         'name': 'Test GmbH',
                         'num_employees': 32,
                         'is_large': False
@@ -230,28 +239,31 @@ class ExpressionsTests(TestCase):
             lambda c: six.text_type(c.point_of_contact),
         )
 
+    def test_joins(self):
         c = Company.objects.all()[0]
-        c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
+        c.point_of_contact = Employee.objects.create(
+            firstname="Guido", lastname="van Rossum")
+        old_ceo = c.ceo
+        c.ceo = c.point_of_contact
         c.save()
 
         # F Expressions can also span joins
         self.assertQuerysetEqual(
-            Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")), [
-                "Foobar Ltd.",
-                "Test GmbH",
+            Company.objects.filter(
+                ceo__firstname=F("point_of_contact__firstname")),
+            [
+                "Example Inc.",
             ],
             lambda c: c.name
         )
-
+        c.ceo = old_ceo
+        c.save()
+        # Guido is point of contanct but not CEO. For the null cases we do
+        # not generate a match.
         Company.objects.exclude(
             ceo__firstname=F("point_of_contact__firstname")
         ).update(name="foo")
-        self.assertEqual(
-            Company.objects.exclude(
-                ceo__firstname=F('point_of_contact__firstname')
-            ).get().name,
-            "foo",
-        )
+        self.assertEqual(Company.objects.filter(name="foo").count(), 1)
 
         self.assertRaises(FieldError,
             lambda: Company.objects.exclude(
@@ -259,6 +271,7 @@ class ExpressionsTests(TestCase):
             ).update(name=F('point_of_contact__lastname'))
         )
 
+    def test_save(self):
         # F expressions can be used to update attributes on single objects
         test_gmbh = Company.objects.get(name="Test GmbH")
         self.assertEqual(test_gmbh.num_employees, 32)
