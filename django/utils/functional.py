@@ -293,6 +293,16 @@ class SimpleLazyObject(LazyObject):
             self._setup()
         return self._wrapped.__dict__
 
+    # Python 3.3 will call __reduce__ when pickling; these methods are needed
+    # to serialize and deserialize correctly. They are not called in earlier
+    # versions of Python.
+    @classmethod
+    def __newobj__(cls, *args):
+        return cls.__new__(cls, *args)
+
+    def __reduce__(self):
+        return (self.__newobj__, (self.__class__,), self.__getstate__())
+
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
