@@ -206,20 +206,19 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(list(six.iteritems(d)),
-                          [('position', 'Developer'), ('name', 'Simon')])
+        self.assertEqual(sorted(six.iteritems(d)),
+                          [('name', 'Simon'), ('position', 'Developer')])
 
-        self.assertEqual(list(six.iterlists(d)),
-                          [('position', ['Developer']),
-                           ('name', ['Adrian', 'Simon'])])
+        self.assertEqual(sorted(six.iterlists(d)),
+                          [('name', ['Adrian', 'Simon']),
+                           ('position', ['Developer'])])
 
         # MultiValueDictKeyError: "Key 'lastname' not found in
         # <MultiValueDict: {'position': ['Developer'],
         #                   'name': ['Adrian', 'Simon']}>"
-        self.assertRaisesMessage(MultiValueDictKeyError,
-            '"Key \'lastname\' not found in <MultiValueDict: {\'position\':'\
-            ' [\'Developer\'], \'name\': [\'Adrian\', \'Simon\']}>"',
-            d.__getitem__, 'lastname')
+        with self.assertRaisesRegexp(MultiValueDictKeyError,
+                '''^"Key 'lastname' not found in <MultiValueDict: .+>"$'''):
+            d['lastname']
 
         self.assertEqual(d.get('lastname'), None)
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
@@ -229,7 +228,7 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(list(six.itervalues(d)),
+        self.assertEqual(sorted(six.itervalues(d)),
                           ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):

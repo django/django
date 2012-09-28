@@ -89,7 +89,17 @@ class MailTests(TestCase):
         """
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
-        self.assertEqual(email.message().as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
+
+        self.assertEqual(sorted(email.message().items()), [
+            ('Content-Transfer-Encoding', '7bit'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('From', 'from@example.com'),
+            ('MIME-Version', '1.0'),
+            ('Message-ID', 'foo'),
+            ('Subject', 'subject'),
+            ('To', 'to@example.com'),
+            ('date', 'Fri, 09 Nov 2001 01:08:47 -0000'),
+        ])
 
     def test_from_header(self):
         """

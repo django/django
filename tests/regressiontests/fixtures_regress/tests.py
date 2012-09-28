@@ -15,6 +15,7 @@ from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.six import PY3, StringIO
+import json
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
@@ -302,15 +303,17 @@ class TestFixtures(TestCase):
         # between different Python versions.
         data = re.sub('0{6,}\d', '', data)
 
-        lion_json = '{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}'
-        emu_json = '{"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}'
-        platypus_json = '{"pk": %d, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}'
-        platypus_json = platypus_json % animal.pk
+        animals_data = sorted([
+            {"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}},
+            {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}},
+            {"pk": animal.pk, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}},
+        ], key=lambda x: x["pk"])
 
-        self.assertEqual(len(data), len('[%s]' % ', '.join([lion_json, emu_json, platypus_json])))
-        self.assertTrue(lion_json in data)
-        self.assertTrue(emu_json in data)
-        self.assertTrue(platypus_json in data)
+        data = sorted(json.loads(data), key=lambda x: x["pk"])
+
+        self.maxDiff = 1024
+        self.assertEqual(data, animals_data)
+
 
     def test_proxy_model_included(self):
         """
