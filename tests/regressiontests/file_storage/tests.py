@@ -78,7 +78,7 @@ class GetStorageClassTests(SimpleTestCase):
         six.assertRaisesRegex(self,
             ImproperlyConfigured,
             ('Error importing storage module django.core.files.non_existing_'
-                'storage: "No module named .*non_existing_storage"'),
+                'storage: "No module named .*non_existing_storage'),
             get_storage_class,
             'django.core.files.non_existing_storage.NonExistingStorage'
         )

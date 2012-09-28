@@ -1010,7 +1010,8 @@ class ManageSettingsWithImportError(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named foo42bar")
+        self.assertOutput(err, "No module named")
+        self.assertOutput(err, "foo42bar")
 
     def test_builtin_command_with_attribute_error(self):
         """
@@ -1033,7 +1034,8 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'No module named admin_scriptz')
+        self.assertOutput(err, 'No module named')
+        self.assertOutput(err, 'admin_scriptz')
 
     def test_broken_app(self):
         "manage.py validate reports an ImportError if an app's models.py raises one on import"
