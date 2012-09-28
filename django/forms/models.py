@@ -85,6 +85,8 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         for f in opts.many_to_many:
             if fields and f.name not in fields:
                 continue
+            if exclude and f.name in exclude:
+                continue
             if f.name in cleaned_data:
                 f.save_form_data(instance, cleaned_data[f.name])
     if commit:
@@ -405,7 +407,8 @@ class BaseModelForm(BaseForm):
         else:
             fail_message = 'changed'
         return save_instance(self, self.instance, self._meta.fields,
-                             fail_message, commit, construct=False)
+                             fail_message, commit, self._meta.exclude,
+                             construct=False)
 
     save.alters_data = True
 
