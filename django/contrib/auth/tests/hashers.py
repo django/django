@@ -118,7 +118,14 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertEqual(encoded, 
 'pbkdf2_sha1$10000$seasalt$91JiNKgwADC8j2j86Ije/cc4vfQ=')
         self.assertTrue(hasher.verify('letmein', encoded))
-    
+
+    def test_pbkdf2_is_current_returns_false_if_iterations_differs(self):
+        hasher = PBKDF2PasswordHasher()
+        hasher.iterations = 1000
+        encoded = hasher.encode('letmein', 'seasalt')
+        hasher.iterations = 2000
+        self.assertFalse(hasher.is_current(encoded))
+
     @skipUnless(bcrypt, "py-bcrypt not installed")
     def test_bcrypt_is_current_returns_false_if_work_factor_differs(self):
         hasher = BCryptPasswordHasher()
@@ -127,29 +134,20 @@ class TestUtilsHashPass(unittest.TestCase):
         hasher.rounds = 3
         self.assertFalse(hasher.is_current(encoded))
 
+    @skipUnless(bcrypt, "py-bcrypt not installed")
     def test_check_password_setter_called_when_is_current_false(self):
         class ExceptionSetterCalled(Exception):
             pass
-        
         def setter(password):
             raise ExceptionSetterCalled
-        
         raw_password = 'letmein'
-        
         hasher = BCryptPasswordHasher()
         hasher.rounds = 2
         encoded = make_password(raw_password, hasher=hasher)
         hasher.rounds = 3
         self.assertRaises(ExceptionSetterCalled,
             check_password, *(raw_password, encoded), **{ 'setter': setter })
-    
-    def test_pbkdf2_is_current_returns_false_if_iterations_differs(self):
-        hasher = PBKDF2PasswordHasher()
-        hasher.iterations = 1000
-        encoded = hasher.encode('letmein', 'seasalt')
-        hasher.iterations = 2000
-        self.assertFalse(hasher.is_current(encoded))
-        
+
     def test_upgrade(self):
         self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         for algo in ('sha1', 'md5'):
