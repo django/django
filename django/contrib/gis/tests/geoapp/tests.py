@@ -576,8 +576,8 @@ class GeoQuerySetTest(TestCase):
         for c in City.objects.filter(point__isnull=False).num_geom():
             # Oracle will return 1 for the number of geometries on non-collections,
             # whereas PostGIS will return None.
-            if postgis:
-                self.assertEqual(None, c.num_geom)
+            if postgis and connection.ops.spatial_version < (2, 0, 0):
+                self.assertIsNone(c.num_geom)
             else:
                 self.assertEqual(1, c.num_geom)
 

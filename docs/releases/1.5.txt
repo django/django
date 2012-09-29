@@ -119,7 +119,8 @@ GeoDjango
 
 * The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
 
-* Support for GDAL < 1.5 has been dropped.
+* Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
+  dropped.
 
 Minor features
 ~~~~~~~~~~~~~~
