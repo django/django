@@ -78,10 +78,11 @@ class Command(BaseCommand):
                     if not username:
                         input_msg = capfirst(username_field.verbose_name)
                         if default_username:
-                            input_msg += ' (leave blank to use %r)' % default_username
+                            input_msg += " (leave blank to use '%s')" % default_username
                         raw_value = input(input_msg + ': ')
+
                     if default_username and raw_value == '':
-                        username = default_username
+                        raw_value = default_username
                     try:
                         username = username_field.clean(raw_value, None)
                     except exceptions.ValidationError as e:
