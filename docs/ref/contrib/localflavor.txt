@@ -1269,6 +1269,10 @@ United Kingdom (``gb``)
     expression used is sourced from the schema for British Standard BS7666
     address types at http://www.cabinetoffice.gov.uk/media/291293/bs7666-v2-0.xml.
 
+.. class:: gb.forms.GBPhoneNumberField
+
+    A form field that validates input as a UK phone number.
+
 .. class:: gb.forms.GBCountySelect
 
     A ``Select`` widget that uses a list of UK counties/regions as its choices.
