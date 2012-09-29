@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.handlers.modwsgi import check_password, groups_for_user
 from django.contrib.auth.models import User, Group
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 
-class ModWsgiHandlerTestCase(TestCase):
+class ModWsgiHandlerTestCase(TransactionTestCase):
     """
     Tests for the mod_wsgi authentication handler
     """
