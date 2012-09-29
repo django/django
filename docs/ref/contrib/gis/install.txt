@@ -69,6 +69,11 @@ Oracle              GEOS                            10.2, 11            XE not s
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
 ==================  ==============================  ==================  =========================================
 
+See also `this comparison matrix`__ on the OSGeo Wiki for
+PostgreSQL/PostGIS/GEOS/GDAL possible combinations.
+
+__ http://trac.osgeo.org/postgis/wiki/UsersWikiPostgreSQLPostGIS
+
 .. _geospatial_libs:
 
 Geospatial libraries
