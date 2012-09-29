@@ -113,7 +113,7 @@ class CommonMiddleware(object):
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
-            elif hasattr(response, 'content'):
+            elif not hasattr(response, 'streaming_content'):
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
             if 'etag' in locals():
                 if 200 <= response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:

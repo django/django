@@ -5,13 +5,14 @@ import copy
 import os
 import pickle
 import tempfile
+import warnings
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
                          HttpResponseNotModified, HttpStreamingResponse,
-                         SimpleCookie, BadHeaderError,
-                         parse_cookie)
+                         CompatibleHttpStreamingResponse, SimpleCookie,
+                         BadHeaderError, parse_cookie)
 from django.test import TestCase
 from django.utils.encoding import smart_str
 from django.utils import six
@@ -410,6 +411,11 @@ class HttpStreamingResponseTests(TestCase):
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
 
+        # and even when a non-iterable is given as content.
+        r = HttpStreamingResponse(123)
+        self.assertEqual(list(r), [b'123'])
+        self.assertEqual(list(r), [])
+
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))
 
@@ -443,6 +449,23 @@ class HttpStreamingResponseTests(TestCase):
         with self.assertRaises(Exception):
             r.tell()
 
+class CompatibleHttpStreamingResponseTests(TestCase):
+    def test_compatible_streaming_response(self):
+        # we can access and assign content, but it will raise a
+        # PendingDeprecationWarning each time.
+        r = CompatibleHttpStreamingResponse(iter([1, 2, 3]))
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            self.assertEqual(r.content, b'123')
+            r.content = 'abc'
+        assert w[0].category is PendingDeprecationWarning
+        assert w[1].category is PendingDeprecationWarning
+
+        # and we can still only iterate once.
+        self.assertEqual(b''.join(r), b'abc')
+        self.assertEqual(b''.join(r), b'')
+
 class FileCloseTests(TestCase):
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
@@ -452,6 +475,13 @@ class FileCloseTests(TestCase):
         r = HttpResponse(file1)
         self.assertFalse(file1.closed)
         r.close()
+        self.assertTrue(file1.closed)
+
+        # automatically close file when we finish iterating the response.
+        file1 = open(filename)
+        r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        list(r)
         self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all
@@ -474,6 +504,13 @@ class FileCloseTests(TestCase):
         r = HttpStreamingResponse(file1)
         self.assertFalse(file1.closed)
         r.close()
+        self.assertTrue(file1.closed)
+
+        # automatically close file when we finish iterating the response.
+        file1 = open(filename)
+        r = HttpStreamingResponse(file1)
+        self.assertFalse(file1.closed)
+        list(r)
         self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all

@@ -6,7 +6,7 @@ import unittest
 
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import HttpResponseNotModified, HttpStreamingResponse
+from django.http import HttpResponseNotModified, CompatibleHttpStreamingResponse
 from django.test import TestCase
 from django.utils.http import http_date
 from django.views.static import was_modified_since
@@ -31,7 +31,7 @@ class StaticTests(TestCase):
         media_files = ['file.txt', 'file.txt.gz']
         for filename in media_files:
             response = self.client.get('/views/%s/%s' % (self.prefix, filename))
-            self.assertIsInstance(response, HttpStreamingResponse)
+            self.assertIsInstance(response, CompatibleHttpStreamingResponse)
             file_path = path.join(media_dir, filename)
             content = b''.join(response)
             with open(file_path, 'rb') as fp:

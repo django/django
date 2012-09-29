@@ -13,7 +13,8 @@ class GZipMiddleware(object):
     """
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
-        if hasattr(response, 'content') and len(response.content) < 200:
+        if not hasattr(response, 'streaming_content') \
+            and len(response.content) < 200:
             return response
 
         patch_vary_headers(response, ('Accept-Encoding',))
@@ -32,23 +33,19 @@ class GZipMiddleware(object):
         if not re_accepts_gzip.search(ae):
             return response
 
-        if hasattr(response, 'content'):
-            # Return the compressed content only if it's actually shorter.
-            compressed_content = compress_string(response.content)
-            if len(compressed_content) >= len(response.content):
-                return response
-            response.content = compressed_content
-            response['Content-Length'] = str(len(response.content))
-        elif hasattr(response, 'streaming_content'):
+        if hasattr(response, 'streaming_content'):
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
             response.streaming_content = \
                 compress_sequence(response.streaming_content)
             del response['Content-Length']
         else:
-            # Return the original response, because we don't know how to
-            # replace it's content.
-            return response
+            # Return the compressed content only if it's actually shorter.
+            compressed_content = compress_string(response.content)
+            if len(compressed_content) >= len(response.content):
+                return response
+            response.content = compressed_content
+            response['Content-Length'] = str(len(response.content))
 
         if response.has_header('ETag'):
             response['ETag'] = re.sub('"$', ';gzip"', response['ETag'])

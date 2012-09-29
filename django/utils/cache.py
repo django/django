@@ -95,7 +95,7 @@ def get_max_age(response):
             pass
 
 def _set_response_etag(response):
-    if hasattr(response, 'content'):
+    if not hasattr(response, 'streaming_content'):
         response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
     return response
 

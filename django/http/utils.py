@@ -26,16 +26,16 @@ def conditional_content_removal(request, response):
     responses. Ensures compliance with RFC 2616, section 4.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
-        if hasattr(response, 'content'):
-            response.content = ''
-        elif hasattr(response, 'streaming_content'):
+        if hasattr(response, 'streaming_content'):
             response.streaming_content = []
+        else:
+            response.content = ''
         response['Content-Length'] = 0
     if request.method == 'HEAD':
-        if hasattr(response, 'content'):
-            response.content = ''
-        elif hasattr(response, 'streaming_content'):
+        if hasattr(response, 'streaming_content'):
             response.streaming_content = []
+        else:
+            response.content = ''
     return response
 
 def fix_IE_for_attach(request, response):

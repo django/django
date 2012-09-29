@@ -142,10 +142,10 @@ As a result, middleware can no longer be guaranteed that all responses will
 have a ``content`` attribute. Middleware should inspect the response and
 behave accordingly if they need access to content::
 
-    if hasattr(response, 'content'):
-        response.content = wrap_content(response.content)
-    elif hasattr(response, 'streaming_content'):
+    if hasattr(response, 'streaming_content'):
         response.streaming_content = wrap_streaming_content(response.streaming_content)
+    else
+        response.content = wrap_content(response.content)
 
 When passing an iterator as content to the :class:`~django.http.HttpResponse`
 class, Django will consume the iterator immediately to prevent buggy behaviour

@@ -823,7 +823,7 @@ Attributes
     This attribute exists so that you can determine the capabilities of a
     response object, and wrap or replace the content. For example::
 
-        if hasattr(response, 'content'):
-            response.content = wrap_content(response.content)
-        elif hasattr(response, 'streaming_content'):
+        if hasattr(response, 'streaming_content'):
             response.streaming_content = wrap_streaming_content(response.streaming_content)
+        else:
+            response.content = wrap_content(response.content)
