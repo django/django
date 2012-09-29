@@ -129,6 +129,12 @@ Django 1.5 also includes several smaller improvements worth noting:
   configuration duplication. More information can be found in the
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
+* The Oracle backend now supports a `float_is_enough` entry in the 
+  `OPTIONS` dictionary, which makes it treat numbers as floats (rather
+  than slower, more precise data types) when it does not know which
+  number type to use. For more details, see the 
+  :ref:`Oracle notes <oracle-notes>`.
+
 Backwards incompatible changes in 1.5
 =====================================
 

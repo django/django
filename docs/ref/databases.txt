@@ -659,6 +659,32 @@ The ``RETURNING INTO`` clause can be disabled by setting the
 In this case, the Oracle backend will use a separate ``SELECT`` query to
 retrieve AutoField values.
 
+Floats and Decimals
+-------------------
+
+The Oracle backend returns a number as a ``float``, ``int`` or 
+``decimal.Decimal``, when there is enough information to know which type 
+is expected. This is not the case with some expressions used in raw SQL 
+(or ``extra(select={...})`` fields). In these cases, by default, the Oracle
+backend reads the value from the database as a string, and returns it as an
+``int`` or ``Decimal`` based on the presence of a decimal point in it. This
+behavior can be slow, and may cause incompatibility with other database
+backends (which use ``float`` in these cases), but it assures accurate
+number retrieval (since an Oracle ``NUMBER`` can have many more digits than
+a Python ``float``).
+
+If precision beyond ``float`` is not an issue, speed and compatibility can be 
+regained by setting the ``float_is_enough`` option of the database 
+configuration to True::
+
+            'OPTIONS': {
+                'float_is_enough': True,
+            },
+
+.. versionchanged:: 1.5
+
+The ``float_is_enough`` option is new in Django 1.5.
+
 Naming issues
 -------------
 
