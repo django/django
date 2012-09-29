@@ -882,9 +882,10 @@ def _to_unicode(s):
     return s
 
 
-def _decimal_or_int(value):
+def _decimal_or_int(value, 
+                    D=decimal.Decimal):
     if '.' in value:
-        return decimal.Decimal(value)
+        return D(value)
     else:
         return int(value)
 
