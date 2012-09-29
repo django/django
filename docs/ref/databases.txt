@@ -570,7 +570,7 @@ required.
 
 .. versionchanged:: 1.5
 
-Until Django 1.4, the required `cx_Oracle`_ version was 4.3.1.
+Django 1.5 changed the required `cx_Oracle`_ version from 4.3.1 to 5.0.1.
 
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
