@@ -9,6 +9,9 @@ from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.timezone import is_naive
+from django.utils.http import http_date
+
+from time import mktime
 
 
 def add_domain(domain, url, secure=False):
@@ -21,6 +24,7 @@ def add_domain(domain, url, secure=False):
             or url.startswith('mailto:')):
         url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
+
 
 class FeedDoesNotExist(ObjectDoesNotExist):
     pass
@@ -38,6 +42,11 @@ class Feed(object):
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
         response = HttpResponse(content_type=feedgen.mime_type)
+        if getattr(self, 'item_pubdate', False):
+            # if item_pubdate is defined by user, set header so
+            # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+            modified = http_date(mktime(feedgen.latest_post_date().timetuple()))
+            response['Last-Modified'] = modified
         feedgen.write(response, 'utf-8')
         return response
 
