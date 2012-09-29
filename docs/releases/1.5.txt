@@ -161,13 +161,16 @@ Django 1.5 also includes several smaller improvements worth noting:
   :func:`~django.contrib.auth.decorators.login_required` documentation.
 
 * Django now provides a mod_wsgi :doc:`auth handler
-  </howto/deployment/wsgi/apache-auth>`
+  </howto/deployment/wsgi/apache-auth>`.
 
 * The :meth:`QuerySet.delete() <django.db.models.query.QuerySet.delete>`
   and :meth:`Model.delete() <django.db.models.Model.delete()>` can now take
   fast-path in some cases. The fast-path allows for less queries and less
   objects fetched into memory. See :meth:`QuerySet.delete()
   <django.db.models.query.QuerySet.delete>` for details.
+
+* An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
+  the request as ``resolver_match``.
 
 Backwards incompatible changes in 1.5
 =====================================
