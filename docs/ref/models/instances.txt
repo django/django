@@ -387,10 +387,11 @@ perform an update on all fields.
 Specifying ``update_fields`` will force an update.
 
 When saving a model fetched through deferred model loading
-(:meth:`~Model.only()` or :meth:`~Model.defer()`) only the fields loaded from
-the DB will get updated. In effect there is an automatic ``update_fields`` in
-this case. If you assign or change any deferred field value, these fields will
-be added to the updated fields.
+(:meth:`~django.db.models.query.QuerySet.only()` or
+:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+from the DB will get updated. In effect there is an automatic
+``update_fields`` in this case. If you assign or change any deferred field
+value, the field will be added to the updated fields.
 
 Deleting objects
 ================
