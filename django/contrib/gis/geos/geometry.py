@@ -581,6 +581,20 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Return the envelope for this geometry (a polygon)."
         return self._topology(capi.geos_envelope(self.ptr))
 
+    def interpolate(self, distance):
+        if not isinstance(self, (LineString, MultiLineString)):
+            raise TypeError('interpolate only works on LineString and MultiLineString geometries')
+        if not hasattr(capi, 'geos_interpolate'):
+            raise NotImplementedError('interpolate requires GEOS 3.2+')
+        return self._topology(capi.geos_interpolate(self.ptr, distance))
+
+    def interpolate_normalized(self, distance):
+        if not isinstance(self, (LineString, MultiLineString)):
+            raise TypeError('interpolate only works on LineString and MultiLineString geometries')
+        if not hasattr(capi, 'geos_interpolate_normalized'):
+            raise NotImplementedError('interpolate_normalized requires GEOS 3.2+')
+        return self._topology(capi.geos_interpolate_normalized(self.ptr, distance))
+
     def intersection(self, other):
         "Returns a Geometry representing the points shared by this Geometry and other."
         return self._topology(capi.geos_intersection(self.ptr, other.ptr))
@@ -589,6 +603,24 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def point_on_surface(self):
         "Computes an interior point of this Geometry."
         return self._topology(capi.geos_pointonsurface(self.ptr))
+
+    def project(self, point):
+        if not isinstance(point, Point):
+            raise TypeError('locate_point argument must be a Point')
+        if not isinstance(self, (LineString, MultiLineString)):
+            raise TypeError('locate_point only works on LineString and MultiLineString geometries')
+        if not hasattr(capi, 'geos_project'):
+            raise NotImplementedError('geos_project requires GEOS 3.2+')
+        return capi.geos_project(self.ptr, point.ptr)
+
+    def project_normalized(self, point):
+        if not isinstance(point, Point):
+            raise TypeError('locate_point argument must be a Point')
+        if not isinstance(self, (LineString, MultiLineString)):
+            raise TypeError('locate_point only works on LineString and MultiLineString geometries')
+        if not hasattr(capi, 'geos_project_normalized'):
+            raise NotImplementedError('project_normalized requires GEOS 3.2+')
+        return capi.geos_project_normalized(self.ptr, point.ptr)
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this Geometry and the other."

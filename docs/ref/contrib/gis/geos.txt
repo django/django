@@ -416,10 +416,35 @@ quarter circle (defaults is 8).
 Returns a :class:`GEOSGeometry` representing the points making up this
 geometry that do not make up other.
 
+.. method:: GEOSGeometry.interpolate(distance)
+.. method:: GEOSGeometry.interpolate_normalized(distance)
+
+.. versionadded:: 1.5
+
+Given a distance (float), returns the point (or closest point) within the
+geometry (:class:`LineString` or :class:`MultiLineString`) at that distance.
+The normalized version takes the distance as a float between 0 (origin) and 1
+(endpoint).
+
+Reverse of :meth:`GEOSGeometry.project`.
+
 .. method:: GEOSGeometry:intersection(other)
 
 Returns a :class:`GEOSGeometry` representing the points shared by this
 geometry and other.
+
+.. method:: GEOSGeometry.project(point)
+.. method:: GEOSGeometry.project_normalized(point)
+
+.. versionadded:: 1.5
+
+Returns the distance (float) from the origin of the geometry
+(:class:`LineString` or :class:`MultiLineString`) to the point projected on the
+geometry (that is to a point of the line the closest to the given point).
+The normalized version returns the distance as a float between 0 (origin) and 1
+(endpoint).
+
+Reverse of :meth:`GEOSGeometry.interpolate`.
 
 .. method:: GEOSGeometry.relate(other)
 
