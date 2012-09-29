@@ -41,6 +41,7 @@ DEFAULT_LOGGING = {
     'handlers': {
         'console':{
             'level': 'INFO',
+            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
         },
         'null': {
@@ -55,7 +56,6 @@ DEFAULT_LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'filters': ['require_debug_true'],
         },
         'django.request': {
             'handlers': ['mail_admins'],
