@@ -141,9 +141,12 @@ class TestUtilsHashPass(unittest.TestCase):
             raise ExceptionSetterCalled
         raw_password = 'letmein'
         hasher = PBKDF2PasswordHasher()
-        hasher.iterations = 1000
+        # We're going to hash with an iteration of 1. In check_password() below,
+        # it is going to instantiate a new Hasher with the iterations value from 
+        # settings or default of 10000, which will make is_current() False.
+        # Is there a better way to guarantee is_current() is false?
+        hasher.iterations = 1
         encoded = make_password(raw_password, hasher=hasher)
-        hasher.iterations = 2000
         self.assertRaises(ExceptionSetterCalled,
             check_password, *(raw_password, encoded), **{ 'setter': setter })
 
