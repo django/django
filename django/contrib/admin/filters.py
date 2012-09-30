@@ -131,7 +131,7 @@ class FieldListFilter(ListFilter):
     def queryset(self, request, queryset):
         try:
             return queryset.filter(**self.used_parameters)
-        except ValidationError as e:
+        except ValidationError, e:
             raise IncorrectLookupParameters(e)
 
     @classmethod

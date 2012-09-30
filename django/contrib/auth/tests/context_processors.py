@@ -43,13 +43,15 @@ class PermWrapperTests(TestCase):
         Test that 'something' in PermWrapper doesn't end up in endless loop.
         """
         perms = PermWrapper(MockUser())
-        with self.assertRaises(TypeError):
+        def raises():
             self.EQLimiterObject() in perms
+        self.assertRaises(raises, TypeError)
 
     def test_permlookupdict_in(self):
         pldict = PermLookupDict(MockUser(), 'mockapp')
-        with self.assertRaises(TypeError):
+        def raises():
             self.EQLimiterObject() in pldict
+        self.assertRaises(raises, TypeError)
 
 
 class AuthContextProcessorTests(TestCase):
