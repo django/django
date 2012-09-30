@@ -134,17 +134,16 @@ class TestUtilsHashPass(unittest.TestCase):
         hasher.rounds = 3
         self.assertFalse(hasher.is_current(encoded))
 
-    @skipUnless(bcrypt, "py-bcrypt not installed")
     def test_check_password_setter_called_when_is_current_false(self):
         class ExceptionSetterCalled(Exception):
             pass
         def setter(password):
             raise ExceptionSetterCalled
         raw_password = 'letmein'
-        hasher = BCryptPasswordHasher()
-        hasher.rounds = 2
+        hasher = PBKDF2PasswordHasher()
+        hasher.iterations = 1000
         encoded = make_password(raw_password, hasher=hasher)
-        hasher.rounds = 3
+        hasher.iterations = 2000
         self.assertRaises(ExceptionSetterCalled,
             check_password, *(raw_password, encoded), **{ 'setter': setter })
 
