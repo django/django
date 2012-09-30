@@ -11,6 +11,7 @@ from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.encoding import smart_text, is_protected_type
 from django.utils import six
 
+
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to basic Python objects.
@@ -72,6 +73,7 @@ class Serializer(base.Serializer):
     def getvalue(self):
         return self.objects
 
+
 def Deserializer(object_list, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
@@ -80,19 +82,28 @@ def Deserializer(object_list, **options):
     stream or a string) to the constructor
     """
     db = options.pop('using', DEFAULT_DB_ALIAS)
+    ignore = options.pop('ignorenonexistent', False)
+
     models.get_apps()
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.attname : Model._meta.pk.to_python(d["pk"])}
+        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d["pk"])}
         m2m_data = {}
+        model_fields = [fields[0].name for fields in Model._meta.get_fields_with_model()]
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
             if isinstance(field_value, str):
                 field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
 
-            field = Model._meta.get_field(field_name)
+            if ignore:
+                if field_name in model_fields:
+                    field = Model._meta.get_field(field_name)
+                else:
+                    continue
+            else:
+                field = Model._meta.get_field(field_name)
 
             # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):

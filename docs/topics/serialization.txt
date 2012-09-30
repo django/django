@@ -108,6 +108,11 @@ Deserializing data is also a fairly simple operation::
 As you can see, the ``deserialize`` function takes the same format argument as
 ``serialize``, a string or stream of data, and returns an iterator.
 
+.. versionadded:: 1.5
+If in model were removed some fields, for correct processing fixtures you can send the argument ``ignorenonexistent``::
+
+    serializers.deserialize("xml", data, ignorenonexistent=True)
+
 However, here it gets slightly complicated. The objects returned by the
 ``deserialize`` iterator *aren't* simple Django objects. Instead, they are
 special ``DeserializedObject`` instances that wrap a created -- but unsaved --

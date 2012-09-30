@@ -176,6 +176,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
+* The loaddata management command has got new option to ignore data for fields
+  that no longer exist.
+
 Backwards incompatible changes in 1.5
 =====================================
 
