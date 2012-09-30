@@ -27,6 +27,8 @@ class Company(models.Model):
         Employee,
         related_name='company_point_of_contact_set',
         null=True)
+    is_large = models.BooleanField(
+        blank=True)
 
     def __str__(self):
         return self.name
