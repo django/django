@@ -792,25 +792,35 @@ HttpStreamingResponse objects
 .. class:: HttpStreamingResponse
 
 The :class:`HttpStreamingResponse` class should be used when you need to stream
-a response. You might want to do this because your content takes a long time to
-generate, and you want to progressively deliver it to avoid a browser timeout,
-and to avoid bringing the entire content into memory.
+a response. You might want to do this if generating the full response takes too
+much time so that you need to deliever it progressively, or to avoid bringing
+the entire content into memory.
 
-It is not a subclass of :class:`HttpResponse`, because it features a very
-slightly different API. However, it is almost identical, with the following
-notable differences:
+The :class:`HttpStreamingResponse` is not a subclass of :class:`HttpResponse`,
+because it features a very slightly different API. However, it is almost
+identical, with the following notable differences:
 
 * It should be given an iterator that yields strings as content. Any other
   content will be converted to an iterator for consistent behaviour.
 
-* You cannot access it's content, except by iterating the response, which
+* You cannot access its content, except by iterating the response. This
   should only occur when the response is returned to the client.
 
 * It has no ``content`` attribute. Instead, it has a
   :attr:`~HttpStreamingResponse.streaming_content` attribute.
 
-* You cannot use the file-like object ``tell()`` method. Doing so will raise
-  ``Exception``.
+* You cannot use the file-like object ``tell()`` or ``write()`` methods.
+  Doing so will raise ``Exception``.
+
+* If the iterable has a ``close()`` method it will be called once the iterable
+  is consumed.
+
+Note that :class:`HttpStreamingResponse` should only be used in situations
+where it is absolutely required that the whole content isn't iterated before
+transferring the data to the client. Because the content can't be accessed,
+many middlewares can't function normally. For example the ETag and
+Content-Length headers can't be generated for streaming responses. Caching
+done in middleware will be disabled.
 
 Attributes
 ----------
@@ -824,6 +834,9 @@ Attributes
     response object, and wrap or replace the content. For example::
 
         if hasattr(response, 'streaming_content'):
+            # Note that the wrapper for streaming content should not consume
+            # the content prematurely - usually it should be an iterator
+            # itself.
             response.streaming_content = wrap_streaming_content(response.streaming_content)
         else:
             response.content = wrap_content(response.content)

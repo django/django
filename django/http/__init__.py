@@ -526,7 +526,7 @@ class HttpResponseBase(object):
     """
     A base HTTP response class with dictionary-accessed headers.
 
-    This should not be used directly. Use the HttpResponse and
+    This class should not be used directly. Use the HttpResponse and
     HttpStreamingResponse subclasses, instead.
     """
 
@@ -684,25 +684,31 @@ class HttpResponseBase(object):
 
     def _set_container(self, value, consume_iterable):
         if isinstance(value, collections.Iterable) \
-                and not isinstance(value, six.text_type):
+                and not isinstance(value, (bytes, six.text_type)):
             # keep a reference to the iterable, so we can close it later,
             # if necessary (e.g. file objects).
             self._iterable_content.append(value)
             if consume_iterable:
                 # convert iterable to list, so we can iterate over it many
-                # times and append to it.
+                # times and append to it. Ensure .content can be accessed
+                # multiple times.
                 self._container = list(value)
             else:
                 # convert sequence to an iterable, so we can only iterate over
-                # it once.
+                # it once. Ensure .streaming_content can't be accesed but
+                # once.
                 self._container = iter(value)
         else:
+            # Make sure ._containter is always in consistent format, and that
+            # multi/single access to .[streaming_]content is guaranteed to
+            # hold.
             if consume_iterable:
                 self._container = [value]
             else:
                 self._container = iter([value])
 
     def make_bytes(self, value):
+        # YIKES!
         if isinstance(value, int):
             value = six.text_type(value)
         if isinstance(value, six.text_type):

@@ -540,6 +540,7 @@ class GZipMiddlewareTest(TestCase):
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
     uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
+    sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
 
     def setUp(self):
         self.req = HttpRequest()
@@ -554,7 +555,7 @@ class GZipMiddlewareTest(TestCase):
         self.resp.status_code = 200
         self.resp.content = self.compressible_string
         self.resp['Content-Type'] = 'text/html; charset=UTF-8'
-        self.stream_resp = HttpStreamingResponse(self.compressible_string)
+        self.stream_resp = HttpStreamingResponse(self.sequence)
         self.stream_resp['Content-Type'] = 'text/html; charset=UTF-8'
 
     @staticmethod
@@ -575,7 +576,7 @@ class GZipMiddlewareTest(TestCase):
         Tests that compression is performed on responses with streaming content.
         """
         r = GZipMiddleware().process_response(self.req, self.stream_resp)
-        self.assertEqual(self.decompress(b''.join(r)), self.compressible_string)
+        self.assertEqual(self.decompress(b''.join(r)), b''.join(self.sequence))
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertFalse(r.has_header('Content-Length'))
 

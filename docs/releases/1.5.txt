@@ -136,16 +136,17 @@ In Django 1.5 you can explicitly generate a streaming response with the new
 can safely wrap or replace the ``streaming_content``.
 
 Unlike the :class:`~django.http.HttpResponse` class, the new response class
-does not have a ``content`` attribute.
-
-As a result, middleware can no longer be guaranteed that all responses will
-have a ``content`` attribute. Middleware should inspect the response and
-behave accordingly if they need access to content::
+does not have a ``content`` attribute. As a result, middleware should no longer
+assume that all responses will have a ``content`` attribute. Middleware should
+inspect the response and behave accordingly if they need access to content::
 
     if hasattr(response, 'streaming_content'):
         response.streaming_content = wrap_streaming_content(response.streaming_content)
-    else
+    else:
         response.content = wrap_content(response.content)
+
+Note that ``streaming_content`` should be assumed to be too large to hold in
+memory, and thus middleware should not access in ways that break streaming.
 
 When passing an iterator as content to the :class:`~django.http.HttpResponse`
 class, Django will consume the iterator immediately to prevent buggy behaviour
