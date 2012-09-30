@@ -148,6 +148,16 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(ExceptionSetterCalled,
             check_password, *(raw_password, encoded), **{ 'setter': setter })
 
+    def test_check_password_setter_not_called_when_is_current_true(self):
+        class ExceptionSetterCalled(Exception):
+            pass
+        def setter(password):
+            raise ExceptionSetterCalled
+        raw_password = 'letmein'
+        hasher = PBKDF2PasswordHasher()
+        encoded = make_password(raw_password, hasher=hasher)
+        self.assertTrue(check_password(raw_password, encoded, setter))
+
     def test_upgrade(self):
         self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         for algo in ('sha1', 'md5'):
