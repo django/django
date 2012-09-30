@@ -231,7 +231,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
 
     def is_current(self, encoded):
         summary = self.safe_summary(encoded)
-        return summary['iterations'] == self.iterations
+        return int(summary['iterations']) == self.iterations
 
     def encode(self, password, salt, iterations=None):
         assert password
@@ -285,7 +285,7 @@ class BCryptPasswordHasher(BasePasswordHasher):
 
     def is_current(self, encoded):
         summary = self.safe_summary(encoded)
-        return summary['work factor'] == self.rounds
+        return int(summary['work factor']) == self.rounds
 
     def salt(self):
         bcrypt = self._load_library()
