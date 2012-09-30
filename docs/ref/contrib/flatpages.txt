@@ -158,9 +158,7 @@ For more on middleware, read the :doc:`middleware docs
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
     only steps in once another view has successfully produced a 404 response.
     If another view or middleware class attempts to produce a 404 but ends up
-    raising an exception instead (such as a ``TemplateDoesNotExist``
-    exception if your site does not have an appropriate template to
-    use for HTTP 404 responses), the response will become an HTTP 500
+    raising an exception instead, the response will become an HTTP 500
     ("Internal Server Error") and the
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
     will not attempt to serve a flat page.

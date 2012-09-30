@@ -628,15 +628,6 @@ class TemplateExceptionTests(TestCase):
                 if hasattr(template_loader, 'reset'):
                     template_loader.reset()
 
-    @override_settings(TEMPLATE_DIRS=(),)
-    def test_no_404_template(self):
-        "Missing templates are correctly reported by test client"
-        try:
-            response = self.client.get("/no_such_view/")
-            self.fail("Should get error about missing template")
-        except TemplateDoesNotExist:
-            pass
-
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'bad_templates'),)
     )
