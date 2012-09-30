@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 
+from django.core.serializers.base import DeserializationError
 from django.core import management
 from django.core.management.base import CommandError
 from django.core.management.commands.dumpdata import sort_dependencies
@@ -22,6 +23,7 @@ from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
 
 
 class TestFixtures(TestCase):
+
     def animal_pre_save_check(self, signal, sender, instance, **kwargs):
         self.pre_save_checks.append(
             (
@@ -53,6 +55,33 @@ class TestFixtures(TestCase):
         )
         animal.save()
         self.assertGreater(animal.id, 1)
+
+    def test_loaddata_not_found_fields_not_ignore(self):
+        """
+        Test for ticket #9279 -- Error is raised for entries in
+        the serialised data for fields that have been removed
+        from the database when not ignored.
+        """
+        with self.assertRaises(DeserializationError):
+            management.call_command(
+                'loaddata',
+                'sequence_extra',
+                verbosity=0
+            )
+
+    def test_loaddata_not_found_fields_ignore(self):
+        """
+        Test for ticket #9279 -- Ignores entries in
+        the serialised data for fields that have been removed
+        from the database.
+        """
+        management.call_command(
+            'loaddata',
+            'sequence_extra',
+            ignore=True,
+            verbosity=0
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, 'Lion')
 
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml(self):

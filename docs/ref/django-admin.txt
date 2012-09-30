@@ -289,6 +289,11 @@ Searches for and loads the contents of the named fixture into the database.
 The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
 
+.. versionadded:: 1.5
+
+The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
+may have been removed from models since the fixture was originally generated.
+
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
 

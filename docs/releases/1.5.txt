@@ -195,6 +195,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
+* The loaddata management command now supports an `ignorenonexistent` option to
+  ignore data for fields that no longer exist.
+
 Backwards incompatible changes in 1.5
 =====================================
 
