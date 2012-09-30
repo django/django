@@ -180,6 +180,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   and inversion, expanding the types of expressions that can be passed to the
   database.
 
+* When using :class:`~django.template.RequestContext`, it is now possible to
+  look up permissions by using ``{% if 'someapp.someperm' in perms %}``
+  in templates.
+
 Backwards incompatible changes in 1.5
 =====================================
 
