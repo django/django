@@ -29,7 +29,7 @@ only authenticated users to be able to view:
 
 .. code-block:: apache
 
-    WSGIScriptAlias / /path/to/mysite/config/mysite.wsgi
+    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     WSGIProcessGroup %{GLOBAL}
     WSGIApplicationGroup django
@@ -39,7 +39,7 @@ only authenticated users to be able to view:
         AuthName "Top Secret"
         Require valid-user
         AuthBasicProvider wsgi
-        WSGIAuthUserScript /path/to/mysite/config/mysite.wsgi
+        WSGIAuthUserScript /path/to/mysite.com/mysite/wsgi.py
     </Location>
 
 The ``WSGIAuthUserScript`` directive tells mod_wsgi to execute the
@@ -72,7 +72,7 @@ check_user function:
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
 
-    from django.contrib.auth.handlers.modwsgi import check_user
+    from django.contrib.auth.handlers.modwsgi import check_password
 
     from django.core.handlers.wsgi import WSGIHandler
     application = WSGIHandler()
@@ -95,7 +95,7 @@ In this case, the Apache configuration should look like this:
 
 .. code-block:: apache
 
-    WSGIScriptAlias / /path/to/mysite/config/mysite.wsgi
+    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     WSGIProcessGroup %{GLOBAL}
     WSGIApplicationGroup django
@@ -104,8 +104,8 @@ In this case, the Apache configuration should look like this:
         AuthType Basic
         AuthName "Top Secret"
         AuthBasicProvider wsgi
-        WSGIAuthUserScript /path/to/mysite/config/mysite.wsgi
-        WSGIAuthGroupScript /path/to/mysite/config/mysite.wsgi
+        WSGIAuthUserScript /path/to/mysite.com/mysite/wsgi.py
+        WSGIAuthGroupScript /path/to/mysite.com/mysite/wsgi.py
         Require group secret-agents
         Require valid-user
     </Location>
@@ -116,7 +116,7 @@ returns a list groups the given user belongs to.
 
 .. code-block:: python
 
-    from django.contrib.auth.handlers.modwsgi import check_user, groups_for_user
+    from django.contrib.auth.handlers.modwsgi import check_password, groups_for_user
 
 Requests for ``/secret/`` will now also require user to be a member of the
 "secret-agents" group.
