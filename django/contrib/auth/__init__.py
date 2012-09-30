@@ -1,5 +1,5 @@
 import re
-
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
@@ -12,6 +12,7 @@ REDIRECT_FIELD_NAME = 'next'
 def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i + 1:]
+
     try:
         mod = import_module(module)
     except ImportError as e:
@@ -133,8 +134,13 @@ def get_user(request):
     try:
         user_id = request.session[SESSION_KEY]
         backend_path = request.session[BACKEND_SESSION_KEY]
-        backend = load_backend(backend_path)
-        user = backend.get_user(user_id) or AnonymousUser()
+
+        if backend_path not in settings.AUTHENTICATION_BACKENDS:
+            request.session.flush()
+            user = AnonymousUser()
+        else:
+            backend = load_backend(backend_path)
+            user = backend.get_user(user_id)
     except KeyError:
         user = AnonymousUser()
     return user

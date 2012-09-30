@@ -1,7 +1,11 @@
+# PEP-414
 from __future__ import unicode_literals
+n = str
+
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.custom_user import ExtensionUser
@@ -297,6 +301,91 @@ class NoBackendsTest(TestCase):
 
     def test_raises_exception(self):
         self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
+
+@skipIfCustomUser
+class RemovedBackendTest(TestCase):
+    """
+    Tests for changes in the settings.AUTHENTICATION_BACKENDS
+    """
+    old_backend = 'django.contrib.auth.tests.auth_backends.OldBackend'
+    new_backend = 'django.contrib.auth.tests.auth_backends.NewBackend'
+
+    TEST_USERNAME = 'test_user'
+    TEST_PASSWORD = 'test_password'
+    TEST_EMAIL    = 'test@example.com'
+
+    def setUp(self):
+        # test user
+        User.objects.create_user(self.TEST_USERNAME, self.TEST_EMAIL, self.TEST_PASSWORD)
+
+        # get the module
+        import sys
+        self.module = sys.modules[self.__module__]
+
+        # put the backends to the test
+        self.module.OldBackend = type(n('OldBackend'), (ModelBackend, ), {})
+        self.module.NewBackend = type(n('NewBackend'), (ModelBackend, ), {})
+
+    def tearDown(self):
+        # remove the test backends
+        if hasattr(self.module, 'NewBackend'): del self.module.NewBackend
+        if hasattr(self.module, 'OldBackend'): del self.module.OldBackend
+
+    @override_settings(AUTHENTICATION_BACKENDS = (old_backend, ))
+    def test_renamed_backend(self):
+        """
+        Tests for auth backend removed from both settings and the project. 
+        This happens when the backend is renamed.
+        """
+        from django.http import HttpRequest
+        from django.contrib.auth import get_user
+
+        # prepare session and stuff
+        self.assertTrue(self.client.login(username=self.TEST_USERNAME, 
+            password=self.TEST_PASSWORD))
+
+        # prepare request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        # remove the old backend
+        del self.module.OldBackend
+        
+        # change the AUTHENTICATION_BACKENDS
+        with self.settings(AUTHENTICATION_BACKENDS = (self.new_backend, )):
+            # try to get the user from request
+            user = get_user(request)
+
+            # assert the user retrieval is successful and the user is anonymous
+            self.assertIsNotNone(user)
+            self.assertTrue(user.is_anonymous)
+
+    @override_settings(AUTHENTICATION_BACKENDS = (old_backend, ))
+    def test_changed_backend_settings(self):
+        """
+        Tests for user backend removed from settings only.
+        """
+        from django.http import HttpRequest
+        from django.contrib.auth import get_user
+
+        # prepare session and stuff
+        self.assertTrue(self.client.login(username=self.TEST_USERNAME, 
+            password=self.TEST_PASSWORD))
+
+        # prepare request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        # this time the backend is not removed from the project
+
+        # change the AUTHENTICATION_BACKENDS
+        with self.settings(AUTHENTICATION_BACKENDS = (self.new_backend, )):
+            # try to get the user from request
+            user = get_user(request)
+
+            # assert the user retrieval is successful and the user is anonymous
+            self.assertIsNotNone(user)
+            self.assertTrue(user.is_anonymous)
 
 
 @skipIfCustomUser
