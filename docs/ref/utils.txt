@@ -170,6 +170,37 @@ The functions defined in this module share the following properties:
     ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
     instance.
 
+``django.utils.decorators``
+===========================
+
+.. module:: django.utils.decorators
+    :synopsis: Functions that help with creating decorators for views.
+
+.. function:: method_decorator(decorator)
+
+    Converts a function decorator into a method decorator. See :ref:`decorating
+    class based views<decorating-class-based-views>` for example usage.
+
+.. function:: decorator_from_middleware(middleware_class)
+
+    Given a middleware class, returns a view decorator. This lets you use
+    middleware functionality on a per-view basis. The middleware is created
+    with no params passed.
+
+.. function:: decorator_from_middleware_with_args(middleware_class)
+
+    Like ``decorator_from_middleware``, but returns a function
+    that accepts the arguments to be passed to the middleware_class.
+    For example, the :func:`~django.views.decorators.cache.cache_page`
+    decorator is created from the
+    :class:`~django.middleware.cache.CacheMiddleware` like this::
+
+         cache_page = decorator_from_middleware_with_args(CacheMiddleware)
+
+         @cache_page(3600)
+         def my_view(request):
+             pass
+
 ``django.utils.encoding``
 =========================
 
