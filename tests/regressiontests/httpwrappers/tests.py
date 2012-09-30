@@ -5,14 +5,13 @@ import copy
 import os
 import pickle
 import tempfile
-import warnings
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
                          HttpResponseNotModified, HttpStreamingResponse,
-                         CompatibleHttpStreamingResponse, SimpleCookie,
-                         BadHeaderError, parse_cookie)
+                         SimpleCookie, BadHeaderError,
+                         parse_cookie)
 from django.test import TestCase
 from django.utils.encoding import smart_str
 from django.utils import six
@@ -440,31 +439,14 @@ class HttpStreamingResponseTests(TestCase):
         # and won't consume it's content.
         self.assertEqual(list(r), [b'hello', b'world'])
 
-        # additional content can be written to the response.
+        # additional content cannot be written to the response.
         r = HttpStreamingResponse(iter(['hello', 'world']))
-        r.write('!')
-        self.assertEqual(b''.join(r), b'helloworld!')
+        with self.assertRaises(Exception):
+            r.write('!')
 
-        # but we can't tell the current position.
+        # and we can't tell the current position.
         with self.assertRaises(Exception):
             r.tell()
-
-class CompatibleHttpStreamingResponseTests(TestCase):
-    def test_compatible_streaming_response(self):
-        # we can access and assign content, but it will raise a
-        # PendingDeprecationWarning each time.
-        r = CompatibleHttpStreamingResponse(iter([1, 2, 3]))
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            self.assertEqual(r.content, b'123')
-            r.content = 'abc'
-        assert w[0].category is PendingDeprecationWarning
-        assert w[1].category is PendingDeprecationWarning
-
-        # and we can still only iterate once.
-        self.assertEqual(b''.join(r), b'abc')
-        self.assertEqual(b''.join(r), b'')
 
 class FileCloseTests(TestCase):
     def test_response(self):

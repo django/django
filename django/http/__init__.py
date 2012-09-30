@@ -817,41 +817,6 @@ class HttpStreamingResponse(HttpResponseBase):
     def streaming_content(self, value):
         self._set_container(value, consume_iterable=False)
 
-    def write(self, content):
-        def appended_iterator(iterator, content):
-            for chunk in iterator:
-                yield chunk
-            yield content
-        self.streaming_content = appended_iterator(self._container, content)
-
-class CompatibleHttpStreamingResponse(HttpStreamingResponse):
-    """
-    This class maintains compatibility with middleware that doesn't know how
-    to handle the content of a streaming response by exposing a `content`
-    attribute that will consume and cache the content iterator when accessed.
-
-    These responses will stream only if no middleware attempts to access the
-    `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a PendingDeprecationWarning.
-    """
-    @property
-    def content(self):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
-        content = b''.join(self)
-        self._set_container(content, consume_iterable=False)
-        return content
-
-    @content.setter
-    def content(self, value):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
-        self._set_container(value, consume_iterable=False)
-
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 

@@ -1423,25 +1423,20 @@ class CacheI18nTest(TestCase):
             USE_ETAGS=True,
     )
     def test_middleware_with_streaming_response(self):
-        def set_cache(request, lang, msg):
-            translation.activate(lang)
-            response = HttpStreamingResponse(msg)
-            return UpdateCacheMiddleware().process_response(request, response)
-
         # cache with non empty request.GET
         request = self._get_request_cache(query_string='foo=baz&other=true')
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+
         # first access, cache must return None
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data, None)
+
+        # pass streaming response through UpdateCacheMiddleware.
         content = 'Check for cache with QUERY_STRING and streaming content'
         response = HttpStreamingResponse(content)
         UpdateCacheMiddleware().process_response(request, response)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        # cache must return content
-        self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(list(get_cache_data), [six.binary_type(content)])
-        # different QUERY_STRING, cache must be empty
-        request = self._get_request_cache(query_string='foo=baz&somethingelse=true')
+
+        # second access, cache must still return None, because we can't cache
+        # streaming response.
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data, None)
 
