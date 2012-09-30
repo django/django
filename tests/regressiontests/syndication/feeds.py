@@ -46,6 +46,10 @@ class TestRss091Feed(TestRss2Feed):
     feed_type = feedgenerator.RssUserland091Feed
 
 
+class TestRss7936Feed(TestRss2Feed):
+    item_pubdate = None
+
+
 class TestAtomFeed(TestRss2Feed):
     feed_type = feedgenerator.Atom1Feed
     subtitle = TestRss2Feed.description

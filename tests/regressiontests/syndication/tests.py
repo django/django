@@ -226,6 +226,14 @@ class SyndicationFeedTest(FeedTestCase):
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
         self.assertEqual(updated[-6:], '+00:42')
 
+    def test_feed_last_modified_time(self):
+        response = self.client.get('/syndication/rss2/')
+        self.assertTrue(response.has_header('Last-Modified'))
+
+    def test_feed_last_modified_time_without_pub_date(self):
+        response = self.client.get('/syndication/rss7936/')
+        self.assertFalse(response.has_header('Last-Modified'))
+
     def test_feed_url(self):
         """
         Test that the feed_url can be overridden.
