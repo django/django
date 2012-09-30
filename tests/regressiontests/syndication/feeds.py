@@ -46,6 +46,14 @@ class TestRss091Feed(TestRss2Feed):
     feed_type = feedgenerator.RssUserland091Feed
 
 
+class TestNoPubdateFeed(views.Feed):
+    title = 'Test feed'
+    link = '/feed/'
+
+    def items(self):
+        return Entry.objects.all()
+
+
 class TestAtomFeed(TestRss2Feed):
     feed_type = feedgenerator.Atom1Feed
     subtitle = TestRss2Feed.description
