@@ -79,7 +79,8 @@ class TestFixtures(TestCase):
             'loaddata',
             'sequence_extra',
             ignore=True,
-            verbosity=0
+            verbosity=0,
+            commit=False
         )
         self.assertEqual(Animal.specimens.all()[0].name, 'Lion')
 
