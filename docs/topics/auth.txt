@@ -877,7 +877,6 @@ for notification when a user logs in or out.
 
 .. data:: django.contrib.auth.signals.user_logged_in
    :module:
-.. versionadded:: 1.3
 
 Sent when a user logs in successfully.
 
@@ -894,7 +893,6 @@ Arguments sent with this signal:
 
 .. data:: django.contrib.auth.signals.user_logged_out
    :module:
-.. versionadded:: 1.3
 
 Sent when the logout method is called.
 
