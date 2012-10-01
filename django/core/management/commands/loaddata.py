@@ -33,8 +33,8 @@ class Command(BaseCommand):
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
                 'fixtures into. Defaults to the "default" database.'),
         make_option('--ignorenonexistent', '-i', action='store_true', dest='ignore',
-            default=False, help='Ignores entries in the serialised data for fields'
-                                ' that have been removed from the database'),
+            default=False, help='Ignores entries in the serialized data for fields'
+                                ' that do not currently exist on the model.'),
     )
 
     def handle(self, *fixture_labels, **options):
