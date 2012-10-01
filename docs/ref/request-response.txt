@@ -608,6 +608,10 @@ Attributes
     A string representing the content, encoded from a Unicode
     object if necessary.
 
+    .. note:: If an iterable that has a ``close()`` method is assigned to
+       ``content``, its ``close()`` method will be called after the iterator
+       has been consumed.
+
 .. attribute:: HttpResponse.status_code
 
     The `HTTP Status code`_ for the response.
@@ -811,9 +815,6 @@ identical, with the following notable differences:
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise ``Exception``.
-
-* If the iterable has a ``close()`` method it will be called once the iterable
-  is consumed.
 
 Note that :class:`HttpStreamingResponse` should only be used in situations
 where it is absolutely required that the whole content isn't iterated before

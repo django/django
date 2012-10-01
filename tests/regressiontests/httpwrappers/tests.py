@@ -431,13 +431,13 @@ class HttpStreamingResponseTests(TestCase):
         r.streaming_content = (chunk.upper() for chunk in r.streaming_content)
         self.assertEqual(list(r), [b'ABC', b'DEF'])
 
-        # coercing a streaming response to bytes doesn't return an HTTP
-        # message like a regular response does.
+        # coercing a streaming response to bytes doesn't return a complete HTTP
+        # message like a regular response does. it only gives us the headers.
         r = HttpStreamingResponse(iter(['hello', 'world']))
-        # Doesn't work on Python 3.
-        # self.assertEqual(repr(r), six.binary_type(r))
+        self.assertEqual(
+            six.binary_type(r), b'Content-Type: text/html; charset=utf-8')
 
-        # and won't consume its content.
+        # and this won't consume its content.
         self.assertEqual(list(r), [b'hello', b'world'])
 
         # additional content cannot be written to the response.
@@ -453,29 +453,17 @@ class FileCloseTests(TestCase):
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
-        # file isn't closed until we close the response.
+        # file is closed when it is consumed, when it is assigned.
         file1 = open(filename)
         r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        r.close()
-        self.assertTrue(file1.closed)
-
-        # automatically close file when we finish iterating the response.
-        file1 = open(filename)
-        r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        list(r)
         self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all
-        # closed with the response.
+        # closed.
         file1 = open(filename)
         file2 = open(filename)
         r = HttpResponse(file1)
         r.content = file2
-        self.assertFalse(file1.closed)
-        self.assertFalse(file2.closed)
-        r.close()
         self.assertTrue(file1.closed)
         self.assertTrue(file2.closed)
 

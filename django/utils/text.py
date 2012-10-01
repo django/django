@@ -308,7 +308,6 @@ class StreamingBuffer(object):
     def close(self):
         return
 
-
 def compress_sequence(sequence):
     buf = StreamingBuffer() 
     zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)

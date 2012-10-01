@@ -685,19 +685,23 @@ class HttpResponseBase(object):
     def _set_container(self, value, consume_iterable):
         if isinstance(value, collections.Iterable) \
                 and not isinstance(value, (bytes, six.text_type)):
-            # keep a reference to the iterable, so we can close it later,
-            # if necessary (e.g. file objects).
-            self._iterable_content.append(value)
             if consume_iterable:
                 # convert iterable to list, so we can iterate over it many
                 # times and append to it. Ensure .content can be accessed
                 # multiple times.
                 self._container = list(value)
+                # close iterable after consuming it.
+                if hasattr(value, 'close') and callable(value.close):
+                    value.close()
             else:
                 # convert sequence to an iterable, so we can only iterate over
                 # it once. Ensure .streaming_content can't be accesed but
                 # once.
                 self._container = iter(value)
+                # keep a reference to the iterable, so we can close it later,
+                # if necessary (e.g. file objects).
+                if hasattr(value, 'close') and callable(value.close):
+                    self._iterable_content.append(value)
         else:
             # Make sure ._containter is always in consistent format, and that
             # multi/single access to .[streaming_]content is guaranteed to
@@ -708,15 +712,18 @@ class HttpResponseBase(object):
                 self._container = iter([value])
 
     def make_bytes(self, value):
-        # YIKES!
+        # normalise values we know can be safely encoded as ascii, to text.
         if isinstance(value, int):
             value = six.text_type(value)
+        # if the value is text, it will need to be encoded.
         if isinstance(value, six.text_type):
+            # if the response already has a content-encoding, encode as ascii.
             if self.has_header('Content-Encoding'):
                 value = value.encode('ascii')
+            # otherwise encode with the character set of the response.
             else:
                 value = value.encode(self._charset)
-        # force conversion to bytes in case value is a subclass
+        # finally, force conversion to bytes in case value is a subclass.
         return bytes(value)
 
     def __iter__(self):
@@ -733,9 +740,8 @@ class HttpResponseBase(object):
     next = __next__             # Python 2 compatibility
 
     def close(self):
-        for value in self._iterable_content:
-            if hasattr(value, 'close'):
-                value.close()
+        while self._iterable_content:
+            self._iterable_content.pop().close()
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
@@ -804,6 +810,11 @@ class HttpStreamingResponse(HttpResponseBase):
         # streaming_content is an iterator that yields bytestrings.
         # See the streaming_content property methods.
         self.streaming_content = content
+
+    if six.PY3:
+        __bytes__ = HttpResponseBase.serialize_headers
+    else:
+        __str__ = HttpResponseBase.serialize_headers
 
     @property
     def content(self):
