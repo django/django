@@ -155,6 +155,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   argument. By default the batch_size is unlimited except for SQLite where
   single batch is limited so that 999 parameters per query isn't exceeded.
 
+* :mod:`django.contrib.auth` provides a new signal that is emitted
+  whenever a user fails to login successfully. See
+  :data:`~django.contrib.auth.signals.user_login_failed`
+
 * The :setting:`LOGIN_URL` and :setting:`LOGIN_REDIRECT_URL` settings now also
   accept view function names and
   :ref:`named URL patterns <naming-url-patterns>`. This allows you to reduce
