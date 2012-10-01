@@ -289,6 +289,8 @@ Searches for and loads the contents of the named fixture into the database.
 The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
 
+The ``--ignorenonexistent`` option can be used for ignore fields were removed from models and database.
+
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
 
@@ -331,6 +333,10 @@ directories will be included in the search path. For example::
 would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 :setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
+
+If you changed the model and do not want generate fixture again, you can use flag ``--ignorenonexistent`` for ignore not existing fields in model::
+
+    django-admin.py loaddata foo/bar/mydata.json --ignorenonexistent
 
 When fixture files are processed, the data is saved to the database as is.
 Model defined ``save`` methods and ``pre_save`` signals are not called.
