@@ -21,16 +21,11 @@ def check_password(environ, username, password):
             user = UserModel.objects.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return None
-        try:
-            if not user.is_active:
-                return None
-        except AttributeError as e:
-            # a custom user may not support is_active
+        if not user.is_active:
             return None
         return user.check_password(password)
     finally:
         db.close_connection()
-
 
 def groups_for_user(environ, username):
     """
