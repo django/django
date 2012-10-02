@@ -418,13 +418,14 @@ class Options(object):
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in get_models(include_auto_created=True, only_installed=False):
-            for f in klass._meta.local_fields:
-                if f.rel and not isinstance(f.rel.to, six.string_types):
-                    if self == f.rel.to._meta:
-                        cache[RelatedObject(f.rel.to, klass, f)] = None
-                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
-                    elif self.concrete_model == f.rel.to._meta.concrete_model:
-                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+            if not klass._meta.swapped:
+                for f in klass._meta.local_fields:
+                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                        if self == f.rel.to._meta:
+                            cache[RelatedObject(f.rel.to, klass, f)] = None
+                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+                        elif self.concrete_model == f.rel.to._meta.concrete_model:
+                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
@@ -460,9 +461,12 @@ class Options(object):
                 else:
                     cache[obj] = model
         for klass in get_models(only_installed=False):
-            for f in klass._meta.local_many_to_many:
-                if f.rel and not isinstance(f.rel.to, six.string_types) and self == f.rel.to._meta:
-                    cache[RelatedObject(f.rel.to, klass, f)] = None
+            if not klass._meta.swapped:
+                for f in klass._meta.local_many_to_many:
+                    if (f.rel
+                            and not isinstance(f.rel.to, six.string_types)
+                            and self == f.rel.to._meta):
+                        cache[RelatedObject(f.rel.to, klass, f)] = None
         if app_cache_ready():
             self._related_many_to_many_cache = cache
         return cache

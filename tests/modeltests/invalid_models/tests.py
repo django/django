@@ -37,7 +37,7 @@ class InvalidModelTestCase(unittest.TestCase):
     # easier to set this up as an override than to require every developer
     # to specify a value in their test settings.
     @override_settings(
-        TEST_SWAPPED_MODEL='invalid_models.Target',
+        TEST_SWAPPED_MODEL='invalid_models.ReplacementModel',
         TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model',
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )

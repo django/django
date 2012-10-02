@@ -303,11 +303,26 @@ class SwappedModel(models.Model):
     References to this model *should* raise a validation error.
     Requires TEST_SWAPPED_MODEL to be defined in the test environment;
     this is guaranteed by the test runner using @override_settings.
+
+    The foreign keys and m2m relations on this model *shouldn't*
+    install related accessors, so there shouldn't be clashes with
+    the equivalent names on the replacement.
     """
     name = models.CharField(max_length=100)
 
+    foreign = models.ForeignKey(Target, related_name='swappable_fk_set')
+    m2m = models.ManyToManyField(Target, related_name='swappable_m2m_set')
+
     class Meta:
         swappable = 'TEST_SWAPPED_MODEL'
+
+
+class ReplacementModel(models.Model):
+    """A replacement model for swapping purposes."""
+    name = models.CharField(max_length=100)
+
+    foreign = models.ForeignKey(Target, related_name='swappable_fk_set')
+    m2m = models.ManyToManyField(Target, related_name='swappable_m2m_set')
 
 
 class BadSwappableValue(models.Model):

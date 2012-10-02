@@ -23,7 +23,6 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.conf import settings
     from django.db import models, connection
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
@@ -37,7 +36,19 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app):
         opts = cls._meta
 
-        # Do field-specific validation.
+        # Check swappable attribute.
+        if opts.swapped:
+            try:
+                app_label, model_name = opts.swapped.split('.')
+            except ValueError:
+                e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
+                continue
+            if not models.get_model(app_label, model_name):
+                e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
+            # No need to perform any other validation checks on a swapped model.
+            continue
+
+        # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
@@ -284,16 +295,6 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, "Accessor for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
                     if r.get_accessor_name() == rel_query_name:
                         e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-
-        # Check swappable attribute.
-        if opts.swapped:
-            try:
-                app_label, model_name = opts.swapped.split('.')
-            except ValueError:
-                e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
-                continue
-            if not models.get_model(app_label, model_name):
-                e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
 
         # Check ordering attribute.
         if opts.ordering:
