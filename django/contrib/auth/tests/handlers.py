@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.handlers.modwsgi import check_password, groups_for_user
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TransactionTestCase
 
 
@@ -13,7 +14,6 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     def setUp(self):
         user1 = User.objects.create_user('test', 'test@example.com', 'test')
         User.objects.create_user('test1', 'test1@example.com', 'test1')
-
         group = Group.objects.create(name='test_group')
         user1.groups.add(group)
 
@@ -21,6 +21,10 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         """
         Verify that check_password returns the correct values as per
         http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Authentication_Provider
+
+        because the custom user available in the test framework does not
+        support the is_active attribute, we can't test this with a custom
+        user.
         """
 
         # User not in database
@@ -32,6 +36,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         # Valid user with incorrect password
         self.assertFalse(check_password({}, 'test', 'incorrect'))
 
+    @skipIfCustomUser
     def test_groups_for_user(self):
         """
         Check that groups_for_user returns correct values as per
