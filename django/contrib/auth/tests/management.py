@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.contrib.auth import models, management
+from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
 from django.contrib.auth.tests import CustomUser
@@ -167,3 +168,43 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         self.assertEqual(CustomUser.objects.count(), 0)
+
+
+class PermissionDuplicationTestCase(TestCase):
+
+    def setUp(self):
+        self._original_user_permission = models.User._meta.permissions
+
+    def tearUp(self):
+        models.User._meta.permissions = self._original_user_permissions
+
+    def test_duplicated_permissions(self):
+        """
+        Test that we show proper error message if we are trying to create
+        duplicate permissions.
+        """
+        # check duplicated default permission
+        models.Permission._meta.permissions = [
+           ('change_permission', 'Can edit permission (duplicate)')]
+        self.assertRaisesRegexp(CommandError,
+            "The permission codename 'change_permission' clashes with a "
+            "builtin permission for model 'auth.Permission'.",
+            create_permissions, models, [], verbosity=0)
+
+        # check duplicated custom permissions
+        models.Permission._meta.permissions = [
+            ('my_custom_permission', 'Some permission'),
+            ('other_one', 'Some other permission'),
+            ('my_custom_permission', 'Some permission with duplicate permission code'),
+        ]
+        self.assertRaisesRegexp(CommandError,
+            "The permission codename 'my_custom_permission' is duplicated for model "
+            "'auth.Permission'.",
+            create_permissions, models, [], verbosity=0)
+
+        # should not raise anything
+        models.Permission._meta.permissions = [
+            ('my_custom_permission', 'Some permission'),
+            ('other_one', 'Some other permission'),
+        ]
+        create_permissions(models, [], verbosity=0)
