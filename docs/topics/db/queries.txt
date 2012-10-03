@@ -640,15 +640,6 @@ that were modified more than 3 days after they were published::
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
-.. versionadded:: 1.5
-    Comparisons and negation operators for ``F()`` expressions
-
-Django also supports the comparison operators ``==``, ``!=``, ``<=``, ``<``,
-``>``, ``>=`` and the bitwise negation operator ``~`` (boolean ``not`` operator
-will raise ``TypeError``)::
-
-    >>> Entry.objects.filter(is_heavily_quoted=~(F('n_pingbacks') < 100))
-
 The pk lookup shortcut
 ----------------------
 

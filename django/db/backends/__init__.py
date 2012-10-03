@@ -913,9 +913,6 @@ class BaseDatabaseOperations(object):
         can vary between backends (e.g., Oracle with %% and &) and between
         subexpression types (e.g., date expressions)
         """
-        if connector == 'NOT':
-            assert len(sub_expressions) == 1
-            return 'NOT (%s)' % sub_expressions[0]
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
 

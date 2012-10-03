@@ -177,10 +177,6 @@ Django 1.5 also includes several smaller improvements worth noting:
   :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
-* :ref:`F() expressions <query-expressions>` now support comparison operations
-  and inversion, expanding the types of expressions that can be passed to the
-  database.
-
 * When using :class:`~django.template.RequestContext`, it is now possible to
   look up permissions by using ``{% if 'someapp.someperm' in perms %}``
   in templates.

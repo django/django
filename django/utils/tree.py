@@ -88,12 +88,8 @@ class Node(object):
         Otherwise, the whole tree is pushed down one level and a new root
         connector is created, connecting the existing tree and the new node.
         """
-        # Using for loop with 'is' instead of 'if node in children' so node
-        # __eq__ method doesn't get called. The __eq__ method can be overriden
-        # by subtypes, for example the F-expression.
-        for child in self.children:
-            if node is child and conn_type == self.connector:
-                return
+        if node in self.children and conn_type == self.connector:
+            return
         if len(self.children) < 2:
             self.connector = conn_type
         if self.connector == conn_type:
