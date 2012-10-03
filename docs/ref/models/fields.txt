@@ -668,6 +668,11 @@ the field. Note: This method will close the file if it happens to be open when
 The optional ``save`` argument controls whether or not the instance is saved
 after the file has been deleted. Defaults to ``True``.
 
+Note that when a model is deleted, related files are not deleted. If you need
+to cleanup orphaned files, you'll need to handle it yourself (for instance,
+with a custom management command that can be run manually or scheduled to run
+periodically via e.g. cron).
+
 ``FilePathField``
 -----------------
 
