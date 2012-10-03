@@ -62,6 +62,8 @@ class ChoiceFieldModel(models.Model):
                                           default=lambda: ChoiceOptionModel.objects.filter(name='default'))
     multi_choice_int = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice_int',
                                               default=lambda: [1])
+    multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True, null=True,
+                                                   related_name='multi_choice_optional')
 
 class OptionalMultiChoiceModel(models.Model):
     multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='not_relevant',
