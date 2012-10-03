@@ -128,7 +128,7 @@ class ExpressionOperatorTests(TestCase):
 
     def test_lefthand_bitwise_and(self):
         # LH Bitwise ands on integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') & 56)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer').bitand(56))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
@@ -136,7 +136,7 @@ class ExpressionOperatorTests(TestCase):
     @skipUnlessDBFeature('supports_bitwise_or')
     def test_lefthand_bitwise_or(self):
         # LH Bitwise or on integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') | 48)
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer').bitor(48))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
@@ -181,20 +181,6 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
-    def test_right_hand_bitwise_and(self):
-        # RH Bitwise ands on integers
-        Number.objects.filter(pk=self.n.pk).update(integer=15 & F('integer'))
-
-        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 10)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
-
-    @skipUnlessDBFeature('supports_bitwise_or')
-    def test_right_hand_bitwise_or(self):
-        # RH Bitwise or on integers
-        Number.objects.filter(pk=self.n.pk).update(integer=15 | F('integer'))
-
-        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 47)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
 class FTimeDeltaTests(TestCase):
 
