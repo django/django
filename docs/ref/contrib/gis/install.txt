@@ -757,6 +757,21 @@ Similarly, on Red Hat and CentOS systems::
 
     $ sudo yum install binutils
 
+PostgreSQL's createdb fails
+---------------------------
+
+When the PostgreSQL cluster uses a non-UTF8 encoding, the
+:file:`create_template_postgis-*.sh` script will fail when executing
+``createdb``::
+
+    createdb: database creation failed: ERROR:  new encoding (UTF8) is incompatible
+      with the encoding of the template database (SQL_ASCII)
+
+The `current workaround`__ is to re-create the cluster using UTF8 (back up any
+databases before dropping the cluster).
+
+__ http://jacobian.org/writing/pg-encoding-ubuntu/
+
 Platform-specific instructions
 ==============================
 
