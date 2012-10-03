@@ -194,9 +194,9 @@ class GeoQuerySet(QuerySet):
             # PostGIS AsGML() aggregate function parameter order depends on the
             # version -- uggh.
             if backend.spatial_version > (1, 3, 1):
-                procedure_fmt = '%(version)s,%(geo_col)s,%(precision)s'
+                s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             else:
-                procedure_fmt = '%(geo_col)s,%(precision)s,%(version)s'
+                s['procedure_fmt'] = '%(geo_col)s,%(precision)s,%(version)s'
             s['procedure_args'] = {'precision' : precision, 'version' : version}
 
         return self._spatial_attribute('gml', s, **kwargs)
