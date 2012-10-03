@@ -641,13 +641,16 @@ that were modified more than 3 days after they were published::
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
 .. versionadded:: 1.5
-    Comparisons and negation operators for ``F()`` expressions
+    ``.bitand()`` and ``.bitor()``
 
-Django also supports the comparison operators ``==``, ``!=``, ``<=``, ``<``,
-``>``, ``>=`` and the bitwise negation operator ``~`` (boolean ``not`` operator
-will raise ``TypeError``)::
+The ``F()`` objects now support bitwise operations by ``.bitand()`` and
+``.bitor()``, for example::
 
-    >>> Entry.objects.filter(is_heavily_quoted=~(F('n_pingbacks') < 100))
+    >>> F('somefield').bitand(16)
+
+.. versionchanged:: 1.5
+    The previously undocumented operators ``&`` and ``|`` no longer produce
+    bitwise operations, use ``.bitand()`` and ``.bitor()`` instead.
 
 The pk lookup shortcut
 ----------------------

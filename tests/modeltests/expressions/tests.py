@@ -9,26 +9,24 @@ from .models import Company, Employee
 
 
 class ExpressionsTests(TestCase):
-    def setUp(self):
+    def test_filter(self):
         Company.objects.create(
-            name="Example Inc.", num_employees=2300, num_chairs=5, is_large=False,
+            name="Example Inc.", num_employees=2300, num_chairs=5,
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
         )
         Company.objects.create(
-            name="Foobar Ltd.", num_employees=3, num_chairs=4, is_large=False,
+            name="Foobar Ltd.", num_employees=3, num_chairs=4,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer")
         )
         Company.objects.create(
-            name="Test GmbH", num_employees=32, num_chairs=1, is_large=False,
+            name="Test GmbH", num_employees=32, num_chairs=1,
             ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
         )
 
-
-    def test_filter(self):
         company_query = Company.objects.values(
-            "name", "num_employees", "num_chairs", "is_large"
+            "name", "num_employees", "num_chairs"
         ).order_by(
-            "name", "num_employees", "num_chairs", "is_large"
+            "name", "num_employees", "num_chairs"
         )
 
         # We can filter for companies where the number of employees is greater
@@ -39,13 +37,11 @@ class ExpressionsTests(TestCase):
                     "num_chairs": 5,
                     "name": "Example Inc.",
                     "num_employees": 2300,
-                    "is_large": False
                 },
                 {
                     "num_chairs": 1,
                     "name": "Test GmbH",
-                    "num_employees": 32,
-                    "is_large": False
+                    "num_employees": 32
                 },
             ],
             lambda o: o
@@ -59,20 +55,17 @@ class ExpressionsTests(TestCase):
                 {
                     "num_chairs": 2300,
                     "name": "Example Inc.",
-                    "num_employees": 2300,
-                    "is_large": False
+                    "num_employees": 2300
                 },
                 {
                     "num_chairs": 3,
                     "name": "Foobar Ltd.",
-                    "num_employees": 3,
-                    "is_large": False
+                    "num_employees": 3
                 },
                 {
                     "num_chairs": 32,
                     "name": "Test GmbH",
-                    "num_employees": 32,
-                    "is_large": False
+                    "num_employees": 32
                 }
             ],
             lambda o: o
@@ -86,20 +79,17 @@ class ExpressionsTests(TestCase):
                 {
                     'num_chairs': 2302,
                     'name': 'Example Inc.',
-                    'num_employees': 2300,
-                    'is_large': False
+                    'num_employees': 2300
                 },
                 {
                     'num_chairs': 5,
                     'name': 'Foobar Ltd.',
-                    'num_employees': 3,
-                    'is_large': False
+                    'num_employees': 3
                 },
                 {
                     'num_chairs': 34,
                     'name': 'Test GmbH',
-                    'num_employees': 32,
-                    'is_large': False
+                    'num_employees': 32
                 }
             ],
             lambda o: o,
@@ -114,20 +104,17 @@ class ExpressionsTests(TestCase):
                 {
                     'num_chairs': 6900,
                     'name': 'Example Inc.',
-                    'num_employees': 2300,
-                    'is_large': False
+                    'num_employees': 2300
                 },
                 {
                     'num_chairs': 9,
                     'name': 'Foobar Ltd.',
-                    'num_employees': 3,
-                    'is_large': False
+                    'num_employees': 3
                 },
                 {
                     'num_chairs': 96,
                     'name': 'Test GmbH',
-                    'num_employees': 32,
-                    'is_large': False
+                    'num_employees': 32
                 }
             ],
             lambda o: o,
@@ -142,87 +129,21 @@ class ExpressionsTests(TestCase):
                 {
                     'num_chairs': 5294600,
                     'name': 'Example Inc.',
-                    'num_employees': 2300,
-                    'is_large': False
+                    'num_employees': 2300
                 },
                 {
                     'num_chairs': 15,
                     'name': 'Foobar Ltd.',
-                    'num_employees': 3,
-                    'is_large': False
+                    'num_employees': 3
                 },
                 {
                     'num_chairs': 1088,
                     'name': 'Test GmbH',
-                    'num_employees': 32,
-                    'is_large': False
+                    'num_employees': 32
                 }
             ],
             lambda o: o,
         )
-
-    def test_comparisons(self):
-        company_query = Company.objects.values(
-            "name", "num_employees", "num_chairs", "is_large"
-        ).order_by(
-            "name", "num_employees", "num_chairs", "is_large"
-        )
-        # The comparison operators and the bitwise unary not can be used
-        # to assign to boolean fields
-        for expression in (
-            # Check boundaries
-            ~(F('num_employees') < 33),
-            ~(F('num_employees') <= 32),
-            (F('num_employees') > 2299),
-            (F('num_employees') >= 2300),
-            (F('num_employees') == 2300),
-            ((F('num_employees') + 1 != 4) & (32 != F('num_employees'))),
-            # Inverted argument order works too
-            (2299 < F('num_employees')),
-            (2300 <= F('num_employees'))
-        ):
-            # Test update by F-expression
-            company_query.update(
-                is_large=expression
-            )
-            # Compare results
-            self.assertQuerysetEqual(
-                company_query, [
-                    {
-                        'num_chairs': 5,
-                        'name': 'Example Inc.',
-                        'num_employees': 2300,
-                        'is_large': True
-                    },
-                    {
-                        'num_chairs': 4,
-                        'name': 'Foobar Ltd.',
-                        'num_employees': 3,
-                        'is_large': False
-                    },
-                    {
-                        'num_chairs': 1,
-                        'name': 'Test GmbH',
-                        'num_employees': 32,
-                        'is_large': False
-                    }
-                ],
-                lambda o: o,
-            )
-            # Reset values
-            company_query.update(
-                is_large=False
-            )
-
-        # The python boolean operators should be avoided as they yield
-        # unexpected results
-        test_gmbh = Company.objects.get(name="Test GmbH")
-        with self.assertRaises(TypeError):
-            test_gmbh.is_large = not F('is_large')
-        with self.assertRaises(TypeError):
-            test_gmbh.is_large = F('is_large') and F('is_large')
-        with self.assertRaises(TypeError):
-            test_gmbh.is_large = F('is_large') or F('is_large')
 
         # The relation of a foreign key can become copied over to an other
         # foreign key.
@@ -239,31 +160,28 @@ class ExpressionsTests(TestCase):
             lambda c: six.text_type(c.point_of_contact),
         )
 
-    def test_joins(self):
         c = Company.objects.all()[0]
-        c.point_of_contact = Employee.objects.create(
-            firstname="Guido", lastname="van Rossum")
-        old_ceo = c.ceo
-        c.ceo = c.point_of_contact
+        c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
         c.save()
 
         # F Expressions can also span joins
         self.assertQuerysetEqual(
-            Company.objects.filter(
-                ceo__firstname=F("point_of_contact__firstname")),
-            [
-                "Example Inc.",
+            Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")), [
+                "Foobar Ltd.",
+                "Test GmbH",
             ],
             lambda c: c.name
         )
-        c.ceo = old_ceo
-        c.save()
-        # Guido is point of contanct but not CEO. For the null cases we do
-        # not generate a match.
+
         Company.objects.exclude(
             ceo__firstname=F("point_of_contact__firstname")
         ).update(name="foo")
-        self.assertEqual(Company.objects.filter(name="foo").count(), 1)
+        self.assertEqual(
+            Company.objects.exclude(
+                ceo__firstname=F('point_of_contact__firstname')
+            ).get().name,
+            "foo",
+        )
 
         self.assertRaises(FieldError,
             lambda: Company.objects.exclude(
@@ -271,7 +189,6 @@ class ExpressionsTests(TestCase):
             ).update(name=F('point_of_contact__lastname'))
         )
 
-    def test_save(self):
         # F expressions can be used to update attributes on single objects
         test_gmbh = Company.objects.get(name="Test GmbH")
         self.assertEqual(test_gmbh.num_employees, 32)
@@ -285,8 +202,9 @@ class ExpressionsTests(TestCase):
         test_gmbh.point_of_contact = None
         test_gmbh.save()
         self.assertTrue(test_gmbh.point_of_contact is None)
-        with self.assertRaises(ValueError):
+        def test():
             test_gmbh.point_of_contact = F("ceo")
+        self.assertRaises(ValueError, test)
 
         test_gmbh.point_of_contact = test_gmbh.ceo
         test_gmbh.save()
