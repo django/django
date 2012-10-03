@@ -152,7 +152,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUser')
     def test_swappable_user_missing_required_field(self):
-        "A superuser can be created when a custom User model is in use"
+        "A Custom superuser won't be created when a required field isn't provided"
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
