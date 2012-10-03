@@ -510,6 +510,7 @@ to build and install::
 Post-installation
 =================
 
+.. _spatialdb_template:
 .. _spatialdb_template91:
 
 Creating a spatial database with PostGIS 2.0 and PostgreSQL 9.1
