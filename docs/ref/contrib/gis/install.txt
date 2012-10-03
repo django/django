@@ -523,6 +523,9 @@ spatial functionality::
     > CREATE EXTENSION postgis;
     > CREATE EXTENSION postgis_topology;
 
+No PostGIS topology functionalities are yet available from GeoDjango, so the
+creation of the ``postgis_topology`` extension is entirely optional.
+
 .. _spatialdb_template_earlier:
 
 Creating a spatial database template for earlier versions
