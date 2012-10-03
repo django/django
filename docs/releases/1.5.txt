@@ -422,6 +422,9 @@ on the form.
 Miscellaneous
 ~~~~~~~~~~~~~
 
+* :class:`django.forms.ModelMultipleChoiceField` now returns an empty
+  ``QuerySet`` as the empty value instead of an empty list.
+
 * :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
   instead of :exc:`ValueError` for non-integer inputs.
 
