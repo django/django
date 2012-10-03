@@ -301,9 +301,9 @@ class ModelFormBaseTest(TestCase):
 
         self.assertHTMLEqual(
             str(SubclassMeta()),
-            """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
-<tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
-<tr><th><label for="id_checkbox">Checkbox:</label></th><td><input type="checkbox" name="checkbox" id="id_checkbox" /></td></tr>"""
+            """<tr><th><label class="required" for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
+<tr><th><label class="required" for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
+<tr><th><label class="required" for="id_checkbox">Checkbox:</label></th><td><input type="checkbox" name="checkbox" id="id_checkbox" /></td></tr>"""
             )
 
     def test_orderfields_form(self):
@@ -316,8 +316,8 @@ class ModelFormBaseTest(TestCase):
                          ['url', 'name'])
         self.assertHTMLEqual(
             str(OrderFields()),
-            """<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
-<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""
+            """<tr><th><label class="required" for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
+<tr><th><label class="required" for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""
             )
 
     def test_orderfields2_form(self):
@@ -566,15 +566,15 @@ class OldFormForXTests(TestCase):
         f = BaseCategoryForm()
         self.assertHTMLEqual(
             str(f),
-            """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
-<tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
-<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>"""
+            """<tr><th><label class="required" for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
+<tr><th><label class="required" for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
+<tr><th><label class="required" for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>"""
             )
         self.assertHTMLEqual(
             str(f.as_ul()),
-            """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
-<li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" /></li>
-<li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>"""
+            """<li><label class="required" for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
+<li><label class="required" for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" /></li>
+<li><label class="required" for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>"""
             )
         self.assertHTMLEqual(
             str(f["name"]),
@@ -1081,14 +1081,14 @@ class OldFormForXTests(TestCase):
         bw2.delete()
 
         form = WriterProfileForm()
-        self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+        self.assertHTMLEqual(form.as_p(), '''<p><label class="required" for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Carl Bernstein</option>
 <option value="%s">Joe Better</option>
 <option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
+<p><label class="required" for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
         data = {
             'writer': six.text_type(w_woodward.pk),
@@ -1099,14 +1099,14 @@ class OldFormForXTests(TestCase):
         self.assertEqual(six.text_type(instance), 'Bob Woodward is 65')
 
         form = WriterProfileForm(instance=instance)
-        self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+        self.assertHTMLEqual(form.as_p(), '''<p><label class="required" for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
 <option value="%s" selected="selected">Bob Woodward</option>
 <option value="%s">Carl Bernstein</option>
 <option value="%s">Joe Better</option>
 <option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
+<p><label class="required" for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
     def test_phone_number_field(self):
         f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
@@ -1466,8 +1466,8 @@ class OldFormForXTests(TestCase):
         self.assertEqual(list(CategoryForm.base_fields),
                          ['description', 'url'])
 
-        self.assertHTMLEqual(six.text_type(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
-<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>''')
+        self.assertHTMLEqual(six.text_type(CategoryForm()), '''<tr><th><label class="required" for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
+<tr><th><label class="required" for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>''')
         # to_field_name should also work on ModelMultipleChoiceField ##################
 
         field = forms.ModelMultipleChoiceField(Inventory.objects.all(), to_field_name='barcode')
@@ -1483,4 +1483,4 @@ class OldFormForXTests(TestCase):
         self.assertEqual(list(CustomFieldForExclusionForm.base_fields),
                          ['name'])
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
-                         '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
+                         '''<tr><th><label class="required" for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')

@@ -170,7 +170,8 @@ class BaseForm(object):
                     if self.label_suffix:
                         if label[-1] not in ':?.!':
                             label = format_html('{0}{1}', label, self.label_suffix)
-                    label = bf.label_tag(label) or ''
+                    label_class_attr = {'class': 'required'} if bf.field.required else None
+                    label = bf.label_tag(label, label_class_attr) or ''
                 else:
                     label = ''
 

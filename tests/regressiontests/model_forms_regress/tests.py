@@ -135,8 +135,8 @@ class ManyToManyCallableInitialTests(TestCase):
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
         form = ModelForm()
-        self.assertHTMLEqual(form.as_ul(), """<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
-<li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
+        self.assertHTMLEqual(form.as_ul(), """<li><label class="required" for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
+<li><label class="required" for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
 <option value="%d" selected="selected">First Book</option>
 <option value="%d" selected="selected">Second Book</option>
 <option value="%d">Third Book</option>

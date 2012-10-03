@@ -370,7 +370,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
-        self.assertTrue('<label for="id_mydate_month">' in d.as_p())
+        self.assertTrue('<label for="id_mydate_month" class="required">' in d.as_p())
 
     def test_multiwidget(self):
         # MultiWidget and MultiValueField #############################################
@@ -432,7 +432,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
             field1 = ComplexField(widget=w)
 
         f = ComplexFieldForm()
-        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label class="required" for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J">John</option>
 <option value="P">Paul</option>
@@ -442,7 +442,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 <input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>""")
 
         f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
-        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label class="required" for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J" selected="selected">John</option>
 <option value="P" selected="selected">Paul</option>
@@ -790,4 +790,4 @@ class FormsExtraL10NTestCase(TestCase):
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown
         a = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
-        self.assertTrue('<label for="id_mydate_day">' in a.as_p())
+        self.assertTrue('<label for="id_mydate_day" class="required">' in a.as_p())
