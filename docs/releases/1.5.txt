@@ -486,3 +486,10 @@ a User account, this will be an appropriate design pattern to follow. However,
 the :setting:`AUTH_PROFILE_MODULE` setting, and the
 :meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
 the user profile model, should not be used any longer.
+
+Cleaned :djadmin:`cleanup` management command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command have contained only expired sessions clean up for years.
+Therefore new command :djadmin:`cleansessions` in ``django.contrib.sessions``
+do the job and :djadmin:`cleanup` command just call it.

@@ -573,6 +573,22 @@ that is, if any of its dictionary values have been assigned or deleted.
 
 .. _Django settings: ../settings/
 
+Management commands
+===================
+
+.. highlight:: console
+
+``django.contrib.sessions`` exposes one management commands.
+
+cleansessions
+-------------
+
+.. django-admin:: cleansessions
+
+Cleans expired sessions from database.
+
+.. versionadded:: 1.5
+
 Technical details
 =================
 
