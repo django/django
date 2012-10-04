@@ -1911,6 +1911,15 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your User
             model, but should *not* contain the ``USERNAME_FIELD``.
 
+    .. attribute:: User.is_active
+
+        A boolean attribute that indicates whether the user is considered
+        "active".  This attribute is provided as an attribute on
+        ``AbstractBaseUser`` defaulting to ``True``. How you choose to
+        implement it will depend on the details of your chosen auth backends.
+        See the documentation of the :attr:`attribute on the builtin user model
+        <django.contrib.auth.models.User.is_active>` for details.
+
     .. method:: User.get_full_name():
 
         A longer formal identifier for the user. A common interpretation
