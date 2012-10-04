@@ -209,9 +209,11 @@ class PasswordResetForm(forms.Form):
         """
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        self.users_cache = UserModel.objects.filter(email__iexact=email,
-                                                    is_active=True)
+        self.users_cache = UserModel.objects.filter(email__iexact=email)
         if not len(self.users_cache):
+            raise forms.ValidationError(self.error_messages['unknown'])
+        if not any(user.is_active for user in self.users_cache):
+            # none of the filtered users are active
             raise forms.ValidationError(self.error_messages['unknown'])
         if any((user.password == UNUSABLE_PASSWORD)
                for user in self.users_cache):

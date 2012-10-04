@@ -232,6 +232,8 @@ class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
 
+    is_active = True
+
     REQUIRED_FIELDS = []
 
     class Meta:
