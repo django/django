@@ -73,19 +73,6 @@ def gdal_full_version():
     "Returns the full GDAL version information."
     return _version_info('')
 
-def gdal_release_date(date=False):
-    """
-    Returns the release date in a string format, e.g, "2007/06/27".
-    If the date keyword argument is set to True, a Python datetime object
-    will be returned instead.
-    """
-    from datetime import date as date_type
-    rel = _version_info('RELEASE_DATE')
-    yy, mm, dd = map(int, (rel[0:4], rel[4:6], rel[6:8]))
-    d = date_type(yy, mm, dd)
-    if date: return d
-    else: return d.strftime('%Y/%m/%d')
-
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 def gdal_version_info():
     ver = gdal_version().decode()
