@@ -10,7 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
-from django.test import TestCase
+from django.test import TransactionTestCase, TestCase
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
@@ -1930,3 +1930,32 @@ class RouterModelArgumentTestCase(TestCase):
         pet = Pet.objects.create(owner=person, name='Wart')
         # test related FK collection
         person.delete()
+
+class SyncDBTestCase(TransactionTestCase):
+    multi_db = True
+
+    def setUp(self):
+        ContentType.objects.using('other').delete()
+        ContentType.objects.using('default').delete()
+
+    def tearDown(self):
+        management.call_command('syncdb', database='default', verbosity=0, interactive=False)
+        management.call_command('syncdb', database='other', verbosity=0, interactive=False)
+
+    def test_other_database_sync(self):
+        """
+        Test for #16036: syncdb with --database option fails
+        The reason of the bug is ContentTypesManager looking for the table in default,
+        regardless of the used database.
+        """
+        # syncdb on other
+        management.call_command('syncdb', 
+            database='other',
+            verbosity=0,
+            load_initial_data=False,
+            interactive=False)
+
+        # the default database should be empty
+        self.assertEquals(ContentType.objects.using("default").count(), 0)
+        # the other database should be filled
+        self.assertNotEquals(ContentType.objects.using("other").count(), 0)

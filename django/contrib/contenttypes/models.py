@@ -41,7 +41,7 @@ class ContentTypeManager(models.Manager):
             # Load or create the ContentType entry. The smart_text() is
             # needed around opts.verbose_name_raw because name_raw might be a
             # django.utils.functional.__proxy__ object.
-            ct, created = self.get_or_create(
+            ct, created = self.using(self.db).get_or_create(
                 app_label = opts.app_label,
                 model = opts.object_name.lower(),
                 defaults = {'name': smart_text(opts.verbose_name_raw)},
