@@ -4,6 +4,7 @@ from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRExcept
 from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
 
+
 # List of acceptable data sources.
 ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
                   fields={'dbl' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
@@ -59,7 +60,6 @@ class DataSourceTest(unittest.TestCase):
 
     def test03a_layers(self):
         "Testing Data Source Layers."
-        print("\nBEGIN - expecting out of range feature id error; safe to ignore.\n")
         for source in ds_list:
             ds = DataSource(source.ds)
 
@@ -108,7 +108,6 @@ class DataSourceTest(unittest.TestCase):
                         # the feature values here while in this loop.
                         for fld_name in fld_names:
                             self.assertEqual(source.field_values[fld_name][i], feat.get(fld_name))
-        print("\nEND - expecting out of range feature id error; safe to ignore.")
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."

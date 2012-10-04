@@ -1,10 +1,15 @@
 from __future__ import unicode_literals
 
+import logging
 import os
 import re
-from ctypes import c_char_p, CDLL
+from ctypes import c_char_p, c_int, CDLL, CFUNCTYPE
 from ctypes.util import find_library
+
 from django.contrib.gis.gdal.error import OGRException
+
+
+logger = logging.getLogger('django.contrib.gis')
 
 # Custom library path set?
 try:
@@ -86,3 +91,18 @@ GDAL_MINOR_VERSION = int(_verinfo['minor'])
 GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
 GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
 del _verinfo
+
+# Set library error handling so as errors are logged
+CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
+def err_handler(error_class, error_number, message):
+    logger.error('GDAL_ERROR %d: %s' % (error_number, message))
+err_handler = CPLErrorHandler(err_handler)
+
+def function(name, args, restype):
+    func = std_call(name)
+    func.argtypes = args
+    func.restype = restype
+    return func
+
+set_error_handler = function('CPLSetErrorHandler', [CPLErrorHandler], CPLErrorHandler)
+set_error_handler(err_handler)

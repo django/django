@@ -147,17 +147,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_errors(self):
         "Testing the Error handlers."
         # string-based
-        print("\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n")
         for err in self.geometries.errors:
-            try:
-                g = fromstr(err.wkt)
-            except (GEOSException, ValueError):
-                pass
+            with self.assertRaises((GEOSException, ValueError)):
+                _ = fromstr(err.wkt)
 
         # Bad WKB
         self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))
-
-        print("\nEND - expecting GEOS_ERROR; safe to ignore.\n")
 
         class NotAGeometry(object):
             pass
@@ -458,7 +453,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
-        print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
         prev = fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
@@ -476,8 +470,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                     self.assertEqual(p.geom_typeid, 3)
                     self.assertEqual(p.valid, True)
                 self.assertEqual(mpoly.wkt, MultiPolygon(*tuple(poly.clone() for poly in mpoly)).wkt)
-
-        print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")
 
     def test_memory_hijinks(self):
         "Testing Geometry __del__() on rings and polygons."
@@ -1025,18 +1017,14 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         g = GEOSGeometry("POINT(0 0)")
         self.assertTrue(g.valid)
-        self.assertTrue(isinstance(g.valid_reason, six.string_types))
+        self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertEqual(g.valid_reason, "Valid Geometry")
-
-        print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
 
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
-        self.assertTrue(not g.valid)
-        self.assertTrue(isinstance(g.valid_reason, six.string_types))
+        self.assertFalse(g.valid)
+        self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
-
-        print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")
 
     @unittest.skipUnless(geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
     def test_linearref(self):
