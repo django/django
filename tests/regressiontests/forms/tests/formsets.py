@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.forms import Form, CharField, IntegerField, ValidationError, DateField
 from django.forms.formsets import formset_factory, BaseFormSet
+from django.forms.util import ErrorList
 from django.test import TestCase
 
 
@@ -845,6 +846,15 @@ class FormsFormsetTestCase(TestCase):
         formset = ChoiceFormset()
         self.assertEqual(len(formset.forms), 0)
         self.assertTrue(formset)
+
+
+    def test_formset_error_class(self):
+        # Regression tests for #16479 -- formsets form use ErrorList instead of supplied error_class
+        class CustomErrorList(ErrorList):
+            pass
+
+        formset = FavoriteDrinksFormSet(error_class=CustomErrorList)
+        self.assertEqual(formset.forms[0].error_class, CustomErrorList)
 
 
 data = {
