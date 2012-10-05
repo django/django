@@ -23,10 +23,10 @@ to the GPL-licensed `Python GeoIP`__ interface provided by MaxMind.
 In order to perform IP-based geolocation, the :class:`GeoIP` object requires
 the GeoIP C libary and either the GeoIP `Country`__ or `City`__ 
 datasets in binary format (the CSV files will not work!).  These datasets may be 
-`downloaded from MaxMind`__.  Grab the ``GeoIP.dat.gz`` and ``GeoLiteCity.dat.gz``
-and unzip them in a directory corresponding to what you set 
-:setting:`GEOIP_PATH` with in your settings.  See the example and reference below
-for more details.
+`downloaded from MaxMind`__.  Grab the ``GeoLiteCountry/GeoIP.dat.gz`` and
+``GeoLiteCity.dat.gz`` files and unzip them in a directory corresponding to what
+you set :setting:`GEOIP_PATH` with in your settings.  See the example and
+reference below for more details.
 
 __ http://www.maxmind.com/app/c
 __ http://www.maxmind.com/app/python
