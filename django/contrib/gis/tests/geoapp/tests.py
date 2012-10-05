@@ -575,10 +575,13 @@ class GeoQuerySetTest(TestCase):
     def test_num_geom(self):
         "Testing the `num_geom` GeoQuerySet method."
         # Both 'countries' only have two geometries.
-        for c in Country.objects.num_geom(): self.assertEqual(2, c.num_geom)
+        for c in Country.objects.num_geom():
+            self.assertEqual(2, c.num_geom)
+
         for c in City.objects.filter(point__isnull=False).num_geom():
-            # Oracle will return 1 for the number of geometries on non-collections,
-            # whereas PostGIS will return None.
+            # Oracle and PostGIS 2.0+ will return 1 for the number of
+            # geometries on non-collections, whereas PostGIS < 2.0.0
+            # will return None.
             if postgis and connection.ops.spatial_version < (2, 0, 0):
                 self.assertIsNone(c.num_geom)
             else:
