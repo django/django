@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import unittest
 from copy import copy
 from decimal import Decimal
 
@@ -9,6 +10,7 @@ from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
     InvalidDecimal, MissingForeignKey)
 from django.db import router
+from django.conf import settings
 from django.test import TestCase
 
 from .models import (
@@ -308,6 +310,7 @@ class LayerMapRouterTest(TestCase):
     def tearDown(self):
         router.routers = self.old_routers
 
+    @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):
         lm = LayerMapping(City, city_shp, city_mapping)
         self.assertEqual(lm.using, 'other')
