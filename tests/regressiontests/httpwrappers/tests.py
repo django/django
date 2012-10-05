@@ -449,21 +449,59 @@ class HttpStreamingResponseTests(TestCase):
         with self.assertRaises(Exception):
             r.tell()
 
+    def test_response(self):
+        # provide compatibility for unofficially supported streaming behaviour
+        # by not consuming an iterator assigned to HttpResponse as content
+        # until first access of `content`, first call to `write()` or first
+        # call to `tell()`.
+
+        # access content.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertNotIsInstance(r._container, list)
+        r.content
+        self.assertIsInstance(r._container, list)
+
+        # call write().
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertNotIsInstance(r._container, list)
+        r.write('!')
+        self.assertIsInstance(r._container, list)
+
+        # call tell().
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertNotIsInstance(r._container, list)
+        r.tell()
+        self.assertIsInstance(r._container, list)
+
 class FileCloseTests(TestCase):
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
-        # file is closed when it is consumed, when it is assigned.
+        # file isn't closed until we close the response.
         file1 = open(filename)
         r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # don't automatically close file when we finish iterating the response.
+        file1 = open(filename)
+        r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        list(r)
+        self.assertFalse(file1.closed)
+        r.close()
         self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all
-        # closed.
+        # closed with the response.
         file1 = open(filename)
         file2 = open(filename)
         r = HttpResponse(file1)
         r.content = file2
+        self.assertFalse(file1.closed)
+        self.assertFalse(file2.closed)
+        r.close()
         self.assertTrue(file1.closed)
         self.assertTrue(file2.closed)
 
