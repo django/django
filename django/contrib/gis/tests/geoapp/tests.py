@@ -529,8 +529,10 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertTrue(gml_regex.match(ptown.gml))
 
-        if postgis:
-            self.assertIn('<gml:pos srsDimension="2">', City.objects.gml(version=3).get(name='Pueblo').gml)
+        # PostGIS < 1.5 doesn't include dimension im GMLv3 output.
+        if postgis and connection.ops.spatial_version >= (1, 5, 0):
+            self.assertIn('<gml:pos srsDimension="2">',
+                          City.objects.gml(version=3).get(name='Pueblo').gml)
 
     def test_kml(self):
         "Testing KML output from the database using GeoQuerySet.kml()."
