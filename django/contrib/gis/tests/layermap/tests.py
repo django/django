@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import os
-import unittest
 from copy import copy
 from decimal import Decimal
 
@@ -12,6 +11,7 @@ from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
 from django.db import router
 from django.conf import settings
 from django.test import TestCase
+from django.utils import unittest
 
 from .models import (
     City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
