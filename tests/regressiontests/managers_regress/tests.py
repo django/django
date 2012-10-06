@@ -1,26 +1,42 @@
 from __future__ import absolute_import
+import copy
 
+from django.conf import settings
+from django.db import models
+from django.db.models.loading import cache
 from django.test import TestCase
+from django.test.utils import override_settings
 
-from .models import Child1, Child2, Child3, Child4, Child5, Child6, Child7
+from .models import (
+    Child1,
+    Child2,
+    Child3,
+    Child4,
+    Child5,
+    Child6,
+    Child7,
+    AbstractBase1,
+    AbstractBase2,
+    AbstractBase3,
+)
 
 
 class ManagersRegressionTests(TestCase):
     def test_managers(self):
-        a1 = Child1.objects.create(name='fred', data='a1')
-        a2 = Child1.objects.create(name='barney', data='a2')
-        b1 = Child2.objects.create(name='fred', data='b1', value=1)
-        b2 = Child2.objects.create(name='barney', data='b2', value=42)
-        c1 = Child3.objects.create(name='fred', data='c1', comment='yes')
-        c2 = Child3.objects.create(name='barney', data='c2', comment='no')
-        d1 = Child4.objects.create(name='fred', data='d1')
-        d2 = Child4.objects.create(name='barney', data='d2')
-        e1 = Child5.objects.create(name='fred', comment='yes')
-        e2 = Child5.objects.create(name='barney', comment='no')
-        f1 = Child6.objects.create(name='fred', data='f1', value=42)
-        f2 = Child6.objects.create(name='barney', data='f2', value=42)
-        g1 = Child7.objects.create(name='fred')
-        g2 = Child7.objects.create(name='barney')
+        Child1.objects.create(name='fred', data='a1')
+        Child1.objects.create(name='barney', data='a2')
+        Child2.objects.create(name='fred', data='b1', value=1)
+        Child2.objects.create(name='barney', data='b2', value=42)
+        Child3.objects.create(name='fred', data='c1', comment='yes')
+        Child3.objects.create(name='barney', data='c2', comment='no')
+        Child4.objects.create(name='fred', data='d1')
+        Child4.objects.create(name='barney', data='d2')
+        Child5.objects.create(name='fred', comment='yes')
+        Child5.objects.create(name='barney', comment='no')
+        Child6.objects.create(name='fred', data='f1', value=42)
+        Child6.objects.create(name='barney', data='f2', value=42)
+        Child7.objects.create(name='fred')
+        Child7.objects.create(name='barney')
 
         self.assertQuerysetEqual(Child1.manager1.all(), ["<Child1: a1>"])
         self.assertQuerysetEqual(Child1.manager2.all(), ["<Child1: a2>"])
@@ -54,3 +70,125 @@ class ManagersRegressionTests(TestCase):
                 "<Child7: fred>"
             ]
         )
+
+    def test_abstract_manager(self):
+        # Accessing the manager on an abstract model should
+        # raise an attribute error with an appropriate message.
+        try:
+            AbstractBase3.objects.all()
+            self.fail('Should raise an AttributeError')
+        except AttributeError as e:
+            # This error message isn't ideal, but if the model is abstract and
+            # a lot of the class instantiation logic isn't invoked; if the
+            # manager is implied, then we don't get a hook to install the
+            # error-raising manager.
+            self.assertEqual(str(e), "type object 'AbstractBase3' has no attribute 'objects'")
+
+    def test_custom_abstract_manager(self):
+        # Accessing the manager on an abstract model with an custom
+        # manager should raise an attribute error with an appropriate
+        # message.
+        try:
+            AbstractBase2.restricted.all()
+            self.fail('Should raise an AttributeError')
+        except AttributeError as e:
+            self.assertEqual(str(e), "Manager isn't available; AbstractBase2 is abstract")
+
+    def test_explicit_abstract_manager(self):
+        # Accessing the manager on an abstract model with an explicit
+        # manager should raise an attribute error with an appropriate
+        # message.
+        try:
+            AbstractBase1.objects.all()
+            self.fail('Should raise an AttributeError')
+        except AttributeError as e:
+            self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
+
+    def test_swappable_manager(self):
+        try:
+            # This test adds dummy models to the app cache. These
+            # need to be removed in order to prevent bad interactions
+            # with the flush operation in other tests.
+            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_store = copy.deepcopy(cache.app_store)
+
+            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
+
+            class SwappableModel(models.Model):
+                class Meta:
+                    swappable = 'TEST_SWAPPABLE_MODEL'
+
+            # Accessing the manager on a swappable model should
+            # raise an attribute error with a helpful message
+            try:
+                SwappableModel.objects.all()
+                self.fail('Should raise an AttributeError')
+            except AttributeError as e:
+                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+
+        finally:
+            del settings.TEST_SWAPPABLE_MODEL
+            cache.app_models = old_app_models
+            cache.app_store = old_app_store
+
+    def test_custom_swappable_manager(self):
+        try:
+            # This test adds dummy models to the app cache. These
+            # need to be removed in order to prevent bad interactions
+            # with the flush operation in other tests.
+            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_store = copy.deepcopy(cache.app_store)
+
+            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
+
+            class SwappableModel(models.Model):
+
+                stuff = models.Manager()
+
+                class Meta:
+                    swappable = 'TEST_SWAPPABLE_MODEL'
+
+            # Accessing the manager on a swappable model with an
+            # explicit manager should raise an attribute error with a
+            # helpful message
+            try:
+                SwappableModel.stuff.all()
+                self.fail('Should raise an AttributeError')
+            except AttributeError as e:
+                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+
+        finally:
+            del settings.TEST_SWAPPABLE_MODEL
+            cache.app_models = old_app_models
+            cache.app_store = old_app_store
+
+    def test_explicit_swappable_manager(self):
+        try:
+            # This test adds dummy models to the app cache. These
+            # need to be removed in order to prevent bad interactions
+            # with the flush operation in other tests.
+            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_store = copy.deepcopy(cache.app_store)
+
+            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
+
+            class SwappableModel(models.Model):
+
+                objects = models.Manager()
+
+                class Meta:
+                    swappable = 'TEST_SWAPPABLE_MODEL'
+
+            # Accessing the manager on a swappable model with an
+            # explicit manager should raise an attribute error with a
+            # helpful message
+            try:
+                SwappableModel.objects.all()
+                self.fail('Should raise an AttributeError')
+            except AttributeError as e:
+                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+
+        finally:
+            del settings.TEST_SWAPPABLE_MODEL
+            cache.app_models = old_app_models
+            cache.app_store = old_app_store
