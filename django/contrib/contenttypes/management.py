@@ -3,8 +3,9 @@ from django.db.models import get_apps, get_models, signals
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
+from django.db import DEFAULT_DB_ALIAS
 
-def update_contenttypes(app, created_models, verbosity=2, **kwargs):
+def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
@@ -22,7 +23,7 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     # Get all the content types
     content_types = dict(
         (ct.model, ct)
-        for ct in ContentType.objects.filter(app_label=app_label)
+        for ct in ContentType.objects.using(db).filter(app_label=app_label)
     )
     to_remove = [
         ct
@@ -30,7 +31,7 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
         if model_name not in app_models
     ]
 
-    cts = ContentType.objects.bulk_create([
+    cts = ContentType.objects.using(db).bulk_create([
         ContentType(
             name=smart_text(model._meta.verbose_name_raw),
             app_label=app_label,
