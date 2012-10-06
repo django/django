@@ -327,7 +327,7 @@ essentially "roots" a set of URLs below other ones.
 For example, here's an excerpt of the URLconf for the `Django Web site`_
 itself. It includes a number of other URLconfs::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns, include
 
     urlpatterns = patterns('',
         # ... snip ...
@@ -347,28 +347,23 @@ string to the included URLconf for further processing.
 Another possibility is to include additional URL patterns not by specifying the
 URLconf Python module defining them as the ``include()`` argument but by using
 directly the pattern list as returned by :func:`~django.conf.urls.patterns`
-instead. For example::
+instead. For example, consider this URLconf::
 
     from django.conf.urls import patterns, url, include
 
     extra_patterns = patterns('',
-        url(r'^reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
-        url(r'^charge/$', 'credit.views.charge', name='credit-charge'),
+        url(r'^reports/(?P<id>\d+)/$', 'credit.views.report'),
+        url(r'^charge/$', 'credit.views.charge'),
     )
 
     urlpatterns = patterns('',
-        url(r'^$', 'apps.main.views.homepage', name='site-homepage'),
+        url(r'^$', 'apps.main.views.homepage'),
         (r'^help/', include('apps.help.urls')),
         (r'^credit/', include(extra_patterns)),
     )
 
-This approach can be seen in use when you deploy an instance of the Django
-Admin application. The Django Admin is deployed as instances of a
-:class:`~django.contrib.admin.AdminSite`; each
-:class:`~django.contrib.admin.AdminSite` instance has an attribute ``urls``
-that returns the url patterns available to that instance. It is this attribute
-that you ``include()`` into your projects ``urlpatterns`` when you deploy the
-admin instance.
+In this example, the ``/credit/reports/`` URL will be handled by the
+``credit.views.report()`` Django view.
 
 .. _`Django Web site`: https://www.djangoproject.com/
 
@@ -595,33 +590,33 @@ A URL namespace comes in two parts, both of which are strings:
     This describes the name of the application that is being deployed. Every
     instance of a single application will have the same application namespace.
     For example, Django's admin application has the somewhat predictable
-    application namespace of ``admin``.
+    application namespace of ``'admin'``.
 
   instance namespace
     This identifies a specific instance of an application. Instance namespaces
     should be unique across your entire project. However, an instance namespace
     can be the same as the application namespace. This is used to specify a
     default instance of an application. For example, the default Django Admin
-    instance has an instance namespace of ``admin``.
+    instance has an instance namespace of ``'admin'``.
 
-Namespaced URLs are specified using the ``:`` operator. For example, the main
-index page of the admin application is referenced using ``admin:index``. This
-indicates a namespace of ``admin``, and a named URL of ``index``.
+Namespaced URLs are specified using the ``':'`` operator. For example, the main
+index page of the admin application is referenced using ``'admin:index'``. This
+indicates a namespace of ``'admin'``, and a named URL of ``'index'``.
 
-Namespaces can also be nested. The named URL ``foo:bar:whiz`` would look for
-a pattern named ``whiz`` in the namespace ``bar`` that is itself defined within
-the top-level namespace ``foo``.
+Namespaces can also be nested. The named URL ``'foo:bar:whiz'`` would look for
+a pattern named ``'whiz'`` in the namespace ``'bar'`` that is itself defined
+within the top-level namespace ``'foo'``.
 
 .. _topics-http-reversing-url-namespaces:
 
 Reversing namespaced URLs
 -------------------------
 
-When given a namespaced URL (e.g. ``myapp:index``) to resolve, Django splits
+When given a namespaced URL (e.g. ``'myapp:index'``) to resolve, Django splits
 the fully qualified name into parts, and then tries the following lookup:
 
-1. First, Django looks for a matching application namespace (in this
-   example, ``myapp``). This will yield a list of instances of that
+1. First, Django looks for a matching :term:`application namespace` (in this
+   example, ``'myapp'``). This will yield a list of instances of that
    application.
 
 2. If there is a *current* application defined, Django finds and returns
@@ -632,19 +627,20 @@ the fully qualified name into parts, and then tries the following lookup:
    render a template.
 
    The current application can also be specified manually as an argument
-   to the :func:`reverse()` function.
+   to the :func:`django.core.urlresolvers.reverse()` function.
 
 3. If there is no current application. Django looks for a default
    application instance. The default application instance is the instance
-   that has an instance namespace matching the application namespace (in
-   this example, an instance of the ``myapp`` called ``myapp``).
+   that has an :term:`instance namespace` matching the :term:`application
+   namespace` (in this example, an instance of the ``myapp`` called
+   ``'myapp'``).
 
 4. If there is no default application instance, Django will pick the last
    deployed instance of the application, whatever its instance name may be.
 
-5. If the provided namespace doesn't match an application namespace in
+5. If the provided namespace doesn't match an :term:`application namespace` in
    step 1, Django will attempt a direct lookup of the namespace as an
-   instance namespace.
+   :term:`instance namespace`.
 
 If there are nested namespaces, these steps are repeated for each part of the
 namespace until only the view name is unresolved. The view name will then be
@@ -654,58 +650,68 @@ Example
 ~~~~~~~
 
 To show this resolution strategy in action, consider an example of two instances
-of ``myapp``: one called ``foo``, and one called ``bar``. ``myapp`` has a main
-index page with a URL named `index`. Using this setup, the following lookups are
-possible:
+of ``myapp``: one called ``'foo'``, and one called ``'bar'``. ``myapp`` has a
+main index page with a URL named ``'index'``. Using this setup, the following
+lookups are possible:
 
 * If one of the instances is current - say, if we were rendering a utility page
-  in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
-  the instance ``bar``.
+  in the instance ``'bar'`` - ``'myapp:index'`` will resolve to the index page
+  of the instance ``'bar'``.
 
 * If there is no current instance - say, if we were rendering a page
-  somewhere else on the site - ``myapp:index`` will resolve to the last
+  somewhere else on the site - ``'myapp:index'`` will resolve to the last
   registered instance of ``myapp``. Since there is no default instance,
   the last instance of ``myapp`` that is registered will be used. This could
-  be ``foo`` or ``bar``, depending on the order they are introduced into the
+  be ``'foo'`` or ``'bar'``, depending on the order they are introduced into the
   urlpatterns of the project.
 
-* ``foo:index`` will always resolve to the index page of the instance ``foo``.
+* ``'foo:index'`` will always resolve to the index page of the instance
+  ``'foo'``.
 
-If there was also a default instance - i.e., an instance named `myapp` - the
+If there was also a default instance - i.e., an instance named ``'myapp'`` - the
 following would happen:
 
 * If one of the instances is current - say, if we were rendering a utility page
-  in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
-  the instance ``bar``.
+  in the instance ``'bar'`` - ``'myapp:index'`` will resolve to the index page
+  of the instance ``'bar'``.
 
 * If there is no current instance - say, if we were rendering a page somewhere
-  else on the site - ``myapp:index`` will resolve to the index page of the
+  else on the site - ``'myapp:index'`` will resolve to the index page of the
   default instance.
 
-* ``foo:index`` will again resolve to the index page of the instance ``foo``.
+* ``'foo:index'`` will again resolve to the index page of the instance
+  ``'foo'``.
+
+.. _namespaces-and-include:
 
 URL namespaces and included URLconfs
 ------------------------------------
 
 URL namespaces of included URLconfs can be specified in two ways.
 
-Firstly, you can provide the application and instance namespace as arguments
-to ``include()`` when you construct your URL patterns. For example,::
+Firstly, you can provide the application and :term:`instance namespace` as
+arguments to :func:`django.conf.urls.include()` when you construct your URL
+patterns. For example,::
 
     (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
 
-This will include the URLs defined in ``apps.help.urls`` into the application
-namespace ``bar``, with the instance namespace ``foo``.
+This will include the URLs defined in ``apps.help.urls`` into the
+:term:`application namespace` ``'bar'``, with the :term:`instance namespace`
+``'foo'``.
 
 Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` a ``patterns`` object, that object will be added to the
-global namespace. However, you can also ``include()`` an object that contains
-a 3-tuple containing::
+you ``include()`` an object as returned by :func:`~django.conf.urls.patterns`,
+the URLs contained in that object will be added to the global namespace.
+However, you can also ``include()`` a 3-tuple containing::
 
     (<patterns object>, <application namespace>, <instance namespace>)
 
 This will include the nominated URL patterns into the given application and
-instance namespace. For example, the ``urls`` attribute of Django's
-:class:`~django.contrib.admin.AdminSite` object returns a 3-tuple that contains
-all the patterns in an admin site, plus the name of the admin instance, and the
-application namespace ``admin``.
+instance namespace.
+
+For example, the Django Admin is deployed as instances of
+:class:`~django.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
+attribute: A 3-tuple that contains all the patterns in the corresponding admin
+site, plus the application namespace ``'admin'``, and the name of the admin
+instance. It is this ``urls`` attribute that you ``include()`` into your
+projects ``urlpatterns`` when you deploy an Admin instance.

@@ -80,15 +80,32 @@ The ``prefix`` parameter has the same meaning as the first argument to
 include()
 ---------
 
-.. function:: include(<module or pattern_list>)
+.. function:: include(module[, namespace=None, app_name=None])
+              include(pattern_list)
+              include((pattern_list, app_namespace, instance_namespace))
 
-A function that takes a full Python import path to another URLconf module that
-should be "included" in this place.
+    A function that takes a full Python import path to another URLconf module
+    that should be "included" in this place. Optionally, the :term:`application
+    namespace` and :term:`instance namespace` where the entries will be included
+    into can also be specified.
 
-:func:`include` also accepts as an argument an iterable that returns URL
-patterns.
+    ``include()`` also accepts as an argument either an iterable that returns
+    URL patterns or a 3-tuple containing such iterable plus the names of the
+    application and instance namespaces.
 
-See :ref:`Including other URLconfs <including-other-urlconfs>`.
+    :arg module: URLconf module (or module name)
+    :type module: Module or string
+    :arg namespace: Instance namespace for the URL entries being included
+    :type namespace: string
+    :arg app_name: Application namespace for the URL entries being included
+    :type app_name: string
+    :arg pattern_list: Iterable of URL entries as returned by :func:`patterns`
+    :arg app_namespace: Application namespace for the URL entries being included
+    :type app_namespace: string
+    :arg instance_namespace: Instance namespace for the URL entries being included
+    :type instance_namespace: string
+
+See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
 handler403
 ----------
