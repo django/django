@@ -2074,20 +2074,20 @@ authentication app::
             Creates and saves a superuser with the given email, date of
             birth and password.
             """
-            u = self.create_user(username,
-                            password=password,
-                            date_of_birth=date_of_birth
-                        )
-            u.is_admin = True
-            u.save(using=self._db)
-            return u
+            user = self.create_user(username,
+                password=password,
+                date_of_birth=date_of_birth
+            )
+            user.is_admin = True
+            user.save(using=self._db)
+            return user
 
 
     class MyUser(AbstractBaseUser):
         email = models.EmailField(
-                            verbose_name='email address',
-                            max_length=255
-                        )
+            verbose_name='email address',
+            max_length=255
+        )
         date_of_birth = models.DateField()
         is_active = models.BooleanField(default=True)
         is_admin = models.BooleanField(default=False)
