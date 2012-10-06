@@ -44,7 +44,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         modify the placeholder based on the contents of the given value.
         """
         if hasattr(value, 'expression'):
-            placeholder = placeholder % self.get_expression_column(value)
+            placeholder = self.get_expression_column(value)
         else:
             placeholder = '%s(%%s)' % self.from_text
         return placeholder
