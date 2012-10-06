@@ -14,7 +14,7 @@ from django.contrib.gis.gdal.srs import SpatialReference
 # GDAL ctypes function prototypes.
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -103,7 +103,8 @@ class Layer(GDALBase):
     @property
     def name(self):
         "Returns the name of this layer in the Data Source."
-        return capi.get_fd_name(self._ldefn)
+        name = capi.get_fd_name(self._ldefn)
+        return force_text(name, self._ds.encoding, strings_only=True)
 
     @property
     def num_feat(self, force=1):
@@ -135,8 +136,9 @@ class Layer(GDALBase):
         Returns a list of string names corresponding to each of the Fields
         available in this Layer.
         """
-        return [capi.get_field_name(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields) ]
+        return [force_text(capi.get_field_name(capi.get_field_defn(self._ldefn, i)),
+                           self._ds.encoding, strings_only=True)
+                for i in xrange(self.num_fields)]
 
     @property
     def field_types(self):

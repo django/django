@@ -167,7 +167,8 @@ class DataSourceTest(unittest.TestCase):
                         self.assertEqual(True, isinstance(feat[k], v))
 
                     # Testing Feature.__iter__
-                    for fld in feat: self.assertEqual(True, fld.name in source.fields.keys())
+                    for fld in feat:
+                        self.assertEqual(True, fld.name in source.fields.keys())
 
     def test05_geometries(self):
         "Testing Geometries from Data Source Features."

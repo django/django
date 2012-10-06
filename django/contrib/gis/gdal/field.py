@@ -3,6 +3,8 @@ from datetime import date, datetime, time
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException
 from django.contrib.gis.gdal.prototypes import ds as capi
+from django.utils.encoding import force_text
+
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -53,7 +55,8 @@ class Field(GDALBase):
 
     def as_string(self):
         "Retrieves the Field's value as a string."
-        return capi.get_field_as_string(self._feat.ptr, self._index)
+        string = capi.get_field_as_string(self._feat.ptr, self._index)
+        return force_text(string, encoding=self._feat.encoding, strings_only=True)
 
     def as_datetime(self):
         "Retrieves the Field's value as a tuple of date & time components."
@@ -70,7 +73,8 @@ class Field(GDALBase):
     @property
     def name(self):
         "Returns the name of this Field."
-        return capi.get_field_name(self.ptr)
+        name = capi.get_field_name(self.ptr)
+        return force_text(name, encoding=self._feat.encoding, strings_only=True)
 
     @property
     def precision(self):

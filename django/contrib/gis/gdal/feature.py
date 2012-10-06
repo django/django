@@ -7,7 +7,7 @@ from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
 
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -69,6 +69,10 @@ class Feature(GDALBase):
 
     #### Feature Properties ####
     @property
+    def encoding(self):
+        return self._layer._ds.encoding
+
+    @property
     def fid(self):
         "Returns the feature identifier."
         return capi.get_fid(self.ptr)
@@ -76,7 +80,8 @@ class Feature(GDALBase):
     @property
     def layer_name(self):
         "Returns the name of the layer for the feature."
-        return capi.get_feat_name(self._layer._ldefn)
+        name = capi.get_feat_name(self._layer._ldefn)
+        return force_text(name, self.encoding, strings_only=True)
 
     @property
     def num_fields(self):
