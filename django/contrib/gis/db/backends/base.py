@@ -116,6 +116,16 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError
 
+    def get_expression_column(self, evaluator):
+        """
+        Helper method to return the quoted column string from the evaluator
+        for its expression.
+        """
+        for expr, col_tup in evaluator.cols:
+            if expr is evaluator.expression:
+                return '%s.%s' % tuple(map(self.quote_name, col_tup))
+        raise Exception("Could not find the column for the expression.")
+
     # Spatial SQL Construction
     def spatial_aggregate_sql(self, agg):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')

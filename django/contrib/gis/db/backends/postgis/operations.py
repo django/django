@@ -381,7 +381,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            placeholder = placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            placeholder = placeholder % self.get_expression_column(value)
 
         return placeholder
 

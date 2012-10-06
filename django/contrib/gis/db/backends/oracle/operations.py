@@ -213,7 +213,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s'
             # No geometry value used for F expression, substitue in
             # the column name instead.
-            return placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            return placeholder % self.get_expression_column(value)
         else:
             if transform_value(value, f.srid):
                 return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
