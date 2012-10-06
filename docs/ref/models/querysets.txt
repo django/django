@@ -1564,7 +1564,8 @@ update
 .. method:: update(**kwargs)
 
 Performs an SQL update query for the specified fields, and returns
-the number of rows affected.
+the number of rows matched (which may not be equal to the number of rows
+updated if some rows already have the new value).
 
 For example, to turn comments off for all blog entries published in 2010,
 you could do this::

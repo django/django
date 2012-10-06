@@ -959,7 +959,8 @@ new value to be the new model instance you want to point to. For example::
     >>> Entry.objects.all().update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
-affected by the query. The only restriction on the
+matched by the query (which may not be equal to the number of rows updated if
+some rows already have the new value). The only restriction on the
 :class:`~django.db.models.query.QuerySet` that is updated is that it can only
 access one database table, the model's main table. You can filter based on
 related fields, but you can only update columns in the model's main
