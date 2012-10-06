@@ -28,27 +28,18 @@ def load_backend(backend_name):
         # listing all possible (built-in) database backends.
         backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
         try:
-            available_backends = [f for f in os.listdir(backend_dir)
+            builtin_backends = [f for f in os.listdir(backend_dir)
                     if os.path.isdir(os.path.join(backend_dir, f))
-                    and not (f.startswith('.') or f == '__pycache__')]
+                    and not (f.startswith('.') or f in ('__pycache__', 'dummy'))]
         except EnvironmentError:
-            available_backends = []
-        full_notation = backend_name.startswith('django.db.backends.')
-        if full_notation:
-            backend_name = backend_name[19:] # See #15621.
-        if backend_name not in available_backends:
-            backend_reprs = map(repr, sorted(available_backends))
+            builtin_backends = []
+        if backend_name not in ['django.db.backends.%s' % b for b in
+                                builtin_backends]:
+            backend_reprs = map(repr, sorted(builtin_backends))
             error_msg = ("%r isn't an available database backend.\n"
-                         "Try using django.db.backends.XXX, where XXX "
+                         "Try using 'django.db.backends.XXX', where XXX "
                          "is one of:\n    %s\nError was: %s" %
                          (backend_name, ", ".join(backend_reprs), e_user))
-            raise ImproperlyConfigured(error_msg)
-        elif not full_notation:
-            # user tried to use the old notation for the database backend
-            error_msg = ("%r isn't an available database backend.\n"
-                         "Try using django.db.backends.%s instead.\n"
-                         "Error was: %s" %
-                         (backend_name, backend_name, e_user))
             raise ImproperlyConfigured(error_msg)
         else:
             # If there's some other error, this must be an error in Django
