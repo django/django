@@ -32,8 +32,9 @@ class BaseSpatialOperations(object):
     # How the geometry column should be selected.
     select = None
 
-    # Does the spatial database have a geography type?
+    # Does the spatial database have a geometry or geography type?
     geography = False
+    geometry = False
 
     area = False
     centroid = False
