@@ -30,7 +30,7 @@ def load_backend(backend_name):
         try:
             available_backends = [f for f in os.listdir(backend_dir)
                     if os.path.isdir(os.path.join(backend_dir, f))
-                    and not f.startswith('.')]
+                    and not (f.startswith('.') or f == '__pycache__')]
         except EnvironmentError:
             available_backends = []
         full_notation = backend_name.startswith('django.db.backends.')

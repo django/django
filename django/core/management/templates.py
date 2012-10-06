@@ -138,7 +138,7 @@ class TemplateCommand(BaseCommand):
                     os.mkdir(target_dir)
 
             for dirname in dirs[:]:
-                if dirname.startswith('.'):
+                if dirname.startswith('.') or dirname == '__pycache__':
                     dirs.remove(dirname)
 
             for filename in files:
