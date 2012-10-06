@@ -11,7 +11,6 @@ try:
     from urllib.parse import urlsplit, urlunsplit
 except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
-from xml.dom.minidom import parseString, Node
 import select
 import socket
 import threading
@@ -38,7 +37,7 @@ from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
 from django.test.utils import (get_warnings_state, restore_warnings_state,
-    override_settings)
+    override_settings, compare_xml, strip_quotes)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
 from django.utils.encoding import force_text
@@ -134,107 +133,22 @@ class OutputChecker(doctest.OutputChecker):
             optionflags)
 
     def check_output_xml(self, want, got, optionsflags):
-        """Tries to do a 'xml-comparision' of want and got.  Plain string
-        comparision doesn't always work because, for example, attribute
-        ordering should not be important.
-
-        Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
-        """
-        _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
-        def norm_whitespace(v):
-            return _norm_whitespace_re.sub(' ', v)
-
-        def child_text(element):
-            return ''.join([c.data for c in element.childNodes
-                            if c.nodeType == Node.TEXT_NODE])
-
-        def children(element):
-            return [c for c in element.childNodes
-                    if c.nodeType == Node.ELEMENT_NODE]
-
-        def norm_child_text(element):
-            return norm_whitespace(child_text(element))
-
-        def attrs_dict(element):
-            return dict(element.attributes.items())
-
-        def check_element(want_element, got_element):
-            if want_element.tagName != got_element.tagName:
-                return False
-            if norm_child_text(want_element) != norm_child_text(got_element):
-                return False
-            if attrs_dict(want_element) != attrs_dict(got_element):
-                return False
-            want_children = children(want_element)
-            got_children = children(got_element)
-            if len(want_children) != len(got_children):
-                return False
-            for want, got in zip(want_children, got_children):
-                if not check_element(want, got):
-                    return False
-            return True
-
-        want, got = self._strip_quotes(want, got)
-        want = want.replace('\\n','\n')
-        got = got.replace('\\n','\n')
-
-        # If the string is not a complete xml document, we may need to add a
-        # root element. This allow us to compare fragments, like "<foo/><bar/>"
-        if not want.startswith('<?xml'):
-            wrapper = '<root>%s</root>'
-            want = wrapper % want
-            got = wrapper % got
-
-        # Parse the want and got strings, and compare the parsings.
         try:
-            want_root = parseString(want).firstChild
-            got_root = parseString(got).firstChild
+            return compare_xml(want, got)
         except Exception:
             return False
-        return check_element(want_root, got_root)
 
     def check_output_json(self, want, got, optionsflags):
         """
         Tries to compare want and got as if they were JSON-encoded data
         """
-        want, got = self._strip_quotes(want, got)
+        want, got = strip_quotes(want, got)
         try:
             want_json = json.loads(want)
             got_json = json.loads(got)
         except Exception:
             return False
         return want_json == got_json
-
-    def _strip_quotes(self, want, got):
-        """
-        Strip quotes of doctests output values:
-
-        >>> o = OutputChecker()
-        >>> o._strip_quotes("'foo'")
-        "foo"
-        >>> o._strip_quotes('"foo"')
-        "foo"
-        """
-        def is_quoted_string(s):
-            s = s.strip()
-            return (len(s) >= 2
-                    and s[0] == s[-1]
-                    and s[0] in ('"', "'"))
-
-        def is_quoted_unicode(s):
-            s = s.strip()
-            return (len(s) >= 3
-                    and s[0] == 'u'
-                    and s[1] == s[-1]
-                    and s[1] in ('"', "'"))
-
-        if is_quoted_string(want) and is_quoted_string(got):
-            want = want.strip()[1:-1]
-            got = got.strip()[1:-1]
-        elif is_quoted_unicode(want) and is_quoted_unicode(got):
-            want = want.strip()[2:-1]
-            got = got.strip()[2:-1]
-        return want, got
 
 
 class DocTestRunner(doctest.DocTestRunner):
@@ -444,6 +358,38 @@ class SimpleTestCase(ut2.TestCase):
             standardMsg = '%s == %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             self.fail(self._formatMessage(msg, standardMsg))
+
+    def assertXMLEqual(self, xml1, xml2, msg=None):
+        """
+        Asserts that two XML snippets are semantically the same.
+        Whitespace in most cases is ignored, and attribute ordering is not
+        significant. The passed-in arguments must be valid XML.
+        """
+        try:
+            result = compare_xml(xml1, xml2)
+        except Exception as e:
+            standardMsg = 'First or second argument is not valid XML\n%s' % e
+            self.fail(self._formatMessage(msg, standardMsg))
+        else:
+            if not result:
+                standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                self.fail(self._formatMessage(msg, standardMsg))
+
+    def assertXMLNotEqual(self, xml1, xml2, msg=None):
+        """
+        Asserts that two XML snippets are not semantically equivalent.
+        Whitespace in most cases is ignored, and attribute ordering is not
+        significant. The passed-in arguments must be valid XML.
+        """
+        try:
+            result = compare_xml(xml1, xml2)
+        except Exception as e:
+            standardMsg = 'First or second argument is not valid XML\n%s' % e
+            self.fail(self._formatMessage(msg, standardMsg))
+        else:
+            if result:
+                standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                self.fail(self._formatMessage(msg, standardMsg))
 
 
 class TransactionTestCase(SimpleTestCase):

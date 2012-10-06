@@ -198,6 +198,11 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The loaddata management command now supports an `ignorenonexistent` option to
   ignore data for fields that no longer exist.
 
+* :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
+  you to test equality for XML content at a semantic level, without caring for
+  syntax differences (spaces, attribute order, etc.).
+
 Backwards incompatible changes in 1.5
 =====================================
 
