@@ -61,7 +61,7 @@ class Layer(GDALBase):
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
         for i in xrange(self.num_feat):
-            yield Feature(capi.get_next_feature(self._ptr), self._ldefn)
+            yield Feature(capi.get_next_feature(self._ptr), self)
 
     def __len__(self):
         "The length is the number of features."
@@ -81,7 +81,7 @@ class Layer(GDALBase):
         if self._random_read:
             # If the Layer supports random reading, return.
             try:
-                return Feature(capi.get_feature(self.ptr, feat_id), self._ldefn)
+                return Feature(capi.get_feature(self.ptr, feat_id), self)
             except OGRException:
                 pass
         else:

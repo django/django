@@ -16,15 +16,21 @@ from django.utils.six.moves import xrange
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
-    "A class that wraps an OGR Feature, needs to be instantiated from a Layer object."
+    """
+    This class that wraps an OGR Feature, needs to be instantiated
+    from a Layer object.
+    """
 
     #### Python 'magic' routines ####
-    def __init__(self, feat, fdefn):
-        "Initializes on the pointers for the feature and the layer definition."
-        if not feat or not fdefn:
+    def __init__(self, feat, layer):
+        """
+        Initializes on the feature pointers for the feature and the layer
+        definition, as well as the Layer.
+        """
+        if not feat:
             raise OGRException('Cannot create OGR Feature, invalid pointer given.')
         self.ptr = feat
-        self._fdefn = fdefn
+        self._layer = layer
 
     def __del__(self):
         "Releases a reference to this object."
@@ -43,7 +49,7 @@ class Feature(GDALBase):
             if index < 0 or index > self.num_fields:
                 raise OGRIndexError('index out of range')
             i = index
-        return Field(self.ptr, i)
+        return Field(self, i)
 
     def __iter__(self):
         "Iterates over each field in the Feature."
@@ -71,7 +77,7 @@ class Feature(GDALBase):
     @property
     def layer_name(self):
         "Returns the name of the layer for the feature."
-        return capi.get_feat_name(self._fdefn)
+        return capi.get_feat_name(self._layer._ldefn)
 
     @property
     def num_fields(self):
@@ -81,7 +87,7 @@ class Feature(GDALBase):
     @property
     def fields(self):
         "Returns a list of fields in the Feature."
-        return [capi.get_field_name(capi.get_field_defn(self._fdefn, i))
+        return [capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i))
                 for i in xrange(self.num_fields)]
 
     @property
@@ -94,7 +100,7 @@ class Feature(GDALBase):
     @property
     def geom_type(self):
         "Returns the OGR Geometry Type for this Feture."
-        return OGRGeomType(capi.get_fd_geom_type(self._fdefn))
+        return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
 
     #### Feature Methods ####
     def get(self, field):

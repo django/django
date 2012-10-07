@@ -125,7 +125,10 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(control_vals, test_vals)
 
     def test03c_layer_references(self):
-        "Test to make sure Layer access is still available without the DataSource."
+        """
+        Test to make sure Layer/Feature access is still available without
+        the DataSource/Feature.
+        """
         source = ds_list[0]
 
         # See ticket #9448.
@@ -140,6 +143,9 @@ class DataSourceTest(unittest.TestCase):
         lyr = get_layer()
         self.assertEqual(source.nfeat, len(lyr))
         self.assertEqual(source.gtype, lyr.geom_type.num)
+
+        # Same issue for Feature/Field objects, see #18640
+        self.assertEqual(str(lyr[0]['str']), "1")
 
     def test04_features(self):
         "Testing Data Source Features."

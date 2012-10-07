@@ -9,12 +9,15 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 #
 # The OGR_Fld_* routines are relevant here.
 class Field(GDALBase):
-    "A class that wraps an OGR Field, needs to be instantiated from a Feature object."
+    """
+    This class wraps an OGR Field, and needs to be instantiated
+    from a Feature object.
+    """
 
     #### Python 'magic' routines ####
     def __init__(self, feat, index):
         """
-        Initializes on the feature pointer and the integer index of
+        Initializes on the feature object and the integer index of
         the field within the feature.
         """
         # Setting the feature pointer and index.
@@ -22,7 +25,7 @@ class Field(GDALBase):
         self._index = index
 
         # Getting the pointer for this field.
-        fld_ptr = capi.get_feat_field_defn(feat, index)
+        fld_ptr = capi.get_feat_field_defn(feat.ptr, index)
         if not fld_ptr:
             raise OGRException('Cannot create OGR Field, invalid pointer given.')
         self.ptr = fld_ptr
@@ -42,21 +45,22 @@ class Field(GDALBase):
     #### Field Methods ####
     def as_double(self):
         "Retrieves the Field's value as a double (float)."
-        return capi.get_field_as_double(self._feat, self._index)
+        return capi.get_field_as_double(self._feat.ptr, self._index)
 
     def as_int(self):
         "Retrieves the Field's value as an integer."
-        return capi.get_field_as_integer(self._feat, self._index)
+        return capi.get_field_as_integer(self._feat.ptr, self._index)
 
     def as_string(self):
         "Retrieves the Field's value as a string."
-        return capi.get_field_as_string(self._feat, self._index)
+        return capi.get_field_as_string(self._feat.ptr, self._index)
 
     def as_datetime(self):
         "Retrieves the Field's value as a tuple of date & time components."
         yy, mm, dd, hh, mn, ss, tz = [c_int() for i in range(7)]
-        status = capi.get_field_as_datetime(self._feat, self._index, byref(yy), byref(mm), byref(dd),
-                                            byref(hh), byref(mn), byref(ss), byref(tz))
+        status = capi.get_field_as_datetime(
+            self._feat.ptr, self._index, byref(yy), byref(mm), byref(dd),
+            byref(hh), byref(mn), byref(ss), byref(tz))
         if status:
             return (yy, mm, dd, hh, mn, ss, tz)
         else:
