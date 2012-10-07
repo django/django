@@ -106,9 +106,10 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
+        username_field = self.model._meta.get_field(getattr(self.model, 'USERNAME_FIELD', 'username'))
         defaults = {
             'auto_populated_fields': (),
-            'username_help_text': self.model._meta.get_field('username').help_text,
+            'username_help_text': username_field.help_text,
         }
         extra_context.update(defaults)
         return super(UserAdmin, self).add_view(request, form_url,
@@ -133,7 +134,7 @@ class UserAdmin(admin.ModelAdmin):
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
-            'title': _('Change password: %s') % escape(user.username),
+            'title': _('Change password: %s') % escape(str(user)),
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
