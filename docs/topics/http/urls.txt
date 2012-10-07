@@ -421,9 +421,9 @@ options to views.
 Passing extra options to ``include()``
 --------------------------------------
 
-Similarly, you can pass extra options to ``include()``. When you pass extra
-options to ``include()``, *each* line in the included URLconf will be passed
-the extra options.
+Similarly, you can pass extra options to :func:`~django.conf.urls.include`.
+When you pass extra options to ``include()``, *each* line in the included
+URLconf will be passed the extra options.
 
 For example, these two URLconf sets are functionally identical:
 
@@ -509,6 +509,103 @@ imported::
     urlpatterns = patterns('',
         (r'^myview/$', ClassBasedView.as_view()),
     )
+
+Reverse resolution of URLs
+==========================
+
+A common need when working on a Django project is the possibility to obtain URLs
+in their final forms either for embedding in generated content (views and assets
+URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
+the server side (redirections, etc.)
+
+It is strongly desirable not having to hard-code these URLs (a laborious,
+non-scalable and error-prone strategy) or having to devise ad-hoc mechanisms for
+generating URLs that are parallel to the design described by the URLconf and as
+such in danger of producing stale URLs at some point.
+
+In other words, what's needed is a DRY mechanism. Among other advantages it
+would allow evolution of the URL design without having to go all over the
+project source code to search and replace outdated URLs.
+
+The piece of information we have available as a starting point to get a URL is
+an identification (e.g. the name) of the view in charge of handling it, other
+pieces of information that necessarily must participate in the lookup of the
+right URL are the types (positional, keyword) and values of the view arguments.
+
+Django provides a solution such that the URL mapper is the only repository of
+the URL design. You feed it with your URLconf and then it can be used in both
+directions:
+
+* Starting with a URL requested by the user/browser, it calls the right Django
+  view providing any arguments it might need with their values as extracted from
+  the URL.
+
+* Starting with the identification of the corresponding Django view plus the
+  values of arguments that would be passed to it, obtain the associated URL.
+
+The first one is the usage we've been discussing in the previous sections. The
+second one is what is known as *reverse resolution of URLs*, *reverse URL
+matching*, *reverse URL lookup*, or simply *URL reversing*.
+
+Django provides tools for performing URL reversing that match the different
+layers where URLs are needed:
+
+* In templates: Using the :ttag:`url` template tag.
+
+* In Python code: Using the :func:`django.core.urlresolvers.reverse()`
+  function.
+
+* In higher level code related to handling of URLs of Django model instances:
+  The :meth:`django.db.models.Model.get_absolute_url()` method and the
+  :func:`django.db.models.permalink` decorator.
+
+Examples
+--------
+
+Consider again this URLconf entry::
+
+    from django.conf.urls import patterns, url
+
+    urlpatterns = patterns('',
+	#...
+        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
+	#...
+    )
+
+According to this design, the URL for the archive corresponding to year *nnnn*
+is ``/articles/nnnn/``.
+
+You can obtain these in template code by using:
+
+.. code-block:: html+django
+
+    <a href="{% url 'news.views.year_archive' 2012 %}">2012 Archive</a>
+    {# Or with the year in a template context variable: #}
+    <ul>
+    {% for yearvar in year_list %}
+    <li><a href="{% url 'news.views.year_archive' yearvar %}">{{ yearvar }} Archive</a></li>
+    {% endfor %}
+    </ul>
+
+Or in Python code::
+
+    from django.core.urlresolvers import reverse
+    from django.http import HttpResponseRedirect
+
+    def redirect_to_year(request):
+        # ...
+        year = 2006
+        # ...
+        return HttpResponseRedirect(reverse('new.views.year_archive', args=(year,)))
+
+If, for some reason, it was decided that the URL where content for yearly
+article archives are published at should be changed then you would only need to
+change the entry in the URLconf.
+
+In some scenarios where views are of a generic nature, a many-to-one
+relationship might exist between URLs and views. For these cases the view name
+isn't a good enough identificator for it when it comes the time of reversing
+URLs. Read the next section to know about the solution Django provides for this.
 
 .. _naming-url-patterns:
 
@@ -689,9 +786,10 @@ URL namespaces and included URLconfs
 
 URL namespaces of included URLconfs can be specified in two ways.
 
-Firstly, you can provide the application and :term:`instance namespace` as
-arguments to :func:`django.conf.urls.include()` when you construct your URL
-patterns. For example,::
+Firstly, you can provide the :term:`application <application namespace>` and
+:term:`instance <instance namespace>` namespaces as arguments to
+:func:`django.conf.urls.include()` when you construct your URL patterns. For
+example,::
 
     (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
 
@@ -705,6 +803,15 @@ the URLs contained in that object will be added to the global namespace.
 However, you can also ``include()`` a 3-tuple containing::
 
     (<patterns object>, <application namespace>, <instance namespace>)
+
+For example::
+
+    help_patterns = patterns('',
+        url(r'^basic/$', 'apps.help.views.views.basic'),
+        url(r'^advanced/$', 'apps.help.views.views.advanced'),
+    )
+
+    (r'^help/', include(help_patterns, 'bar', 'foo')),
 
 This will include the nominated URL patterns into the given application and
 instance namespace.

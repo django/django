@@ -769,7 +769,7 @@ Use the ``django.test.client.Client`` class to make requests.
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-        If you had an url ``/redirect_me/`` that redirected to ``/next/``, that
+        If you had a URL ``/redirect_me/`` that redirected to ``/next/``, that
         redirected to ``/final/``, this is what you'd see::
 
             >>> response = c.get('/redirect_me/', follow=True)

@@ -8,8 +8,7 @@ reverse()
 ---------
 
 If you need to use something similar to the :ttag:`url` template tag in
-your code, Django provides the following function (in the
-:mod:`django.core.urlresolvers` module):
+your code, Django provides the following function:
 
 .. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
 
@@ -59,15 +58,15 @@ You can use ``kwargs`` instead of ``args``. For example::
 
 .. note::
 
-    The string returned by :meth:`~django.core.urlresolvers.reverse` is already
+    The string returned by ``reverse()`` is already
     :ref:`urlquoted <uri-and-iri-handling>`. For example::
 
         >>> reverse('cities', args=[u'Orléans'])
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
-    ``urllib.quote``) to the output of :meth:`~django.core.urlresolvers.reverse`
-    may produce undesirable results.
+    ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
+    results.
 
 reverse_lazy()
 --------------
@@ -94,9 +93,8 @@ URLConf is loaded. Some common cases where this function is necessary are:
 resolve()
 ---------
 
-The :func:`django.core.urlresolvers.resolve` function can be used for
-resolving URL paths to the corresponding view functions. It has the
-following signature:
+The ``resolve()`` function can be used for resolving URL paths to the
+corresponding view functions. It has the following signature:
 
 .. function:: resolve(path, urlconf=None)
 
@@ -184,7 +182,7 @@ whether a view would raise a ``Http404`` error before redirecting to it::
 permalink()
 -----------
 
-The :func:`django.db.models.permalink` decorator is useful for writing short
+The :func:`~django.db.models.permalink` decorator is useful for writing short
 methods that return a full URL path. For example, a model's
 ``get_absolute_url()`` method. See :func:`django.db.models.permalink` for more.
 

@@ -997,7 +997,7 @@ refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`^django.core.urlresolvers.NoReverseMatch` exception raised, which will
+:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
 cause your site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
