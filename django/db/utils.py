@@ -1,4 +1,5 @@
 import os
+import pkgutil
 from threading import local
 
 from django.conf import settings
@@ -28,9 +29,9 @@ def load_backend(backend_name):
         # listing all possible (built-in) database backends.
         backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
         try:
-            builtin_backends = [f for f in os.listdir(backend_dir)
-                    if os.path.isdir(os.path.join(backend_dir, f))
-                    and not (f.startswith('.') or f in ('__pycache__', 'dummy'))]
+            builtin_backends = [
+                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+                if ispkg and name != 'dummy']
         except EnvironmentError:
             builtin_backends = []
         if backend_name not in ['django.db.backends.%s' % b for b in
