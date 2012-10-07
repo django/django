@@ -16,22 +16,39 @@ from django.utils.text import capfirst
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--username', dest='username', default=None,
-            help='Specifies the username for the superuser.'),
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help=('Tells Django to NOT prompt the user for input of any kind. '
-                  'You must use --username with --noinput, along with an option for '
-                  'any other required field. Superusers created with --noinput will '
-                  ' not be able to log in until they\'re given a valid password.')),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
-    ) + tuple(
-        make_option('--%s' % field, dest=field, default=None,
-            help='Specifies the %s for the superuser.' % field)
-        for field in get_user_model().REQUIRED_FIELDS
-    )
 
+    def __init__(self, *args, **kwargs):
+        """
+        an __init__ method is here largely to support swapping out custom user
+        models in tests
+        """
+
+        super(Command, self).__init__(*args, **kwargs)
+        self.UserModel = get_user_model()
+        self.required_fields = self.UserModel.REQUIRED_FIELDS
+        self.username_field_name = getattr(self.UserModel, 'USERNAME_FIELD', 'username')
+        self.username_field = self.UserModel._meta.get_field(self.username_field_name)
+        if 'username' in self.required_fields and not self.username_field_name == 'username':
+            CommandError('Custom User objects requiring a "username" field must'
+                    'designate it as the USERNAME_FIELD. This is required when'
+                    'creating superusers')
+
+        self.option_list = BaseCommand.option_list + (
+            make_option('--%s' % self.username_field_name, dest='username', default=None,
+                help='Specifies the username for the superuser.'),
+            make_option('--noinput', action='store_false', dest='interactive', default=True,
+                help=('Tells Django to NOT prompt the user for input of any kind. '
+                    'You must use --username with --noinput, along with an option for '
+                    'any other required field. Superusers created with --noinput will '
+                    ' not be able to log in until they\'re given a valid password.')),
+            make_option('--database', action='store', dest='database',
+                default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
+        ) + tuple(
+            make_option('--%s' % field, dest=field, default=None,
+                help='Specifies the %s for the superuser.' % field)
+            for field in self.required_fields
+        )
+    option_list = BaseCommand.option_list
     help = 'Used to create a superuser.'
 
     def handle(self, *args, **options):
@@ -40,10 +57,7 @@ class Command(BaseCommand):
         verbosity = int(options.get('verbosity', 1))
         database = options.get('database')
 
-        UserModel = get_user_model()
-
-        username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
-        other_fields = UserModel.REQUIRED_FIELDS
+        other_fields = self.required_fields
 
         # If not provided, create the user with an unusable password
         password = None
@@ -53,12 +67,13 @@ class Command(BaseCommand):
         if not interactive:
             try:
                 if not username:
-                    raise CommandError("You must use --username with --noinput.")
-                username = username_field.clean(username, None)
+                    raise CommandError("You must use --%s with --noinput." %
+                            self.username_field_name)
+                username = self.username_field.clean(username, None)
 
                 for field_name in other_fields:
                     if options.get(field_name):
-                        field = UserModel._meta.get_field(field_name)
+                        field = self.UserModel._meta.get_field(field_name)
                         other_data[field_name] = field.clean(options[field_name], None)
                     else:
                         raise CommandError("You must use --%s with --noinput." % field_name)
@@ -74,9 +89,8 @@ class Command(BaseCommand):
 
                 # Get a username
                 while username is None:
-                    username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
                     if not username:
-                        input_msg = capfirst(username_field.verbose_name)
+                        input_msg = capfirst(self.username_field.verbose_name)
                         if default_username:
                             input_msg += " (leave blank to use '%s')" % default_username
                         raw_value = input(input_msg + ': ')
@@ -84,23 +98,23 @@ class Command(BaseCommand):
                     if default_username and raw_value == '':
                         raw_value = default_username
                     try:
-                        username = username_field.clean(raw_value, None)
+                        username = self.username_field.clean(raw_value, None)
                     except exceptions.ValidationError as e:
                         self.stderr.write("Error: %s" % '; '.join(e.messages))
                         username = None
                         continue
                     try:
-                        UserModel.objects.using(database).get(**{
-                                getattr(UserModel, 'USERNAME_FIELD', 'username'): username
-                            })
-                    except UserModel.DoesNotExist:
+                        self.UserModel.objects.using(database).get_by_natural_key(
+                                username)
+                    except self.UserModel.DoesNotExist:
                         pass
                     else:
-                        self.stderr.write("Error: That username is already taken.")
+                        self.stderr.write("Error: That %s is already taken." %
+                                self.username_field.verbose_name)
                         username = None
 
                 for field_name in other_fields:
-                    field = UserModel._meta.get_field(field_name)
+                    field = self.UserModel._meta.get_field(field_name)
                     other_data[field_name] = options.get(field_name)
                     while other_data[field_name] is None:
                         raw_value = input(capfirst(field.verbose_name + ': '))
@@ -128,6 +142,6 @@ class Command(BaseCommand):
                 self.stderr.write("\nOperation cancelled.")
                 sys.exit(1)
 
-        UserModel.objects.db_manager(database).create_superuser(username=username, password=password, **other_data)
+        self.UserModel.objects.db_manager(database).create_superuser(username=username, password=password, **other_data)
         if verbosity >= 1:
             self.stdout.write("Superuser created successfully.")
