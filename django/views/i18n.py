@@ -73,7 +73,7 @@ function npgettext(context, singular, plural, count) { return (count == 1) ? sin
 LibHead = """
 /* gettext library */
 
-var catalog = new Array();
+var catalog = {};
 """
 
 LibFoot = """
@@ -118,7 +118,7 @@ function npgettext(context, singular, plural, count) {
 LibFormatHead = """
 /* formatting library */
 
-var formats = new Array();
+var formats = {};
 
 """
 
