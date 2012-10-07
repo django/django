@@ -2012,8 +2012,8 @@ the admin to control access of the User to admin content:
 
 .. attribute:: User.username
 
-    ``UserAdmin`` assumes that your model will provide a username field - and
-    that this field is set as the ``USERNAME_FIELD`` for the class.
+    ``UserAdmin`` assumes that your model will provide a field named 'username'
+    - and that this field is set as the ``USERNAME_FIELD`` for the class.
 
 .. attribute:: User.is_staff
 
