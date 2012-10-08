@@ -18,11 +18,8 @@ from django.utils.text import capfirst
 class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
-        """
-        an __init__ method is here largely to support swapping out custom user
-        models in tests
-        """
-
+        # an __init__ method is here largely to support swapping out custom user
+        # models in tests
         super(Command, self).__init__(*args, **kwargs)
         self.UserModel = get_user_model()
         self.required_fields = self.UserModel.REQUIRED_FIELDS
