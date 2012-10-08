@@ -360,7 +360,7 @@ class ExceptionReporter(object):
             # (http://www.python.org/dev/peps/pep-0263/)
             match = re.search(br'coding[:=]\s*([-\w.]+)', line)
             if match:
-                encoding = match.group(1)
+                encoding = match.group(1).decode('ascii')
                 break
         source = [six.text_type(sline, encoding, 'replace') for sline in source]
 
