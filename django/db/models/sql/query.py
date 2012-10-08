@@ -702,6 +702,11 @@ class Query(object):
         aliases = list(aliases)
         while aliases:
             alias = aliases.pop(0)
+            if self.alias_map[alias].rhs_join_col is None:
+                # This is the base table (first FROM entry) - this table
+                # isn't really joined at all in the query, so we should not
+                # alter its join type.
+                continue
             parent_alias = self.alias_map[alias].lhs_alias
             parent_louter = (parent_alias
                 and self.alias_map[parent_alias].join_type == self.LOUTER)
@@ -1188,6 +1193,9 @@ class Query(object):
                     for alias in join_list:
                         if self.alias_map[alias].join_type == self.LOUTER:
                             j_col = self.alias_map[alias].rhs_join_col
+                            # The join promotion logic should never produce
+                            # a LOUTER join for the base join - assert that.
+                            assert j_col is not None
                             entry = self.where_class()
                             entry.add(
                                 (Constraint(alias, j_col, None), 'isnull', True),
