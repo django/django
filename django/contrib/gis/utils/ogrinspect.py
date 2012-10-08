@@ -2,8 +2,6 @@
 This module is for inspecting OGR data sources and generating either
 models for GeoDjango and/or mapping dictionaries for use with the
 `LayerMapping` utility.
-
-Author: Travis Pinney, Dane Springmeyer, & Justin Bronn
 """
 from django.utils.six.moves import zip
 # Requires GDAL to use.
