@@ -24,8 +24,7 @@ class Feature(GDALBase):
     #### Python 'magic' routines ####
     def __init__(self, feat, layer):
         """
-        Initializes on the feature pointers for the feature and the layer
-        definition, as well as the Layer.
+        Initializes Feature from a pointer and its Layer object.
         """
         if not feat:
             raise OGRException('Cannot create OGR Feature, invalid pointer given.')

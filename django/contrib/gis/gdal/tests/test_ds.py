@@ -126,8 +126,7 @@ class DataSourceTest(unittest.TestCase):
 
     def test03c_layer_references(self):
         """
-        Test to make sure Layer/Feature access is still available without
-        the DataSource/Feature.
+        Ensure OGR objects keep references to the objects they belong to.
         """
         source = ds_list[0]
 
