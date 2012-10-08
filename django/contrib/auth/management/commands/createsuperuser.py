@@ -35,12 +35,13 @@ class Command(BaseCommand):
 
         self.option_list = BaseCommand.option_list + (
             make_option('--%s' % self.username_field_name, dest='username', default=None,
-                help='Specifies the username for the superuser.'),
+                help='Specifies the %s for the superuser.' % self.username_field_name),
             make_option('--noinput', action='store_false', dest='interactive', default=True,
                 help=('Tells Django to NOT prompt the user for input of any kind. '
-                    'You must use --username with --noinput, along with an option for '
+                    'You must use --%s with --noinput, along with an option for '
                     'any other required field. Superusers created with --noinput will '
-                    ' not be able to log in until they\'re given a valid password.')),
+                    ' not be able to log in until they\'re given a valid password.' %
+                    self.username_field_name)),
             make_option('--database', action='store', dest='database',
                 default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
         ) + tuple(
@@ -48,6 +49,7 @@ class Command(BaseCommand):
                 help='Specifies the %s for the superuser.' % field)
             for field in self.required_fields
         )
+
     option_list = BaseCommand.option_list
     help = 'Used to create a superuser.'
 
