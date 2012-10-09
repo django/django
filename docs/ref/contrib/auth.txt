@@ -1,4 +1,417 @@
 ``django.contrib.auth``
 =======================
 
-See :doc:`/topics/auth`.
+
+Users
+=====
+
+.. class:: models.User
+
+API reference
+-------------
+
+Fields
+~~~~~~
+
+.. class:: models.User
+
+    :class:`~django.contrib.auth.models.User` objects have the following
+    fields:
+
+    .. attribute:: models.User.username
+
+        Required. 30 characters or fewer. Usernames may contain alphanumeric,
+        ``_``, ``@``, ``+``, ``.`` and ``-`` characters.
+
+    .. attribute:: models.User.first_name
+
+        Optional. 30 characters or fewer.
+
+    .. attribute:: models.User.last_name
+
+        Optional. 30 characters or fewer.
+
+    .. attribute:: models.User.email
+
+        Optional. Email address.
+
+    .. attribute:: models.User.password
+
+        Required. A hash of, and metadata about, the password. (Django doesn't
+        store the raw password.) Raw passwords can be arbitrarily long and can
+        contain any character. See the "Passwords" section below.
+
+    .. attribute:: models.User.is_staff
+
+        Boolean. Designates whether this user can access the admin site.
+
+    .. attribute:: models.User.is_active
+
+        Boolean. Designates whether this user account should be considered
+        active. We recommend that you set this flag to ``False`` instead of
+        deleting accounts; that way, if your applications have any foreign keys
+        to users, the foreign keys won't break.
+
+        This doesn't necessarily control whether or not the user can log in.
+        Authentication backends aren't required to check for the ``is_active``
+        flag, and the default backends do not. If you want to reject a login
+        based on ``is_active`` being ``False``, it's up to you to check that in
+        your own login view or a custom authentication backend. However, the
+        :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+        :func:`~django.contrib.auth.views.login` view (which is the default)
+        *does* perform this check, as do the permission-checking methods such
+        as :meth:`~models.User.has_perm` and the authentication in the Django
+        admin. All of those functions/methods will return ``False`` for
+        inactive users.
+
+    .. attribute:: models.User.is_superuser
+
+        Boolean. Designates that this user has all permissions without
+        explicitly assigning them.
+
+    .. attribute:: models.User.last_login
+
+        A datetime of the user's last login. Is set to the current date/time by
+        default.
+
+    .. attribute:: models.User.date_joined
+
+        A datetime designating when the account was created. Is set to the
+        current date/time by default when the account is created.
+
+Methods
+~~~~~~~
+
+.. class:: models.User
+
+    :class:`~django.contrib.auth.models.User` objects have two many-to-many
+    fields: ``groups`` and ``user_permissions``.
+    :class:`~django.contrib.auth.models.User` objects can access their related
+    objects in the same way as any other :doc:`Django model
+    </topics/db/models>`:
+
+    .. code-block:: python
+
+        myuser.groups = [group_list]
+        myuser.groups.add(group, group, ...)
+        myuser.groups.remove(group, group, ...)
+        myuser.groups.clear()
+        myuser.user_permissions = [permission_list]
+        myuser.user_permissions.add(permission, permission, ...)
+        myuser.user_permissions.remove(permission, permission, ...)
+        myuser.user_permissions.clear()
+
+    In addition to those automatic API methods,
+    :class:`~django.contrib.auth.models.User` objects have the following custom
+    methods:
+
+    .. method:: models.User.is_anonymous()
+
+        Always returns ``False``. This is a way of differentiating
+        :class:`~django.contrib.auth.models.User` and
+        :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        Generally, you should prefer using
+        :meth:`~django.contrib.auth.models.User.is_authenticated()` to this
+        method.
+
+    .. method:: models.User.is_authenticated()
+
+        Always returns ``True``. This is a way to tell if the user has been
+        authenticated. This does not imply any permissions, and doesn't check
+        if the user is active - it only indicates that the user has provided a
+        valid username and password.
+
+    .. method:: models.User.get_full_name()
+
+        Returns the :attr:`~django.contrib.auth.models.User.first_name` plus
+        the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
+        between.
+
+    .. method:: models.User.set_password(raw_password)
+
+        Sets the user's password to the given raw string, taking care of the
+        password hashing. Doesn't save the
+        :class:`~django.contrib.auth.models.User` object.
+
+    .. method:: models.User.check_password(raw_password)
+
+        Returns ``True`` if the given raw string is the correct password for
+        the user. (This takes care of the password hashing in making the
+        comparison.)
+
+    .. method:: models.User.set_unusable_password()
+
+        Marks the user as having no password set.  This isn't the same as
+        having a blank string for a password.
+        :meth:`~django.contrib.auth.models.User.check_password()` for this user
+        will never return ``True``. Doesn't save the
+        :class:`~django.contrib.auth.models.User` object.
+
+        You may need this if authentication for your application takes place
+        against an existing external source such as an LDAP directory.
+
+    .. method:: models.User.has_usable_password()
+
+        Returns ``False`` if
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
+        been called for this user.
+
+    .. method:: models.User.get_group_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, through his/her
+        groups.
+
+        If ``obj`` is passed in, only returns the group permissions for
+        this specific object.
+
+    .. method:: models.User.get_all_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, both through
+        group and user permissions.
+
+        If ``obj`` is passed in, only returns the permissions for this
+        specific object.
+
+    .. method:: models.User.has_perm(perm, obj=None)
+
+        Returns ``True`` if the user has the specified permission, where perm is
+        in the format ``"<app label>.<permission codename>"``. (see
+        `permissions`_ section below). If the user is inactive, this method will
+        always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for a permission for
+        the model, but for this specific object.
+
+    .. method:: models.User.has_perms(perm_list, obj=None)
+
+        Returns ``True`` if the user has each of the specified permissions,
+        where each perm is in the format
+        ``"<app label>.<permission codename>"``. If the user is inactive,
+        this method will always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for permissions for
+        the model, but for the specific object.
+
+    .. method:: models.User.has_module_perms(package_name)
+
+        Returns ``True`` if the user has any permissions in the given package
+        (the Django app label). If the user is inactive, this method will
+        always return ``False``.
+
+    .. method:: models.User.email_user(subject, message, from_email=None)
+
+        Sends an email to the user. If
+        :attr:`~django.contrib.auth.models.User.from_email` is ``None``, Django
+        uses the :setting:`DEFAULT_FROM_EMAIL`.
+
+    .. method:: models.User.get_profile()
+
+        .. deprecated:: 1.5
+            With the introduction of :ref:`custom User models <auth-custom-user>`,
+            the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+            model is no longer supported. See the
+            :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
+        Returns a site-specific profile for this user. Raises
+        :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
+        current site doesn't allow profiles, or
+        :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
+        have a profile. For information on how to define a site-specific user
+        profile, see the section on `storing additional user information`_ below.
+
+.. _storing additional user information: #storing-additional-information-about-users
+
+Manager functions
+~~~~~~~~~~~~~~~~~
+
+.. class:: models.UserManager
+
+    The :class:`~django.contrib.auth.models.User` model has a custom manager
+    that has the following helper functions:
+
+    .. method:: models.UserManager.create_user(username, email=None, password=None)
+
+        .. versionchanged:: 1.4
+           The ``email`` parameter was made optional. The username
+           parameter is now checked for emptiness and raises a
+           :exc:`ValueError` in case of a negative result.
+
+        Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
+
+        The :attr:`~django.contrib.auth.models.User.username` and
+        :attr:`~django.contrib.auth.models.User.password` are set as given. The
+        domain portion of :attr:`~django.contrib.auth.models.User.email` is
+        automatically converted to lowercase, and the returned
+        :class:`~django.contrib.auth.models.User` object will have
+        :attr:`~models.User.is_active` set to ``True``.
+
+        If no password is provided,
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
+        be called.
+
+        See `Creating users`_ for example usage.
+
+    .. method:: models.UserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+
+        Returns a random password with the given length and given string of
+        allowed characters. (Note that the default value of ``allowed_chars``
+        doesn't contain letters that can cause user confusion, including:
+
+        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
+          letter L, uppercase letter i, and the number one)
+        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+          and zero)
+
+
+.. _topics-auth-signals:
+
+Login and logout signals
+------------------------
+
+The auth framework uses two :doc:`signals </topics/signals>` that can be used
+for notification when a user logs in or out.
+
+.. data:: django.contrib.auth.signals.user_logged_in
+   :module:
+
+Sent when a user logs in successfully.
+
+Arguments sent with this signal:
+
+``sender``
+    The class of the user that just logged in.
+
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
+
+``user``
+    The user instance that just logged in.
+
+.. data:: django.contrib.auth.signals.user_logged_out
+   :module:
+
+Sent when the logout method is called.
+
+``sender``
+    As above: the class of the user that just logged out or ``None``
+    if the user was not authenticated.
+
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
+
+``user``
+    The user instance that just logged out or ``None`` if the
+    user was not authenticated.
+
+.. data:: django.contrib.auth.signals.user_login_failed
+   :module:
+.. versionadded:: 1.5
+
+Sent when the user failed to login successfully
+
+``sender``
+    The name of the module used for authentication.
+
+``credentials``
+    A dictonary of keyword arguments containing the user credentials that were
+    passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+    authentication backend. Credentials matching a set of 'sensitive' patterns,
+    (including password) will not be sent in the clear as part of the signal.
+
+
+
+Permission API reference
+------------------------
+
+.. currentmodule:: django.contrib.auth.models
+
+.. class:: models.Permission
+
+Fields
+~~~~~~
+
+:class:`~django.contrib.auth.models.Permission` objects have the following
+fields:
+
+.. attribute:: Permission.name
+
+    Required. 50 characters or fewer. Example: ``'Can vote'``.
+
+.. attribute:: Permission.content_type
+
+    Required. A reference to the ``django_content_type`` database table, which
+    contains a record for each installed Django model.
+
+.. attribute:: Permission.codename
+
+    Required. 100 characters or fewer. Example: ``'can_vote'``.
+
+Methods
+~~~~~~~
+
+:class:`~django.contrib.auth.models.Permission` objects have the standard
+data-access methods like any other :doc:`Django model </ref/models/instances>`.
+
+.. currentmodule:: django.contrib.auth
+
+Programmatically creating permissions
+-------------------------------------
+
+While custom permissions can be defined within a model's ``Meta`` class, you
+can also create permissions directly. For example, you can create the
+``can_publish`` permission for a ``BlogPost`` model in ``myapp``::
+
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    permission = Permission.objects.create(codename='can_publish',
+                                           name='Can Publish Posts',
+                                           content_type=content_type)
+
+The permission can then be assigned to a
+:class:`~django.contrib.auth.models.User` via its ``user_permissions``
+attribute or to a :class:`~django.contrib.auth.models.Group` via its
+``permissions`` attribute.
+
+Groups
+======
+
+Groups are a generic way of categorizing users so you can apply permissions, or
+some other label, to those users. A user can belong to any number of groups.
+
+A user in a group automatically has the permissions granted to that group. For
+example, if the group ``Site editors`` has the permission
+``can_edit_home_page``, any user in that group will have that permission.
+
+Beyond permissions, groups are a convenient way to categorize users to give
+them some label, or extended functionality. For example, you could create a
+group ``'Special users'``, and you could write code that could, say, give them
+access to a members-only portion of your site, or send them members-only email
+messages.
+
+API reference
+-------------
+
+.. class:: models.Group
+
+Fields
+~~~~~~
+
+:class:`~django.contrib.auth.models.Group` objects have the following fields:
+
+.. attribute:: Group.name
+
+    Required. 80 characters or fewer. Any characters are permitted. Example:
+    ``'Awesome Users'``.
+
+.. attribute:: Group.permissions
+
+    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
+
+        group.permissions = [permission_list]
+        group.permissions.add(permission, permission, ...)
+        group.permissions.remove(permission, permission, ...)
+        group.permissions.clear()
+
+
