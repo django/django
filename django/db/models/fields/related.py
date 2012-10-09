@@ -308,7 +308,7 @@ class SingleRelatedObjectDescriptor(object):
         related_pk = getattr(instance, self.related.field.rel.get_related_field().attname)
         if related_pk is None:
             raise ValueError('Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                                (value, self.related.opts.object_name))
+                                (value, instance._meta.object_name))
 
         # Set the value of the related field to the value of the related object's related field
         setattr(value, self.related.field.attname, related_pk)
