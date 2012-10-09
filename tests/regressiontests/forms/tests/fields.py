@@ -501,6 +501,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, 'abcd')
 
     # EmailField ##################################################################
+    # See also modeltests/validators tests for validate_email specific tests
 
     def test_emailfield_1(self):
         f = EmailField()
@@ -508,16 +509,8 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual('person@example.com', f.clean('person@example.com'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@bar')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@invalid-.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@-invalid.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@inv-.alid-.com')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@inv-.-alid.com')
-        self.assertEqual('example@valid-----hyphens.com', f.clean('example@valid-----hyphens.com'))
-        self.assertEqual('example@valid-with-hyphens.com', f.clean('example@valid-with-hyphens.com'))
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'example@.com')
-        self.assertEqual('local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com', f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
+        self.assertEqual('local@domain.with.idn.xyz\xe4\xf6\xfc\xdfabc.part.com',
+            f.clean('local@domain.with.idn.xyzäöüßabc.part.com'))
 
     def test_email_regexp_for_performance(self):
         f = EmailField()
@@ -530,17 +523,15 @@ class FieldsTests(SimpleTestCase):
                 'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
             )
 
-    def test_emailfield_2(self):
+    def test_emailfield_not_required(self):
         f = EmailField(required=False)
         self.assertEqual('', f.clean(''))
         self.assertEqual('', f.clean(None))
         self.assertEqual('person@example.com', f.clean('person@example.com'))
         self.assertEqual('example@example.com', f.clean('      example@example.com  \t   \t '))
         self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@')
-        self.assertRaisesMessage(ValidationError, "'Enter a valid email address.'", f.clean, 'foo@bar')
 
-    def test_emailfield_3(self):
+    def test_emailfield_min_max_length(self):
         f = EmailField(min_length=10, max_length=15)
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'", f.clean, 'a@foo.com')
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
