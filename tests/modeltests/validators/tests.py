@@ -28,6 +28,7 @@ TEST_DATA = (
     (validate_email, 'email@[127.0.0.1]', None),
     (validate_email, 'example@valid-----hyphens.com', None),
     (validate_email, 'example@valid-with-hyphens.com', None),
+    (validate_email, 'test@domain.with.idn.tld.उदाहरण.परीक्षा', None),
 
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
