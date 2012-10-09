@@ -88,3 +88,22 @@ class ExtensionUser(AbstractUser):
 
     class Meta:
         app_label = 'auth'
+
+
+class InvalidUsernameUser(AbstractUser):
+    """
+    A test custom user which has a required username field that is not used
+    as the USERNAME_FIELD. This is invalid for createsuperuser management
+    command which uses the 'username' kwarg in it's signature
+    """
+
+    ident = models.CharField(max_length=30)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'ident'
+    REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['username']
+
+    class Meta:
+        app_label = 'auth'
+

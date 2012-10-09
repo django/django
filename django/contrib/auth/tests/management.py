@@ -151,6 +151,23 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
+    @override_settings(AUTH_USER_MODEL='auth.InvalidUsernameUser')
+    def test_invalid_required_fields(self):
+        """
+        A custom user model having 'username' in REQUIRED_FIELDS without using
+        it as USERNAME_FIELD is invalid because of the existing signature of
+        'createsuperuser' using the username kwarg
+        """
+
+        new_io = StringIO()
+        with self.assertRaises(CommandError):
+            call_command("createsuperuser",
+                    interactive=False,
+                    username='foo',
+                    stdout=new_io,
+                    skip_validation=True
+            )
+
     @override_settings(AUTH_USER_MODEL='auth.CustomUser')
     def test_swappable_user_missing_required_field(self):
         "A Custom superuser won't be created when a required field isn't provided"

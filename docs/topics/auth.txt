@@ -1897,6 +1897,15 @@ password resets. You must then provide some key implementation details:
             ...
             REQUIRED_FIELDS = ['date_of_birth', 'height']
 
+.. note::
+
+    ``REQUIRED_FIELDS`` contains required fields that are in addition to the
+    field specified by ``USERNAME_FIELD``, you do not need to include it here
+    again. Also note that if you are going to have a field named ``username``
+    which you want to be required, it must be used as the ``USERNAME_FIELD``
+    attribute - this is a requirement of the
+    :meth:`~django.contrib.auth.models.UserManager.create_superuser` method.
+
 .. method:: User.get_full_name():
 
     A longer formal identifier for the user. A common interpretation
