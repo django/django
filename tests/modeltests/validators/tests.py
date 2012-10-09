@@ -162,11 +162,23 @@ def create_simple_test_method(validator, expected, value, num):
     if expected is not None and issubclass(expected, Exception):
         test_mask = 'test_%s_raises_error_%d'
         def test_func(self):
-            self.assertRaises(expected, validator, value)
+            # assertRaises not used, so as to be able to produce an error message
+            # containing the tested value
+            try:
+                validator(value)
+            except expected:
+                pass
+            else:
+                self.fail("%s not raised when validating '%s'" % (
+                    expected.__name__, value))
     else:
         test_mask = 'test_%s_%d'
         def test_func(self):
-            self.assertEqual(expected, validator(value))
+            try:
+                self.assertEqual(expected, validator(value))
+            except ValidationError as e:
+                self.fail("Validation of '%s' failed. Error message was: %s" % (
+                    value, str(e)))
     if isinstance(validator, types.FunctionType):
         val_name = validator.__name__
     else:
