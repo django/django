@@ -516,12 +516,8 @@ class FieldsTests(SimpleTestCase):
         f = EmailField()
         # Check for runaway regex security problem. This will take for-freeking-ever
         # if the security fix isn't in place.
-        self.assertRaisesMessage(
-                ValidationError,
-                "'Enter a valid email address.'",
-                f.clean,
-                'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
-            )
+        addr = 'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
+        self.assertEqual(addr, f.clean(addr))
 
     def test_emailfield_not_required(self):
         f = EmailField(required=False)
