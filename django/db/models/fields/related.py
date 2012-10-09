@@ -261,13 +261,17 @@ class SingleRelatedObjectDescriptor(object):
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
-            params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-            try:
-                rel_obj = self.get_query_set(instance=instance).get(**params)
-            except self.related.model.DoesNotExist:
+            related_pk = instance._get_pk_val()
+            if related_pk is None:
                 rel_obj = None
             else:
-                setattr(rel_obj, self.related.field.get_cache_name(), instance)
+                params = {'%s__pk' % self.related.field.name: related_pk}
+                try:
+                    rel_obj = self.get_query_set(instance=instance).get(**params)
+                except self.related.model.DoesNotExist:
+                    rel_obj = None
+                else:
+                    setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None:
             raise self.related.model.DoesNotExist
@@ -301,8 +305,13 @@ class SingleRelatedObjectDescriptor(object):
                     raise ValueError('Cannot assign "%r": instance is on database "%s", value is on database "%s"' %
                                         (value, instance._state.db, value._state.db))
 
+        related_pk = getattr(instance, self.related.field.rel.get_related_field().attname)
+        if related_pk is None:
+            raise ValueError('Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
+                                (value, self.related.opts.object_name))
+
         # Set the value of the related field to the value of the related object's related field
-        setattr(value, self.related.field.attname, getattr(instance, self.related.field.rel.get_related_field().attname))
+        setattr(value, self.related.field.attname, related_pk)
 
         # Since we already know what the related object is, seed the related
         # object caches now, too. This avoids another db hit if you get the
