@@ -1,16 +1,43 @@
+======================================
+Using the Django authentication system
+======================================
 
+This document explains the usage of Django's authentication system in its
+default configuration. This configuration has evolved to serve the most common
+needs of projects, handling a reasonably wide range of tasks, and has well
+vetted security handling. While this default configuration may handle the
+majority of cases as is, the design of the system supports extensive extension
+and customization which is :doc:`documented in its own section
+</topics/auth/customizing>`.
 
-Basic usage
------------
+User objects
+============
+
+:class:`~django.contrib.auth.models.User` objects are the core of the
+authentication system. They typically represent the people interacting with
+your site and are used to enable things like restricting access, registering
+user profiles, associating content with creators etc. Only one class of user
+exists in Django's authentication framework, i.e., a 'superuser' is just a user
+with the superuser flag set to True.
+
+The primary attributes of the default user are:
+
+* username
+* password
+* email
+* first name
+* last name
+
+See the :class:`full API documentation <django.contrib.auth.models.User>` for
+details.
 
 .. _topics-auth-creating-users:
 
 Creating users
 ~~~~~~~~~~~~~~
 
-The most basic way to create users is to use the
-:meth:`~django.contrib.auth.models.UserManager.create_user` helper function
-that comes with Django::
+The most basic way to create users is to use the included
+:meth:`~django.contrib.auth.models.UserManager.create_user` helper function::
 
     >>> from django.contrib.auth.models import User
     >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
@@ -18,34 +45,45 @@ that comes with Django::
     # At this point, user is a User object that has already been saved
     # to the database. You can continue to change its attributes
     # if you want to change other fields.
-    >>> user.is_staff = True
+    >>> user.last_name = 'Lennon'
     >>> user.save()
 
-You can also create users using the Django admin site. Assuming you've enabled
-the admin site and hooked it to the URL ``/admin/``, the "Add user" page is at
-``/admin/auth/user/add/``. You should also see a link to "Users" in the "Auth"
-section of the main admin index page. The "Add user" admin page is different
-than standard admin pages in that it requires you to choose a username and
-password before allowing you to edit the rest of the user's fields.
+If you have the Django admin installed, you can also create users there.
+--- link to section in admin docs
 
-Also note: if you want your own user account to be able to create users using
-the Django admin site, you'll need to give yourself permission to add users
-*and* change users (i.e., the "Add user" and "Change user" permissions). If
-your account has permission to add users but not to change them, you won't be
-able to add users. Why? Because if you have permission to add users, you have
-the power to create superusers, which can then, in turn, change other users. So
-Django requires add *and* change permissions as a slight security measure.
+.. _topics-auth-creating-superusers:
 
+Creating superusers
+-------------------
+
+:djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the
+first time you run it with ``'django.contrib.auth'`` in your
+:setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
+you can use a command line utility::
+
+    manage.py createsuperuser --username=joe --email=joe@example.com
+
+You will be prompted for a password. After you enter one, the user will be
+created immediately. If you leave off the :djadminopt:`--username` or the
+:djadminopt:`--email` options, it will prompt you for those values.
 
 Changing passwords
 ~~~~~~~~~~~~~~~~~~
+
+Django does not store raw (clear text) passwords on the user model, but only
+a hash (see :doc:`documentation of how passwords are managed
+</topics/auth/passwords>` for full details). Because of this, do not attempt to
+manipulate the password attribute of the user directly. This is why we use
+a helper function when creating a user.
+
+To change a user's password, you have several options:
 
 :djadmin:`manage.py changepassword *username* <changepassword>` offers a method
 of changing a User's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
 do not supply a user, the command will attempt to change the password
-whose username matches the current user.
+whose username matches the current system user.
 
 You can also change a password programmatically, using
 :meth:`~django.contrib.auth.models.User.set_password()`:
@@ -57,11 +95,40 @@ You can also change a password programmatically, using
     >>> u.set_password('new password')
     >>> u.save()
 
-Don't set the :attr:`~django.contrib.auth.models.User.password` attribute
-directly unless you know what you're doing. This is explained in the next
-section.
+If you have the Django admin installed, you can also change user's passwords there.
+--- link to section in admin docs
+--- link to section on forms/views for changing passwords
 
---- note to how django stores passwords
+
+
+Authentication in Web requests
+==============================
+
+Until now, this document has dealt with the low-level APIs for manipulating
+authentication-related objects. On a higher level, Django can hook this
+authentication framework into its system of
+:class:`request objects <django.http.HttpRequest>`.
+
+First, install the
+:class:`~django.contrib.sessions.middleware.SessionMiddleware` and
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+middlewares by adding them to your :setting:`MIDDLEWARE_CLASSES` setting. See
+the :doc:`session documentation </topics/http/sessions>` for more information.
+
+Once you have those middlewares installed, you'll be able to access
+:attr:`request.user <django.http.HttpRequest.user>` in views.
+:attr:`request.user <django.http.HttpRequest.user>` will give you a
+:class:`~django.contrib.auth.models.User` object representing the currently
+logged-in user. If a user isn't currently logged in,
+:attr:`request.user <django.http.HttpRequest.user>` will be set to an instance
+of :class:`~django.contrib.auth.models.AnonymousUser` (see the previous
+section). You can tell them apart with
+:meth:`~django.contrib.auth.models.User.is_authenticated()`, like so::
+
+    if request.user.is_authenticated():
+        # Do something for authenticated users.
+    else:
+        # Do something for anonymous users.
 
 Anonymous users
 ---------------
@@ -96,60 +163,6 @@ In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
 
-.. _topics-auth-creating-superusers:
-
-Creating superusers
--------------------
-
-:djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the
-first time you run it after adding ``'django.contrib.auth'`` to your
-:setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
-you can use a command line utility::
-
-    manage.py createsuperuser --username=joe --email=joe@example.com
-
-You will be prompted for a password. After you enter one, the user will be
-created immediately. If you leave off the :djadminopt:`--username` or the
-:djadminopt:`--email` options, it will prompt you for those values.
-
-If you're using an older release of Django, the old way of creating a superuser
-on the command line still works::
-
-    python /path/to/django/contrib/auth/create_superuser.py
-
-...where :file:`/path/to` is the path to the Django codebase on your
-filesystem. The ``manage.py`` command is preferred because it figures out the
-correct path and environment for you.
-
-
-Authentication in Web requests
-==============================
-
-Until now, this document has dealt with the low-level APIs for manipulating
-authentication-related objects. On a higher level, Django can hook this
-authentication framework into its system of
-:class:`request objects <django.http.HttpRequest>`.
-
-First, install the
-:class:`~django.contrib.sessions.middleware.SessionMiddleware` and
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-middlewares by adding them to your :setting:`MIDDLEWARE_CLASSES` setting. See
-the :doc:`session documentation </topics/http/sessions>` for more information.
-
-Once you have those middlewares installed, you'll be able to access
-:attr:`request.user <django.http.HttpRequest.user>` in views.
-:attr:`request.user <django.http.HttpRequest.user>` will give you a
-:class:`~django.contrib.auth.models.User` object representing the currently
-logged-in user. If a user isn't currently logged in,
-:attr:`request.user <django.http.HttpRequest.user>` will be set to an instance
-of :class:`~django.contrib.auth.models.AnonymousUser` (see the previous
-section). You can tell them apart with
-:meth:`~django.contrib.auth.models.User.is_authenticated()`, like so::
-
-    if request.user.is_authenticated():
-        # Do something for authenticated users.
-    else:
-        # Do something for anonymous users.
 
 .. _how-to-log-a-user-in:
 
@@ -258,4 +271,20 @@ How to log a user out
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
 
+Managing users in the admin
+
+You can also create users using the Django admin site. Assuming you've enabled
+the admin site and hooked it to the URL ``/admin/``, the "Add user" page is at
+``/admin/auth/user/add/``. You should also see a link to "Users" in the "Auth"
+section of the main admin index page. The "Add user" admin page is different
+than standard admin pages in that it requires you to choose a username and
+password before allowing you to edit the rest of the user's fields.
+
+Also note: if you want your own user account to be able to create users using
+the Django admin site, you'll need to give yourself permission to add users
+*and* change users (i.e., the "Add user" and "Change user" permissions). If
+your account has permission to add users but not to change them, you won't be
+able to add users. Why? Because if you have permission to add users, you have
+the power to create superusers, which can then, in turn, change other users. So
+Django requires add *and* change permissions as a slight security measure.
 
