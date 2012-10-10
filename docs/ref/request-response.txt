@@ -16,7 +16,8 @@ passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects.
+:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+module.
 
 HttpRequest objects
 ===================
