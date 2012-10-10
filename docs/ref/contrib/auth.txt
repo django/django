@@ -41,6 +41,11 @@ Fields
         store the raw password.) Raw passwords can be arbitrarily long and can
         contain any character. See the "Passwords" section below.
 
+
+
+---TODO: Groups
+
+
     .. attribute:: models.User.is_staff
 
         Boolean. Designates whether this user can access the admin site.
@@ -261,6 +266,41 @@ Manager functions
           letter L, uppercase letter i, and the number one)
         * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
           and zero)
+
+
+Anonymous users
+---------------
+
+.. class:: models.AnonymousUser
+
+    :class:`django.contrib.auth.models.AnonymousUser` is a class that
+    implements the :class:`django.contrib.auth.models.User` interface, with
+    these differences:
+
+    * :attr:`~django.contrib.auth.models.User.id` is always ``None``.
+    * :attr:`~django.contrib.auth.models.User.is_staff` and
+      :attr:`~django.contrib.auth.models.User.is_superuser` are always
+      ``False``.
+    * :attr:`~django.contrib.auth.models.User.is_active` is always ``False``.
+    * :attr:`~django.contrib.auth.models.User.groups` and
+      :attr:`~django.contrib.auth.models.User.user_permissions` are always
+      empty.
+    * :meth:`~django.contrib.auth.models.User.is_anonymous()` returns ``True``
+      instead of ``False``.
+    * :meth:`~django.contrib.auth.models.User.is_authenticated()` returns
+      ``False`` instead of ``True``.
+    * :meth:`~django.contrib.auth.models.User.set_password()`,
+      :meth:`~django.contrib.auth.models.User.check_password()`,
+      :meth:`~django.contrib.auth.models.User.save()`,
+      :meth:`~django.contrib.auth.models.User.delete()`,
+      :meth:`~django.contrib.auth.models.User.set_groups()` and
+      :meth:`~django.contrib.auth.models.User.set_permissions()` raise
+      :exc:`NotImplementedError`.
+
+In practice, you probably won't need to use
+:class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
+they're used by Web requests, as explained in the next section.
+
 
 
 .. _topics-auth-signals:
