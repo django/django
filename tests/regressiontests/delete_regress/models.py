@@ -2,7 +2,6 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-
 class Award(models.Model):
     name = models.CharField(max_length=25)
     object_id = models.PositiveIntegerField()
@@ -93,3 +92,10 @@ class FooPhoto(models.Model):
 class FooFileProxy(FooFile):
     class Meta:
         proxy = True
+
+class OrgUnit(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+
+class Login(models.Model):
+    description = models.CharField(max_length=32)
+    orgunit = models.ForeignKey(OrgUnit)

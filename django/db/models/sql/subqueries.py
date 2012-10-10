@@ -70,8 +70,9 @@ class DeleteQuery(Query):
                 self.delete_batch(values, using)
                 return
             else:
-                values = innerq
+                innerq.clear_select_clause()
                 innerq.select = [(self.get_initial_alias(), pk.column)]
+                values = innerq
             where = self.where_class()
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
             self.where = where
@@ -237,11 +238,8 @@ class DateQuery(Query):
                 % field.name
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
+        self.clear_select_clause()
         self.select = [select]
-        self.select_fields = [None]
-        self.select_related = False # See #7097.
-        self.aggregates = SortedDict() # See 18056.
-        self.set_extra_mask([])
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 
