@@ -11,7 +11,7 @@ from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
-from django.utils import six
+from django.utils import six, unittest
 
 from .models import Country, City, PennsylvaniaCity, State, Track
 
@@ -294,6 +294,13 @@ class GeoLookupTest(TestCase):
         qs = City.objects.filter(point__left=ks_border)
         self.assertEqual(2, len(qs))
         for c in qs: self.assertEqual(True, c.name in cities)
+
+    # The left/right lookup tests are known failures on PostGIS 2.0+
+    # until the following bug is fixed:
+    #  http://trac.osgeo.org/postgis/ticket/2035
+    # TODO: Ensure fixed in 2.0.2, else modify upper bound for version here.
+    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+        test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
