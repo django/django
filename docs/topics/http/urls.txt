@@ -567,9 +567,9 @@ Consider again this URLconf entry::
     from django.conf.urls import patterns, url
 
     urlpatterns = patterns('',
-	#...
+        #...
         url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
-	#...
+        #...
     )
 
 According to this design, the URL for the archive corresponding to year *nnnn*
@@ -598,7 +598,7 @@ Or in Python code::
         # ...
         return HttpResponseRedirect(reverse('news.views.year_archive', args=(year,)))
 
-If, for some reason, it was decided that the URL where content for yearly
+If, for some reason, it was decided that the URLs where content for yearly
 article archives are published at should be changed then you would only need to
 change the entry in the URLconf.
 
