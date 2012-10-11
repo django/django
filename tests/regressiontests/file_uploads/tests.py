@@ -74,15 +74,14 @@ class FileUploadTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_base64_upload(self):
-        test_string = "This data will be transmitted base64-encoded."
+    def _test_base64_upload(self, content):
         payload = client.FakePayload("\r\n".join([
             '--' + client.BOUNDARY,
             'Content-Disposition: form-data; name="file"; filename="test.txt"',
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
             '',]))
-        payload.write(b"\r\n" + base64.b64encode(force_bytes(test_string)) + b"\r\n")
+        payload.write(b"\r\n" + base64.b64encode(force_bytes(content)) + b"\r\n")
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
@@ -94,7 +93,13 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         received = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual(received['file'], test_string)
+        self.assertEqual(received['file'], content)
+
+    def test_base64_upload(self):
+        self._test_base64_upload("This data will be transmitted base64-encoded.")
+
+    def test_big_base64_upload(self):
+        self._test_base64_upload("Big data" * 68000)  # > 512Kb
 
     def test_unicode_file_name(self):
         tdir = sys_tempfile.mkdtemp()
