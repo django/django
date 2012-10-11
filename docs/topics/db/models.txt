@@ -84,7 +84,9 @@ Fields
 
 The most important part of a model -- and the only required part of a model --
 is the list of database fields it defines. Fields are specified by class
-attributes.
+attributes. Be careful not to choose field names that conflict with the
+:doc:`models API </ref/models/instances>` like ``clean``, ``save``, or
+``delete``.
 
 Example::
 
