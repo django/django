@@ -80,7 +80,12 @@ Get your database running
 If you plan to use Django's database API functionality, you'll need to make
 sure a database server is running. Django supports many different database
 servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
-SQLite_ (although SQLite doesn't require a separate server to be running).
+SQLite_.
+
+It is common practice to use SQLite in a desktop development environment.
+Unless you need database feature parity between your desktop development
+environment and your deployment environment, using SQLite for development is
+generally the simplest option as it doesn't require running a separate server.
 
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
