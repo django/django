@@ -589,6 +589,8 @@ to a faster hashing algorithm::
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
 
+.. _topics-testing-code-coverage:
+
 Integration with coverage.py
 ----------------------------
 
