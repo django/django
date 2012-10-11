@@ -173,10 +173,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 class PermissionDuplicationTestCase(TestCase):
 
     def setUp(self):
-        self._original_user_permission = models.User._meta.permissions
+        self._original_permissions = models.Permission._meta.permissions[:]
 
-    def tearUp(self):
-        models.User._meta.permissions = self._original_user_permissions
+    def tearDown(self):
+        models.Permission._meta.permissions = self._original_permissions
 
     def test_duplicated_permissions(self):
         """
