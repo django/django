@@ -3,9 +3,20 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 
 class PostGISCreation(DatabaseCreation):
+    template_postgis = None
     geom_index_type = 'GIST'
     geom_index_ops = 'GIST_GEOMETRY_OPS'
     geom_index_ops_nd = 'GIST_GEOMETRY_OPS_ND'
+
+    def __init__(self, *args, **kwargs):
+        super(PostGISCreation, self).__init__(*args, **kwargs)
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT datname FROM pg_database;')
+        db_names = [row[0] for row in cursor.fetchall()]
+        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
+
+        if template_postgis in db_names:
+            self.template_postgis = template_postgis
 
     def sql_indexes_for_field(self, model, f, style):
         "Return any spatial index creation SQL for the field."
@@ -67,5 +78,7 @@ class PostGISCreation(DatabaseCreation):
         return output
 
     def sql_table_creation_suffix(self):
-        postgis_template = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-        return ' TEMPLATE %s' % self.connection.ops.quote_name(postgis_template)
+        if self.template_postgis is not None:
+            qn = self.connection.ops.quote_name
+            return ' TEMPLATE %s' % qn(self.template_postgis)
+        return ''
