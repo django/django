@@ -35,7 +35,7 @@ DATETIME_INPUT_FORMATS = (
     '%Y-%m-%d',             # '2006-10-25'
 )
 
-# these are the separators for non-monetary numbers. For monetary numbers, 
+# these are the separators for non-monetary numbers. For monetary numbers,
 # the DECIMAL_SEPARATOR is a . (decimal point) and the THOUSAND_SEPARATOR is a
 # ' (single quote).
 # For details, please refer to http://www.bk.admin.ch/dokumentation/sprachen/04915/05016/index.html?lang=de
