@@ -158,6 +158,16 @@ Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
 choice at this point.
 
+If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
+tables, ensure that your tables are using the same storage engine (i.e. MyISAM
+vs. InnoDB). Specifically, if tables that have a ``ForeignKey`` between them
+use different storage engines, you may see an error like the following when
+running ``syncdb``::
+
+    _mysql_exceptions.OperationalError: (
+        1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
+    )
+
 .. versionchanged:: 1.4
 
 In previous versions of Django, fixtures with forward references (i.e.
