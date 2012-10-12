@@ -282,7 +282,7 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.extent3d`          X
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
-:meth:`GeoQuerySet.geojson`           X
+:meth:`GeoQuerySet.geojson`           X                X
 :meth:`GeoQuerySet.gml`               X        X       X
 :meth:`GeoQuerySet.intersection`      X        X       X
 :meth:`GeoQuerySet.kml`               X                X

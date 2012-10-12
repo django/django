@@ -474,21 +474,21 @@ class GeoQuerySetTest(TestCase):
 
     def test_geojson(self):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
-        # Only PostGIS 1.3.4+ supports GeoJSON.
+        # Only PostGIS 1.3.4+ and SpatiaLite 3.0+ support GeoJSON.
         if not connection.ops.geojson:
             self.assertRaises(NotImplementedError, Country.objects.all().geojson, field_name='mpoly')
             return
 
-        if connection.ops.spatial_version >= (1, 4, 0):
-            pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
-            houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
-            victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
-            chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
-        else:
+        pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
+        houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
+        victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
+        chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        if postgis and connection.ops.spatial_version < (1, 4, 0):
             pueblo_json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
             houston_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
             victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
-            chicago_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        elif spatialite:
+            victoria_json = '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],"coordinates":[-123.305196,48.462611]}'
 
         # Precision argument should only be an integer
         self.assertRaises(TypeError, City.objects.geojson, precision='foo')
