@@ -138,7 +138,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         new_io = StringIO()
         call_command("createsuperuser",
             interactive=False,
-            username="joe@somewhere.org",
+            email="joe@somewhere.org",
             date_of_birth="1976-04-01",
             stdout=new_io,
             skip_validation=True

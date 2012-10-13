@@ -1878,47 +1878,54 @@ The easiest way to construct a compliant custom User model is to inherit from
 implementation of a `User` model, including hashed passwords and tokenized
 password resets. You must then provide some key implementation details:
 
-.. attribute:: User.USERNAME_FIELD
+.. class:: models.CustomUser
 
-    A string describing the name of the field on the User model that is
-    used as the unique identifier. This will usually be a username of
-    some kind, but it can also be an email address, or any other unique
-    identifier. In the following example, the field `identifier` is used
-    as the identifying field::
+    .. attribute:: User.USERNAME_FIELD
 
-        class MyUser(AbstractBaseUser):
-            identfier = models.CharField(max_length=40, unique=True, db_index=True)
-            ...
-            USERNAME_FIELD = 'identifier'
+        A string describing the name of the field on the User model that is
+        used as the unique identifier. This will usually be a username of
+        some kind, but it can also be an email address, or any other unique
+        identifier. In the following example, the field `identifier` is used
+        as the identifying field::
 
-.. attribute:: User.REQUIRED_FIELDS
+            class MyUser(AbstractBaseUser):
+                identfier = models.CharField(max_length=40, unique=True, db_index=True)
+                ...
+                USERNAME_FIELD = 'identifier'
 
-    A list of the field names that *must* be provided when creating
-    a user. For example, here is the partial definition for a User model
-    that defines two required fields - a date of birth and height::
+    .. attribute:: User.REQUIRED_FIELDS
 
-        class MyUser(AbstractBaseUser):
-            ...
-            date_of_birth = models.DateField()
-            height = models.FloatField()
-            ...
-            REQUIRED_FIELDS = ['date_of_birth', 'height']
+        A list of the field names that *must* be provided when creating
+        a user. For example, here is the partial definition for a User model
+        that defines two required fields - a date of birth and height::
 
-.. method:: User.get_full_name():
+            class MyUser(AbstractBaseUser):
+                ...
+                date_of_birth = models.DateField()
+                height = models.FloatField()
+                ...
+                REQUIRED_FIELDS = ['date_of_birth', 'height']
 
-    A longer formal identifier for the user. A common interpretation
-    would be the full name name of the user, but it can be any string that
-    identifies the user.
+        .. note::
 
-.. method:: User.get_short_name():
+            ``REQUIRED_FIELDS`` must contain all required fields on your User
+            model, but should *not* contain the ``USERNAME_FIELD``.
 
-    A short, informal identifier for the user. A common interpretation
-    would be the first name of the user, but it can be any string that
-    identifies the user in an informal way. It may also return the same
-    value as :meth:`django.contrib.auth.User.get_full_name()`.
+    .. method:: User.get_full_name():
+
+        A longer formal identifier for the user. A common interpretation
+        would be the full name name of the user, but it can be any string that
+        identifies the user.
+
+    .. method:: User.get_short_name():
+
+        A short, informal identifier for the user. A common interpretation
+        would be the first name of the user, but it can be any string that
+        identifies the user in an informal way. It may also return the same
+        value as :meth:`django.contrib.auth.User.get_full_name()`.
 
 The following methods are available on any subclass of
-:class:`~django.contrib.auth.models.AbstractBaseUser`::
+:class:`~django.contrib.auth.models.AbstractBaseUser`:
 
 .. class:: models.AbstractBaseUser
 
@@ -1979,33 +1986,36 @@ defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
 additional methods:
 
-.. method:: UserManager.create_user(username, password=None, **other_fields)
+.. class:: models.CustomUserManager
 
-    The prototype of `create_user()` should accept all required fields
-    as arguments. For example, if your user model defines `username`,
-    and `date_of_birth` as required fields, then create_user should be
-    defined as::
+    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, **other_fields)
 
-        def create_user(self, username, date_of_birth, password=None):
-            # create user here
+        The prototype of `create_user()` should accept the username field,
+        plus all required fields as arguments. For example, if your user model
+        uses `email` as the username field, and has `date_of_birth` as a required
+        fields, then create_user should be defined as::
 
-.. method:: UserManager.create_superuser(username, password, **other_fields)
+            def create_user(self, email, date_of_birth, password=None):
+                # create user here
 
-    The prototype of `create_superuser()` should accept all required fields
-    as arguments. For example, if your user model defines `username`,
-    and `date_of_birth` as required fields, then create_user should be
-    defined as::
+    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
 
-        def create_superuser(self, username, date_of_birth, password):
-            # create superuser here
+        The prototype of `create_user()` should accept the username field,
+        plus all required fields as arguments. For example, if your user model
+        uses `email` as the username field, and has `date_of_birth` as a required
+        fields, then create_superuser should be defined as::
 
-    Unlike `create_user()`, `create_superuser()` *must* require the caller
-    to provider a password.
+            def create_superuser(self, email, date_of_birth, password):
+                # create superuser here
+
+        Unlike `create_user()`, `create_superuser()` *must* require the caller
+        to provider a password.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
 
 .. class:: models.BaseUserManager
+
     .. method:: models.BaseUserManager.normalize_email(email)
 
         A classmethod that normalizes email addresses by lowercasing
@@ -2165,12 +2175,12 @@ authentication app::
             user.save(using=self._db)
             return user
 
-        def create_superuser(self, username, date_of_birth, password):
+        def create_superuser(self, email, date_of_birth, password):
             """
             Creates and saves a superuser with the given email, date of
             birth and password.
             """
-            user = self.create_user(username,
+            user = self.create_user(email,
                 password=password,
                 date_of_birth=date_of_birth
             )
@@ -2223,7 +2233,7 @@ authentication app::
             return self.is_admin
 
 Then, to register this custom User model with Django's admin, the following
-code would be required in ``admin.py``::
+code would be required in the app's ``admin.py`` file::
 
     from django import forms
     from django.contrib import admin
@@ -2249,7 +2259,7 @@ code would be required in ``admin.py``::
             password1 = self.cleaned_data.get("password1")
             password2 = self.cleaned_data.get("password2")
             if password1 and password2 and password1 != password2:
-                raise forms.ValidationError('Passwords don't match')
+                raise forms.ValidationError("Passwords don't match")
             return password2
 
         def save(self, commit=True):
