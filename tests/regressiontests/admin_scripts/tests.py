@@ -1428,10 +1428,25 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
         args = ['startproject', '7testproject']
         testproject_dir = os.path.join(test_dir, '7testproject')
+        self.addCleanup(cleanup, testproject_dir)
 
         out, err = self.run_django_admin(args)
-        self.addCleanup(cleanup, testproject_dir)
         self.assertOutput(err, "Error: '7testproject' is not a valid project name. Please make sure the name begins with a letter or underscore.")
+        self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_path_as_project_name(self):
+        "Make sure the startproject management command validates a project name"
+
+        def cleanup(p):
+            if os.path.exists(p):
+                shutil.rmtree(p)
+
+        args = ['startproject', '../testproject']
+        testproject_dir = os.path.join(test_dir, '../testproject')
+        self.addCleanup(cleanup, testproject_dir)
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(err, "Error: '../testproject' is not a valid project name. Please make sure the name begins with a letter or underscore.")
         self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):
