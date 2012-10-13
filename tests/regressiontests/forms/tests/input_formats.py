@@ -9,7 +9,8 @@ from django.test import SimpleTestCase
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)
 class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
-        activate('de')
+        # nl/formats.py has customized TIME_INPUT_FORMATS
+        activate('nl')
 
     def tearDown(self):
         deactivate()
@@ -92,7 +93,7 @@ class LocalizedTimeTests(SimpleTestCase):
         result = f.clean('13.30.05')
         self.assertEqual(result, time(13,30,5))
 
-        # # Check that the parsed result does a round trip to the same format
+        # Check that the parsed result does a round trip to the same format
         text = f.widget._format_value(result)
         self.assertEqual(text, "13:30:05")
 
@@ -301,6 +302,9 @@ class LocalizedDateTests(SimpleTestCase):
         f = forms.DateField()
         # Parse a date in an unaccepted format; get an error
         self.assertRaises(forms.ValidationError, f.clean, '21/12/2010')
+
+        # ISO formats are accepted, even if not specified in formats.py
+        self.assertEqual(f.clean('2010-12-21'), date(2010,12,21))
 
         # Parse a date in a valid format, get a parsed result
         result = f.clean('21.12.2010')
@@ -584,6 +588,9 @@ class LocalizedDateTimeTests(SimpleTestCase):
         f = forms.DateTimeField()
         # Parse a date in an unaccepted format; get an error
         self.assertRaises(forms.ValidationError, f.clean, '1:30:05 PM 21/12/2010')
+
+        # ISO formats are accepted, even if not specified in formats.py
+        self.assertEqual(f.clean('2010-12-21 13:30:05'), datetime(2010,12,21,13,30,5))
 
         # Parse a date in a valid format, get a parsed result
         result = f.clean('21.12.2010 13:30:05')
