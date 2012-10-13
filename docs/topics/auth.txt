@@ -2083,9 +2083,23 @@ auth views.
 Custom users and django.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want your custom User model to also work with Admin, your User model must
-define some additional attributes and methods. These methods allow the admin to
-control access of the User to admin content:
+If you want your custom user model to also work with the authentication
+system's default :class:`~django.contrib.admin.ModelAdmin`
+(:class:`django.contrib.auth.admin.UserAdmin`), your user model must meet some
+additional criteria.  The permission related methods are required and used by
+the admin to control access of the User to admin content:
+
+.. note::
+
+    Your custom user does not need to use the ModelAdmin provided by
+    contrib.auth in order to be usable by the admin
+    :class:`~django.contrib.auth.admin.UserAdmin` can be subclassed or
+    replaced based on the details of your custom user.
+
+.. attribute:: User.username
+
+    ``UserAdmin`` assumes that your model will provide a field named 'username'
+    - and that this field is set as the ``USERNAME_FIELD`` for the class.
 
 .. attribute:: User.is_staff
 
