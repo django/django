@@ -19,10 +19,6 @@ DATE_INPUT_FORMATS = (
     '%d/%m/%Y', # '31/12/2009'
     '%d/%m/%y', # '31/12/09'
 )
-TIME_INPUT_FORMATS = (
-    '%H:%M:%S', # '14:30:59'
-    '%H:%M',    # '14:30'
-)
 DATETIME_INPUT_FORMATS = (
     '%d/%m/%Y %H:%M:%S',
     '%d/%m/%Y %H:%M',
