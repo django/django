@@ -52,6 +52,9 @@ class ReadOnlyPasswordHashField(forms.Field):
         kwargs.setdefault("required", False)
         super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
 
+    def clean_password(self):
+        return self.initial
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -118,9 +121,6 @@ class UserChangeForm(forms.ModelForm):
                     "this user's password, but you can change the password "
                     "using <a href=\"password/\">this form</a>."))
 
-    def clean_password(self):
-        return self.initial["password"]
-
     class Meta:
         model = User
 
@@ -160,7 +160,7 @@ class AuthenticationForm(forms.Form):
 
         # Set the label for the "username" field.
         UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         self.fields['username'].label = capfirst(username_field.verbose_name)
 
     def clean(self):

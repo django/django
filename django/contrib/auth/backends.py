@@ -105,7 +105,7 @@ class RemoteUserBackend(ModelBackend):
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
             user, created = UserModel.objects.get_or_create(**{
-                getattr(UserModel, 'USERNAME_FIELD', 'username'): username
+                UserModel.USERNAME_FIELD: username
             })
             if created:
                 user = self.configure_user(user)

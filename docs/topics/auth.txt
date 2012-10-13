@@ -149,6 +149,12 @@ Methods
     :class:`~django.contrib.auth.models.User` objects have the following custom
     methods:
 
+    .. method:: models.User.get_username()
+
+        Returns the username for the user. Since the User model can be swapped
+        out, you should use  this method instead of referencing the username
+        attribute directly.
+
     .. method:: models.User.is_anonymous()
 
         Always returns ``False``. This is a way of differentiating
@@ -1826,11 +1832,12 @@ different User model.
 Instead of referring to :class:`~django.contrib.auth.models.User` directly,
 you should reference the user model using
 :func:`django.contrib.auth.get_user_model()`. This method will return the
-currently  active User model -- the custom User model if one is specified, or
+currently active User model -- the custom User model if one is specified, or
 :class:`~django.contrib.auth.User` otherwise.
 
-In relations to the User model, you should specify the custom model using
-the :setting:`AUTH_USER_MODEL` setting. For example::
+When you define a foreign key or many-to-many relations to the User model,
+you should specify the custom model using the :setting:`AUTH_USER_MODEL`
+setting. For example::
 
     from django.conf import settings
     from django.db import models
@@ -1910,6 +1917,60 @@ password resets. You must then provide some key implementation details:
     identifies the user in an informal way. It may also return the same
     value as :meth:`django.contrib.auth.User.get_full_name()`.
 
+The following methods are available on any subclass of
+:class:`~django.contrib.auth.models.AbstractBaseUser`::
+
+.. class:: models.AbstractBaseUser
+
+    .. method:: models.AbstractBaseUser.get_username()
+
+        Returns the value of the field nominated by ``USERNAME_FIELD``.
+
+    .. method:: models.AbstractBaseUser.is_anonymous()
+
+        Always returns ``False``. This is a way of differentiating
+        from  :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        Generally, you should prefer using
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
+        method.
+
+    .. method:: models.AbstractBaseUser.is_authenticated()
+
+        Always returns ``True``. This is a way to tell if the user has been
+        authenticated. This does not imply any permissions, and doesn't check
+        if the user is active - it only indicates that the user has provided a
+        valid username and password.
+
+    .. method:: models.AbstractBaseUser.set_password(raw_password)
+
+        Sets the user's password to the given raw string, taking care of the
+        password hashing. Doesn't save the
+        :class:`~django.contrib.auth.models.AbstractBaseUser` object.
+
+    .. method:: models.AbstractBaseUser.check_password(raw_password)
+
+        Returns ``True`` if the given raw string is the correct password for
+        the user. (This takes care of the password hashing in making the
+        comparison.)
+
+    .. method:: models.AbstractBaseUser.set_unusable_password()
+
+        Marks the user as having no password set.  This isn't the same as
+        having a blank string for a password.
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password()` for this user
+        will never return ``True``. Doesn't save the
+        :class:`~django.contrib.auth.models.AbstractBaseUser` object.
+
+        You may need this if authentication for your application takes place
+        against an existing external source such as an LDAP directory.
+
+    .. method:: models.AbstractBaseUser.has_usable_password()
+
+        Returns ``False`` if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
+        been called for this user.
+
+
 You should also define a custom manager for your User model. If your User
 model defines `username` and `email` fields the same as Django's default User,
 you can just install Django's
@@ -1940,6 +2001,31 @@ additional methods:
 
     Unlike `create_user()`, `create_superuser()` *must* require the caller
     to provider a password.
+
+:class:`~django.contrib.auth.models.BaseUserManager` provides the following
+utility methods:
+
+.. class:: models.BaseUserManager
+    .. method:: models.BaseUserManager.normalize_email(email)
+
+        A classmethod that normalizes email addresses by lowercasing
+        the domain portion of the email address.
+
+    .. method:: models.BaseUserManager.get_by_natural_key(username)
+
+        Retrieves a user instance using the contents of the field
+        nominated by ``USERNAME_FIELD``.
+
+    .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+
+        Returns a random password with the given length and given string of
+        allowed characters. (Note that the default value of ``allowed_chars``
+        doesn't contain letters that can cause user confusion, including:
+
+        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
+          letter L, uppercase letter i, and the number one)
+        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+          and zero)
 
 Extending Django's default User
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2020,6 +2106,16 @@ control access of the User to admin content:
     Returns True if the user has permission to access models in
     the given app.
 
+You will also need to register your custom User model with the admin. If
+your custom User model extends :class:`~django.contrib.auth.models.AbstractUser`,
+you can use Django's existing :class:`~django.contrib.auth.admin.UserAdmin`
+class. However, if your User model extends
+:class:`~django.contrib.auth.models.AbstractBaseUser`, you'll need to define
+a custom ModelAdmin class. It may be possible to subclass the default
+:class:`~django.contrib.auth.admin.UserAdmin`; however, you'll need to
+override any of the definitions that refer to fields on
+:class:`~django.contrib.auth.models.AbstractUser` that aren't on your
+custom User class.
 
 Custom users and Proxy models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2036,11 +2132,11 @@ behavior into your User subclass.
 A full example
 --------------
 
-Here is an example of a full models.py for an admin-compliant custom
-user app. This user model uses an email address as the username, and has a
-required date of birth; it provides no permission checking, beyond a simple
-`admin` flag on the user account. This model would be compatible with all
-the built-in auth forms and views, except for the User creation forms.
+Here is an example of an admin-compliant custom user app. This user model uses
+an email address as the username, and has a required date of birth; it
+provides no permission checking, beyond a simple `admin` flag on the user
+account. This model would be compatible with all the built-in auth forms and
+views, except for the User creation forms.
 
 This code would all live in a ``models.py`` file for a custom
 authentication app::
@@ -2086,7 +2182,9 @@ authentication app::
     class MyUser(AbstractBaseUser):
         email = models.EmailField(
             verbose_name='email address',
-            max_length=255
+            max_length=255,
+            unique=True,
+            db_index=True,
         )
         date_of_birth = models.DateField()
         is_active = models.BooleanField(default=True)
@@ -2124,6 +2222,87 @@ authentication app::
             # Simplest possible answer: All admins are staff
             return self.is_admin
 
+Then, to register this custom User model with Django's admin, the following
+code would be required in ``admin.py``::
+
+    from django import forms
+    from django.contrib import admin
+    from django.contrib.auth.models import Group
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.forms import ReadOnlyPasswordHashField
+
+    from customauth.models import MyUser
+
+
+    class UserCreationForm(forms.ModelForm):
+        """A form for creating new users. Includes all the required
+        fields, plus a repeated password."""
+        password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+        password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+        class Meta:
+            model = MyUser
+            fields = ('email', 'date_of_birth')
+
+        def clean_password2(self):
+            # Check that the two password entries match
+            password1 = self.cleaned_data.get("password1")
+            password2 = self.cleaned_data.get("password2")
+            if password1 and password2 and password1 != password2:
+                raise forms.ValidationError('Passwords don't match')
+            return password2
+
+        def save(self, commit=True):
+            # Save the provided password in hashed format
+            user = super(UserCreationForm, self).save(commit=False)
+            user.set_password(self.cleaned_data["password1"])
+            if commit:
+                user.save()
+            return user
+
+
+    class UserChangeForm(forms.ModelForm):
+        """A form for updateing users. Includes all the fields on
+        the user, but replaces the password field with admin's
+        pasword hash display field.
+        """
+        password = ReadOnlyPasswordHashField()
+
+        class Meta:
+            model = MyUser
+
+
+    class MyUserAdmin(UserAdmin):
+        # The forms to add and change user instances
+        form = UserChangeForm
+        add_form = UserCreationForm
+
+        # The fields to be used in displaying the User model.
+        # These override the definitions on the base UserAdmin
+        # that reference specific fields on auth.User.
+        list_display = ('email', 'date_of_birth', 'is_admin')
+        list_filter = ('is_admin',)
+        fieldsets = (
+            (None, {'fields': ('email', 'password')}),
+            ('Personal info', {'fields': ('date_of_birth',)}),
+            ('Permissions', {'fields': ('is_admin',)}),
+            ('Important dates', {'fields': ('last_login',)}),
+        )
+        add_fieldsets = (
+            (None, {
+                'classes': ('wide',),
+                'fields': ('email', 'date_of_birth', 'password1', 'password2')}
+            ),
+        )
+        search_fields = ('email',)
+        ordering = ('email',)
+        filter_horizontal = ()
+
+    # Now register the new UserAdmin...
+    admin.site.register(MyUser, MyUserAdmin)
+    # ... and, since we're not using Django's builtin permissions,
+    # unregister the Group model from admin.
+    admin.site.unregister(Group)
 
 .. _authentication-backends:
 

@@ -11,13 +11,12 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import escape
 from django.utils.decorators import method_decorator
-from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
 csrf_protect_m = method_decorator(csrf_protect)
+
 
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
@@ -106,9 +105,10 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
+        username_field = self.model._meta.get_field(self.model.USERNAME_FIELD)
         defaults = {
             'auto_populated_fields': (),
-            'username_help_text': self.model._meta.get_field('username').help_text,
+            'username_help_text': username_field.help_text,
         }
         extra_context.update(defaults)
         return super(UserAdmin, self).add_view(request, form_url,
@@ -171,4 +171,3 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
-

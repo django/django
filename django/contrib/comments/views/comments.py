@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
 
-
 class CommentPostBadRequest(http.HttpResponseBadRequest):
     """
     Response returned when a comment post is invalid. If ``DEBUG`` is on a
@@ -26,6 +25,7 @@ class CommentPostBadRequest(http.HttpResponseBadRequest):
         super(CommentPostBadRequest, self).__init__()
         if settings.DEBUG:
             self.content = render_to_string("comments/400-debug.html", {"why": why})
+
 
 @csrf_protect
 @require_POST
@@ -40,7 +40,7 @@ def post_comment(request, next=None, using=None):
     data = request.POST.copy()
     if request.user.is_authenticated():
         if not data.get('name', ''):
-            data["name"] = request.user.get_full_name() or request.user.username
+            data["name"] = request.user.get_full_name() or request.user.get_username()
         if not data.get('email', ''):
             data["email"] = request.user.email
 
@@ -98,8 +98,8 @@ def post_comment(request, next=None, using=None):
         ]
         return render_to_response(
             template_list, {
-                "comment" : form.data.get("comment", ""),
-                "form" : form,
+                "comment": form.data.get("comment", ""),
+                "form": form,
                 "next": next,
             },
             RequestContext(request, {})
@@ -113,9 +113,9 @@ def post_comment(request, next=None, using=None):
 
     # Signal that the comment is about to be saved
     responses = signals.comment_will_be_posted.send(
-        sender  = comment.__class__,
-        comment = comment,
-        request = request
+        sender=comment.__class__,
+        comment=comment,
+        request=request
     )
 
     for (receiver, response) in responses:
@@ -126,15 +126,14 @@ def post_comment(request, next=None, using=None):
     # Save the comment and signal that it was saved
     comment.save()
     signals.comment_was_posted.send(
-        sender  = comment.__class__,
-        comment = comment,
-        request = request
+        sender=comment.__class__,
+        comment=comment,
+        request=request
     )
 
     return next_redirect(data, next, comment_done, c=comment._get_pk_val())
 
 comment_done = confirmation_view(
-    template = "comments/posted.html",
-    doc = """Display a "comment was posted" success page."""
+    template="comments/posted.html",
+    doc="""Display a "comment was posted" success page."""
 )
-

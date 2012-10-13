@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
         UserModel = get_user_model()
 
-        username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         other_fields = UserModel.REQUIRED_FIELDS
 
         # If not provided, create the user with an unusable password
@@ -74,7 +74,7 @@ class Command(BaseCommand):
 
                 # Get a username
                 while username is None:
-                    username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
+                    username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
                     if not username:
                         input_msg = capfirst(username_field.verbose_name)
                         if default_username:
@@ -91,7 +91,7 @@ class Command(BaseCommand):
                         continue
                     try:
                         UserModel.objects.using(database).get(**{
-                                getattr(UserModel, 'USERNAME_FIELD', 'username'): username
+                                UserModel.USERNAME_FIELD: username
                             })
                     except UserModel.DoesNotExist:
                         pass
