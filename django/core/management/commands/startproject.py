@@ -10,8 +10,7 @@ class Command(TemplateCommand):
             "given directory.")
 
     def handle(self, project_name=None, target=None, *args, **options):
-        if project_name is None:
-            raise CommandError("you must provide a project name")
+        self.validate_name(project_name, "project")
 
         # Check that the project_name cannot be imported.
         try:
