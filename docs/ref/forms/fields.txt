@@ -414,6 +414,8 @@ For each field, we describe the default widget used if you don't specify
         '%d %B %Y',       # '25 October 2006'
         '%d %B, %Y',      # '25 October, 2006'
 
+    See also :ref:`format localization <format-localization>`.
+
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
 
@@ -444,6 +446,8 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
