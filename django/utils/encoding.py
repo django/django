@@ -107,16 +107,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
                     else:
                         s = six.text_type(bytes(s), encoding, errors)
                 except UnicodeEncodeError:
-                    if not isinstance(s, Exception):
-                        raise
-                    # If we get to here, the caller has passed in an Exception
-                    # subclass populated with non-ASCII data without special
-                    # handling to display as a string. We need to handle this
-                    # without raising a further exception. We do an
-                    # approximation to what the Exception's standard str()
-                    # output should be.
-                    s = ' '.join([force_text(arg, encoding, strings_only,
-                            errors) for arg in s])
+                    raise
         else:
             # Note: We use .decode() here, instead of six.text_type(s, encoding,
             # errors), so that if s is a SafeBytes, it ends up being a
