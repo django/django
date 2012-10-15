@@ -73,16 +73,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
                 try:
                     s = unicode(str(s), encoding, errors)
                 except UnicodeEncodeError:
-                    if not isinstance(s, Exception):
-                        raise
-                    # If we get to here, the caller has passed in an Exception
-                    # subclass populated with non-ASCII data without special
-                    # handling to display as a string. We need to handle this
-                    # without raising a further exception. We do an
-                    # approximation to what the Exception's standard str()
-                    # output should be.
-                    s = u' '.join([force_unicode(arg, encoding, strings_only,
-                            errors) for arg in s])
+                    raise                        
         elif not isinstance(s, unicode):
             # Note: We use .decode() here, instead of unicode(s, encoding,
             # errors), so that if s is a SafeString, it ends up being a
