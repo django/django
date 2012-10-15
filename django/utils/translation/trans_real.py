@@ -273,7 +273,8 @@ else:
         return do_translate(message, 'ugettext')
 
 def pgettext(context, message):
-    result = ugettext("%s%s%s" % (context, CONTEXT_SEPARATOR, message))
+    msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
+    result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -319,9 +320,10 @@ else:
         return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = ungettext("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
-                        number)
+    msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                      "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                      number)
+    result = ungettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = ungettext(singular, plural, number)
