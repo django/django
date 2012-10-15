@@ -160,6 +160,9 @@ class SortedDict(dict):
     def __iter__(self):
         return iter(self.keyOrder)
 
+    def __reversed__(self):
+        return reversed(self.keyOrder)
+
     def pop(self, k, *args):
         result = super(SortedDict, self).pop(k, *args)
         try:
