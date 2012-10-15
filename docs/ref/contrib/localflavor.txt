@@ -99,6 +99,7 @@ The following countries have django-localflavor- packages.
 * Italy: https://github.com/django/django-localflavor-it
 * Japan: https://github.com/django/django-localflavor-jp
 * Kuwait: https://github.com/django/django-localflavor-kw
+* Lithuania: https://github.com/simukis/django-localflavor-lt
 * Macedonia: https://github.com/django/django-localflavor-mk
 * Mexico: https://github.com/django/django-localflavor-mx
 * The Netherlands: https://github.com/django/django-localflavor-nl
