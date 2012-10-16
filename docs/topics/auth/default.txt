@@ -133,9 +133,10 @@ Django provides two functions in :mod:`django.contrib.auth`:
 .. function:: authenticate()
 
     To authenticate a given username and password, use
-    :func:`~django.contrib.auth.authenticate()`. It takes two keyword
-    arguments, ``username`` and ``password``, and it returns a
-    :class:`~django.contrib.auth.models.User` object if the password is valid
+    :func:`~django.contrib.auth.authenticate()`. It takes credentials in the
+    form of keyword arguments, in the default configuration this is
+    ``username`` and ``password``, and it returns
+    a :class:`~django.contrib.auth.models.User` object if the password is valid
     for the given username. If the password is invalid,
     :func:`~django.contrib.auth.authenticate()` returns ``None``. Example::
 
