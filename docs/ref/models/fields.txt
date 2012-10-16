@@ -971,6 +971,12 @@ need to use::
 This sort of reference can be useful when resolving circular import
 dependencies between two applications.
 
+A database index is automatically created on the ``ForeignKey``. You can
+disable this by setting :attr:`~Field.db_index` to ``False``.  You may want to
+avoid the overhead of an index if you are creating a foreign key for
+consistency rather than joins, or if you will be creating an alternative index
+like a partial or multiple column index.
+
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
