@@ -136,7 +136,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(max_length=30)
+    username = forms.CharField(max_length=254)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
@@ -198,7 +198,7 @@ class PasswordResetForm(forms.Form):
         'unusable': _("The user account associated with this email "
                       "address cannot reset the password."),
     }
-    email = forms.EmailField(label=_("Email"), max_length=75)
+    email = forms.EmailField(label=_("Email"), max_length=254)
 
     def clean_email(self):
         """
