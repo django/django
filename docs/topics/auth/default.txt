@@ -17,8 +17,9 @@ User objects
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., a 'superuser' is just a user
-with the superuser flag set to True.
+exists in Django's authentication framework, i.e., 'superusers' or admin
+'staff' users are is just a user objects with special attributes set, not
+different classes of user objects.
 
 The primary attributes of the default user are:
 
@@ -29,14 +30,14 @@ The primary attributes of the default user are:
 * last name
 
 See the :class:`full API documentation <django.contrib.auth.models.User>` for
-details.
+full reference, the documentation that follows is more task oriented.
 
 .. _topics-auth-creating-users:
 
 Creating users
-~~~~~~~~~~~~~~
+--------------
 
-The most basic way to create users is to use the included
+The most direct way to create users is to use the included
 :meth:`~django.contrib.auth.models.UserManager.create_user` helper function::
 
     >>> from django.contrib.auth.models import User
@@ -68,13 +69,13 @@ created immediately. If you leave off the :djadminopt:`--username` or the
 :djadminopt:`--email` options, it will prompt you for those values.
 
 Changing passwords
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Django does not store raw (clear text) passwords on the user model, but only
 a hash (see :doc:`documentation of how passwords are managed
 </topics/auth/passwords>` for full details). Because of this, do not attempt to
-manipulate the password attribute of the user directly. This is why we use
-a helper function when creating a user.
+manipulate the password attribute of the user directly. This is why a a helper
+function is used when creating a user.
 
 To change a user's password, you have several options:
 
@@ -100,69 +101,25 @@ If you have the Django admin installed, you can also change user's passwords the
 --- link to section on forms/views for changing passwords
 
 
-
 Authentication in Web requests
 ==============================
 
-Until now, this document has dealt with the low-level APIs for manipulating
-authentication-related objects. On a higher level, Django can hook this
-authentication framework into its system of
-:class:`request objects <django.http.HttpRequest>`.
+Django uses :doc:`sessions </topics/http/sessions>` and middleware to hook the
+authentication system into :class:`request objects <django.http.HttpRequest>`.
 
-First, install the
-:class:`~django.contrib.sessions.middleware.SessionMiddleware` and
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-middlewares by adding them to your :setting:`MIDDLEWARE_CLASSES` setting. See
-the :doc:`session documentation </topics/http/sessions>` for more information.
+These provide a :attr:`request.user <django.http.HttpRequest.user>`  attribute
+on every request which represents the current user. If the current user has not
+logged in, this attribute will be set to an instance
+of :class:`~django.contrib.auth.models.AnonymousUser`, otherwise it will be an
+instance of :class:`~django.contrib.auth.models.User`.
 
-Once you have those middlewares installed, you'll be able to access
-:attr:`request.user <django.http.HttpRequest.user>` in views.
-:attr:`request.user <django.http.HttpRequest.user>` will give you a
-:class:`~django.contrib.auth.models.User` object representing the currently
-logged-in user. If a user isn't currently logged in,
-:attr:`request.user <django.http.HttpRequest.user>` will be set to an instance
-of :class:`~django.contrib.auth.models.AnonymousUser` (see the previous
-section). You can tell them apart with
+You can tell them apart with
 :meth:`~django.contrib.auth.models.User.is_authenticated()`, like so::
 
     if request.user.is_authenticated():
         # Do something for authenticated users.
     else:
         # Do something for anonymous users.
-
-Anonymous users
----------------
-
-.. class:: models.AnonymousUser
-
-    :class:`django.contrib.auth.models.AnonymousUser` is a class that
-    implements the :class:`django.contrib.auth.models.User` interface, with
-    these differences:
-
-    * :attr:`~django.contrib.auth.models.User.id` is always ``None``.
-    * :attr:`~django.contrib.auth.models.User.is_staff` and
-      :attr:`~django.contrib.auth.models.User.is_superuser` are always
-      ``False``.
-    * :attr:`~django.contrib.auth.models.User.is_active` is always ``False``.
-    * :attr:`~django.contrib.auth.models.User.groups` and
-      :attr:`~django.contrib.auth.models.User.user_permissions` are always
-      empty.
-    * :meth:`~django.contrib.auth.models.User.is_anonymous()` returns ``True``
-      instead of ``False``.
-    * :meth:`~django.contrib.auth.models.User.is_authenticated()` returns
-      ``False`` instead of ``True``.
-    * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`,
-      :meth:`~django.contrib.auth.models.User.save()`,
-      :meth:`~django.contrib.auth.models.User.delete()`,
-      :meth:`~django.contrib.auth.models.User.set_groups()` and
-      :meth:`~django.contrib.auth.models.User.set_permissions()` raise
-      :exc:`NotImplementedError`.
-
-In practice, you probably won't need to use
-:class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
-they're used by Web requests, as explained in the next section.
-
 
 .. _how-to-log-a-user-in:
 
