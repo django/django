@@ -116,13 +116,13 @@ class Template(object):
     def __init__(self, template_string, origin=None,
                  name='<Unknown Template>'):
         try:
-            template_string = force_text(template_string)
+            self.template_string = force_text(template_string)
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
         if settings.TEMPLATE_DEBUG and origin is None:
-            origin = StringOrigin(template_string)
-        self.nodelist = compile_string(template_string, origin)
+            origin = StringOrigin(self.template_string)
+        self.nodelist = compile_string(self.template_string, origin)
         self.name = name
 
     def __iter__(self):
