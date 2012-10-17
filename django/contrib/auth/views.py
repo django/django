@@ -156,7 +156,7 @@ def password_reset(request, is_admin_site=False,
                 'request': request,
             }
             if is_admin_site:
-                opts = dict(opts, domain_override=request.META['HTTP_HOST'])
+                opts = dict(opts, domain_override=request.get_host())
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
     else:

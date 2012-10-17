@@ -51,6 +51,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^logout/next_page/$', 'django.contrib.auth.views.logout', dict(next_page='/somewhere/')),
     (r'^remote_user/$', remote_user_auth_view),
     (r'^password_reset_from_email/$', 'django.contrib.auth.views.password_reset', dict(from_email='staffmember@example.com')),
+    (r'^admin_password_reset/$', 'django.contrib.auth.views.password_reset', dict(is_admin_site=True)),
     (r'^login_required/$', login_required(password_reset)),
     (r'^login_required_login_url/$', login_required(password_reset, login_url='/somewhere/')),
 
