@@ -16,7 +16,8 @@ passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects.
+:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+module.
 
 HttpRequest objects
 ===================
@@ -28,7 +29,8 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes except ``session`` should be considered read-only.
+All attributes should be considered read-only, unless stated otherwise below.
+``session`` is a notable exception.
 
 .. attribute:: HttpRequest.body
 
@@ -648,7 +650,7 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
     .. versionchanged:: 1.3
 
