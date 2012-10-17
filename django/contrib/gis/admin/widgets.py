@@ -1,3 +1,5 @@
+import logging
+
 from django.forms.widgets import Textarea
 from django.template import loader, Context
 from django.templatetags.static import static
@@ -10,6 +12,8 @@ from django.contrib.gis.geos import GEOSGeometry, GEOSException, fromstr
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
 geo_context = Context({'LANGUAGE_BIDI' : translation.get_language_bidi()})
+logger = logging.getLogger('django.contrib.gis')
+
 
 class OpenLayersWidget(Textarea):
     """
@@ -29,7 +33,11 @@ class OpenLayersWidget(Textarea):
         if isinstance(value, six.string_types):
             try:
                 value = GEOSGeometry(value)
-            except (GEOSException, ValueError):
+            except (GEOSException, ValueError) as err:
+                logger.error(
+                    "Error creating geometry from value '%s' (%s)" % (
+                    value, err)
+                )
                 value = None
 
         if value and value.geom_type.upper() != self.geom_type:
@@ -56,7 +64,11 @@ class OpenLayersWidget(Textarea):
                     ogr = value.ogr
                     ogr.transform(srid)
                     wkt = ogr.wkt
-                except OGRException:
+                except OGRException as err:
+                    logger.error(
+                        "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
+                        value.srid, srid, err)
+                    )
                     wkt = ''
             else:
                 wkt = value.wkt
