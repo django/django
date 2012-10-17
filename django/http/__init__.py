@@ -180,6 +180,11 @@ class HttpRequest(object):
             server_port = str(self.META['SERVER_PORT'])
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
+
+        # Disallow potentially poisoned hostnames.
+        if set(';/?@&=+$,').intersection(host):
+            raise SuspiciousOperation('Invalid HTTP_HOST header: %s' % host)
+
         return host
 
     def get_full_path(self):
