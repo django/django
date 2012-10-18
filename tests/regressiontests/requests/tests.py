@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
 from django.test.utils import str_prefix
@@ -109,6 +110,38 @@ class RequestsTests(unittest.TestCase):
             }
             self.assertEqual(request.get_host(), 'internal.com:8042')
 
+            # Poisoned host headers are rejected as suspicious
+            legit_hosts = [
+                'example.com',
+                'example.com:80',
+                '12.34.56.78',
+                '12.34.56.78:443',
+                '[2001:19f0:feee::dead:beef:cafe]',
+                '[2001:19f0:feee::dead:beef:cafe]:8080',
+            ]
+
+            poisoned_hosts = [
+                'example.com@evil.tld',
+                'example.com:dr.frankenstein@evil.tld',
+                'example.com:someone@somestie.com:80',
+                'example.com:80/badpath'
+            ]
+
+            for host in legit_hosts:
+                request = HttpRequest()
+                request.META = {
+                    'HTTP_HOST': host,
+                }
+                request.get_host()
+
+            for host in poisoned_hosts:
+                with self.assertRaises(SuspiciousOperation):
+                    request = HttpRequest()
+                    request.META = {
+                        'HTTP_HOST': host,
+                    }
+                    request.get_host()
+
         finally:
             settings.USE_X_FORWARDED_HOST = old_USE_X_FORWARDED_HOST
 
@@ -152,6 +185,38 @@ class RequestsTests(unittest.TestCase):
                 'SERVER_PORT': 8042,
             }
             self.assertEqual(request.get_host(), 'internal.com:8042')
+
+            # Poisoned host headers are rejected as suspicious
+            legit_hosts = [
+                'example.com',
+                'example.com:80',
+                '12.34.56.78',
+                '12.34.56.78:443',
+                '[2001:19f0:feee::dead:beef:cafe]',
+                '[2001:19f0:feee::dead:beef:cafe]:8080',
+            ]
+
+            poisoned_hosts = [
+                'example.com@evil.tld',
+                'example.com:dr.frankenstein@evil.tld',
+                'example.com:dr.frankenstein@evil.tld:80',
+                'example.com:80/badpath'
+            ]
+
+            for host in legit_hosts:
+                request = HttpRequest()
+                request.META = {
+                    'HTTP_HOST': host,
+                }
+                request.get_host()
+
+            for host in poisoned_hosts:
+                with self.assertRaises(SuspiciousOperation):
+                    request = HttpRequest()
+                    request.META = {
+                        'HTTP_HOST': host,
+                    }
+                    request.get_host()
 
         finally:
             settings.USE_X_FORWARDED_HOST = old_USE_X_FORWARDED_HOST
