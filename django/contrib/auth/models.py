@@ -33,7 +33,7 @@ user_logged_in.connect(update_last_login)
 
 
 class SiteProfileNotAvailable(Exception):
-    pass
+    silent_variable_failure = True
 
 
 class PermissionManager(models.Manager):
