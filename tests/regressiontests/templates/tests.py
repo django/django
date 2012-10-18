@@ -385,6 +385,47 @@ class Templates(unittest.TestCase):
 
         self.assertEqual(cm.exception.django_template_source[1], (0, 14))
 
+    def test_usergetprofile_silentfailure(self):
+        # See #15098
+        from django.template import Template, Context
+        from django.contrib.auth.models import User, SiteProfileNotAvailable
+
+        # Unset AUTH_PROFILE_MODULE so that User.get_profile raises SiteProfileNotAvailable
+        reassign = False
+        if hasattr(settings, "AUTH_PROFILE_MODULE"):
+            old_profile = settings.AUTH_PROFILE_MODULE
+            del settings.AUTH_PROFILE_MODULE
+            reassign = True
+
+        # Set TEMPLATE_STRING_IF_INVALID to a known string.
+        old_invalid = settings.TEMPLATE_STRING_IF_INVALID
+        settings.TEMPLATE_STRING_IF_INVALID = 'INVALID'
+
+        try:
+            user=User()
+            try:
+                p=user.get_profile()
+                #if this does not raise SiteProfileNotAvailable, we have a problem.
+                #We can't be entirely sure that creating a user object will not automatically also create a profile, but if it does,
+                #User.get_profile should still fail if settings.AUTH_PROFILE_MODULE is unusable.
+                #If it doesn't, I don't see a way to ensure that the user will not have a profile.
+                self.fail(
+                    "FAILED - Couldn't ensure that user.get_profile would fail, probably because the implementation of get_profile changed.")
+            except SiteProfileNotAvailable:
+                pass
+                #all is well
+            t = Template("{{ user.get_profile }}")
+            c = Context({ "user" : user })
+            try:
+                rendered = t.render(c)
+            except SiteProfileNotAvailable:
+                self.fail("FAILED - User.get_profile should fail silently from within templates.")
+            self.assertEquals(rendered, "INVALID")
+        finally:
+            settings.TEMPLATE_STRING_IF_INVALID = old_invalid
+            if reassign:
+                settings.AUTH_PROFILE_MODULE = old_profile
+
     def test_invalid_block_suggestion(self):
         # See #7876
         from django.template import Template, TemplateSyntaxError
