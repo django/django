@@ -448,6 +448,13 @@ called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`.to_python` won't be called
 automatically.
 
+.. warning::
+
+    If your custom field allows ``null=True``, any field method that takes
+    ``value`` as an argument, like :meth:`~Field.to_python` and
+    :meth:`~Field.get_prep_value`, should handle the case when ``value`` is
+    ``None``.
+
 Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
