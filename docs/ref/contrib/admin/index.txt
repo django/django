@@ -307,7 +307,9 @@ subclass::
     By default a ``ModelForm`` is dynamically created for your model. It is
     used to create the form presented on both the add/change pages. You can
     easily provide your own ``ModelForm`` to override any default form behavior
-    on the add/change pages.
+    on the add/change pages. Alternatively, you can customize the default
+    form rather than specifying an entirely new one by using the
+    :meth:`ModelAdmin.get_form` method.
 
     For an example see the section `Adding custom validation to the admin`_.
 
@@ -373,7 +375,8 @@ subclass::
 
 .. attribute:: ModelAdmin.inlines
 
-    See :class:`InlineModelAdmin` objects below.
+    See :class:`InlineModelAdmin` objects below as well as
+    :meth:`ModelAdmin.get_formsets`.
 
 .. attribute:: ModelAdmin.list_display
 
@@ -1109,6 +1112,38 @@ templates used by the :class:`ModelAdmin` views:
 
         (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
+.. method:: ModelAdmin.get_form(self, request, obj=None, **kwargs)
+
+    Returns a :class:`~django.forms.ModelForm` class for use in the admin add
+    and change views, see :meth:`add_view` and :meth:`change_view`.
+
+    If you wanted to hide a field from non-superusers, for example, you could
+    override ``get_form`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_form(self, request, obj=None, **kwargs):
+                self.exclude = []
+                if not request.user.is_superuser:
+                    self.exclude.append('field_to_hide')
+                return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
+.. method:: ModelAdmin.get_formsets(self, request, obj=None)
+
+    Yields :class:`InlineModelAdmin`\s for use in admin add and change views.
+
+    For example if you wanted to display a particular inline only in the change
+    view, you could override ``get_formsets`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            inlines = [MyInline, SomeOtherInline]
+
+            def get_formsets(self, request, obj=None):
+                for inline in self.get_inline_instances():
+                    # hide MyInline in the add view
+                    if isinstance(inline, MyInline) and obj is None:
+                        continue
+                    yield inline.get_formset(request, obj)
+
 .. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
     The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
@@ -1422,8 +1457,6 @@ The ``InlineModelAdmin`` class adds:
     The value for ``form`` defaults to ``ModelForm``. This is what is passed
     through to ``inlineformset_factory`` when creating the formset for this
     inline.
-
-    .. _ref-contrib-admin-inline-extra:
 
 .. attribute:: InlineModelAdmin.extra
 
