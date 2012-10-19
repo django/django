@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
+from django.db.utils import load_backend
+
 
 class PostGISCreation(DatabaseCreation):
     template_postgis = None
@@ -82,3 +84,26 @@ class PostGISCreation(DatabaseCreation):
             qn = self.connection.ops.quote_name
             return ' TEMPLATE %s' % qn(self.template_postgis)
         return ''
+
+    def _create_test_db(self, verbosity, autoclobber):
+        test_database_name = super(PostGISCreation, self)._create_test_db(verbosity, autoclobber)
+        if self.template_postgis is None:
+            # Get a new connection to the database.
+            settings_dict = self.connection.settings_dict.copy()
+            settings_dict['NAME'] = test_database_name
+            # We have to change the engine, otherwise the postgis backend will
+            # complain about the database not being yet spatial.
+            settings_dict['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
+            backend = load_backend(settings_dict['ENGINE'])
+            new_connection = backend.DatabaseWrapper(
+                             settings_dict,
+                             alias='__create_extensions_test_db__',
+                             allow_thread_sharing=False)
+
+            cursor = new_connection.cursor()
+            cursor.execute("CREATE EXTENSION postgis;")
+            cursor.execute("CREATE EXTENSION postgis_topology;")
+            cursor.execute("COMMIT;")
+            new_connection.close()
+
+        return test_database_name
