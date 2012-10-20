@@ -1046,6 +1046,16 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
+
+    .. versionadded:: 1.5
+
+    The ``get_inline_instances`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
+    objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
+    section.
+
 .. method:: ModelAdmin.get_urls(self)
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
