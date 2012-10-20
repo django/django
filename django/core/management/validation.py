@@ -1,5 +1,6 @@
 import sys
 
+from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
@@ -47,6 +48,12 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
             # No need to perform any other validation checks on a swapped model.
             continue
+
+        # This is the current User model. Check known validation problems with User models
+        if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
+            # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
+            if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
+                e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
