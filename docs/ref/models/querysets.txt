@@ -1456,6 +1456,16 @@ evaluated will force it to evaluate again, repeating the query.
 Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
 ignored since these two optimizations do not make sense together.
 
+.. warning::
+
+    Some Python database drivers like ``psycopg2`` perform caching if using
+    client side cursors (instantiated with ``connection.cursor()`` and what
+    Django's ORM uses). Using ``iterator()`` does not affect caching at the
+    database driver level. To disable this caching, look at `server side
+    cursors`_.
+
+.. _server side cursors: http://initd.org/psycopg/docs/usage.html#server-side-cursors
+
 latest
 ~~~~~~
 
