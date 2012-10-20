@@ -119,16 +119,16 @@ class SessionBase(object):
         "Encoding mechanism used earlier. Deprecated"
         pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
         hash = self._hash(pickled)
-        return base64.encodestring(hash + ":" + pickled)
+        return base64.b64encode(hash.encode() + b":" + pickled).decode('ascii')
 
     def decode_legacy(self, session_data):
         "Decoding mechanism used earlier. Deprecated"
-        encoded_data = base64.decodestring(session_data)
+        encoded_data = base64.b64decode(force_bytes(session_data))
         try:
             # could produce ValueError if there is no ':'
-            hash, pickled = encoded_data.split(':', 1)
+            hash, pickled = encoded_data.split(b':', 1)
             expected_hash = self._hash(pickled)
-            if not constant_time_compare(hash, expected_hash):
+            if not constant_time_compare(hash.decode(), expected_hash):
                 raise SuspiciousOperation("Session data corrupted")
             else:
                 return pickle.loads(pickled)
