@@ -52,9 +52,6 @@ class ReadOnlyPasswordHashField(forms.Field):
         kwargs.setdefault("required", False)
         super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
 
-    def clean_password(self):
-        return self.initial
-
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -129,6 +126,12 @@ class UserChangeForm(forms.ModelForm):
         f = self.fields.get('user_permissions', None)
         if f is not None:
             f.queryset = f.queryset.select_related('content_type')
+
+    def clean_password(self):
+        # Regardless of what the user provides, return the initial value.
+        # This is done here, rather than on the field, because the
+        # field does not have access to the initial value
+        return self.initial["password"]
 
 
 class AuthenticationForm(forms.Form):
