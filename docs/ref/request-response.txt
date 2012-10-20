@@ -566,13 +566,21 @@ file-like object::
 Passing iterators
 ~~~~~~~~~~~~~~~~~
 
-Finally, you can pass ``HttpResponse`` an iterator rather than passing it
-hard-coded strings. If you use this technique, follow these guidelines:
+Finally, you can pass ``HttpResponse`` an iterator rather than strings. If you
+use this technique, the iterator should return strings.
 
-* The iterator should return strings.
-* If an :class:`HttpResponse` has been initialized with an iterator as its
-  content, you can't use the :class:`HttpResponse` instance as a file-like
-  object. Doing so will raise ``Exception``.
+.. versionchanged:: 1.5
+
+    Passing an iterator as content to :class:`HttpResponse` creates a
+    streaming response if (and only if) no middleware accesses the
+    :attr:`HttpResponse.content` attribute before the response is returned.
+
+    If you want to guarantee that your response will stream to the client, you
+    should use the new :class:`StreamingHttpResponse` class instead.
+
+If an :class:`HttpResponse` instance has been initialized with an iterator as
+its content, you can't use it as a file-like object. Doing so will raise an
+exception.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -613,6 +621,13 @@ Attributes
 .. attribute:: HttpResponse.status_code
 
     The `HTTP Status code`_ for the response.
+
+.. attribute:: HttpResponse.streaming
+
+    This is always ``False``.
+
+    This attribute exists so middleware can treat streaming responses
+    differently from regular responses.
 
 Methods
 -------
@@ -781,3 +796,63 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+StreamingHttpResponse objects
+=============================
+
+.. versionadded:: 1.5
+
+.. class:: StreamingHttpResponse
+
+The :class:`StreamingHttpResponse` class is used to stream a response from
+Django to the browser. You might want to do this if generating the response
+takes too long or uses too much memory. For instance, it's useful for
+generating large CSV files.
+
+.. admonition:: Performance considerations
+
+    Django is designed for short-lived requests. Streaming responses will tie
+    a worker process and keep a database connection idle in transaction for
+    the entire duration of the response. This may result in poor performance.
+
+    Generally speaking, you should perform expensive tasks outside of the
+    request-response cycle, rather than resorting to a streamed response.
+
+The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
+because it features a slightly different API. However, it is almost identical,
+with the following notable differences:
+
+* It should be given an iterator that yields strings as content.
+
+* You cannot access its content, except by iterating the response object
+  itself. This should only occur when the response is returned to the client.
+
+* It has no ``content`` attribute. Instead, it has a
+  :attr:`~StreamingHttpResponse.streaming_content` attribute.
+
+* You cannot use the file-like object ``tell()`` or ``write()`` methods.
+  Doing so will raise an exception.
+
+* Any iterators that have a ``close()`` method and are assigned as content will
+  be closed automatically after the response has been iterated.
+
+:class:`StreamingHttpResponse` should only be used in situations where it is
+absolutely required that the whole content isn't iterated before transferring
+the data to the client. Because the content can't be accessed, many
+middlewares can't function normally. For example the ``ETag`` and ``Content-
+Length`` headers can't be generated for streaming responses.
+
+Attributes
+----------
+
+.. attribute:: StreamingHttpResponse.streaming_content
+
+    An iterator of strings representing the content.
+
+.. attribute:: HttpResponse.status_code
+
+    The `HTTP Status code`_ for the response.
+
+.. attribute:: HttpResponse.streaming
+
+    This is always ``True``.

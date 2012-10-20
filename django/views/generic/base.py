@@ -99,7 +99,7 @@ class View(object):
         """
         response = http.HttpResponse()
         response['Allow'] = ', '.join(self._allowed_methods())
-        response['Content-Length'] = 0
+        response['Content-Length'] = '0'
         return response
 
     def _allowed_methods(self):

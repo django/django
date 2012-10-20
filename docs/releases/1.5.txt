@@ -84,6 +84,24 @@ For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
 is particularly helpful in combination with ``prefetch_related``.
 
+Explicit support for streaming responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before Django 1.5, it was possible to create a streaming response by passing
+an iterator to :class:`~django.http.HttpResponse`. But this was unreliable:
+any middleware that accessed the :attr:`~django.http.HttpResponse.content`
+attribute would consume the iterator prematurely.
+
+You can now explicitly generate a streaming response with the new
+:class:`~django.http.StreamingHttpResponse` class. This class exposes a
+:class:`~django.http.StreamingHttpResponse.streaming_content` attribute which
+is an iterator.
+
+Since :class:`~django.http.StreamingHttpResponse` does not have a ``content``
+attribute, middleware that need access to the response content must test for
+streaming responses and behave accordingly. See :ref:`response-middleware` for
+more information.
+
 ``{% verbatim %}`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

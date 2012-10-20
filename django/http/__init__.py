@@ -528,18 +528,23 @@ def parse_cookie(cookie):
 class BadHeaderError(ValueError):
     pass
 
-class HttpResponse(object):
-    """A basic HTTP response, with content and dictionary-accessed headers."""
+class HttpResponseBase(object):
+    """
+    An HTTP response base class with dictionary-accessed headers.
+
+    This class doesn't handle content. It should not be used directly.
+    Use the HttpResponse and StreamingHttpResponse subclasses instead.
+    """
 
     status_code = 200
 
-    def __init__(self, content='', content_type=None, status=None,
-            mimetype=None):
+    def __init__(self, content_type=None, status=None, mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
+        self._closable_objects = []
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
                           " content_type instead", PendingDeprecationWarning)
@@ -547,26 +552,24 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        # content is a bytestring. See the content property methods.
-        self.content = content
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
 
         self['Content-Type'] = content_type
 
-    def serialize(self):
-        """Full HTTP message, including headers, as a bytestring."""
+    def serialize_headers(self):
+        """HTTP headers as a bytestring."""
         headers = [
             ('%s: %s' % (key, value)).encode('us-ascii')
             for key, value in self._headers.values()
         ]
-        return b'\r\n'.join(headers) + b'\r\n\r\n' + self.content
+        return b'\r\n'.join(headers)
 
     if six.PY3:
-        __bytes__ = serialize
+        __bytes__ = serialize_headers
     else:
-        __str__ = serialize
+        __str__ = serialize_headers
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
         """Converts headers key/value to ascii/latin1 native strings.
@@ -690,24 +693,75 @@ class HttpResponse(object):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
+    # Common methods used by subclasses
+
+    def make_bytes(self, value):
+        """Turn a value into a bytestring encoded in the output charset."""
+        # For backwards compatibility, this method supports values that are
+        # unlikely to occur in real applications. It has grown complex and
+        # should be refactored. It also overlaps __next__. See #18796.
+        if self.has_header('Content-Encoding'):
+            if isinstance(value, int):
+                value = six.text_type(value)
+            if isinstance(value, six.text_type):
+                value = value.encode('ascii')
+            # force conversion to bytes in case chunk is a subclass
+            return bytes(value)
+        else:
+            return force_bytes(value, self._charset)
+
+    # These methods partially implement the file-like object interface.
+    # See http://docs.python.org/lib/bltin-file-objects.html
+
+    # The WSGI server must call this method upon completion of the request.
+    # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
+    def close(self):
+        for closable in self._closable_objects:
+            closable.close()
+
+    def write(self, content):
+        raise Exception("This %s instance is not writable" % self.__class__.__name__)
+
+    def flush(self):
+        pass
+
+    def tell(self):
+        raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
+
+class HttpResponse(HttpResponseBase):
+    """
+    An HTTP response class with a string as content.
+
+    This content that can be read, appended to or replaced.
+    """
+
+    streaming = False
+
+    def __init__(self, content='', *args, **kwargs):
+        super(HttpResponse, self).__init__(*args, **kwargs)
+        # Content is a bytestring. See the `content` property methods.
+        self.content = content
+
+    def serialize(self):
+        """Full HTTP message, including headers, as a bytestring."""
+        return self.serialize_headers() + b'\r\n\r\n' + self.content
+
+    if six.PY3:
+        __bytes__ = serialize
+    else:
+        __str__ = serialize
+
     @property
     def content(self):
-        if self.has_header('Content-Encoding'):
-            def make_bytes(value):
-                if isinstance(value, int):
-                    value = six.text_type(value)
-                if isinstance(value, six.text_type):
-                    value = value.encode('ascii')
-                # force conversion to bytes in case chunk is a subclass
-                return bytes(value)
-            return b''.join(make_bytes(e) for e in self._container)
-        return b''.join(force_bytes(e, self._charset) for e in self._container)
+        return b''.join(self.make_bytes(e) for e in self._container)
 
     @content.setter
     def content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             self._container = value
             self._base_content_is_iter = True
+            if hasattr(value, 'close'):
+                self._closable_objects.append(value)
         else:
             self._container = [value]
             self._base_content_is_iter = False
@@ -727,24 +781,84 @@ class HttpResponse(object):
 
     next = __next__             # Python 2 compatibility
 
-    def close(self):
-        if hasattr(self._container, 'close'):
-            self._container.close()
-
-    # The remaining methods partially implement the file-like object interface.
-    # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
         if self._base_content_is_iter:
-            raise Exception("This %s instance is not writable" % self.__class__)
+            raise Exception("This %s instance is not writable" % self.__class__.__name__)
         self._container.append(content)
-
-    def flush(self):
-        pass
 
     def tell(self):
         if self._base_content_is_iter:
-            raise Exception("This %s instance cannot tell its position" % self.__class__)
+            raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
         return sum([len(chunk) for chunk in self])
+
+class StreamingHttpResponse(HttpResponseBase):
+    """
+    A streaming HTTP response class with an iterator as content.
+
+    This should only be iterated once, when the response is streamed to the
+    client. However, it can be appended to or replaced with a new iterator
+    that wraps the original content (or yields entirely new content).
+    """
+
+    streaming = True
+
+    def __init__(self, streaming_content=(), *args, **kwargs):
+        super(StreamingHttpResponse, self).__init__(*args, **kwargs)
+        # `streaming_content` should be an iterable of bytestrings.
+        # See the `streaming_content` property methods.
+        self.streaming_content = streaming_content
+
+    @property
+    def content(self):
+        raise AttributeError("This %s instance has no `content` attribute. "
+            "Use `streaming_content` instead." % self.__class__.__name__)
+
+    @property
+    def streaming_content(self):
+        return self._iterator
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        # Ensure we can never iterate on "value" more than once.
+        self._iterator = iter(value)
+        if hasattr(value, 'close'):
+            self._closable_objects.append(value)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self.make_bytes(next(self._iterator))
+
+    next = __next__             # Python 2 compatibility
+
+class CompatibleStreamingHttpResponse(StreamingHttpResponse):
+    """
+    This class maintains compatibility with middleware that doesn't know how
+    to handle the content of a streaming response by exposing a `content`
+    attribute that will consume and cache the content iterator when accessed.
+
+    These responses will stream only if no middleware attempts to access the
+    `content` attribute. Otherwise, they will behave like a regular response,
+    and raise a `PendingDeprecationWarning`.
+    """
+    @property
+    def content(self):
+        warnings.warn(
+            'Accessing the `content` attribute on a streaming response is '
+            'deprecated. Use the `streaming_content` attribute instead.',
+            PendingDeprecationWarning)
+        content = b''.join(self)
+        self.streaming_content = [content]
+        return content
+
+    @content.setter
+    def content(self, content):
+        warnings.warn(
+            'Accessing the `content` attribute on a streaming response is '
+            'deprecated. Use the `streaming_content` attribute instead.',
+            PendingDeprecationWarning)
+        self.streaming_content = [content]
 
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']

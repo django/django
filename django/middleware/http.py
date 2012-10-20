@@ -10,7 +10,7 @@ class ConditionalGetMiddleware(object):
     """
     def process_response(self, request, response):
         response['Date'] = http_date()
-        if not response.has_header('Content-Length'):
+        if not response.streaming and not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
         if response.has_header('ETag'):
