@@ -62,22 +62,20 @@ class FileUploadTests(TestCase):
 
     def test_base64_upload(self):
         test_string = "This data will be transmitted base64-encoded."
-        payload = "\r\n".join([
+        payload = client.FakePayload("\r\n".join([
             '--' + client.BOUNDARY,
             'Content-Disposition: form-data; name="file"; filename="test.txt"',
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
-            '',
-            base64.b64encode(force_bytes(test_string)).decode('ascii'),
-            '--' + client.BOUNDARY + '--',
-            '',
-        ]).encode('utf-8')
+            '',]))
+        payload.write(b"\r\n" + base64.b64encode(force_bytes(test_string)) + b"\r\n")
+        payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
             'PATH_INFO':      "/file_uploads/echo_content/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     client.FakePayload(payload),
+            'wsgi.input':     payload,
         }
         response = self.client.request(**r)
         received = json.loads(response.content.decode('utf-8'))
@@ -126,27 +124,23 @@ class FileUploadTests(TestCase):
             "../..\\hax0rd.txt"         # Relative path, mixed.
         ]
 
-        payload = []
+        payload = client.FakePayload()
         for i, name in enumerate(scary_file_names):
-            payload.extend([
+            payload.write('\r\n'.join([
                 '--' + client.BOUNDARY,
                 'Content-Disposition: form-data; name="file%s"; filename="%s"' % (i, name),
                 'Content-Type: application/octet-stream',
                 '',
-                'You got pwnd.'
-            ])
-        payload.extend([
-            '--' + client.BOUNDARY + '--',
-            '',
-        ])
+                'You got pwnd.\r\n'
+            ]))
+        payload.write('\r\n--' + client.BOUNDARY + '--\r\n')
 
-        payload = "\r\n".join(payload).encode('utf-8')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
             'PATH_INFO':      "/file_uploads/echo/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     client.FakePayload(payload),
+            'wsgi.input':     payload,
         }
         response = self.client.request(**r)
 
@@ -159,7 +153,7 @@ class FileUploadTests(TestCase):
     def test_filename_overflow(self):
         """File names over 256 characters (dangerous on some platforms) get fixed up."""
         name = "%s.txt" % ("f"*500)
-        payload = "\r\n".join([
+        payload = client.FakePayload("\r\n".join([
             '--' + client.BOUNDARY,
             'Content-Disposition: form-data; name="file"; filename="%s"' % name,
             'Content-Type: application/octet-stream',
@@ -167,13 +161,13 @@ class FileUploadTests(TestCase):
             'Oops.'
             '--' + client.BOUNDARY + '--',
             '',
-        ]).encode('utf-8')
+        ]))
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
             'PATH_INFO':      "/file_uploads/echo/",
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     client.FakePayload(payload),
+            'wsgi.input':     payload,
         }
         got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
@@ -184,7 +178,7 @@ class FileUploadTests(TestCase):
         attempt to read beyond the end of the stream, and simply will handle
         the part that can be parsed gracefully.
         """
-        payload = "\r\n".join([
+        payload_str = "\r\n".join([
             '--' + client.BOUNDARY,
             'Content-Disposition: form-data; name="file"; filename="foo.txt"',
             'Content-Type: application/octet-stream',
@@ -192,14 +186,14 @@ class FileUploadTests(TestCase):
             'file contents'
             '--' + client.BOUNDARY + '--',
             '',
-        ]).encode('utf-8')
-        payload = payload[:-10]
+        ])
+        payload = client.FakePayload(payload_str[:-10])
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
             'PATH_INFO': '/file_uploads/echo/',
             'REQUEST_METHOD': 'POST',
-            'wsgi.input': client.FakePayload(payload),
+            'wsgi.input': payload,
         }
         got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertEqual(got, {})
