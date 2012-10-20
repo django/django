@@ -105,7 +105,6 @@ class PostGISCreation(DatabaseCreation):
 
             cursor = new_connection.cursor()
             cursor.execute("CREATE EXTENSION postgis;")
-            cursor.execute("CREATE EXTENSION postgis_topology;")
             cursor.execute("COMMIT;")
             new_connection.close()
 
