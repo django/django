@@ -473,8 +473,8 @@ def default_urlconf(request):
 # always work even if the template loader is broken.
 #
 
-TECHNICAL_500_TEMPLATE = """
-<!DOCTYPE html>
+TECHNICAL_500_TEMPLATE = """\
+{% load l10n %}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -700,13 +700,13 @@ TECHNICAL_500_TEMPLATE = """
           <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
 
           {% if frame.context_line %}
-            <div class="context" id="c{{ frame.id }}">
+            <div class="context" id="c{{ frame.id|unlocalize }}">
               {% if frame.pre_context and not is_email %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno|unlocalize }}" class="pre-context" id="pre{{ frame.id|unlocalize }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id|unlocalize }}', 'post{{ frame.id|unlocalize }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
+              <ol start="{{ frame.lineno|unlocalize }}" class="context-line"><li onclick="toggle('pre{{ frame.id|unlocalize }}', 'post{{ frame.id|unlocalize }}')"><pre>{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
               {% if frame.post_context and not is_email  %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1"|unlocalize }}' class="post-context" id="post{{ frame.id|unlocalize }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id|unlocalize }}', 'post{{ frame.id|unlocalize }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}
@@ -716,10 +716,10 @@ TECHNICAL_500_TEMPLATE = """
                 {% if is_email %}
                     <h2>Local Vars</h2>
                 {% else %}
-                    <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
+                    <a href="#" onclick="return varToggle(this, '{{ frame.id|unlocalize }}')"><span>&#x25b6;</span> Local vars</a>
                 {% endif %}
             </div>
-            <table class="vars" id="v{{ frame.id }}">
+            <table class="vars" id="v{{ frame.id|unlocalize }}">
               <thead>
                 <tr>
                   <th>Variable</th>
