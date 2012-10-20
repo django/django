@@ -288,6 +288,39 @@ def compress_string(s):
     zfile.close()
     return zbuf.getvalue()
 
+# WARNING - be aware that compress_sequence does not achieve the same
+# level of compression as compress_string.
+class StreamingBuffer(object):
+    def __init__(self):
+        self.vals = []
+    
+    def write(self, val):
+        self.vals.append(val)
+
+    def read(self):
+        ret = b''.join(self.vals)
+        self.vals = []
+        return ret
+
+    def flush(self):
+        return
+
+    def close(self):
+        return
+
+def compress_sequence(sequence):
+    buf = StreamingBuffer() 
+    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)
+    # Output headers...
+    yield buf.read()
+    for item in sequence:
+        zfile.write(item)
+        zfile.flush()
+        yield buf.read()
+    zfile.close()
+    val = buf.read()
+    yield val
+
 ustring_re = re.compile("([\u0080-\uffff])")
 
 def javascript_quote(s, quote_double_quotes=False):
