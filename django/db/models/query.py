@@ -1271,6 +1271,18 @@ class EmptyQuerySet(QuerySet):
             kwargs[arg.default_alias] = arg
         return dict([(key, None) for key in kwargs])
 
+    def values(self, *fields):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def values_list(self, *fields, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
     # EmptyQuerySet is always an empty result in where-clauses (and similar
     # situations).
     value_annotation = False
