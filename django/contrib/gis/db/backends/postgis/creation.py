@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.utils import load_backend
+from django.utils.functional import cached_property
 
 
 class PostGISCreation(DatabaseCreation):
@@ -9,19 +10,16 @@ class PostGISCreation(DatabaseCreation):
     geom_index_ops = 'GIST_GEOMETRY_OPS'
     geom_index_ops_nd = 'GIST_GEOMETRY_OPS_ND'
 
-    @property
+    @cached_property
     def template_postgis(self):
-        if not hasattr(self, '_template_postgis'):
-            cursor = self.connection.cursor()
-            cursor.execute('SELECT datname FROM pg_database;')
-            db_names = [row[0] for row in cursor.fetchall()]
-            template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-
-            if template_postgis in db_names:
-                self._template_postgis = template_postgis
-            else:
-                self._template_postgis = None
-        return self._template_postgis
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT datname FROM pg_database;')
+        db_names = [row[0] for row in cursor.fetchall()]
+        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
+        if template_postgis in db_names:
+            return template_postgis
+        else:
+            return None
 
     def sql_indexes_for_field(self, model, f, style):
         "Return any spatial index creation SQL for the field."
