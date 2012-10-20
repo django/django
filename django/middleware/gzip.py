@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from django.utils.text import compress_string
 from django.utils.cache import patch_vary_headers
@@ -11,6 +12,11 @@ class GZipMiddleware(object):
     It sets the Vary header accordingly, so that caches will base their storage
     on the Accept-Encoding header.
     """
+    def __init__(self):
+        warnings.warn("GZipMiddleware is deprecated. "
+                      "This task should be delegated to the web server/gateway.",
+            PendingDeprecationWarning)
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if len(response.content) < 200:

@@ -3,6 +3,7 @@
 import gzip
 import re
 import random
+import warnings
 from io import BytesIO
 
 from django.conf import settings
@@ -513,6 +514,9 @@ class GZipMiddlewareTest(TestCase):
     uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
 
     def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+            module='django.middleware.gzip')
         self.req = HttpRequest()
         self.req.META = {
             'SERVER_NAME': 'testserver',
@@ -525,6 +529,9 @@ class GZipMiddlewareTest(TestCase):
         self.resp.status_code = 200
         self.resp.content = self.compressible_string
         self.resp['Content-Type'] = 'text/html; charset=UTF-8'
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     @staticmethod
     def decompress(gzipped_string):
@@ -595,7 +602,13 @@ class ETagGZipMiddlewareTest(TestCase):
     compressible_string = b'a' * 500
 
     def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+            module='django.middleware.gzip')
         self.rf = RequestFactory()
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_compress_response(self):
         """
