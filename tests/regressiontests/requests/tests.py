@@ -330,6 +330,7 @@ class RequestsTests(unittest.TestCase):
     def test_stream(self):
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         self.assertEqual(request.read(), b'name=value')
@@ -341,6 +342,7 @@ class RequestsTests(unittest.TestCase):
         """
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         self.assertEqual(request.POST, {'name': ['value']})
@@ -354,6 +356,7 @@ class RequestsTests(unittest.TestCase):
         """
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         self.assertEqual(request.read(2), b'na')
@@ -402,9 +405,28 @@ class RequestsTests(unittest.TestCase):
                                'wsgi.input': BytesIO(payload)})
         self.assertEqual(request.POST, {})
 
+    def test_POST_binary_only(self):
+        payload = b'\r\n\x01\x00\x00\x00ab\x00\x00\xcd\xcc,@'
+        environ = {'REQUEST_METHOD': 'POST',
+                   'CONTENT_TYPE': 'application/octet-stream',
+                   'CONTENT_LENGTH': len(payload),
+                   'wsgi.input': BytesIO(payload)}
+        request = WSGIRequest(environ)
+        self.assertEqual(request.POST, {})
+        self.assertEqual(request.FILES, {})
+        self.assertEqual(request.body, payload)
+
+        # Same test without specifying content-type
+        environ.update({'CONTENT_TYPE': '', 'wsgi.input': BytesIO(payload)})
+        request = WSGIRequest(environ)
+        self.assertEqual(request.POST, {})
+        self.assertEqual(request.FILES, {})
+        self.assertEqual(request.body, payload)
+
     def test_read_by_lines(self):
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         self.assertEqual(list(request), [b'name=value'])
@@ -415,6 +437,7 @@ class RequestsTests(unittest.TestCase):
         """
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         raw_data = request.body
@@ -427,6 +450,7 @@ class RequestsTests(unittest.TestCase):
         """
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': BytesIO(payload)})
         raw_data = request.body
@@ -479,6 +503,7 @@ class RequestsTests(unittest.TestCase):
 
         payload = b'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': ExplodingBytesIO(payload)})
 

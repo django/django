@@ -92,8 +92,14 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.POST
 
-    A dictionary-like object containing all given HTTP POST parameters. See the
-    :class:`QueryDict` documentation below.
+    A dictionary-like object containing all given HTTP POST parameters,
+    providing that the request contains form data. See the
+    :class:`QueryDict` documentation below. If you need to access raw or
+    non-form data posted in the request, access this through the
+    :attr:`HttpRequest.body` attribute instead.
+
+    .. versionchanged:: 1.5
+        Before Django 1.5, HttpRequest.POST contained non-form data.
 
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but

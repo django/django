@@ -315,7 +315,7 @@ class HttpRequest(object):
         self._post_parse_error = True
 
     def _load_post_and_files(self):
-        # Populates self._post and self._files
+        """Populate self._post and self._files if the content-type is a form type"""
         if self.method != 'POST':
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
             return
@@ -323,7 +323,7 @@ class HttpRequest(object):
             self._mark_post_parse_error()
             return
 
-        if self.META.get('CONTENT_TYPE', '').startswith('multipart'):
+        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
             if hasattr(self, '_body'):
                 # Use already read data
                 data = BytesIO(self._body)
@@ -341,8 +341,10 @@ class HttpRequest(object):
                 # empty POST
                 self._mark_post_parse_error()
                 raise
-        else:
+        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
+        else:
+            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
 
     ## File-like and iterator interface.
     ##
