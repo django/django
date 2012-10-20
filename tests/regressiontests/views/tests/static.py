@@ -4,10 +4,10 @@ import mimetypes
 from os import path
 import unittest
 
-from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 
@@ -15,16 +15,11 @@ from .. import urls
 from ..urls import media_dir
 
 
+@override_settings(DEBUG=True)
 class StaticTests(TestCase):
     """Tests django views in django/views/static.py"""
 
-    def setUp(self):
-        self.prefix = 'site_media'
-        self.old_debug = settings.DEBUG
-        settings.DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
+    prefix = 'site_media'
 
     def test_serve(self):
         "The static view can serve static media"
@@ -112,7 +107,6 @@ class StaticHelperTest(StaticTests):
     """
     def setUp(self):
         super(StaticHelperTest, self).setUp()
-        self.prefix = 'media'
         self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 

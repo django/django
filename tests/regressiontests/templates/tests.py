@@ -155,16 +155,8 @@ class UTF8Class:
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
 class Templates(unittest.TestCase):
-    def setUp(self):
-        self.old_static_url = settings.STATIC_URL
-        self.old_media_url = settings.MEDIA_URL
-        settings.STATIC_URL = "/static/"
-        settings.MEDIA_URL = "/media/"
-
-    def tearDown(self):
-        settings.STATIC_URL = self.old_static_url
-        settings.MEDIA_URL = self.old_media_url
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()

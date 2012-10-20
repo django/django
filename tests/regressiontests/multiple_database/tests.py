@@ -4,13 +4,13 @@ import datetime
 import pickle
 from operator import attrgetter
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
@@ -1620,20 +1620,11 @@ class AuthTestCase(TestCase):
         command_output = new_io.getvalue().strip()
         self.assertTrue('"email": "alice@example.com",' in command_output)
 
-_missing = object()
-class UserProfileTestCase(TestCase):
-    def setUp(self):
-        self.old_auth_profile_module = getattr(settings, 'AUTH_PROFILE_MODULE', _missing)
-        settings.AUTH_PROFILE_MODULE = 'multiple_database.UserProfile'
 
-    def tearDown(self):
-        if self.old_auth_profile_module is _missing:
-            del settings.AUTH_PROFILE_MODULE
-        else:
-            settings.AUTH_PROFILE_MODULE = self.old_auth_profile_module
+@override_settings(AUTH_PROFILE_MODULE='multiple_database.UserProfile')
+class UserProfileTestCase(TestCase):
 
     def test_user_profiles(self):
-
         alice = User.objects.create_user('alice', 'alice@example.com')
         bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
 
