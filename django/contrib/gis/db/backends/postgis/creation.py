@@ -5,20 +5,23 @@ from django.db.utils import load_backend
 
 
 class PostGISCreation(DatabaseCreation):
-    template_postgis = None
     geom_index_type = 'GIST'
     geom_index_ops = 'GIST_GEOMETRY_OPS'
     geom_index_ops_nd = 'GIST_GEOMETRY_OPS_ND'
 
-    def __init__(self, *args, **kwargs):
-        super(PostGISCreation, self).__init__(*args, **kwargs)
-        cursor = self.connection.cursor()
-        cursor.execute('SELECT datname FROM pg_database;')
-        db_names = [row[0] for row in cursor.fetchall()]
-        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
+    @property
+    def template_postgis(self):
+        if not hasattr(self, '_template_postgis'):
+            cursor = self.connection.cursor()
+            cursor.execute('SELECT datname FROM pg_database;')
+            db_names = [row[0] for row in cursor.fetchall()]
+            template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
 
-        if template_postgis in db_names:
-            self.template_postgis = template_postgis
+            if template_postgis in db_names:
+                self._template_postgis = template_postgis
+            else:
+                self._template_postgis = None
+        return self._template_postgis
 
     def sql_indexes_for_field(self, model, f, style):
         "Return any spatial index creation SQL for the field."
