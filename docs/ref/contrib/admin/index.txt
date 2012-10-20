@@ -1148,7 +1148,7 @@ templates used by the :class:`ModelAdmin` views:
             inlines = [MyInline, SomeOtherInline]
 
             def get_formsets(self, request, obj=None):
-                for inline in self.get_inline_instances():
+                for inline in self.get_inline_instances(request, obj):
                     # hide MyInline in the add view
                     if isinstance(inline, MyInline) and obj is None:
                         continue
