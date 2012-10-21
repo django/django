@@ -8,6 +8,7 @@ Functions that modify an HTTP request or response in some way.
 # it's a little fiddly to override this behavior, so they should be truly
 # universally applicable.
 
+
 def fix_location_header(request, response):
     """
     Ensures that we always use an absolute URI in any location header in the
@@ -19,6 +20,7 @@ def fix_location_header(request, response):
     if 'Location' in response and request.get_host():
         response['Location'] = request.build_absolute_uri(response['Location'])
     return response
+
 
 def conditional_content_removal(request, response):
     """
@@ -37,6 +39,7 @@ def conditional_content_removal(request, response):
         else:
             response.content = ''
     return response
+
 
 def fix_IE_for_attach(request, response):
     """
@@ -66,6 +69,7 @@ def fix_IE_for_attach(request, response):
 
     return response
 
+
 def fix_IE_for_vary(request, response):
     """
     This function will fix the bug reported at
@@ -90,4 +94,3 @@ def fix_IE_for_vary(request, response):
             pass
 
     return response
-
