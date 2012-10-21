@@ -833,9 +833,6 @@ with the following notable differences:
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
 
-* Any iterators that have a ``close()`` method and are assigned as content will
-  be closed automatically after the response has been iterated.
-
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
