@@ -289,6 +289,10 @@ these changes.
 * The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
   the User model, will be removed.
 
+* The ``GZipMiddleware`` middleware will be removed. These sorts of HTTP
+  optimizations should be the task of the web server/gateway, not the web
+  application itself.
+
 2.0
 ---
 

@@ -530,3 +530,13 @@ a User account, this will be an appropriate design pattern to follow. However,
 the :setting:`AUTH_PROFILE_MODULE` setting, and the
 :meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
 the user profile model, should not be used any longer.
+
+``GZipMiddleware``
+~~~~~~~~~~~~~~~~~~
+
+:class:`django.middleware.gzip.GZipMiddleware` has been deprecated, as it is
+not good practice to compute those sorts of optimizations in the web application
+itself. This is rather the task of the Web server/gateway as explained in more
+details in the `PEP 3333`_.
+
+.. _PEP 3333: http://www.python.org/dev/peps/pep-3333/#other-http-features
