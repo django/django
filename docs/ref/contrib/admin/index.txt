@@ -806,8 +806,8 @@ subclass::
     By default the admin shows all fields as editable. Any fields in this
     option (which should be a ``list`` or ``tuple``) will display its data
     as-is and non-editable. Note that when specifying
-    specify :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` the
-    read-only fields must be present to be shown (they are ignored otherwise).
+    :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` the read-only
+    fields must be present to be shown (they are ignored otherwise).
 
     If ``readonly_fields`` is used without defining explicit ordering through
     :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` they will be
