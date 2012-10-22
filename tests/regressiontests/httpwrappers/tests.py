@@ -330,13 +330,6 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
 
-    def test_iterator_isnt_rewound(self):
-        # Regression test for #13222
-        r = HttpResponse('abc')
-        i = iter(r)
-        self.assertEqual(list(i), [b'abc'])
-        self.assertEqual(list(i), [])
-
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")

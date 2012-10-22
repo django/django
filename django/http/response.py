@@ -260,9 +260,9 @@ class HttpResponse(HttpResponseBase):
         else:
             self._container = [value]
             self._base_content_is_iter = False
-        self._iterator = iter(self._container)
 
     def __iter__(self):
+        self._iterator = iter(self._container)
         return self
 
     def __next__(self):
@@ -284,7 +284,7 @@ class HttpResponse(HttpResponseBase):
     def tell(self):
         if self._base_content_is_iter:
             raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
-        return len(self.content)
+        return sum([len(chunk) for chunk in self])
 
 
 class StreamingHttpResponse(HttpResponseBase):
