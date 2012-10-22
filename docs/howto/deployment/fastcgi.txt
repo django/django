@@ -394,6 +394,11 @@ easily by using the ``touch`` command::
 
     touch mysite.fcgi
 
+In some instances, it will be necessary to kill the FastCGI process which can
+be accomplished with the following command::
+
+    killall -USR1 mysite.fcgi
+
 Serving admin media files
 =========================
 
