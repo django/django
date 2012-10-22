@@ -179,8 +179,6 @@ subclass::
     values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
     read-only.
 
-    .. versionadded:: 1.4
-
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
     same line and the ``content`` field will be displayed below them in its
@@ -807,14 +805,35 @@ subclass::
 
     By default the admin shows all fields as editable. Any fields in this
     option (which should be a ``list`` or ``tuple``) will display its data
-    as-is and non-editable. This option behaves nearly identical to
-    :attr:`ModelAdmin.list_display`. Usage is the same, however, when you
+    as-is and non-editable. Note that when specifying
     specify :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` the
     read-only fields must be present to be shown (they are ignored otherwise).
 
     If ``readonly_fields`` is used without defining explicit ordering through
     :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` they will be
     added last after all editable fields.
+    
+    A read-only field can not only display data from a model's field, it can
+    also display the output of a function, or a model's method, or a method of
+    the ``ModelAdmin`` class itself, if these are declared in
+    ``readonly_fields``. This is very similar to the way
+    :attr:`ModelAdmin.list_display` behaves.
+    
+    This provides an effective and easy way to use the admin interface to
+    provide feedback on the status of the objects being edited, for example::
+    
+        class PersonAdmin(ModelAdmin):
+            readonly_fields = ('address_report',)   
+    
+            # instance is the instance of the model we are editing
+            def address_report(self, instance):
+                return "%s" % (", ".join(instance.get_full_address)) or "<span class='errors'>Warning: I can't determine this person's address.</span>"
+
+            # the short_description functions like a model field's verbose_name
+            address_report.short_description = "Address"
+            # in this example, we have used HTML tags in the output
+            address_report.allow_tags = True
+
 
 .. attribute:: ModelAdmin.save_as
 
