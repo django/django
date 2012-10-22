@@ -56,11 +56,11 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if not autoclobber:
                     confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
                 if autoclobber or confirm == 'yes':
-                  try:
-                      os.remove(test_database_name)
-                  except Exception as e:
-                      sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
-                      sys.exit(2)
+                    try:
+                        os.remove(test_database_name)
+                    except Exception as e:
+                        sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                        sys.exit(2)
                 else:
                     print("Tests cancelled.")
                     sys.exit(1)
