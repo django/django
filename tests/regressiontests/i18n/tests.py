@@ -269,7 +269,6 @@ class TranslationTests(TestCase):
         (%(person)s is translated as %(personne)s in fr.po)
         Refs #16516.
         """
-        from django.template import Template, Context
         with translation.override('fr'):
             t = Template('{% load i18n %}{% blocktrans %}My name is {{ person }}.{% endblocktrans %}')
             rendered = t.render(Context({'person': 'James'}))
@@ -282,11 +281,20 @@ class TranslationTests(TestCase):
         (%(person) misses a 's' in fr.po, causing the string formatting to fail)
         Refs #18393.
         """
-        from django.template import Template, Context
         with translation.override('fr'):
             t = Template('{% load i18n %}{% blocktrans %}My other name is {{ person }}.{% endblocktrans %}')
             rendered = t.render(Context({'person': 'James'}))
             self.assertEqual(rendered, 'My other name is James.')
+
+    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),), LANGUAGE_CODE="fr")
+    def test_bad_placeholder_3(self):
+        """
+        Test that broken default translation won't cause infinite recursion.
+        """
+        with translation.override("fr"):
+            t = Template('{% load i18n %}{% blocktrans %}My name is {{ person }}.{% endblocktrans %}')
+            rendered = t.render(Context({'person': 'James'}))
+            self.assertEqual(rendered, 'My name is James.')
 
 
 class FormattingTests(TestCase):
@@ -820,6 +828,30 @@ class MiscTests(TestCase):
             self.assertEqual(t_sing.render(Context({'percent': 42})), 'Das Ergebnis war 42%')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '42% stellt 1 Objekt dar')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '42% stellt 4 Objekte dar')
+
+    def test_percent_formatting_in_blocktrans(self):
+        """
+        Test that using Python's %-formatting is properly escaped in blocktrans.
+        """
+        t = Template('{% load i18n %}{% blocktrans %}Enter SMS No. %(foo)s.{% endblocktrans %}')
+        rendered = t.render(Context({'foo': 42}))
+        self.assertEqual(rendered, 'Enter SMS No. %(foo)s.')
+
+    def test_percent_formatting_in_blocktrans_plural(self):
+        """
+        Test that %-formatting is escaped in plural blocks.
+        """
+        extended_locale_paths = settings.LOCALE_PATHS + (
+            os.path.join(here, 'other', 'locale'),
+        )
+        with self.settings(LOCALE_PATHS=extended_locale_paths):
+            t_sing = Template("{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}")
+            t_plur = Template("{% load i18n %}{% blocktrans count num as number %}%(percent)s% represents {{ num }} object{% plural %}%(percent)s% represents {{ num }} objects{% endblocktrans %}")
+            with translation.override('de'):
+                # Strings won't get translated as they don't match after escaping %
+                self.assertEqual(t_sing.render(Context({'num_comments': 42})), 'There are %(num_comments)s comments')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '%(percent)s% represents 1 object')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
 
 
 class ResolutionOrderI18NTests(TestCase):

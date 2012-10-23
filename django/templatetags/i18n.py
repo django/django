@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 
+from django.conf import settings
 from django.template import (Node, Variable, TemplateSyntaxError,
     TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
 from django.template.base import _render_value_in_context
@@ -110,13 +111,13 @@ class BlockTranslateNode(Node):
         vars = []
         for token in tokens:
             if token.token_type == TOKEN_TEXT:
-                result.append(token.contents)
+                result.append(token.contents.replace('%', '%%'))
             elif token.token_type == TOKEN_VAR:
                 result.append('%%(%s)s' % token.contents)
                 vars.append(token.contents)
         return ''.join(result), vars
 
-    def render(self, context):
+    def render(self, context, nested_call=False):
         if self.message_context:
             message_context = self.message_context.resolve(context)
         else:
@@ -128,13 +129,10 @@ class BlockTranslateNode(Node):
         # the end of function
         context.update(tmp_context)
         singular, vars = self.render_token_list(self.singular)
-        # Escape all isolated '%'
-        singular = re.sub('%(?!\()', '%%', singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
             plural, plural_vars = self.render_token_list(self.plural)
-            plural = re.sub('%(?!\()', '%%', plural)
             if message_context:
                 result = translation.npgettext(message_context, singular,
                                                plural, count)
@@ -149,11 +147,14 @@ class BlockTranslateNode(Node):
         data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
         try:
-            result = result % data
+            formatted_result = result % data
         except (KeyError, ValueError):
+            if nested_call:
+                # either string is malformed, or it's a bug
+                raise TemplateSyntaxError("'blocktrans' is unable to format string returned by gettext: %r using %r" % (result, data))
             with translation.override(None):
-                result = self.render(context)
-        return result
+                formatted_result = self.render(context, nested_call=True)
+        return formatted_result
 
 
 class LanguageNode(Node):
