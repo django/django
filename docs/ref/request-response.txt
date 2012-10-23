@@ -569,18 +569,25 @@ Passing iterators
 Finally, you can pass ``HttpResponse`` an iterator rather than strings. If you
 use this technique, the iterator should return strings.
 
+Passing an iterator as content to :class:`HttpResponse` creates a
+streaming response if (and only if) no middleware accesses the
+:attr:`HttpResponse.content` attribute before the response is returned.
+
 .. versionchanged:: 1.5
 
-    Passing an iterator as content to :class:`HttpResponse` creates a
-    streaming response if (and only if) no middleware accesses the
-    :attr:`HttpResponse.content` attribute before the response is returned.
+This technique is fragile and was deprecated in Django 1.5. If you need the
+response to be streamed from the iterator to the client, you should use the
+:class:`StreamingHttpResponse` class instead.
 
-    If you want to guarantee that your response will stream to the client, you
-    should use the new :class:`StreamingHttpResponse` class instead.
+As of Django 1.7, when :class:`HttpResponse` is instantiated with an
+iterator, it will consume it immediately, store the response content as a
+string, and discard the iterator.
 
-If an :class:`HttpResponse` instance has been initialized with an iterator as
-its content, you can't use it as a file-like object. Doing so will raise an
-exception.
+.. versionchanged:: 1.5
+
+You can now use :class:`HttpResponse` as a file-like object even if it was
+instantiated with an iterator. Django will consume and save the content of
+the iterator on first access.
 
 Setting headers
 ~~~~~~~~~~~~~~~

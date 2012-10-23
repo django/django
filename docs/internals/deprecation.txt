@@ -286,6 +286,10 @@ these changes.
 * The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
   will be removed (``content_type`` should be used instead).
 
+* When :class:`~django.http.HttpResponse` is instantiated with an iterator,
+  or when :attr:`~django.http.HttpResponse.content` is set to an iterator,
+  that iterator will be immediately consumed.
+
 * The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
   the User model, will be removed.
 

@@ -246,8 +246,18 @@ class HttpResponse(HttpResponseBase):
     else:
         __str__ = serialize
 
+    def _consume_content(self):
+        # If the response was instantiated with an iterator, when its content
+        # is accessed, the iterator is going be exhausted and the content
+        # loaded in memory. At this point, it's better to abandon the original
+        # iterator and save the content for later reuse. This is a temporary
+        # solution. See the comment in __iter__ below for the long term plan.
+        if self._base_content_is_iter:
+            self.content = b''.join(self.make_bytes(e) for e in self._container)
+
     @property
     def content(self):
+        self._consume_content()
         return b''.join(self.make_bytes(e) for e in self._container)
 
     @content.setter
@@ -262,6 +272,17 @@ class HttpResponse(HttpResponseBase):
             self._base_content_is_iter = False
 
     def __iter__(self):
+        # Raise a deprecation warning only if the content wasn't consumed yet,
+        # because the response may be intended to be streamed.
+        # Once the deprecation completes, iterators should be consumed upon
+        # assignment rather than upon access. The _consume_content method
+        # should be removed. See #6527.
+        if self._base_content_is_iter:
+            warnings.warn(
+                'Creating streaming responses with `HttpResponse` is '
+                'deprecated. Use `StreamingHttpResponse` instead '
+                'if you need the streaming behavior.',
+                PendingDeprecationWarning, stacklevel=2)
         self._iterator = iter(self._container)
         return self
 
@@ -277,14 +298,12 @@ class HttpResponse(HttpResponseBase):
     next = __next__             # Python 2 compatibility
 
     def write(self, content):
-        if self._base_content_is_iter:
-            raise Exception("This %s instance is not writable" % self.__class__.__name__)
+        self._consume_content()
         self._container.append(content)
 
     def tell(self):
-        if self._base_content_is_iter:
-            raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
-        return sum([len(chunk) for chunk in self])
+        self._consume_content()
+        return sum(len(chunk) for chunk in self)
 
 
 class StreamingHttpResponse(HttpResponseBase):
@@ -389,6 +408,7 @@ class HttpResponseNotModified(HttpResponse):
         if value:
             raise AttributeError("You cannot set content to a 304 (Not Modified) response")
         self._container = []
+        self._base_content_is_iter = False
 
 
 class HttpResponseBadRequest(HttpResponse):

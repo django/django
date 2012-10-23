@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import copy
 import os
 import pickle
+import warnings
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
@@ -313,11 +314,17 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [1, 2, 3]
         self.assertEqual(r.content, b'123')
 
-        #test retrieval explicitly using iter and odd inputs
+        #test retrieval explicitly using iter (deprecated) and odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        my_iter = r.__iter__()
-        result = list(my_iter)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+            my_iter = iter(r)
+            self.assertEqual(w[0].category, PendingDeprecationWarning)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+            result = list(my_iter)
+            self.assertEqual(w[0].category, PendingDeprecationWarning)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
@@ -330,6 +337,16 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
 
+        # content can safely be accessed multiple times.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.content, r.content)
+        self.assertEqual(r.content, b'helloworld')
+
+        # additional content can be written to the response.
+        r.write('!')
+        self.assertEqual(r.content, b'helloworld!')
+
+
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")
@@ -338,7 +355,9 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.tell(), 17)
 
         r = HttpResponse(['abc'])
-        self.assertRaises(Exception, r.write, 'def')
+        r.write('def')
+        self.assertEqual(r.tell(), 6)
+        self.assertEqual(r.content, b'abcdef')
 
     def test_unsafe_redirect(self):
         bad_urls = [
@@ -447,7 +466,9 @@ class FileCloseTests(TestCase):
         file1 = open(filename)
         r = HttpResponse(file1)
         self.assertFalse(file1.closed)
-        list(r)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            list(r)
         self.assertFalse(file1.closed)
         r.close()
         self.assertTrue(file1.closed)
