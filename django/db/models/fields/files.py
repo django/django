@@ -10,7 +10,7 @@ from django.core.files.images import ImageFile
 from django.db.models import signals
 from django.utils.encoding import force_str, force_text
 from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 class FieldFile(File):
     def __init__(self, instance, field, name):
@@ -208,7 +208,8 @@ class FileDescriptor(object):
 class FileField(Field):
 
     default_error_messages = {
-        'max_length': _('Filename is %(extra)d characters too long.')
+        'max_length': lambda n: ungettext_lazy('Filename is %(extra)d character too long.',
+                                               'Filename is %(extra)d characters too long.', n)
     }
 
     # The class to wrap instance attributes in. Accessing the file object off
@@ -249,8 +250,13 @@ class FileField(Field):
             filename = self.generate_filename(model_instance, value.name)
         length = len(filename)
         if self.max_length and length > self.max_length:
-            error_values = {'extra': length - self.max_length}
-            raise ValidationError(self.error_messages['max_length'] % error_values)
+            extra = length - self.max_length
+            error_values = {'extra': extra}
+            if callable(self.error_messages['max_length']):
+                error_text = self.error_messages['max_length'](extra) % error_values
+            else:
+                error_text = self.error_messages['max_length'] % error_values
+            raise ValidationError(error_text)
 
     def get_internal_type(self):
         return "FileField"

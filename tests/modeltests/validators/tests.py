@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import *
 from django.test.utils import str_prefix
 from django.utils.unittest import TestCase
+from django.utils.translation import ugettext
 
 
 NOW = datetime.now()
@@ -213,6 +214,43 @@ class TestSimpleValidators(TestCase):
         v = ValidationError({'first': 'First Problem'})
         self.assertEqual(str(v), str_prefix("{%(_)s'first': %(_)s'First Problem'}"))
         self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': %(_)s'First Problem'})"))
+
+
+class UngettextValidators(TestCase):
+    def test_min_length_validator(self):
+        class MinLengthValidatorString(MinLengthValidator):
+            message = 'The length of value should be at least %(limit_value)d, but your value is of length %(show_value)d.'
+        string_validator = MinLengthValidatorString(10)
+        self.assertRaisesRegexp(ValidationError, str_prefix("%(_)s'[The length of value should be at least 10, but your value is of length 4']"),
+                                string_validator, 'aaa!')
+        class MinLengthValidatorFunction(MinLengthValidator):
+            message_function = lambda self, n: 'Wow, so long!' if n > 6 else 'Too short!'
+        function_validator = MinLengthValidatorFunction(10)
+        self.assertRaisesRegexp(ValidationError, str_prefix(r"[%(_)s'Too short]"), function_validator, 'Mouse')
+        self.assertRaisesRegexp(ValidationError, str_prefix(r"[%(_)s'Wow, so long]"), function_validator, 'Longcat')
+        default_validator = MinLengthValidator(10)
+        expected = ugettext('Ensure this value has at least %(limit_value)d characters (it has %(show_value)d)')
+        expected = expected % {'limit_value': 10, 'show_value': 8}
+        expected = str_prefix(r"[%%(_)s'%s']" % expected)
+        self.assertRaisesRegexp(ValidationError, expected, default_validator, 'Shortcat')
+
+    def test_max_length_validator(self):
+        class MaxLengthValidatorString(MaxLengthValidator):
+            message = 'The length of value SHOULD NOT BE OVER %(limit_value)d, but your value TOO LONG: %(show_value)d.'
+        string_validator = MaxLengthValidatorString(5)
+        self.assertRaisesRegexp(ValidationError, str_prefix("%(_)s'[The length of value SHOULD NOT BE OVER 10, but your value TOO LONG: 36']"), 
+                                string_validator, 'Hippopotomonstrosesquippedaliophobia')
+        class MaxLengthValidatorFunction(MaxLengthValidator):
+            message_function = lambda self, n: 'Long enough' if n > 13 else 'A bit shorty'
+        function_validator = MaxLengthValidatorFunction(10)
+        self.assertRaisesRegexp(ValidationError, str_prefix("[%(_)s'Long enough]"), function_validator, 'Hippopotomonstrosesquippedaliophobia')
+        self.assertRaisesRegexp(ValidationError, str_prefix("[%(_)s'A bit shorty]"), function_validator, 'hippopotamus')
+        default_validator = MaxLengthValidator(10)
+        expected = ugettext('Ensure this value has at least %(limit_value)d characters (it has %(show_value)d)')
+        expected = expected % {'limit_value': 10, 'show_value': 8}
+        expected = str_prefix("[%%(_)s'%s']" % expected)
+        self.assertRaisesRegexp(ValidationError, expected, default_validator, 'Shortcat')
+
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

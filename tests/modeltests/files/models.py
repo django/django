@@ -15,6 +15,11 @@ from django.core.files.storage import FileSystemStorage
 temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
+class FileFieldSubclass(models.FileField):
+    default_error_messages = {
+        'max_length': 'Filename is %(extra)d character too long.'
+    }
+
 class Storage(models.Model):
     def custom_upload_to(self, filename):
         return 'foo'
@@ -28,3 +33,4 @@ class Storage(models.Model):
     custom = models.FileField(storage=temp_storage, upload_to=custom_upload_to)
     random = models.FileField(storage=temp_storage, upload_to=random_upload_to, max_length=16)
     default = models.FileField(storage=temp_storage, upload_to='tests', default='tests/default.txt')
+    subclass = FileFieldSubclass(storage=temp_storage, upload_to=random_upload_to, max_length=16)
