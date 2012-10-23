@@ -1,6 +1,6 @@
 import copy
 from django.db import router
-from django.db.models.query import QuerySet, EmptyQuerySet, insert_query, RawQuerySet
+from django.db.models.query import QuerySet, insert_query, RawQuerySet
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 
@@ -113,7 +113,7 @@ class Manager(object):
     #######################
 
     def get_empty_query_set(self):
-        return EmptyQuerySet(self.model, using=self._db)
+        return QuerySet(self.model, using=self._db).none()
 
     def get_query_set(self):
         """Returns a new QuerySet object.  Subclasses can override this method
@@ -258,5 +258,9 @@ class SwappedManagerDescriptor(object):
 
 
 class EmptyManager(Manager):
+    def __init__(self, model):
+        super(EmptyManager, self).__init__()
+        self.model = model
+
     def get_query_set(self):
         return self.get_empty_query_set()

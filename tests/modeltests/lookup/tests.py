@@ -436,7 +436,7 @@ class LookupTests(TestCase):
             ])
 
     def test_none(self):
-       # none() returns an EmptyQuerySet that behaves like any other QuerySet object
+       # none() returns a QuerySet that behaves like any other QuerySet object
         self.assertQuerysetEqual(Article.objects.none(), [])
         self.assertQuerysetEqual(
             Article.objects.none().filter(headline__startswith='Article'), [])

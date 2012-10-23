@@ -31,6 +31,11 @@ Minor features
 Backwards incompatible changes in 1.6
 =====================================
 
+* The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
+  it is only usable as a marker class for checking if
+  :meth:`~django.db.models.query.QuerySet.none` has been called:
+  ``isinstance(qs.none(), EmptyQuerySet)``
+
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
