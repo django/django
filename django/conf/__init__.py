@@ -25,7 +25,7 @@ class LazySettings(LazyObject):
     The user can manually configure settings prior to using them. Otherwise,
     Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
-    def _setup(self, name):
+    def _setup(self, name=None):
         """
         Load the settings module pointed to by the environment variable. This
         is used the first time we need any settings at all, if the user has not
@@ -36,11 +36,12 @@ class LazySettings(LazyObject):
             if not settings_module: # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
+            desc = ("setting %s" % name) if name else "settings"
             raise ImproperlyConfigured(
-                "Requested setting %s, but settings are not configured. "
+                "Requested %s, but settings are not configured. "
                 "You must either define the environment variable %s "
                 "or call settings.configure() before accessing settings."
-                % (name, ENVIRONMENT_VARIABLE))
+                % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
         self._configure_logging()
