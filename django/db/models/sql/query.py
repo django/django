@@ -25,7 +25,7 @@ from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
-    ExtraWhere, AND, OR)
+    ExtraWhere, AND, OR, EmptyWhere)
 from django.core.exceptions import FieldError
 
 __all__ = ['Query', 'RawQuery']
@@ -1510,6 +1510,13 @@ class Query(object):
         if active_positions > 1:
             self.add_filter(('%s__isnull' % trimmed_prefix, False), negate=True,
                     can_reuse=can_reuse)
+
+    def set_empty(self):
+        self.where = EmptyWhere()
+        self.having = EmptyWhere()
+
+    def is_empty(self):
+        return isinstance(self.where, EmptyWhere) or isinstance(self.having, EmptyWhere)
 
     def set_limits(self, low=None, high=None):
         """

@@ -272,6 +272,14 @@ class WhereNode(tree.Node):
                 if hasattr(child[3], 'relabel_aliases'):
                     child[3].relabel_aliases(change_map)
 
+class EmptyWhere(WhereNode):
+
+    def add(self, data, connector):
+        return
+
+    def as_sql(self, qn=None, connection=None):
+        raise EmptyResultSet
+
 class EverythingNode(object):
     """
     A node that matches everything.

@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import Field, FieldDoesNotExist
+from django.db.models.query import EmptyQuerySet
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -639,3 +640,9 @@ class ModelTest(TestCase):
         Article.objects.bulk_create([Article(headline=lazy, pub_date=datetime.now())])
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
+
+    def test_emptyqs(self):
+        # Can't be instantiated
+        with self.assertRaises(TypeError):
+            EmptyQuerySet()
+        self.assertTrue(isinstance(Article.objects.none(), EmptyQuerySet))

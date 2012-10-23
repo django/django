@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
-from django.db.models.query import ITER_CHUNK_SIZE, EmptyQuerySet
+from django.db.models.query import ITER_CHUNK_SIZE
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
@@ -663,31 +663,32 @@ class Queries1Tests(BaseQuerysetTest):
             Item.objects.filter(created__in=[self.time1, self.time2]),
             ['<Item: one>', '<Item: two>']
         )
-
     def test_ticket7235(self):
         # An EmptyQuerySet should not raise exceptions if it is filtered.
-        q = EmptyQuerySet()
-        self.assertQuerysetEqual(q.all(), [])
-        self.assertQuerysetEqual(q.filter(x=10), [])
-        self.assertQuerysetEqual(q.exclude(y=3), [])
-        self.assertQuerysetEqual(q.complex_filter({'pk': 1}), [])
-        self.assertQuerysetEqual(q.select_related('spam', 'eggs'), [])
-        self.assertQuerysetEqual(q.annotate(Count('eggs')), [])
-        self.assertQuerysetEqual(q.order_by('-pub_date', 'headline'), [])
-        self.assertQuerysetEqual(q.distinct(), [])
-        self.assertQuerysetEqual(
-            q.extra(select={'is_recent': "pub_date > '2006-01-01'"}),
-            []
-        )
-        q.query.low_mark = 1
-        self.assertRaisesMessage(
-            AssertionError,
-            'Cannot change a query once a slice has been taken',
-            q.extra, select={'is_recent': "pub_date > '2006-01-01'"}
-        )
-        self.assertQuerysetEqual(q.reverse(), [])
-        self.assertQuerysetEqual(q.defer('spam', 'eggs'), [])
-        self.assertQuerysetEqual(q.only('spam', 'eggs'), [])
+        Eaten.objects.create(meal='m')
+        q = Eaten.objects.none()
+        with self.assertNumQueries(0):
+            self.assertQuerysetEqual(q.all(), [])
+            self.assertQuerysetEqual(q.filter(meal='m'), [])
+            self.assertQuerysetEqual(q.exclude(meal='m'), [])
+            self.assertQuerysetEqual(q.complex_filter({'pk': 1}), [])
+            self.assertQuerysetEqual(q.select_related('food'), [])
+            self.assertQuerysetEqual(q.annotate(Count('food')), [])
+            self.assertQuerysetEqual(q.order_by('meal', 'food'), [])
+            self.assertQuerysetEqual(q.distinct(), [])
+            self.assertQuerysetEqual(
+                q.extra(select={'foo': "1"}),
+                []
+            )
+            q.query.low_mark = 1
+            self.assertRaisesMessage(
+                AssertionError,
+                'Cannot change a query once a slice has been taken',
+                q.extra, select={'foo': "1"}
+            )
+            self.assertQuerysetEqual(q.reverse(), [])
+            self.assertQuerysetEqual(q.defer('meal'), [])
+            self.assertQuerysetEqual(q.only('meal'), [])
 
     def test_ticket7791(self):
         # There were "issues" when ordering and distinct-ing on fields related
@@ -1935,8 +1936,8 @@ class CloneTests(TestCase):
 
 class EmptyQuerySetTests(TestCase):
     def test_emptyqueryset_values(self):
-        # #14366 -- Calling .values() on an EmptyQuerySet and then cloning that
-        # should not cause an error"
+        # #14366 -- Calling .values() on an empty QuerySet and then cloning
+        # that should not cause an error
         self.assertQuerysetEqual(
             Number.objects.none().values('num').order_by('num'), []
         )
@@ -1952,9 +1953,9 @@ class EmptyQuerySetTests(TestCase):
         )
 
     def test_ticket_19151(self):
-        # #19151 -- Calling .values() or .values_list() on an EmptyQuerySet
-        # should return EmptyQuerySet and not cause an error.
-        q = EmptyQuerySet()
+        # #19151 -- Calling .values() or .values_list() on an empty QuerySet
+        # should return an empty QuerySet and not cause an error.
+        q = Author.objects.none()
         self.assertQuerysetEqual(q.values(), [])
         self.assertQuerysetEqual(q.values_list(), [])
 
