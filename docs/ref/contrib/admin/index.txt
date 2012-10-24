@@ -803,6 +803,14 @@ subclass::
         class ArticleAdmin(admin.ModelAdmin):
             raw_id_fields = ("newspaper",)
 
+    The ``raw_id_fields`` ``Input`` widget should contain a primary key if the
+    field is a ``ForeignKey`` or a comma separated list of values if the field
+    is a ``ManyToManyField``.  The ``raw_id_fields`` widget shows a magnifying
+    glass button next to the field which allows users to search for and select
+    a value:
+
+    .. image:: _images/raw_id_fields.png
+
 .. attribute:: ModelAdmin.readonly_fields
 
     By default the admin shows all fields as editable. Any fields in this
