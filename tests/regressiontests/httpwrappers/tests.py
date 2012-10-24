@@ -330,11 +330,12 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header
-        r = HttpResponse([1,1,2,4,8])
+        r = HttpResponse()
         r['Content-Encoding'] = 'winning'
-        self.assertEqual(r.content, b'11248')
-        r.content = ['\u079e',]
-        self.assertRaises(UnicodeEncodeError,
+        r.content = [b'abc', b'def']
+        self.assertEqual(r.content, b'abcdef')
+        r.content = ['\u079e']
+        self.assertRaises(TypeError if six.PY3 else UnicodeEncodeError,
                           getattr, r, 'content')
 
         # .content can safely be accessed multiple times.
