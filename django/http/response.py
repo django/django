@@ -283,7 +283,8 @@ class HttpResponse(HttpResponseBase):
                 'deprecated. Use `StreamingHttpResponse` instead '
                 'if you need the streaming behavior.',
                 PendingDeprecationWarning, stacklevel=2)
-        self._iterator = iter(self._container)
+        if not hasattr(self, '_iterator'):
+            self._iterator = iter(self._container)
         return self
 
     def __next__(self):
@@ -303,7 +304,7 @@ class HttpResponse(HttpResponseBase):
 
     def tell(self):
         self._consume_content()
-        return sum(len(chunk) for chunk in self)
+        return len(self.content)
 
 
 class StreamingHttpResponse(HttpResponseBase):

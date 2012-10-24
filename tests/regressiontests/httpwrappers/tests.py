@@ -337,15 +337,36 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
 
-        # content can safely be accessed multiple times.
+        # .content can safely be accessed multiple times.
         r = HttpResponse(iter(['hello', 'world']))
         self.assertEqual(r.content, r.content)
         self.assertEqual(r.content, b'helloworld')
+        # accessing the iterator works (once) after accessing .content
+        self.assertEqual(b''.join(r), b'helloworld')
+        self.assertEqual(b''.join(r), b'')
+        # accessing .content still works
+        self.assertEqual(r.content, b'helloworld')
+
+        # XXX accessing .content doesn't work if the response was iterated first
+        # XXX change this when the deprecation completes in HttpResponse
+        r = HttpResponse(iter(['hello', 'world']))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            self.assertEqual(b''.join(r), b'helloworld')
+        self.assertEqual(r.content, b'')                # not the expected result!
 
         # additional content can be written to the response.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.content, b'helloworld')
         r.write('!')
         self.assertEqual(r.content, b'helloworld!')
 
+    def test_iterator_isnt_rewound(self):
+        # Regression test for #13222
+        r = HttpResponse('abc')
+        i = iter(r)
+        self.assertEqual(list(i), [b'abc'])
+        self.assertEqual(list(i), [])
 
     def test_file_interface(self):
         r = HttpResponse()

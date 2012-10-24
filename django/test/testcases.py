@@ -596,7 +596,11 @@ class TransactionTestCase(SimpleTestCase):
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
         text = force_text(text, encoding=response._charset)
-        content = b''.join(response).decode(response._charset)
+        if response.streaming:
+            content = b''.join(response.streaming_content)
+        else:
+            content = response.content
+        content = content.decode(response._charset)
         # Avoid ResourceWarning about unclosed files.
         response.close()
         if html:
