@@ -365,6 +365,16 @@ entirely!). If you want to use a different database name, specify
 :setting:`TEST_NAME` in the dictionary for any given database in
 :setting:`DATABASES`.
 
+Note that if your code attempts to access the database when its modules are
+compiled, then this will occur *before* the test database is set up, with
+potentially unexpected results. 
+
+For example if you have a database query in module-level code, and a real
+database exists, data from it could pollute your tests.
+
+*It is a bad idea to have such import-time database queries in your code* anyway
+- rewrite your code so that it doesn't do this.
+    
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
 :setting:`ENGINE`, :setting:`USER`, :setting:`HOST`, etc. The test
