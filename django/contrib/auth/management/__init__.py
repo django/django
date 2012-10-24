@@ -25,6 +25,10 @@ def _get_all_permissions(opts, ctype):
     """
     builtin = _get_builtin_permissions(opts)
     custom = list(opts.permissions)
+
+    if any(isinstance(el, basestring) for el in custom):
+        custom = [custom]
+
     _check_permission_clashing(custom, builtin, ctype)
     return builtin + custom
 
