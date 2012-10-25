@@ -417,7 +417,7 @@ translates (roughly) into the following SQL::
     There's one exception though, in case of a
     :class:`~django.db.models.ForeignKey` you can specify the field
     name suffixed with ``_id``. In this case, the value parameter is expected
-    to contain the raw value of the foreign model's primary key. For example::
+    to contain the raw value of the foreign model's primary key. For example:
 
         >>> Entry.objects.filter(blog_id__exact=4)
 
