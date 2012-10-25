@@ -115,7 +115,6 @@ class Query(object):
         self.default_ordering = True
         self.standard_ordering = True
         self.ordering_aliases = []
-        self.select_fields = []
         self.related_select_fields = []
         self.dupe_avoidance = {}
         self.used_aliases = set()
@@ -124,6 +123,9 @@ class Query(object):
 
         # SQL-related attributes
         self.select = []
+        # For each to-be-selected field in self.select there must be a
+        # corresponding entry in self.select - git seems to need this.
+        self.select_fields = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
