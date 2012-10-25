@@ -2,14 +2,29 @@
 Django 1.5 release notes - UNDER DEVELOPMENT
 ============================================
 
-Welcome to Django 1.5!
+October 25, 2012.
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.4 or older versions. We've also dropped some
-features, which are detailed in :doc:`our deprecation plan
-</internals/deprecation>`, and we've `begun the deprecation process for some
-features`_.
+Welcome to Django 1.5 alpha!
+
+This is the first in a series of preview/development releases leading up to the
+eventual release of Django 1.5, scheduled for December 2012. This release is
+primarily targeted at developers who are interested in trying out new features
+and testing the Django codebase to help identify and resolve bugs prior to the
+final 1.5 release.
+
+As such, this release is *not* intended for production use, and any such use
+is discouraged.
+
+In particular, we need the community's help to test Django 1.5's new `Python 3
+support`_ -- not just to report bugs on Python 3, but also regressions on Python
+2. While Django is very conservative with regards to backwards compatibility,
+mistakes are always possible, and it's likely that the Python 3 refactoring work
+introduced some regressions.
+
+Django 1.5 alpha includes various `new features`_ and some minor `backwards
+incompatible changes`_. There are also some features that have been dropped,
+which are detailed in :doc:`our deprecation plan </internals/deprecation>`,
+and we've `begun the deprecation process for some features`_.
 
 .. _`new features`: `What's new in Django 1.5`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.5`_
@@ -26,7 +41,7 @@ yourself. This could be a simple extension to the existing ``User`` model -- for
 example, you could add a Twitter or Facebook ID field -- or you could completely
 replace the ``User`` with one totally customized for your site.
 
-Django 1.5 is also the first release with `Python 3 support`_! We're labling
+Django 1.5 is also the first release with `Python 3 support`_! We're labeling
 this support "experimental" because we don't yet consider it production-ready,
 but everything's in place for you to start porting your apps to Python 3.
 Our next release, Django 1.6, will support Python 3 without reservations.
@@ -91,7 +106,7 @@ need to install a different version of Django on Python 3. This means that
 you can write application targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
-However, we're labeling this support "experimental" for now: although it's
+However, we're labling this support "experimental" for now: although it's
 receved extensive testing via our automated test suite, it's recieved very
 little real-world testing. We've done our best to eliminate bugs, but we can't
 be sure we covered all possible uses of Django. Further, Django's more than a
@@ -102,7 +117,7 @@ Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
 3. Instead, use this oportunity to begin :doc:`porting applications to Python 3
-<topics/python>`. If you're an author of a pluggable component, we encourage you
+</topics/python3>`. If you're an author of a pluggable component, we encourage you
 to start porting now.
 
 We plan to offer first-class, production-ready support for Python 3 in our next
@@ -160,8 +175,6 @@ In Django 1.5, the third line no longer triggers a new SQL query to fetch
 For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
 is particularly helpful in combination with ``prefetch_related``.
-
-.. _explicit-streaming-responses:
 
 Explicit support for streaming responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -374,12 +387,10 @@ If you were using the ``data`` parameter in a PUT request without a
 ``content_type``, you must encode your data before passing it to the test
 client and set the ``content_type`` argument.
 
-.. _simplejson-incompatibilities:
-
 System version of :mod:`simplejson` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`As explained below <simplejson-deprecation>`, Django 1.5 deprecates
+As explained below, Django 1.5 deprecates
 :mod:`django.utils.simplejson` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of :mod:`simplejson`, it may trigger errors
@@ -560,8 +571,6 @@ Miscellaneous
 Features deprecated in 1.5
 ==========================
 
-.. _simplejson-deprecation:
-
 :setting:`AUTH_PROFILE_MODULE`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -580,8 +589,7 @@ Streaming behavior of :class:`HttpResponse`
 
 Django 1.5 deprecates the ability to stream a response by passing an iterator
 to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
-:class:`~django.http.StreamingHttpResponse`. See :ref:`explicit-streaming-
-responses` above.
+:class:`~django.http.StreamingHttpResponse`. See above for more details.
 
 In Django 1.7 and above, the iterator will be consumed immediately by
 :class:`~django.http.HttpResponse`.
@@ -595,10 +603,10 @@ removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
 instead :mod:`django.utils.simplejson`.
 
 Unfortunately, this change might have unwanted side-effects, because of
-incompatibilities between versions of :mod:`simplejson` -- see the
-:ref:`backwards-incompatible changes <simplejson-incompatibilities>` section.
-If you rely on features added to :mod:`simplejson` after it became Python's
-:mod:`json`, you should import :mod:`simplejson` explicitly.
+incompatibilities between versions of :mod:`simplejson` -- see the backwards-
+incompatible changes section. If you rely on features added to :mod:`simplejson`
+after it became Python's :mod:`json`, you should import :mod:`simplejson`
+explicitly.
 
 ``django.utils.encoding.StrAndUnicode``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
