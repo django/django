@@ -267,6 +267,12 @@ class ProxyDeleteTest(TestCase):
 
         self.assertEqual(len(FooFileProxy.objects.all()), 0)
 
+    def test_19187_values(self):
+        with self.assertRaises(TypeError):
+            Image.objects.values().delete()
+        with self.assertRaises(TypeError):
+            Image.objects.values_list().delete()
+
 class Ticket19102Tests(TestCase):
     """
     Test different queries which alter the SELECT clause of the query. We

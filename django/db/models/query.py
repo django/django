@@ -983,6 +983,12 @@ class ValuesQuerySet(QuerySet):
         for row in self.query.get_compiler(self.db).results_iter():
             yield dict(zip(names, row))
 
+    def delete(self):
+        # values().delete() doesn't work currently - make sure it raises an
+        # user friendly error.
+        raise TypeError("Queries with .values() or .values_list() applied "
+                        "can't be deleted")
+
     def _setup_query(self):
         """
         Constructs the field_names list that the values query will be
