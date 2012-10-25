@@ -17,6 +17,7 @@ class MultipleObjectMixin(ContextMixin):
     paginate_by = None
     context_object_name = None
     paginator_class = Paginator
+    page_kwarg = 'page'
 
     def get_queryset(self):
         """
@@ -39,7 +40,8 @@ class MultipleObjectMixin(ContextMixin):
         Paginate the queryset, if needed.
         """
         paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
-        page = self.kwargs.get('page') or self.request.GET.get('page') or 1
+        page_kwarg = self.page_kwarg
+        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
         except ValueError:
