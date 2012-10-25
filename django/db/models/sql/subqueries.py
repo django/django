@@ -48,6 +48,11 @@ class DeleteQuery(Query):
             self.do_query(self.model._meta.db_table, where, using=using)
 
     def delete_qs(self, query, using):
+        """
+        Delete the queryset in one SQL query (if possible). For simple queries
+        this is done by copying the query.query.where to self.query, for
+        complex queries by using subquery.
+        """
         innerq = query.query
         # Make sure the inner query has at least one table in use.
         innerq.get_initial_alias()
