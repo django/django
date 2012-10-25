@@ -116,8 +116,8 @@ Configurable User model
 
 In Django 1.5, you can now use your own model as the store for user-related
 data. If your project needs a username with more than 30 characters, or if
-you want to store usernames in a format other than first name/last name, or
-you want to put custom profile information onto your User object, you can
+you want to store user's names in a format other than first name/last name,
+or you want to put custom profile information onto your User object, you can
 now do so.
 
 If you have a third-party reusable application that references the User model,
