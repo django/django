@@ -128,6 +128,12 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(self.d1, {})
         self.assertEqual(self.d1.keyOrder, [])
 
+    def test_reversed(self):
+        self.assertEqual(list(self.d1), [7, 1, 9])
+        self.assertEqual(list(self.d2), [1, 9, 0, 7])
+        self.assertEqual(list(reversed(self.d1)), [9, 1, 7])
+        self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
+
     def test_insert(self):
         d = SortedDict()
         with warnings.catch_warnings(record=True) as w:

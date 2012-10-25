@@ -50,3 +50,40 @@ class ActionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Action, ActionAdmin)
+
+
+class Person(models.Model):
+    nick = models.CharField(max_length=20)
+
+
+class PersonAdmin(admin.ModelAdmin):
+    """A custom ModelAdmin that customizes the deprecated post_url_continue
+    argument to response_add()"""
+    def response_add(self, request, obj, post_url_continue='../%s/continue/',
+                     continue_url=None, add_url=None, hasperm_url=None,
+                     noperm_url=None):
+        return super(PersonAdmin, self).response_add(request, obj,
+                                                     post_url_continue,
+                                                     continue_url, add_url,
+                                                     hasperm_url, noperm_url)
+
+
+admin.site.register(Person, PersonAdmin)
+
+
+class City(models.Model):
+    name = models.CharField(max_length=20)
+
+
+class CityAdmin(admin.ModelAdmin):
+    """A custom ModelAdmin that redirects to the changelist when the user
+    presses the 'Save and add another' button when adding a model instance."""
+    def response_add(self, request, obj,
+                     add_another_url='admin:admin_custom_urls_city_changelist',
+                     **kwargs):
+        return super(CityAdmin, self).response_add(request, obj,
+                                                   add_another_url=add_another_url,
+                                                   **kwargs)
+
+
+admin.site.register(City, CityAdmin)

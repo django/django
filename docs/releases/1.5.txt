@@ -84,6 +84,26 @@ For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
 is particularly helpful in combination with ``prefetch_related``.
 
+.. _explicit-streaming-responses:
+
+Explicit support for streaming responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before Django 1.5, it was possible to create a streaming response by passing
+an iterator to :class:`~django.http.HttpResponse`. But this was unreliable:
+any middleware that accessed the :attr:`~django.http.HttpResponse.content`
+attribute would consume the iterator prematurely.
+
+You can now explicitly generate a streaming response with the new
+:class:`~django.http.StreamingHttpResponse` class. This class exposes a
+:class:`~django.http.StreamingHttpResponse.streaming_content` attribute which
+is an iterator.
+
+Since :class:`~django.http.StreamingHttpResponse` does not have a ``content``
+attribute, middleware that needs access to the response content must test for
+streaming responses and behave accordingly. See :ref:`response-middleware` for
+more information.
+
 ``{% verbatim %}`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -177,10 +197,6 @@ Django 1.5 also includes several smaller improvements worth noting:
   :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
-* :ref:`F() expressions <query-expressions>` now support comparison operations
-  and inversion, expanding the types of expressions that can be passed to the
-  database.
-
 * When using :class:`~django.template.RequestContext`, it is now possible to
   look up permissions by using ``{% if 'someapp.someperm' in perms %}``
   in templates.
@@ -197,6 +213,11 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * The loaddata management command now supports an `ignorenonexistent` option to
   ignore data for fields that no longer exist.
+
+* :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
+  you to test equality for XML content at a semantic level, without caring for
+  syntax differences (spaces, attribute order, etc.).
 
 Backwards incompatible changes in 1.5
 =====================================
@@ -243,6 +264,18 @@ For consistency with the design of the other generic views,
 :class:`~django.views.generic.base.TemplateView` no longer passes a ``params``
 dictionary into the context, instead passing the variables from the URLconf
 directly into the context.
+
+Non-form data in HTTP requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
+posted via HTTP requests with non form-specific content-types in the header.
+In prior versions, data posted with content-types other than
+``multipart/form-data`` or ``application/x-www-form-urlencoded`` would still
+end up represented in the :attr:`request.POST <django.http.HttpRequest.POST>`
+attribute. Developers wishing to access the raw POST data for these cases,
+should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
+instead.
 
 OPTIONS, PUT and DELETE requests in the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -419,8 +452,18 @@ with the :meth:`~django.forms.Form.is_valid()` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 
+Cleaned :djadmin:`cleanup` management command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command have contained only expired sessions clean up for years.
+Therefore new command :djadmin:`cleansessions` in ``django.contrib.sessions``
+do the job and :djadmin:`cleanup` command just call it.
+
 Miscellaneous
 ~~~~~~~~~~~~~
+
+* :class:`django.forms.ModelMultipleChoiceField` now returns an empty
+  ``QuerySet`` as the empty value instead of an empty list.
 
 * :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
   instead of :exc:`ValueError` for non-integer inputs.
@@ -434,10 +477,44 @@ Miscellaneous
   needs. The new default value is `0666` (octal) and the current umask value
   is first masked out.
 
+* The :ref:`F() expressions <query-expressions>` supported bitwise operators by
+  ``&`` and ``|``. These operators are now available using ``.bitand()`` and
+  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be consistent with
+  :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
+  the operators are used as boolean AND and OR operators.
+
+* The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
+  HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
+  in your pages.
+
 Features deprecated in 1.5
 ==========================
 
 .. _simplejson-deprecation:
+
+:setting:`AUTH_PROFILE_MODULE`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the introduction of :ref:`custom User models <auth-custom-user>`, there is
+no longer any need for a built-in mechanism to store user profile data.
+
+You can still define user profiles models that have a one-to-one relation with
+the User model - in fact, for many applications needing to associate data with
+a User account, this will be an appropriate design pattern to follow. However,
+the :setting:`AUTH_PROFILE_MODULE` setting, and the
+:meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
+the user profile model, should not be used any longer.
+
+Streaming behavior of :class:`HttpResponse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.5 deprecates the ability to stream a response by passing an iterator
+to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
+:class:`~django.http.StreamingHttpResponse`. See :ref:`explicit-streaming-
+responses` above.
+
+In Django 1.7 and above, the iterator will be consumed immediately by
+:class:`~django.http.HttpResponse`.
 
 ``django.utils.simplejson``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -453,18 +530,19 @@ incompatibilities between versions of :mod:`simplejson` -- see the
 If you rely on features added to :mod:`simplejson` after it became Python's
 :mod:`json`, you should import :mod:`simplejson` explicitly.
 
-``itercompat.product``
-~~~~~~~~~~~~~~~~~~~~~~
-
-The :func:`~django.utils.itercompat.product` function has been deprecated. Use
-the built-in :func:`itertools.product` instead.
-
 ``django.utils.encoding.StrAndUnicode``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :class:`~django.utils.encoding.StrAndUnicode` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
 :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
+
+``django.utils.itercompat.product``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+the built-in :func:`itertools.product` instead.
+
 
 ``django.utils.markup``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -473,23 +551,3 @@ The markup contrib module has been deprecated and will follow an accelerated
 deprecation schedule. Direct use of python markup libraries or 3rd party tag
 libraries is preferred to Django maintaining this functionality in the
 framework.
-
-:setting:`AUTH_PROFILE_MODULE`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-With the introduction of :ref:`custom User models <auth-custom-user>`, there is
-no longer any need for a built-in mechanism to store user profile data.
-
-You can still define user profiles models that have a one-to-one relation with
-the User model - in fact, for many applications needing to associate data with
-a User account, this will be an appropriate design pattern to follow. However,
-the :setting:`AUTH_PROFILE_MODULE` setting, and the
-:meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
-the user profile model, should not be used any longer.
-
-Cleaned :djadmin:`cleanup` management command
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This command have contained only expired sessions clean up for years.
-Therefore new command :djadmin:`cleansessions` in ``django.contrib.sessions``
-do the job and :djadmin:`cleanup` command just call it.

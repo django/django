@@ -1,10 +1,10 @@
+from django.db import models
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, AbstractUser, UserManager
+
+
 # The custom User uses email as the unique identifier, and requires
 # that every user provide a date of birth. This lets us test
 # changes in username datatype, and non-text required fields.
-
-from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, date_of_birth, password=None):
@@ -23,8 +23,8 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password, date_of_birth):
-        u = self.create_user(username, password=password, date_of_birth=date_of_birth)
+    def create_superuser(self, email, password, date_of_birth):
+        u = self.create_user(email, password=password, date_of_birth=date_of_birth)
         u.is_admin = True
         u.save(using=self._db)
         return u
@@ -73,3 +73,18 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+
+# The extension user is a simple extension of the built-in user class,
+# adding a required date_of_birth field. This allows us to check for
+# any hard references to the name "User" in forms/handlers etc.
+
+class ExtensionUser(AbstractUser):
+    date_of_birth = models.DateField()
+
+    objects = UserManager()
+
+    REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
+
+    class Meta:
+        app_label = 'auth'

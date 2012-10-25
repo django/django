@@ -45,7 +45,7 @@ from django.contrib.gis.gdal.layer import Layer
 # Getting the ctypes prototypes for the DataSource.
 from django.contrib.gis.gdal.prototypes import ds as capi
 
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -57,12 +57,14 @@ class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
 
     #### Python 'magic' routines ####
-    def __init__(self, ds_input, ds_driver=False, write=False):
+    def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
         if write:
             self._write = 1
         else:
             self._write = 0
+        # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        self.encoding = encoding
 
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.
@@ -129,4 +131,5 @@ class DataSource(GDALBase):
     @property
     def name(self):
         "Returns the name of the data source."
-        return capi.get_ds_name(self._ptr)
+        name = capi.get_ds_name(self._ptr)
+        return force_text(name, self.encoding, strings_only=True)

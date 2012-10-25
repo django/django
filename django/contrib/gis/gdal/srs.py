@@ -34,7 +34,7 @@ from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
 
 from django.utils import six
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 
 
 #### Spatial Reference class. ####
@@ -139,8 +139,7 @@ class SpatialReference(GDALBase):
         """
         if not isinstance(target, six.string_types) or not isinstance(index, int):
             raise TypeError
-        value = capi.get_attr_value(self.ptr, force_bytes(target), index)
-        return force_text(value, 'ascii', strings_only=True)
+        return capi.get_attr_value(self.ptr, force_bytes(target), index)
 
     def auth_name(self, target):
         "Returns the authority name for the given string target node."

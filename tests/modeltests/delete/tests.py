@@ -250,7 +250,7 @@ class DeletionTests(TestCase):
         self.assertNumQueries(3, a.delete)
         self.assertFalse(User.objects.exists())
         self.assertFalse(Avatar.objects.exists())
-        self.assertEquals(len(calls), 1)
+        self.assertEqual(len(calls), 1)
         models.signals.post_delete.disconnect(noop, sender=User)
 
     @skipIfDBFeature("can_defer_constraint_checks")
@@ -275,7 +275,7 @@ class DeletionTests(TestCase):
         self.assertNumQueries(4, a.delete)
         self.assertFalse(User.objects.exists())
         self.assertFalse(Avatar.objects.exists())
-        self.assertEquals(len(calls), 1)
+        self.assertEqual(len(calls), 1)
         models.signals.post_delete.disconnect(noop, sender=User)
 
     def test_hidden_related(self):
@@ -317,7 +317,7 @@ class FastDeleteTests(TestCase):
         u1 = User.objects.create()
         u2 = User.objects.create()
         self.assertNumQueries(1, User.objects.filter(pk=u1.pk).delete)
-        self.assertEquals(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.filter(pk=u2.pk).exists())
 
     def test_fast_delete_joined_qs(self):
@@ -327,7 +327,7 @@ class FastDeleteTests(TestCase):
         expected_queries = 1 if connection.features.update_can_self_select else 2
         self.assertNumQueries(expected_queries,
                               User.objects.filter(avatar__desc='a').delete)
-        self.assertEquals(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.filter(pk=u2.pk).exists())
 
     def test_fast_delete_inheritance(self):
@@ -340,8 +340,8 @@ class FastDeleteTests(TestCase):
         # self.assertNumQueries(2, c.delete)
         c.delete()
         self.assertFalse(Child.objects.exists())
-        self.assertEquals(Parent.objects.count(), 1)
-        self.assertEquals(Parent.objects.filter(pk=p.pk).count(), 1)
+        self.assertEqual(Parent.objects.count(), 1)
+        self.assertEqual(Parent.objects.filter(pk=p.pk).count(), 1)
         # 1 for self delete, 1 for fast delete of empty "child" qs.
         self.assertNumQueries(2, p.delete)
         self.assertFalse(Parent.objects.exists())

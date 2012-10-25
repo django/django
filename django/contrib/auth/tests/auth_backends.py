@@ -1,24 +1,29 @@
 from __future__ import unicode_literals
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.auth.tests.custom_user import ExtensionUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
 
 
-@skipIfCustomUser
-class BackendTest(TestCase):
-
+class BaseModelBackendTest(object):
+    """
+    A base class for tests that need to validate the ModelBackend
+    with different User models. Subclasses should define a class
+    level UserModel attribute, and a create_users() method to
+    construct two users for test purposes.
+    """
     backend = 'django.contrib.auth.backends.ModelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
         settings.AUTHENTICATION_BACKENDS = (self.backend,)
-        User.objects.create_user('test', 'test@example.com', 'test')
-        User.objects.create_superuser('test2', 'test2@example.com', 'test')
+        self.create_users()
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
@@ -28,7 +33,7 @@ class BackendTest(TestCase):
         ContentType.objects.clear_cache()
 
     def test_has_perm(self):
-        user = User.objects.get(username='test')
+        user = self.UserModel.objects.get(username='test')
         self.assertEqual(user.has_perm('auth.test'), False)
         user.is_staff = True
         user.save()
@@ -47,14 +52,14 @@ class BackendTest(TestCase):
         self.assertEqual(user.has_perm('auth.test'), False)
 
     def test_custom_perms(self):
-        user = User.objects.get(username='test')
-        content_type=ContentType.objects.get_for_model(Group)
+        user = self.UserModel.objects.get(username='test')
+        content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
         user.save()
 
         # reloading user to purge the _perm_cache
-        user = User.objects.get(username='test')
+        user = self.UserModel.objects.get(username='test')
         self.assertEqual(user.get_all_permissions() == set(['auth.test']), True)
         self.assertEqual(user.get_group_permissions(), set([]))
         self.assertEqual(user.has_module_perms('Group'), False)
@@ -65,7 +70,7 @@ class BackendTest(TestCase):
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
         user.save()
-        user = User.objects.get(username='test')
+        user = self.UserModel.objects.get(username='test')
         self.assertEqual(user.get_all_permissions(), set(['auth.test2', 'auth.test', 'auth.test3']))
         self.assertEqual(user.has_perm('test'), False)
         self.assertEqual(user.has_perm('auth.test'), True)
@@ -75,7 +80,7 @@ class BackendTest(TestCase):
         group.permissions.add(perm)
         group.save()
         user.groups.add(group)
-        user = User.objects.get(username='test')
+        user = self.UserModel.objects.get(username='test')
         exp = set(['auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'])
         self.assertEqual(user.get_all_permissions(), exp)
         self.assertEqual(user.get_group_permissions(), set(['auth.test_group']))
@@ -87,8 +92,8 @@ class BackendTest(TestCase):
 
     def test_has_no_object_perm(self):
         """Regressiontest for #12462"""
-        user = User.objects.get(username='test')
-        content_type=ContentType.objects.get_for_model(Group)
+        user = self.UserModel.objects.get(username='test')
+        content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
         user.save()
@@ -100,8 +105,64 @@ class BackendTest(TestCase):
 
     def test_get_all_superuser_permissions(self):
         "A superuser has all permissions. Refs #14795"
-        user = User.objects.get(username='test2')
+        user = self.UserModel.objects.get(username='test2')
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
+
+
+@skipIfCustomUser
+class ModelBackendTest(BaseModelBackendTest, TestCase):
+    """
+    Tests for the ModelBackend using the default User model.
+    """
+    UserModel = User
+
+    def create_users(self):
+        User.objects.create_user(
+            username='test',
+            email='test@example.com',
+            password='test',
+        )
+        User.objects.create_superuser(
+            username='test2',
+            email='test2@example.com',
+            password='test',
+        )
+
+
+@override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
+class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
+    """
+    Tests for the ModelBackend using the custom ExtensionUser model.
+
+    This isn't a perfect test, because both the User and ExtensionUser are
+    synchronized to the database, which wouldn't ordinary happen in
+    production. As a result, it doesn't catch errors caused by the non-
+    existence of the User table.
+
+    The specific problem is queries on .filter(groups__user) et al, which
+    makes an implicit assumption that the user model is called 'User'. In
+    production, the auth.User table won't exist, so the requested join
+    won't exist either; in testing, the auth.User *does* exist, and
+    so does the join. However, the join table won't contain any useful
+    data; for testing, we check that the data we expect actually does exist.
+    """
+
+    UserModel = ExtensionUser
+
+    def create_users(self):
+        ExtensionUser.objects.create_user(
+            username='test',
+            email='test@example.com',
+            password='test',
+            date_of_birth=date(2006, 4, 25)
+        )
+        ExtensionUser.objects.create_superuser(
+            username='test2',
+            email='test2@example.com',
+            password='test',
+            date_of_birth=date(1976, 11, 8)
+        )
+
 
 class TestObj(object):
     pass
@@ -110,7 +171,7 @@ class TestObj(object):
 class SimpleRowlevelBackend(object):
     def has_perm(self, user, perm, obj=None):
         if not obj:
-            return # We only support row level perms
+            return  # We only support row level perms
 
         if isinstance(obj, TestObj):
             if user.username == 'test2':
@@ -128,7 +189,7 @@ class SimpleRowlevelBackend(object):
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
-            return [] # We only support row level perms
+            return []  # We only support row level perms
 
         if not isinstance(obj, TestObj):
             return ['none']
@@ -142,7 +203,7 @@ class SimpleRowlevelBackend(object):
 
     def get_group_permissions(self, user, obj=None):
         if not obj:
-            return # We only support row level perms
+            return  # We only support row level perms
 
         if not isinstance(obj, TestObj):
             return ['none']
@@ -189,7 +250,6 @@ class RowlevelBackendTest(TestCase):
         self.assertEqual(self.user2.get_all_permissions(), set([]))
 
     def test_get_group_permissions(self):
-        content_type=ContentType.objects.get_for_model(Group)
         group = Group.objects.create(name='test_group')
         self.user3.groups.add(group)
         self.assertEqual(self.user3.get_group_permissions(TestObj()), set(['group_perm']))

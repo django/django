@@ -103,11 +103,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             self.geom_func_prefix = prefix
             self.spatial_version = version
         except DatabaseError:
-            raise ImproperlyConfigured('Cannot determine PostGIS version for database "%s". '
-                                       'GeoDjango requires at least PostGIS version 1.3. '
-                                       'Was the database created from a spatial database '
-                                       'template?' % self.connection.settings_dict['NAME']
-                                       )
+            raise ImproperlyConfigured(
+                'Cannot determine PostGIS version for database "%s". '
+                'GeoDjango requires at least PostGIS version 1.3. '
+                'Was the database created from a spatial database '
+                'template?' % self.connection.settings_dict['NAME']
+                )
         # TODO: Raise helpful exceptions as they become known.
 
         # PostGIS-specific operators. The commented descriptions of these
@@ -215,6 +216,10 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 'bboverlaps' : PostGISOperator('&&'),
                 }
 
+        # Native geometry type support added in PostGIS 2.0.
+        if version >= (2, 0, 0):
+            self.geometry = True
+
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         gis_terms = ['isnull']
         gis_terms += list(self.geometry_operators)
@@ -320,6 +325,14 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                                           'only with an SRID of 4326.')
 
             return 'geography(%s,%d)'% (f.geom_type, f.srid)
+        elif self.geometry:
+            # Postgis 2.0 supports type-based geometries.
+            # TODO: Support 'M' extension.
+            if f.dim == 3:
+                geom_type = f.geom_type + 'Z'
+            else:
+                geom_type = f.geom_type
+            return 'geometry(%s,%d)' % (geom_type, f.srid)
         else:
             return None
 
@@ -381,7 +394,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            placeholder = placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            placeholder = placeholder % self.get_expression_column(value)
 
         return placeholder
 

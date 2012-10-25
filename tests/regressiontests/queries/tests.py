@@ -1698,6 +1698,13 @@ class EmptyQuerySetTests(TestCase):
             []
         )
 
+    def test_ticket_19151(self):
+        # #19151 -- Calling .values() or .values_list() on an EmptyQuerySet
+        # should return EmptyQuerySet and not cause an error.
+        q = EmptyQuerySet()
+        self.assertQuerysetEqual(q.values(), [])
+        self.assertQuerysetEqual(q.values_list(), [])
+
 
 class ValuesQuerysetTests(BaseQuerysetTest):
     def test_flat_values_lits(self):

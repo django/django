@@ -8,6 +8,7 @@ from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
+from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils.unittest import skipUnless
 from django.test import TestCase
@@ -1035,8 +1036,8 @@ class OldFormForXTests(TestCase):
             f.clean([c6.id])
 
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
-        self.assertEqual(f.clean([]), [])
-        self.assertEqual(f.clean(()), [])
+        self.assertIsInstance(f.clean([]), EmptyQuerySet)
+        self.assertIsInstance(f.clean(()), EmptyQuerySet)
         with self.assertRaises(ValidationError):
             f.clean(['10'])
         with self.assertRaises(ValidationError):

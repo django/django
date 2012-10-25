@@ -18,7 +18,7 @@ class HTTPSSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/secure/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_secure_sitemap_section(self):
         "A secure sitemap section can be rendered"
@@ -28,7 +28,7 @@ class HTTPSSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
 
 @override_settings(SECURE_PROXY_SSL_HEADER=False)
@@ -43,7 +43,7 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url.replace('http://', 'https://')
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_sitemap_section_with_https_request(self):
         "A sitemap section requested in HTTPS is rendered with HTTPS links"
@@ -53,4 +53,4 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url.replace('http://', 'https://'), date.today())
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)

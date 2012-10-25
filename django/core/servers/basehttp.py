@@ -14,9 +14,8 @@ import socket
 import sys
 import traceback
 try:
-    from urllib.parse import unquote, urljoin
+    from urllib.parse import urljoin
 except ImportError:     # Python 2
-    from urllib import unquote
     from urlparse import urljoin
 from django.utils.six.moves import socketserver
 from wsgiref import simple_server
@@ -138,37 +137,6 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         self.path = ''
         self.style = color_style()
         super(WSGIRequestHandler, self).__init__(*args, **kwargs)
-
-    def get_environ(self):
-        env = self.server.base_environ.copy()
-        env['SERVER_PROTOCOL'] = self.request_version
-        env['REQUEST_METHOD'] = self.command
-        if '?' in self.path:
-            path,query = self.path.split('?',1)
-        else:
-            path,query = self.path,''
-
-        env['PATH_INFO'] = unquote(path)
-        env['QUERY_STRING'] = query
-        env['REMOTE_ADDR'] = self.client_address[0]
-        env['CONTENT_TYPE'] = self.headers.get('content-type', 'text/plain')
-
-        length = self.headers.get('content-length')
-        if length:
-            env['CONTENT_LENGTH'] = length
-
-        for key, value in self.headers.items():
-            key = key.replace('-','_').upper()
-            value = value.strip()
-            if key in env:
-                # Skip content length, type, etc.
-                continue
-            if 'HTTP_' + key in env:
-                # Comma-separate multiple headers
-                env['HTTP_' + key] += ',' + value
-            else:
-                env['HTTP_' + key] = value
-        return env
 
     def log_message(self, format, *args):
         # Don't bother logging requests for admin images or the favicon.

@@ -30,10 +30,9 @@ def check_const_string(result, func, cargs, offset=None):
     if offset:
         check_err(result)
         ptr = ptr_byref(cargs, offset)
-        return ptr.value.decode()
+        return ptr.value
     else:
-        if result is not None:
-            return result.decode()
+        return result
 
 def check_string(result, func, cargs, offset=-1, str_result=False):
     """
@@ -48,13 +47,13 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         # For routines that return a string.
         ptr = result
         if not ptr: s = None
-        else: s = string_at(result).decode()
+        else: s = string_at(result)
     else:
         # Error-code return specified.
         check_err(result)
         ptr = ptr_byref(cargs, offset)
         # Getting the string value
-        s = ptr.value.decode()
+        s = ptr.value
     # Correctly freeing the allocated memory beind GDAL pointer
     # w/the VSIFree routine.
     if ptr: lgdal.VSIFree(ptr)

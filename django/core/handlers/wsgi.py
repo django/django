@@ -152,11 +152,6 @@ class WSGIRequest(http.HttpRequest):
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
 
-    def get_full_path(self):
-        # RFC 3986 requires query string arguments to be in the ASCII range.
-        # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.environ.get('QUERY_STRING', ''))) or '')
-
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
 

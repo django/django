@@ -11,7 +11,7 @@ from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
-from django.utils import six
+from django.utils import six, unittest
 
 from .models import Country, City, PennsylvaniaCity, State, Track
 
@@ -295,6 +295,13 @@ class GeoLookupTest(TestCase):
         self.assertEqual(2, len(qs))
         for c in qs: self.assertEqual(True, c.name in cities)
 
+    # The left/right lookup tests are known failures on PostGIS 2.0+
+    # until the following bug is fixed:
+    #  http://trac.osgeo.org/postgis/ticket/2035
+    # TODO: Ensure fixed in 2.0.2, else modify upper bound for version here.
+    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+        test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
+
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
@@ -467,21 +474,21 @@ class GeoQuerySetTest(TestCase):
 
     def test_geojson(self):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
-        # Only PostGIS 1.3.4+ supports GeoJSON.
+        # Only PostGIS 1.3.4+ and SpatiaLite 3.0+ support GeoJSON.
         if not connection.ops.geojson:
             self.assertRaises(NotImplementedError, Country.objects.all().geojson, field_name='mpoly')
             return
 
-        if connection.ops.spatial_version >= (1, 4, 0):
-            pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
-            houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
-            victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
-            chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
-        else:
+        pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
+        houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
+        victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
+        chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        if postgis and connection.ops.spatial_version < (1, 4, 0):
             pueblo_json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
             houston_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
             victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
-            chicago_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        elif spatialite:
+            victoria_json = '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],"coordinates":[-123.305196,48.462611]}'
 
         # Precision argument should only be an integer
         self.assertRaises(TypeError, City.objects.geojson, precision='foo')
@@ -529,6 +536,11 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertTrue(gml_regex.match(ptown.gml))
 
+        # PostGIS < 1.5 doesn't include dimension im GMLv3 output.
+        if postgis and connection.ops.spatial_version >= (1, 5, 0):
+            self.assertIn('<gml:pos srsDimension="2">',
+                          City.objects.gml(version=3).get(name='Pueblo').gml)
+
     def test_kml(self):
         "Testing KML output from the database using GeoQuerySet.kml()."
         # Only PostGIS and Spatialite (>=2.4.0-RC4) support KML serialization
@@ -572,10 +584,13 @@ class GeoQuerySetTest(TestCase):
     def test_num_geom(self):
         "Testing the `num_geom` GeoQuerySet method."
         # Both 'countries' only have two geometries.
-        for c in Country.objects.num_geom(): self.assertEqual(2, c.num_geom)
+        for c in Country.objects.num_geom():
+            self.assertEqual(2, c.num_geom)
+
         for c in City.objects.filter(point__isnull=False).num_geom():
-            # Oracle will return 1 for the number of geometries on non-collections,
-            # whereas PostGIS will return None.
+            # Oracle and PostGIS 2.0+ will return 1 for the number of
+            # geometries on non-collections, whereas PostGIS < 2.0.0
+            # will return None.
             if postgis and connection.ops.spatial_version < (2, 0, 0):
                 self.assertIsNone(c.num_geom)
             else:

@@ -21,7 +21,7 @@ Here's an example::
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
         writer = csv.writer(response)
         writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
@@ -93,7 +93,7 @@ Here's an example, which generates the same CSV file as above::
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
         # The data is hard-coded here, but you could load it from a database or
         # some other source.

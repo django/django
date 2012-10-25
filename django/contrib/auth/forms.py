@@ -118,9 +118,6 @@ class UserChangeForm(forms.ModelForm):
                     "this user's password, but you can change the password "
                     "using <a href=\"password/\">this form</a>."))
 
-    def clean_password(self):
-        return self.initial["password"]
-
     class Meta:
         model = User
 
@@ -130,13 +127,19 @@ class UserChangeForm(forms.ModelForm):
         if f is not None:
             f.queryset = f.queryset.select_related('content_type')
 
+    def clean_password(self):
+        # Regardless of what the user provides, return the initial value.
+        # This is done here, rather than on the field, because the
+        # field does not have access to the initial value
+        return self.initial["password"]
+
 
 class AuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(max_length=30)
+    username = forms.CharField(max_length=254)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
@@ -160,7 +163,7 @@ class AuthenticationForm(forms.Form):
 
         # Set the label for the "username" field.
         UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(getattr(UserModel, 'USERNAME_FIELD', 'username'))
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         self.fields['username'].label = capfirst(username_field.verbose_name)
 
     def clean(self):
@@ -198,7 +201,7 @@ class PasswordResetForm(forms.Form):
         'unusable': _("The user account associated with this email "
                       "address cannot reset the password."),
     }
-    email = forms.EmailField(label=_("Email"), max_length=75)
+    email = forms.EmailField(label=_("Email"), max_length=254)
 
     def clean_email(self):
         """

@@ -1603,3 +1603,15 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         with codecs.open(path, 'r', 'utf-8') as f:
             self.assertEqual(f.read(),
                 'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
+
+
+class DiffSettings(AdminScriptTestCase):
+    """Tests for diffsettings management command."""
+    def test_basic(self):
+        "Runs without error and emits settings diff."
+        self.write_settings('settings_to_diff.py', sdict={'FOO': '"bar"'})
+        args = ['diffsettings', '--settings=settings_to_diff']
+        out, err = self.run_manage(args)
+        self.remove_settings('settings_to_diff.py')
+        self.assertNoOutput(err)
+        self.assertOutput(out, "FOO = 'bar'  ###")

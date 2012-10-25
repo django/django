@@ -37,7 +37,7 @@
 try:
     from django.contrib.gis.gdal.driver import Driver
     from django.contrib.gis.gdal.datasource import DataSource
-    from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, gdal_release_date, GDAL_VERSION
+    from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION
     from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
     from django.contrib.gis.gdal.geometries import OGRGeometry
     HAS_GDAL = True

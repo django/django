@@ -226,7 +226,7 @@ Hooking the wizard into a URLconf
 ---------------------------------
 
 Finally, we need to specify which forms to use in the wizard, and then
-deploy the new :class:`WizardView` object at an URL in the ``urls.py``. The
+deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
 wizard's :meth:`as_view` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 

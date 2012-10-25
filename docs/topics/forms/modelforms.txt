@@ -202,7 +202,7 @@ of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
 calling ``is_valid()`` on your form will convert any date fields on your model
 to actual date objects. If form validation fails, only some of the updates
 may be applied. For this reason, you'll probably want to avoid reusing the
-model instance.
+model instance passed to the form, especially if validation fails.
 
 
 The ``save()`` method

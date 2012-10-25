@@ -265,6 +265,23 @@ class UserChangeFormTest(TestCase):
         self.assertIn(_("Invalid password format or unknown hashing algorithm."),
             form.as_table())
 
+    def test_bug_19133(self):
+        "The change form does not return the password value"
+        # Use the form to construct the POST data
+        user = User.objects.get(username='testclient')
+        form_for_data = UserChangeForm(instance=user)
+        post_data = form_for_data.initial
+
+        # The password field should be readonly, so anything
+        # posted here should be ignored; the form will be
+        # valid, and give back the 'initial' value for the
+        # password field.
+        post_data['password'] = 'new password'
+        form = UserChangeForm(instance=user, data=post_data)
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['password'], 'sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161')
+
 
 @skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

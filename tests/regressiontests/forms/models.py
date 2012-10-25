@@ -63,6 +63,12 @@ class ChoiceFieldModel(models.Model):
     multi_choice_int = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice_int',
                                               default=lambda: [1])
 
+class OptionalMultiChoiceModel(models.Model):
+    multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='not_relevant',
+                                          default=lambda: ChoiceOptionModel.objects.filter(name='default'))
+    multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True, null=True,
+                                                   related_name='not_relevant2')
+
 
 class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')

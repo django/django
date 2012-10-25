@@ -165,7 +165,7 @@ class BaseUserManager(models.Manager):
         return get_random_string(length, allowed_chars)
 
     def get_by_natural_key(self, username):
-        return self.get(**{getattr(self.model, 'USERNAME_FIELD', 'username'): username})
+        return self.get(**{self.model.USERNAME_FIELD: username})
 
 
 class UserManager(BaseUserManager):
@@ -227,6 +227,7 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
+@python_2_unicode_compatible
 class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
@@ -235,6 +236,16 @@ class AbstractBaseUser(models.Model):
 
     class Meta:
         abstract = True
+
+    def get_username(self):
+        "Return the identifying username for this User"
+        return getattr(self, self.USERNAME_FIELD)
+
+    def __str__(self):
+        return self.get_username()
+
+    def natural_key(self):
+        return (self.get_username(),)
 
     def is_anonymous(self):
         """
@@ -277,7 +288,6 @@ class AbstractBaseUser(models.Model):
         raise NotImplementedError()
 
 
-@python_2_unicode_compatible
 class AbstractUser(AbstractBaseUser):
     """
     An abstract base class implementing a fully featured User model with
@@ -314,18 +324,13 @@ class AbstractUser(AbstractBaseUser):
 
     objects = UserManager()
 
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
         abstract = True
-
-    def __str__(self):
-        return self.username
-
-    def natural_key(self):
-        return (self.username,)
 
     def get_absolute_url(self):
         return "/users/%s/" % urlquote(self.username)

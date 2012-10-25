@@ -589,6 +589,36 @@ to a faster hashing algorithm::
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
 
+.. _topics-testing-code-coverage:
+
+Integration with coverage.py
+----------------------------
+
+Code coverage describes how much source code has been tested. It shows which
+parts of your code are being exercised by tests and which are not. It's an
+important part of testing applications, so it's strongly recommended to check
+the coverage of your tests.
+
+Django can be easily integrated with `coverage.py`_, a tool for measuring code
+coverage of Python programs. First, `install coverage.py`_. Next, run the
+following from your project folder containing ``manage.py``::
+
+   coverage run --source='.' manage.py test myapp
+
+This runs your tests and collects coverage data of the executed files in your
+project. You can see a report of this data by typing following command::
+
+   coverage report
+
+Note that some Django code was executed while running tests, but it is not
+listed here because of the ``source`` flag passed to the previous command.
+
+For more options like annotated HTML listings detailing missed lines, see the
+`coverage.py`_ docs.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
+.. _install coverage.py: http://pypi.python.org/pypi/coverage
+
 Testing tools
 =============
 
@@ -769,7 +799,7 @@ Use the ``django.test.client.Client`` class to make requests.
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-        If you had an url ``/redirect_me/`` that redirected to ``/next/``, that
+        If you had a URL ``/redirect_me/`` that redirected to ``/next/``, that
         redirected to ``/final/``, this is what you'd see::
 
             >>> response = c.get('/redirect_me/', follow=True)
@@ -1783,6 +1813,25 @@ your test suite.
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
+.. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are equal. The
+    comparison is based on XML semantics. Similarily to
+    :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
+    made on parsed content, hence only semantic differences are considered, not
+    syntax differences. When unvalid XML is passed in any parameter, an
+    ``AssertionError`` is always raised, even if both string are identical.
+
+.. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
+    comparison is based on XML semantics. See
+    :meth:`~SimpleTestCase.assertXMLEqual` for details.
+
 .. _topics-testing-email:
 
 Email services
@@ -1973,8 +2022,8 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
         @classmethod
         def tearDownClass(cls):
-            super(MySeleniumTests, cls).tearDownClass()
             cls.selenium.quit()
+            super(MySeleniumTests, cls).tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))

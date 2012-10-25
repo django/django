@@ -440,20 +440,30 @@ Open your settings file (``mysite/settings.py``, remember) and look at the
 filesystem directories to check when loading Django templates. It's a search
 path.
 
+Create a ``mytemplates`` directory in your project directory. Templates can
+live anywhere on your filesystem that Django can access. (Django runs as
+whatever user your server runs.) However, keeping your templates within the
+project is a good convention to follow.
+
+When you’ve done that, create a directory polls in your template directory.
+Within that, create a file called index.html. Note that our
+``loader.get_template('polls/index.html')`` code from above maps to
+[template_directory]/polls/index.html” on the filesystem.
+
 By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
 tell Django where our templates live::
 
     TEMPLATE_DIRS = (
-        '/home/my_username/mytemplates', # Change this to your own directory.
+        '/path/to/mysite/mytemplates', # Change this to your own directory.
     )
 
 Now copy the template ``admin/base_site.html`` from within the default Django
 admin template directory in the source code of Django itself
 (``django/contrib/admin/templates``) into an ``admin`` subdirectory of
 whichever directory you're using in :setting:`TEMPLATE_DIRS`. For example, if
-your :setting:`TEMPLATE_DIRS` includes ``'/home/my_username/mytemplates'``, as
+your :setting:`TEMPLATE_DIRS` includes ``'/path/to/mysite/mytemplates'``, as
 above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
-``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
+``/path/to/mysite/mytemplates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
 
 .. admonition:: Where are the Django source files?

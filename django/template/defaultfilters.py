@@ -96,7 +96,7 @@ def fix_ampersands_filter(value):
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
 # ones) are not recognized by Decimal but we want to return them unchanged vs.
-# returning an empty string as we do for completley invalid input.  Note these
+# returning an empty string as we do for completely invalid input.  Note these
 # need to be built up from values that are not inf/nan, since inf/nan values do
 # not reload properly from .pyc files on Windows prior to some level of Python 2.5
 # (see Python Issue757815 and Issue1080440).

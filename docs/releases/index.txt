@@ -28,7 +28,7 @@ Final releases
 .. toctree::
    :maxdepth: 1
 
-   .. 1.4.2 (uncomment on release)
+   1.4.2
    1.4.1
    1.4
 

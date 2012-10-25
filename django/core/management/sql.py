@@ -17,9 +17,8 @@ def sql_create(app, style, connection):
         # This must be the "dummy" database backend, which means the user
         # hasn't set ENGINE for the database.
         raise CommandError("Django doesn't know which syntax to use for your SQL statements,\n" +
-            "because you haven't specified the ENGINE setting for the database.\n" +
-            "Edit your settings file and change DATBASES['default']['ENGINE'] to something like\n" +
-            "'django.db.backends.postgresql' or 'django.db.backends.mysql'.")
+            "because you haven't properly specified the ENGINE setting for the database.\n" +
+            "see: https://docs.djangoproject.com/en/dev/ref/settings/#databases")
 
     # Get installed models, so we generate REFERENCES right.
     # We trim models from the current app so that the sqlreset command does not
