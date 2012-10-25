@@ -66,6 +66,11 @@ class BooleanModel(models.Model):
     bfield = models.BooleanField()
     string = models.CharField(max_length=10, default='abc')
 
+class FksToBooleans(models.Model):
+    """Model wih FKs to models with {Null,}BooleanField's, #15040"""
+    bf = models.ForeignKey(BooleanModel)
+    nbf = models.ForeignKey(NullBooleanModel)
+
 class RenamedField(models.Model):
     modelname = models.IntegerField(name="fieldname", choices=((1,'One'),))
 

@@ -767,10 +767,20 @@ class SQLCompiler(object):
                         # We only set this up here because
                         # related_select_fields isn't populated until
                         # execute_sql() has been called.
+
+                        # We also include types of fields of related models that
+                        # will be included via select_related() for the benefit
+                        # of MySQL/MySQLdb when boolean fields are involved
+                        # (#15040).
+
+                        # This code duplicates the logic for the order of fields
+                        # found in get_columns(). It would be nice to clean this up.
                         if self.query.select_fields:
-                            fields = self.query.select_fields + self.query.related_select_fields
+                            fields = self.query.select_fields
                         else:
                             fields = self.query.model._meta.fields
+                        fields = fields + self.query.related_select_fields
+
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
                         only_load = self.deferred_to_columns()
