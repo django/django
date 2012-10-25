@@ -52,6 +52,18 @@ However, as with previous releases, Django 1.5 ships with some minor
 `backwards incompatible changes`_; people upgrading from previous versions
 of Django should read that list carefully.
 
+One deprecated feature worth noting is the shift to "new-style" :ttag:`url` tag.
+Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
+incorrectly (Django considered ``"myview"`` to be a literal name of a view, not
+a template variable named ``myview``). Django 1.3 and above introduced the
+``{% load url from future %}`` syntax to bring in the corrected behavior where
+``myview`` was seen as a variable.
+
+The upshot of this is that if you are not using ``{% load url from future %}``
+in your templates, you'll need to change tags like ``{% url myview %}`` to
+``{% url "myview" %}``. If you *were* using ``{% load url from future %}`` you
+can simply remove that line under Django 1.5
+
 Python compatibility
 ====================
 
