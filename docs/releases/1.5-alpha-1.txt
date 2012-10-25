@@ -21,7 +21,7 @@ support`_ -- not just to report bugs on Python 3, but also regressions on Python
 mistakes are always possible, and it's likely that the Python 3 refactoring work
 introduced some regressions.
 
-Django 1.4 alpha includes various `new features`_ and some minor `backwards
+Django 1.5 alpha includes various `new features`_ and some minor `backwards
 incompatible changes`_. There are also some features that have been dropped,
 which are detailed in :doc:`our deprecation plan </internals/deprecation>`,
 and we've `begun the deprecation process for some features`_.
