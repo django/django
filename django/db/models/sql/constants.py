@@ -25,6 +25,9 @@ JoinInfo = namedtuple('JoinInfo',
                       'table_name rhs_alias join_type lhs_alias '
                       'lhs_join_col rhs_join_col nullable')
 
+# Pairs of column clauses to select, and (possibly None) field for the clause.
+SelectInfo = namedtuple('SelectInfo', 'col field')
+
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
 SINGLE = 'single'

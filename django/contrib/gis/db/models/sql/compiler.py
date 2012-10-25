@@ -39,7 +39,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if self.query.select:
             only_load = self.deferred_to_columns()
             # This loop customized for GeoQuery.
-            for col, field in zip(self.query.select, self.query.select_fields):
+            for col, field in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias].table_name
@@ -85,7 +85,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         ])
 
         # This loop customized for GeoQuery.
-        for (table, col), field in zip(self.query.related_select_cols, self.query.related_select_fields):
+        for (table, col), field in self.query.related_select_cols:
             r = self.get_field_select(field, table, col)
             if with_aliases and col in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)

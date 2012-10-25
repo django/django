@@ -6,7 +6,7 @@ from django.db.backends.util import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
-        GET_ITERATOR_CHUNK_SIZE)
+        GET_ITERATOR_CHUNK_SIZE, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
@@ -188,7 +188,7 @@ class SQLCompiler(object):
             col_aliases = set()
         if self.query.select:
             only_load = self.deferred_to_columns()
-            for col in self.query.select:
+            for col, _ in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias].table_name
@@ -233,7 +233,7 @@ class SQLCompiler(object):
             for alias, aggregate in self.query.aggregate_select.items()
         ])
 
-        for table, col in self.query.related_select_cols:
+        for (table, col), _ in self.query.related_select_cols:
             r = '%s.%s' % (qn(table), qn(col))
             if with_aliases and col in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
@@ -557,8 +557,9 @@ class SQLCompiler(object):
             for extra_select, extra_params in six.itervalues(self.query.extra_select):
                 extra_selects.append(extra_select)
                 params.extend(extra_params)
-            cols = (group_by + self.query.select +
-                self.query.related_select_cols + extra_selects)
+            select_cols = [s.col for s in self.query.select]
+            related_select_cols = [s.col for s in self.query.related_select_cols]
+            cols = (group_by + select_cols + related_select_cols + extra_selects)
             seen = set()
             for col in cols:
                 if col in seen:
@@ -589,7 +590,6 @@ class SQLCompiler(object):
             opts = self.query.get_meta()
             root_alias = self.query.get_initial_alias()
             self.query.related_select_cols = []
-            self.query.related_select_fields = []
         if not used:
             used = set()
         if dupe_set is None:
@@ -664,8 +664,8 @@ class SQLCompiler(object):
             used.add(alias)
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
-            self.query.related_select_cols.extend(columns)
-            self.query.related_select_fields.extend(f.rel.to._meta.fields)
+            self.query.related_select_cols.extend(
+                SelectInfo(col, field) for col, field in zip(columns, f.rel.to._meta.fields))
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -734,8 +734,8 @@ class SQLCompiler(object):
                 used.add(alias)
                 columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=model._meta, as_pairs=True, local_only=True)
-                self.query.related_select_cols.extend(columns)
-                self.query.related_select_fields.extend(model._meta.fields)
+                self.query.related_select_cols.extend(
+                    SelectInfo(col, field) for col, field in zip(columns, model._meta.fields))
 
                 next = requested.get(f.related_query_name(), {})
                 # Use True here because we are looking at the _reverse_ side of
@@ -772,7 +772,7 @@ class SQLCompiler(object):
                 if resolve_columns:
                     if fields is None:
                         # We only set this up here because
-                        # related_select_fields isn't populated until
+                        # related_select_cols isn't populated until
                         # execute_sql() has been called.
 
                         # We also include types of fields of related models that
@@ -782,11 +782,11 @@ class SQLCompiler(object):
 
                         # This code duplicates the logic for the order of fields
                         # found in get_columns(). It would be nice to clean this up.
-                        if self.query.select_fields:
-                            fields = self.query.select_fields
+                        if self.query.select:
+                            fields = [f.field for f in self.query.select]
                         else:
                             fields = self.query.model._meta.fields
-                        fields = fields + self.query.related_select_fields
+                        fields = fields + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.

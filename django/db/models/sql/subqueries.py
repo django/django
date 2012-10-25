@@ -76,7 +76,7 @@ class DeleteQuery(Query):
                 return
             else:
                 innerq.clear_select_clause()
-                innerq.select, innerq.select_fields = [(self.get_initial_alias(), pk.column)], [None]
+                innerq.select = [SelectInfo((self.get_initial_alias(), pk.column), None)]
                 values = innerq
             where = self.where_class()
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
@@ -244,7 +244,7 @@ class DateQuery(Query):
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
         self.clear_select_clause()
-        self.select, self.select_fields = [select], [None]
+        self.select = [SelectInfo(select, None)]
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 
