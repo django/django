@@ -12,6 +12,7 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core import management
 from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
@@ -257,6 +258,7 @@ class SessionTestsMixin(object):
         data = {'a test key': 'a test value'}
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
+        
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
@@ -290,6 +292,27 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         del self.session._session_cache
         self.assertEqual(self.session['y'], 2)
 
+    def test_cleansessions_command(self):
+        """
+        Test cleansessions command for cleaning expired sessions from db.
+        """
+        self.assertFalse(Session.objects.count())
+
+        # One object in the future
+        self.session['foo'] = 'bar'
+        self.session.set_expiry(timezone.now() + timedelta(hours=1))
+        self.session.save()
+
+        # One object in the past
+        self.session._session_key = None
+        self.session.set_expiry(timezone.now() - timedelta(hours=1))
+        self.session.save()
+
+        # Two sessions are in DB before clean...
+        self.assertEqual(2, Session.objects.count())
+        management.call_command('cleansessions')
+        # ... and one expired is deleted.
+        self.assertEqual(1, Session.objects.count())
 
 @override_settings(USE_TZ=True)
 class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
