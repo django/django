@@ -141,9 +141,9 @@ these changes.
   :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
 
 * The :ttag:`url` and :ttag:`ssi` template tags will be
-  modified so that the first argument to each tag is a
-  template variable, not an implied string. Until then, the new-style
-  behavior is provided in the ``future`` template tag library.
+  modified so that the first argument to each tag is a template variable, not
+  an implied string. In 1.4, this behavior is provided by a version of the tag
+  in the ``future`` template tag library.
 
 * The :djadmin:`reset` and :djadmin:`sqlreset` management commands
   will be removed.
