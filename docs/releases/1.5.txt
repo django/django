@@ -79,7 +79,7 @@ need to install a different version of Django on Python 3. This means that
 you can write application targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
-However, we're labling this support "experimental" for now: although it's
+However, we're labeling this support "experimental" for now: although it's
 receved extensive testing via our automated test suite, it's recieved very
 little real-world testing. We've done our best to eliminate bugs, but we can't
 be sure we covered all possible uses of Django. Further, Django's more than a
