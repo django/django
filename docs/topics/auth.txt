@@ -1889,7 +1889,7 @@ password resets. You must then provide some key implementation details:
         as the identifying field::
 
             class MyUser(AbstractBaseUser):
-                identfier = models.CharField(max_length=40, unique=True, db_index=True)
+                identifier = models.CharField(max_length=40, unique=True, db_index=True)
                 ...
                 USERNAME_FIELD = 'identifier'
 
