@@ -1,6 +1,7 @@
 import errno
 import os
 import tempfile
+import time
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
@@ -43,6 +44,10 @@ class SessionStore(SessionBase):
                 "Invalid characters in session key")
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
+
+    def expired(self):
+        age = time.time() - os.path.getmtime(self._key_to_file())
+        return age > settings.SESSION_COOKIE_AGE
 
     def load(self):
         session_data = {}
@@ -155,5 +160,6 @@ class SessionStore(SessionBase):
 
         # Cleanup all empty sessions
         for session in sessions:
-            if not session.load():
+            if session.expired():
+                print "Will delete " + session.session_key 
                 session.delete()
