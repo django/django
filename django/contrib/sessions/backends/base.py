@@ -281,3 +281,10 @@ class SessionBase(object):
         Loads the session data and returns a dictionary.
         """
         raise NotImplementedError
+
+    @classmethod
+    def cleanup(cls):
+        """
+        Cleanup the expired sessions.
+        """
+        raise NotImplementedError

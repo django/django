@@ -261,6 +261,11 @@ You can edit it multiple times.
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's Web browser is closed.
 
+    .. method:: SessionBase.cleanup()
+
+       Class method which cleans up expired session (eg. delete related rows
+       in database, files, etc.)
+
 Session object guidelines
 -------------------------
 
