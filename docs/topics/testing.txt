@@ -365,6 +365,32 @@ entirely!). If you want to use a different database name, specify
 :setting:`TEST_NAME` in the dictionary for any given database in
 :setting:`DATABASES`.
 
+Note that if your code attempts to access the database when its modules are
+compiled - if you have code that executes inside a module or class when it is
+imported, rather than when a function is called - then this will occur
+*before* the test database is set up. If a real database exists, this could
+allow data from that to pollute your tests.
+
+It is a bad idea to have import-time database queries in your code anyway.
+
+Instead of referring in import-time code to the result of a database query
+directly::
+
+	# get the base_entity, using the base_entity_id from settings
+	base_entity = Entity.objects.get(id = base_entity_id)
+	
+create a function that when called will perform the query::
+
+	_base_entity = None
+	def get_base_entity():
+		if not _base_entity: 
+			_base_entity = Entity.objects.get(id = base_entity_id)			
+        return _base_entity
+     
+and then call the function::
+
+	base_entity = get_base_entity()
+
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
 :setting:`ENGINE`, :setting:`USER`, :setting:`HOST`, etc. The test
