@@ -528,7 +528,7 @@ class CheckboxInput(Widget):
         values = {'true': True, 'false': False}
         if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
-        return value
+        return bool(value)
 
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the

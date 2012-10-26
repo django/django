@@ -225,6 +225,10 @@ class FormsWidgetTestCase(TestCase):
         # checkboxes).
         self.assertFalse(w.value_from_datadict({}, {}, 'testing'))
 
+        value = w.value_from_datadict({'testing': '0'}, {}, 'testing')
+        self.assertIsInstance(value, bool)
+        self.assertTrue(value)
+
         self.assertFalse(w._has_changed(None, None))
         self.assertFalse(w._has_changed(None, ''))
         self.assertFalse(w._has_changed('', None))
