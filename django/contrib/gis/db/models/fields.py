@@ -95,7 +95,7 @@ class GeometryField(Field):
         # Is this a geography rather than a geometry column?
         self.geography = geography
 
-        # Oracle-specific private attributes for creating the entrie in
+        # Oracle-specific private attributes for creating the entry in
         # `USER_SDO_GEOM_METADATA`
         self._extent = kwargs.pop('extent', (-180.0, -90.0, 180.0, 90.0))
         self._tolerance = kwargs.pop('tolerance', 0.05)
@@ -160,7 +160,7 @@ class GeometryField(Field):
         # from the given string input.
         if isinstance(geom, Geometry):
             pass
-        elif isinstance(geom, six.string_types) or hasattr(geom, '__geo_interface__'):
+        elif isinstance(geom, (bytes, six.string_types)) or hasattr(geom, '__geo_interface__'):
             try:
                 geom = Geometry(geom)
             except GeometryException:

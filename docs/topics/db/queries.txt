@@ -633,14 +633,24 @@ issue the query::
 
     >>> Entry.objects.filter(authors__name=F('blog__name'))
 
-.. versionadded:: 1.3
-
 For date and date/time fields, you can add or subtract a
 :class:`~datetime.timedelta` object. The following would return all entries
 that were modified more than 3 days after they were published::
 
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
+
+.. versionadded:: 1.5
+    ``.bitand()`` and ``.bitor()``
+
+The ``F()`` objects now support bitwise operations by ``.bitand()`` and
+``.bitor()``, for example::
+
+    >>> F('somefield').bitand(16)
+
+.. versionchanged:: 1.5
+    The previously undocumented operators ``&`` and ``|`` no longer produce
+    bitwise operations, use ``.bitand()`` and ``.bitor()`` instead.
 
 The pk lookup shortcut
 ----------------------
@@ -876,10 +886,9 @@ it. For example::
     # This will delete the Blog and all of its Entry objects.
     b.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 Note that :meth:`~django.db.models.query.QuerySet.delete` is the only
 :class:`~django.db.models.query.QuerySet` method that is not exposed on a
@@ -953,7 +962,8 @@ new value to be the new model instance you want to point to. For example::
     >>> Entry.objects.all().update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
-affected by the query. The only restriction on the
+matched by the query (which may not be equal to the number of rows updated if
+some rows already have the new value). The only restriction on the
 :class:`~django.db.models.query.QuerySet` that is updated is that it can only
 access one database table, the model's main table. You can filter based on
 related fields, but you can only update columns in the model's main

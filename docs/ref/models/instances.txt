@@ -387,10 +387,11 @@ perform an update on all fields.
 Specifying ``update_fields`` will force an update.
 
 When saving a model fetched through deferred model loading
-(:meth:`~Model.only()` or :meth:`~Model.defer()`) only the fields loaded from
-the DB will get updated. In effect there is an automatic ``update_fields`` in
-this case. If you assign or change any deferred field value, these fields will
-be added to the updated fields.
+(:meth:`~django.db.models.query.QuerySet.only()` or
+:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+from the DB will get updated. In effect there is an automatic
+``update_fields`` in this case. If you assign or change any deferred field
+value, the field will be added to the updated fields.
 
 Deleting objects
 ================
@@ -493,12 +494,16 @@ defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
-hard-coding your objects' URLs. For example, this template code is bad::
+hard-coding your objects' URLs. For example, this template code is bad:
+
+.. code-block:: html+django
 
     <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-This template code is much better::
+This template code is much better:
+
+.. code-block:: html+django
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
@@ -534,7 +539,9 @@ pattern name) and a list of position or keyword arguments and uses the URLconf
 patterns to construct the correct, full URL. It returns a string for the
 correct URL, with all parameters substituted in the correct positions.
 
-The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url` template tag and a high-level wrapper for the :func:`django.core.urlresolvers.reverse()` function.
+The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
+template tag and a high-level wrapper for the
+:func:`django.core.urlresolvers.reverse()` function.
 
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::

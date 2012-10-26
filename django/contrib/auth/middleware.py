@@ -55,7 +55,7 @@ class RemoteUserMiddleware(object):
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
         if request.user.is_authenticated():
-            if request.user.username == self.clean_username(username, request):
+            if request.user.get_username() == self.clean_username(username, request):
                 return
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
@@ -75,6 +75,6 @@ class RemoteUserMiddleware(object):
         backend = auth.load_backend(backend_str)
         try:
             username = backend.clean_username(username)
-        except AttributeError: # Backend has no clean_username method.
+        except AttributeError:  # Backend has no clean_username method.
             pass
         return username

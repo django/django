@@ -1,11 +1,14 @@
 from __future__ import absolute_import, unicode_literals
 
+import warnings
+
+from django.contrib.admin.util import quote
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from .models import Action
+from .models import Action, Person, City
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -67,7 +70,7 @@ class AdminCustomUrlsTest(TestCase):
 
         # Ditto, but use reverse() to build the URL
         url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=('add',))
+                args=(quote('add'),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
@@ -75,19 +78,50 @@ class AdminCustomUrlsTest(TestCase):
         # Should correctly get the change_view for the model instance with the
         # funny-looking PK (the one wth a 'path/to/html/document.html' value)
         url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=("path/to/html/document.html",))
+                args=(quote("path/to/html/document.html"),))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
         self.assertContains(response, 'value="path/to/html/document.html"')
 
-    def testChangeViewHistoryButton(self):
-        url = reverse('admin:%s_action_change' % Action._meta.app_label,
-                args=('The name of an action',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        expected_link = reverse('admin:%s_action_history' %
-                                Action._meta.app_label,
-                                args=('The name of an action',))
-        self.assertContains(response, '<a href="%s" class="historylink"' %
-                            expected_link)
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class CustomUrlsWorkflowTests(TestCase):
+    fixtures = ['users.json']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_old_argument_deprecation(self):
+        """Test reporting of post_url_continue deprecation."""
+        post_data = {
+            'nick': 'johndoe',
+        }
+        cnt = Person.objects.count()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            response = self.client.post(reverse('admin:admin_custom_urls_person_add'), post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Person.objects.count(), cnt + 1)
+            # We should get a DeprecationWarning
+            self.assertEqual(len(w), 1)
+            self.assertTrue(isinstance(w[0].message, DeprecationWarning))
+
+    def test_custom_add_another_redirect(self):
+        """Test customizability of post-object-creation redirect URL."""
+        post_data = {
+            'name': 'Rome',
+            '_addanother': '1',
+        }
+        cnt = City.objects.count()
+        with warnings.catch_warnings(record=True) as w:
+            # POST to the view whose post-object-creation redir URL argument we
+            # are customizing (object creation)
+            response = self.client.post(reverse('admin:admin_custom_urls_city_add'), post_data)
+            self.assertEqual(City.objects.count(), cnt + 1)
+            # Check that it redirected to the URL we set
+            self.assertRedirects(response, reverse('admin:admin_custom_urls_city_changelist'))
+            self.assertEqual(len(w), 0) # We should get no DeprecationWarning

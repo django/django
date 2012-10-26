@@ -1,14 +1,17 @@
+import re
+
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
-from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
 REDIRECT_FIELD_NAME = 'next'
 
+
 def load_backend(path):
     i = path.rfind('.')
-    module, attr = path[:i], path[i+1:]
+    module, attr = path[:i], path[i + 1:]
     try:
         mod = import_module(module)
     except ImportError as e:
@@ -21,6 +24,7 @@ def load_backend(path):
         raise ImproperlyConfigured('Module "%s" does not define a "%s" authentication backend' % (module, attr))
     return cls()
 
+
 def get_backends():
     from django.conf import settings
     backends = []
@@ -29,6 +33,22 @@ def get_backends():
     if not backends:
         raise ImproperlyConfigured('No authentication backends have been defined. Does AUTHENTICATION_BACKENDS contain anything?')
     return backends
+
+
+def _clean_credentials(credentials):
+    """
+    Cleans a dictionary of credentials of potentially sensitive info before
+    sending to less secure functions.
+
+    Not comprehensive - intended for user_login_failed signal
+    """
+    SENSITIVE_CREDENTIALS = re.compile('api|token|key|secret|password|signature', re.I)
+    CLEANSED_SUBSTITUTE = '********************'
+    for key in credentials:
+        if SENSITIVE_CREDENTIALS.search(key):
+            credentials[key] = CLEANSED_SUBSTITUTE
+    return credentials
+
 
 def authenticate(**credentials):
     """
@@ -45,6 +65,11 @@ def authenticate(**credentials):
         # Annotate the user object with the path of the backend.
         user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
         return user
+
+    # The credentials supplied are invalid to all backends, fire signal
+    user_login_failed.send(sender=__name__,
+            credentials=_clean_credentials(credentials))
+
 
 def login(request, user):
     """
@@ -69,6 +94,7 @@ def login(request, user):
         request.user = user
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
+
 def logout(request):
     """
     Removes the authenticated user's ID from the request and flushes their
@@ -85,6 +111,22 @@ def logout(request):
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
+
+
+def get_user_model():
+    "Return the User model that is active in this project"
+    from django.conf import settings
+    from django.db.models import get_model
+
+    try:
+        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    except ValueError:
+        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
+    user_model = get_model(app_label, model_name)
+    if user_model is None:
+        raise ImproperlyConfigured("AUTH_USER_MODEL refers to model '%s' that has not been installed" % settings.AUTH_USER_MODEL)
+    return user_model
+
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser

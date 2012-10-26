@@ -28,7 +28,7 @@ exception or returns the clean value::
     >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'Enter a valid e-mail address.']
+    ValidationError: [u'Enter a valid email address.']
 
 Core field arguments
 --------------------
@@ -405,7 +405,7 @@ For each field, we describe the default widget used if you don't specify
     Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
     following will also be included in the default input formats::
 
-        '%b %m %d',       # 'Oct 25 2006'
+        '%b %d %Y',       # 'Oct 25 2006'
         '%b %d, %Y',      # 'Oct 25, 2006'
         '%d %b %Y',       # '25 Oct 2006'
         '%d %b, %Y',      # '25 Oct, 2006'
@@ -413,6 +413,8 @@ For each field, we describe the default widget used if you don't specify
         '%B %d, %Y',      # 'October 25, 2006'
         '%d %B %Y',       # '25 October 2006'
         '%d %B, %Y',      # '25 October, 2006'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -444,6 +446,8 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -703,8 +707,6 @@ For each field, we describe the default widget used if you don't specify
 
 ``TypedMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 .. class:: TypedMultipleChoiceField(**kwargs)
 
@@ -999,12 +1001,16 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: ``SelectMultiple``
-    * Empty value: ``[]`` (an empty list)
-    * Normalizes to: A list of model instances.
+    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
+
+    .. versionchanged:: 1.5
+        The empty and normalized values were changed to be consistently
+        ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
 
     Allows the selection of one or more model objects, suitable for
     representing a many-to-many relation. As with :class:`ModelChoiceField`,

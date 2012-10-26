@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import logging
 import sys
 from io import BytesIO
 from threading import Lock
@@ -10,9 +11,8 @@ from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_str, force_text, iri_to_uri
-from django.utils.log import getLogger
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 # See http://www.iana.org/assignments/http-status-codes
@@ -151,11 +151,6 @@ class WSGIRequest(http.HttpRequest):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
-
-    def get_full_path(self):
-        # RFC 3986 requires query string arguments to be in the ASCII range.
-        # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.environ.get('QUERY_STRING', ''))) or '')
 
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'

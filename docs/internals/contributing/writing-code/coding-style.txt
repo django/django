@@ -140,9 +140,9 @@ Model style
   a tuple of tuples, with an all-uppercase name, either near the top of
   the model module or just above the model class. Example::
 
-      GENDER_CHOICES = (
-          ('M', 'Male'),
-          ('F', 'Female'),
+      DIRECTION_CHOICES = (
+          ('U', 'Up'),
+          ('D', 'Down'),
       )
 
 Use of ``django.conf.settings``

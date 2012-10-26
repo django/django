@@ -3,11 +3,11 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 
-from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import six
 from django.utils import translation
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
@@ -613,7 +613,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         data = dict(email='invalid')
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
         self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
-<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" /></p>""")
@@ -642,17 +642,14 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFalse(b.has_changed())
 
 
-
+@override_settings(USE_L10N=True)
 class FormsExtraL10NTestCase(TestCase):
     def setUp(self):
         super(FormsExtraL10NTestCase, self).setUp()
-        self.old_use_l10n = getattr(settings, 'USE_L10N', False)
-        settings.USE_L10N = True
         translation.activate('nl')
 
     def tearDown(self):
         translation.deactivate()
-        settings.USE_L10N = self.old_use_l10n
         super(FormsExtraL10NTestCase, self).tearDown()
 
     def test_l10n(self):

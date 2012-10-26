@@ -1013,7 +1013,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages['required'])
         elif not self.required and not value:
-            return []
+            return self.queryset.none()
         if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['list'])
         key = self.to_field_name or 'pk'

@@ -33,6 +33,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Florian Apolloner
     * Jeremy Dunck
     * Bryan Veloso
+    * Preston Holmes
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -424,6 +425,7 @@ answer newbie questions, and generally made Django that much better:
     phil@produxion.net
     phil.h.smith@gmail.com
     Gustavo Picon
+    Travis Pinney
     Michael Placentra II <someone@michaelplacentra2.net>
     plisk
     Daniel Poelzleithner <http://poelzi.org/>
@@ -499,6 +501,7 @@ answer newbie questions, and generally made Django that much better:
     Wiliam Alves de Souza <wiliamsouza83@gmail.com>
     Don Spaulding <donspauldingii@gmail.com>
     Calvin Spealman <ironfroggy@gmail.com>
+    Dane Springmeyer
     Bjørn Stabell <bjorn@exoweb.net>
     Georgi Stanojevski <glisha@gmail.com>
     starrynight <cmorgh@gmail.com>

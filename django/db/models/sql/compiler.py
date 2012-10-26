@@ -774,10 +774,20 @@ class SQLCompiler(object):
                         # We only set this up here because
                         # related_select_fields isn't populated until
                         # execute_sql() has been called.
+
+                        # We also include types of fields of related models that
+                        # will be included via select_related() for the benefit
+                        # of MySQL/MySQLdb when boolean fields are involved
+                        # (#15040).
+
+                        # This code duplicates the logic for the order of fields
+                        # found in get_columns(). It would be nice to clean this up.
                         if self.query.select_fields:
-                            fields = self.query.select_fields + self.query.related_select_fields
+                            fields = self.query.select_fields
                         else:
                             fields = self.query.model._meta.fields
+                        fields = fields + self.query.related_select_fields
+
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
                         only_load = self.deferred_to_columns()
@@ -897,8 +907,11 @@ class SQLInsertCompiler(SQLCompiler):
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
             r_fmt, r_params = self.connection.ops.return_insert_id()
-            result.append(r_fmt % col)
-            params += r_params
+            # Skip empty r_fmt to allow subclasses to customize behaviour for
+            # 3rd party backends. Refs #19096.
+            if r_fmt:
+                result.append(r_fmt % col)
+                params += r_params
             return [(" ".join(result), tuple(params))]
         if can_bulk:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
@@ -934,7 +947,8 @@ class SQLDeleteCompiler(SQLCompiler):
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
-        result.append('WHERE %s' % where)
+        if where:
+            result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
 
 class SQLUpdateCompiler(SQLCompiler):

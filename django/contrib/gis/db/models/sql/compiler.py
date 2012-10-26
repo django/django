@@ -1,3 +1,8 @@
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
+
 from django.utils.six.moves import zip
 
 from django.db.backends.util import truncate_name, typecast_timestamp
@@ -114,10 +119,10 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         result = []
         if opts is None:
             opts = self.query.model._meta
+        # Skip all proxy to the root proxied model
+        opts = opts.concrete_model._meta
         aliases = set()
         only_load = self.deferred_to_columns()
-        # Skip all proxy to the root proxied model
-        proxied_model = opts.concrete_model
 
         if start_alias:
             seen = {None: start_alias}
@@ -128,12 +133,9 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 try:
                     alias = seen[model]
                 except KeyError:
-                    if model is proxied_model:
-                        alias = start_alias
-                    else:
-                        link_field = opts.get_ancestor_link(model)
-                        alias = self.query.join((start_alias, model._meta.db_table,
-                                link_field.column, model._meta.pk.column))
+                    link_field = opts.get_ancestor_link(model)
+                    alias = self.query.join((start_alias, model._meta.db_table,
+                            link_field.column, model._meta.pk.column))
                     seen[model] = alias
             else:
                 # If we're starting from the base model of the queryset, the
@@ -190,7 +192,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if self.connection.ops.oracle or getattr(self.query, 'geo_values', False):
             # We resolve the rest of the columns if we're on Oracle or if
             # the `geo_values` attribute is defined.
-            for value, field in map(None, row[index_start:], fields):
+            for value, field in zip_longest(row[index_start:], fields):
                 values.append(self.query.convert_values(value, field, self.connection))
         else:
             values.extend(row[index_start:])

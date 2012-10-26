@@ -2,12 +2,14 @@
 from __future__ import unicode_literals
 
 import copy
+import os
 import pickle
+import warnings
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
-                         HttpResponseNotModified,
+                         HttpResponseNotModified, StreamingHttpResponse,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
 from django.test import TestCase
@@ -127,10 +129,14 @@ class QueryDictTests(unittest.TestCase):
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
 
-        self.assertEqual(list(six.iteritems(q)),  [('foo', 'another'), ('name', 'john')])
-        self.assertEqual(list(six.iterlists(q)), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertEqual(list(six.iterkeys(q)), ['foo', 'name'])
-        self.assertEqual(list(six.itervalues(q)), ['another', 'john'])
+        self.assertEqual(sorted(list(six.iteritems(q))),
+                         [('foo', 'another'), ('name', 'john')])
+        self.assertEqual(sorted(list(six.iterlists(q))),
+                         [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertEqual(sorted(list(six.iterkeys(q))),
+                         ['foo', 'name'])
+        self.assertEqual(sorted(list(six.itervalues(q))),
+                         ['another', 'john'])
         self.assertEqual(len(q), 2)
 
         q.update({'foo': 'hello'})
@@ -312,22 +318,60 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [1, 2, 3]
         self.assertEqual(r.content, b'123')
 
-        #test retrieval explicitly using iter and odd inputs
+        #test retrieval explicitly using iter (deprecated) and odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        my_iter = r.__iter__()
-        result = list(my_iter)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+            my_iter = iter(r)
+            self.assertEqual(w[0].category, PendingDeprecationWarning)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+            result = list(my_iter)
+            self.assertEqual(w[0].category, PendingDeprecationWarning)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header
-        r = HttpResponse([1,1,2,4,8])
+        r = HttpResponse()
         r['Content-Encoding'] = 'winning'
-        self.assertEqual(r.content, b'11248')
-        r.content = ['\u079e',]
-        self.assertRaises(UnicodeEncodeError,
+        r.content = [b'abc', b'def']
+        self.assertEqual(r.content, b'abcdef')
+        r.content = ['\u079e']
+        self.assertRaises(TypeError if six.PY3 else UnicodeEncodeError,
                           getattr, r, 'content')
+
+        # .content can safely be accessed multiple times.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.content, r.content)
+        self.assertEqual(r.content, b'helloworld')
+        # accessing the iterator works (once) after accessing .content
+        self.assertEqual(b''.join(r), b'helloworld')
+        self.assertEqual(b''.join(r), b'')
+        # accessing .content still works
+        self.assertEqual(r.content, b'helloworld')
+
+        # XXX accessing .content doesn't work if the response was iterated first
+        # XXX change this when the deprecation completes in HttpResponse
+        r = HttpResponse(iter(['hello', 'world']))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            self.assertEqual(b''.join(r), b'helloworld')
+        self.assertEqual(r.content, b'')                # not the expected result!
+
+        # additional content can be written to the response.
+        r = HttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.content, b'helloworld')
+        r.write('!')
+        self.assertEqual(r.content, b'helloworld!')
+
+    def test_iterator_isnt_rewound(self):
+        # Regression test for #13222
+        r = HttpResponse('abc')
+        i = iter(r)
+        self.assertEqual(list(i), [b'abc'])
+        self.assertEqual(list(i), [])
 
     def test_file_interface(self):
         r = HttpResponse()
@@ -337,7 +381,9 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.tell(), 17)
 
         r = HttpResponse(['abc'])
-        self.assertRaises(Exception, r.write, 'def')
+        r.write('def')
+        self.assertEqual(r.tell(), 6)
+        self.assertEqual(r.content, b'abcdef')
 
     def test_unsafe_redirect(self):
         bad_urls = [
@@ -350,7 +396,6 @@ class HttpResponseTests(unittest.TestCase):
                               HttpResponseRedirect, url)
             self.assertRaises(SuspiciousOperation,
                               HttpResponsePermanentRedirect, url)
-
 
 class HttpResponseSubclassesTests(TestCase):
     def test_redirect(self):
@@ -378,6 +423,115 @@ class HttpResponseSubclassesTests(TestCase):
             content='Only the GET method is allowed',
             content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
+
+class StreamingHttpResponseTests(TestCase):
+    def test_streaming_response(self):
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+
+        # iterating over the response itself yields bytestring chunks.
+        chunks = list(r)
+        self.assertEqual(chunks, [b'hello', b'world'])
+        for chunk in chunks:
+            self.assertIsInstance(chunk, six.binary_type)
+
+        # and the response can only be iterated once.
+        self.assertEqual(list(r), [])
+
+        # even when a sequence that can be iterated many times, like a list,
+        # is given as content.
+        r = StreamingHttpResponse(['abc', 'def'])
+        self.assertEqual(list(r), [b'abc', b'def'])
+        self.assertEqual(list(r), [])
+
+        # streaming responses don't have a `content` attribute.
+        self.assertFalse(hasattr(r, 'content'))
+
+        # and you can't accidentally assign to a `content` attribute.
+        with self.assertRaises(AttributeError):
+            r.content = 'xyz'
+
+        # but they do have a `streaming_content` attribute.
+        self.assertTrue(hasattr(r, 'streaming_content'))
+
+        # that exists so we can check if a response is streaming, and wrap or
+        # replace the content iterator.
+        r.streaming_content = iter(['abc', 'def'])
+        r.streaming_content = (chunk.upper() for chunk in r.streaming_content)
+        self.assertEqual(list(r), [b'ABC', b'DEF'])
+
+        # coercing a streaming response to bytes doesn't return a complete HTTP
+        # message like a regular response does. it only gives us the headers.
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+        self.assertEqual(
+            six.binary_type(r), b'Content-Type: text/html; charset=utf-8')
+
+        # and this won't consume its content.
+        self.assertEqual(list(r), [b'hello', b'world'])
+
+        # additional content cannot be written to the response.
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+        with self.assertRaises(Exception):
+            r.write('!')
+
+        # and we can't tell the current position.
+        with self.assertRaises(Exception):
+            r.tell()
+
+class FileCloseTests(TestCase):
+    def test_response(self):
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+
+        # file isn't closed until we close the response.
+        file1 = open(filename)
+        r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # don't automatically close file when we finish iterating the response.
+        file1 = open(filename)
+        r = HttpResponse(file1)
+        self.assertFalse(file1.closed)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            list(r)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # when multiple file are assigned as content, make sure they are all
+        # closed with the response.
+        file1 = open(filename)
+        file2 = open(filename)
+        r = HttpResponse(file1)
+        r.content = file2
+        self.assertFalse(file1.closed)
+        self.assertFalse(file2.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+        self.assertTrue(file2.closed)
+
+    def test_streaming_response(self):
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+
+        # file isn't closed until we close the response.
+        file1 = open(filename)
+        r = StreamingHttpResponse(file1)
+        self.assertFalse(file1.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+
+        # when multiple file are assigned as content, make sure they are all
+        # closed with the response.
+        file1 = open(filename)
+        file2 = open(filename)
+        r = StreamingHttpResponse(file1)
+        r.streaming_content = file2
+        self.assertFalse(file1.closed)
+        self.assertFalse(file2.closed)
+        r.close()
+        self.assertTrue(file1.closed)
+        self.assertTrue(file2.closed)
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):
@@ -419,7 +573,7 @@ class CookieTests(unittest.TestCase):
         """
         Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
         """
-        self.assertTrue('good_cookie' in parse_cookie('a,=b; a,=c; good_cookie=yes').keys())
+        self.assertTrue('good_cookie' in parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
 
     def test_httponly_after_load(self):
         """

@@ -66,7 +66,7 @@ def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
     if settings.USE_TZ:
         if timezone.is_naive(value):
-            warnings.warn("SQLite received a naive datetime (%s)"
+            warnings.warn("MySQL received a naive datetime (%s)"
                           " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()

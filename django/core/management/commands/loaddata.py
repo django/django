@@ -23,6 +23,7 @@ try:
 except ImportError:
     has_bz2 = False
 
+
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
     args = "fixture [fixture ...]"
@@ -31,9 +32,14 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
                 'fixtures into. Defaults to the "default" database.'),
+        make_option('--ignorenonexistent', '-i', action='store_true', dest='ignore',
+            default=False, help='Ignores entries in the serialized data for fields'
+                                ' that do not currently exist on the model.'),
     )
 
     def handle(self, *fixture_labels, **options):
+
+        ignore = options.get('ignore')
         using = options.get('database')
 
         connection = connections[using]
@@ -175,7 +181,7 @@ class Command(BaseCommand):
                                         self.stdout.write("Installing %s fixture '%s' from %s." % \
                                             (format, fixture_name, humanize(fixture_dir)))
 
-                                    objects = serializers.deserialize(format, fixture, using=using)
+                                    objects = serializers.deserialize(format, fixture, using=using, ignorenonexistent=ignore)
 
                                     for obj in objects:
                                         objects_in_fixture += 1

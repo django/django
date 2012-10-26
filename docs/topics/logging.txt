@@ -2,8 +2,6 @@
 Logging
 =======
 
-.. versionadded:: 1.3
-
 .. module:: django.utils.log
    :synopsis: Logging tools for Django applications
 
@@ -194,6 +192,8 @@ There are two other logging calls available:
 * ``logger.exception()``: Creates an ``ERROR`` level logging
   message wrapping the current exception stack frame.
 
+.. _configuring-logging:
+
 Configuring logging
 ===================
 
@@ -217,6 +217,14 @@ dictionary of logging settings. These settings describes the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
+
+Prior to Django 1.5, the :setting:`LOGGING` setting overwrote the :ref:`default
+Django logging configuration <default-logging-configuration>`. From Django
+1.5 forward, the project's logging configuration is merged with Django's
+defaults, hence you can decide if you want to add to, or replace the existing
+configuration. To completely override the default configuration, set the
+``disable_existing_loggers`` key to True in the :setting:`LOGGING`
+dictConfig. Alternatively you can redefine some or all of the loggers.
 
 Logging is configured as soon as settings have been loaded
 (either manually using :func:`~django.conf.settings.configure` or when at least
@@ -346,36 +354,6 @@ This logging configuration does the following things:
     means that all ``INFO`` level messages (or higher) will be
     printed to the console; ``ERROR`` and ``CRITICAL``
     messages will also be output via email.
-
-.. admonition:: Custom handlers and circular imports
-
-    If your ``settings.py`` specifies a custom handler class and the file
-    defining that class also imports ``settings.py`` a circular import will
-    occur.
-
-    For example, if ``settings.py`` contains the following config for
-    :setting:`LOGGING`::
-
-        LOGGING = {
-          'version': 1,
-          'handlers': {
-            'custom_handler': {
-              'level': 'INFO',
-              'class': 'myproject.logconfig.MyHandler',
-            }
-          }
-        }
-
-    and ``myproject/logconfig.py`` has the following line before the
-    ``MyHandler`` definition::
-
-        from django.conf import settings
-
-    then the ``dictconfig`` module will raise an exception like the following::
-
-        ValueError: Unable to configure handler 'custom_handler':
-        Unable to configure handler 'custom_handler':
-        'module' object has no attribute 'logconfig'
 
 .. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects
 
@@ -567,3 +545,31 @@ logging module.
                 'class': 'django.utils.log.AdminEmailHandler'
             }
         },
+
+.. class:: RequireDebugTrue()
+
+   .. versionadded:: 1.5
+
+   This filter is similar to :class:`RequireDebugFalse`, except that records are
+   passed only when :setting:`DEBUG` is `True`.
+
+.. _default-logging-configuration:
+
+Django's default logging configuration
+======================================
+
+By default, Django configures the ``django.request`` logger so that all messages
+with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
+long as the :setting:`DEBUG` setting is set to ``False``.
+
+All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
+`True` are sent ot the console. They are simply discarded (sent to
+``NullHandler``) when :setting:`DEBUG` is `False`.
+
+.. versionchanged:: 1.5
+
+    Before Django 1.5, all messages reaching the ``django`` logger were
+    discarded, regardless of :setting:`DEBUG`.
+
+See also :ref:`Configuring logging <configuring-logging>` to learn how you can
+complement or replace this default logging configuration.

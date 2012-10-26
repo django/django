@@ -6,6 +6,7 @@ from django.core.management.base import AppCommand
 from django.core.management.sql import sql_all
 from django.db import connections, DEFAULT_DB_ALIAS
 
+
 class Command(AppCommand):
     help = "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the given model module name(s)."
 

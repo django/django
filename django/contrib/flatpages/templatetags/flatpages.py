@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.sites.models import get_current_site
 
 
 register = template.Library()
@@ -19,7 +20,11 @@ class FlatpageNode(template.Node):
             self.user = None
 
     def render(self, context):
-        flatpages = FlatPage.objects.filter(sites__id=settings.SITE_ID)
+        if 'request' in context:
+            site_pk = get_current_site(context['request']).pk
+        else:
+            site_pk = settings.SITE_ID
+        flatpages = FlatPage.objects.filter(sites__id=site_pk)
         # If a prefix was specified, add a filter
         if self.starts_with:
             flatpages = flatpages.filter(

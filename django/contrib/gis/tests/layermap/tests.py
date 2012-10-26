@@ -1,4 +1,5 @@
-from __future__ import absolute_import
+# coding: utf-8
+from __future__ import absolute_import, unicode_literals
 
 import os
 from copy import copy
@@ -8,7 +9,10 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
     InvalidDecimal, MissingForeignKey)
+from django.db import router
+from django.conf import settings
 from django.test import TestCase
+from django.utils import unittest
 
 from .models import (
     City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
@@ -25,6 +29,7 @@ invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
 NAMES  = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
 NUMS   = [1, 2, 1, 19, 1] # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
+
 
 class LayerMapTest(TestCase):
 
@@ -281,3 +286,39 @@ class LayerMapTest(TestCase):
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 3)
         self.assertEqual(City.objects.all().order_by('name_txt')[0].name_txt, "Houston")
+
+    def test_encoded_name(self):
+        """ Test a layer containing utf-8-encoded name """
+        city_shp = os.path.join(shp_path, 'ch-city', 'ch-city.shp')
+        lm = LayerMapping(City, city_shp, city_mapping)
+        lm.save(silent=True, strict=True)
+        self.assertEqual(City.objects.count(), 1)
+        self.assertEqual(City.objects.all()[0].name, "Zürich")
+
+class OtherRouter(object):
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return self.db_for_read(model, **hints)
+
+    def allow_relation(self, obj1, obj2, **hints):
+        return None
+
+    def allow_syncdb(self, db, model):
+        return True
+
+
+class LayerMapRouterTest(TestCase):
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [OtherRouter()]
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
+    def test_layermapping_default_db(self):
+        lm = LayerMapping(City, city_shp, city_mapping)
+        self.assertEqual(lm.using, 'other')

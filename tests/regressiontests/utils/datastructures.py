@@ -128,6 +128,12 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(self.d1, {})
         self.assertEqual(self.d1.keyOrder, [])
 
+    def test_reversed(self):
+        self.assertEqual(list(self.d1), [7, 1, 9])
+        self.assertEqual(list(self.d2), [1, 9, 0, 7])
+        self.assertEqual(list(reversed(self.d1)), [9, 1, 7])
+        self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
+
     def test_insert(self):
         d = SortedDict()
         with warnings.catch_warnings(record=True) as w:
@@ -206,19 +212,18 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
-        self.assertEqual(list(six.iteritems(d)),
-                          [('position', 'Developer'), ('name', 'Simon')])
+        self.assertEqual(sorted(list(six.iteritems(d))),
+                          [('name', 'Simon'), ('position', 'Developer')])
 
-        self.assertEqual(list(six.iterlists(d)),
-                          [('position', ['Developer']),
-                           ('name', ['Adrian', 'Simon'])])
+        self.assertEqual(sorted(list(six.iterlists(d))),
+                          [('name', ['Adrian', 'Simon']),
+                           ('position', ['Developer'])])
 
         # MultiValueDictKeyError: "Key 'lastname' not found in
         # <MultiValueDict: {'position': ['Developer'],
         #                   'name': ['Adrian', 'Simon']}>"
-        self.assertRaisesMessage(MultiValueDictKeyError,
-            '"Key \'lastname\' not found in <MultiValueDict: {\'position\':'\
-            ' [\'Developer\'], \'name\': [\'Adrian\', \'Simon\']}>"',
+        six.assertRaisesRegex(self, MultiValueDictKeyError,
+            r'"Key \'lastname\' not found in <MultiValueDict',
             d.__getitem__, 'lastname')
 
         self.assertEqual(d.get('lastname'), None)
@@ -229,8 +234,8 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(list(six.itervalues(d)),
-                          ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(sorted(list(six.itervalues(d))),
+                         ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
         d = MultiValueDict()

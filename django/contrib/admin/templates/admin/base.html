@@ -26,7 +26,7 @@
         {% if user.is_active and user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
-            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
+            <strong>{% filter force_escape %}{% firstof user.get_short_name user.get_username %}{% endfilter %}</strong>.
             {% block userlinks %}
                 {% url 'django-admindocs-docroot' as docsroot %}
                 {% if docsroot %}

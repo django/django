@@ -55,7 +55,7 @@ The format files aren't managed by the use of Transifex. To change them, you
 must :doc:`create a patch<writing-code/submitting-patches>` against the
 Django source tree, as for any code change:
 
-* Create a diff against the current Subversion trunk.
+* Create a diff against the current Git master branch.
 
 * Open a ticket in Django's ticket system, set its ``Component`` field to
   ``Translations``, and attach the patch to it.

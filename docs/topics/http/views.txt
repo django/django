@@ -134,13 +134,12 @@ The 404 (page not found) view
 
 When you raise an ``Http404`` exception, Django loads a special view devoted
 to handling 404 errors. By default, it's the view
-``django.views.defaults.page_not_found``, which loads and renders the template
-``404.html``.
+``django.views.defaults.page_not_found``, which either produces a very simple
+"Not Found" message or loads and renders the template ``404.html`` if you
+created it in your root template directory.
 
-This means you need to define a ``404.html`` template in your root template
-directory. This template will be used for all 404 errors. The default 404 view
-will pass one variable to the template: ``request_path``, which is the URL
-that resulted in the error.
+The default 404 view will pass one variable to the template: ``request_path``,
+which is the URL that resulted in the error.
 
 The ``page_not_found`` view should suffice for 99% of Web applications, but if
 you want to override it, you can specify ``handler404`` in your URLconf, like
@@ -152,14 +151,10 @@ Behind the scenes, Django determines the 404 view by looking for
 ``handler404`` in your root URLconf, and falling back to
 ``django.views.defaults.page_not_found`` if you did not define one.
 
-Four things to note about 404 views:
+Three things to note about 404 views:
 
 * The 404 view is also called if Django doesn't find a match after
   checking every regular expression in the URLconf.
-
-* If you don't define your own 404 view — and simply use the default,
-  which is recommended — you still have one obligation: you must create a
-  ``404.html`` template in the root of your template directory.
 
 * The 404 view is passed a :class:`~django.template.RequestContext` and
   will have access to variables supplied by your
@@ -176,13 +171,12 @@ The 500 (server error) view
 
 Similarly, Django executes special-case behavior in the case of runtime errors
 in view code. If a view results in an exception, Django will, by default, call
-the view ``django.views.defaults.server_error``, which loads and renders the
-template ``500.html``.
+the view ``django.views.defaults.server_error``, which either produces a very
+simple "Server Error" message or loads and renders the template ``500.html`` if
+you created it in your root template directory.
 
-This means you need to define a ``500.html`` template in your root template
-directory. This template will be used for all server errors. The default 500
-view passes no variables to this template and is rendered with an empty
-``Context`` to lessen the chance of additional errors.
+The default 500 view passes no variables to the ``500.html`` template and is
+rendered with an empty ``Context`` to lessen the chance of additional errors.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
 you want to override the view, you can specify ``handler500`` in your URLconf,
@@ -194,11 +188,7 @@ Behind the scenes, Django determines the 500 view by looking for
 ``handler500`` in your root URLconf, and falling back to
 ``django.views.defaults.server_error`` if you did not define one.
 
-Two things to note about 500 views:
-
-* If you don't define your own 500 view — and simply use the default,
-  which is recommended — you still have one obligation: you must create a
-  ``500.html`` template in the root of your template directory.
+One thing to note about 500 views:
 
 * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
   your 500 view will never be used, and the traceback will be displayed

@@ -27,8 +27,8 @@ def topology_func(f):
 
 # GeoJSON routines.
 from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
-to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True)
-to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True)
+to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True, decoding='ascii')
+to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True, decoding='ascii')
 
 # GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)
@@ -57,8 +57,8 @@ destroy_geom = void_output(lgdal.OGR_G_DestroyGeometry, [c_void_p], errcheck=Fal
 
 # Geometry export routines.
 to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True) # special handling for WKB.
-to_wkt = string_output(lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)])
-to_gml = string_output(lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True)
+to_wkt = string_output(lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)], decoding='ascii')
+to_gml = string_output(lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding='ascii')
 get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])
 
 # Geometry spatial-reference related routines.
@@ -73,7 +73,7 @@ get_coord_dim = int_output(lgdal.OGR_G_GetCoordinateDimension, [c_void_p])
 set_coord_dim = void_output(lgdal.OGR_G_SetCoordinateDimension, [c_void_p, c_int], errcheck=False)
 
 get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
-get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p])
+get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')
 get_geom_type = int_output(lgdal.OGR_G_GetGeometryType, [c_void_p])
 get_point_count = int_output(lgdal.OGR_G_GetPointCount, [c_void_p])
 get_point = void_output(lgdal.OGR_G_GetPoint, [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False)

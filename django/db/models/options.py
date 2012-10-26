@@ -21,7 +21,8 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'auto_created', 'auto_register')
+                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created', 'auto_register')
+
 
 @python_2_unicode_compatible
 class Options(object):
@@ -32,8 +33,8 @@ class Options(object):
         self.verbose_name_plural = None
         self.db_table = ''
         self.ordering = []
-        self.unique_together =  []
-        self.permissions =  []
+        self.unique_together = []
+        self.permissions = []
         self.object_name, self.app_label = None, app_label
         self.get_latest_by = None
         self.order_with_respect_to = None
@@ -55,6 +56,7 @@ class Options(object):
         # in the end of the proxy_for_model chain. In particular, for
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
+        self.swappable = None
         self.parents = SortedDict()
         self.duplicate_targets = {}
         self.auto_created = False
@@ -220,6 +222,19 @@ class Options(object):
         activate(lang)
         return raw
     verbose_name_raw = property(verbose_name_raw)
+
+    def _swapped(self):
+        """
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
+        """
+        if self.swappable:
+            model_label = '%s.%s' % (self.app_label, self.object_name)
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for not in (None, model_label):
+                return swapped_for
+        return None
+    swapped = property(_swapped)
 
     def _fields(self):
         """
@@ -406,13 +421,14 @@ class Options(object):
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in get_models(include_auto_created=True, only_installed=False):
-            for f in klass._meta.local_fields:
-                if f.rel and not isinstance(f.rel.to, six.string_types):
-                    if self == f.rel.to._meta:
-                        cache[RelatedObject(f.rel.to, klass, f)] = None
-                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
-                    elif self.concrete_model == f.rel.to._meta.concrete_model:
-                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+            if not klass._meta.swapped:
+                for f in klass._meta.local_fields:
+                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                        if self == f.rel.to._meta:
+                            cache[RelatedObject(f.rel.to, klass, f)] = None
+                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+                        elif self.concrete_model == f.rel.to._meta.concrete_model:
+                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
@@ -448,9 +464,12 @@ class Options(object):
                 else:
                     cache[obj] = model
         for klass in get_models(only_installed=False):
-            for f in klass._meta.local_many_to_many:
-                if f.rel and not isinstance(f.rel.to, six.string_types) and self == f.rel.to._meta:
-                    cache[RelatedObject(f.rel.to, klass, f)] = None
+            if not klass._meta.swapped:
+                for f in klass._meta.local_many_to_many:
+                    if (f.rel
+                            and not isinstance(f.rel.to, six.string_types)
+                            and self == f.rel.to._meta):
+                        cache[RelatedObject(f.rel.to, klass, f)] = None
         if app_cache_ready():
             self._related_many_to_many_cache = cache
         return cache

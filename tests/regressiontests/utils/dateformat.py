@@ -72,6 +72,11 @@ class DateFormatTests(unittest.TestCase):
 
         self.assertEqual(dateformat.format(my_birthday, 'a'), 'p.m.')
 
+    def test_microsecond(self):
+        # Regression test for #18951
+        dt = datetime(2009, 5, 16, microsecond=123)
+        self.assertEqual(dateformat.format(dt, 'u'), '000123')
+
     def test_date_formats(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
         timestamp = datetime(2008, 5, 19, 11, 45, 23, 123456)

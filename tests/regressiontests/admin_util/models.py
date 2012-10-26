@@ -39,3 +39,6 @@ class Guest(models.Model):
 
     class Meta:
         verbose_name = "awesome guest"
+
+class EventGuide(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)

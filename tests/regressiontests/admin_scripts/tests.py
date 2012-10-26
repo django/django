@@ -982,13 +982,11 @@ class ManageMultipleSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
+
 class ManageSettingsWithImportError(AdminScriptTestCase):
     """Tests for manage.py when using the default settings.py file
     with an import error. Ticket #14130.
     """
-    def setUp(self):
-        self.write_settings_with_import_error('settings.py')
-
     def tearDown(self):
         self.remove_settings('settings.py')
 
@@ -1004,11 +1002,27 @@ class ManageSettingsWithImportError(AdminScriptTestCase):
             settings_file.write('# The next line will cause an import error:\nimport foo42bar\n')
 
     def test_builtin_command(self):
-        "import error: manage.py builtin commands shows useful diagnostic info when settings with import errors is provided"
+        """
+        import error: manage.py builtin commands shows useful diagnostic info
+        when settings with import errors is provided
+        """
+        self.write_settings_with_import_error('settings.py')
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named foo42bar")
+        self.assertOutput(err, "No module named")
+        self.assertOutput(err, "foo42bar")
+
+    def test_builtin_command_with_attribute_error(self):
+        """
+        manage.py builtin commands does not swallow attribute errors from bad settings (#18845)
+        """
+        self.write_settings('settings.py', sdict={'BAD_VAR': 'INSTALLED_APPS.crash'})
+        args = ['collectstatic', 'admin_scripts']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "AttributeError: 'list' object has no attribute 'crash'")
+
 
 class ManageValidate(AdminScriptTestCase):
     def tearDown(self):
@@ -1020,7 +1034,8 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'No module named admin_scriptz')
+        self.assertOutput(err, 'No module named')
+        self.assertOutput(err, 'admin_scriptz')
 
     def test_broken_app(self):
         "manage.py validate reports an ImportError if an app's models.py raises one on import"
@@ -1590,3 +1605,15 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         with codecs.open(path, 'r', 'utf-8') as f:
             self.assertEqual(f.read(),
                 'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
+
+
+class DiffSettings(AdminScriptTestCase):
+    """Tests for diffsettings management command."""
+    def test_basic(self):
+        "Runs without error and emits settings diff."
+        self.write_settings('settings_to_diff.py', sdict={'FOO': '"bar"'})
+        args = ['diffsettings', '--settings=settings_to_diff']
+        out, err = self.run_manage(args)
+        self.remove_settings('settings_to_diff.py')
+        self.assertNoOutput(err)
+        self.assertOutput(out, "FOO = 'bar'  ###")

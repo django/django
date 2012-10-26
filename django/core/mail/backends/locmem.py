@@ -20,5 +20,7 @@ class EmailBackend(BaseEmailBackend):
 
     def send_messages(self, messages):
         """Redirect messages to the dummy outbox"""
+        for message in messages:  # .message() triggers header validation
+            message.message()
         mail.outbox.extend(messages)
         return len(messages)

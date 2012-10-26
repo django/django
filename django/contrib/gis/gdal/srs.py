@@ -34,6 +34,8 @@ from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
 
 from django.utils import six
+from django.utils.encoding import force_bytes
+
 
 #### Spatial Reference class. ####
 class SpatialReference(GDALBase):
@@ -51,7 +53,6 @@ class SpatialReference(GDALBase):
         EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        buf = c_char_p('')
         srs_type = 'user'
 
         if isinstance(srs_input, six.string_types):
@@ -79,6 +80,7 @@ class SpatialReference(GDALBase):
             srs = srs_input
         else:
             # Creating a new SRS pointer, using the string buffer.
+            buf = c_char_p(b'')
             srs = capi.new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
@@ -137,15 +139,15 @@ class SpatialReference(GDALBase):
         """
         if not isinstance(target, six.string_types) or not isinstance(index, int):
             raise TypeError
-        return capi.get_attr_value(self.ptr, target, index)
+        return capi.get_attr_value(self.ptr, force_bytes(target), index)
 
     def auth_name(self, target):
         "Returns the authority name for the given string target node."
-        return capi.get_auth_name(self.ptr, target)
+        return capi.get_auth_name(self.ptr, force_bytes(target))
 
     def auth_code(self, target):
         "Returns the authority code for the given string target node."
-        return capi.get_auth_code(self.ptr, target)
+        return capi.get_auth_code(self.ptr, force_bytes(target))
 
     def clone(self):
         "Returns a clone of this SpatialReference object."
@@ -219,12 +221,14 @@ class SpatialReference(GDALBase):
         and will automatically determines whether to return the linear
         or angular units.
         """
+        units, name = None, None
         if self.projected or self.local:
-            return capi.linear_units(self.ptr, byref(c_char_p()))
+            units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         elif self.geographic:
-            return capi.angular_units(self.ptr, byref(c_char_p()))
-        else:
-            return (None, None)
+            units, name = capi.angular_units(self.ptr, byref(c_char_p()))
+        if name is not None:
+            name.decode()
+        return (units, name)
 
     #### Spheroid/Ellipsoid Properties ####
     @property
@@ -283,7 +287,7 @@ class SpatialReference(GDALBase):
 
     def import_user_input(self, user_input):
         "Imports the Spatial Reference from the given user input string."
-        capi.from_user_input(self.ptr, user_input)
+        capi.from_user_input(self.ptr, force_bytes(user_input))
 
     def import_wkt(self, wkt):
         "Imports the Spatial Reference from OGC WKT (string)"

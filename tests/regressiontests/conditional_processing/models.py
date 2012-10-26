@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.test import TestCase
-from django.utils import unittest
-from django.utils.http import parse_etags, quote_etag, parse_http_date
 
 
 FULL_RESPONSE = 'Test conditional get response'
@@ -129,30 +127,3 @@ class ConditionalGet(TestCase):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = r'"\"'
         response = self.client.get('/condition/etag/')
         self.assertFullResponse(response, check_last_modified=False)
-
-
-class ETagProcessing(unittest.TestCase):
-    def testParsing(self):
-        etags = parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
-        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
-
-    def testQuoting(self):
-        quoted_etag = quote_etag(r'e\t"ag')
-        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
-
-
-class HttpDateProcessing(unittest.TestCase):
-    def testParsingRfc1123(self):
-        parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))
-
-    def testParsingRfc850(self):
-        parsed = parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))
-
-    def testParsingAsctime(self):
-        parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 6, 8, 49, 37))

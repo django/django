@@ -118,8 +118,7 @@ def parse_http_date(date):
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
 
-    Returns an floating point number expressed in seconds since the epoch, in
-    UTC.
+    Returns an integer expressed in seconds since the epoch, in UTC.
     """
     # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
     # RFC2616 makes it mandatory to support RFC850 dates too. So we roll

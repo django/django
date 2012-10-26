@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# This coding header is significant for tests, as the debug view is parsing
+# files to search for such a header to decode the source file content
 from __future__ import absolute_import, unicode_literals
 
 import inspect

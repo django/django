@@ -30,9 +30,10 @@ _accepted = {}
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
 
-# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
+# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
+# and RFC 3066, section 2.1
 accept_language_re = re.compile(r'''
-        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)         # "en", "en-au", "x-y-z", "*"
+        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)      # "en", "en-au", "x-y-z", "es-419", "*"
         (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
@@ -273,7 +274,8 @@ else:
         return do_translate(message, 'ugettext')
 
 def pgettext(context, message):
-    result = ugettext("%s%s%s" % (context, CONTEXT_SEPARATOR, message))
+    msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
+    result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -319,9 +321,10 @@ else:
         return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = ungettext("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
-                        number)
+    msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                      "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                      number)
+    result = ungettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = ungettext(singular, plural, number)
@@ -437,8 +440,8 @@ def blankout(src, char):
     return dot_re.sub(char, src)
 
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?\s*""")
-block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?(?:\s+|$)""")
+inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")

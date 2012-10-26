@@ -42,7 +42,7 @@ class BaseDatabaseCreation(object):
             (list_of_sql, pending_references_dict)
         """
         opts = model._meta
-        if not opts.managed or opts.proxy:
+        if not opts.managed or opts.proxy or opts.swapped:
             return [], {}
         final_output = []
         table_output = []
@@ -94,9 +94,9 @@ class BaseDatabaseCreation(object):
 
         full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' +
                           style.SQL_TABLE(qn(opts.db_table)) + ' (']
-        for i, line in enumerate(table_output): # Combine and add commas.
+        for i, line in enumerate(table_output):  # Combine and add commas.
             full_statement.append(
-                '    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
+                '    %s%s' % (line, i < len(table_output) - 1 and ',' or ''))
         full_statement.append(')')
         if opts.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(
@@ -145,11 +145,11 @@ class BaseDatabaseCreation(object):
         """
         from django.db.backends.util import truncate_name
 
-        if not model._meta.managed or model._meta.proxy:
+        opts = model._meta
+        if not opts.managed or opts.proxy or opts.swapped:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
-        opts = model._meta
         if model in pending_references:
             for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
@@ -174,7 +174,7 @@ class BaseDatabaseCreation(object):
         """
         Returns the CREATE INDEX SQL statements for a single model.
         """
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for f in model._meta.local_fields:
@@ -213,7 +213,7 @@ class BaseDatabaseCreation(object):
         Return the DROP TABLE and restraint dropping statements for a single
         model.
         """
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         # Drop the table now
         qn = self.connection.ops.quote_name
@@ -230,7 +230,7 @@ class BaseDatabaseCreation(object):
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
         from django.db.backends.util import truncate_name
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         qn = self.connection.ops.quote_name

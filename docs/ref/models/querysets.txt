@@ -505,15 +505,8 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-.. versionchanged:: 1.3
-
-The ``values()`` method previously did not return anything for
-:class:`~django.db.models.ManyToManyField` attributes and would raise an error
-if you tried to pass this type of field to it.
-
-This restriction has been lifted, and you can now also refer to fields on
-related models with reverse relations through ``OneToOneField``, ``ForeignKey``
-and ``ManyToManyField`` attributes::
+You can also refer to fields on related models with reverse relations through
+``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
     Blog.objects.values('name', 'entry__headline')
     [{'name': 'My blog', 'entry__headline': 'An entry'},
@@ -1463,6 +1456,16 @@ evaluated will force it to evaluate again, repeating the query.
 Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
 ignored since these two optimizations do not make sense together.
 
+.. warning::
+
+    Some Python database drivers like ``psycopg2`` perform caching if using
+    client side cursors (instantiated with ``connection.cursor()`` and what
+    Django's ORM uses). Using ``iterator()`` does not affect caching at the
+    database driver level. To disable this caching, look at `server side
+    cursors`_.
+
+.. _server side cursors: http://initd.org/psycopg/docs/usage.html#server-side-cursors
+
 latest
 ~~~~~~
 
@@ -1571,7 +1574,8 @@ update
 .. method:: update(**kwargs)
 
 Performs an SQL update query for the specified fields, and returns
-the number of rows affected.
+the number of rows matched (which may not be equal to the number of rows
+updated if some rows already have the new value).
 
 For example, to turn comments off for all blog entries published in 2010,
 you could do this::
@@ -1631,7 +1635,7 @@ does not call any ``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
 calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
 update a bunch of records for a model that has a custom
-:meth:`~django.db.models.Model.save()`` method, loop over them and call
+:meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
 
     for e in Entry.objects.filter(pub_date__year=2010):
@@ -1664,16 +1668,30 @@ For example::
     # This will delete all Blogs and all of their Entry objects.
     blogs.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.pre_delete` and
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
+
+.. versionadded:: 1.5
+    Allow fast-path deletion of objects
+
+Django needs to fetch objects into memory to send signals and handle cascades.
+However, if there are no cascades and no signals, then Django may take a
+fast-path and delete objects without fetching into memory. For large
+deletes this can result in significantly reduced memory usage. The amount of
+executed queries can be reduced, too.
+
+ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
+DO_NOTHING do not prevent taking the fast-path in deletion.
+
+Note that the queries generated in object deletion is an implementation
+detail subject to change.
 
 .. _field-lookups:
 

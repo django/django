@@ -4,10 +4,12 @@ from datetime import date, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.utils import unittest
 
 
+@skipIfCustomUser
 class TokenGeneratorTest(TestCase):
 
     def test_make_token(self):

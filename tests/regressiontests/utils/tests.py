@@ -17,10 +17,11 @@ from .encoding import TestEncodingUtils
 from .feedgenerator import FeedgeneratorTest
 from .functional import FunctionalTestCase
 from .html import TestUtilsHtml
-from .http import TestUtilsHttp
+from .http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
 from .ipv6 import TestUtilsIPv6
 from .jslex import JsToCForGettextTest, JsTokensTest
 from .module_loading import CustomLoader, DefaultLoader, EggLoader
+from .numberformat import TestNumberFormat
 from .os_utils import SafeJoinTests
 from .regex_helper import NormalizeTests
 from .simplelazyobject import TestUtilsSimpleLazyObject

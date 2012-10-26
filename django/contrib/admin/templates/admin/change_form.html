@@ -29,7 +29,7 @@
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
     {% block object-tools-items %}
-    <li><a href="{% url opts|admin_urlname:'history' original.pk %}" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a></li>
     {% if has_absolute_url %}<li><a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}
   </ul>

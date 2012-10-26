@@ -1,14 +1,22 @@
+from __future__ import unicode_literals
+
+import logging
 import os
 import re
-from ctypes import c_char_p, CDLL
+from ctypes import c_char_p, c_int, CDLL, CFUNCTYPE
 from ctypes.util import find_library
+
 from django.contrib.gis.gdal.error import OGRException
+from django.core.exceptions import ImproperlyConfigured
+
+logger = logging.getLogger('django.contrib.gis')
 
 # Custom library path set?
 try:
     from django.conf import settings
     lib_path = settings.GDAL_LIBRARY_PATH
-except (AttributeError, EnvironmentError, ImportError):
+except (AttributeError, EnvironmentError,
+        ImportError, ImproperlyConfigured):
     lib_path = None
 
 if lib_path:
@@ -65,28 +73,15 @@ _version_info.restype = c_char_p
 
 def gdal_version():
     "Returns only the GDAL version number information."
-    return _version_info('RELEASE_NAME')
+    return _version_info(b'RELEASE_NAME')
 
 def gdal_full_version():
     "Returns the full GDAL version information."
     return _version_info('')
 
-def gdal_release_date(date=False):
-    """
-    Returns the release date in a string format, e.g, "2007/06/27".
-    If the date keyword argument is set to True, a Python datetime object
-    will be returned instead.
-    """
-    from datetime import date as date_type
-    rel = _version_info('RELEASE_DATE')
-    yy, mm, dd = map(int, (rel[0:4], rel[4:6], rel[6:8]))
-    d = date_type(yy, mm, dd)
-    if date: return d
-    else: return d.strftime('%Y/%m/%d')
-
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 def gdal_version_info():
-    ver = gdal_version()
+    ver = gdal_version().decode()
     m = version_regex.match(ver)
     if not m: raise OGRException('Could not parse GDAL version string "%s"' % ver)
     return dict([(key, m.group(key)) for key in ('major', 'minor', 'subminor')])
@@ -97,3 +92,18 @@ GDAL_MINOR_VERSION = int(_verinfo['minor'])
 GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
 GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
 del _verinfo
+
+# Set library error handling so as errors are logged
+CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
+def err_handler(error_class, error_number, message):
+    logger.error('GDAL_ERROR %d: %s' % (error_number, message))
+err_handler = CPLErrorHandler(err_handler)
+
+def function(name, args, restype):
+    func = std_call(name)
+    func.argtypes = args
+    func.restype = restype
+    return func
+
+set_error_handler = function('CPLSetErrorHandler', [CPLErrorHandler], CPLErrorHandler)
+set_error_handler(err_handler)

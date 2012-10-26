@@ -125,4 +125,4 @@ def check_str_arg(result, func, cargs):
     """
     dbl = result
     ptr = cargs[-1]._obj
-    return dbl, ptr.value
+    return dbl, ptr.value.decode()

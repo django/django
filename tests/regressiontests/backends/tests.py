@@ -666,13 +666,6 @@ class ThreadTests(TestCase):
         self.assertEqual(len(exceptions), 0)
 
 
-class BackendLoadingTests(TestCase):
-    def test_old_style_backends_raise_useful_exception(self):
-        six.assertRaisesRegex(self, ImproperlyConfigured,
-            "Try using django.db.backends.sqlite3 instead",
-            load_backend, 'sqlite3')
-
-
 class MySQLPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL

@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.models import (Group, User, SiteProfileNotAvailable,
     UserManager)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, AUTH_PROFILE_MODULE='')
 class ProfileTestCase(TestCase):
 
@@ -31,6 +33,7 @@ class ProfileTestCase(TestCase):
             user.get_profile()
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class NaturalKeysTestCase(TestCase):
     fixtures = ['authtestdata.json']
@@ -45,6 +48,7 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(Group.objects.get_by_natural_key('users'), users_group)
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
     fixtures = ['regular.json']
@@ -55,6 +59,7 @@ class LoadDataWithoutNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithNaturalKeysTestCase(TestCase):
     fixtures = ['natural.json']
@@ -65,6 +70,7 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
+@skipIfCustomUser
 class UserManagerTestCase(TestCase):
 
     def test_create_user(self):

@@ -2,8 +2,6 @@
 Using mixins with class-based views
 ===================================
 
-.. versionadded:: 1.3
-
 .. caution::
 
     This is an advanced topic. A working knowledge of :doc:`Django's

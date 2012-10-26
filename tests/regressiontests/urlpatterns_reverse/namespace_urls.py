@@ -28,6 +28,7 @@ otherobj2 = URLObject('nodefault', 'other-ns2')
 urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     url(r'^normal/$', 'empty_view', name='normal-view'),
     url(r'^normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='normal-view'),
+    url(r'^resolver_match/$', 'pass_resolver_match_view', name='test-resolver-match'),
 
     url(r'^\+\\\$\*/$', 'empty_view', name='special-view'),
 

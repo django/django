@@ -407,6 +407,18 @@ Jeremy Dunck
 .. _vlogger: http://youtube.com/bryanveloso/
 .. _shoutcaster: http://twitch.tv/vlogalonstar/
 
+`Preston Holmes`_
+    Preston is a recovering neuroscientist who originally discovered Django as
+    part of a sweeping move to Python from a grab bag of half a dozen
+    languages. He was drawn to Django's balance of practical batteries included
+    philosophy, care and thought in code design, and strong open source
+    community. In addition to his current job in private progressive education,
+    Preston contributes some developer time to local non-profits.
+
+    Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
+
+.. _Preston Holmes: http://www.ptone.com/
+
 Specialists
 -----------
 

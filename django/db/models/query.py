@@ -529,6 +529,14 @@ class QuerySet(object):
         self._result_cache = None
     delete.alters_data = True
 
+    def _raw_delete(self, using):
+        """
+        Deletes objects found from the given queryset in single direct SQL
+        query. No signals are sent, and there is no protection for cascades.
+        """
+        sql.DeleteQuery(self.model).delete_qs(self, using)
+    _raw_delete.alters_data = True
+
     def update(self, **kwargs):
         """
         Updates all elements in the current QuerySet, setting all the given
@@ -975,6 +983,12 @@ class ValuesQuerySet(QuerySet):
         for row in self.query.get_compiler(self.db).results_iter():
             yield dict(zip(names, row))
 
+    def delete(self):
+        # values().delete() doesn't work currently - make sure it raises an
+        # user friendly error.
+        raise TypeError("Queries with .values() or .values_list() applied "
+                        "can't be deleted")
+
     def _setup_query(self):
         """
         Constructs the field_names list that the values query will be
@@ -1262,6 +1276,18 @@ class EmptyQuerySet(QuerySet):
         for arg in args:
             kwargs[arg.default_alias] = arg
         return dict([(key, None) for key in kwargs])
+
+    def values(self, *fields):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def values_list(self, *fields, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
 
     # EmptyQuerySet is always an empty result in where-clauses (and similar
     # situations).

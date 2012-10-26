@@ -80,11 +80,11 @@ This accomplishes several things quite nicely:
   The view code that displays a given story just checks to make sure the
   requested story is on the current site. It looks something like this::
 
-      from django.conf import settings
+      from django.contrib.sites.models import get_current_site
 
       def article_detail(request, article_id):
           try:
-              a = Article.objects.get(id=article_id, sites__id__exact=settings.SITE_ID)
+              a = Article.objects.get(id=article_id, sites__id__exact=get_current_site(request).id)
           except Article.DoesNotExist:
               raise Http404
           # ...
@@ -131,52 +131,35 @@ For example::
             # Do something else.
 
 Of course, it's ugly to hard-code the site IDs like that. This sort of
-hard-coding is best for hackish fixes that you need done quickly. A slightly
+hard-coding is best for hackish fixes that you need done quickly. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 
-    from django.conf import settings
-    from django.contrib.sites.models import Site
+    from django.contrib.sites.models import get_current_site
 
     def my_view(request):
-        current_site = Site.objects.get(id=settings.SITE_ID)
+        current_site = get_current_site(request)
         if current_site.domain == 'foo.com':
             # Do something
         else:
             # Do something else.
 
-The idiom of retrieving the :class:`~django.contrib.sites.models.Site` object
-for the value of :setting:`settings.SITE_ID <SITE_ID>` is quite common, so
-the :class:`~django.contrib.sites.models.Site` model's manager has a
-``get_current()`` method. This example is equivalent to the previous one::
+This has also the advantage of checking if the sites framework is installed, and
+return a :class:`RequestSite` instance if it is not.
+
+If you don't have access to the request object, you can use the
+``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
+model's manager. You should then ensure that your settings file does contain
+the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
 
     from django.contrib.sites.models import Site
 
-    def my_view(request):
+    def my_function_without_request():
         current_site = Site.objects.get_current()
         if current_site.domain == 'foo.com':
             # Do something
         else:
             # Do something else.
-
-.. versionchanged:: 1.3
-
-For code which relies on getting the current domain but cannot be certain
-that the sites framework will be installed for any given project, there is a
-utility function :func:`~django.contrib.sites.models.get_current_site` that
-takes a request object as an argument and returns either a Site instance (if
-the sites framework is installed) or a RequestSite instance (if it is not).
-This allows loose coupling with the sites framework and provides a usable
-fallback for cases where it is not installed.
-
-.. versionadded:: 1.3
-
-.. function:: get_current_site(request)
-
-    Checks if contrib.sites is installed and returns either the current
-    :class:`~django.contrib.sites.models.Site` object or a 
-    :class:`~django.contrib.sites.models.RequestSite` object based on
-    the request.
 
 Getting the current domain for display
 --------------------------------------
@@ -196,14 +179,14 @@ current site's :attr:`~django.contrib.sites.models.Site.name` and
 
 Here's an example of what the form-handling view looks like::
 
-    from django.contrib.sites.models import Site
+    from django.contrib.sites.models import get_current_site
     from django.core.mail import send_mail
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        current_site = Site.objects.get_current()
+        current_site = get_current_site(request)
         send_mail('Thanks for subscribing to %s alerts' % current_site.name,
             'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
             'editor@%s' % current_site.domain,
@@ -374,19 +357,19 @@ Here's how Django uses the sites framework:
 
 * In the :mod:`redirects framework <django.contrib.redirects>`, each
   redirect object is associated with a particular site. When Django searches
-  for a redirect, it takes into account the current :setting:`SITE_ID`.
+  for a redirect, it takes into account the current site.
 
 * In the comments framework, each comment is associated with a particular
   site. When a comment is posted, its
-  :class:`~django.contrib.sites.models.Site` is set to the current
-  :setting:`SITE_ID`, and when comments are listed via the appropriate
-  template tag, only the comments for the current site are displayed.
+  :class:`~django.contrib.sites.models.Site` is set to the current site,
+  and when comments are listed via the appropriate template tag, only the
+  comments for the current site are displayed.
 
 * In the :mod:`flatpages framework <django.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
   you specify its :class:`~django.contrib.sites.models.Site`, and the
   :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-  checks the current :setting:`SITE_ID` in retrieving flatpages to display.
+  checks the current site in retrieving flatpages to display.
 
 * In the :mod:`syndication framework <django.contrib.syndication>`, the
   templates for ``title`` and ``description`` automatically have access to a
@@ -437,7 +420,7 @@ fallback when the database-backed sites framework is not available.
 
         Sets the ``name`` and ``domain`` attributes to the value of
         :meth:`~django.http.HttpRequest.get_host`.
-        
+
 
 A :class:`~django.contrib.sites.models.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object, except

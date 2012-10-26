@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
 
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -15,15 +16,20 @@ from django.utils.six.moves import xrange
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
-    "A class that wraps an OGR Feature, needs to be instantiated from a Layer object."
+    """
+    This class that wraps an OGR Feature, needs to be instantiated
+    from a Layer object.
+    """
 
     #### Python 'magic' routines ####
-    def __init__(self, feat, fdefn):
-        "Initializes on the pointers for the feature and the layer definition."
-        if not feat or not fdefn:
+    def __init__(self, feat, layer):
+        """
+        Initializes Feature from a pointer and its Layer object.
+        """
+        if not feat:
             raise OGRException('Cannot create OGR Feature, invalid pointer given.')
         self.ptr = feat
-        self._fdefn = fdefn
+        self._layer = layer
 
     def __del__(self):
         "Releases a reference to this object."
@@ -42,7 +48,7 @@ class Feature(GDALBase):
             if index < 0 or index > self.num_fields:
                 raise OGRIndexError('index out of range')
             i = index
-        return Field(self.ptr, i)
+        return Field(self, i)
 
     def __iter__(self):
         "Iterates over each field in the Feature."
@@ -63,6 +69,10 @@ class Feature(GDALBase):
 
     #### Feature Properties ####
     @property
+    def encoding(self):
+        return self._layer._ds.encoding
+
+    @property
     def fid(self):
         "Returns the feature identifier."
         return capi.get_fid(self.ptr)
@@ -70,7 +80,8 @@ class Feature(GDALBase):
     @property
     def layer_name(self):
         "Returns the name of the layer for the feature."
-        return capi.get_feat_name(self._fdefn)
+        name = capi.get_feat_name(self._layer._ldefn)
+        return force_text(name, self.encoding, strings_only=True)
 
     @property
     def num_fields(self):
@@ -80,7 +91,7 @@ class Feature(GDALBase):
     @property
     def fields(self):
         "Returns a list of fields in the Feature."
-        return [capi.get_field_name(capi.get_field_defn(self._fdefn, i))
+        return [capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i))
                 for i in xrange(self.num_fields)]
 
     @property
@@ -93,7 +104,7 @@ class Feature(GDALBase):
     @property
     def geom_type(self):
         "Returns the OGR Geometry Type for this Feture."
-        return OGRGeomType(capi.get_fd_geom_type(self._fdefn))
+        return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
 
     #### Feature Methods ####
     def get(self, field):
@@ -107,6 +118,7 @@ class Feature(GDALBase):
 
     def index(self, field_name):
         "Returns the index of the given field name."
-        i = capi.get_field_index(self.ptr, field_name)
-        if i < 0: raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
+        i = capi.get_field_index(self.ptr, force_bytes(field_name))
+        if i < 0:
+            raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
         return i

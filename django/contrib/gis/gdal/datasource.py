@@ -45,6 +45,7 @@ from django.contrib.gis.gdal.layer import Layer
 # Getting the ctypes prototypes for the DataSource.
 from django.contrib.gis.gdal.prototypes import ds as capi
 
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -56,12 +57,14 @@ class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
 
     #### Python 'magic' routines ####
-    def __init__(self, ds_input, ds_driver=False, write=False):
+    def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
         if write:
             self._write = 1
         else:
             self._write = 0
+        # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        self.encoding = encoding
 
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.
@@ -73,7 +76,7 @@ class DataSource(GDALBase):
             ds_driver = Driver.ptr_type()
             try:
                 # OGROpen will auto-detect the data source type.
-                ds = capi.open_ds(ds_input, self._write, byref(ds_driver))
+                ds = capi.open_ds(force_bytes(ds_input), self._write, byref(ds_driver))
             except OGRException:
                 # Making the error message more clear rather than something
                 # like "Invalid pointer returned from OGROpen".
@@ -102,7 +105,7 @@ class DataSource(GDALBase):
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
         if isinstance(index, six.string_types):
-            l = capi.get_layer_by_name(self.ptr, index)
+            l = capi.get_layer_by_name(self.ptr, force_bytes(index))
             if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
             if index < 0 or index >= self.layer_count:
@@ -128,4 +131,5 @@ class DataSource(GDALBase):
     @property
     def name(self):
         "Returns the name of the data source."
-        return capi.get_ds_name(self._ptr)
+        name = capi.get_ds_name(self._ptr)
+        return force_text(name, self.encoding, strings_only=True)

@@ -1,9 +1,11 @@
 import sys
 
+from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
 from django.utils import six
+
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -15,13 +17,13 @@ class ModelErrorCollection:
         self.errors.append((context, error))
         self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
 
+
 def get_validation_errors(outfile, app=None):
     """
     Validates all models that are part of the specified app. If no app name is provided,
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.conf import settings
     from django.db import models, connection
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
@@ -35,7 +37,25 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app):
         opts = cls._meta
 
-        # Do field-specific validation.
+        # Check swappable attribute.
+        if opts.swapped:
+            try:
+                app_label, model_name = opts.swapped.split('.')
+            except ValueError:
+                e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
+                continue
+            if not models.get_model(app_label, model_name):
+                e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
+            # No need to perform any other validation checks on a swapped model.
+            continue
+
+        # This is the current User model. Check known validation problems with User models
+        if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
+            # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
+            if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
+                e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
+
+        # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
@@ -56,7 +76,7 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, '"%s": CharFields require a "max_length" attribute that is a positive integer.' % f.name)
             if isinstance(f, models.DecimalField):
                 decimalp_ok, mdigits_ok = False, False
-                decimalp_msg ='"%s": DecimalFields require a "decimal_places" attribute that is a non-negative integer.'
+                decimalp_msg = '"%s": DecimalFields require a "decimal_places" attribute that is a non-negative integer.'
                 try:
                     decimal_places = int(f.decimal_places)
                     if decimal_places < 0:
@@ -123,6 +143,10 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, six.string_types):
                     continue
 
+                # Make sure the model we're related hasn't been swapped out
+                if f.rel.to._meta.swapped:
+                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+
                 # Make sure the related field specified by a ForeignKey is unique
                 if not f.rel.to._meta.get_field(f.rel.field_name).unique:
                     e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
@@ -165,6 +189,10 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, six.string_types):
                     continue
 
+            # Make sure the model we're related hasn't been swapped out
+            if f.rel.to._meta.swapped:
+                e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+
             # Check that the field is not set to unique.  ManyToManyFields do not support unique.
             if f.unique:
                 e.add(opts, "ManyToManyFields cannot be unique.  Remove the unique argument on '%s'." % f.name)
@@ -176,7 +204,7 @@ def get_validation_errors(outfile, app=None):
                 seen_from, seen_to, seen_self = False, False, 0
                 for inter_field in f.rel.through._meta.fields:
                     rel_to = getattr(inter_field.rel, 'to', None)
-                    if from_model == to_model: # relation to self
+                    if from_model == to_model:  # relation to self
                         if rel_to == from_model:
                             seen_self += 1
                         if seen_self > 2:
@@ -278,7 +306,8 @@ def get_validation_errors(outfile, app=None):
         # Check ordering attribute.
         if opts.ordering:
             for field_name in opts.ordering:
-                if field_name == '?': continue
+                if field_name == '?':
+                    continue
                 if field_name.startswith('-'):
                     field_name = field_name[1:]
                 if opts.order_with_respect_to and field_name == '_order':

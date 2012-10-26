@@ -115,7 +115,6 @@ class Query(object):
         self.default_ordering = True
         self.standard_ordering = True
         self.ordering_aliases = []
-        self.select_fields = []
         self.related_select_fields = []
         self.dupe_avoidance = {}
         self.used_aliases = set()
@@ -124,6 +123,9 @@ class Query(object):
 
         # SQL-related attributes
         self.select = []
+        # For each to-be-selected field in self.select there must be a
+        # corresponding entry in self.select - git seems to need this.
+        self.select_fields = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
@@ -431,13 +433,9 @@ class Query(object):
 
     def has_results(self, using):
         q = self.clone()
+        q.clear_select_clause()
         q.add_extra({'a': 1}, None, None, None, None, None)
-        q.select = []
-        q.select_fields = []
-        q.default_cols = False
-        q.select_related = False
-        q.set_extra_mask(('a',))
-        q.set_aggregate_mask(())
+        q.set_extra_mask(['a'])
         q.clear_ordering(True)
         q.set_limits(high=1)
         compiler = q.get_compiler(using=using)
@@ -702,6 +700,11 @@ class Query(object):
         aliases = list(aliases)
         while aliases:
             alias = aliases.pop(0)
+            if self.alias_map[alias].rhs_join_col is None:
+                # This is the base table (first FROM entry) - this table
+                # isn't really joined at all in the query, so we should not
+                # alter its join type.
+                continue
             parent_alias = self.alias_map[alias].lhs_alias
             parent_louter = (parent_alias
                 and self.alias_map[parent_alias].join_type == self.LOUTER)
@@ -1188,6 +1191,9 @@ class Query(object):
                     for alias in join_list:
                         if self.alias_map[alias].join_type == self.LOUTER:
                             j_col = self.alias_map[alias].rhs_join_col
+                            # The join promotion logic should never produce
+                            # a LOUTER join for the base join - assert that.
+                            assert j_col is not None
                             entry = self.where_class()
                             entry.add(
                                 (Constraint(alias, j_col, None), 'isnull', True),
@@ -1617,6 +1623,17 @@ class Query(object):
         Typically, this means no limits or offsets have been put on the results.
         """
         return not self.low_mark and self.high_mark is None
+
+    def clear_select_clause(self):
+        """
+        Removes all fields from SELECT clause.
+        """
+        self.select = []
+        self.select_fields = []
+        self.default_cols = False
+        self.select_related = False
+        self.set_extra_mask(())
+        self.set_aggregate_mask(())
 
     def clear_select_fields(self):
         """

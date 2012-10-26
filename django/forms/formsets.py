@@ -123,7 +123,11 @@ class BaseFormSet(object):
         """
         Instantiates and returns the i-th form instance in a formset.
         """
-        defaults = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
+        defaults = {
+            'auto_id': self.auto_id,
+            'prefix': self.add_prefix(i),
+            'error_class': self.error_class,
+            }
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files

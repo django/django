@@ -155,16 +155,8 @@ class UTF8Class:
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
 class Templates(unittest.TestCase):
-    def setUp(self):
-        self.old_static_url = settings.STATIC_URL
-        self.old_media_url = settings.MEDIA_URL
-        settings.STATIC_URL = "/static/"
-        settings.MEDIA_URL = "/media/"
-
-    def tearDown(self):
-        settings.STATIC_URL = self.old_static_url
-        settings.MEDIA_URL = self.old_media_url
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
@@ -229,11 +221,11 @@ class Templates(unittest.TestCase):
             loader.template_source_loaders = (filesystem.Loader(),)
 
             # We rely on the fact that runtests.py sets up TEMPLATE_DIRS to
-            # point to a directory containing a 404.html file. Also that
+            # point to a directory containing a login.html file. Also that
             # the file system and app directories loaders both inherit the
             # load_template method from the BaseLoader class, so we only need
             # to test one of them.
-            load_name = '404.html'
+            load_name = 'login.html'
             template = loader.get_template(load_name)
             template_name = template.nodelist[0].source[0].name
             self.assertTrue(template_name.endswith(load_name),

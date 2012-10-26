@@ -92,7 +92,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing HEX input/output."
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
-            self.assertEqual(g.hex, geom1.hex)
+            self.assertEqual(g.hex.encode(), geom1.hex)
             # Constructing w/HEX
             geom2 = OGRGeometry(g.hex)
             self.assertEqual(geom1, geom2)
@@ -102,7 +102,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex)
+            self.assertEqual(b2a_hex(wkb).upper(), g.hex.encode())
             # Constructing w/WKB.
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)
@@ -235,15 +235,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
-        print("\nBEGIN - expecting IllegalArgumentException; safe to ignore.\n")
-        try:
-            c = poly.centroid
-        except OGRException:
-            # Should raise an OGR exception, rings are not closed
-            pass
-        else:
-            self.fail('Should have raised an OGRException!')
-        print("\nEND - expecting IllegalArgumentException; safe to ignore.\n")
+        with self.assertRaises(OGRException):
+            _ = poly.centroid
 
         poly.close_rings()
         self.assertEqual(10, poly.point_count) # Two closing points should've been added

@@ -141,6 +141,9 @@ class Signal(object):
                     del self.receivers[index]
                     break
 
+    def has_listeners(self, sender=None):
+        return bool(self._live_receivers(_make_id(sender)))
+
     def send(self, sender, **named):
         """
         Send signal from sender to all connected receivers.

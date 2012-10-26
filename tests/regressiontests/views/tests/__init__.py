@@ -7,4 +7,4 @@ from .defaults import DefaultsTests
 from .i18n import JsI18NTests, I18NTests, JsI18NTestsMultiPackage
 from .shortcuts import ShortcutTests
 from .specials import URLHandling
-from .static import StaticHelperTest, StaticTests
+from .static import StaticHelperTest, StaticUtilsTests, StaticTests

@@ -60,6 +60,8 @@ Other topics
     For information about serving the static files (images, JavaScript, and
     CSS) associated with the admin in production, see :ref:`serving-files`.
 
+    Having problems?  Try :doc:`/faq/admin`.
+
 ``ModelAdmin`` objects
 ======================
 
@@ -128,8 +130,6 @@ subclass::
     Example::
 
         date_hierarchy = 'pub_date'
-
-    .. versionadded:: 1.3
 
     This will intelligently populate itself based on available data,
     e.g. if all the dates are in one month, it'll show the day-level
@@ -307,7 +307,9 @@ subclass::
     By default a ``ModelForm`` is dynamically created for your model. It is
     used to create the form presented on both the add/change pages. You can
     easily provide your own ``ModelForm`` to override any default form behavior
-    on the add/change pages.
+    on the add/change pages. Alternatively, you can customize the default
+    form rather than specifying an entirely new one by using the
+    :meth:`ModelAdmin.get_form` method.
 
     For an example see the section `Adding custom validation to the admin`_.
 
@@ -373,7 +375,8 @@ subclass::
 
 .. attribute:: ModelAdmin.inlines
 
-    See :class:`InlineModelAdmin` objects below.
+    See :class:`InlineModelAdmin` objects below as well as
+    :meth:`ModelAdmin.get_formsets`.
 
 .. attribute:: ModelAdmin.list_display
 
@@ -576,8 +579,6 @@ subclass::
           class PersonAdmin(ModelAdmin):
               list_filter = ('is_staff', 'company')
 
-      .. versionadded:: 1.3
-
       Field names in ``list_filter`` can also span relations
       using the ``__`` lookup, for example::
 
@@ -748,8 +749,6 @@ subclass::
 
 .. attribute:: ModelAdmin.paginator
 
-    .. versionadded:: 1.3
-
     The paginator class to be used for pagination. By default,
     :class:`django.core.paginator.Paginator` is used. If the custom paginator
     class doesn't have the same constructor interface as
@@ -803,6 +802,14 @@ subclass::
 
         class ArticleAdmin(admin.ModelAdmin):
             raw_id_fields = ("newspaper",)
+
+    The ``raw_id_fields`` ``Input`` widget should contain a primary key if the
+    field is a ``ForeignKey`` or a comma separated list of values if the field
+    is a ``ManyToManyField``.  The ``raw_id_fields`` widget shows a magnifying
+    glass button next to the field which allows users to search for and select
+    a value:
+
+    .. image:: _images/raw_id_fields.png
 
 .. attribute:: ModelAdmin.readonly_fields
 
@@ -966,8 +973,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.delete_model(self, request, obj)
 
-    .. versionadded:: 1.3
-
     The ``delete_model`` method is given the ``HttpRequest`` and a model
     instance. Use this method to do pre- or post-delete operations.
 
@@ -1049,6 +1054,16 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
+
+    .. versionadded:: 1.5
+
+    The ``get_inline_instances`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
+    objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
+    section.
+
 .. method:: ModelAdmin.get_urls(self)
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
@@ -1114,6 +1129,38 @@ templates used by the :class:`ModelAdmin` views:
     :meth:`AdminSite.admin_view`::
 
         (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+
+.. method:: ModelAdmin.get_form(self, request, obj=None, **kwargs)
+
+    Returns a :class:`~django.forms.ModelForm` class for use in the admin add
+    and change views, see :meth:`add_view` and :meth:`change_view`.
+
+    If you wanted to hide a field from non-superusers, for example, you could
+    override ``get_form`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_form(self, request, obj=None, **kwargs):
+                self.exclude = []
+                if not request.user.is_superuser:
+                    self.exclude.append('field_to_hide')
+                return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
+.. method:: ModelAdmin.get_formsets(self, request, obj=None)
+
+    Yields :class:`InlineModelAdmin`\s for use in admin add and change views.
+
+    For example if you wanted to display a particular inline only in the change
+    view, you could override ``get_formsets`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            inlines = [MyInline, SomeOtherInline]
+
+            def get_formsets(self, request, obj=None):
+                for inline in self.get_inline_instances(request, obj):
+                    # hide MyInline in the add view
+                    if isinstance(inline, MyInline) and obj is None:
+                        continue
+                    yield inline.get_formset(request, obj)
 
 .. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
@@ -1213,8 +1260,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
 
-    .. versionadded:: 1.3
-
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
 
@@ -1294,8 +1339,6 @@ on your ``ModelAdmin``::
                 "all": ("my_styles.css",)
             }
             js = ("my_code.js",)
-
-.. versionchanged:: 1.3
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
@@ -1394,17 +1437,14 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.exclude`
 - :attr:`~ModelAdmin.filter_horizontal`
 - :attr:`~ModelAdmin.filter_vertical`
+- :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
-
-.. versionadded:: 1.3
-
-- :attr:`~ModelAdmin.ordering`
-- :meth:`~ModelAdmin.queryset`
 
 .. versionadded:: 1.4
 
@@ -1435,8 +1475,6 @@ The ``InlineModelAdmin`` class adds:
     The value for ``form`` defaults to ``ModelForm``. This is what is passed
     through to ``inlineformset_factory`` when creating the formset for this
     inline.
-
-    .. _ref-contrib-admin-inline-extra:
 
 .. attribute:: InlineModelAdmin.extra
 
@@ -1812,8 +1850,6 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site login view.
 
 .. attribute:: AdminSite.login_form
-
-    .. versionadded:: 1.3
 
     Subclass of :class:`~django.contrib.auth.forms.AuthenticationForm` that
     will be used by the admin site login view.

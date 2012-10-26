@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import re
 
 from django.conf import settings
@@ -6,9 +7,9 @@ from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
-from django.utils.log import getLogger
 
-logger = getLogger('django.request')
+
+logger = logging.getLogger('django.request')
 
 
 class CommonMiddleware(object):
@@ -112,14 +113,18 @@ class CommonMiddleware(object):
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
+            elif response.streaming:
+                etag = None
             else:
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
-                cookies = response.cookies
-                response = http.HttpResponseNotModified()
-                response.cookies = cookies
-            else:
-                response['ETag'] = etag
+            if etag is not None:
+                if (200 <= response.status_code < 300
+                    and request.META.get('HTTP_IF_NONE_MATCH') == etag):
+                    cookies = response.cookies
+                    response = http.HttpResponseNotModified()
+                    response.cookies = cookies
+                else:
+                    response['ETag'] = etag
 
         return response
 

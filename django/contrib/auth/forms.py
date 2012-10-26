@@ -7,9 +7,10 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import format_html, format_html_join
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
@@ -117,9 +118,6 @@ class UserChangeForm(forms.ModelForm):
                     "this user's password, but you can change the password "
                     "using <a href=\"password/\">this form</a>."))
 
-    def clean_password(self):
-        return self.initial["password"]
-
     class Meta:
         model = User
 
@@ -129,13 +127,19 @@ class UserChangeForm(forms.ModelForm):
         if f is not None:
             f.queryset = f.queryset.select_related('content_type')
 
+    def clean_password(self):
+        # Regardless of what the user provides, return the initial value.
+        # This is done here, rather than on the field, because the
+        # field does not have access to the initial value
+        return self.initial["password"]
+
 
 class AuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = forms.CharField(label=_("Username"), max_length=30)
+    username = forms.CharField(max_length=254)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
@@ -156,6 +160,11 @@ class AuthenticationForm(forms.Form):
         self.request = request
         self.user_cache = None
         super(AuthenticationForm, self).__init__(*args, **kwargs)
+
+        # Set the label for the "username" field.
+        UserModel = get_user_model()
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.fields['username'].label = capfirst(username_field.verbose_name)
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -187,20 +196,21 @@ class AuthenticationForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     error_messages = {
-        'unknown': _("That e-mail address doesn't have an associated "
+        'unknown': _("That email address doesn't have an associated "
                      "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this e-mail "
+        'unusable': _("The user account associated with this email "
                       "address cannot reset the password."),
     }
-    email = forms.EmailField(label=_("E-mail"), max_length=75)
+    email = forms.EmailField(label=_("Email"), max_length=254)
 
     def clean_email(self):
         """
         Validates that an active user exists with the given email address.
         """
+        UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        self.users_cache = User.objects.filter(email__iexact=email,
-                                               is_active=True)
+        self.users_cache = UserModel.objects.filter(email__iexact=email,
+                                                    is_active=True)
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
         if any((user.password == UNUSABLE_PASSWORD)

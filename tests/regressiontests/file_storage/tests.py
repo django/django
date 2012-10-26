@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import errno
 import os
 import shutil
+import sys
 import tempfile
 import time
 from datetime import datetime, timedelta
@@ -23,6 +24,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils import unittest
+from django.test.utils import override_settings
 from ..servers.tests import LiveServerBase
 
 # Try to import PIL in either of the two ways it can end up installed.
@@ -76,7 +78,7 @@ class GetStorageClassTests(SimpleTestCase):
         six.assertRaisesRegex(self,
             ImproperlyConfigured,
             ('Error importing storage module django.core.files.non_existing_'
-                'storage: "No module named .*non_existing_storage"'),
+                'storage: "No module named .*non_existing_storage'),
             get_storage_class,
             'django.core.files.non_existing_storage.NonExistingStorage'
         )
@@ -433,22 +435,29 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.storage.delete('conflict')
         self.storage.delete('conflict_1')
 
+@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
-        self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0o666
+        self.umask = 0o027
+        self.old_umask = os.umask(self.umask)
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
     def tearDown(self):
-        settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
         shutil.rmtree(self.storage_dir)
+        os.umask(self.old_umask)
 
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o654)
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile("data"))
         actual_mode = os.stat(self.storage.path(name))[0] & 0o777
-        self.assertEqual(actual_mode, 0o666)
+        self.assertEqual(actual_mode, 0o654)
 
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
+    def test_file_upload_default_permissions(self):
+        fname = self.storage.save("some_file", ContentFile("data"))
+        mode = os.stat(self.storage.path(fname))[0] & 0o777
+        self.assertEqual(mode, 0o666 & ~self.umask)
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):

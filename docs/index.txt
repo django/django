@@ -181,7 +181,6 @@ testing of Django applications:
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
-  :doc:`Apache authentication <howto/apache-auth>` |
   :doc:`Handling static files <howto/static-files>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
@@ -241,7 +240,7 @@ applications:
 * :doc:`Authentication <topics/auth>`
 * :doc:`Caching <topics/cache>`
 * :doc:`Logging <topics/logging>`
-* :doc:`Sending e-mails <topics/email>`
+* :doc:`Sending emails <topics/email>`
 * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
 * :doc:`Comments <ref/contrib/comments/index>`, :doc:`comment moderation <ref/contrib/comments/moderation>` and :doc:`custom comments <ref/contrib/comments/custom>`
 * :doc:`Pagination <topics/pagination>`

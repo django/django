@@ -23,7 +23,7 @@ these changes.
 * The :mod:`django.contrib.gis.db.backend` module will be removed in favor
   of the specific backends.
 
-* ``SMTPConnection`` will be removed in favor of a generic E-mail backend API.
+* ``SMTPConnection`` will be removed in favor of a generic Email backend API.
 
 * The many to many SQL generation functions on the database backends
   will be removed.
@@ -134,16 +134,16 @@ these changes.
 
 * The function-based generic view modules will be removed in favor of their
   class-based equivalents, outlined :doc:`here
-  </topics/class-based-views/index>`:
+  </topics/class-based-views/index>`.
 
 * The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
   removed.  In its place use
   :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
 
 * The :ttag:`url` and :ttag:`ssi` template tags will be
-  modified so that the first argument to each tag is a
-  template variable, not an implied string. Until then, the new-style
-  behavior is provided in the ``future`` template tag library.
+  modified so that the first argument to each tag is a template variable, not
+  an implied string. In 1.4, this behavior is provided by a version of the tag
+  in the ``future`` template tag library.
 
 * The :djadmin:`reset` and :djadmin:`sqlreset` management commands
   will be removed.
@@ -285,6 +285,13 @@ these changes.
 
 * The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
   will be removed (``content_type`` should be used instead).
+
+* When :class:`~django.http.HttpResponse` is instantiated with an iterator,
+  or when :attr:`~django.http.HttpResponse.content` is set to an iterator,
+  that iterator will be immediately consumed.
+
+* The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
+  the User model, will be removed.
 
 2.0
 ---

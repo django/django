@@ -925,7 +925,7 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     default_validators = [validators.validate_email]
-    description = _("E-mail address")
+    description = _("Email address")
 
     def __init__(self, *args, **kwargs):
         # max_length should be overridden to 254 characters to be fully

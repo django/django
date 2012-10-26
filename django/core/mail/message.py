@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import mimetypes
 import os
 import random
+import sys
 import time
 from email import charset as Charset, encoders as Encoders
 from email.generator import Generator
@@ -138,6 +139,9 @@ class SafeMIMEText(MIMEText):
         """
         fp = six.StringIO()
         g = Generator(fp, mangle_from_ = False)
+        if sys.version_info < (2, 6, 6) and isinstance(self._payload, six.text_type):
+            # Workaround for http://bugs.python.org/issue1368247
+            self._payload = self._payload.encode(self._charset.output_charset)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 

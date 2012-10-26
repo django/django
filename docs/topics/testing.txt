@@ -73,8 +73,6 @@ module defines tests in class-based approach.
 
 .. admonition:: unittest2
 
-    .. versionchanged:: 1.3
-
     Python 2.7 introduced some major changes to the unittest library,
     adding some extremely useful features. To ensure that every Django
     project can benefit from these new features, Django ships with a
@@ -436,8 +434,6 @@ two databases.
 Controlling creation order for test databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.3
-
 By default, Django will always create the ``default`` database first.
 However, no guarantees are made on the creation order of any other
 databases in your test setup.
@@ -512,6 +508,13 @@ file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
+Caches are not cleared after each test, and running "manage.py test fooapp" can
+insert data from the tests into the cache of a live system if you run your
+tests in production because, unlike databases, a separate "test cache" is not
+used. This behavior `may change`_ in the future.
+
+.. _may change: https://code.djangoproject.com/ticket/11505
+
 Understanding the test output
 -----------------------------
 
@@ -585,6 +588,36 @@ to a faster hashing algorithm::
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
+
+.. _topics-testing-code-coverage:
+
+Integration with coverage.py
+----------------------------
+
+Code coverage describes how much source code has been tested. It shows which
+parts of your code are being exercised by tests and which are not. It's an
+important part of testing applications, so it's strongly recommended to check
+the coverage of your tests.
+
+Django can be easily integrated with `coverage.py`_, a tool for measuring code
+coverage of Python programs. First, `install coverage.py`_. Next, run the
+following from your project folder containing ``manage.py``::
+
+   coverage run --source='.' manage.py test myapp
+
+This runs your tests and collects coverage data of the executed files in your
+project. You can see a report of this data by typing following command::
+
+   coverage report
+
+Note that some Django code was executed while running tests, but it is not
+listed here because of the ``source`` flag passed to the previous command.
+
+For more options like annotated HTML listings detailing missed lines, see the
+`coverage.py`_ docs.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
+.. _install coverage.py: http://pypi.python.org/pypi/coverage
 
 Testing tools
 =============
@@ -766,7 +799,7 @@ Use the ``django.test.client.Client`` class to make requests.
         and a ``redirect_chain`` attribute will be set in the response object
         containing tuples of the intermediate urls and status codes.
 
-        If you had an url ``/redirect_me/`` that redirected to ``/next/``, that
+        If you had a URL ``/redirect_me/`` that redirected to ``/next/``, that
         redirected to ``/final/``, this is what you'd see::
 
             >>> response = c.get('/redirect_me/', follow=True)
@@ -1001,8 +1034,6 @@ Specifically, a ``Response`` object has the following attributes:
         The HTTP status of the response, as an integer. See
         :rfc:`2616#section-10` for a full list of HTTP status codes.
 
-    .. versionadded:: 1.3
-
     .. attribute:: templates
 
         A list of ``Template`` instances used to render the final content, in
@@ -1088,8 +1119,6 @@ The request factory
 -------------------
 
 .. class:: RequestFactory
-
-.. versionadded:: 1.3
 
 The :class:`~django.test.client.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
@@ -1326,8 +1355,6 @@ This means, instead of instantiating a ``Client`` in each test::
 
 Customizing the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 .. attribute:: TestCase.client_class
 
@@ -1625,7 +1652,7 @@ your test suite.
     "a@a.com" as a valid email address, but rejects "aaa" with a reasonable
     error message::
 
-        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid e-mail address.']})
+        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
 
 
 .. method:: TestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
@@ -1708,8 +1735,6 @@ your test suite.
 
 .. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
 
-    .. versionadded:: 1.3
-
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
     The comparison of the contents of ``qs`` and ``values`` is performed using
@@ -1729,8 +1754,6 @@ your test suite.
 
 
 .. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
-
-    .. versionadded:: 1.3
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
     ``num`` database queries are executed.
@@ -1789,6 +1812,25 @@ your test suite.
 
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
+
+.. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are equal. The
+    comparison is based on XML semantics. Similarily to
+    :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
+    made on parsed content, hence only semantic differences are considered, not
+    syntax differences. When unvalid XML is passed in any parameter, an
+    ``AssertionError`` is always raised, even if both string are identical.
+
+.. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
+    comparison is based on XML semantics. See
+    :meth:`~SimpleTestCase.assertXMLEqual` for details.
 
 .. _topics-testing-email:
 
@@ -1853,8 +1895,6 @@ Skipping tests
 --------------
 
 .. currentmodule:: django.test
-
-.. versionadded:: 1.3
 
 The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
 :func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests
@@ -1982,8 +2022,8 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
         @classmethod
         def tearDownClass(cls):
-            super(MySeleniumTests, cls).tearDownClass()
             cls.selenium.quit()
+            super(MySeleniumTests, cls).tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))

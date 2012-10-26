@@ -215,7 +215,7 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+        self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
 
     def test_valid_form_with_template(self):
         "POST valid data to a form using multiple templates"
@@ -263,7 +263,7 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, 'base.html')
         self.assertTemplateNotUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+        self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
 
     def test_unknown_page(self):
         "GET an invalid URL"

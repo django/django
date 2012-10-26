@@ -1,6 +1,7 @@
 from django.db import connections
 from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
 
+from django.contrib.gis import memoryview
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
@@ -145,13 +146,14 @@ class GeoQuerySet(QuerySet):
         """
         backend = connections[self.db].ops
         if not backend.geojson:
-            raise NotImplementedError('Only PostGIS 1.3.4+ supports GeoJSON serialization.')
+            raise NotImplementedError('Only PostGIS 1.3.4+ and SpatiaLite 3.0+ '
+                                      'support GeoJSON serialization.')
 
         if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')
 
         # Setting the options flag -- which depends on which version of
-        # PostGIS we're using.
+        # PostGIS we're using. SpatiaLite only uses the first group of options.
         if backend.spatial_version >= (1, 4, 0):
             options = 0
             if crs and bbox: options = 3
@@ -193,9 +195,9 @@ class GeoQuerySet(QuerySet):
             # PostGIS AsGML() aggregate function parameter order depends on the
             # version -- uggh.
             if backend.spatial_version > (1, 3, 1):
-                procedure_fmt = '%(version)s,%(geo_col)s,%(precision)s'
+                s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             else:
-                procedure_fmt = '%(geo_col)s,%(precision)s,%(version)s'
+                s['procedure_fmt'] = '%(geo_col)s,%(precision)s,%(version)s'
             s['procedure_args'] = {'precision' : precision, 'version' : version}
 
         return self._spatial_attribute('gml', s, **kwargs)
@@ -676,7 +678,7 @@ class GeoQuerySet(QuerySet):
                     if not backend.geography:
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
-                        if not str(Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
+                        if not str(Geometry(memoryview(params[0].ewkb)).geom_type) == 'Point':
                             raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.

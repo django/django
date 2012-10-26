@@ -1,6 +1,7 @@
 """
  This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
 """
+from __future__ import unicode_literals
 
 from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
@@ -10,7 +11,7 @@ class PostGISAdapter(object):
         "Initializes on the geometry."
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry.
-        self.ewkb = str(geom.ewkb)
+        self.ewkb = bytes(geom.ewkb)
         self.srid = geom.srid
         self._adapter = Binary(self.ewkb)
 
@@ -39,7 +40,7 @@ class PostGISAdapter(object):
     def getquoted(self):
         "Returns a properly quoted string for use in PostgreSQL/PostGIS."
         # psycopg will figure out whether to use E'\\000' or '\000'
-        return 'ST_GeomFromEWKB(%s)' % self._adapter.getquoted()
+        return str('ST_GeomFromEWKB(%s)' % self._adapter.getquoted().decode())
 
     def prepare_database_save(self, unused):
         return self
