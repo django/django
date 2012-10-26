@@ -149,7 +149,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(q['foo'], 'bar')
         self.assertEqual(q.getlist('foo'), ['bar'])
-        self.assertEqual(q.urlencode(), 'foo=bar&name=john')
+        self.assertIn(q.urlencode(), ['foo=bar&name=john', 'name=john&foo=bar'])
 
         q.clear()
         self.assertEqual(len(q), 0)
@@ -266,14 +266,18 @@ class HttpResponseTests(unittest.TestCase):
         # The response also converts unicode or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
+        del r['Content-Type']
         r['foo'] = 'bar'
         l = list(r.items())
+        self.assertEqual(len(l), 1)
         self.assertEqual(l[0], ('foo', 'bar'))
         self.assertIsInstance(l[0][0], str)
 
         r = HttpResponse()
+        del r['Content-Type']
         r[b'foo'] = 'bar'
         l = list(r.items())
+        self.assertEqual(len(l), 1)
         self.assertEqual(l[0], ('foo', 'bar'))
         self.assertIsInstance(l[0][0], str)
 
