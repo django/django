@@ -258,6 +258,26 @@ class SessionTestsMixin(object):
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    def test_decode_legacy(self):
+        # Ensure we can decode what we encode
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode_legacy(encoded), data)
+
+    def test_decode_compatibility_disabled(self):
+        # Test that session data encoded with legacy mechanisms is reset when
+        # compatibility is disabled
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode(encoded), {})
+
+    @override_settings(SESSION_KEEP_COMPATIBLE=True)
+    def test_decode_compatibility_enabled(self):
+        # Test that session data encoded with legacy mechanisms is not reset
+        # when compatibility is enabled
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode(encoded), data)
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
@@ -352,6 +372,21 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(SuspiciousOperation,
                           self.backend("a/b/c").load)
 
+    # This test fails with cookie (which is fine I suppose) and cache backends,
+    # thats why added it to file tests only.
+    @override_settings(SESSION_COOKIE_AGE=0)
+    def test_onload_expiry_check(self):
+        """
+        Test to ensure that expiry of session is checked on-load
+        """
+
+        # Setup a test cookie
+        self.session.set_test_cookie()
+        self.assertTrue(self.session.test_cookie_worked())
+
+        self.session.load()
+        # The test data should be absent now, as the cookie age is 0
+        self.assertFalse(self.session.test_cookie_worked())
 
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
