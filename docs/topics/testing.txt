@@ -1586,15 +1586,23 @@ The decorator can also be applied to test case classes::
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
 
-.. note::
+When overriding settings, make sure to handle the cases in which your app's
+code uses a cache or similar feature that retains state even if the
+setting is changed. Django provides the
+:data:`django.test.signals.setting_changed` signal that lets you register
+callbacks to clean up and otherwise reset state when settings are changed.
 
-    When overriding settings, make sure to handle the cases in which your app's
-    code uses a cache or similar feature that retains state even if the
-    setting is changed. Django provides the
-    :data:`django.test.signals.setting_changed` signal that lets you register
-    callbacks to clean up and otherwise reset state when settings are changed.
-    Note that this signal isn't currently used by Django itself, so changing
-    built-in settings may not yield the results you expect.
+Django itself uses this signal to reset various data:
+
+=========================== ========================
+Overriden settings          Data reset
+=========================== ========================
+USE_TZ, TIME_ZONE           Databases timezone
+TEMPLATE_CONTEXT_PROCESSORS Context processors cache
+TEMPLATE_LOADERS            Template loaders cache
+SERIALIZATION_MODULES       Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE Default translation and loaded translations
+=========================== ========================
 
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
