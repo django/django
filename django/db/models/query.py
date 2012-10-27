@@ -1418,8 +1418,15 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0):
     fields = row[index_start : index_start + field_count]
     # If all the select_related columns are None, then the related
     # object must be non-existent - set the relation to None.
-    # Otherwise, construct the related object.
-    if fields == (None,) * field_count:
+    # Otherwise, construct the related object. Also, some backends treat ''
+    # and None equivalently for char fields, so we have to be prepared for
+    # '' values.
+    if connections[using].features.interprets_empty_strings_as_nulls:
+        vals = tuple([None if f == '' else f for f in fields])
+    else:
+        vals = fields
+
+    if vals == (None,) * field_count:
         obj = None
     else:
         if field_names:
