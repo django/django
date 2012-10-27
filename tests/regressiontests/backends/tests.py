@@ -26,6 +26,14 @@ from . import models
 class OracleChecks(unittest.TestCase):
 
     @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle quote_name semantics")
+    def test_quote_name(self):
+        # Check that '%' chars are escaped for query execution.
+        name = '"SOME%NAME"'
+        quoted_name = connection.ops.quote_name(name)
+        self.assertEquals(quoted_name % (), name)
+
+    @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
