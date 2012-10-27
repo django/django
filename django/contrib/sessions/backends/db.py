@@ -14,7 +14,7 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             s = Session.objects.get(
-                session_key = self.session_key,
+                session_key=self.session_key,
                 expire_date__gt=timezone.now()
             )
             return self.decode(s.session_data)

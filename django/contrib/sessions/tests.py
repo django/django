@@ -83,7 +83,7 @@ class SessionTestsMixin(object):
         self.session['some key'] = 1
         self.session.modified = False
         self.session.accessed = False
-        self.assertTrue('some key' in self.session)
+        self.assertIn('some key', self.session)
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
 
@@ -200,28 +200,28 @@ class SessionTestsMixin(object):
         # Using seconds
         self.session.set_expiry(10)
         delta = self.session.get_expiry_date() - timezone.now()
-        self.assertTrue(delta.seconds in (9, 10))
+        self.assertIn(delta.seconds, (9, 10))
 
         age = self.session.get_expiry_age()
-        self.assertTrue(age in (9, 10))
+        self.assertIn(age, (9, 10))
 
     def test_custom_expiry_timedelta(self):
         # Using timedelta
         self.session.set_expiry(timedelta(seconds=10))
         delta = self.session.get_expiry_date() - timezone.now()
-        self.assertTrue(delta.seconds in (9, 10))
+        self.assertIn(delta.seconds, (9, 10))
 
         age = self.session.get_expiry_age()
-        self.assertTrue(age in (9, 10))
+        self.assertIn(age, (9, 10))
 
     def test_custom_expiry_datetime(self):
         # Using fixed datetime
         self.session.set_expiry(timezone.now() + timedelta(seconds=10))
         delta = self.session.get_expiry_date() - timezone.now()
-        self.assertTrue(delta.seconds in (9, 10))
+        self.assertIn(delta.seconds, (9, 10))
 
         age = self.session.get_expiry_age()
-        self.assertTrue(age in (9, 10))
+        self.assertIn(age, (9, 10))
 
     def test_custom_expiry_reset(self):
         self.session.set_expiry(None)
@@ -257,6 +257,21 @@ class SessionTestsMixin(object):
         data = {'a test key': 'a test value'}
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
+
+    def test_actual_expiry(self):
+        # Regression test for #19200
+        old_session_key = None
+        new_session_key = None
+        try:
+            self.session['foo'] = 'bar'
+            self.session.set_expiry(-timedelta(seconds=10))
+            self.session.create()
+            # With an expiry date in the past, the session expires instantly.
+            new_session = self.backend(self.session.session_key)
+            self.assertNotIn('foo', new_session)
+        finally:
+            self.session.delete(old_session_key)
+            self.session.delete(new_session_key)
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
