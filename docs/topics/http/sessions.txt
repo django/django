@@ -272,6 +272,13 @@ You can edit it multiple times.
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's Web browser is closed.
 
+    .. method:: SessionBase.clear_expired
+
+      .. versionadded:: 1.5
+
+      Removes expired sessions from the session store. This class method is
+      called by :djadmin:`clearsessions`.
+
 Session object guidelines
 -------------------------
 
@@ -458,22 +465,29 @@ This setting is a global default and can be overwritten at a per-session level
 by explicitly calling the :meth:`~backends.base.SessionBase.set_expiry` method
 of ``request.session`` as described above in `using sessions in views`_.
 
-Clearing the session table
+Clearing the session store
 ==========================
 
-If you're using the database backend, note that session data can accumulate in
-the ``django_session`` database table and Django does *not* provide automatic
-purging. Therefore, it's your job to purge expired sessions on a regular basis.
+As users create new sessions on your website, session data can accumulate in
+your session store. If you're using the database backend, the
+``django_session`` database table will grow. If you're using the file backend,
+your temporary directory will contain an increasing number of files.
 
-To understand this problem, consider what happens when a user uses a session.
+To understand this problem, consider what happens with the database backend.
 When a user logs in, Django adds a row to the ``django_session`` database
 table. Django updates this row each time the session data changes. If the user
 logs out manually, Django deletes the row. But if the user does *not* log out,
-the row never gets deleted.
+the row never gets deleted. A similar process happens with the file backend.
 
-Django provides a sample clean-up script: ``django-admin.py clearsessions``.
-That script deletes any session in the session table whose ``expire_date`` is
-in the past -- but your application may have different requirements.
+Django does *not* provide automatic purging of expired sessions. Therefore,
+it's your job to purge expired sessions on a regular basis. Django provides a
+clean-up management command for this purpose: :djadmin:`clearsessions`. It's
+recommended to call this command on a regular basis, for example as a daily
+cron job.
+
+Note that the cache backend isn't vulnerable to this problem, because caches
+automatically delete stale data. Neither is the cookie backend, because the
+session data is stored by the users' browsers.
 
 Settings
 ========

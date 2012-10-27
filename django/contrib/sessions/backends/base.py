@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import base64
-import time
 from datetime import datetime, timedelta
 try:
     from django.utils.six.moves import cPickle as pickle
@@ -307,5 +306,16 @@ class SessionBase(object):
     def load(self):
         """
         Loads the session data and returns a dictionary.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def clear_expired(cls):
+        """
+        Remove expired sessions from the session store.
+
+        If this operation isn't possible on a given backend, it should raise
+        NotImplementedError. If it isn't necessary, because the backend has
+        a built-in expiration mechanism, it should be a no-op.
         """
         raise NotImplementedError

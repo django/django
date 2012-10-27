@@ -1,4 +1,5 @@
 from datetime import timedelta
+import os
 import shutil
 import string
 import tempfile
@@ -12,6 +13,7 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core import management
 from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
@@ -319,6 +321,30 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         del self.session._session_cache
         self.assertEqual(self.session['y'], 2)
 
+    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.db")
+    def test_clearsessions_command(self):
+        """
+        Test clearsessions command for clearing expired sessions.
+        """
+        self.assertEqual(0, Session.objects.count())
+
+        # One object in the future
+        self.session['foo'] = 'bar'
+        self.session.set_expiry(3600)
+        self.session.save()
+
+        # One object in the past
+        other_session = self.backend()
+        other_session['foo'] = 'bar'
+        other_session.set_expiry(-3600)
+        other_session.save()
+
+        # Two sessions are in the database before clearsessions...
+        self.assertEqual(2, Session.objects.count())
+        management.call_command('clearsessions')
+        # ... and one is deleted.
+        self.assertEqual(1, Session.objects.count())
+
 
 @override_settings(USE_TZ=True)
 class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
@@ -358,6 +384,9 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
         self.temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
+        # Reset the file session backend's internal caches
+        if hasattr(self.backend, '_storage_path'):
+            del self.backend._storage_path
         super(FileSessionTests, self).setUp()
 
     def tearDown(self):
@@ -368,6 +397,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     @override_settings(
         SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
     def test_configuration_check(self):
+        del self.backend._storage_path
         # Make sure the file backend checks for a good storage dir
         self.assertRaises(ImproperlyConfigured, self.backend)
 
@@ -380,6 +410,37 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Ensure we don't allow directory-traversal
         self.assertRaises(SuspiciousOperation,
                           self.backend("a/b/c").load)
+
+    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
+    def test_clearsessions_command(self):
+        """
+        Test clearsessions command for clearing expired sessions.
+        """
+        storage_path = self.backend._get_storage_path()
+        file_prefix = settings.SESSION_COOKIE_NAME
+
+        def count_sessions():
+            return len([session_file for session_file in os.listdir(storage_path)
+                                     if session_file.startswith(file_prefix)])
+
+        self.assertEqual(0, count_sessions())
+
+        # One object in the future
+        self.session['foo'] = 'bar'
+        self.session.set_expiry(3600)
+        self.session.save()
+
+        # One object in the past
+        other_session = self.backend()
+        other_session['foo'] = 'bar'
+        other_session.set_expiry(-3600)
+        other_session.save()
+
+        # Two sessions are in the filesystem before clearsessions...
+        self.assertEqual(2, count_sessions())
+        management.call_command('clearsessions')
+        # ... and one is deleted.
+        self.assertEqual(1, count_sessions())
 
 
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):

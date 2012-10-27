@@ -1,3 +1,4 @@
+import datetime
 import errno
 import os
 import tempfile
@@ -5,26 +6,35 @@ import tempfile
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-
+from django.utils import timezone
 
 class SessionStore(SessionBase):
     """
     Implements a file based session store.
     """
     def __init__(self, session_key=None):
-        self.storage_path = getattr(settings, "SESSION_FILE_PATH", None)
-        if not self.storage_path:
-            self.storage_path = tempfile.gettempdir()
-
-        # Make sure the storage path is valid.
-        if not os.path.isdir(self.storage_path):
-            raise ImproperlyConfigured(
-                "The session storage path %r doesn't exist. Please set your"
-                " SESSION_FILE_PATH setting to an existing directory in which"
-                " Django can store session data." % self.storage_path)
-
+        self.storage_path = type(self)._get_storage_path()
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super(SessionStore, self).__init__(session_key)
+
+    @classmethod
+    def _get_storage_path(cls):
+        try:
+            return cls._storage_path
+        except AttributeError:
+            storage_path = getattr(settings, "SESSION_FILE_PATH", None)
+            if not storage_path:
+                storage_path = tempfile.gettempdir()
+
+            # Make sure the storage path is valid.
+            if not os.path.isdir(storage_path):
+                raise ImproperlyConfigured(
+                    "The session storage path %r doesn't exist. Please set your"
+                    " SESSION_FILE_PATH setting to an existing directory in which"
+                    " Django can store session data." % storage_path)
+
+            cls._storage_path = storage_path
+            return storage_path
 
     VALID_KEY_CHARS = set("abcdef0123456789")
 
@@ -44,6 +54,18 @@ class SessionStore(SessionBase):
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
 
+    def _last_modification(self):
+        """
+        Return the modification time of the file storing the session's content.
+        """
+        modification = os.stat(self._key_to_file()).st_mtime
+        if settings.USE_TZ:
+            modification = datetime.datetime.utcfromtimestamp(modification)
+            modification = modification.replace(tzinfo=timezone.utc)
+        else:
+            modification = datetime.datetime.fromtimestamp(modification)
+        return modification
+
     def load(self):
         session_data = {}
         try:
@@ -55,6 +77,15 @@ class SessionStore(SessionBase):
                 try:
                     session_data = self.decode(file_data)
                 except (EOFError, SuspiciousOperation):
+                    self.create()
+
+                # Remove expired sessions.
+                expiry_age = self.get_expiry_age(
+                    modification=self._last_modification(),
+                    expiry=session_data.get('_session_expiry'))
+                if expiry_age < 0:
+                    session_data = {}
+                    self.delete()
                     self.create()
         except IOError:
             self.create()
@@ -142,3 +173,19 @@ class SessionStore(SessionBase):
 
     def clean(self):
         pass
+
+    @classmethod
+    def clear_expired(cls):
+        storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        file_prefix = settings.SESSION_COOKIE_NAME
+
+        for session_file in os.listdir(storage_path):
+            if not session_file.startswith(file_prefix):
+                continue
+            session_key = session_file[len(file_prefix):]
+            session = cls(session_key)
+            # When an expired session is loaded, its file is removed, and a
+            # new file is immediately created. Prevent this by disabling
+            # the create() method.
+            session.create = lambda: None
+            session.load()
