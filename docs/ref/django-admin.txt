@@ -1200,8 +1200,6 @@ clearsessions
 
 Can be run as a cron job or directly to clean out expired sessions.
 
-This is only supported by the database backend at the moment.
-
 ``django.contrib.sitemaps``
 ---------------------------
 

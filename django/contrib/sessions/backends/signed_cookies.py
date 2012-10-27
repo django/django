@@ -92,3 +92,7 @@ class SessionStore(SessionBase):
         return signing.dumps(session_cache, compress=True,
             salt='django.contrib.sessions.backends.signed_cookies',
             serializer=PickleSerializer)
+
+    @classmethod
+    def clear_expired(cls):
+        pass

@@ -65,3 +65,7 @@ class SessionStore(SessionBase):
                 return
             session_key = self.session_key
         self._cache.delete(KEY_PREFIX + session_key)
+
+    @classmethod
+    def clear_expired(cls):
+        pass
