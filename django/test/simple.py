@@ -309,12 +309,17 @@ class DjangoTestSuiteRunner(object):
 
             for alias in aliases:
                 connection = connections[alias]
-                old_names.append((connection, db_name, True))
-                if test_db_name is None:
-                    test_db_name = connection.creation.create_test_db(
-                            self.verbosity, autoclobber=not self.interactive)
+                # Skip database creation if backend is dummy
+                if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
+                    # Set destroy = False for teardown_databases()
+                    old_names.append((connection, db_name, False))
                 else:
-                    connection.settings_dict['NAME'] = test_db_name
+                    old_names.append((connection, db_name, True))
+                    if test_db_name is None:
+                        test_db_name = connection.creation.create_test_db(
+                            self.verbosity, autoclobber=not self.interactive)
+                    else:
+                        connection.settings_dict['NAME'] = test_db_name
 
         for alias, mirror_alias in mirrored_aliases.items():
             mirrors.append((alias, connections[alias].settings_dict['NAME']))
