@@ -277,9 +277,11 @@ class SessionTestsMixin(object):
         try:
             self.session['foo'] = 'bar'
             self.session.set_expiry(-timedelta(seconds=10))
-            self.session.create()
+            self.session.save()
+            old_session_key = self.session.session_key
             # With an expiry date in the past, the session expires instantly.
             new_session = self.backend(self.session.session_key)
+            new_session_key = new_session.session_key
             self.assertNotIn('foo', new_session)
         finally:
             self.session.delete(old_session_key)
@@ -353,15 +355,15 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     backend = FileSession
 
     def setUp(self):
-        super(FileSessionTests, self).setUp()
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
         self.temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
+        super(FileSessionTests, self).setUp()
 
     def tearDown(self):
+        super(FileSessionTests, self).tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
         shutil.rmtree(self.temp_session_store)
-        super(FileSessionTests, self).tearDown()
 
     @override_settings(
         SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
