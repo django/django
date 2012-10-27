@@ -293,6 +293,11 @@ these changes.
 * The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
   the User model, will be removed.
 
+* The ``cleanup`` management command will be removed. It's replaced by
+  ``clearsessions``.
+
+* The ``daily_cleanup.py`` script will be removed.
+
 2.0
 ---
 
