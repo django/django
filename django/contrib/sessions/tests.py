@@ -197,31 +197,43 @@ class SessionTestsMixin(object):
         self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
 
     def test_custom_expiry_seconds(self):
-        # Using seconds
-        self.session.set_expiry(10)
-        delta = self.session.get_expiry_date() - timezone.now()
-        self.assertIn(delta.seconds, (9, 10))
+        modification = timezone.now()
 
-        age = self.session.get_expiry_age()
-        self.assertIn(age, (9, 10))
+        self.session.set_expiry(10)
+
+        date = self.session.get_expiry_date(modification=modification)
+        self.assertEqual(date, modification + timedelta(seconds=10))
+
+        age = self.session.get_expiry_age(modification=modification)
+        self.assertEqual(age, 10)
 
     def test_custom_expiry_timedelta(self):
-        # Using timedelta
-        self.session.set_expiry(timedelta(seconds=10))
-        delta = self.session.get_expiry_date() - timezone.now()
-        self.assertIn(delta.seconds, (9, 10))
+        modification = timezone.now()
 
-        age = self.session.get_expiry_age()
-        self.assertIn(age, (9, 10))
+        # Mock timezone.now, because set_expiry calls it on this code path.
+        original_now = timezone.now
+        try:
+            timezone.now = lambda: modification
+            self.session.set_expiry(timedelta(seconds=10))
+        finally:
+            timezone.now = original_now
+
+        date = self.session.get_expiry_date(modification=modification)
+        self.assertEqual(date, modification + timedelta(seconds=10))
+
+        age = self.session.get_expiry_age(modification=modification)
+        self.assertEqual(age, 10)
 
     def test_custom_expiry_datetime(self):
-        # Using fixed datetime
-        self.session.set_expiry(timezone.now() + timedelta(seconds=10))
-        delta = self.session.get_expiry_date() - timezone.now()
-        self.assertIn(delta.seconds, (9, 10))
+        modification = timezone.now()
 
-        age = self.session.get_expiry_age()
-        self.assertIn(age, (9, 10))
+        self.session.set_expiry(modification + timedelta(seconds=10))
+
+        date = self.session.get_expiry_date(modification=modification)
+        self.assertEqual(date, modification + timedelta(seconds=10))
+
+        age = self.session.get_expiry_age(modification=modification)
+        self.assertEqual(age, 10)
 
     def test_custom_expiry_reset(self):
         self.session.set_expiry(None)

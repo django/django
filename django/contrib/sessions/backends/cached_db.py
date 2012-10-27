@@ -40,7 +40,7 @@ class SessionStore(DBStore):
                 )
                 data = self.decode(s.session_data)
                 cache.set(self.cache_key, data,
-                    self.get_expiry_age(s.expire_date))
+                    self.get_expiry_age(expiry=s.expire_date))
             except (Session.DoesNotExist, SuspiciousOperation):
                 self.create()
                 data = {}
