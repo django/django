@@ -170,28 +170,52 @@ class SessionBase(object):
 
     _session = property(_get_session)
 
-    def get_expiry_age(self, expiry=None):
+    def get_expiry_age(self, **kwargs):
         """Get the number of seconds until the session expires.
 
-        expiry is an optional parameter specifying the datetime of expiry.
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
         """
-        if expiry is None:
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Make the difference between "expiry=None passed in kwargs" and
+        # "expiry not passed in kwargs", in order to guarantee not to trigger
+        # self.load() when expiry is provided.
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
             expiry = self.get('_session_expiry')
+
         if not expiry:   # Checks both None and 0 cases
             return settings.SESSION_COOKIE_AGE
         if not isinstance(expiry, datetime):
             return expiry
-        delta = expiry - timezone.now()
+        delta = expiry - modification
         return delta.days * 86400 + delta.seconds
 
-    def get_expiry_date(self):
-        """Get session the expiry date (as a datetime object)."""
-        expiry = self.get('_session_expiry')
+    def get_expiry_date(self, **kwargs):
+        """Get session the expiry date (as a datetime object).
+
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
+        """
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Same comment as in get_expiry_age
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
+            expiry = self.get('_session_expiry')
+
         if isinstance(expiry, datetime):
             return expiry
         if not expiry:   # Checks both None and 0 cases
             expiry = settings.SESSION_COOKIE_AGE
-        return timezone.now() + timedelta(seconds=expiry)
+        return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):
         """

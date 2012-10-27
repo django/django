@@ -250,11 +250,22 @@ You can edit it multiple times.
       with no custom expiration (or those set to expire at browser close), this
       will equal :setting:`SESSION_COOKIE_AGE`.
 
+      This function accepts two optional keyword arguments:
+
+      - ``modification``: last modification of the session, as a
+        :class:`~datetime.datetime` object. Defaults to the current time.
+      - ``expiry``: expiry information for the session, as a
+        :class:`~datetime.datetime` object, an :class:`int` (in seconds), or
+        ``None``. Defaults to the value stored in the session by
+        :meth:`set_expiry`, if there is one, or ``None``.
+
     .. method:: get_expiry_date
 
       Returns the date this session will expire. For sessions with no custom
       expiration (or those set to expire at browser close), this will equal the
       date :setting:`SESSION_COOKIE_AGE` seconds from now.
+
+      This function accepts the same keyword argumets as :meth:`get_expiry_age`.
 
     .. method:: get_expire_at_browser_close
 
