@@ -170,9 +170,13 @@ class SessionBase(object):
 
     _session = property(_get_session)
 
-    def get_expiry_age(self):
-        """Get the number of seconds until the session expires."""
-        expiry = self.get('_session_expiry')
+    def get_expiry_age(self, expiry=None):
+        """Get the number of seconds until the session expires.
+
+        expiry is an optional parameter specifying the datetime of expiry.
+        """
+        if expiry is None:
+            expiry = self.get('_session_expiry')
         if not expiry:   # Checks both None and 0 cases
             return settings.SESSION_COOKIE_AGE
         if not isinstance(expiry, datetime):
