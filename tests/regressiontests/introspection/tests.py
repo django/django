@@ -4,9 +4,14 @@ from functools import update_wrapper
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils import six
+from django.utils import six, unittest
 
 from .models import Reporter, Article
+
+if connection.vendor == 'oracle':
+    expectedFailureOnOracle = unittest.expectedFailure
+else:
+    expectedFailureOnOracle = lambda f: f
 
 #
 # The introspection module is optional, so methods tested here might raise
@@ -89,7 +94,13 @@ class IntrospectionTests(six.with_metaclass(IgnoreNotimplementedError, TestCase)
             [datatype(r[1], r) for r in desc],
             ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
         )
-        # Check also length of CharFields
+
+    # The following test fails on Oracle due to #17202 (can't correctly
+    # inspect the length of character columns).
+    @expectedFailureOnOracle
+    def test_get_table_description_col_lengths(self):
+        cursor = connection.cursor()
+        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
             [30, 30, 75]
