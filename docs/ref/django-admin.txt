@@ -1,4 +1,7 @@
 =============================
+
+
+.. 
 django-admin.py and manage.py
 =============================
 
@@ -93,8 +96,11 @@ cleanup
 
 .. django-admin:: cleanup
 
-Can be run as a cronjob or directly to clean out old data from the database
-(only expired sessions at the moment).
+Can be run as a cronjob or directly to clean out old data from the database.
+Right now it only calls :djadmin:`cleansessions` management command from
+``django.contrib.sessions``.
+
+.. versionchanged:: 1.5
 
 compilemessages
 ---------------
@@ -1198,6 +1204,20 @@ This command is only available if the :doc:`Sitemaps framework
 
 Please refer to its :djadmin:`description <ping_google>` in the Sitemaps
 documentation.
+
+``django.contrib.sessions``
+---------------------------
+
+cleansessions
+~~~~~~~~~~~~~
+
+This command is only available if the :doc:`Sessions </topics/http/sessions>`
+(``django.contrib.sessions``) are installed.
+
+Please refer to its :djadmin:`description <cleansessions>` in the Sessions
+documentation.
+
+.. versionadded:: 1.5
 
 ``django.contrib.staticfiles``
 ------------------------------

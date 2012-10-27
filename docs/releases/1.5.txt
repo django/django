@@ -529,6 +529,13 @@ with the :meth:`~django.forms.Form.is_valid()` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 
+Cleaned :djadmin:`cleanup` management command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command have contained only expired sessions clean up for years.
+Therefore new command :djadmin:`cleansessions` in ``django.contrib.sessions``
+do the job and :djadmin:`cleanup` command just call it.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

@@ -142,3 +142,24 @@ class SessionStore(SessionBase):
 
     def clean(self):
         pass
+
+    @classmethod
+    def cleanup(cls):
+        storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        file_prefix = settings.SESSION_COOKIE_NAME
+
+        # Get all file sessions stored
+        sessions = [cls(session[len(file_prefix):])
+                        for session in os.listdir(storage_path)
+                        if session.startswith(file_prefix)]
+
+        for session in sessions:
+            old_key = session.session_key
+            session.load()
+            new_key = session.session_key
+
+            # The key was changed i.e. new session created, so the existing one
+            # was invalid. Lests clean it all up
+            if old_key != new_key:
+                session.delete(old_key)
+                session.delete(new_key)
