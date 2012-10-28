@@ -34,7 +34,7 @@ INTERNAL_IPS = ()
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
 TIME_ZONE = 'America/Chicago'
-
+TIME_ZONE = 'Europe/Paris'
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ = False
 
