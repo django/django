@@ -62,18 +62,18 @@ class B(models.Model):
 # Using to_field on the through model
 @python_2_unicode_compatible
 class Car(models.Model):
-    make = models.CharField(max_length=20, unique=True)
+    make = models.CharField(max_length=20, unique=True, null=True)
     drivers = models.ManyToManyField('Driver', through='CarDriver')
 
     def __str__(self):
-        return self.make
+        return "%s" % self.make
 
 @python_2_unicode_compatible
 class Driver(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=20, unique=True, null=True)
 
     def __str__(self):
-        return self.name
+        return "%s" % self.name
 
 @python_2_unicode_compatible
 class CarDriver(models.Model):
