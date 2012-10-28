@@ -53,7 +53,14 @@ class ConnectionDoesNotExist(Exception):
 
 class ConnectionHandler(object):
     def __init__(self, databases):
-        self.databases = databases
+        if not databases:
+            self.databases = {
+                DEFAULT_DB_ALIAS: {
+                    'ENGINE': 'django.db.backends.dummy',
+                },
+            }
+        else:
+            self.databases = databases
         self._connections = local()
 
     def ensure_defaults(self, alias):

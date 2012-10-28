@@ -23,6 +23,17 @@ from django.utils import unittest
 from . import models
 
 
+class DummyBackendTest(TestCase):
+    def test_no_databases(self):
+        """
+        Test that empty DATABASES setting default to the dummy backend.
+        """
+        DATABASES = {}
+        conns = ConnectionHandler(DATABASES)
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
+            'django.db.backends.dummy')
+
+
 class OracleChecks(unittest.TestCase):
 
     @unittest.skipUnless(connection.vendor == 'oracle',
