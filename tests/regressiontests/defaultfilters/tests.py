@@ -80,12 +80,15 @@ class DefaultFiltersTests(TestCase):
             decimal_ctx.prec = old_prec
 
 
-    # This fails because of Python's float handling. Floats with many zeroes
-    # after the decimal point should be passed in as another type such as
-    # unicode or Decimal.
-    @unittest.expectedFailure
-    def test_floatformat_fail(self):
+    def test_floatformat_py2_fail(self):
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
+
+    # The test above fails because of Python 2's float handling. Floats with
+    # many zeroes after the decimal point should be passed in as another type
+    # such as unicode or Decimal.
+    if not six.PY3:
+        test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
+
 
     def test_addslashes(self):
         self.assertEqual(addslashes('"double quotes" and \'single quotes\''),
