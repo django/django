@@ -14,12 +14,15 @@
 from __future__ import unicode_literals
 
 import sys
-import os
+from os.path import abspath, dirname, join
+
+# Make sure we use this copy of Django
+sys.path.insert(1, abspath(dirname(dirname(__file__))))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "_ext")))
+sys.path.append(abspath(join(dirname(__file__), "_ext")))
 
 # -- General configuration -----------------------------------------------------
 
