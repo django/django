@@ -123,18 +123,104 @@ class ToFieldThroughTests(TestCase):
         self.car = Car.objects.create(make="Toyota")
         self.driver = Driver.objects.create(name="Ryan Briscoe")
         CarDriver.objects.create(car=self.car, driver=self.driver)
+        # We are testing if wrong objects get deleted due to using wrong
+        # field value in m2m queries. So, it is essential that the pk
+        # numberings do not match.
+        # Create one intentionally unused driver to mix up the autonumbering
+        self.unused_driver = Driver.objects.create(name="Barney Gumble")
+        # And two intentionally unused cars.
+        self.unused_car1 = Car.objects.create(make="Trabant")
+        self.unused_car2 = Car.objects.create(make="Wartburg")
 
     def test_to_field(self):
         self.assertQuerysetEqual(
             self.car.drivers.all(),
             ["<Driver: Ryan Briscoe>"]
-            )
+        )
 
     def test_to_field_reverse(self):
         self.assertQuerysetEqual(
             self.driver.car_set.all(),
             ["<Car: Toyota>"]
-            )
+        )
+
+    def test_to_field_clear_reverse(self):
+        self.driver.car_set.clear()
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),[])
+
+    def test_to_field_clear(self):
+        self.car.drivers.clear()
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),[])
+
+    # Low level tests for _add_items and _remove_items. We test these methods
+    # because .add/.remove aren't available for m2m fields with through, but
+    # through is the only way to set to_field currently. We do want to make
+    # sure these methods are ready if the ability to use .add or .remove with
+    # to_field relations is added some day.
+    def test_add(self):
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),
+            ["<Driver: Ryan Briscoe>"]
+        )
+        # Yikes - barney is going to drive...
+        self.car.drivers._add_items('car', 'driver', self.unused_driver)
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),
+            ["<Driver: Ryan Briscoe>", "<Driver: Barney Gumble>"]
+        )
+
+    def test_add_null(self):
+        nullcar = Car.objects.create(make=None)
+        with self.assertRaises(ValueError):
+            nullcar.drivers._add_items('car', 'driver', self.unused_driver)
+
+    def test_add_related_null(self):
+        nulldriver = Driver.objects.create(name=None)
+        with self.assertRaises(ValueError):
+            self.car.drivers._add_items('car', 'driver', nulldriver)
+
+    def test_add_reverse(self):
+        car2 = Car.objects.create(make="Honda")
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),
+            ["<Car: Toyota>"]
+        )
+        self.driver.car_set._add_items('driver', 'car', car2)
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),
+            ["<Car: Toyota>", "<Car: Honda>"]
+        )
+
+    def test_add_null_reverse(self):
+        nullcar = Car.objects.create(make=None)
+        with self.assertRaises(ValueError):
+            self.driver.car_set._add_items('driver', 'car', nullcar)
+
+    def test_add_null_reverse_related(self):
+        nulldriver = Driver.objects.create(name=None)
+        with self.assertRaises(ValueError):
+            nulldriver.car_set._add_items('driver', 'car', self.car)
+
+    def test_remove(self):
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),
+            ["<Driver: Ryan Briscoe>"]
+        )
+        self.car.drivers._remove_items('car', 'driver', self.driver)
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),[])
+
+    def test_remove_reverse(self):
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),
+            ["<Car: Toyota>"]
+        )
+        self.driver.car_set._remove_items('driver', 'car', self.car)
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),[])
+
 
 class ThroughLoadDataTestCase(TestCase):
     fixtures = ["m2m_through"]
