@@ -542,3 +542,8 @@ class CookieSessionTests(SessionTestsMixin, TestCase):
         testing for this behavior is meaningless.
         """
         pass
+
+    @unittest.expectedFailure
+    def test_actual_expiry(self):
+        # The cookie backend doesn't handle non-default expiry dates, see #19201
+        super(CookieSessionTests, self).test_actual_expiry()
