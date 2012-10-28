@@ -43,7 +43,9 @@ class SessionStore(SessionBase):
                 continue
             self.modified = True
             return
-        raise RuntimeError("Unable to create a new session key.")
+        raise RuntimeError(
+            "Unable to create a new session key. "
+            "It is likely that the cache is unavailable.")
 
     def save(self, must_create=False):
         if must_create:
