@@ -148,11 +148,11 @@ class HumanizeTests(TestCase):
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
 
-    @skipIf(settings.TIME_ZONE != "Ameria/Chicago" and pytz is None,
+    @skipIf(settings.TIME_ZONE != "America/Chicago" and pytz is None,
             "this test requires pytz when a non-default time zone is set")
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
-        # This is 2012-03-08HT19:30:00-06:00 in Ameria/Chicago
+        # This is 2012-03-08HT19:30:00-06:00 in America/Chicago
         dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
