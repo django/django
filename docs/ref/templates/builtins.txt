@@ -1226,7 +1226,8 @@ G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
 h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
 H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
 i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Not implemented.
+I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
 j                 Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
 l                 Day of the week, textual, long.           ``'Friday'``
