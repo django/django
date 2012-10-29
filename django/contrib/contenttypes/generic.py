@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from functools import partial
-from operator import attrgetter
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
@@ -329,8 +328,11 @@ def create_generic_related_manager(superclass):
                     set(obj._get_pk_val() for obj in instances)
                 }
             qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            # We (possibly) need to convert object IDs to the type of the
+            # instances' PK in order to match up instances:
+            object_id_converter = instances[0]._meta.pk.to_python
             return (qs,
-                    attrgetter(self.object_id_field_name),
+                    lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
                     lambda obj: obj._get_pk_val(),
                     False,
                     self.prefetch_cache_name)
