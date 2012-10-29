@@ -115,6 +115,8 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertTrue("http://adminsite.com" in mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
 
+    # Skip any 500 handler action (like sending more mail...)
+    @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails"
         # This attack is based on the way browsers handle URLs. The colon
@@ -131,6 +133,8 @@ class PasswordResetTest(AuthViewsTestCase):
             )
         self.assertEqual(len(mail.outbox), 0)
 
+    # Skip any 500 handler action (like sending more mail...)
+    @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
         with self.assertRaises(SuspiciousOperation):
