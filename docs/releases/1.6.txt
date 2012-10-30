@@ -1,0 +1,32 @@
+============================================
+Django 1.6 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 1.6!
+
+These release notes cover the `new features`_, as well as some `backwards
+incompatible changes`_ you'll want to be aware of when upgrading from Django
+1.5 or older versions. We've also dropped some features, which are detailed in
+:doc:`our deprecation plan </internals/deprecation>`, and we've `begun the
+deprecation process for some features`_.
+
+.. _`new features`: `What's new in Django 1.6`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.6`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.6`_
+
+What's new in Django 1.6
+========================
+
+Backwards incompatible changes in 1.6
+=====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation plan </internals/deprecation>` for any features that
+    have been removed. If you haven't updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
+Features deprecated in 1.6
+==========================

@@ -16,6 +16,13 @@ Final releases
 
 .. _development_release_notes:
 
+1.6 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   1.6
+
 1.5 release
 -----------
 .. toctree::
