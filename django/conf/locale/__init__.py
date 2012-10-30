@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 
+# About name_local: capitalize it as if your language name was appearing
+# inside a sentence in your language.
+
 LANG_INFO = {
     'ar': {
         'bidi': True,
@@ -137,7 +140,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'fr',
         'name': 'French',
-        'name_local': 'Fran\xe7ais',
+        'name_local': 'fran\xe7ais',
     },
     'fy-nl': {
         'bidi': False,
