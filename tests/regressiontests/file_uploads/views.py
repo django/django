@@ -9,8 +9,8 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.encoding import force_bytes
 
-from .models import FileModel, UPLOAD_TO
-from .tests import UNICODE_FILENAME
+from .models import FileModel
+from .tests import UNICODE_FILENAME, UPLOAD_TO
 from .uploadhandler import QuotaUploadHandler, ErroringUploadHandler
 
 
