@@ -2084,6 +2084,7 @@ out the `full reference`_ for more details.
 
         def test_login(self):
             from selenium.webdriver.support.wait import WebDriverWait
+            timeout = 2
             ...
             self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
             # Wait until the response is received
