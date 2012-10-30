@@ -100,11 +100,13 @@ class UserManagerTestCase(TestCase):
                                  'The given username must be set',
                                   User.objects.create_user, username='')
 
+
 class IsActiveTestCase(TestCase):
     """
     Tests the behavior of the guaranteed is_active attribute
     """
 
+    @skipIfCustomUser
     def test_builtin_user_isactive(self):
         user = User.objects.create(username='foo', email='foo@bar.com')
         # is_active is true by default
