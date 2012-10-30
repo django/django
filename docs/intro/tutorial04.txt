@@ -278,5 +278,10 @@ For full details on generic views, see the :doc:`generic views documentation
 What's next?
 ============
 
-The tutorial ends here for the time being. In the meantime, you might want to
-check out some pointers on :doc:`where to go from here </intro/whatsnext>`.
+The beginner tutorial ends here for the time being. In the meantime, you might
+want to check out some pointers on :doc:`where to go from here
+</intro/whatsnext>`.
+
+If you are familiar with Python packaging and interested in learning how to
+turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
+write reusable apps</intro/reusable-apps>`.

@@ -315,6 +315,12 @@ Load the page in your Web browser, and you should see a bulleted-list
 containing the "What's up" poll from Tutorial 1. The link points to the poll's
 detail page.
 
+.. admonition:: Organizing Templates
+
+    Rather than one big templates directory, you can also store templates
+    within each app. We'll discuss this in more detail in the :doc:`reusable
+    apps tutorial</intro/reusable-apps>`.
+
 A shortcut: :func:`~django.shortcuts.render`
 --------------------------------------------
 
