@@ -299,6 +299,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * RemoteUserMiddleware now forces logout when the REMOTE_USER header
   disappears during the same browser session.
 
+* The :ref:`cache-based session backend <cached-sessions-backend>` can store
+  session data in a non-default cache.
+
 Backwards incompatible changes in 1.5
 =====================================
 
