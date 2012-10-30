@@ -139,33 +139,22 @@ class QuerySet(object):
 
     def __contains__(self, val):
         # The 'in' operator works without this method, due to __iter__. This
-        # implementation exists only to shortcut the creation of Model
-        # instances, by bailing out early if we find a matching element.
-        pos = 0
-        if self._result_cache is not None:
-            if val in self._result_cache:
-                return True
-            elif self._iter is None:
-                # iterator is exhausted, so we have our answer
-                return False
-            # remember not to check these again:
-            pos = len(self._result_cache)
-        else:
-            # We need to start filling the result cache out. The following
-            # ensures that self._iter is not None and self._result_cache is not
-            # None
-            it = iter(self)
+        # implementation exists to shortcut fetching the whole result set
+        # when the QuerySet hasn't been evaluated.
 
-        # Carry on, one result at a time.
-        while True:
-            if len(self._result_cache) <= pos:
-                self._fill_cache(num=1)
-            if self._iter is None:
-                # we ran out of items
-                return False
-            if self._result_cache[pos] == val:
-                return True
-            pos += 1
+        # If it's not even the same type, it's safe to assume
+        # that val is not in the QuerySet
+        if not isinstance(val, self.model):
+            return False
+
+        # The QuerySet has already been evaluated, let's just look inside.
+        if self._result_cache is not None:
+            return val in self._result_cache
+
+        # If we're checking the existance of the same Model inside a
+        # QuerySet, what we're really asking is if the pk of the Model
+        # exists in the database.
+        return self.filter(pk=val.pk).exists()
 
     def __getitem__(self, k):
         """
