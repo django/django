@@ -17,6 +17,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         group = Group.objects.create(name='test_group')
         user1.groups.add(group)
 
+    @skipIfCustomUser
     def test_check_password(self):
         """
         Verify that check_password returns the correct values as per
