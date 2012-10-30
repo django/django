@@ -7,22 +7,36 @@ import hashlib
 import json
 import os
 import shutil
+import tempfile as sys_tempfile
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
+from django.test.utils import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 from django.utils import unittest
 
 from . import uploadhandler
-from .models import FileModel, temp_storage, UPLOAD_TO
+from .models import FileModel
 
 
 UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
+MEDIA_ROOT = sys_tempfile.mkdtemp()
+UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class FileUploadTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.isdir(MEDIA_ROOT):
+            os.makedirs(MEDIA_ROOT)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(MEDIA_ROOT)
+
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
             post_data = {
@@ -83,7 +97,8 @@ class FileUploadTests(TestCase):
         self.assertEqual(received['file'], test_string)
 
     def test_unicode_file_name(self):
-        tdir = tempfile.gettempdir()
+        tdir = sys_tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tdir, True)
 
         # This file contains chinese symbols and an accented char in the name.
         with open(os.path.join(tdir, UNICODE_FILENAME), 'w+b') as file1:
@@ -95,11 +110,6 @@ class FileUploadTests(TestCase):
                 }
 
             response = self.client.post('/file_uploads/unicode_name/', post_data)
-
-        try:
-            os.unlink(file1.name)
-        except OSError:
-            pass
 
         self.assertEqual(response.status_code, 200)
 
@@ -347,26 +357,28 @@ class FileUploadTests(TestCase):
         # shouldn't differ.
         self.assertEqual(os.path.basename(obj.testfile.path), 'MiXeD_cAsE.txt')
 
-class DirectoryCreationTests(unittest.TestCase):
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+class DirectoryCreationTests(TestCase):
     """
     Tests for error handling during directory creation
     via _save_FIELD_file (ticket #6450)
     """
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.isdir(MEDIA_ROOT):
+            os.makedirs(MEDIA_ROOT)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(MEDIA_ROOT)
+
     def setUp(self):
         self.obj = FileModel()
-        if not os.path.isdir(temp_storage.location):
-            os.makedirs(temp_storage.location)
-        if os.path.isdir(UPLOAD_TO):
-            os.chmod(UPLOAD_TO, 0o700)
-            shutil.rmtree(UPLOAD_TO)
-
-    def tearDown(self):
-        os.chmod(temp_storage.location, 0o700)
-        shutil.rmtree(temp_storage.location)
 
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
-        os.chmod(temp_storage.location, 0o500)
+        os.chmod(MEDIA_ROOT, 0o500)
+        self.addCleanup(os.chmod, MEDIA_ROOT, 0o700)
         try:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'))
         except OSError as err:
@@ -378,6 +390,7 @@ class DirectoryCreationTests(unittest.TestCase):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
+        self.addCleanup(os.remove, UPLOAD_TO)
         with self.assertRaises(IOError) as exc_info:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'))
         # The test needs to be done on a specific string as IOError
