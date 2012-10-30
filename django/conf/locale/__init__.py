@@ -56,7 +56,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'da',
         'name': 'Danish',
-        'name_local': 'Dansk',
+        'name_local': 'dansk',
     },
     'de': {
         'bidi': False,
@@ -272,7 +272,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'nb',
         'name': 'Norwegian Bokmal',
-        'name_local': 'Norsk (bokm\xe5l)',
+        'name_local': 'norsk (bokm\xe5l)',
     },
     'ne': {
         'bidi': False,
@@ -290,13 +290,13 @@ LANG_INFO = {
         'bidi': False,
         'code': 'nn',
         'name': 'Norwegian Nynorsk',
-        'name_local': 'Norsk (nynorsk)',
+        'name_local': 'norsk (nynorsk)',
     },
     'no': {
         'bidi': False,
         'code': 'no',
         'name': 'Norwegian',
-        'name_local': 'Norsk',
+        'name_local': 'norsk',
     },
     'pa': {
         'bidi': False,
@@ -368,7 +368,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sv',
         'name': 'Swedish',
-        'name_local': 'Svenska',
+        'name_local': 'svenska',
     },
     'sw': {
         'bidi': False,
