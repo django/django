@@ -45,6 +45,8 @@ If you want to use a database-backed session, you need to add
 Once you have configured your installation, run ``manage.py syncdb``
 to install the single database table that stores session data.
 
+.. _cached-sessions-backend:
+
 Using cached sessions
 ---------------------
 
@@ -61,6 +63,13 @@ sure you've configured your cache; see the :doc:`cache documentation
     enough to be a good choice, and it'll be faster to use file or database
     sessions directly instead of sending everything through the file or
     database cache backends.
+
+If you have multiple caches defined in :setting:`CACHES`, Django will use the
+default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
+name of that cache.
+
+.. versionchanged:: 1.5
+    The :setting:`SESSION_CACHE_ALIAS` setting was added.
 
 Once your cache is configured, you've got two choices for how to store data in
 the cache:
