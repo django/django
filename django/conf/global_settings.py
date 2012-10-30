@@ -445,6 +445,7 @@ MIDDLEWARE_CLASSES = (
 # SESSIONS #
 ############
 
+SESSION_CACHE_ALIAS = 'default'                         # Cache to store session data if using the cache session backend.
 SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.
