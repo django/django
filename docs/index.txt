@@ -46,6 +46,9 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 3 <intro/tutorial03>` |
   :doc:`Part 4 <intro/tutorial04>`
 
+* **Advanced Tutorials:**
+  :doc:`How to write reusable apps <intro/reusable-apps>`
+
 The model layer
 ===============
 
