@@ -419,6 +419,24 @@ The permission_required decorator
 Authentication Views
 --------------------
 
+.. module:: django.contrib.auth.views
+
+---TODO intro to all view here
+
+.. versionadded:: 1.4
+
+The :func:`~views.login` view and the :ref:`other-built-in-views` now all
+return a :class:`~django.template.response.TemplateResponse` instance,
+which allows you to easily customize the response data before rendering.
+For more details, see the
+:doc:`TemplateResponse documentation </ref/template-response>`.
+
+---also generally noted for all views:
+
+See :doc:`the URL documentation </topics/http/urls>` for details on using
+named URL patterns.
+
+
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
     **URL name:** ``login``
@@ -431,20 +449,19 @@ Authentication Views
     * If called via ``GET``, it displays a login form that POSTs to the
       same URL. More on this in a bit.
 
-    * If called via ``POST``, it tries to log the user in. If login is
-      successful, the view redirects to the URL specified in ``next``. If
-      ``next`` isn't provided, it redirects to
+    * If called via ``POST`` with user submitted credentials, it tries to log
+      the user in. If login is successful, the view redirects to the URL
+      specified in ``next``. If ``next`` isn't provided, it redirects to
       :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (which
       defaults to ``/accounts/profile/``). If login isn't successful, it
       redisplays the login form.
 
-    It's your responsibility to provide the login form in a template called
+    It's your responsibility to provide the login page html in a template called
     ``registration/login.html`` by default. This template gets passed four
     template context variables:
 
-    * ``form``: A :class:`~django.forms.Form` object representing the login
-      form. See the :doc:`forms documentation </topics/forms/index>` for
-      more on ``Form`` objects.
+    * ``form``: A :class:`~django.forms.Form` object representing the
+      :class:`~django.contrib.auth.forms.AuthenticationForm`.
 
     * ``next``: The URL to redirect to after successful login. This may
       contain a query string, too.
@@ -505,8 +522,8 @@ Authentication Views
 
         {% endblock %}
 
-    If you are using alternate authentication (see
-    :ref:`authentication-backends`) you can pass a custom authentication form
+    If you have customized the authentication (see
+    :doc:`Customizing Authentication </topics/auth/customizing>`) you can pass a custom authentication form
     to the login view via the ``authentication_form`` parameter. This form must
     accept a ``request`` keyword argument in its ``__init__`` method, and
     provide a ``get_user`` method which returns the authenticated user object
@@ -515,33 +532,12 @@ Authentication Views
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
 
-    .. versionadded:: 1.4
-
-    The :func:`~views.login` view and the :ref:`other-built-in-views` now all
-    return a :class:`~django.template.response.TemplateResponse` instance,
-    which allows you to easily customize the response data before rendering.
-    For more details, see the
-    :doc:`TemplateResponse documentation </ref/template-response>`.
-
-.. _other-built-in-views:
-
-Other built-in views
---------------------
-
-.. module:: django.contrib.auth.views
-
-In addition to the :func:`~views.login` view, the authentication system
-includes a few other useful built-in views located in
-:mod:`django.contrib.auth.views`:
 
 .. function:: logout(request, [next_page, template_name, redirect_field_name])
 
     Logs a user out.
 
     **URL name:** ``logout``
-
-    See :doc:`the URL documentation </topics/http/urls>` for details on using
-    named URL patterns.
 
     **Optional arguments:**
 
