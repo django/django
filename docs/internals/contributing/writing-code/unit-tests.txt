@@ -38,6 +38,8 @@ with this sample ``settings`` module, ``cd`` into the Django
 If you get an ``ImportError: No module named django.contrib`` error,
 you need to add your install of Django to your ``PYTHONPATH``.
 
+.. _running-unit-tests-settings:
+
 Using another ``settings`` module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -132,6 +134,8 @@ Then, run the tests normally, for example:
 .. code-block:: bash
 
     ./runtests.py --settings=test_sqlite admin_inlines
+
+.. _running-unit-tests-dependencies:
 
 Running all the tests
 ~~~~~~~~~~~~~~~~~~~~~
