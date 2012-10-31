@@ -1693,6 +1693,16 @@ This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
 
+.. setting:: SESSION_CACHE_ALIAS
+
+SESSION_CACHE_ALIAS
+-------------------
+
+Default: ``default``
+
+If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
+this selects the cache to use.
+
 .. setting:: SESSION_COOKIE_SECURE
 
 SESSION_COOKIE_SECURE

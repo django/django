@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import connections
 from django.dispatch import receiver, Signal
 from django.utils import timezone
+from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
 
@@ -72,3 +73,9 @@ def language_changed(**kwargs):
         trans_real._default = None
         if kwargs['setting'] == 'LOCALE_PATHS':
             trans_real._translations = {}
+
+@receiver(setting_changed)
+def file_storage_changed(**kwargs):
+    if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
+        from django.core.files.storage import default_storage
+        default_storage._wrapped = empty

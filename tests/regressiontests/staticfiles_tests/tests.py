@@ -12,7 +12,6 @@ from django.template import loader, Context
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
-from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -48,10 +47,9 @@ class BaseStaticFilesTestCase(object):
     Test case with a couple utility assertions.
     """
     def setUp(self):
-        # Clear the cached default_storage out, this is because when it first
-        # gets accessed (by some other test), it evaluates settings.MEDIA_ROOT,
+        # Clear the cached staticfiles_storage out, this is because when it first
+        # gets accessed (by some other test), it evaluates settings.STATIC_ROOT,
         # since we're planning on changing that we need to clear out the cache.
-        default_storage._wrapped = empty
         storage.staticfiles_storage._wrapped = empty
         # Clear the cached staticfile finders, so they are reinitialized every
         # run and pick up changes in settings.STATICFILES_DIRS.
@@ -709,9 +707,6 @@ class TestMiscFinder(TestCase):
     """
     A few misc finder tests.
     """
-    def setUp(self):
-        default_storage._wrapped = empty
-
     def test_get_finder(self):
         self.assertIsInstance(finders.get_finder(
             'django.contrib.staticfiles.finders.FileSystemFinder'),
