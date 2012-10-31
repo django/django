@@ -29,7 +29,9 @@ There are seven steps in activating the Django admin site:
    :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
    ``django.contrib.messages.middleware.MessageMiddleware`` to
    :setting:`MIDDLEWARE_CLASSES`. (These are both active by default, so
-   you only need to do this if you've manually tweaked the settings.)
+   you only need to do this if you've manually tweaked the settings.) You
+   will also need to add 'django.contrib.auth.middleware.AuthenticationMiddleware'
+   to your :setting:`MIDDLEWARE_CLASSES`.
 
 4. Determine which of your application's models should be editable in the
    admin interface.
