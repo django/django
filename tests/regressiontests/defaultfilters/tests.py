@@ -304,7 +304,12 @@ class DefaultFiltersTests(TestCase):
 
         # Check urlize trims trailing period when followed by parenthesis - see #18644
         self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
-                         '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+            '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+
+        # Check urlize doesn't crash when square bracket is appended to url (#19070)
+        self.assertEqual(urlize('[see www.example.com]'),
+            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
+
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
