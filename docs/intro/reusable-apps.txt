@@ -291,16 +291,19 @@ Using your own package
 Since we moved the ``polls`` directory out of the project, it's no longer
 working. We'll now fix this by installing our new ``django-polls`` package.
 
-.. admonition:: Installing as a system library
+.. admonition:: Installing as a user library
 
-   The following steps install ``django-polls`` as a system library. In
-   general, it's best to avoid messing with your system libraries to avoid
-   breaking things. For this simple example though, the risk is low and it will
-   help with understanding packaging. We'll explain how to uninstall in
-   step 4.
+   The following steps install ``django-polls`` as a user library. Per-user
+   installs have a lot of advantages over installing the package system-wide,
+   such as being usable on systems where you don't have administrator access
+   as well as preventing the package from affecting system services and other
+   users of the machine. Python 2.6 added support for user libraries, so if
+   you are using an older version this won't work, but Django 1.5 requires
+   Python 2.6 or newer anyway.
 
-   For experienced users, a neater way to manage your packages is to use
-   "virtualenv" (see below).
+   Note that per-user installations can still affect the behavior of system
+   tools that run as that user, so ``virtualenv`` is a more robust solution
+   (see below).
 
 1. Inside ``django-polls/dist``, untar the new package
    ``django-polls-0.1.tar.gz`` (e.g. ``tar xzvf django-polls-0.1.tar.gz``). If
@@ -310,9 +313,9 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 2. Change into the directory created in step 1 (e.g. ``cd django-polls-0.1``).
 
 3. If you're using GNU/Linux, Mac OS X or some other flavor of Unix, enter the
-   command ``sudo python setup.py install`` at the shell prompt.  If you're
-   using Windows, start up a command shell with administrator privileges and
-   run the command ``setup.py install``.
+   command ``python setup.py install --user`` at the shell prompt.  If you're
+   using Windows, start up a command shell and run the command
+   ``setup.py install --user``.
 
    With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
@@ -320,7 +323,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 4. To uninstall the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
 
-    sudo pip uninstall django-polls
+    pip uninstall django-polls
 
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
@@ -347,11 +350,10 @@ is choosing the license under which your code is distributed.
 Installing Python packages with virtualenv
 ==========================================
 
-Earlier, we installed the polls app as a system library. This has some
+Earlier, we installed the polls app as a user library. This has some
 disadvantages:
 
-* Modifying the system libraries can affect other Python software on your
-  system.
+* Modifying the user libraries can affect other Python software on your system.
 
 * You won't be able to run multiple versions of this package (or others with
   the same name).
