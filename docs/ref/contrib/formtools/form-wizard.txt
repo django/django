@@ -622,8 +622,11 @@ Usage of ``NamedUrlWizardView``
 
 .. class:: NamedUrlWizardView
 
-There is a :class:`WizardView` subclass which adds named-urls support to the wizard.
-By doing this, you can have single urls for every step.
+There is a :class:`WizardView` subclass which adds named-urls support to the
+wizard. By doing this, you can have single urls for every step. You can also
+use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
+classes which preselect the backend used for storing information (server-side
+sessions and browser cookies respectively).
 
 To use the named urls, you have to change the ``urls.py``.
 
