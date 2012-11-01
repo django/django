@@ -139,6 +139,8 @@ useful -- you can use the global default storage system::
 
 See :doc:`/ref/files/storage` for the file storage API.
 
+.. _builtin-fs-storage:
+
 The built-in filesystem storage class
 -------------------------------------
 
