@@ -117,7 +117,7 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return re.sub(r'<[^>]*?>', '', force_text(value))
+    return re.sub(r'</?\S([^=]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', '', force_text(value))
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
