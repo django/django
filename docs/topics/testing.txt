@@ -379,6 +379,15 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 advanced settings.
 
+.. admonition:: Finding data from your production database when running tests?
+
+    If your code attempts to access the database when its modules are compiled,
+    this will occur *before* the test database is set up, with potentially
+    unexpected results. For example, if you have a database query in
+    module-level code and a real database exists, production data could pollute
+    your tests. *It is a bad idea to have such import-time database queries in
+    your code* anyway - rewrite your code so that it doesn't do this.
+
 .. _topics-testing-masterslave:
 
 Testing master/slave configurations
