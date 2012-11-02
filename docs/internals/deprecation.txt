@@ -298,6 +298,9 @@ these changes.
 
 * The ``daily_cleanup.py`` script will be removed.
 
+* The ``depth`` keyword argument will be removed from
+  :meth:`~django.db.models.query.QuerySet.select_related`.
+
 2.0
 ---
 

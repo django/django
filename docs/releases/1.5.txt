@@ -638,3 +638,10 @@ The :djadmin:`cleanup` management command has been deprecated and replaced by
 
 The undocumented ``daily_cleanup.py`` script has been deprecated. Use the
 :djadmin:`clearsessions` management command instead.
+
+``depth`` keyword argument in ``select_related``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``depth`` keyword argument in
+:meth:`~django.db.models.query.QuerySet.select_related` has been deprecated.
+You should use field names instead.

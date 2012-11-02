@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import itertools
 import sys
+import warnings
 
 from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
@@ -698,6 +699,9 @@ class QuerySet(object):
         If fields are specified, they must be ForeignKey fields and only those
         related objects are included in the selection.
         """
+        if 'depth' in kwargs:
+            warnings.warn('The "depth" keyword argument has been deprecated.\n'
+                    'Use related field names instead.', PendingDeprecationWarning)
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
