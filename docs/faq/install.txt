@@ -18,7 +18,7 @@ What are Django's prerequisites?
 
 Django requires Python, specifically Python 2.6.5 - 2.7.x. No other Python
 libraries are required for basic Django usage. Django 1.5 also has
-experimental support for Python 3.2 and above.
+experimental support for Python 3.2.3 and above.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -69,14 +69,14 @@ Django version Python versions
 1.2            2.4, 2.5, 2.6, 2.7
 1.3            2.4, 2.5, 2.6, 2.7
 **1.4**        **2.5, 2.6, 2.7**
-*1.5 (future)* *2.6, 2.7* and *3.2, 3.3 (experimental)*
+*1.5 (future)* *2.6, 2.7* and *3.2.3, 3.3 (experimental)*
 ============== ===============
 
 Can I use Django with Python 3?
 -------------------------------
 
-Django 1.5 introduces experimental support for Python 3.2 and 3.3. However, we
-don't yet suggest that you use Django and Python 3 in production.
+Django 1.5 introduces experimental support for Python 3.2.3 and above. However,
+we don't yet suggest that you use Django and Python 3 in production.
 
 Python 3 support should be considered a "preview". It's offered to bootstrap
 the transition of the Django ecosystem to Python 3, and to help you start
