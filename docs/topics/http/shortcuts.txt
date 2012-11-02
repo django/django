@@ -4,7 +4,7 @@ Django shortcut functions
 
 .. module:: django.shortcuts
    :synopsis:
-       Convenience shortcuts that spam multiple levels of Django's MVC stack.
+       Convenience shortcuts that span multiple levels of Django's MVC stack.
 
 .. index:: shortcuts
 
