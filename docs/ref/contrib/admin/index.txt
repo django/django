@@ -1233,9 +1233,38 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_changelist(self, request, **kwargs)
 
-    Returns the Changelist class to be used for listing. By default,
+    Returns the ``Changelist`` class to be used for listing. By default,
     ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
     class you can change the behavior of the listing.
+
+.. method:: ModelAdmin.get_changelist_form(self, request, **kwargs)
+
+    Returns a :class:`~django.forms.ModelForm` class for use in the ``Formset``
+    on the changelist page. To use a custom form, for example::
+
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = MyModel
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_changelist_form(self, request, **kwargs):
+                return MyForm
+
+.. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
+
+    Returns a :ref:`ModelFormSet <model-formsets>` class for use on the
+    changelist page if :attr:`~ModelAdmin.list_editable` is used. To use a
+    custom formset, for example::
+
+        from django.forms.models import BaseModelFormSet
+
+        class MyAdminFormSet(BaseModelFormSet):
+            pass
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_changelist_formset(self, request, **kwargs):
+                kwargs['formset'] = MyAdminFormSet
+                return super(MyModelAdmin, self).get_changelist_formset(request, **kwargs)
 
 .. method:: ModelAdmin.has_add_permission(self, request)
 
@@ -1552,6 +1581,10 @@ The ``InlineModelAdmin`` class adds:
     Specifies whether or not inline objects can be deleted in the inline.
     Defaults to ``True``.
 
+.. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
+
+    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
+    See the example for :class:`ModelAdmin.get_formsets`.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
