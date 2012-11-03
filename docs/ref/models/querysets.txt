@@ -622,6 +622,11 @@ select_related
 
 .. method:: select_related()
 
+.. deprecated:: 1.5
+    The ``depth`` parameter to ``select_related()`` has been deprecated. You
+    should replace it with the use of the ``(*fields)`` format instead. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
 Returns a ``QuerySet`` that will automatically "follow" foreign-key
 relationships, selecting that additional related-object data when it executes
 its query. This is a performance booster which results in (sometimes much)
