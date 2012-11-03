@@ -774,7 +774,7 @@ class FormatStylePlaceholderCursor(object):
         return CursorIterator(self.cursor)
 
 
-class CursorIterator(object):
+class CursorIterator(six.Iterator):
 
     """Cursor iterator wrapper that invokes our custom row factory."""
 
@@ -787,8 +787,6 @@ class CursorIterator(object):
 
     def __next__(self):
         return _rowfactory(next(self.iter), self.cursor)
-
-    next = __next__             # Python 2 compatibility
 
 
 def _rowfactory(row, cursor):

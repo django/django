@@ -67,9 +67,9 @@ class BoundMethodWeakref(object):
             same BoundMethodWeakref instance.
 
     """
-    
+
     _allInstances = weakref.WeakValueDictionary()
-    
+
     def __new__( cls, target, onDelete=None, *arguments,**named ):
         """Create new instance or return current instance
 
@@ -92,7 +92,7 @@ class BoundMethodWeakref(object):
             cls._allInstances[key] = base
             base.__init__( target, onDelete, *arguments,**named)
             return base
-    
+
     def __init__(self, target, onDelete=None):
         """Return a weak-reference-like instance for a bound method
 
@@ -132,7 +132,7 @@ class BoundMethodWeakref(object):
         self.weakFunc = weakref.ref(target.__func__, remove)
         self.selfName = str(target.__self__)
         self.funcName = str(target.__func__.__name__)
-    
+
     def calculateKey( cls, target ):
         """Calculate the reference key for this reference
 
@@ -141,7 +141,7 @@ class BoundMethodWeakref(object):
         """
         return (id(target.__self__),id(target.__func__))
     calculateKey = classmethod( calculateKey )
-    
+
     def __str__(self):
         """Give a friendly representation of the object"""
         return """%s( %s.%s )"""%(
@@ -157,14 +157,16 @@ class BoundMethodWeakref(object):
     def __bool__( self ):
         """Whether we are still a valid reference"""
         return self() is not None
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def __eq__(self, other):
         """Compare with another reference"""
         if not isinstance(other, self.__class__):
             return self.__class__ == type(other)
         return self.key == other.key
-    
+
     def __call__(self):
         """Return a strong reference to the bound method
 

@@ -136,7 +136,9 @@ class QuerySet(object):
         except StopIteration:
             return False
         return True
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def __contains__(self, val):
         # The 'in' operator works without this method, due to __iter__. This
