@@ -110,7 +110,7 @@ class MultiPartParser(object):
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict(MultiValueDict(), encoding=self._encoding), MultiValueDict()
+            return QueryDict('', encoding=self._encoding), MultiValueDict()
 
         # See if the handler will want to take care of the parsing.
         # This allows overriding everything if somebody wants it.
