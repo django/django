@@ -256,7 +256,7 @@ class MultiPartParser(object):
         """Cleanup filename from Internet Explorer full paths."""
         return filename and filename[filename.rfind("\\")+1:].strip()
 
-class LazyStream(object):
+class LazyStream(six.Iterator):
     """
     The LazyStream wrapper allows one to get and "unget" bytes from a stream.
 
@@ -323,8 +323,6 @@ class LazyStream(object):
         self.position += len(output)
         return output
 
-    next = __next__             # Python 2 compatibility
-
     def close(self):
         """
         Used to invalidate/disable this lazy stream.
@@ -369,7 +367,7 @@ class LazyStream(object):
                 " if there is none, report this to the Django developers."
             )
 
-class ChunkIter(object):
+class ChunkIter(six.Iterator):
     """
     An iterable that will yield chunks of data. Given a file-like object as the
     constructor, this object will yield chunks of read operations from that
@@ -389,12 +387,10 @@ class ChunkIter(object):
         else:
             raise StopIteration()
 
-    next = __next__             # Python 2 compatibility
-
     def __iter__(self):
         return self
 
-class InterBoundaryIter(object):
+class InterBoundaryIter(six.Iterator):
     """
     A Producer that will iterate over boundaries.
     """
@@ -411,9 +407,7 @@ class InterBoundaryIter(object):
         except InputStreamExhausted:
             raise StopIteration()
 
-    next = __next__             # Python 2 compatibility
-
-class BoundaryIter(object):
+class BoundaryIter(six.Iterator):
     """
     A Producer that is sensitive to boundaries.
 
@@ -488,8 +482,6 @@ class BoundaryIter(object):
             else:
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
-
-    next = __next__             # Python 2 compatibility
 
     def _find_boundary(self, data, eof = False):
         """

@@ -151,7 +151,9 @@ class MeasureBase(object):
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
             raise TypeError('%(class)s must be divided with number or %(class)s' % {"class":pretty_name(self)})
-    __div__ = __truediv__ # Python 2 compatibility
+
+    def __div__(self, other):   # Python 2 compatibility
+        return type(self).__truediv__(self, other)
 
     def __itruediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):
@@ -159,11 +161,15 @@ class MeasureBase(object):
             return self
         else:
             raise TypeError('%(class)s must be divided with number' % {"class":pretty_name(self)})
-    __idiv__ = __itruediv__ # Python 2 compatibility
+
+    def __idiv__(self, other):  # Python 2 compatibility
+        return type(self).__itruediv__(self, other)
 
     def __bool__(self):
         return bool(self.standard)
-    __nonzero__ = __bool__ # Python 2 compatibility
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def default_units(self, kwargs):
         """
@@ -314,7 +320,9 @@ class Area(MeasureBase):
                 **{self.STANDARD_UNIT: (self.standard / other)})
         else:
             raise TypeError('%(class)s must be divided by a number' % {"class":pretty_name(self)})
-    __div__ = __truediv__ # Python 2 compatibility
+
+    def __div__(self, other):  # Python 2 compatibility
+        return type(self).__truediv__(self, other)
 
 
 # Shortcuts

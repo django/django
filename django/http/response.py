@@ -23,7 +23,7 @@ class BadHeaderError(ValueError):
     pass
 
 
-class HttpResponseBase(object):
+class HttpResponseBase(six.Iterator):
     """
     An HTTP response base class with dictionary-accessed headers.
 
@@ -217,8 +217,6 @@ class HttpResponseBase(object):
     def __next__(self):
         # Subclasses must define self._iterator for this function.
         return self.make_bytes(next(self._iterator))
-
-    next = __next__             # Python 2 compatibility
 
     # These methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html

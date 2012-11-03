@@ -69,7 +69,9 @@ class BaseFormSet(object):
     def __bool__(self):
         """All formsets have a management form which is not included in the length"""
         return True
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     @property
     def management_form(self):
