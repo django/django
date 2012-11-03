@@ -294,6 +294,15 @@ class CommonMiddlewareTest(TestCase):
         CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
 
+    # Other tests
+
+    def test_non_ascii_query_string_does_not_crash(self):
+        """Regression test for #15152"""
+        request = self._get_request('slash')
+        request.META['QUERY_STRING'] = 'drink=café'
+        response = CommonMiddleware().process_request(request)
+        self.assertEqual(response.status_code, 301)
+
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'regressiontests.middleware.cond_get_urls'

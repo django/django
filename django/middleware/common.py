@@ -6,6 +6,7 @@ from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
+from django.utils import six
 from django.core import urlresolvers
 
 
@@ -87,7 +88,17 @@ class CommonMiddleware(object):
         else:
             newurl = urlquote(new_url[1])
         if request.META.get('QUERY_STRING', ''):
-            newurl += '?' + request.META['QUERY_STRING']
+            if six.PY3:
+                newurl += '?' + request.META['QUERY_STRING']
+            else:
+                # `query_string` is a bytestring. Appending it to the unicode
+                # string `newurl` will fail if it isn't ASCII-only. This isn't
+                # allowed; only broken software generates such query strings.
+                # Better drop the invalid query string than crash (#15152).
+                try:
+                    newurl += '?' + request.META['QUERY_STRING'].decode()
+                except UnicodeDecodeError:
+                    pass
         return http.HttpResponsePermanentRedirect(newurl)
 
     def process_response(self, request, response):
