@@ -138,6 +138,10 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         self.style = color_style()
         super(WSGIRequestHandler, self).__init__(*args, **kwargs)
 
+    def address_string(self):
+        # Short-circuit parent method to not call socket.getfqdn
+        return self.client_address[0]
+
     def log_message(self, format, *args):
         # Don't bother logging requests for admin images or the favicon.
         if (self.path.startswith(self.admin_static_prefix)
