@@ -55,7 +55,7 @@ def add_lazy_relation(cls, field, relation, operation):
     else:
         # Look for an "app.Model" relation
 
-        if isinstance(relation, basestring):
+        if isinstance(relation, six.string_types):
             try:
                 app_label, model_name = relation.split(".")
             except ValueError:
