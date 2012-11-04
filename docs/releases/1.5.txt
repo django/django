@@ -302,6 +302,10 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :ref:`cache-based session backend <cached-sessions-backend>` can store
   session data in a non-default cache.
 
+* Multi-column indexes can now be created on models. Read the
+  :attr:`~django.db.models.Options.index_together` documentation for more
+  infomration.
+
 Backwards incompatible changes in 1.5
 =====================================
 

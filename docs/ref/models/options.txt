@@ -263,9 +263,9 @@ Django quotes column and table names behind the scenes.
 
 ``index_together``
 
-.. versionadded:: 1.5
-
 .. attribute:: Options.index_together
+
+    .. versionadded:: 1.5
 
     Sets of field names that, taken together, are indexed::
 
