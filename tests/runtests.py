@@ -277,7 +277,7 @@ if __name__ == "__main__":
     usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
     parser.add_option(
-        '-v','--verbosity', action='store', dest='verbosity', default='1',
+        '-v', '--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2', '3'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all '
              'output')
