@@ -616,25 +616,25 @@ the field. This method returns the "human-readable" value of the field.
 
 For example::
 
-        from django.db import models
+    from django.db import models
 
-        class Person(models.Model):
-            SHIRT_SIZES = (
-                (u'S', u'Small'),
-                (u'M', u'Medium'),
-                (u'L', u'Large'),
-            )
-            name = models.CharField(max_length=60)
-            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+    class Person(models.Model):
+        SHIRT_SIZES = (
+            (u'S', u'Small'),
+            (u'M', u'Medium'),
+            (u'L', u'Large'),
+        )
+        name = models.CharField(max_length=60)
+        shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
 
-    ::
+::
 
-        >>> p = Person(name="Fred Flintstone", shirt_size="L")
-        >>> p.save()
-        >>> p.shirt_size
-        u'L'
-        >>> p.get_shirt_size_display()
-        u'Large'
+    >>> p = Person(name="Fred Flintstone", shirt_size="L")
+    >>> p.save()
+    >>> p.shirt_size
+    u'L'
+    >>> p.get_shirt_size_display()
+    u'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
