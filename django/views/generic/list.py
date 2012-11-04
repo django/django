@@ -50,9 +50,10 @@ class MultipleObjectMixin(ContextMixin):
         try:
             page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
-        except InvalidPage:
-            raise Http404(_('Invalid page (%(page_number)s)') % {
-                                'page_number': page_number
+        except InvalidPage as e:
+            raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
+                                'page_number': page_number,
+                                'message': e.message,
             })
 
     def get_paginate_by(self, queryset):
