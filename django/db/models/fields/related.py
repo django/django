@@ -54,14 +54,16 @@ def add_lazy_relation(cls, field, relation, operation):
 
     else:
         # Look for an "app.Model" relation
-        try:
-            app_label, model_name = relation.split(".")
-        except ValueError:
-            # If we can't split, assume a model in current app
-            app_label = cls._meta.app_label
-            model_name = relation
-        except AttributeError:
-            # If it doesn't have a split it's actually a model class
+
+        if isinstance(relation, six.string_types):
+            try:
+                app_label, model_name = relation.split(".")
+            except ValueError:
+                # If we can't split, assume a model in current app
+                app_label = cls._meta.app_label
+                model_name = relation
+        else:
+            # it's actually a model class
             app_label = relation._meta.app_label
             model_name = relation._meta.object_name
 
