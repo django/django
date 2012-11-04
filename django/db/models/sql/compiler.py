@@ -569,6 +569,8 @@ class SQLCompiler(object):
                     result.append('%s.%s' % (qn(col[0]), qn(col[1])))
                 elif hasattr(col, 'as_sql'):
                     result.append(col.as_sql(qn, self.connection))
+                elif isinstance(col, unicode):
+                    result.append('(%s)' % col)
                 else:
                     result.append('(%s)' % str(col))
         return result, params
