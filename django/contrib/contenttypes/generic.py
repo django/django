@@ -18,6 +18,7 @@ from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text
 
+
 class GenericForeignKey(object):
     """
     Provides a generic relation to any object through content-type/object-id
@@ -51,9 +52,6 @@ class GenericForeignKey(object):
             kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None, using=None):
-        # Convenience function using get_model avoids a circular import when
-        # using this model
-        ContentType = get_model("contenttypes", "contenttype")
         if obj:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
@@ -215,7 +213,6 @@ class GenericRelation(RelatedField, Field):
         """
         if negate:
             return []
-        ContentType = get_model("contenttypes", "contenttype")
         content_type = ContentType.objects.get_for_model(self.model)
         prefix = "__".join(pieces[:pos + 1])
         return [("%s__%s" % (prefix, self.content_type_field_name),
