@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.views.generic.base import View
 
 from .models import Author, Artist
@@ -171,8 +172,17 @@ class ListViewTests(TestCase):
         with self.assertNumQueries(3):
             self.client.get('/list/authors/notempty/paginated/')
 
+    @override_settings(DEBUG=True)
+    def test_paginated_list_view_returns_useful_message_on_invalid_page(self):
+        # test for #19240
+        # tests that source exception's message is included in page
+        self._make_authors(1)
+        res = self.client.get('/list/authors/paginated/2/')
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.context.get('reason'),
+                "Invalid page (2): That page contains no results")
+
     def _make_authors(self, n):
         Author.objects.all().delete()
         for i in range(n):
             Author.objects.create(name='Author %02i' % i, slug='a%s' % i)
-
