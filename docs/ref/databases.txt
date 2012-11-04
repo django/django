@@ -33,6 +33,15 @@ aggregate with a database backend that falls within the affected release range.
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
 
+PostgreSQL connection settings
+------------------------------
+
+By default (empty :setting:`HOST`), the connection to the database is done
+through UNIX domain sockets ('local' lines in pg_hba.conf). If you want to
+connect through TCP sockets, set :setting:`HOST` to 'localhost' or '127.0.0.1'
+('host' lines in pg_hba.conf). On Windows, you should always define
+:setting:`HOST`, as UNIX domain sockets are not available.
+
 Optimizing PostgreSQL's configuration
 -------------------------------------
 
