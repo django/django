@@ -356,6 +356,13 @@ class HardReferenceModel(models.Model):
     m2m_4 = models.ManyToManyField('invalid_models.SwappedModel', related_name='m2m_hardref4')
 
 
+class BadIndexTogether1(models.Model):
+    class Meta:
+        index_together = [
+            ["field_that_does_not_exist"],
+        ]
+
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
@@ -470,6 +477,7 @@ invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'in
 invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
+invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
 """
 
 if not connection.features.interprets_empty_strings_as_nulls:

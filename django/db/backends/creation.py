@@ -177,34 +177,47 @@ class BaseDatabaseCreation(object):
         output = []
         for f in model._meta.local_fields:
             output.extend(self.sql_indexes_for_field(model, f, style))
+        for fs in model._meta.index_together:
+            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            output.extend(self.sql_indexes_for_fields(model, fields, style))
         return output
 
     def sql_indexes_for_field(self, model, f, style):
         """
         Return the CREATE INDEX SQL statements for a single model field.
         """
+        if f.db_index and not f.unique:
+            return self.sql_indexes_for_fields(model, [f], style)
+        else:
+            return []
+
+    def sql_indexes_for_fields(self, model, fields, style):
         from django.db.backends.util import truncate_name
 
-        if f.db_index and not f.unique:
-            qn = self.connection.ops.quote_name
-            tablespace = f.db_tablespace or model._meta.db_tablespace
-            if tablespace:
-                tablespace_sql = self.connection.ops.tablespace_sql(tablespace)
-                if tablespace_sql:
-                    tablespace_sql = ' ' + tablespace_sql
-            else:
-                tablespace_sql = ''
-            i_name = '%s_%s' % (model._meta.db_table, self._digest(f.column))
-            output = [style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                style.SQL_TABLE(qn(truncate_name(
-                    i_name, self.connection.ops.max_name_length()))) + ' ' +
-                style.SQL_KEYWORD('ON') + ' ' +
-                style.SQL_TABLE(qn(model._meta.db_table)) + ' ' +
-                "(%s)" % style.SQL_FIELD(qn(f.column)) +
-                "%s;" % tablespace_sql]
+        if len(fields) == 1 and fields[0].db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
+        elif model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
         else:
-            output = []
-        return output
+            tablespace_sql = ""
+        if tablespace_sql:
+            tablespace_sql = " " + tablespace_sql
+
+        field_names = []
+        qn = self.connection.ops.quote_name
+        for f in fields:
+            field_names.append(style.SQL_FIELD(qn(f.column)))
+
+        index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
+
+        return [
+            style.SQL_KEYWORD("CREATE INDEX") + " " +
+            style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + " " +
+            style.SQL_KEYWORD("ON") + " " +
+            style.SQL_TABLE(qn(model._meta.db_table)) + " " +
+            "(%s)" % style.SQL_FIELD(", ".join(field_names)) +
+            "%s;" % tablespace_sql,
+        ]
 
     def sql_destroy_model(self, model, references_to_delete, style):
         """
