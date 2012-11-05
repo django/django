@@ -53,13 +53,12 @@ ArchiveIndexView
 
     **Example views.py**::
 
+        from django.conf.urls.defaults import *
         from django.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
-        class ArticleArchiveIndexView(ArchiveIndexView):
-
-            model = Article
+        url(r'^article/archive/$', ArchiveIndexView.as_view(model=Article, date_field="pub_date")),
 
     **Example myapp/article_archive.html**:: 
 
@@ -151,6 +150,47 @@ YearArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
+    **Example urls.py**::
+        from django.conf.urls.defaults import *
+
+        from myapp.views import ArticleYearArchiveView
+
+        url(r'^(?P<year>\d{4})/$', ArticleYearArchiveView.as_view(), name="archive-year"),
+
+    **Example views.py**::
+        from django.views.generic.dates import YearArchiveView
+
+        from myapp.models import Article
+
+        class ArticleYearArchiveView(YearArchiveView):
+            
+            queryset = Article.objects.all()
+            date_field="pub_date"
+            make_object_list=True
+
+    **Example myapp/article_archive_year.html**::
+
+        <ul> 
+            {% for date in date_list %}  
+                <li>
+                    <a href="{% url 'archive-year-month' date.year date.month %}">
+                        {{ date|date:"N" }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div>
+            <h1>All Articles for {{ year|date:"Y" }}</h1>
+            {% for obj in object_list %}
+                <p>
+                    <a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a>      
+                    - {{ obj.pub_date|date:"F j, Y" }}
+                </p>
+            {% endfor %}
+        </div>
+
+
 MonthArchiveView
 ----------------
 
@@ -203,6 +243,21 @@ MonthArchiveView
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
+
+    **Example myapp/article_archive_month.html**::
+
+        {% for article in object_list %}         
+            <p>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</p>
+        {% endfor %}
+
+        <p>
+            <a href="{% url 'archive-year-month' previous_month.year previous_month.month %}">
+            {{ previous_month|date:"F Y" }}</a> 
+            {% if next_month %} 
+                <a href="{% url 'archive-year-month' next_month.year next_month.month %}">
+                {{ next_month|date:"F Y" }}</a>
+            {% endif %}
+        </p>
 
 WeekArchiveView
 ---------------
