@@ -83,4 +83,8 @@ class Group(models.Model):
 
 
 class Cheese(models.Model):
-   name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+
+
+class Article(models.Model):
+    content = models.TextField()
