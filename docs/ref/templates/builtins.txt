@@ -1528,17 +1528,6 @@ displayed. For example:
 ``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
 ============  ================================  ==========
 
-If the argument passed to ``floatformat`` is 0 (zero), it will round the number
-to the nearest integer.
-
-============  ================================  ==========
-``value``     Template                          Output
-============  ================================  ==========
-``34.23234``  ``{{ value|floatformat:"0" }}``   ``34``
-``34.00000``  ``{{ value|floatformat:"0" }}``   ``34``
-``39.56000``  ``{{ value|floatformat:"0" }}``   ``40``
-============  ================================  ==========
-
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
