@@ -3,7 +3,15 @@
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
 <fieldset class="module">
-   <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+   <h2>
+     {% with formset_opts=inline_admin_formset.opts max_num=inline_admin_formset.formset.max_num %}
+       {% if not max_num or max_num > 1 %}
+         {{ formset_opts.verbose_name_plural|capfirst }}
+       {% else %}
+         {{ formset_opts.verbose_name|capfirst }}
+       {% endif %}
+     {% endwith %}
+   </h2>
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
      <thead><tr>
