@@ -1505,6 +1505,17 @@ that many decimal places. For example:
 ``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
 ============  =============================  ==========
 
+Particularly useful is passing 0 (zero) as the argument which will round the
+float to the nearest integer.
+
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"0" }}``   ``34``
+``34.00000``  ``{{ value|floatformat:"0" }}``   ``34``
+``39.56000``  ``{{ value|floatformat:"0" }}``   ``40``
+============  ================================  ==========
+
 If the argument passed to ``floatformat`` is negative, it will round a number
 to that many decimal places -- but only if there's a decimal part to be
 displayed. For example:
