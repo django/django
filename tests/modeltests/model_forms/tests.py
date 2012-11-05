@@ -1060,7 +1060,10 @@ class OldFormForXTests(TestCase):
         # Add a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
         # than caching it at time of instantiation.
-        c6 = Category.objects.create(id=6, name='Sixth', url='6th')
+        # Note, we are using an id of 1006 here since tests that run before
+        # this may create categories with primary keys up to 6. Use
+        # a number that is will not conflict.
+        c6 = Category.objects.create(id=1006, name='Sixth', url='6th')
         self.assertEqual(c6.name, 'Sixth')
         self.assertQuerysetEqual(f.clean([c6.id]), ["Sixth"])
 
