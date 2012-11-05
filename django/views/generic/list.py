@@ -53,7 +53,7 @@ class MultipleObjectMixin(ContextMixin):
         except InvalidPage as e:
             raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
                                 'page_number': page_number,
-                                'message': e.message,
+                                'message': str(e)
             })
 
     def get_paginate_by(self, queryset):
