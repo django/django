@@ -4,7 +4,9 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
 from django.utils import formats
@@ -14,6 +16,8 @@ from django.utils.translation import activate, deactivate
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import python_2_unicode_compatible
+
+from ..models import Article
 
 
 class FormsWidgetTestCase(TestCase):
@@ -1093,6 +1097,22 @@ class WidgetTests(TestCase):
         self.assertFalse(form.is_valid())
         form = SplitDateRequiredForm({'field': ['', '']})
         self.assertFalse(form.is_valid())
+
+
+class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
+    urls = 'regressiontests.forms.urls'
+
+    def test_textarea_trailing_newlines(self):
+        """
+        Test that a roundtrip on a ModelForm doesn't alter the TextField value
+        """
+        article = Article.objects.create(content="\nTst\n")
+        self.selenium.get('%s%s' % (self.live_server_url,
+            reverse('article_form', args=[article.pk])))
+        self.selenium.find_element_by_id('submit').submit()
+        article = Article.objects.get(pk=article.pk)
+        # Should be "\nTst\n" after #19251 is fixed
+        self.assertEqual(article.content, "\r\nTst\r\n")
 
 
 @python_2_unicode_compatible

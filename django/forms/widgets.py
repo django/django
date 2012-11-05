@@ -403,7 +403,7 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{0}>{1}</textarea>',
+        return format_html('<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
