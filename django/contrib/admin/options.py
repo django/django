@@ -1416,6 +1416,7 @@ class InlineModelAdmin(BaseModelAdmin):
     formset = BaseInlineFormSet
     extra = 3
     max_num = None
+    min_num = None
     template = None
     verbose_name = None
     verbose_name_plural = None
@@ -1469,6 +1470,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
+            "min_num": self.min_num,
             "can_delete": can_delete,
         }
         defaults.update(kwargs)

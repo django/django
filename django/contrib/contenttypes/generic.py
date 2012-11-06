@@ -423,7 +423,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   ct_field="content_type", fk_field="object_id",
                                   fields=None, exclude=None,
                                   extra=3, can_order=False, can_delete=True,
-                                  max_num=None,
+                                  max_num=None, min_num=None,
                                   formfield_callback=None):
     """
     Returns an ``GenericInlineFormSet`` for the given kwargs.
@@ -448,7 +448,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                    formfield_callback=formfield_callback,
                                    formset=formset,
                                    extra=extra, can_delete=can_delete, can_order=can_order,
-                                   fields=fields, exclude=exclude, max_num=max_num)
+                                   fields=fields, exclude=exclude, max_num=max_num, min_num=min_num)
     FormSet.ct_field = ct_field
     FormSet.ct_fk_field = fk_field
     return FormSet
@@ -485,6 +485,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "can_order": False,
             "fields": fields,
             "max_num": self.max_num,
+            "min_num": self.min_num,
             "exclude": exclude
         }
         defaults.update(kwargs)
