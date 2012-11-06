@@ -176,7 +176,7 @@ class SessionStore(SessionBase):
 
     @classmethod
     def clear_expired(cls):
-        storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        storage_path = cls._get_storage_path()
         file_prefix = settings.SESSION_COOKIE_NAME
 
         for session_file in os.listdir(storage_path):
