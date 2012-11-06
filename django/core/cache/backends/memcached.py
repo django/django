@@ -90,6 +90,9 @@ class BaseMemcachedCache(BaseCache):
 
     def incr(self, key, delta=1, version=None):
         key = self.make_key(key, version=version)
+        # memcached doesn't support a negative delta
+        if delta < 0:
+            return self._cache.decr(key, -delta)
         try:
             val = self._cache.incr(key, delta)
 
@@ -105,6 +108,9 @@ class BaseMemcachedCache(BaseCache):
 
     def decr(self, key, delta=1, version=None):
         key = self.make_key(key, version=version)
+        # memcached doesn't support a negative delta
+        if delta < 0:
+            return self._cache.incr(key, -delta)
         try:
             val = self._cache.decr(key, delta)
 
