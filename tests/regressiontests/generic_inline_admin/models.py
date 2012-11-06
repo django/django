@@ -44,6 +44,11 @@ class EpisodeExtra(Episode):
 class EpisodeMaxNum(Episode):
     pass
 
+#
+# Generic inline with extra and min_num
+#
+class EpisodeMinNum(Episode):
+    pass
 
 #
 # Generic inline with unique_together
