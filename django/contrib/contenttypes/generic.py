@@ -53,7 +53,7 @@ class GenericForeignKey(object):
     def get_content_type(self, obj=None, id=None, using=None):
         if obj:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
-        elif id:
+        elif id is not None:
             return ContentType.objects.db_manager(using).get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
@@ -117,7 +117,7 @@ class GenericForeignKey(object):
             # performance when dealing with GFKs in loops and such.
             f = self.model._meta.get_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
-            if ct_id:
+            if ct_id is not None:
                 ct = self.get_content_type(id=ct_id, using=instance._state.db)
                 try:
                     rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
