@@ -3,9 +3,9 @@
   <h2>
     {% with formset_opts=inline_admin_formset.opts max_num=inline_admin_formset.formset.max_num %}
       {% if not max_num or max_num > 1 %}
-        {{ formset_opts.verbose_name_plural|capfirst }}
+        {{ formset_opts.verbose_name_plural|title }}
       {% else %}
-        {{ formset_opts.verbose_name|capfirst }}
+        {{ formset_opts.verbose_name|title }}
       {% endif %}
     {% endwith %}
   </h2>
