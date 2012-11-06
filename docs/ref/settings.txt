@@ -1560,9 +1560,9 @@ for.
 You'll need to set a tuple with two elements -- the name of the header to look
 for and the required value. For example::
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-Here, we're telling Django that we trust the ``X-Forwarded-Protocol`` header
+Here, we're telling Django that we trust the ``X-Forwarded-Proto`` header
 that comes from our proxy, and any time its value is ``'https'``, then the
 request is guaranteed to be secure (i.e., it originally came in via HTTPS).
 Obviously, you should *only* set this setting if you control your proxy or
@@ -1575,16 +1575,18 @@ available in ``request.META``.)
 
 .. warning::
 
-    **You will probably open security holes in your site if you set this without knowing what you're doing. And if you fail to set it when you should. Seriously.**
+    **You will probably open security holes in your site if you set this
+    without knowing what you're doing. And if you fail to set it when you
+    should. Seriously.**
 
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
 
     * Your Django app is behind a proxy.
-    * Your proxy strips the 'X-Forwarded-Protocol' header from all incoming
+    * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
       requests. In other words, if end users include that header in their
       requests, the proxy will discard it.
-    * Your proxy sets the 'X-Forwarded-Protocol' header and sends it to Django,
+    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 
     If any of those are not true, you should keep this setting set to ``None``
