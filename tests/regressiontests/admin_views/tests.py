@@ -3690,6 +3690,6 @@ class AdminViewLogoutTest(TestCase):
         # follow the redirect and test results.
         response = self.client.get('/test_admin/admin/logout/', follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, 'admin/login.html')
+        self.assertTemplateUsed(response, 'admin/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')

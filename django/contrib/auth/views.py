@@ -4,6 +4,7 @@ except ImportError:     # Python 2
     from urlparse import urlparse, urlunparse
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
@@ -13,6 +14,7 @@ from django.shortcuts import resolve_url
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.generic import FormView
 
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
@@ -22,56 +24,189 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
 
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def login(request, template_name='registration/login.html',
-          redirect_field_name=REDIRECT_FIELD_NAME,
-          authentication_form=AuthenticationForm,
-          current_app=None, extra_context=None):
+class LoginView(FormView):
+    """Class-based login view."""
+    #: Template name.
+    template_name = 'registration/login.html'
+
+    #: Name of the field passed via GET which sets the redirection URL.
+    redirect_field_name = REDIRECT_FIELD_NAME
+
+    #: Success URL.
+    success_url = '/accounts/profile/'
+
+    #: Authentication form class.
+    form_class = AuthenticationForm
+
+    def validate_success_url(self, value):
+        """Raise ValidationError if success URL is invalid, else return URL."""
+        if not value:
+            raise ValidationError('Redirect URL is required')
+        # Heavier security check -- don't allow redirection to a different
+        # host.
+        netloc = urlparse(value)[1]
+        if netloc and netloc != self.request.get_host():
+            raise ValidationError('URL belongs to another host.')
+        return value
+
+    def get_success_url(self):
+        """Get success URL from request parameters or settings.
+
+        As with any FormView, you can also customize the success URL via the
+        view's ``success_url`` argument.
+
+        """
+        # Try request parameters, with validation.
+        candidate_url = self.request.REQUEST.get(self.redirect_field_name, '')
+        try:
+            success_url = self.validate_success_url(candidate_url)
+        except ValidationError:
+            # Try parent's get_success_url(): read views's ``success_url``.
+            try:
+                success_url = super(LoginView, self).get_success_url()
+            except ImproperlyConfigured:
+                # Fallback to settings.
+                success_url = settings.LOGIN_REDIRECT_URL
+        return success_url
+
+    def set_test_cookie(self):
+        """Set test cookie."""
+        self.request.session.set_test_cookie()
+
+    def unset_test_cookie(self):
+        """Remove test cookie."""
+        if self.request.session.test_cookie_worked():
+            self.request.session.delete_test_cookie()
+
+    def login(self, user):
+        """Actually log user in."""
+        return auth_login(self.request, user)
+
+    def form_valid(self, form):
+        """Process form: log the user in, clean test cookie..."""
+        self.login(form.get_user())
+        self.unset_test_cookie()
+        return super(LoginView, self).form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET requests."""
+        self.request = request
+        self.set_test_cookie()
+        return super(LoginView, self).get(request, *args, **kwargs)
+
+    def get_current_site(self):
+        """Return current site, for use in context data.
+
+        Returned value is a :py:class:`django.contrib.sites.models.Site`
+        instance.
+
+        """
+        return get_current_site(self.request)
+
+    def get_context_data(self, **kwargs):
+        """Return context data for use in TemplateResponse."""
+        data = super(LoginView, self).get_context_data(**kwargs)
+        current_site = self.get_current_site()
+        data[self.redirect_field_name] = self.get_success_url()
+        data['site'] = current_site
+        data['site_name'] = current_site.name
+        if self.extra_context is not None:
+            data.update(self.extra_context)
+        return data
+
+
+class BackwardCompatibleLoginView(LoginView):
+    """Backward compatible LoginView.
+
+    This class-based view focuses on backward compatibility. It implies
+    additional code. Whereas LoginView focuses on "current class-based style".
+
+    This class-based view accepts deprecated arguments. It may be removed in
+    future Django releases. Use :py:class:`django.contrib.auth.views.LoginView`
+    wherever possible.
+
     """
-    Displays the login form and handles the login action.
+    #: URL where to redirect in case of success.
+    #:
+    #: .. warning::
+    #:
+    #:    This option is deprecated. It is a duplicate of of ``success_url``
+    #:    which remains for backward-compatibility purpose. Use ``success_url``
+    #:    whenever possible.
+    redirect_to = None
+
+    #: Authentication form class.
+    #:
+    #: If set, has precedence over standard ``form_class``.
+    #:
+    #: .. warning::
+    #:
+    #:    This option is deprecated. It is a duplicate of of ``form_class``
+    #:    which remains for backward-compatibility purpose. Use ``form_class``
+    #:    whenever possible.
+    authentication_form = None
+
+    #: A hint indicating which application contains the current view.
+    #: See the namespaced URL resolution strategy for more information.
+    #:
+    #: .. note::
+    #:
+    #:    This argument is provided for backward-compatibility. Generic
+    #     class-based views (i.e. TemplateResponseMixin) don't use it.
+    current_app = None
+
+    #: Extra context.
+    #:
+    #: .. note::
+    #:
+    #:    This argument is provided for backward-compatibility. Generic
+    #     class-based views (i.e. TemplateResponseMixin) don't use it.
+    extra_context = None
+
+    def get_form_class(self):
+        """Return self.authentication_form or self.form_class."""
+        if self.authentication_form:
+            return self.authentication_form
+        else:
+            return super(BackwardCompatibleLoginView, self).get_form_class()
+
+    def get_success_url(self):
+        """Get success URL from request parameters or settings.
+
+        As with any FormView, you can also customize the success URL via the
+        view's ``success_url`` argument.
+
+        """
+        # Backward compatibility: if provided, ``redirect_to`` overrides
+        # ``success_url``
+        if self.redirect_to:
+            self.success_url = self.redirect_to
+        return super(BackwardCompatibleLoginView, self).get_success_url()
+
+    def render_to_response(self, context, **response_kwargs):
+        """Return response."""
+        if self.current_app:
+            response_kwargs['current_app'] = self.current_app
+        return super(BackwardCompatibleLoginView, self).render_to_response(
+            context, **response_kwargs)
+
+
+def login_decorator(view_func):
+    """Standard composition of view decorators for use with login views.
+
+    Use this as a shorcut to decorate custom LoginView instances.
+
     """
-    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    return sensitive_post_parameters()(csrf_protect(never_cache(view_func)))
 
-    if request.method == "POST":
-        form = authentication_form(data=request.POST)
-        if form.is_valid():
-            # Use default setting if redirect_to is empty
-            if not redirect_to:
-                redirect_to = settings.LOGIN_REDIRECT_URL
-            redirect_to = resolve_url(redirect_to)
 
-            netloc = urlparse(redirect_to)[1]
-            # Heavier security check -- don't allow redirection to a different
-            # host.
-            if netloc and netloc != request.get_host():
-                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+@login_decorator
+def login(request, *args, **kwargs):
+    """Pre-configured and pre-decorated login view for backward-compatibility.
 
-            # Okay, security checks complete. Log the user in.
-            auth_login(request, form.get_user())
-
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
-
-            return HttpResponseRedirect(redirect_to)
-    else:
-        form = authentication_form(request)
-
-    request.session.set_test_cookie()
-
-    current_site = get_current_site(request)
-
-    context = {
-        'form': form,
-        redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
-                            current_app=current_app)
+    """
+    view = BackwardCompatibleLoginView.as_view(*args, **kwargs)
+    return view(request)
 
 
 def logout(request, next_page=None,
