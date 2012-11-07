@@ -103,21 +103,12 @@ class SQLCompiler(object):
             result.append('WHERE %s' % where)
             params.extend(w_params)
 
-        grouping, gb_params = self.get_grouping()
+        grouping, gb_params = self.get_grouping(ordering_group_by)
         if grouping:
             if distinct_fields:
                 raise NotImplementedError(
                     "annotate() + distinct(fields) not implemented.")
-            if ordering:
-                # If the backend can't group by PK (i.e., any database
-                # other than MySQL), then any fields mentioned in the
-                # ordering clause needs to be in the group by clause.
-                if not self.connection.features.allows_group_by_pk:
-                    for col, col_params in ordering_group_by:
-                        if col not in grouping:
-                            grouping.append(str(col))
-                            gb_params.extend(col_params)
-            else:
+            if not ordering:
                 ordering = self.connection.ops.force_no_ordering()
             result.append('GROUP BY %s' % ', '.join(grouping))
             params.extend(gb_params)
@@ -378,7 +369,7 @@ class SQLCompiler(object):
                 else:
                     order = asc
                 result.append('%s %s' % (field, order))
-                group_by.append((field, []))
+                group_by.append((str(field), []))
                 continue
             col, order = get_order_dir(field, asc)
             if col in self.query.aggregate_select:
@@ -538,39 +529,52 @@ class SQLCompiler(object):
                 first = False
         return result, []
 
-    def get_grouping(self):
+    def get_grouping(self, ordering_group_by):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
         qn = self.quote_name_unless_alias
         result, params = [], []
         if self.query.group_by is not None:
-            if (len(self.query.model._meta.fields) == len(self.query.select) and
-                self.connection.features.allows_group_by_pk):
+            select_cols = self.query.select + self.query.related_select_cols
+            # Just the column, not the fields.
+            select_cols = [s[0] for s in select_cols]
+            if (len(self.query.model._meta.fields) == len(self.query.select)
+                    and self.connection.features.allows_group_by_pk):
                 self.query.group_by = [
                     (self.query.model._meta.db_table, self.query.model._meta.pk.column)
                 ]
-
-            group_by = self.query.group_by or []
-
-            extra_selects = []
-            for extra_select, extra_params in six.itervalues(self.query.extra_select):
-                extra_selects.append(extra_select)
-                params.extend(extra_params)
-            select_cols = [s.col for s in self.query.select]
-            related_select_cols = [s.col for s in self.query.related_select_cols]
-            cols = (group_by + select_cols + related_select_cols + extra_selects)
+                select_cols = []
             seen = set()
+            cols = self.query.group_by + select_cols
             for col in cols:
-                if col in seen:
-                    continue
-                seen.add(col)
                 if isinstance(col, (list, tuple)):
-                    result.append('%s.%s' % (qn(col[0]), qn(col[1])))
+                    sql = '%s.%s' % (qn(col[0]), qn(col[1]))
                 elif hasattr(col, 'as_sql'):
-                    result.append(col.as_sql(qn, self.connection))
+                    sql = col.as_sql(qn, self.connection)
                 else:
-                    result.append('(%s)' % str(col))
+                    sql = '(%s)' % str(col)
+                if sql not in seen:
+                    result.append(sql)
+                    seen.add(sql)
+
+            # Still, we need to add all stuff in ordering (except if the backend can
+            # group by just by PK).
+            if ordering_group_by and not self.connection.features.allows_group_by_pk:
+                for order, order_params in ordering_group_by:
+                    # Even if we have seen the same SQL string, it might have
+                    # different params, so, we add same SQL in "has params" case.
+                    if order not in seen or params:
+                        result.append(order)
+                        params.extend(order_params)
+                        seen.add(order)
+
+            # Unconditionally add the extra_select items.
+            for extra_select, extra_params in self.query.extra_select.values():
+                sql = '(%s)' % str(extra_select)
+                result.append(sql)
+                params.extend(extra_params)
+
         return result, params
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
