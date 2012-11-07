@@ -1469,3 +1469,12 @@ Examples::
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+
+Output redirection
+==================
+
+Note that you can redirect standard output and error streams as all commands
+support the ``stdout`` and ``stderr`` options. For example, you could write::
+
+    with open('/tmp/command_output') as f:
+        management.call_command('dumpdata', stdout=f)
