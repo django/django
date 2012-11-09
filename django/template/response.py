@@ -40,7 +40,7 @@ class SimpleTemplateResponse(HttpResponse):
         rendered, and that the pickled state only includes rendered
         data, not the data used to construct the response.
         """
-        obj_dict = self.__dict__.copy()
+        obj_dict = super(SimpleTemplateResponse, self).__getstate__()
         if not self._is_rendered:
             raise ContentNotRenderedError('The response content must be '
                                           'rendered before it can be pickled.')
