@@ -1,6 +1,9 @@
 import collections
 from math import ceil
 
+from django.utils import six
+
+
 class InvalidPage(Exception):
     pass
 
@@ -89,6 +92,8 @@ class Page(collections.Sequence):
         return len(self.object_list)
 
     def __getitem__(self, index):
+        if not isinstance(index, (slice,) + six.integer_types):
+            raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
         return list(self.object_list)[index]

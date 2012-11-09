@@ -266,3 +266,25 @@ class ModelPaginationTests(TestCase):
         self.assertEqual(1, p.previous_page_number())
         self.assertEqual(6, p.start_index())
         self.assertEqual(9, p.end_index())
+
+    def test_page_getitem(self):
+        """
+        Tests proper behaviour of a paginator page __getitem__ (queryset
+        evaluation, slicing, exception raised).
+        """
+        paginator = Paginator(Article.objects.all(), 5)
+        p = paginator.page(1)
+
+        # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
+        # (this happens from the template engine when using eg: {% page_obj.has_previous %})
+        self.assertIsNone(p.object_list._result_cache)
+        self.assertRaises(TypeError, lambda: p['has_previous'])
+        self.assertIsNone(p.object_list._result_cache)
+
+        # Make sure slicing the Page object with numbers and slice objects work.
+        self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
+        self.assertQuerysetEqual(p[slice(2)], [
+                "<Article: Article 1>",
+                "<Article: Article 2>",
+            ]
+        )
