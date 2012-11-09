@@ -53,6 +53,13 @@ comment
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 
+Sample usage::
+
+    <p>Rendered text with {{ pub_date|date:"c" }}</p>
+    {% comment %}
+        <p>Commented out text with {{ create_date|date:"c" }}</p>
+    {% endcomment %}
+
 .. templatetag:: csrf_token
 
 csrf_token
@@ -947,6 +954,10 @@ Argument            Outputs
 ``closecomment``    ``#}``
 ==================  =======
 
+Sample usage::
+
+    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+
 .. templatetag:: url
 
 url
@@ -1409,6 +1420,12 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
+For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
+
+    {% autoescape off %}
+        {{ title|escape }}
+    {% endautoescape %}
+
 .. templatefilter:: escapejs
 
 escapejs
@@ -1541,6 +1558,13 @@ details). This filter is applied *immediately* and returns a new, escaped
 string. This is useful in the rare cases where you need multiple escaping or
 want to apply other filters to the escaped results. Normally, you want to use
 the :tfilter:`escape` filter.
+
+For example, if you want to catch the ``<paragraph>`` HTML elements created by
+the :tfilter:`linebreaks` filter::
+
+    {% autoescape off %}
+        {{ body|linebreaks|force_escape }}
+    {% endautoescape %}
 
 .. templatefilter:: get_digit
 
@@ -1979,7 +2003,9 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
-then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
+then the following would return "8 hours"::
+
+    {{ blog_date|timesince:comment_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -1998,7 +2024,9 @@ given date or datetime. For example, if today is 1 June 2006 and
 
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
-2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+2006, then the following will return "1 week"::
+
+    {{ conference_date|timeuntil:from_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
