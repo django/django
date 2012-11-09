@@ -3,7 +3,7 @@ import sys
 
 if os.name == 'posix':
     def become_daemon(our_home_dir='.', out_log='/dev/null',
-                      err_log='/dev/null', umask=0o022):
+                      err_log='/dev/null', umask=0022):
         "Robustly turn into a UNIX daemon, running in our_home_dir."
         # First fork
         try:
