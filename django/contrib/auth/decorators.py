@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
 from django.shortcuts import resolve_url
+from django.http import HttpResponse
 
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
@@ -73,3 +74,22 @@ def permission_required(perm, login_url=None, raise_exception=False):
         # As the last resort, show the login form
         return False
     return user_passes_test(check_perms, login_url=login_url)
+
+
+def login_required_ajax(function=None):
+    """
+    Decorator for views called with ajax that checks if the user is logged in,
+    sends back a "HTTP Status 401 Unauthorized" if not.
+    """
+    def _decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_authenticated():
+                return view_func(request, *args, **kwargs)
+            else:
+                return HttpResponse(status=401)
+        return _wrapped_view
+
+    if function is None:
+        return _decorator
+    else:
+        return _decorator(function)
