@@ -1549,7 +1549,7 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.min_num
 
-    .. versionadded:: 1.4
+    .. versionadded:: 1.5
 
     This controls the minumum number of forms to show in the inline.
     See :ref:`formsets-min-num` for more information.
