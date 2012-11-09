@@ -75,6 +75,7 @@ class Options(object):
         from django.db.backends.util import truncate_name
 
         cls._meta = self
+        self.model = cls
         self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
         self.object_name = cls.__name__
@@ -464,7 +465,7 @@ class Options(object):
         a granparent or even more distant relation.
         """
         if not self.parents:
-            return
+            return None
         if model in self.parents:
             return [model]
         for parent in self.parents:
@@ -472,8 +473,7 @@ class Options(object):
             if res:
                 res.insert(0, parent)
                 return res
-        raise TypeError('%r is not an ancestor of this model'
-                % model._meta.module_name)
+        return None
 
     def get_parent_list(self):
         """

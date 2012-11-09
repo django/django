@@ -1,9 +1,11 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
+from django.utils import unittest
 
 from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
-    AdvancedUserStat, Image, Product)
+    AdvancedUserStat, Image, Product, Parent1, Parent2, Child1, Child2, Child3,
+    Child4)
 
 
 class ReverseSelectRelatedTestCase(TestCase):
@@ -21,6 +23,14 @@ class ReverseSelectRelatedTestCase(TestCase):
         advstat = AdvancedUserStat.objects.create(user=user2, posts=200, karma=5,
                                                   results=results2)
         StatDetails.objects.create(base_stats=advstat, comments=250)
+        p1 = Parent1(name1="Only Parent1")
+        p1.save()
+        c1 = Child1(name1="Child1 Parent1", name2="Child1 Parent2", value=1)
+        c1.save()
+        p2 = Parent2(name2="Child2 Parent2")
+        p2.save()
+        c2 = Child2(name1="Child2 Parent1", parent2=p2, value=2)
+        c2.save()
 
     def test_basic(self):
         with self.assertNumQueries(1):
@@ -108,3 +118,93 @@ class ReverseSelectRelatedTestCase(TestCase):
             image = Image.objects.select_related('product').get()
             with self.assertRaises(Product.DoesNotExist):
                 image.product
+
+    def test_parent_only(self):
+        with self.assertNumQueries(1):
+            p = Parent1.objects.select_related('child1').get(name1="Only Parent1")
+        with self.assertNumQueries(0):
+            with self.assertRaises(Child1.DoesNotExist):
+                p.child1
+
+    def test_multiple_subclass(self):
+        with self.assertNumQueries(1):
+            p = Parent1.objects.select_related('child1').get(name1="Child1 Parent1")
+            self.assertEqual(p.child1.name2, 'Child1 Parent2')
+
+    def test_onetoone_with_subclass(self):
+        with self.assertNumQueries(1):
+            p = Parent2.objects.select_related('child2').get(name2="Child2 Parent2")
+            self.assertEqual(p.child2.name1, 'Child2 Parent1')
+
+    def test_onetoone_with_two_subclasses(self):
+        with self.assertNumQueries(1):
+            p = Parent2.objects.select_related('child2', "child2__child3").get(name2="Child2 Parent2")
+            self.assertEqual(p.child2.name1, 'Child2 Parent1')
+            with self.assertRaises(Child3.DoesNotExist):
+                p.child2.child3
+        p3 = Parent2(name2="Child3 Parent2")
+        p3.save()
+        c2 = Child3(name1="Child3 Parent1", parent2=p3, value=2, value3=3)
+        c2.save()
+        with self.assertNumQueries(1):
+            p = Parent2.objects.select_related('child2', "child2__child3").get(name2="Child3 Parent2")
+            self.assertEqual(p.child2.name1, 'Child3 Parent1')
+            self.assertEqual(p.child2.child3.value3, 3)
+            self.assertEqual(p.child2.child3.value, p.child2.value)
+            self.assertEqual(p.child2.name1, p.child2.child3.name1)
+
+    def test_multiinheritance_two_subclasses(self):
+        with self.assertNumQueries(1):
+            p = Parent1.objects.select_related('child1', 'child1__child4').get(name1="Child1 Parent1")
+            self.assertEqual(p.child1.name2, 'Child1 Parent2')
+            self.assertEqual(p.child1.name1, p.name1)
+            with self.assertRaises(Child4.DoesNotExist):
+                p.child1.child4
+        Child4(name1='n1', name2='n2', value=1, value4=4).save()
+        with self.assertNumQueries(1):
+            p = Parent2.objects.select_related('child1', 'child1__child4').get(name2="n2")
+            self.assertEqual(p.name2, 'n2')
+            self.assertEqual(p.child1.name1, 'n1')
+            self.assertEqual(p.child1.name2, p.name2)
+            self.assertEqual(p.child1.value, 1)
+            self.assertEqual(p.child1.child4.name1, p.child1.name1)
+            self.assertEqual(p.child1.child4.name2, p.child1.name2)
+            self.assertEqual(p.child1.child4.value, p.child1.value)
+            self.assertEqual(p.child1.child4.value4, 4)
+
+    @unittest.expectedFailure
+    def test_inheritance_deferred(self):
+        c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
+        with self.assertNumQueries(1):
+            p = Parent2.objects.select_related('child1').only(
+                'id2',  'child1__value').get(name2="n2")
+            self.assertEqual(p.id2, c.id2)
+            self.assertEqual(p.child1.value, 1)
+        p = Parent2.objects.select_related('child1').only(
+            'id2',  'child1__value').get(name2="n2")
+        with self.assertNumQueries(1):
+            self.assertEquals(p.name2, 'n2')
+        p = Parent2.objects.select_related('child1').only(
+            'id2',  'child1__value').get(name2="n2")
+        with self.assertNumQueries(1):
+            self.assertEquals(p.child1.name2, 'n2')
+
+    @unittest.expectedFailure
+    def test_inheritance_deferred2(self):
+        c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
+        qs = Parent2.objects.select_related('child1', 'child4').only(
+            'id2',  'child1__value', 'child1__child4__value4')
+        with self.assertNumQueries(1):
+            p = qs.get(name2="n2")
+            self.assertEqual(p.id2, c.id2)
+            self.assertEqual(p.child1.value, 1)
+            self.assertEqual(p.child1.child4.value4, 4)
+            self.assertEqual(p.child1.child4.id2, c.id2)
+        p = qs.get(name2="n2")
+        with self.assertNumQueries(1):
+            self.assertEquals(p.child1.name2, 'n2')
+        p = qs.get(name2="n2")
+        with self.assertNumQueries(1):
+            self.assertEquals(p.child1.name1, 'n1')
+        with self.assertNumQueries(1):
+            self.assertEquals(p.child1.child4.name1, 'n1')
