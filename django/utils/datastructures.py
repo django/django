@@ -1,6 +1,5 @@
 import copy
 import warnings
-from types import GeneratorType
 from django.utils import six
 
 
@@ -120,27 +119,23 @@ class SortedDict(dict):
         return instance
 
     def __init__(self, data=None):
-        if data is None:
-            data = {}
-        elif isinstance(data, GeneratorType):
-            # Unfortunately we need to be able to read a generator twice.  Once
-            # to get the data into self with our super().__init__ call and a
-            # second time to setup keyOrder correctly
-            data = list(data)
-        super(SortedDict, self).__init__(data)
-        if isinstance(data, dict):
-            self.keyOrder = list(data)
+        if data is None or isinstance(data, dict):
+            data = data or []
+            super(SortedDict, self).__init__(data)
+            self.keyOrder = list(data) if data else []
         else:
-            self.keyOrder = []
-            seen = set()
+            super(SortedDict, self).__init__()
+            super_set = super(SortedDict, self).__setitem__
             for key, value in data:
-                if key not in seen:
+                # Take the ordering from first key
+                if key not in self:
                     self.keyOrder.append(key)
-                    seen.add(key)
+                # But override with last value in data (dict() does this)
+                super_set(key, value)
 
     def __deepcopy__(self, memo):
         return self.__class__([(key, copy.deepcopy(value, memo))
-                               for key, value in six.iteritems(self)])
+                               for key, value in self.items()])
 
     def __copy__(self):
         # The Python's default copy implementation will alter the state
@@ -199,13 +194,13 @@ class SortedDict(dict):
         itervalues = _itervalues
 
         def items(self):
-            return list(self.iteritems())
+            return [(k, self[k]) for k in self.keyOrder]
 
         def keys(self):
-            return list(self.iterkeys())
+            return self.keyOrder[:]
 
         def values(self):
-            return list(self.itervalues())
+            return [self[k] for k in self.keyOrder]
 
     def update(self, dict_):
         for k, v in six.iteritems(dict_):
