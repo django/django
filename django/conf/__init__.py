@@ -83,6 +83,7 @@ class LazySettings(LazyObject):
         for name, value in options.items():
             setattr(holder, name, value)
         self._wrapped = holder
+        self._configure_logging()
 
     @property
     def configured(self):

@@ -4,7 +4,7 @@ import copy
 import logging
 import warnings
 
-from django.conf import compat_patch_logging_config
+from django.conf import compat_patch_logging_config, LazySettings
 from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -302,3 +302,20 @@ class SettingsConfigTest(AdminScriptTestCase):
         out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
         self.assertOutput(out, "0 errors found")
+
+
+def dictConfig(config):
+    dictConfig.called = True
+dictConfig.called = False
+
+
+class SettingsConfigureLogging(TestCase):
+    """
+    Test that calling settings.configure() initializes the logging
+    configuration.
+    """
+    def test_configure_initializes_logging(self):
+        settings = LazySettings()
+        settings.configure(
+            LOGGING_CONFIG='regressiontests.logging_tests.tests.dictConfig')
+        self.assertTrue(dictConfig.called)
