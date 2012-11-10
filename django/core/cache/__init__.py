@@ -93,8 +93,6 @@ def parse_backend_conf(backend, **kwargs):
             raise InvalidCacheBackendError("Could not find backend '%s'" % backend)
         location = kwargs.pop('LOCATION', '')
         return backend, location, kwargs
-    raise InvalidCacheBackendError(
-        "Couldn't find a cache backend named '%s'" % backend)
 
 def get_cache(backend, **kwargs):
     """
