@@ -103,7 +103,7 @@ class Query(object):
 
     def __init__(self, model, where=WhereNode):
         self.model = model
-        self.alias_refcount = SortedDict()
+        self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
         # type they are. The key is the alias of the joined table (possibly
@@ -860,7 +860,7 @@ class Query(object):
         count. Note that after execution, the reference counts are zeroed, so
         tables added in compiler will not be seen by this method.
         """
-        return len([1 for count in six.itervalues(self.alias_refcount) if count])
+        return len([1 for count in self.alias_refcount.values() if count])
 
     def join(self, connection, reuse=REUSE_ALL, promote=False,
              outer_if_first=False, nullable=False):
@@ -1532,9 +1532,9 @@ class Query(object):
         # comparison to NULL (e.g. in
         # Tag.objects.exclude(parent__parent__name='t1'), a tag with no parent
         # would otherwise be overlooked).
-        active_positions = [pos for (pos, count) in
-                enumerate(six.itervalues(query.alias_refcount)) if count]
-        if active_positions[-1] > 1:
+        active_positions = len([count for count
+                                in query.alias_refcount.items() if count])
+        if active_positions > 1:
             self.add_filter(('%s__isnull' % prefix, False), negate=True,
                     trim=True, can_reuse=can_reuse)
 
