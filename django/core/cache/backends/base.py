@@ -14,6 +14,7 @@ class InvalidCacheBackendError(ImproperlyConfigured):
 class CacheKeyWarning(DjangoRuntimeWarning):
     pass
 
+
 # Memcached does not accept keys longer than this.
 MEMCACHE_MAX_KEY_LENGTH = 250
 
@@ -26,7 +27,7 @@ def default_key_func(key, key_prefix, version):
     the `key_prefix'. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
-    return ':'.join([key_prefix, str(version), key])
+    return '%s:%s:%s' % (key_prefix, version, key)
 
 
 def get_key_func(key_func):
