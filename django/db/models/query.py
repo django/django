@@ -1395,8 +1395,12 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                 klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
                                             requested=next, only_load=only_load, local_only=True)
                 reverse_related_fields.append((o.field, klass_info))
+    if field_names:
+        pk_idx = field_names.index(klass._meta.pk.attname)
+    else:
+        pk_idx = klass._meta.pk_index()
 
-    return klass, field_names, field_count, related_fields, reverse_related_fields
+    return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
 
 def get_cached_row(row, index_start, using,  klass_info, offset=0):
@@ -1419,26 +1423,17 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0):
     """
     if klass_info is None:
         return None
-    klass, field_names, field_count, related_fields, reverse_related_fields = klass_info
+    klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx = klass_info
 
     fields = row[index_start : index_start + field_count]
-    # If all the select_related columns are None, then the related
+    # If the pk column is None (or the Oracle equivalent ''), then the related
     # object must be non-existent - set the relation to None.
-    # Otherwise, construct the related object. Also, some backends treat ''
-    # and None equivalently for char fields, so we have to be prepared for
-    # '' values.
-    if connections[using].features.interprets_empty_strings_as_nulls:
-        vals = tuple([None if f == '' else f for f in fields])
-    else:
-        vals = fields
-
-    if vals == (None,) * field_count:
+    if fields[pk_idx] == None or fields[pk_idx] == '':
         obj = None
+    elif field_names:
+        obj = klass(**dict(zip(field_names, fields)))
     else:
-        if field_names:
-            obj = klass(**dict(zip(field_names, fields)))
-        else:
-            obj = klass(*fields)
+        obj = klass(*fields)
 
     # If an object was retrieved, set the database state.
     if obj:
