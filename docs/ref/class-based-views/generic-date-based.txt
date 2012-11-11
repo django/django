@@ -61,20 +61,15 @@ ArchiveIndexView
         url(r'^article/archive/$', ArchiveIndexView.as_view(
                                        model=Article, date_field="pub_date")),
 
-    **Example myapp/article_archive.html**:: 
+    .. highlightlang:: html+django
 
-        <html>
-            <head>
-                <title>Article Archive</title>
-            </head>
-            <body>
-                <ul>
-                    {% for article in latest %}
-                        <li>{{ article.pub_date }}: {{ article.title }}</li>
-                    {% endfor %}
-                </ul>
-            </body>
-        </html>
+    **Example myapp/article_archive.html**::
+
+        <ul>
+            {% for article in latest %}
+                <li>{{ article.pub_date }}: {{ article.title }}</li>
+            {% endfor %}
+        </ul>
 
     This will output all articles.
 
@@ -146,14 +141,14 @@ YearArchiveView
       :attr:`~BaseDateListView.allow_empty` and
       :attr:`~DateMixin.allow_future`.
 
-    .. versionadded:: 1.5
+      .. versionadded:: 1.5
 
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
     
-    ArchiveView's use date-based mixins and uses the 
-    :class:`~time.strftime` format. Below is a list of attributes which 
+    ArchiveView's use :doc:`date-based mixins</ref/class-based-views/mixins-date-based>`. and uses the 
+    :func:`~time.strftime` format. Below is a list of attributes which 
     can be set and their defaults:
 
     * ``year_format``  By default, this is ``'%Y'``, which is a 4 digit year.
@@ -162,7 +157,9 @@ YearArchiveView
     * ``week_format``  By default, this is ``'%U'``, which means the week starts 
       on Sunday. Set it to ``'%W'`` if your week starts on Monday.
 
-    **Example urls.py**::
+    **Example urls.py**
+
+    .. code-block:: python
 
         from django.conf.urls.defaults import *
 
@@ -179,7 +176,9 @@ YearArchiveView
                     ArticleYearArchiveView.as_view(), name="archive-year"),
         )
 
-    **Example views.py**::
+    **Example views.py**
+
+    .. code-block:: python
 
         from django.views.generic.dates import YearArchiveView
 
@@ -191,7 +190,9 @@ YearArchiveView
             date_field="pub_date"
             make_object_list=True
 
-    **Example myapp/article_archive_year.html**::
+    **Example myapp/article_archive_year.html**
+
+    .. code-block:: html+django
 
         <ul> 
             {% for date in date_list %}  
@@ -329,7 +330,9 @@ WeekArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
-    **Example urls.py**::
+    **Example urls.py**
+
+    .. code-block:: python
 
         from django.conf.urls.defaults import *
 
@@ -338,8 +341,8 @@ WeekArchiveView
         urlpatterns = patterns('',
             ...
             url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
-                    WeekArchiveView.as_view(model=Article, date_field="pub_date", week_format="%W"), 
-                    name="archive-week"),
+                    WeekArchiveView.as_view(model=Article, date_field="pub_date", 
+                    week_format="%W"), name="archive-week"),
         )
 
     **Example myapp/article_archive_week.html**::
@@ -350,7 +353,17 @@ WeekArchiveView
             </a>
         </h1>
 
-    Here we use the ``'%W'`` format because the :func:`~time.strftime` week format ``'%U'`` is not available in the :class:`~datetime.date` template tag. 
+    In this example, you are outputting the week number. The default 
+    ``week_format`` in the ``WeekArchiveView`` uses  week format ``'%U'`` 
+    which is based on the United States week system where the week begins on a 
+    Sunday. The ``'%W'`` format uses the ISO week format and its week 
+    begins on a Monday.  The ``'%W'`` format is the same in both the 
+    :func:`~time.strftime` and the :tfilter:`date`.  
+
+    However, the :tfilter:`date` template filter does not have an equvilant output 
+    format that supports the US based week system. The :tfilter:`date` 
+    filter ``'%U'`` outputs the number of seconds since the unix epoch.
+
 
 DayArchiveView
 --------------
@@ -409,7 +422,9 @@ DayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-    **Example urls.py**::
+    **Example urls.py**
+
+    .. code-block:: python
 
         from django.conf.urls.defaults import *
 
@@ -454,6 +469,24 @@ TodayArchiveView
     * :class:`django.views.generic.dates.DateMixin`
     * :class:`django.views.generic.base.View`
 
+    **Notes**
+
+    * Uses a default template name of ``<model>_archive_today.html``.
+
+
+    **Example urls.py**
+
+    .. code-block:: python
+
+        from django.conf.urls.defaults import *
+
+        from myapp.views import TodayArchiveView
+
+        urlpatterns = patterns('',
+            ...
+            url(r'^article/today/$', 
+                    TodayArchiveView.as_view(model=Article, date_field="pub_date")),
+        )
 
 DateDetailView
 --------------
@@ -502,25 +535,27 @@ DateDetailView
 
     * Includes the single object associated with the ``model`` specified in the ``DateDetailView``.
 
-    **Notes**
+**Notes**
 
-    * Uses a default ``template_name_suffix`` of ``<app_name>/<model>_detail.html``.
+* Uses a default template name of  ``<app_name>/<model>_detail.html``.
     
 
-    **Example myapp/article_detail.html**::
+**Example myapp/article_detail.html**::
     
-        <h1>{{ article.title }}</h1>
+    <h1>{{ article.title }}</h1>
 
 
-    **Example urls.py**::
+**Example urls.py**
 
-        from django.conf.urls.defaults import *
+.. code-block:: python
 
-        from myapp.views import DateDetailView
+    from django.conf.urls.defaults import *
 
-        urlpatterns = patterns('',
-            ...
-            url(r'^article/(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
-                    DateDetailView.as_view(model=Article, date_field="pub_date"), 
-                    name="date-detail"),
-        )
+    from myapp.views import DateDetailView
+
+    urlpatterns = patterns('',
+        ...
+        url(r'^article/(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
+                DateDetailView.as_view(model=Article, date_field="pub_date"), 
+                name="date-detail"),
+    )
