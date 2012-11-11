@@ -785,6 +785,16 @@ nonexistent cache key.::
     However, if the backend doesn't natively provide an increment/decrement
     operation, it will be implemented using a two-step retrieve/update.
 
+
+You can close the connection to your cache with ``close()`` if implemented by
+the cache backend.
+
+    >>> cache.close()
+
+.. note::
+
+    For caches that don't implement ``close`` methods it is a no-op.
+
 .. _cache_key_prefixing:
 
 Cache key prefixing
