@@ -6,14 +6,17 @@ import warnings
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
 from django.utils.importlib import import_module
 
+
 class InvalidCacheBackendError(ImproperlyConfigured):
     pass
+
 
 class CacheKeyWarning(DjangoRuntimeWarning):
     pass
 
 # Memcached does not accept keys longer than this.
 MEMCACHE_MAX_KEY_LENGTH = 250
+
 
 def default_key_func(key, key_prefix, version):
     """
@@ -24,6 +27,7 @@ def default_key_func(key, key_prefix, version):
     function with custom key making behavior.
     """
     return ':'.join([key_prefix, str(version), key])
+
 
 def get_key_func(key_func):
     """
@@ -39,6 +43,7 @@ def get_key_func(key_func):
             key_func_module = import_module(key_func_module_path)
             return getattr(key_func_module, key_func_name)
     return default_key_func
+
 
 class BaseCache(object):
     def __init__(self, params):
@@ -221,3 +226,7 @@ class BaseCache(object):
         the new version.
         """
         return self.incr_version(key, -delta, version)
+
+    def close(self, **kwargs):
+        """Close the cache connection"""
+        pass
