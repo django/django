@@ -209,7 +209,7 @@ default version of which is included with Django.
 Rendering a custom comment form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want more control over the look and feel of the comment form, you use use
+If you want more control over the look and feel of the comment form, you may use
 :ttag:`get_comment_form` to get a :doc:`form object </topics/forms/index>` that
 you can use in the template::
 
