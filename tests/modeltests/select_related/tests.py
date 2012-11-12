@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from django.test import TestCase
 
 from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Vehicle, Aircraft, FixedWingAircraft
 
 
 class SelectRelatedTests(TestCase):
@@ -160,3 +161,21 @@ class SelectRelatedTests(TestCase):
             Species.objects.select_related,
             'genus__family__order', depth=4
         )
+
+
+class SelectRelatedWithModelInheritenceTests(TestCase):
+
+    def setUp(self):
+        FixedWingAircraft.objects.create(name="747-400",
+                                         max_altitude_in_feet=45100,
+                                         wingspan_in_feet=211)
+
+    def test_two_subclass_traversels(self):
+        """
+        Test traversing down twice in the hierarchy, which is the same as
+        traversing two reverse OneToOne relationships.
+        """
+        with self.assertNumQueries(1):
+            v =Vehicle.objects.select_related('aircraft__fixedwingaircraft')
+            self.assertEqual(v.get().aircraft.fixedwingaircraft.wingspan_in_feet,
+                             211)
