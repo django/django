@@ -421,7 +421,7 @@ Authentication Views
 
 .. module:: django.contrib.auth.views
 
----TODO intro to all view here
+---TODO intro to all view here - include bits immediately below
 
 .. versionadded:: 1.4
 
@@ -456,9 +456,9 @@ named URL patterns.
       defaults to ``/accounts/profile/``). If login isn't successful, it
       redisplays the login form.
 
-    It's your responsibility to provide the login page html in a template called
-    ``registration/login.html`` by default. This template gets passed four
-    template context variables:
+    It's your responsibility to provide the html for the login template
+    , called ``registration/login.html`` by default. This template gets passed
+    four template context variables:
 
     * ``form``: A :class:`~django.forms.Form` object representing the
       :class:`~django.contrib.auth.forms.AuthenticationForm`.
@@ -522,7 +522,7 @@ named URL patterns.
 
         {% endblock %}
 
-    If you have customized the authentication (see
+    If you have customized authentication (see
     :doc:`Customizing Authentication </topics/auth/customizing>`) you can pass a custom authentication form
     to the login view via the ``authentication_form`` parameter. This form must
     accept a ``request`` keyword argument in its ``__init__`` method, and
@@ -837,8 +837,7 @@ Managing users in the admin
 ===========================
 
 You can also create users using the Django admin site. Assuming you've enabled
-the admin site and hooked it to the URL ``/admin/``, the "Add user" page is at
-``/admin/auth/user/add/``. You should also see a link to "Users" in the "Auth"
+the admin site and hooked it to the URL ``/admin/``. You should see a link to "Users" in the "Auth"
 section of the main admin index page. The "Add user" admin page is different
 than standard admin pages in that it requires you to choose a username and
 password before allowing you to edit the rest of the user's fields.
