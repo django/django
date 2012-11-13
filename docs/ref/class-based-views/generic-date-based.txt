@@ -171,8 +171,9 @@ YearArchiveView
         class ArticleYearArchiveView(YearArchiveView):
             
             queryset = Article.objects.all()
-            date_field="pub_date"
-            make_object_list=True
+            date_field = "pub_date"
+            make_object_list = True
+            allow_future = True
 
     **Example urls.py**
 
@@ -272,8 +273,9 @@ MonthArchiveView
         class ArticleMonthArchiveView(MonthArchiveView):
             
             queryset = Article.objects.all()
-            date_field="pub_date"
-            make_object_list=True
+            date_field = "pub_date"
+            make_object_list = True
+            allow_future = True
 
     **Example urls.py**
 
@@ -293,17 +295,18 @@ MonthArchiveView
         )            
 
     **Example myapp/article_archive_month.html**::
-
-        {% for article in object_list %}         
-            <p>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</p>
-        {% endfor %}
+        <ul>
+            {% for article in object_list %}
+                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+            {% endfor %}
+        </ul>
 
         <p>
-            <a href="{% url 'archive-year-month' previous_month.year previous_month.month %}">
-            {{ previous_month|date:"F Y" }}</a> 
-            {% if next_month %} 
-                <a href="{% url 'archive-year-month' next_month.year next_month.month %}">
-                {{ next_month|date:"F Y" }}</a>
+            {% if previous_month %}
+                Previous Month: {{ previous_month|date:"F Y" }}
+            {% endif %}
+            {% if next_month %}
+                Next Month: {{ next_month|date:"F Y" }}
             {% endif %}
         </p>
 
@@ -364,9 +367,10 @@ WeekArchiveView
         class ArticleWeekArchiveView(WeekArchiveView):
             
             queryset = Article.objects.all()
-            date_field="pub_date"
-            make_object_list=True
-
+            date_field = "pub_date"
+            make_object_list = True
+            week_format = "%W"
+            allow_future = True            
 
     **Example urls.py**
 
@@ -377,19 +381,31 @@ WeekArchiveView
         from myapp.views import WeekArchiveView
 
         urlpatterns = patterns('',
-            # Example: /2012/week/23/
-            url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
-                    WeekArchiveView.as_view(model=Article, date_field="pub_date", 
-                    week_format="%W"), name="archive-week"),
+           # Example: /2012/week/23/
+           url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
+                ArticleWeekArchiveView.as_view(),
+                name="archive_week"),       
         )
 
     **Example myapp/article_archive_week.html**::
 
-        <h1>
-            <a href="{% url 'archive-week' week.year week|date:'W' %}">
-                Week {{ week|date:'W' }}
-            </a>
-        </h1>
+        <h1>Week {{ week|date:'W' }}</h1>
+
+        <ul>
+            {% for article in object_list %}
+                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+            {% endfor %}
+        </ul>
+
+        <p>
+            {% if previous_week %}    
+                Previous Week: {{ previous_week|date:"F Y" }}    
+            {% endif %}
+            {% if previous_week and next_week %}--{% endif %}
+            {% if next_week %}
+                Next week: {{ next_week|date:"F Y" }}
+            {% endif %}
+        </p>
 
     In this example, you are outputting the week number. The default 
     ``week_format`` in the ``WeekArchiveView`` uses  week format ``'%U'`` 
