@@ -295,6 +295,7 @@ MonthArchiveView
         )            
 
     **Example myapp/article_archive_month.html**::
+    
         <ul>
             {% for article in object_list %}
                 <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
@@ -485,10 +486,10 @@ DayArchiveView
         from myapp.models import Article
 
         class ArticleDayArchiveView(DayArchiveView):
-            
             queryset = Article.objects.all()
-            date_field="pub_date"
-            make_object_list=True
+            date_field = "pub_date"
+            make_object_list = True
+            allow_future = True
 
 
     **Example urls.py**
@@ -500,19 +501,31 @@ DayArchiveView
         from myapp.views import DayArchiveView
 
         urlpatterns = patterns('',
-            # Example: /2012/12/10/
+            # Example: /2012/nov/10/
             url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$', 
-                    DayArchiveView.as_view(model=Article, date_field="pub_date"), 
-                    name="archive-day"),
+                    ArticleDayArchiveView.as_view(), 
+                    name="archive_day"),
         )
 
     **Example myapp/article_archive_day.html**::
 
-        <li>
-            <a href="{% url 'archive-day' day.year day.month day.day %}">
-                {{ day }}
-            </a>
-        </li>
+        <h1>{{ day }}</h1>
+
+        <ul>
+            {% for article in object_list %}
+                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+            {% endfor %}
+        </ul>
+
+        <p>
+            {% if previous_day %}    
+                Previous Day: {{ previous_day }}    
+            {% endif %}
+            {% if previous_day and next_day %}--{% endif %}
+            {% if next_day %}
+                Next Day: {{ next_day }}
+            {% endif %}
+        </p>
 
 TodayArchiveView
 ----------------
