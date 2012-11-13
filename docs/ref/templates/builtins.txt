@@ -1559,7 +1559,7 @@ string. This is useful in the rare cases where you need multiple escaping or
 want to apply other filters to the escaped results. Normally, you want to use
 the :tfilter:`escape` filter.
 
-For example, if you want to catch the ``<paragraph>`` HTML elements created by
+For example, if you want to catch the ``<p>`` HTML elements created by
 the :tfilter:`linebreaks` filter::
 
     {% autoescape off %}
