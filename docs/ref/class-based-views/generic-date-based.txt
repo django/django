@@ -159,25 +159,6 @@ YearArchiveView
     * ``week_format``  By default, this is ``'%U'``, which means the week starts 
       on Sunday. Set it to ``'%W'`` if your week starts on Monday.
 
-    **Example urls.py**
-
-    .. code-block:: python
-
-        from django.conf.urls import patterns, url
-
-        from myapp.views import ArticleYearArchiveView
-
-        urlpatterns = patterns('',
-            # Example: /2012/08/
-            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$', 
-                    ArticleMonthArchiveView.as_view(month_format='%m')),
-            # Example: /2012/aug/
-            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/$', 
-                    ArticleMonthArchiveView.as_view(), name="archive-year-month"),
-            url(r'^(?P<year>\d{4})/$', 
-                    ArticleYearArchiveView.as_view(), name="archive-year"),
-        )
-
     **Example views.py**
 
     .. code-block:: python
@@ -191,6 +172,19 @@ YearArchiveView
             queryset = Article.objects.all()
             date_field="pub_date"
             make_object_list=True
+
+    **Example urls.py**
+
+    .. code-block:: python
+
+        from django.conf.urls import patterns, url
+
+        from myapp.views import ArticleYearArchiveView
+
+        urlpatterns = patterns('',
+            url(r'^(?P<year>\d{4})/$', 
+                    ArticleYearArchiveView.as_view(), name="archive-year"),
+        )
 
     **Example myapp/article_archive_year.html**
 
@@ -271,6 +265,37 @@ MonthArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
+    **Example views.py**
+
+    .. code-block:: python
+
+        from django.views.generic.dates import MonthArchiveView
+
+        from myapp.models import Article
+
+        class ArticleMonthArchiveView(MonthArchiveView):
+            
+            queryset = Article.objects.all()
+            date_field="pub_date"
+            make_object_list=True
+
+    **Example urls.py**
+
+    .. code-block:: python
+
+        from django.conf.urls import patterns, url
+
+        from myapp.views import ArticleYearArchiveView
+
+        urlpatterns = patterns('',
+            # Example: /2012/08/
+            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$', 
+                    ArticleMonthArchiveView.as_view(month_format='%m')),
+            # Example: /2012/aug/
+            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/$', 
+                    ArticleMonthArchiveView.as_view(), name="archive-year-month"),
+        )            
+
     **Example myapp/article_archive_month.html**::
 
         {% for article in object_list %}         
@@ -331,6 +356,21 @@ WeekArchiveView
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
+
+    **Example views.py**
+
+    .. code-block:: python
+
+        from django.views.generic.dates import WeekArchiveView
+
+        from myapp.models import Article
+
+        class ArticleWeekArchiveView(WeekArchiveView):
+            
+            queryset = Article.objects.all()
+            date_field="pub_date"
+            make_object_list=True
+
 
     **Example urls.py**
 
@@ -424,6 +464,21 @@ DayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
+    **Example views.py**
+
+    .. code-block:: python
+
+        from django.views.generic.dates import DayArchiveView
+
+        from myapp.models import Article
+
+        class ArticleDayArchiveView(DayArchiveView):
+            
+            queryset = Article.objects.all()
+            date_field="pub_date"
+            make_object_list=True
+
+
     **Example urls.py**
 
     .. code-block:: python
@@ -474,6 +529,20 @@ TodayArchiveView
     **Notes**
 
     * Uses a default template name of ``<model>_archive_today.html``.
+
+    **Example views.py**
+
+    .. code-block:: python
+
+        from django.views.generic.dates import TodayArchiveView
+
+        from myapp.models import Article
+
+        class ArticleTodayArchiveView(TodayArchiveView):
+            
+            queryset = Article.objects.all()
+            date_field="pub_date"
+            make_object_list=True    
 
 
     **Example urls.py**
@@ -540,11 +609,6 @@ DateDetailView
 **Notes**
 
 * Uses a default template name of  ``<app_name>/<model>_detail.html``.
-    
-
-**Example myapp/article_detail.html**::
-    
-    <h1>{{ article.title }}</h1>
 
 
 **Example urls.py**
@@ -561,3 +625,7 @@ DateDetailView
                 DateDetailView.as_view(model=Article, date_field="pub_date"), 
                 name="date-detail"),
     )
+
+**Example myapp/article_detail.html**::
+    
+    <h1>{{ article.title }}</h1>
