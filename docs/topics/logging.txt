@@ -476,7 +476,7 @@ Python logging module.
     sensitive information to be filtered out of error reports -- learn more on
     :ref:`Filtering error reports<filtering-error-reports>`.
 
-.. _django-sentry: http://pypi.python.org/pypi/sentry
+.. _Sentry: http://pypi.python.org/pypi/sentry
 
 
 Filters
