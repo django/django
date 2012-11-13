@@ -470,13 +470,13 @@ Python logging module.
     with names and values of local variables at each level of the stack, plus
     the values of your Django settings. This information is potentially very
     sensitive, and you may not want to send it over email. Consider using
-    something such as `django-sentry`_ to get the best of both worlds -- the
+    something such as `Sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
     information over email. You may also explicitly designate certain
     sensitive information to be filtered out of error reports -- learn more on
     :ref:`Filtering error reports<filtering-error-reports>`.
 
-.. _django-sentry: http://pypi.python.org/pypi/django-sentry
+.. _django-sentry: http://pypi.python.org/pypi/sentry
 
 
 Filters
