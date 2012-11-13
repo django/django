@@ -53,13 +53,15 @@ ArchiveIndexView
 
     **Example views.py**::
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import patterns, url
         from django.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
-        url(r'^article/archive/$', ArchiveIndexView.as_view(
+        urlpatterns = patterns('',
+            url(r'^article/archive/$', ArchiveIndexView.as_view(
                                        model=Article, date_field="pub_date")),
+        )
 
     .. highlightlang:: html+django
 
@@ -161,7 +163,7 @@ YearArchiveView
 
     .. code-block:: python
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import patterns, url
 
         from myapp.views import ArticleYearArchiveView
 
@@ -334,12 +336,12 @@ WeekArchiveView
 
     .. code-block:: python
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import patterns, url
 
         from myapp.views import WeekArchiveView
 
         urlpatterns = patterns('',
-            ...
+            # Example: /2012/week/23/
             url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
                     WeekArchiveView.as_view(model=Article, date_field="pub_date", 
                     week_format="%W"), name="archive-week"),
@@ -426,12 +428,12 @@ DayArchiveView
 
     .. code-block:: python
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import patterns, url
 
         from myapp.views import DayArchiveView
 
         urlpatterns = patterns('',
-            ...
+            # Example: /2012/12/10/
             url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$', 
                     DayArchiveView.as_view(model=Article, date_field="pub_date"), 
                     name="archive-day"),
@@ -478,7 +480,7 @@ TodayArchiveView
 
     .. code-block:: python
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import patterns, url
 
         from myapp.views import TodayArchiveView
 
@@ -549,7 +551,7 @@ DateDetailView
 
 .. code-block:: python
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url
 
     from myapp.views import DateDetailView
 
