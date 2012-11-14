@@ -169,7 +169,6 @@ YearArchiveView
         from myapp.models import Article
 
         class ArticleYearArchiveView(YearArchiveView):
-            
             queryset = Article.objects.all()
             date_field = "pub_date"
             make_object_list = True
@@ -271,7 +270,6 @@ MonthArchiveView
         from myapp.models import Article
 
         class ArticleMonthArchiveView(MonthArchiveView):
-            
             queryset = Article.objects.all()
             date_field = "pub_date"
             make_object_list = True
@@ -283,15 +281,18 @@ MonthArchiveView
 
         from django.conf.urls import patterns, url
 
-        from myapp.views import ArticleYearArchiveView
+        from myapp.views import ArticleMonthArchiveView
 
         urlpatterns = patterns('',
-            # Example: /2012/08/
-            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$', 
-                    ArticleMonthArchiveView.as_view(month_format='%m')),
             # Example: /2012/aug/
             url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/$', 
-                    ArticleMonthArchiveView.as_view(), name="archive-year-month"),
+                ArticleMonthArchiveView.as_view(), 
+                name="archive_month"),
+            # Example: /2012/08/                    
+            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$',
+                ArticleMonthArchiveView.as_view(month_format='%m')
+                name="archive_month_numeric"),
+            ),
         )            
 
     **Example myapp/article_archive_month.html**::
@@ -366,7 +367,6 @@ WeekArchiveView
         from myapp.models import Article
 
         class ArticleWeekArchiveView(WeekArchiveView):
-            
             queryset = Article.objects.all()
             date_field = "pub_date"
             make_object_list = True
@@ -379,7 +379,7 @@ WeekArchiveView
 
         from django.conf.urls import patterns, url
 
-        from myapp.views import WeekArchiveView
+        from myapp.views import ArticleWeekArchiveView
 
         urlpatterns = patterns('',
            # Example: /2012/week/23/
@@ -498,7 +498,7 @@ DayArchiveView
 
         from django.conf.urls import patterns, url
 
-        from myapp.views import DayArchiveView
+        from myapp.views import ArticleDayArchiveView
 
         urlpatterns = patterns('',
             # Example: /2012/nov/10/
@@ -564,10 +564,10 @@ TodayArchiveView
         from myapp.models import Article
 
         class ArticleTodayArchiveView(TodayArchiveView):
-            
             queryset = Article.objects.all()
-            date_field="pub_date"
-            make_object_list=True    
+            date_field = "pub_date"
+            make_object_list = True
+            allow_future = True  
 
 
     **Example urls.py**
@@ -576,13 +576,20 @@ TodayArchiveView
 
         from django.conf.urls import patterns, url
 
-        from myapp.views import TodayArchiveView
+        from myapp.views import ArticleTodayArchiveView
 
         urlpatterns = patterns('',
-            ...
-            url(r'^article/today/$', 
-                    TodayArchiveView.as_view(model=Article, date_field="pub_date")),
+            url(r'^today/$', 
+                    ArticleTodayArchiveView.as_view(),
+                    name="archive_today"),  
         )
+
+    .. admonition:: Where is the example template for TodayArchiveView?
+
+        This view uses by default the same template as the
+        :class:`~DayArchiveView`, which is in the previous example. If you need
+        a different template, set the ``template_name`` attribute to be the name
+        of the new template.
 
 DateDetailView
 --------------
@@ -641,17 +648,15 @@ DateDetailView
 .. code-block:: python
 
     from django.conf.urls import patterns, url
-
-    from myapp.views import DateDetailView
+    from django.views.generic.dates import DateDetailView
 
     urlpatterns = patterns('',
-        ...
-        url(r'^article/(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
+        url(r'^(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
                 DateDetailView.as_view(model=Article, date_field="pub_date"), 
-                name="date-detail"),
+                name="archive_date_detail"),
     )
 
 **Example myapp/article_detail.html**::
     
-    <h1>{{ article.title }}</h1>pwd
+    <h1>{{ object.title }}</h1>
     
