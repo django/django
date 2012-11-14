@@ -445,11 +445,6 @@ live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
-When you’ve done that, create a directory polls in your template directory.
-Within that, create a file called index.html. Note that our
-``loader.get_template('polls/index.html')`` code from above maps to
-[template_directory]/polls/index.html” on the filesystem.
-
 By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
 tell Django where our templates live::
 
