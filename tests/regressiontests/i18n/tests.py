@@ -83,6 +83,10 @@ class TranslationTests(TestCase):
         s4 = ugettext_lazy('Some other string')
         self.assertEqual(False, s == s4)
 
+        if not six.PY3:
+            # On Python 2, gettext_lazy should not transform a bytestring to unicode
+            self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
+
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
         self.assertEqual(six.text_type(s1), "test")
