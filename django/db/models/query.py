@@ -1446,6 +1446,10 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0,
     if fields[pk_idx] == None or fields[pk_idx] == '':
         obj = None
     elif field_names:
+        fields = list(fields)
+        for rel_field, value in parent_data:
+            field_names.append(rel_field.attname)
+            fields.append(value)
         obj = klass(**dict(zip(field_names, fields)))
     else:
         obj = klass(*fields)
