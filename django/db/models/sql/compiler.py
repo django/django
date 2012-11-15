@@ -885,6 +885,8 @@ class SQLInsertCompiler(SQLCompiler):
                 [self.placeholder(field, v) for field, v in izip(fields, val)]
                 for val in values
             ]
+            # Oracle Spatial needs to remove some values due to #10888
+            params = self.connection.ops.modify_insert_params(placeholders, params)
         if self.return_id and self.connection.features.can_return_id_from_insert:
             params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))

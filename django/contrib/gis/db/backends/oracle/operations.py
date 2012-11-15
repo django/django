@@ -9,6 +9,7 @@
 """
 import re
 from decimal import Decimal
+from itertools import izip
 
 from django.db.backends.oracle.base import DatabaseOperations
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
@@ -287,3 +288,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
         return SpatialRefSys
+    
+    def modify_insert_params(self, placeholders, params):
+        """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
+        backend due to #10888
+        """
+        # This code doesn't work for bulk insert cases.
+        assert len(placeholders) == 1
+        return [[param for pholder,param
+                 in izip(placeholders[0], params[0]) if pholder != 'NULL'], ]
