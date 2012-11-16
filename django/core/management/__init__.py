@@ -405,7 +405,7 @@ def setup_environ(settings_mod, original_settings_path=None):
         "you likely need to update your 'manage.py'; "
         "please see the Django 1.4 release notes "
         "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
-        DeprecationWarning)
+        DeprecationWarning, stacklevel=2)
 
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
@@ -461,7 +461,7 @@ def execute_manager(settings_mod, argv=None):
         "you likely need to update your 'manage.py'; "
         "please see the Django 1.4 release notes "
         "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
-        DeprecationWarning)
+        DeprecationWarning, stacklevel=2)
 
     setup_environ(settings_mod)
     utility = ManagementUtility(argv)

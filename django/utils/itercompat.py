@@ -24,10 +24,10 @@ def product(*args, **kwds):
 
 def all(iterable):
     warnings.warn("django.utils.itercompat.all is deprecated; use the native version instead",
-                  DeprecationWarning)
+                  DeprecationWarning, stacklevel=2)
     return builtins.all(iterable)
 
 def any(iterable):
     warnings.warn("django.utils.itercompat.any is deprecated; use the native version instead",
-                  DeprecationWarning)
+                  DeprecationWarning, stacklevel=2)
     return builtins.any(iterable)

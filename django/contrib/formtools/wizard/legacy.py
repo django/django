@@ -39,7 +39,7 @@ class FormWizard(object):
         warnings.warn(
             'Old-style form wizards have been deprecated; use the class-based '
             'views in django.contrib.formtools.wizard.views instead.',
-            DeprecationWarning)
+            DeprecationWarning, stacklevel=2)
 
     def __repr__(self):
         return "step: %d\nform_list: %s\ninitial_data: %s" % (self.step, self.form_list, self.initial)
