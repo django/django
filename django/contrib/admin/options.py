@@ -149,6 +149,14 @@ class BaseModelAdmin(object):
                     include_blank = db_field.blank,
                     blank_choice=[('', _('None'))]
                 )
+
+        # If we've got overrides for the formfield defined, use 'em. **kwargs
+        # passed to formfield_for_dbfield override the defaults.
+        for klass in db_field.__class__.mro():
+            if klass in self.formfield_overrides:
+                kwargs = dict(self.formfield_overrides[klass], **kwargs)
+                return db_field.formfield(**kwargs)
+
         return db_field.formfield(**kwargs)
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
