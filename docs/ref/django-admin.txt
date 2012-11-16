@@ -940,14 +940,19 @@ either the path to a directory with the app template file, or a path to a
 compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
 containing the app template files.
 
-Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
-archives with the app template files, downloading and extracting them on the
-fly.
-
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
 
     django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
+
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the app template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
 
 .. versionadded:: 1.4
 
@@ -1014,6 +1019,15 @@ For example, this would look for a project template in the given directory
 when creating the ``myproject`` project::
 
     django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
+
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the project template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
 
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
