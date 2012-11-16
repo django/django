@@ -18,7 +18,8 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, PhoneNumber, Post, Price,
-    Product, TextFile, Writer, WriterProfile, test_images)
+    Product, TextFile, Writer, WriterProfile, test_images,
+    EmptyKeySource, EmptyKeySink)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -1524,3 +1525,12 @@ class OldFormForXTests(TestCase):
                          ['name'])
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
+
+    def test_foreignkeys_which_use_to_field_and_blank_string_key(self):
+        source_n = EmptyKeySource.objects.create(name="")
+        source_a = EmptyKeySource.objects.create(name="a")
+        source_b = EmptyKeySource.objects.create(name="b")
+
+        sink_n = EmptyKeySink.objects.create(title="Hello", source=source_n)
+
+        self.assertEqual(sink_n.source, source_n)
