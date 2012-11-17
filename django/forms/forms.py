@@ -14,6 +14,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 from django.utils import six
 
 
@@ -151,7 +152,7 @@ class BaseForm(object):
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, force_text(e)) for e in bf_errors])
+                    top_errors.extend([_('(Hidden field %s) %s') % (name, force_text(e)) for e in bf_errors])
                 hidden_fields.append(six.text_type(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
