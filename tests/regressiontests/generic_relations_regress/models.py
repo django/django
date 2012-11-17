@@ -8,6 +8,7 @@ __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',
            'Contact', 'Organization', 'Note')
 
+
 @python_2_unicode_compatible
 class Link(models.Model):
     content_type = models.ForeignKey(ContentType)
@@ -17,6 +18,7 @@ class Link(models.Model):
     def __str__(self):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
 
+
 @python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=100)
@@ -25,10 +27,12 @@ class Place(models.Model):
     def __str__(self):
         return "Place: %s" % self.name
 
+
 @python_2_unicode_compatible
 class Restaurant(Place):
     def __str__(self):
         return "Restaurant: %s" % self.name
+
 
 @python_2_unicode_compatible
 class Address(models.Model):
@@ -43,6 +47,7 @@ class Address(models.Model):
     def __str__(self):
         return '%s %s, %s %s' % (self.street, self.city, self.state, self.zipcode)
 
+
 @python_2_unicode_compatible
 class Person(models.Model):
     account = models.IntegerField(primary_key=True)
@@ -52,23 +57,28 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
+
 class CharLink(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.CharField(max_length=100)
     content_object = generic.GenericForeignKey()
+
 
 class TextLink(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.TextField()
     content_object = generic.GenericForeignKey()
 
+
 class OddRelation1(models.Model):
     name = models.CharField(max_length=100)
     clinks = generic.GenericRelation(CharLink)
 
+
 class OddRelation2(models.Model):
     name = models.CharField(max_length=100)
     tlinks = generic.GenericRelation(TextLink)
+
 
 # models for test_q_object_or:
 class Note(models.Model):
@@ -77,10 +87,27 @@ class Note(models.Model):
     content_object = generic.GenericForeignKey()
     note = models.TextField()
 
+
 class Contact(models.Model):
     notes = generic.GenericRelation(Note)
+
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)
     contacts = models.ManyToManyField(Contact, related_name='organizations')
 
+
+class TaggedItem(models.Model):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+
+class ParentPost(models.Model):
+    title = models.TextField(blank=True)
+    relation = generic.GenericRelation(TaggedItem)
+
+
+class Post(ParentPost):
+    description = models.TextField(blank=True)

@@ -2,7 +2,8 @@ from django.db.models import Q
 from django.test import TestCase
 
 from .models import (Address, Place, Restaurant, Link, CharLink, TextLink,
-    Person, Contact, Note, Organization, OddRelation1, OddRelation2)
+    Person, Contact, Note, Organization, OddRelation1, OddRelation2,
+    TaggedItem, ParentPost, Post)
 
 
 class GenericRelationTests(TestCase):
@@ -72,5 +73,17 @@ class GenericRelationTests(TestCase):
             Q(notes__note__icontains=r'other note'))
         self.assertTrue(org_contact in qs)
 
+    def test_inherited_models_delete(self):
+        """
+        Test that when deleting a class that inherits a GenericRelation,
+        the correct related object is deleted on cascade.
+        """
 
+        p = Post.objects.create(title="This is a title",
+            description="This is a description")
+        t = TaggedItem.objects.create(content_object=p, tag="This is a tag")
 
+        self.assertEqual(list(TaggedItem.objects.all()), [t])
+        self.assertEqual(list(Post.objects.all()), [p])
+        p.delete()
+        self.assertEqual(list(TaggedItem.objects.all()), [])
