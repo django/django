@@ -274,6 +274,12 @@ class UtilTests(unittest.TestCase):
             six.text_type(log_entry).startswith('Deleted ')
         )
 
+        # Make sure custom action_flags works
+        log_entry.action_flag = 4
+        self.assertTrue(
+            six.text_type(log_entry).startswith('LogEntry Object')
+        )
+
     def test_safestring_in_field_label(self):
         # safestring should not be escaped
         class MyForm(forms.Form):
