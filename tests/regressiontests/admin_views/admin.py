@@ -27,7 +27,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, Simple)
+    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple)
 
 
 def callable_year(dt_value):
@@ -592,6 +592,28 @@ def callable_on_unknown(obj):
 class AttributeErrorRaisingAdmin(admin.ModelAdmin):
     list_display = [callable_on_unknown, ]
 
+class MessageTestingAdmin(admin.ModelAdmin):
+    actions = ["message_debug", "message_info", "message_success",
+               "message_warning", "message_error", "message_extra_tags"]
+
+    def message_debug(self, request, selected):
+        self.message_user(request, "Test debug", level="debug")
+
+    def message_info(self, request, selected):
+        self.message_user(request, "Test info", level="info")
+
+    def message_success(self, request, selected):
+        self.message_user(request, "Test success", level="success")
+
+    def message_warning(self, request, selected):
+        self.message_user(request, "Test warning", level="warning")
+
+    def message_error(self, request, selected):
+        self.message_user(request, "Test error", level="error")
+
+    def message_extra_tags(self, request, selected):
+        self.message_user(request, "Test tags", extra_tags="extra_tag")
+
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -667,6 +689,7 @@ site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
+site.register(UserMessenger, MessageTestingAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

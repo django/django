@@ -651,6 +651,10 @@ class UndeletableObject(models.Model):
     """
     name = models.CharField(max_length=255)
 
+class UserMessenger(models.Model):
+    """
+    Dummy class for testing message_user functions on ModelAdmin
+    """
 
 class Simple(models.Model):
     """

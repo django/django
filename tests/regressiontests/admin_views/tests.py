@@ -3697,3 +3697,61 @@ class AdminViewLogoutTest(TestCase):
         self.assertEqual(response.template_name, 'admin/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminUserMessageTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def send_message(self, level):
+        """
+        Helper that sends a post to the dummy test methods and asserts that a
+        message with the level has appeared in the response.
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'message_%s' % level,
+            'index': 0,
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/usermessenger/',
+                                    action_data, follow=True)
+        self.assertContains(response,
+                            '<li class="%s">Test %s</li>' % (level, level),
+                            html=True)
+
+    @override_settings(MESSAGE_LEVEL=10)  # Set to DEBUG for this request
+    def test_message_debug(self):
+        self.send_message('debug')
+
+    def test_message_info(self):
+        self.send_message('info')
+
+    def test_message_success(self):
+        self.send_message('success')
+
+    def test_message_warning(self):
+        self.send_message('warning')
+
+    def test_message_error(self):
+        self.send_message('error')
+
+    def test_message_extra_tags(self):
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'message_extra_tags',
+            'index': 0,
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/usermessenger/',
+                                    action_data, follow=True)
+        self.assertContains(response,
+                            '<li class="extra_tag info">Test tags</li>',
+                            html=True)
