@@ -66,3 +66,27 @@ class Species(models.Model):
     genus = models.ForeignKey(Genus)
     def __str__(self):
         return self.name
+
+
+# Some classes that use model inheritence
+
+@python_2_unicode_compatible
+class Vehicle(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+@python_2_unicode_compatible
+class Aircraft(Vehicle):
+    max_altitude_in_feet = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+@python_2_unicode_compatible
+class FixedWingAircraft(Aircraft):
+    wingspan_in_feet = models.IntegerField()
+
+    def __str__(self):
+        return self.name
