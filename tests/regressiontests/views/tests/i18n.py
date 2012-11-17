@@ -6,10 +6,16 @@ from os import path
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
-from django.utils import six
-from django.utils.translation import override, get_language
+from django.test import LiveServerTestCase, TestCase
+from django.test.utils import override_settings
+from django.utils import six, unittest
+from django.utils.translation import override
 from django.utils.text import javascript_quote
+
+try:
+    from selenium.webdriver.firefox import webdriver as firefox
+except ImportError:
+    firefox = None
 
 from ..urls import locale_dir
 
@@ -152,3 +158,43 @@ class JsI18NTestsMultiPackage(TestCase):
                 response = self.client.get('/views/jsi18n/')
                 self.assertContains(response,
                     javascript_quote('este texto de app3 debe ser traducido'))
+
+
+@unittest.skipUnless(firefox, 'Selenium not installed')
+class JavascriptI18nTests(LiveServerTestCase):
+    urls = 'regressiontests.views.urls'
+
+    @classmethod
+    def setUpClass(cls):
+        cls.selenium = firefox.WebDriver()
+        super(JavascriptI18nTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super(JavascriptI18nTests, cls).tearDownClass()
+
+    @override_settings(LANGUAGE_CODE='de')
+    def test_javascript_gettext(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+
+            elem = self.selenium.find_element_by_id("gettext")
+            self.assertEqual(elem.text, u"Entfernen")
+            elem = self.selenium.find_element_by_id("ngettext_sing")
+            self.assertEqual(elem.text, "1 Element")
+            elem = self.selenium.find_element_by_id("ngettext_plur")
+            self.assertEqual(elem.text, "455 Elemente")
+            elem = self.selenium.find_element_by_id("pgettext")
+            self.assertEqual(elem.text, "Kann")
+            elem = self.selenium.find_element_by_id("npgettext_sing")
+            self.assertEqual(elem.text, "1 Resultat")
+            elem = self.selenium.find_element_by_id("npgettext_plur")
+            self.assertEqual(elem.text, "455 Resultate")
+
+    def test_escaping(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            response = self.client.get('%s%s' % (self.live_server_url, '/jsi18n_admin/'))
+            self.assertContains(response, '\\x04')
