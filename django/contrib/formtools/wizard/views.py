@@ -530,7 +530,7 @@ class WizardView(TemplateView):
                         context.update({'another_var': True})
                     return context
         """
-        context = super(WizardView, self).get_context_data(**kwargs)
+        context = super(WizardView, self).get_context_data(form=form, **kwargs)
         context.update(self.storage.extra_data)
         context['wizard'] = {
             'form': form,
