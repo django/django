@@ -149,6 +149,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(queryset=None)),
     (r'^list/authors/paginated/custom_class/$',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
+    (r'^list/authors/paginated/custom_page_kwarg/$',
+        views.AuthorList.as_view(paginate_by=30, page_kwarg='pagina')),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
 
