@@ -574,6 +574,11 @@ Miscellaneous
   HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
   in your pages.
 
+* The template tags library ``adminmedia``, which only contained the
+  deprecated template tag ``{% admin_media_prefix %}``, was removed.
+  Attempting to load it with ``{% load adminmedia %}`` will fail. If your
+  templates still contain that line you must remove it.
+
 Features deprecated in 1.5
 ==========================
 
