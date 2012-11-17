@@ -44,9 +44,6 @@ def post_comment(request, next=None, using=None):
         if not data.get('email', ''):
             data["email"] = request.user.email
 
-    # Check to see if the POST data overrides the view's next argument.
-    next = data.get("next", next)
-
     # Look up the object we're trying to comment about
     ctype = data.get("content_type")
     object_pk = data.get("object_pk")
@@ -100,7 +97,7 @@ def post_comment(request, next=None, using=None):
             template_list, {
                 "comment": form.data.get("comment", ""),
                 "form": form,
-                "next": next,
+                "next": data.get("next", next),
             },
             RequestContext(request, {})
         )
@@ -131,7 +128,8 @@ def post_comment(request, next=None, using=None):
         request=request
     )
 
-    return next_redirect(data, next, comment_done, c=comment._get_pk_val())
+    return next_redirect(request, fallback=next or 'comments-comment-done',
+        c=comment._get_pk_val())
 
 comment_done = confirmation_view(
     template="comments/posted.html",
