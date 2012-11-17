@@ -652,6 +652,16 @@ class UndeletableObject(models.Model):
     name = models.CharField(max_length=255)
 
 
+class Choice(models.Model):
+    choice = models.CharField(max_length=1,
+                              blank=True,
+                              null=True,
+                              choices=(
+                                  ('y','Yes'),
+                                  ('n','No'),
+                                  (None, 'No opinion')
+                              ))
+
 class Simple(models.Model):
     """
     Simple model with nothing on it for use in testing

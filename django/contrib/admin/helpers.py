@@ -186,9 +186,7 @@ class AdminReadonlyField(object):
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:
-                if value is None:
-                    result_repr = EMPTY_CHANGELIST_VALUE
-                elif isinstance(f.rel, ManyToManyRel):
+                if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
