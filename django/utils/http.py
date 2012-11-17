@@ -224,3 +224,15 @@ else:
         """
         p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
         return p1[0:2] == p2[0:2]
+
+def is_safe_url(url, host=None):
+    """
+    Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
+    a different host).
+
+    Always returns ``False`` on an empty url.
+    """
+    if not url:
+        return False
+    netloc = urlparse.urlparse(url)[1]
+    return not netloc or netloc == host

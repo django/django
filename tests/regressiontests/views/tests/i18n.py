@@ -16,12 +16,27 @@ class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
 
     def test_setlang(self):
-        """The set_language view can be used to change the session language"""
+        """
+        The set_language view can be used to change the session language.
+
+        The user is redirected to the 'next' argument if provided.
+        """
         for lang_code, lang_name in settings.LANGUAGES:
             post_data = dict(language=lang_code, next='/views/')
             response = self.client.post('/views/i18n/setlang/', data=post_data)
             self.assertRedirects(response, 'http://testserver/views/')
             self.assertEqual(self.client.session['django_language'], lang_code)
+
+    def test_setlang_unsafe_next(self):
+        """
+        The set_language view only redirects to the 'next' argument if it is
+        "safe".
+        """
+        lang_code, lang_name = settings.LANGUAGES[0]
+        post_data = dict(language=lang_code, next='//unsafe/redirection/')
+        response = self.client.post('/views/i18n/setlang/', data=post_data)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        self.assertEqual(self.client.session['django_language'], lang_code)
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""

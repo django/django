@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int
+from django.utils.http import base36_to_int, is_safe_url
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -34,18 +34,11 @@ def login(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
-            netloc = urlparse.urlparse(redirect_to)[1]
-
-            # Use default setting if redirect_to is empty
-            if not redirect_to:
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
                 redirect_to = settings.LOGIN_REDIRECT_URL
 
-            # Heavier security check -- don't allow redirection to a different
-            # host.
-            elif netloc and netloc != request.get_host():
-                redirect_to = settings.LOGIN_REDIRECT_URL
-
-            # Okay, security checks complete. Log the user in.
+            # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
             if request.session.test_cookie_worked():
@@ -78,27 +71,27 @@ def logout(request, next_page=None,
     Logs out the user and displays 'You are logged out' message.
     """
     auth_logout(request)
-    redirect_to = request.REQUEST.get(redirect_field_name, '')
-    if redirect_to:
-        netloc = urlparse.urlparse(redirect_to)[1]
-        # Security check -- don't allow redirection to a different host.
-        if not (netloc and netloc != request.get_host()):
-            return HttpResponseRedirect(redirect_to)
 
-    if next_page is None:
-        current_site = get_current_site(request)
-        context = {
-            'site': current_site,
-            'site_name': current_site.name,
-            'title': _('Logged out')
-        }
-        if extra_context is not None:
-            context.update(extra_context)
-        return TemplateResponse(request, template_name, context,
-                                current_app=current_app)
-    else:
+    if redirect_field_name in request.REQUEST:
+        next_page = request.REQUEST[redirect_field_name]
+        # Security check -- don't allow redirection to a different host.
+        if not is_safe_url(url=next_page, host=request.get_host()):
+            next_page = request.path
+
+    if next_page:
         # Redirect to this page until the session has been cleared.
-        return HttpResponseRedirect(next_page or request.path)
+        return HttpResponseRedirect(next_page)
+
+    current_site = get_current_site(request)
+    context = {
+        'site': current_site,
+        'site_name': current_site.name,
+        'title': _('Logged out')
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+        current_app=current_app)
 
 def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
     """

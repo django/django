@@ -222,6 +222,13 @@ class CommentViewTests(CommentTestCase):
         match = re.search(r"^http://testserver/somewhere/else/\?c=\d+$", location)
         self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
 
+        data["next"] = "http://badserver/somewhere/else/"
+        data["comment"] = "This is another comment with an unsafe next url"
+        response = self.client.post("/post/", data)
+        location = response["Location"]
+        match = post_redirect_re.match(location)
+        self.assertTrue(match != None, "Unsafe redirection to: %s" % location)
+
     def testCommentDoneView(self):
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
