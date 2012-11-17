@@ -127,8 +127,10 @@ For example::
     def my_view(request):
         if settings.SITE_ID == 3:
             # Do something.
+            pass
         else:
             # Do something else.
+            pass
 
 Of course, it's ugly to hard-code the site IDs like that. This sort of
 hard-coding is best for hackish fixes that you need done quickly. The
@@ -141,11 +143,13 @@ domain::
         current_site = get_current_site(request)
         if current_site.domain == 'foo.com':
             # Do something
+            pass
         else:
             # Do something else.
+            pass
 
-This has also the advantage of checking if the sites framework is installed, and
-return a :class:`RequestSite` instance if it is not.
+This has also the advantage of checking if the sites framework is installed,
+and return a :class:`RequestSite` instance if it is not.
 
 If you don't have access to the request object, you can use the
 ``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
@@ -158,8 +162,10 @@ the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
         current_site = Site.objects.get_current()
         if current_site.domain == 'foo.com':
             # Do something
+            pass
         else:
             # Do something else.
+            pass
 
 Getting the current domain for display
 --------------------------------------
@@ -200,8 +206,8 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
-different template directories (:setting:`TEMPLATE_DIRS`), you could simply farm out
-to the template system like so::
+different template directories (:setting:`TEMPLATE_DIRS`), you could simply
+farm out to the template system like so::
 
     from django.core.mail import send_mail
     from django.template import loader, Context
@@ -216,9 +222,9 @@ to the template system like so::
 
         # ...
 
-In this case, you'd have to create :file:`subject.txt` and :file:`message.txt` template
-files for both the LJWorld.com and Lawrence.com template directories. That
-gives you more flexibility, but it's also more complex.
+In this case, you'd have to create :file:`subject.txt` and :file:`message.txt`
+template files for both the LJWorld.com and Lawrence.com template directories.
+That gives you more flexibility, but it's also more complex.
 
 It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
 objects as much as possible, to remove unneeded complexity and redundancy.
@@ -239,6 +245,15 @@ To do this, you can use the sites framework. A simple example::
     'example.com'
     >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
     'http://example.com/mymodel/objects/3/'
+
+
+Default site and ``syncdb``
+===========================
+
+``django.contrib.sites`` registers a
+:data:`~django.db.models.signals.post_syncdb` signal handler which creates a
+default site named ``example.com`` with the domain ``example.com``. For
+example, this site will be created after Django creates the test database.
 
 Caching the current ``Site`` object
 ===================================
