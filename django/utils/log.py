@@ -62,6 +62,9 @@ DEFAULT_LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'py.warnings': {
+            'handlers': ['console'],
+        },
     }
 }
 
