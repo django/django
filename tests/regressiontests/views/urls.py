@@ -32,6 +32,11 @@ js_info_dict_multi_packages2 = {
     'packages': ('regressiontests.views.app3', 'regressiontests.views.app4'),
 }
 
+js_info_dict_admin = {
+    'domain': 'djangojs',
+    'packages': ('django.contrib.admin', 'regressiontests.views'),
+}
+
 urlpatterns = patterns('',
     (r'^$', views.index_page),
 
@@ -51,6 +56,8 @@ urlpatterns = patterns('',
     (r'^jsi18n_english_translation/$', 'django.views.i18n.javascript_catalog', js_info_dict_english_translation),
     (r'^jsi18n_multi_packages1/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages1),
     (r'^jsi18n_multi_packages2/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages2),
+    (r'^jsi18n_admin/$', 'django.views.i18n.javascript_catalog', js_info_dict_admin),
+    (r'^jsi18n_template/$', views.jsi18n),
 
     # Static views
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),

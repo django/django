@@ -72,6 +72,10 @@ class WizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
         self.assertEqual(response.context.get('another_var', None), True)
 
+        # ticket #19025: `form` should be included in context
+        form = response.context_data['wizard']['form']
+        self.assertEqual(response.context_data['form'], form)            
+
     def test_form_finish(self):
         response = self.client.get(self.wizard_url)
         self.assertEqual(response.status_code, 200)

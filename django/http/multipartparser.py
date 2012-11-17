@@ -199,6 +199,12 @@ class MultiPartParser(object):
                         for chunk in field_stream:
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
+                                # We should always read base64 streams by multiple of 4
+                                over_bytes = len(chunk) % 4
+                                if over_bytes:
+                                    over_chunk = field_stream.read(4 - over_bytes)
+                                    chunk += over_chunk
+
                                 try:
                                     chunk = base64.b64decode(chunk)
                                 except Exception as e:
