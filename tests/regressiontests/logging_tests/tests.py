@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import copy
 import logging
+import sys
 import warnings
 
 from django.conf import compat_patch_logging_config, LazySettings
@@ -10,9 +11,11 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.log import CallbackFilter, RequireDebugFalse
 from django.utils.six import StringIO
+from django.utils.unittest import skipUnless
 
 from ..admin_scripts.tests import AdminScriptTestCase
 
+PYVERS = sys.version_info[:2]
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {
@@ -130,6 +133,32 @@ class DefaultLoggingTest(TestCase):
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+
+@skipUnless(PYVERS > (2,6), "warnings captured only in Python >= 2.7")
+class WarningLoggerTests(TestCase):
+    """
+    Tests that warnings output for DeprecationWarnings is enabled
+    and captured to the logging system
+    """
+    def setUp(self):
+        self.logger = logging.getLogger('py.warnings')
+        self.old_stream = self.logger.handlers[0].stream
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream
+
+    @override_settings(DEBUG=True)
+    def test_warnings_capture(self):
+        output = StringIO()
+        self.logger.handlers[0].stream = output
+        warnings.warn('Foo Deprecated', DeprecationWarning)
+        self.assertTrue('Foo Deprecated' in output.getvalue())
+
+    def test_warnings_capture_debug_false(self):
+        output = StringIO()
+        self.logger.handlers[0].stream = output
+        warnings.warn('Foo Deprecated', DeprecationWarning)
+        self.assertFalse('Foo Deprecated' in output.getvalue())
 
 
 class CallbackFilterTest(TestCase):

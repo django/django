@@ -306,6 +306,13 @@ Django 1.5 also includes several smaller improvements worth noting:
   :attr:`~django.db.models.Options.index_together` documentation for more
   information.
 
+* During Django's logging configuration verbose Deprecation warnings are
+  enabled and warnings are captured into the logging system. Logged warnings
+  are routed through the ``console`` logging handler, which by default requires
+  :setting:`DEBUG` to be True for output to be generated. The result is that
+  DeprecationWarnings should be printed to the console in development
+  environments the way they have been in Python versions < 2.7.
+
 Backwards incompatible changes in 1.5
 =====================================
 
