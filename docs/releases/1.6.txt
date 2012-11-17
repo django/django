@@ -17,6 +17,12 @@ deprecation process for some features`_.
 What's new in Django 1.6
 ========================
 
+Minor features
+~~~~~~~~~~~~~~
+
+* Authentication backends can raise ``PermissionDenied`` to immediately fail
+  the authentication chain.
+
 Backwards incompatible changes in 1.6
 =====================================
 

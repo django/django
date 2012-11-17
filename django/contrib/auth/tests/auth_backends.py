@@ -6,7 +6,8 @@ from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.custom_user import ExtensionUser
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.contrib.auth import authenticate
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -323,3 +324,37 @@ class InActiveUserBackendTest(TestCase):
     def test_has_module_perms(self):
         self.assertEqual(self.user1.has_module_perms("app1"), False)
         self.assertEqual(self.user1.has_module_perms("app2"), False)
+
+
+class PermissionDeniedBackend(object):
+    """
+    Always raises PermissionDenied.
+    """
+    supports_object_permissions = True
+    supports_anonymous_user = True
+    supports_inactive_user = True
+
+    def authenticate(self, username=None, password=None):
+        raise PermissionDenied
+
+
+class PermissionDeniedBackendTest(TestCase):
+    """
+    Tests that other backends are not checked once a backend raises PermissionDenied
+    """
+    backend = 'django.contrib.auth.tests.auth_backends.PermissionDeniedBackend'
+
+    def setUp(self):
+        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        self.user1.save()
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ) +
+            tuple(settings.AUTHENTICATION_BACKENDS))
+    def test_permission_denied(self):
+        "user is not authenticated after a backend raises permission denied #2550"
+        self.assertEqual(authenticate(username='test', password='test'), None)
+
+    @override_settings(AUTHENTICATION_BACKENDS=tuple(
+            settings.AUTHENTICATION_BACKENDS) + (backend, ))
+    def test_authenticates(self):
+        self.assertEqual(authenticate(username='test', password='test'), self.user1)

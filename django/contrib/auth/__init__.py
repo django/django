@@ -1,6 +1,6 @@
 import re
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -60,6 +60,9 @@ def authenticate(**credentials):
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
+        except PermissionDenied:
+            # This backend says to stop in our tracks - this user should not be allowed in at all.
+            return None
         if user is None:
             continue
         # Annotate the user object with the path of the backend.

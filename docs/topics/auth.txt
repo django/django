@@ -2391,6 +2391,12 @@ processing at the first positive match.
     you need to force users to re-authenticate using different methods. A simple
     way to do that is simply to execute ``Session.objects.all().delete()``.
 
+.. versionadded:: 1.6
+
+If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+exception, authentication will immediately fail. Django won't check the
+backends that follow.
+
 Writing an authentication backend
 ---------------------------------
 
