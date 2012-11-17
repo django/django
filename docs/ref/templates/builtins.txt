@@ -1035,6 +1035,10 @@ This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
 
+.. warning::
+
+    Don't forget to put quotes around the url pattern name.
+
 .. templatetag:: verbatim
 
 verbatim
