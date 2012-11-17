@@ -313,6 +313,11 @@ Django 1.5 also includes several smaller improvements worth noting:
   DeprecationWarnings should be printed to the console in development
   environments the way they have been in Python versions < 2.7.
 
+* The API for :meth:`django.contrib.admin.ModelAdmin.message_user` method has
+  been modified to accept additional arguments adding capabilities similar to
+  :func:`django.contrib.messages.add_message`. This is useful for generating
+  error messages from admin actions.
+
 Backwards incompatible changes in 1.5
 =====================================
 
