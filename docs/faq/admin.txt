@@ -10,8 +10,8 @@ things:
 
 * Set the :setting:`SESSION_COOKIE_DOMAIN` setting in your admin config
   file to match your domain. For example, if you're going to
-  "http://www.example.com/admin/" in your browser, in
-  "myproject.settings" you should set ``SESSION_COOKIE_DOMAIN = 'www.example.com'``.
+  "http://www.example.com/admin/" in your browser, in "myproject.settings" you
+  should set :setting:`SESSION_COOKIE_DOMAIN` = 'www.example.com'.
 
 * Some browsers (Firefox?) don't like to accept cookies from domains that
   don't have dots in them. If you're running the admin site on "localhost"
@@ -23,8 +23,9 @@ I can't log in. When I enter a valid username and password, it brings up the log
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 If you're sure your username and password are correct, make sure your user
-account has ``is_active`` and ``is_staff`` set to True. The admin site only
-allows access to users with those two fields both set to True.
+account has :attr:`~django.contrib.auth.models.User.is_active` and
+:attr:`~django.contrib.auth.models.User.is_staff` set to True. The admin site
+only allows access to users with those two fields both set to True.
 
 How can I prevent the cache middleware from caching the admin site?
 -------------------------------------------------------------------
@@ -64,9 +65,10 @@ My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 Django won't bother displaying the filter for a ``ManyToManyField`` if there
 are fewer than two related objects.
 
-For example, if your ``list_filter`` includes ``sites``, and there's only one
-site in your database, it won't display a "Site" filter. In that case,
-filtering by site would be meaningless.
+For example, if your :attr:`~django.contrib.admin.ModelAdmin.list_filter`
+includes :doc:`sites </ref/contrib/sites>`, and there's only one site in your
+database, it won't display a "Site" filter. In that case, filtering by site
+would be meaningless.
 
 Some objects aren't appearing in the admin.
 -------------------------------------------
@@ -85,9 +87,10 @@ How can I customize the functionality of the admin interface?
 
 You've got several options. If you want to piggyback on top of an add/change
 form that Django automatically generates, you can attach arbitrary JavaScript
-modules to the page via the model's ``class Admin`` ``js`` parameter. That
-parameter is a list of URLs, as strings, pointing to JavaScript modules that
-will be included within the admin form via a ``<script>`` tag.
+modules to the page via the model's class Admin :ref:`js parameter
+<modeladmin-media-definitions>`. That parameter is a list of URLs, as strings,
+pointing to JavaScript modules that will be included within the admin form via
+a ``<script>`` tag.
 
 If you want more flexibility than simply tweaking the auto-generated forms,
 feel free to write custom views for the admin. The admin is powered by Django

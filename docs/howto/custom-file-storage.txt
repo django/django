@@ -27,7 +27,7 @@ You'll need to follow these steps:
                     option = settings.CUSTOM_STORAGE_OPTIONS
                 ...
 
-#. Your storage class must implement the :meth:`_open()` and :meth:`_save()
+#. Your storage class must implement the :meth:`_open()` and :meth:`_save()`
    methods, along with any other methods appropriate to your storage class. See
    below for more on these methods.
 
