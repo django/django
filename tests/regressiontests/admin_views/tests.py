@@ -3149,6 +3149,10 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, "Very awesome.")
         self.assertContains(response, "Unkown coolness.")
         self.assertContains(response, "foo")
+
+        # Checks that multiline text in a readonly field gets <br /> tags
+        self.assertContains(response, "Multiline<br />test<br />string")
+
         self.assertContains(response,
             formats.localize(datetime.date.today() - datetime.timedelta(days=7))
         )

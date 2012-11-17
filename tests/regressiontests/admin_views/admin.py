@@ -388,7 +388,10 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
-    readonly_fields = ('posted', 'awesomeness_level', 'coolness', 'value', lambda obj: "foo")
+    readonly_fields = (
+        'posted', 'awesomeness_level', 'coolness', 'value', 'multiline',
+        lambda obj: "foo"
+    )
 
     inlines = [
         LinkInline
@@ -402,6 +405,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def value(self, instance):
         return 1000
+
+    def multiline(self, instance):
+        return "Multiline\ntest\nstring"
+
     value.short_description = 'Value in $US'
 
 
