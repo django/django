@@ -267,6 +267,12 @@ Forms
   :func:`~django.forms.formsets.formset_factory` to allow validating
   a minimum number of submitted forms.
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+* The :attr:`django.middleware.locale.LocaleMiddleware.response_redirect_class`
+  attribute allows you to customize the redirects issued by the middleware.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
