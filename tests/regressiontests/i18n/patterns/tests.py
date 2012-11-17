@@ -8,7 +8,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.template import Template, Context
 from django.utils import translation
+from django.middleware.locale import LocaleMiddleware
+from django.http import HttpResponsePermanentRedirect
 
+class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
+    redirect_class = HttpResponsePermanentRedirect
 
 @override_settings(
     USE_I18N=True,
@@ -169,7 +173,6 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
 
-
 class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     """
     Tests the redirect when the requested URL doesn't end with a slash
@@ -185,6 +188,17 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
         self.assertIn(('http://testserver/en/account/register/', 301), response.redirect_chain)
         self.assertRedirects(response, '/en/account/register/', 302)
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            'regressiontests.i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
+            'django.middleware.common.CommonMiddleware',
+        ),
+    )
+    def test_custom_redirect_class(self):
+        response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en', follow=True)
+        # target status code of 301 because of CommonMiddleware redirecting
+        self.assertIn(('http://testserver/en/account/register/', 301), response.redirect_chain)
+        self.assertRedirects(response, '/en/account/register/', 301)
 
 class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
     """
