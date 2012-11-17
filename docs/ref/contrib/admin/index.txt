@@ -1377,6 +1377,8 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the
 :doc:`TemplateResponse documentation </ref/template-response>`.
 
+.. _modeladmin-media-definitions:
+
 ``ModelAdmin`` media definitions
 --------------------------------
 
