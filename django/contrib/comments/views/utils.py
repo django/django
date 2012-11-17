@@ -4,14 +4,15 @@ A few bits of helper functions for comment views.
 
 import urllib
 import textwrap
-from django.http import HttpResponseRedirect
 from django.core import urlresolvers
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import comments
+from django.utils.http import is_safe_url
 
-def next_redirect(data, default, default_view, **get_kwargs):
+def next_redirect(request, default, default_view, **get_kwargs):
     """
     Handle the "where should I go next?" part of comment views.
 
@@ -21,9 +22,10 @@ def next_redirect(data, default, default_view, **get_kwargs):
 
     Returns an ``HttpResponseRedirect``.
     """
-    next = data.get("next", default)
-    if next is None:
+    next = request.POST.get('next', default)
+    if not is_safe_url(url=next, host=request.get_host()):
         next = urlresolvers.reverse(default_view)
+
     if get_kwargs:
         if '#' in next:
             tmp = next.rsplit('#', 1)
