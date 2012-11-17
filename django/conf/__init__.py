@@ -110,9 +110,6 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        elif name == "ADMIN_MEDIA_PREFIX":
-            warnings.warn("The ADMIN_MEDIA_PREFIX setting has been removed; "
-                          "use STATIC_URL instead.", DeprecationWarning)
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
