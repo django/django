@@ -9,6 +9,7 @@ from django.utils.text import javascript_quote
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
+from django.utils.http import is_safe_url
 from django.utils import six
 
 def set_language(request):
@@ -22,11 +23,11 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.REQUEST.get('next', None)
-    if not next:
-        next = request.META.get('HTTP_REFERER', None)
-    if not next:
-        next = '/'
+    next = request.REQUEST.get('next')
+    if not is_safe_url(url=next, host=request.get_host()):
+        next = request.META.get('HTTP_REFERER')
+        if not is_safe_url(url=next, host=request.get_host()):
+            next = '/'
     response = http.HttpResponseRedirect(next)
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
