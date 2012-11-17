@@ -181,7 +181,7 @@ class JavascriptI18nTests(LiveServerTestCase):
             self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
 
             elem = self.selenium.find_element_by_id("gettext")
-            self.assertEqual(elem.text, u"Entfernen")
+            self.assertEqual(elem.text, "Entfernen")
             elem = self.selenium.find_element_by_id("ngettext_sing")
             self.assertEqual(elem.text, "1 Element")
             elem = self.selenium.find_element_by_id("ngettext_plur")
