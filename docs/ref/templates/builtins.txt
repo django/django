@@ -1935,9 +1935,9 @@ for documentation of Python string formatting
 
 For example::
 
-    {{ value|stringformat:"s" }}
+    {{ value|stringformat:"E" }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is a slug"``.
+If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 .. templatefilter:: striptags
 
