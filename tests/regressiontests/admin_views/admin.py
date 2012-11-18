@@ -27,7 +27,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, Simple)
+    RelatedPrepopulated, UndeletableObject, Simple, Choice)
 
 
 def callable_year(dt_value):
@@ -667,6 +667,13 @@ site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
+
+# Render readonly None fields, via choice, in admin
+class ChoiceList(admin.ModelAdmin):
+    list_display = ['choice']
+    readonly_fields = ['choice']
+    fields = ['choice']
+site.register(Choice, ChoiceList)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

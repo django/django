@@ -1,0 +1,9 @@
+[
+{
+    "pk": 1,
+    "model": "admin_views.choice",
+    "fields": {
+        "choice": null
+    }
+}
+]

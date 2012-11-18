@@ -46,7 +46,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject)
+    Simple, UndeletableObject, Choice)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3003,7 +3003,7 @@ class PrePopulatedTest(TestCase):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
-    urls = "regressiontests.admin_views.urls"
+    urls = 'regressiontests.admin_views.urls'
     fixtures = ['admin-views-users.xml']
 
     def test_basic(self):
@@ -3128,7 +3128,7 @@ class SeleniumPrePopulatedIETests(SeleniumPrePopulatedFirefoxTests):
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"
-    fixtures = ['admin-views-users.xml']
+    fixtures = ['admin-views-users.xml','readonly-render-none-fields.json']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -3201,6 +3201,11 @@ class ReadonlyTest(TestCase):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
         self.assertEqual(response.status_code, 404)
+
+    def test_change_form_renders_correct_null_choice_value(self):
+        response = self.client.get('/test_admin/admin/admin_views/choice/1/')
+        self.assertContains(response, '<p>No opinion</p>', html=True)
+        self.assertNotContains(response, '<p>(None)</p>')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
