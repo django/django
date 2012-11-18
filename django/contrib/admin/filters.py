@@ -102,7 +102,7 @@ class SimpleListFilter(ListFilter):
         }
         for lookup, title in self.lookup_choices:
             yield {
-                'selected': self.value() == lookup,
+                'selected': self.value() == str(lookup),
                 'query_string': cl.get_query_string({
                     self.parameter_name: lookup,
                 }, []),
