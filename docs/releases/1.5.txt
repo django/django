@@ -47,7 +47,7 @@ Other notable new features in Django 1.5 include:
 * ... and more; `see below <#what-s-new-in-django-1-5>`_.
 
 Wherever possible we try to introduce new features in a backwards-compatible
-manner per :doc:`our API stability policy </misc/api-stability>` policy.
+manner per :doc:`our API stability policy </misc/api-stability>`.
 However, as with previous releases, Django 1.5 ships with some minor
 `backwards incompatible changes`_; people upgrading from previous versions
 of Django should read that list carefully.
