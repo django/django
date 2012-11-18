@@ -678,7 +678,7 @@ have ``null=True``.
 Usually, using ``select_related()`` can vastly improve performance because your
 app can avoid many database calls. However, there are times you are only
 interested in specific related models, or have deeply nested sets of
-relationships, and in these cases ``select_related()`` can can be optimized by
+relationships, and in these cases ``select_related()`` can be optimized by
 explicitly passing the related field names you are interested in. Only
 the specified relations will be followed.
 
