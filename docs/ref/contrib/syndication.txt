@@ -53,6 +53,7 @@ This simple example, taken from `chicagocrime.org`_, describes a feed of the
 latest five news items::
 
     from django.contrib.syndication.views import Feed
+    from django.core.urlresolvers import reverse
     from chicagocrime.models import NewsItem
 
     class LatestEntriesFeed(Feed):
@@ -68,6 +69,10 @@ latest five news items::
 
         def item_description(self, item):
             return item.description
+
+        # item_link is only needed if NewsItem has no get_absolute_url method.
+        def item_link(self, item):
+            return reverse('news-item', args=[item.pk])
 
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
