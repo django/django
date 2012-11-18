@@ -3697,3 +3697,23 @@ class AdminViewLogoutTest(TestCase):
         self.assertEqual(response.template_name, 'admin/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class TestIndividualIds(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_app_id_present(self):
+        response = self.client.get("/test_admin/admin/")
+        self.assertContains(response, '<div id="app-Admin_Views" class="module">')
+
+    def test_model_ids_present(self):
+        response = self.client.get("/test_admin/admin/")
+        self.assertContains(response, '<tr id="app-Admin_Views-Actor">')
+        self.assertContains(response, '<tr id="app-Admin_Views-Album">')
