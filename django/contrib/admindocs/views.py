@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
 from django.shortcuts import render_to_response
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist, PermissionDenied
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
@@ -169,7 +169,10 @@ def view_detail(request, view):
 def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    m_list = [m._meta for m in models.get_models()]
+    m_list = []
+    for m in models.get_models():
+        if request.user.has_module_perms(m._meta.app_label):
+            m_list.append(m._meta)
     return render_to_response('admin_doc/model_index.html', {
         'root_path': urlresolvers.reverse('admin:index'),
         'models': m_list
@@ -177,6 +180,8 @@ def model_index(request):
 
 @staff_member_required
 def model_detail(request, app_label, model_name):
+    if not request.user.has_module_perms(app_label):
+        raise PermissionDenied
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
 
