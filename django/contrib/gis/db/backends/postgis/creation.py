@@ -12,14 +12,12 @@ class PostGISCreation(DatabaseCreation):
 
     @cached_property
     def template_postgis(self):
+        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', ('template_postgis',))
         cursor = self.connection.cursor()
-        cursor.execute('SELECT datname FROM pg_database;')
-        db_names = [row[0] for row in cursor.fetchall()]
-        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-        if template_postgis in db_names:
+        cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis))
+        if cursor.fetchone():
             return template_postgis
-        else:
-            return None
+        return None
 
     def sql_indexes_for_field(self, model, f, style):
         "Return any spatial index creation SQL for the field."
