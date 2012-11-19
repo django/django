@@ -25,15 +25,26 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
-        # Build a key for this fragment and all vary-on's.
-        key = ':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on])
-        args = hashlib.md5(force_bytes(key))
-        cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
-        value = cache.get(cache_key)
+        # Build a unicode key for this fragment and all vary-on's.
+        cache_key = get_cache_key(self.fragment_name, [resolve_variable(var, context) for var in self.vary_on])
+        value = cache.get(cache_key)    
         if value is None:
             value = self.nodelist.render(context)
             cache.set(cache_key, value, expire_time)
         return value
+
+def get_cache_key(fragment_name, variables):
+    """
+    Build a templatetags cache key.
+
+    Usage::
+    
+        from django.templatetags.cache import get_cache_key
+        cache_key = get_cache_key('my_template_tag_cache_name', (123,))
+
+    """
+    args = hashlib.md5(force_bytes(':'.join([urlquote(var) for var in variables])))
+    return 'template.cache.%s.%s' % (fragment_name, args.hexdigest())
 
 @register.tag('cache')
 def do_cache(parser, token):
