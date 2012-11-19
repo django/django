@@ -77,6 +77,21 @@ class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
     parameter_name = 'decade__isnull' # Ends with '__isnull"
 
 
+class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
+    title = 'department'
+    parameter_name = 'department'
+
+    def lookups(self, request, model_admin):
+        return set([
+            (employee.department.id,  # Intentionally not a string (Refs #19318)
+             employee.department.code)
+            for employee in model_admin.queryset(request).all()
+        ])
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(department__id=self.value())
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
@@ -116,6 +131,8 @@ class EmployeeAdmin(ModelAdmin):
     list_display = ['name', 'department']
     list_filter = ['department']
 
+class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
+    list_filter = [DepartmentListFilterLookupWithNonStringValue, ]
 
 class ListFiltersTests(TestCase):
 
@@ -138,6 +155,15 @@ class ListFiltersTests(TestCase):
         self.gipsy_book = Book.objects.create(title='Gipsy guitar for dummies', year=2002, is_best_seller=True, date_registered=self.one_week_ago)
         self.gipsy_book.contributors = [self.bob, self.lisa]
         self.gipsy_book.save()
+
+        # Departments
+        self.dev = Department.objects.create(code='DEV', description='Development')
+        self.design = Department.objects.create(code='DSN', description='Design')
+
+        # Employees
+        self.john = Employee.objects.create(name='John Blue', department=self.dev)
+        self.jack = Employee.objects.create(name='Jack Red', department=self.design)
+
 
     def get_changelist(self, request, model, modeladmin):
         return ChangeList(request, model, modeladmin.list_display, modeladmin.list_display_links,
@@ -637,6 +663,29 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?decade__isnull=the+90s')
 
+    def test_lookup_with_non_string_value(self):
+        """
+        Ensure choices are set the selected class when using
+        non-string values for lookups in SimpleListFilters
+        Refs #19318
+        """
+
+        modeladmin = DepartmentFilterEmployeeAdmin(Employee, site)
+        request = self.request_factory.get('/', {'department': '1'})
+        changelist = self.get_changelist(request, Employee, modeladmin)
+
+        queryset = changelist.get_query_set(request)
+
+        self.assertEqual(list(queryset), [self.john])
+
+        filterspec = changelist.get_filters(request)[0][-1]
+        self.assertEqual(force_unicode(filterspec.title), u'department')
+        choices = list(filterspec.choices(changelist))
+
+        self.assertEqual(choices[2]['display'], u'DEV')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?department=1')
+
     def test_fk_with_to_field(self):
         """
         Ensure that a filter on a FK respects the FK's to_field attribute.
@@ -644,17 +693,12 @@ class ListFiltersTests(TestCase):
         """
         modeladmin = EmployeeAdmin(Employee, site)
 
-        dev = Department.objects.create(code='DEV', description='Development')
-        design = Department.objects.create(code='DSN', description='Design')
-        john = Employee.objects.create(name='John Blue', department=dev)
-        jack = Employee.objects.create(name='Jack Red', department=design)
-
         request = self.request_factory.get('/', {})
         changelist = self.get_changelist(request, Employee, modeladmin)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_query_set(request)
-        self.assertEqual(list(queryset), [jack, john])
+        self.assertEqual(list(queryset), [self.jack, self.john])
 
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(force_unicode(filterspec.title), u'department')
@@ -679,7 +723,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_query_set(request)
-        self.assertEqual(list(queryset), [john])
+        self.assertEqual(list(queryset), [self.john])
 
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(force_unicode(filterspec.title), u'department')
