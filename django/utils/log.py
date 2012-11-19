@@ -110,7 +110,12 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
-        mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+        mail.mail_admins(subject, message, fail_silently=True,
+                         html_message=html_message,
+                         connection=self.get_mail_connection())
+
+    def get_mail_connection(self):
+        return None
 
     def format_subject(self, subject):
         """
