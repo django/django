@@ -354,6 +354,7 @@ class AdminSite(object):
                     info = (app_label, model._meta.module_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
                         'perms': perms,
                     }
                     if perms.get('change', False):
