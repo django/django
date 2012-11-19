@@ -119,6 +119,7 @@
         if (options.added) {
           options.added(row);
         }
+        $(document).trigger('admin_add_row', [row[0]]);
       });
     }
     return this;
