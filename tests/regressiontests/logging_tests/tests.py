@@ -15,6 +15,8 @@ from django.utils.unittest import skipUnless
 
 from ..admin_scripts.tests import AdminScriptTestCase
 
+from .logconfig import MyEmailBackend
+
 PYVERS = sys.version_info[:2]
 
 # logging config prior to using filter with mail_admins
@@ -304,6 +306,38 @@ class AdminEmailHandlerTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
+
+    @override_settings(
+            ADMINS=(('admin', 'admin@example.com'),),
+            DEBUG=False,
+        )
+    def test_uses_custom_email_backend(self):
+        """
+        Refs #19325
+        """
+        message = 'All work and no play makes Jack a dull boy'
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        mail_admins_called = {'called': False}
+
+        def my_mail_admins(*args, **kwargs):
+            connection = kwargs['connection']
+            self.assertTrue(isinstance(connection, MyEmailBackend))
+            mail_admins_called['called'] = True
+
+        # Monkeypatches
+        orig_mail_admins = mail.mail_admins
+        orig_email_backend = admin_email_handler.email_backend
+        mail.mail_admins = my_mail_admins
+        admin_email_handler.email_backend = (
+            'regressiontests.logging_tests.logconfig.MyEmailBackend')
+
+        try:
+            self.logger.error(message)
+            self.assertTrue(mail_admins_called['called'])
+        finally:
+            # Revert Monkeypatches
+            mail.mail_admins = orig_mail_admins
+            admin_email_handler.email_backend = orig_email_backend
 
 
 class SettingsConfigTest(AdminScriptTestCase):
