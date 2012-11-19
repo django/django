@@ -114,12 +114,13 @@
               updateElementIndex(this, options.prefix, i);
             });
           }
+          $(document).trigger('formset_delete.admin', [row[0]]);
         });
         // If a post-add callback was supplied, call it with the added form:
         if (options.added) {
           options.added(row);
         }
-        $(document).trigger('admin_add_row', [row[0]]);
+        $(document).trigger('formset_add.admin', [row[0]]);
       });
     }
     return this;

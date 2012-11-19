@@ -1765,6 +1765,21 @@ other inline. In your ``admin.py`` for this example app::
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>` for more
 specific information.
 
+Widgets with JavaScript
+-----------------------
+ 
+.. versionadded:: 1.6
+ 
+Inline model instances are rendered as a formset. The formset contains one form per model instance, plus a hidden empty form. If an inline is added by clicking the button, the hidden form is cloned and showed with JavaScript. 
+
+If any widget in the form requires JavaScript to be executed after it has been added to the DOM, it can be executed on the django.jQuery event ``formset_add.admin`` on ``document``::
+
+    django.jQuery(document).bind('formset_add.admin.my_widget', function(event, row_element) {
+        my_widget_setup($('.my_widget', row_element));
+    });
+     
+This code is added by the widget's :meth:`~django.forms.widgets.Widget.render` method.
+
 Overriding admin templates
 ==========================
 
