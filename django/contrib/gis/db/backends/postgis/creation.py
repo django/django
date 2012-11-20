@@ -100,8 +100,7 @@ class PostGISCreation(DatabaseCreation):
                              allow_thread_sharing=False)
 
             cursor = new_connection.cursor()
-            cursor.execute("CREATE EXTENSION postgis;")
-            cursor.execute("COMMIT;")
+            cursor.execute("CREATE EXTENSION postgis; COMMIT;")
             new_connection.close()
 
         return test_database_name
