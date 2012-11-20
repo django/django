@@ -345,7 +345,7 @@ This sets the minimum message that will be saved in the message storage. See
 MESSAGE_STORAGE
 ---------------
 
-Default: ``'django.contrib.messages.storage.user_messages.FallbackStorage'``
+Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
 Controls where Django stores message data. Valid values are:
 
