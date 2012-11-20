@@ -563,7 +563,7 @@ class TransactionTestCase(SimpleTestCase):
         #  (otherwise 2 aliases pointing to the same DB could block each other).
         # see 18984
         for db in databases:
-            databases[db].rollback_unless_managed()
+            connections[db].rollback_unless_managed()
 
         for db in databases:
             call_command('flush', verbosity=0, interactive=False, database=db,
