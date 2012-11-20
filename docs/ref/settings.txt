@@ -1373,7 +1373,7 @@ more details.
 MESSAGE_STORAGE
 ---------------
 
-Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
+Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
 Controls where Django stores message data.  See the
 :doc:`messages documentation </ref/contrib/messages>` for more details.
