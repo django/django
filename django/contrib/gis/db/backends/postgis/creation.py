@@ -12,9 +12,9 @@ class PostGISCreation(DatabaseCreation):
 
     @cached_property
     def template_postgis(self):
-        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', ('template_postgis',))
+        template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
         cursor = self.connection.cursor()
-        cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis))
+        cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis,))
         if cursor.fetchone():
             return template_postgis
         return None
