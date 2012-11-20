@@ -2,8 +2,10 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.contenttypes import views as contenttype_views
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
@@ -199,6 +201,16 @@ class AdminSite(object):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
                 return self.login(request)
+            if LOGIN_FORM_KEY in request.POST:
+                login_form = AuthenticationForm(data=request.POST)
+                # If user enters valid credentials, we want only to display a message informing him that he is already
+                # logged in. Otherwise he should be logged out.
+                if login_form.is_valid():
+                    messages.add_message(request, messages.ERROR, _('You are already logged in, as {}.').format(request.user))
+                    return HttpResponseRedirect(request.POST[REDIRECT_FIELD_NAME])
+                else:
+                    auth_logout(request)
+                    return self.login(request)
             return view(request, *args, **kwargs)
         if not cacheable:
             inner = never_cache(inner)
