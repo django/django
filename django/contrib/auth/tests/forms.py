@@ -4,16 +4,17 @@ import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils import six
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserCreationFormTest(TestCase):
 
@@ -81,6 +82,7 @@ class UserCreationFormTest(TestCase):
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AuthenticationFormTest(TestCase):
 
@@ -133,6 +135,7 @@ class AuthenticationFormTest(TestCase):
         self.assertEqual(form.non_field_errors(), [])
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SetPasswordFormTest(TestCase):
 
@@ -160,6 +163,7 @@ class SetPasswordFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PasswordChangeFormTest(TestCase):
 
@@ -208,6 +212,7 @@ class PasswordChangeFormTest(TestCase):
                          ['old_password', 'new_password1', 'new_password2'])
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserChangeFormTest(TestCase):
 
@@ -260,7 +265,25 @@ class UserChangeFormTest(TestCase):
         self.assertIn(_("Invalid password format or unknown hashing algorithm."),
             form.as_table())
 
+    def test_bug_19133(self):
+        "The change form does not return the password value"
+        # Use the form to construct the POST data
+        user = User.objects.get(username='testclient')
+        form_for_data = UserChangeForm(instance=user)
+        post_data = form_for_data.initial
 
+        # The password field should be readonly, so anything
+        # posted here should be ignored; the form will be
+        # valid, and give back the 'initial' value for the
+        # password field.
+        post_data['password'] = 'new password'
+        form = UserChangeForm(instance=user, data=post_data)
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['password'], 'sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161')
+
+
+@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PasswordResetFormTest(TestCase):
 
@@ -338,4 +361,4 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
-                         [_("The user account associated with this e-mail address cannot reset the password.")])
+                         [_("The user account associated with this email address cannot reset the password.")])

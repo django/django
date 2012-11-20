@@ -14,7 +14,8 @@ try:
 except ImportError:     # Python 2
     from urllib import unquote
 
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
+from django.http import (CompatibleStreamingHttpResponse, Http404,
+    HttpResponse, HttpResponseRedirect, HttpResponseNotModified)
 from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
 from django.utils.translation import ugettext as _, ugettext_noop
@@ -62,8 +63,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
-    with open(fullpath, 'rb') as f:
-        response = HttpResponse(f.read(), content_type=mimetype)
+    response = CompatibleStreamingHttpResponse(open(fullpath, 'rb'), content_type=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
@@ -138,7 +138,7 @@ def was_modified_since(header=None, mtime=0, size=0):
         header_len = matches.group(3)
         if header_len and int(header_len) != size:
             raise ValueError
-        if mtime > header_mtime:
+        if int(mtime) > header_mtime:
             raise ValueError
     except (AttributeError, ValueError, OverflowError):
         return True

@@ -1,4 +1,8 @@
+import collections
 from math import ceil
+
+from django.utils import six
+
 
 class InvalidPage(Exception):
     pass
@@ -75,7 +79,7 @@ class Paginator(object):
 
 QuerySetPaginator = Paginator # For backwards-compatibility.
 
-class Page(object):
+class Page(collections.Sequence):
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
         self.number = number
@@ -88,39 +92,11 @@ class Page(object):
         return len(self.object_list)
 
     def __getitem__(self, index):
+        if not isinstance(index, (slice,) + six.integer_types):
+            raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
         return list(self.object_list)[index]
-
-    # The following four methods are only necessary for Python <2.6
-    # compatibility (this class could just extend 2.6's collections.Sequence).
-
-    def __iter__(self):
-        i = 0
-        try:
-            while True:
-                v = self[i]
-                yield v
-                i += 1
-        except IndexError:
-            return
-
-    def __contains__(self, value):
-        for v in self:
-            if v == value:
-                return True
-        return False
-
-    def index(self, value):
-        for i, v in enumerate(self):
-            if v == value:
-                return i
-        raise ValueError
-
-    def count(self, value):
-        return sum([1 for v in self if v == value])
-
-    # End of compatibility methods.
 
     def has_next(self):
         return self.number < self.paginator.num_pages

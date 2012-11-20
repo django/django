@@ -19,6 +19,11 @@ def defaults_view(request, arg1, arg2):
 def erroneous_view(request):
     import non_existent
 
+def pass_resolver_match_view(request, *args, **kwargs):
+    response = HttpResponse('')
+    response.resolver_match = request.resolver_match
+    return response
+
 uncallable = "Can I be a view? Pleeeease?"
 
 class ViewClass(object):

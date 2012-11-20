@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.formtools import preview, utils
 from django.contrib.formtools.wizard import FormWizard
 from django.test import TestCase
+from django.test.html import parse_html
 from django.test.utils import override_settings
 from django.utils import unittest
 
@@ -218,7 +219,6 @@ class DummyRequest(http.HttpRequest):
 )
 class WizardTests(TestCase):
     urls = 'django.contrib.formtools.tests.urls'
-    input_re = re.compile('name="([^"]+)" value="([^"]+)"')
     wizard_step_data = (
         {
             '0-name': 'Pony',
@@ -409,14 +409,13 @@ class WizardTests(TestCase):
         """
         Pull the appropriate field data from the context to pass to the next wizard step
         """
-        previous_fields = response.context['previous_fields']
+        previous_fields = parse_html(response.context['previous_fields'])
         fields = {'wizard_step': response.context['step0']}
 
-        def grab(m):
-            fields[m.group(1)] = m.group(2)
-            return ''
+        for input_field in previous_fields:
+            input_attrs = dict(input_field.attributes)
+            fields[input_attrs["name"]] = input_attrs["value"]
 
-        self.input_re.sub(grab, previous_fields)
         return fields
 
     def check_wizard_step(self, response, step_no):
@@ -428,7 +427,6 @@ class WizardTests(TestCase):
         """
         step_count = len(self.wizard_step_data)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Step %d of %d' % (step_no, step_count))
 
         data = self.grab_field_data(response)

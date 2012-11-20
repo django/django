@@ -126,6 +126,17 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(receiver_3)
         self._testIsClean(a_signal)
 
+    def test_has_listeners(self):
+        self.assertFalse(a_signal.has_listeners())
+        self.assertFalse(a_signal.has_listeners(sender=object()))
+        receiver_1 = Callable()
+        a_signal.connect(receiver_1)
+        self.assertTrue(a_signal.has_listeners())
+        self.assertTrue(a_signal.has_listeners(sender=object()))
+        a_signal.disconnect(receiver_1)
+        self.assertFalse(a_signal.has_listeners())
+        self.assertFalse(a_signal.has_listeners(sender=object()))
+
 
 class ReceiverTestCase(unittest.TestCase):
     """

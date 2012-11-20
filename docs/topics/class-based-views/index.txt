@@ -2,8 +2,6 @@
 Class-based views
 =================
 
-.. versionadded:: 1.3
-
 A view is a callable which takes a request and returns a
 response. This can be more than just a function, and Django provides
 an example of some classes which can be used as views. These allow you

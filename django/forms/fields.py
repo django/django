@@ -341,7 +341,7 @@ class BaseTemporalField(Field):
             for format in self.input_formats:
                 try:
                     return self.strptime(value, format)
-                except ValueError:
+                except (ValueError, TypeError):
                     continue
         raise ValidationError(self.error_messages['invalid'])
 
@@ -461,7 +461,7 @@ class RegexField(CharField):
 
 class EmailField(CharField):
     default_error_messages = {
-        'invalid': _('Enter a valid e-mail address.'),
+        'invalid': _('Enter a valid email address.'),
     }
     default_validators = [validators.validate_email]
 

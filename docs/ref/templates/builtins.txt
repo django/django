@@ -53,6 +53,13 @@ comment
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 
+Sample usage::
+
+    <p>Rendered text with {{ pub_date|date:"c" }}</p>
+    {% comment %}
+        <p>Commented out text with {{ create_date|date:"c" }}</p>
+    {% endcomment %}
+
 .. templatetag:: csrf_token
 
 csrf_token
@@ -155,8 +162,6 @@ looks like::
 In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
-
-.. versionadded:: 1.3
 
 By default, when you use the ``as`` keyword with the cycle tag, the
 usage of ``{% cycle %}`` that declares the cycle will itself output
@@ -676,9 +681,6 @@ including it. This example produces the output ``"Hello, John"``:
 
     {{ greeting }}, {{ person|default:"friend" }}!
 
-.. versionchanged:: 1.3
-   Additional context and exclusive context.
-
 You can pass additional context to the template using keyword arguments::
 
     {% include "name_snippet.html" with person="Jane" greeting="Hello" %}
@@ -709,8 +711,6 @@ registered in ``somelibrary`` and ``otherlibrary`` located in package
 ``package``::
 
     {% load somelibrary package.otherlibrary %}
-
-.. versionchanged:: 1.3
 
 You can also selectively load individual filters or tags from a library, using
 the ``from`` argument. In this example, the template tags/filters named ``foo``
@@ -954,6 +954,10 @@ Argument            Outputs
 ``closecomment``    ``#}``
 ==================  =======
 
+Sample usage::
+
+    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+
 .. templatetag:: url
 
 url
@@ -1004,7 +1008,7 @@ refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`^django.core.urlresolvers.NoReverseMatch` exception raised, which will
+:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
 cause your site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
@@ -1075,9 +1079,6 @@ which is rounded up to 88).
 
 with
 ^^^^
-
-.. versionchanged:: 1.3
-   New keyword argument format and multiple variable assignments.
 
 Caches a complex variable under a simpler name. This is useful when accessing
 an "expensive" method (e.g., one that hits the database) multiple times.
@@ -1236,7 +1237,8 @@ G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
 h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
 H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
 i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Not implemented.
+I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
 j                 Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
 l                 Day of the week, textual, long.           ``'Friday'``
@@ -1261,7 +1263,7 @@ S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, 
                   month, 2 characters.
 t                 Number of days in the given month.        ``28`` to ``31``
 T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-u                 Microseconds.                             ``0`` to ``999999``
+u                 Microseconds.                             ``000000`` to ``999999``
 U                 Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
@@ -1418,6 +1420,12 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
+For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
+
+    {% autoescape off %}
+        {{ title|escape }}
+    {% endautoescape %}
+
 .. templatefilter:: escapejs
 
 escapejs
@@ -1514,6 +1522,17 @@ that many decimal places. For example:
 ``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
 ============  =============================  ==========
 
+Particularly useful is passing 0 (zero) as the argument which will round the
+float to the nearest integer.
+
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"0" }}``   ``34``
+``34.00000``  ``{{ value|floatformat:"0" }}``   ``34``
+``39.56000``  ``{{ value|floatformat:"0" }}``   ``40``
+============  ================================  ==========
+
 If the argument passed to ``floatformat`` is negative, it will round a number
 to that many decimal places -- but only if there's a decimal part to be
 displayed. For example:
@@ -1539,6 +1558,13 @@ details). This filter is applied *immediately* and returns a new, escaped
 string. This is useful in the rare cases where you need multiple escaping or
 want to apply other filters to the escaped results. Normally, you want to use
 the :tfilter:`escape` filter.
+
+For example, if you want to catch the ``<p>`` HTML elements created by
+the :tfilter:`linebreaks` filter::
+
+    {% autoescape off %}
+        {{ body|linebreaks|force_escape }}
+    {% endautoescape %}
 
 .. templatefilter:: get_digit
 
@@ -1909,9 +1935,9 @@ for documentation of Python string formatting
 
 For example::
 
-    {{ value|stringformat:"s" }}
+    {{ value|stringformat:"E" }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is a slug"``.
+If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 .. templatefilter:: striptags
 
@@ -1977,7 +2003,9 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
-then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
+then the following would return "8 hours"::
+
+    {{ blog_date|timesince:comment_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -1996,7 +2024,9 @@ given date or datetime. For example, if today is 1 June 2006 and
 
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
-2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+2006, then the following will return "1 week"::
+
+    {{ conference_date|timeuntil:from_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -2125,8 +2155,6 @@ For example::
 
 If ``value`` is ``"http://www.example.org/foo?a=b&c=d"``, the output will be
 ``"http%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
-
-.. versionadded:: 1.3
 
 An optional argument containing the characters which should not be escaped can
 be provided.

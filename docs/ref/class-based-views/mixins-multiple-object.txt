@@ -69,8 +69,17 @@ MultipleObjectMixin
         An integer specifying how many objects should be displayed per page. If
         this is given, the view will paginate objects with
         :attr:`MultipleObjectMixin.paginate_by` objects per page. The view will
-        expect either a ``page`` query string parameter (via ``GET``) or a
-        ``page`` variable specified in the URLconf.
+        expect either a ``page`` query string parameter (via ``request.GET``)
+        or a ``page`` variable specified in the URLconf.
+
+    .. attribute:: page_kwarg
+
+        .. versionadded:: 1.5
+
+        A string specifying the name to use for the page parameter.
+        The view will expect this prameter to be available either as a query
+        string parameter (via ``request.GET``) or as a kwarg variable specified
+        in the URLconf. Defaults to ``page``.
 
     .. attribute:: paginator_class
 

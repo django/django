@@ -68,6 +68,7 @@ class Command(NoArgsCommand):
                 if router.allow_syncdb(db, m)])
             for app in models.get_apps()
         ]
+
         def model_installed(model):
             opts = model._meta
             converter = connection.introspection.table_name_converter
@@ -100,7 +101,6 @@ class Command(NoArgsCommand):
                 for statement in sql:
                     cursor.execute(statement)
                 tables.append(connection.introspection.table_name_converter(model._meta.db_table))
-
 
         transaction.commit_unless_managed(using=db)
 

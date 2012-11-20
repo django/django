@@ -8,18 +8,18 @@ __all__ = ['geos_boundary', 'geos_buffer', 'geos_centroid', 'geos_convexhull',
            'geos_simplify', 'geos_symdifference', 'geos_union', 'geos_relate']
 
 from ctypes import c_double, c_int
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOS_PREPARE
-from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string
+from django.contrib.gis.geos.libgeos import geos_version_info, GEOM_PTR, GEOS_PREPARE
+from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_minus_one, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
-def topology(func, *args):
+def topology(func, *args, **kwargs):
     "For GEOS unary topology functions."
     argtypes = [GEOM_PTR]
     if args: argtypes += args
     func.argtypes = argtypes
-    func.restype = GEOM_PTR
-    func.errcheck = check_geom
+    func.restype = kwargs.get('restype', GEOM_PTR)
+    func.errcheck = kwargs.get('errcheck', check_geom)
     return func
 
 ### Topology Routines ###
@@ -49,3 +49,16 @@ if GEOS_PREPARE:
     geos_cascaded_union.argtypes = [GEOM_PTR]
     geos_cascaded_union.restype = GEOM_PTR
     __all__.append('geos_cascaded_union')
+
+# Linear referencing routines
+info = geos_version_info()
+if info['version'] >= '3.2.0':
+    geos_project = topology(GEOSFunc('GEOSProject'), GEOM_PTR,
+        restype=c_double, errcheck=check_minus_one)
+    geos_interpolate = topology(GEOSFunc('GEOSInterpolate'), c_double)
+
+    geos_project_normalized = topology(GEOSFunc('GEOSProjectNormalized'),
+        GEOM_PTR, restype=c_double, errcheck=check_minus_one)
+    geos_interpolate_normalized = topology(GEOSFunc('GEOSInterpolateNormalized'), c_double)
+    __all__.extend(['geos_project', 'geos_interpolate',
+        'geos_project_normalized', 'geos_interpolate_normalized'])

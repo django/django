@@ -14,6 +14,10 @@ def ensure_default_manager(sender, **kwargs):
     """
     cls = sender
     if cls._meta.abstract:
+        setattr(cls, 'objects', AbstractManagerDescriptor(cls))
+        return
+    elif cls._meta.swapped:
+        setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
         # Create the default manager, if needed.
@@ -42,6 +46,7 @@ def ensure_default_manager(sender, **kwargs):
 
 signals.class_prepared.connect(ensure_default_manager)
 
+
 class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
@@ -56,7 +61,14 @@ class Manager(object):
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
-        setattr(model, name, ManagerDescriptor(self))
+        # Only contribute the manager if the model is concrete
+        if model._meta.abstract:
+            setattr(model, name, AbstractManagerDescriptor(model))
+        elif model._meta.swapped:
+            setattr(model, name, SwappedManagerDescriptor(model))
+        else:
+        # if not model._meta.abstract and not model._meta.swapped:
+            setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
@@ -208,6 +220,7 @@ class Manager(object):
     def raw(self, raw_query, params=None, *args, **kwargs):
         return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
 
+
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
     # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
@@ -218,6 +231,31 @@ class ManagerDescriptor(object):
         if instance != None:
             raise AttributeError("Manager isn't accessible via %s instances" % type.__name__)
         return self.manager
+
+
+class AbstractManagerDescriptor(object):
+    # This class provides a better error message when you try to access a
+    # manager on an abstract model.
+    def __init__(self, model):
+        self.model = model
+
+    def __get__(self, instance, type=None):
+        raise AttributeError("Manager isn't available; %s is abstract" % (
+            self.model._meta.object_name,
+        ))
+
+
+class SwappedManagerDescriptor(object):
+    # This class provides a better error message when you try to access a
+    # manager on a swapped model.
+    def __init__(self, model):
+        self.model = model
+
+    def __get__(self, instance, type=None):
+        raise AttributeError("Manager isn't available; %s has been swapped for '%s'" % (
+            self.model._meta.object_name, self.model._meta.swapped
+        ))
+
 
 class EmptyManager(Manager):
     def get_query_set(self):

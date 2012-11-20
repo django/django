@@ -144,18 +144,14 @@ DEFAULT_CHARSET = 'utf-8'
 # Encoding of files read from disk (template and initial SQL files).
 FILE_CHARSET = 'utf-8'
 
-# E-mail address that error messages come from.
+# Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
 # Whether to send broken-link emails.
 SEND_BROKEN_LINK_EMAILS = False
 
-# Database connection info.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy',
-    },
-}
+# Database connection info. If left empty, will default to the dummy backend.
+DATABASES = {}
 
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
@@ -449,6 +445,7 @@ MIDDLEWARE_CLASSES = (
 # SESSIONS #
 ############
 
+SESSION_CACHE_ALIAS = 'default'                         # Cache to store session data if using the cache session backend.
 SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.
@@ -487,6 +484,8 @@ PROFANITIES_LIST = ()
 ##################
 # AUTHENTICATION #
 ##################
+
+AUTH_USER_MODEL = 'auth.User'
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
@@ -549,33 +548,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 # The callable to use to configure logging
 LOGGING_CONFIG = 'django.utils.log.dictConfig'
 
-# The default logging configuration. This sends an email to
-# the site admins on every HTTP 500 error. All other log
-# records are sent to the bit bucket.
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
+# Custom logging configuration.
+LOGGING = {}
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.

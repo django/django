@@ -126,7 +126,7 @@ def model_to_dict(instance, fields=None, exclude=None):
                 data[f.name] = []
             else:
                 # MultipleChoiceWidget needs a list of pks, not object instances.
-                data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
+                data[f.name] = list(f.value_from_object(instance).values_list('pk', flat=True))
         else:
             data[f.name] = f.value_from_object(instance)
     return data
@@ -1013,7 +1013,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages['required'])
         elif not self.required and not value:
-            return []
+            return self.queryset.none()
         if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['list'])
         key = self.to_field_name or 'pk'

@@ -125,6 +125,10 @@ class TaggedItem(models.Model):
                                       related_name='taggeditem_set3')
     created_by_fkey = models.PositiveIntegerField(null=True)
     created_by = generic.GenericForeignKey('created_by_ct', 'created_by_fkey',)
+    favorite_ct = models.ForeignKey(ContentType, null=True,
+                                    related_name='taggeditem_set4')
+    favorite_fkey = models.CharField(max_length=64, null=True)
+    favorite = generic.GenericForeignKey('favorite_ct', 'favorite_fkey')
 
     def __str__(self):
         return self.tag
@@ -132,7 +136,11 @@ class TaggedItem(models.Model):
 
 class Bookmark(models.Model):
     url = models.URLField()
-    tags = generic.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem, related_name='bookmarks')
+    favorite_tags = generic.GenericRelation(TaggedItem,
+                                    content_type_field='favorite_ct',
+                                    object_id_field='favorite_fkey',
+                                    related_name='favorite_bookmarks')
 
 
 class Comment(models.Model):

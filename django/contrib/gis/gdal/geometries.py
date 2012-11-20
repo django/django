@@ -43,6 +43,8 @@ import sys
 from binascii import a2b_hex, b2a_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 
+from django.contrib.gis import memoryview
+
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
@@ -76,16 +78,11 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = buffer(a2b_hex(geom_input.upper()))
+            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
 
         # Constructing the geometry,
         if str_instance:
-            # Checking if unicode
-            if isinstance(geom_input, six.text_type):
-                # Encoding to ASCII, WKT or HEX doesn't need any more.
-                geom_input = geom_input.encode('ascii')
-
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
@@ -96,19 +93,19 @@ class OGRGeometry(GDALBase):
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See http://trac.osgeo.org/gdal/ticket/1992.
                     g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt'))))
+                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt').encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt'))), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
             elif json_m:
-                g = capi.from_json(geom_input)
+                g = capi.from_json(geom_input.encode())
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
                 ogr_t = OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, buffer):
+        elif isinstance(geom_input, memoryview):
             # WKB was passed in
-            g = capi.from_wkb(str(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
@@ -141,7 +138,7 @@ class OGRGeometry(GDALBase):
             srs = srs.wkt
         else:
             srs = None
-        return str(self.wkb), srs
+        return bytes(self.wkb), srs
 
     def __setstate__(self, state):
         wkb, srs = state
@@ -354,7 +351,7 @@ class OGRGeometry(GDALBase):
         buf = (c_ubyte * sz)()
         wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
-        return buffer(string_at(buf, sz))
+        return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):

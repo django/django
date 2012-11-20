@@ -40,12 +40,5 @@
     "fields": {
       "description": "An action with a name suspected of being a XSS attempt"
     }
-  },
-  {
-    "pk": "The name of an action", 
-    "model": "admin_custom_urls.action", 
-    "fields": {
-      "description": "A generic action"
-    }
   }
 ]

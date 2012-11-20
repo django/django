@@ -16,6 +16,7 @@ from django.test import Client, TestCase
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, override_settings, str_prefix
 from django.template.response import SimpleTemplateResponse
+from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
 
 
@@ -128,6 +129,14 @@ class AssertContainsTests(TestCase):
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertNotContains(r, 'はたけ')
         self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
+
+    def test_nontext_contains(self):
+        r = self.client.get('/test_client_regress/no_template_view/')
+        self.assertContains(r, ugettext_lazy('once'))
+
+    def test_nontext_not_contains(self):
+        r = self.client.get('/test_client_regress/no_template_view/')
+        self.assertNotContains(r, ugettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
         """ Test that we can pass in an unrendered SimpleTemplateReponse
@@ -490,11 +499,11 @@ class AssertFormErrorTests(TestCase):
         try:
             self.assertFormError(response, 'form', 'email', 'Some error.')
         except AssertionError as e:
-            self.assertIn(str_prefix("The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid e-mail address.'])"), str(e))
+            self.assertIn(str_prefix("The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid email address.'])"), str(e))
         try:
             self.assertFormError(response, 'form', 'email', 'Some error.', msg_prefix='abc')
         except AssertionError as e:
-            self.assertIn(str_prefix("abc: The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid e-mail address.'])"), str(e))
+            self.assertIn(str_prefix("abc: The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [%(_)s'Enter a valid email address.'])"), str(e))
 
     def test_unknown_nonfield_error(self):
         """
@@ -618,15 +627,6 @@ class TemplateExceptionTests(TestCase):
             for template_loader in loader.template_source_loaders:
                 if hasattr(template_loader, 'reset'):
                     template_loader.reset()
-
-    @override_settings(TEMPLATE_DIRS=(),)
-    def test_no_404_template(self):
-        "Missing templates are correctly reported by test client"
-        try:
-            response = self.client.get("/no_such_view/")
-            self.fail("Should get error about missing template")
-        except TemplateDoesNotExist:
-            pass
 
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'bad_templates'),)

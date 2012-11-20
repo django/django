@@ -3,6 +3,7 @@ PostgreSQL database backend for Django.
 
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
+import logging
 import sys
 
 from django.db import utils
@@ -14,7 +15,6 @@ from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.utils.encoding import force_str
-from django.utils.log import getLogger
 from django.utils.safestring import SafeText, SafeBytes
 from django.utils import six
 from django.utils.timezone import utc
@@ -33,7 +33,7 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
-logger = getLogger('django.db.backends')
+logger = logging.getLogger('django.db.backends')
 
 def utc_tzinfo_factory(offset):
     if offset != 0:

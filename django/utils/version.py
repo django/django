@@ -30,7 +30,7 @@ def get_version(version=None):
         mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
         sub = mapping[version[3]] + str(version[4])
 
-    return main + sub
+    return str(main + sub)
 
 def get_git_changeset():
     """Returns a numeric identifier of the latest git changeset.

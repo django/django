@@ -3,15 +3,15 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import hashlib
+import logging
 from time import time
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
-from django.utils.log import getLogger
 from django.utils.timezone import utc
 
 
-logger = getLogger('django.db.backends')
+logger = logging.getLogger('django.db.backends')
 
 
 class CursorWrapper(object):
@@ -24,11 +24,9 @@ class CursorWrapper(object):
             self.db.set_dirty()
 
     def __getattr__(self, attr):
-        self.set_dirty()
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+        if attr in ('execute', 'executemany', 'callproc'):
+            self.set_dirty()
+        return getattr(self.cursor, attr)
 
     def __iter__(self):
         return iter(self.cursor)

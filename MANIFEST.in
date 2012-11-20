@@ -32,3 +32,5 @@ recursive-include django/contrib/gis/tests/geogapp/fixtures *
 recursive-include django/contrib/gis/tests/relatedapp/fixtures *
 recursive-include django/contrib/sitemaps/templates *
 recursive-include django/contrib/sitemaps/tests/templates *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

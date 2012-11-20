@@ -80,12 +80,15 @@ class DefaultFiltersTests(TestCase):
             decimal_ctx.prec = old_prec
 
 
-    # This fails because of Python's float handling. Floats with many zeroes
-    # after the decimal point should be passed in as another type such as
-    # unicode or Decimal.
-    @unittest.expectedFailure
-    def test_floatformat_fail(self):
+    def test_floatformat_py2_fail(self):
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
+
+    # The test above fails because of Python 2's float handling. Floats with
+    # many zeroes after the decimal point should be passed in as another type
+    # such as unicode or Decimal.
+    if not six.PY3:
+        test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
+
 
     def test_addslashes(self):
         self.assertEqual(addslashes('"double quotes" and \'single quotes\''),
@@ -301,7 +304,12 @@ class DefaultFiltersTests(TestCase):
 
         # Check urlize trims trailing period when followed by parenthesis - see #18644
         self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
-                         '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+            '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+
+        # Check urlize doesn't crash when square bracket is appended to url (#19070)
+        self.assertEqual(urlize('[see www.example.com]'),
+            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
+
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)

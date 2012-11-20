@@ -4,7 +4,7 @@ Django shortcut functions
 
 .. module:: django.shortcuts
    :synopsis:
-       Convenience shortcuts that spam multiple levels of Django's MVC stack.
+       Convenience shortcuts that span multiple levels of Django's MVC stack.
 
 .. index:: shortcuts
 
@@ -16,8 +16,6 @@ introduce controlled coupling for convenience's sake.
 ==========
 
 .. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app])
-
-   .. versionadded:: 1.3
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.

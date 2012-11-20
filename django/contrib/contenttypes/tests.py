@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, get_current_site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.http import urlquote
@@ -219,9 +219,8 @@ class ContentTypesTests(TestCase):
         obj = FooWithUrl.objects.create(name="john")
 
         if Site._meta.installed:
-            current_site = Site.objects.get_current()
             response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://%s/users/john/" % current_site.domain,
+            self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
                              response._headers.get("location")[1])
 
         Site._meta.installed = False

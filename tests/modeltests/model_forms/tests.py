@@ -8,6 +8,7 @@ from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
+from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils.unittest import skipUnless
 from django.test import TestCase
@@ -560,6 +561,42 @@ class UniqueTest(TestCase):
             "slug": "Django 1.0"}, instance=p)
         self.assertTrue(form.is_valid())
 
+class ModelToDictTests(TestCase):
+    """
+    Tests for forms.models.model_to_dict
+    """
+    def test_model_to_dict_many_to_many(self):
+        categories=[
+            Category(name='TestName1', slug='TestName1', url='url1'),
+            Category(name='TestName2', slug='TestName2', url='url2'),
+            Category(name='TestName3', slug='TestName3', url='url3')
+        ]
+        for c in categories:
+            c.save()
+        writer = Writer(name='Test writer')
+        writer.save()
+
+        art = Article(
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=writer,
+            article='Hello.'
+        )
+        art.save()
+        for c in categories:
+            art.categories.add(c)
+        art.save()
+
+        with self.assertNumQueries(1):
+            d = model_to_dict(art)
+
+        #Ensure all many-to-many categories appear in model_to_dict
+        for c in categories:
+            self.assertIn(c.pk, d['categories'])
+        #Ensure many-to-many relation appears as a list
+        self.assertIsInstance(d['categories'], list)
+
 class OldFormForXTests(TestCase):
     def test_base_form(self):
         self.assertEqual(Category.objects.count(), 0)
@@ -1023,7 +1060,10 @@ class OldFormForXTests(TestCase):
         # Add a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
         # than caching it at time of instantiation.
-        c6 = Category.objects.create(id=6, name='Sixth', url='6th')
+        # Note, we are using an id of 1006 here since tests that run before
+        # this may create categories with primary keys up to 6. Use
+        # a number that is will not conflict.
+        c6 = Category.objects.create(id=1006, name='Sixth', url='6th')
         self.assertEqual(c6.name, 'Sixth')
         self.assertQuerysetEqual(f.clean([c6.id]), ["Sixth"])
 
@@ -1035,8 +1075,8 @@ class OldFormForXTests(TestCase):
             f.clean([c6.id])
 
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
-        self.assertEqual(f.clean([]), [])
-        self.assertEqual(f.clean(()), [])
+        self.assertIsInstance(f.clean([]), EmptyQuerySet)
+        self.assertIsInstance(f.clean(()), EmptyQuerySet)
         with self.assertRaises(ValidationError):
             f.clean(['10'])
         with self.assertRaises(ValidationError):

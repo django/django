@@ -37,6 +37,10 @@ def auth_processor_perms(request):
     return render_to_response('context_processors/auth_attrs_perms.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
 
+def auth_processor_perm_in_perms(request):
+    return render_to_response('context_processors/auth_attrs_perm_in_perms.html',
+        RequestContext(request, {}, processors=[context_processors.auth]))
+
 def auth_processor_messages(request):
     info(request, "Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
@@ -51,6 +55,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^logout/next_page/$', 'django.contrib.auth.views.logout', dict(next_page='/somewhere/')),
     (r'^remote_user/$', remote_user_auth_view),
     (r'^password_reset_from_email/$', 'django.contrib.auth.views.password_reset', dict(from_email='staffmember@example.com')),
+    (r'^admin_password_reset/$', 'django.contrib.auth.views.password_reset', dict(is_admin_site=True)),
     (r'^login_required/$', login_required(password_reset)),
     (r'^login_required_login_url/$', login_required(password_reset, login_url='/somewhere/')),
 
@@ -58,6 +63,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^auth_processor_attr_access/$', auth_processor_attr_access),
     (r'^auth_processor_user/$', auth_processor_user),
     (r'^auth_processor_perms/$', auth_processor_perms),
+    (r'^auth_processor_perm_in_perms/$', auth_processor_perm_in_perms),
     (r'^auth_processor_messages/$', auth_processor_messages),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
 )

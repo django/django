@@ -148,6 +148,18 @@ class TestInline(TestCase):
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
                 'name="-2-0-name" maxlength="100" />', html=True)
 
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_localize_pk_shortcut(self):
+        """
+        Ensure that the "View on Site" link is correct for locales that use
+        thousand separators
+        """
+        holder = Holder.objects.create(pk=123456789, dummy=42)
+        inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly='')
+        response = self.client.get('/admin/admin_inlines/holder/%i/' % holder.id)
+        inner_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(inner).pk, inner.pk)
+        self.assertContains(response, inner_shortcut)
+
     def test_custom_pk_shortcut(self):
         """
         Ensure that the "View on Site" link is correct for models with a

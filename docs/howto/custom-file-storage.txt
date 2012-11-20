@@ -27,9 +27,9 @@ You'll need to follow these steps:
                     option = settings.CUSTOM_STORAGE_OPTIONS
                 ...
 
-#. Your storage class must implement the ``_open()`` and ``_save()`` methods,
-   along with any other methods appropriate to your storage class. See below for
-   more on these methods.
+#. Your storage class must implement the :meth:`_open()` and :meth:`_save()`
+   methods, along with any other methods appropriate to your storage class. See
+   below for more on these methods.
 
    In addition, if your class provides local file storage, it must override
    the ``path()`` method.
@@ -46,8 +46,7 @@ Your custom storage system may override any of the storage methods explained in
 You'll also usually want to use hooks specifically designed for custom storage
 objects. These are:
 
-``_open(name, mode='rb')``
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: _open(name, mode='rb')
 
 **Required**.
 
@@ -56,8 +55,7 @@ uses to open the file. This must return a ``File`` object, though in most cases,
 you'll want to return some subclass here that implements logic specific to the
 backend storage system.
 
-``_save(name, content)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: _save(name, content)
 
 Called by ``Storage.save()``. The ``name`` will already have gone through
 ``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
@@ -67,8 +65,8 @@ Should return the actual name of name of the file saved (usually the ``name``
 passed in, but if the storage needs to change the file name return the new name
 instead).
 
-``get_valid_name(name)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: get_valid_name(name)
+
 
 Returns a filename suitable for use with the underlying storage system. The
 ``name`` argument passed to this method is the original filename sent to the
@@ -78,8 +76,7 @@ how non-standard characters are converted to safe filenames.
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
-``get_available_name(name)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. method:: get_available_name(name)
 
 Returns a filename that is available in the storage mechanism, possibly taking
 the provided filename into account. The ``name`` argument passed to this method

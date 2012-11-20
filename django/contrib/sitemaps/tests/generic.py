@@ -19,4 +19,4 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 %s
 </urlset>
 """ % expected
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)

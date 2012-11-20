@@ -4,11 +4,6 @@
 Class-based generic views
 =========================
 
-.. note::
-    Prior to Django 1.3, generic views were implemented as functions. The
-    function-based implementation has been removed in favor of the
-    class-based approach described here.
-
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
 and template layers, but Web developers also experience this boredom at the view

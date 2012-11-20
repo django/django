@@ -18,4 +18,4 @@ from .regressions import FormsRegressionsTestCase
 from .util import FormsUtilTestCase
 from .validators import TestFieldWithValidators
 from .widgets import (FormsWidgetTestCase, FormsI18NWidgetsTestCase,
-    WidgetTests, ClearableFileInputTests)
+    WidgetTests, LiveWidgetTests, ClearableFileInputTests)

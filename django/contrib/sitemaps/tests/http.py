@@ -26,7 +26,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
@@ -40,7 +40,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
 
     def test_simple_sitemap_section(self):
@@ -51,7 +51,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -61,7 +61,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
@@ -75,7 +75,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
@@ -101,7 +101,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today()
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS,
                 "django.contrib.sites app not installed.")
@@ -143,4 +143,4 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertEqual(response.content, expected_content.encode('utf-8'))
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)

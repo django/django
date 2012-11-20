@@ -5,6 +5,7 @@ from django.contrib.gis.gdal.error import OGRException
 from django.contrib.gis.gdal.prototypes import ds as capi
 
 from django.utils import six
+from django.utils.encoding import force_bytes
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -36,7 +37,7 @@ class Driver(GDALBase):
                 name = dr_input
 
             # Attempting to get the OGR driver by the string name.
-            dr = capi.get_driver_by_name(name)
+            dr = capi.get_driver_by_name(force_bytes(name))
         elif isinstance(dr_input, int):
             self._register()
             dr = capi.get_driver(dr_input)

@@ -117,8 +117,6 @@ middleware is always called on every response.
 ``process_template_response``
 -----------------------------
 
-.. versionadded:: 1.3
-
 .. method:: process_template_response(self, request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is a
@@ -166,6 +164,23 @@ an earlier middleware method returned an :class:`~django.http.HttpResponse`
 classes are applied in reverse order, from the bottom up. This means classes
 defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
 
+.. versionchanged:: 1.5
+    ``response`` may also be an :class:`~django.http.StreamingHttpResponse`
+    object.
+
+Unlike :class:`~django.http.HttpResponse`,
+:class:`~django.http.StreamingHttpResponse` does not have a ``content``
+attribute. As a result, middleware can no longer assume that all responses
+will have a ``content`` attribute. If they need access to the content, they
+must test for streaming responses and adjust their behavior accordingly::
+
+    if response.streaming:
+        response.streaming_content = wrap_streaming_content(response.streaming_content)
+    else:
+        response.content = wrap_content(response.content)
+
+``streaming_content`` should be assumed to be too large to hold in memory.
+Middleware may wrap it in a new generator, but must not consume it.
 
 .. _exception-middleware:
 

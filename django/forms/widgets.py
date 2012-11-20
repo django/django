@@ -403,7 +403,7 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{0}>{1}</textarea>',
+        return format_html('<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
@@ -528,7 +528,7 @@ class CheckboxInput(Widget):
         values = {'true': True, 'false': False}
         if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
-        return value
+        return bool(value)
 
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the

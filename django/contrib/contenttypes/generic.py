@@ -5,19 +5,18 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from functools import partial
-from operator import attrgetter
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
 from django.db import models, router, DEFAULT_DB_ALIAS
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
-from django.db.models.loading import get_model
 from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text
+
 
 class GenericForeignKey(object):
     """
@@ -52,9 +51,6 @@ class GenericForeignKey(object):
             kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None, using=None):
-        # Convenience function using get_model avoids a circular import when
-        # using this model
-        ContentType = get_model("contenttypes", "contenttype")
         if obj:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
@@ -216,7 +212,6 @@ class GenericRelation(RelatedField, Field):
         """
         if negate:
             return []
-        ContentType = get_model("contenttypes", "contenttype")
         content_type = ContentType.objects.get_for_model(self.model)
         prefix = "__".join(pieces[:pos + 1])
         return [("%s__%s" % (prefix, self.content_type_field_name),
@@ -329,8 +324,11 @@ def create_generic_related_manager(superclass):
                     set(obj._get_pk_val() for obj in instances)
                 }
             qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            # We (possibly) need to convert object IDs to the type of the
+            # instances' PK in order to match up instances:
+            object_id_converter = instances[0]._meta.pk.to_python
             return (qs,
-                    attrgetter(self.object_id_field_name),
+                    lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
                     lambda obj: obj._get_pk_val(),
                     False,
                     self.prefetch_cache_name)

@@ -8,7 +8,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core import mail
 from django.http import HttpRequest
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.http import ConditionalGetMiddleware
@@ -294,6 +294,15 @@ class CommonMiddlewareTest(TestCase):
         CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
 
+    # Other tests
+
+    def test_non_ascii_query_string_does_not_crash(self):
+        """Regression test for #15152"""
+        request = self._get_request('slash')
+        request.META['QUERY_STRING'] = 'drink=café'
+        response = CommonMiddleware().process_request(request)
+        self.assertEqual(response.status_code, 301)
+
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'regressiontests.middleware.cond_get_urls'
@@ -321,6 +330,12 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertTrue('Content-Length' in self.resp)
         self.assertEqual(int(self.resp['Content-Length']), content_length)
+
+    def test_content_length_header_not_added(self):
+        resp = StreamingHttpResponse('content')
+        self.assertFalse('Content-Length' in resp)
+        resp = ConditionalGetMiddleware().process_response(self.req, resp)
+        self.assertFalse('Content-Length' in resp)
 
     def test_content_length_header_not_changed(self):
         bad_content_length = len(self.resp.content) + 10
@@ -350,6 +365,29 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp['ETag'] = 'eggs'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 200)
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag(self):
+        req = HttpRequest()
+        res = HttpResponse('content')
+        self.assertTrue(
+            CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        res['ETag'] = 'tomatoes'
+        self.assertEqual(
+            CommonMiddleware().process_response(req, res).get('ETag'),
+            'tomatoes')
+
+    @override_settings(USE_ETAGS=True)
+    def test_no_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        self.assertFalse(
+            CommonMiddleware().process_response(req, res).has_header('ETag'))
 
     # Tests for the Last-Modified header
 
@@ -511,6 +549,7 @@ class GZipMiddlewareTest(TestCase):
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
     uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
+    sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
 
     def setUp(self):
         self.req = HttpRequest()
@@ -525,6 +564,8 @@ class GZipMiddlewareTest(TestCase):
         self.resp.status_code = 200
         self.resp.content = self.compressible_string
         self.resp['Content-Type'] = 'text/html; charset=UTF-8'
+        self.stream_resp = StreamingHttpResponse(self.sequence)
+        self.stream_resp['Content-Type'] = 'text/html; charset=UTF-8'
 
     @staticmethod
     def decompress(gzipped_string):
@@ -538,6 +579,15 @@ class GZipMiddlewareTest(TestCase):
         self.assertEqual(self.decompress(r.content), self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertEqual(r.get('Content-Length'), str(len(r.content)))
+
+    def test_compress_streaming_response(self):
+        """
+        Tests that compression is performed on responses with streaming content.
+        """
+        r = GZipMiddleware().process_response(self.req, self.stream_resp)
+        self.assertEqual(self.decompress(b''.join(r)), b''.join(self.sequence))
+        self.assertEqual(r.get('Content-Encoding'), 'gzip')
+        self.assertFalse(r.has_header('Content-Length'))
 
     def test_compress_non_200_response(self):
         """

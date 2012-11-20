@@ -136,10 +136,6 @@ Simply subclassing :class:`CommentModerator` and changing the values of these
 options will automatically enable the various moderation methods for any
 models registered using the subclass.
 
-.. versionchanged:: 1.3
-
-``moderate_after`` and ``close_after`` now accept 0 as a valid value.
-
 Adding custom moderation methods
 --------------------------------
 

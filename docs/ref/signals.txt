@@ -46,7 +46,7 @@ pre_init
 
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
-Whenever you instantiate a Django model,, this signal is sent at the beginning
+Whenever you instantiate a Django model, this signal is sent at the beginning
 of the model's :meth:`~django.db.models.Model.__init__` method.
 
 Arguments sent with this signal:
@@ -118,8 +118,6 @@ Arguments sent with this signal:
     records in the database as the database might not be in a
     consistent state yet.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -155,8 +153,6 @@ Arguments sent with this signal:
     records in the database as the database might not be in a
     consistent state yet.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -183,8 +179,6 @@ Arguments sent with this signal:
 ``instance``
     The actual instance being deleted.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -208,8 +202,6 @@ Arguments sent with this signal:
 
     Note that the object will no longer be in the database, so be very
     careful what you do with this instance.
-
-.. versionadded:: 1.3
 
 ``using``
     The database alias being used.
@@ -271,8 +263,6 @@ Arguments sent with this signal:
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
-.. versionadded:: 1.3
-
 ``using``
     The database alias being used.
 
@@ -287,13 +277,22 @@ like this::
         # ...
         toppings = models.ManyToManyField(Topping)
 
-If we would do something like this:
+If we connected a handler like this::
+
+    def toppings_changed(sender, **kwargs):
+        # Do something
+        pass
+
+    m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
+
+and then did something like this::
 
     >>> p = Pizza.object.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
-the arguments sent to a :data:`m2m_changed` handler would be:
+the arguments sent to a :data:`m2m_changed` handler (``topppings_changed`` in
+the example above) would be:
 
 ==============  ============================================================
 Argument        Value

@@ -43,17 +43,33 @@ class FakePayload(object):
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in Real Life.
     """
-    def __init__(self, content):
-        self.__content = BytesIO(content)
-        self.__len = len(content)
+    def __init__(self, content=None):
+        self.__content = BytesIO()
+        self.__len = 0
+        self.read_started = False
+        if content is not None:
+            self.write(content)
+
+    def __len__(self):
+        return self.__len
 
     def read(self, num_bytes=None):
+        if not self.read_started:
+            self.__content.seek(0)
+            self.read_started = True
         if num_bytes is None:
             num_bytes = self.__len or 0
         assert self.__len >= num_bytes, "Cannot read more than the available bytes from the HTTP incoming data."
         content = self.__content.read(num_bytes)
         self.__len -= num_bytes
         return content
+
+    def write(self, content):
+        if self.read_started:
+            raise ValueError("Unable to write a payload after he's been read")
+        content = force_bytes(content)
+        self.__content.write(content)
+        self.__len += len(content)
 
 
 class ClientHandler(BaseHandler):

@@ -256,6 +256,10 @@ WHEN (new.%(col_name)s IS NULL)
         if not name.startswith('"') and not name.endswith('"'):
             name = '"%s"' % util.truncate_name(name.upper(),
                                                self.max_name_length())
+        # Oracle puts the query text into a (query % args) construct, so % signs
+        # in names need to be escaped. The '%%' will be collapsed back to '%' at
+        # that stage so we aren't really making the name longer here.
+        name = name.replace('%','%%')
         return name.upper()
 
     def random_function_sql(self):
@@ -770,7 +774,7 @@ class FormatStylePlaceholderCursor(object):
         return CursorIterator(self.cursor)
 
 
-class CursorIterator(object):
+class CursorIterator(six.Iterator):
 
     """Cursor iterator wrapper that invokes our custom row factory."""
 
@@ -783,8 +787,6 @@ class CursorIterator(object):
 
     def __next__(self):
         return _rowfactory(next(self.iter), self.cursor)
-
-    next = __next__             # Python 2 compatibility
 
 
 def _rowfactory(row, cursor):

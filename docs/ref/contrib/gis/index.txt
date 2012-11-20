@@ -15,7 +15,7 @@ of spatially enabled data.
    :maxdepth: 2
 
    tutorial
-   install
+   install/index
    model-api
    db-api
    geoquerysets

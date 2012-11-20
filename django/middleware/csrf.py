@@ -7,6 +7,7 @@ against request forgeries from other sites.
 from __future__ import unicode_literals
 
 import hashlib
+import logging
 import re
 import random
 
@@ -15,10 +16,10 @@ from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.encoding import force_text
 from django.utils.http import same_origin
-from django.utils.log import getLogger
 from django.utils.crypto import constant_time_compare, get_random_string
 
-logger = getLogger('django.request')
+
+logger = logging.getLogger('django.request')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."

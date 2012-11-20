@@ -69,7 +69,9 @@ class BaseStorage(object):
         wizard_files = self.data[self.step_files_key].get(step, {})
 
         if wizard_files and not self.file_storage:
-            raise NoFileStorageConfigured
+            raise NoFileStorageConfigured(
+                    "You need to define 'file_storage' in your "
+                    "wizard view in order to handle file uploads.")
 
         files = {}
         for field, field_dict in six.iteritems(wizard_files):
@@ -81,7 +83,9 @@ class BaseStorage(object):
 
     def set_step_files(self, step, files):
         if files and not self.file_storage:
-            raise NoFileStorageConfigured
+            raise NoFileStorageConfigured(
+                    "You need to define 'file_storage' in your "
+                    "wizard view in order to handle file uploads.")
 
         if step not in self.data[self.step_files_key]:
             self.data[self.step_files_key][step] = {}

@@ -28,7 +28,9 @@ class File(FileProxyMixin):
 
     def __bool__(self):
         return bool(self.name)
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def __len__(self):
         return self.size
@@ -142,7 +144,9 @@ class ContentFile(File):
 
     def __bool__(self):
         return True
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def open(self, mode=None):
         self.seek(0)

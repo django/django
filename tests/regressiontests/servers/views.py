@@ -15,3 +15,7 @@ def create_model_instance(request):
     person = Person(name='emily')
     person.save()
     return HttpResponse('')
+
+
+def environ_view(request):
+    return HttpResponse("\n".join(["%s: %r" % (k, v) for k, v in request.environ.items()]))

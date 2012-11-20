@@ -14,6 +14,7 @@ from django.contrib.gis.gdal.srs import SpatialReference
 # GDAL ctypes function prototypes.
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
+from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -38,7 +39,7 @@ class Layer(GDALBase):
         self._ds = ds
         self._ldefn = capi.get_layer_defn(self._ptr)
         # Does the Layer support random reading?
-        self._random_read = self.test_capability('RandomRead')
+        self._random_read = self.test_capability(b'RandomRead')
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
@@ -60,7 +61,7 @@ class Layer(GDALBase):
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
         for i in xrange(self.num_feat):
-            yield Feature(capi.get_next_feature(self._ptr), self._ldefn)
+            yield Feature(capi.get_next_feature(self._ptr), self)
 
     def __len__(self):
         "The length is the number of features."
@@ -80,7 +81,7 @@ class Layer(GDALBase):
         if self._random_read:
             # If the Layer supports random reading, return.
             try:
-                return Feature(capi.get_feature(self.ptr, feat_id), self._ldefn)
+                return Feature(capi.get_feature(self.ptr, feat_id), self)
             except OGRException:
                 pass
         else:
@@ -102,7 +103,8 @@ class Layer(GDALBase):
     @property
     def name(self):
         "Returns the name of this layer in the Data Source."
-        return capi.get_fd_name(self._ldefn)
+        name = capi.get_fd_name(self._ldefn)
+        return force_text(name, self._ds.encoding, strings_only=True)
 
     @property
     def num_feat(self, force=1):
@@ -134,8 +136,9 @@ class Layer(GDALBase):
         Returns a list of string names corresponding to each of the Fields
         available in this Layer.
         """
-        return [capi.get_field_name(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields) ]
+        return [force_text(capi.get_field_name(capi.get_field_defn(self._ldefn, i)),
+                           self._ds.encoding, strings_only=True)
+                for i in xrange(self.num_fields)]
 
     @property
     def field_types(self):
@@ -212,4 +215,4 @@ class Layer(GDALBase):
           'FastFeatureCount', 'FastGetExtent', 'CreateField', 'Transactions',
           'DeleteFeature', and 'FastSetNextByIndex'.
         """
-        return bool(capi.test_capability(self.ptr, capability))
+        return bool(capi.test_capability(self.ptr, force_bytes(capability)))

@@ -11,7 +11,7 @@ requires.
 Typically, these packages are based on the latest stable release of Django, so
 if you want to use the development version of Django you'll need to follow the
 instructions for :ref:`installing the development version
-<installing-development-version>` from our Subversion repository.
+<installing-development-version>` from our Git repository.
 
 If you're using Linux or a Unix installation, such as OpenSolaris,
 check with your distributor to see if they already package Django. If

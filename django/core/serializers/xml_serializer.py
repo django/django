@@ -161,8 +161,6 @@ class Deserializer(base.Deserializer):
                 return self._handle_object(node)
         raise StopIteration
 
-    next = __next__             # Python 2 compatibility
-
     def _handle_object(self, node):
         """
         Convert an <object> node to a DeserializedObject.

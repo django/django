@@ -48,9 +48,9 @@ def prepare_lookup_value(key, value):
 def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
-    any '/', '_' and ':' characters. Similar to urllib.quote, except that the
-    quoting is slightly different so that it doesn't get automatically
-    unquoted by the Web browser.
+    any '/', '_' and ':' and similarly problematic characters.
+    Similar to urllib.quote, except that the quoting is slightly different so
+    that it doesn't get automatically unquoted by the Web browser.
     """
     if not isinstance(s, six.string_types):
         return s
@@ -190,6 +190,13 @@ class NestedObjects(Collector):
         for root in self.edges.get(None, ()):
             roots.extend(self._nested(root, seen, format_callback))
         return roots
+
+    def can_fast_delete(self, *args, **kwargs):
+        """
+        We always want to load the objects into memory so that we can display
+        them to the user in confirm page.
+        """
+        return False
 
 
 def model_format_dict(obj):

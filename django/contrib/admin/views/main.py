@@ -3,6 +3,7 @@ from functools import reduce
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
@@ -376,4 +377,8 @@ class ChangeList(object):
             return qs
 
     def url_for_result(self, result):
-        return "%s/" % quote(getattr(result, self.pk_attname))
+        pk = getattr(result, self.pk_attname)
+        return reverse('admin:%s_%s_change' % (self.opts.app_label,
+                                               self.opts.module_name),
+                       args=(quote(pk),),
+                       current_app=self.model_admin.admin_site.name)

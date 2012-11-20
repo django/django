@@ -140,6 +140,15 @@ That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
 advanced techniques.
 
+Handling errors in actions
+--------------------------
+
+If there are foreseeable error conditions that may occur while running your
+action, you should gracefully inform the user of the problem. This means
+handling exceptions and and using
+:meth:`django.contrib.admin.ModelAdmin.message_user` to display a user friendly
+description of the problem in the response.
+
 Advanced action techniques
 ==========================
 

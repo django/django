@@ -26,9 +26,10 @@ There are seven steps in activating the Django admin site:
    in your :setting:`INSTALLED_APPS` list, add them.
 
 3. Add ``django.contrib.messages.context_processors.messages`` to
-   :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
-   :class:`~django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE_CLASSES`. (These are both active by default, so
+   :setting:`TEMPLATE_CONTEXT_PROCESSORS` as well as
+   :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
+   :class:`django.contrib.messages.middleware.MessageMiddleware` to
+   :setting:`MIDDLEWARE_CLASSES`. (These are all active by default, so
    you only need to do this if you've manually tweaked the settings.)
 
 4. Determine which of your application's models should be editable in the
@@ -59,6 +60,8 @@ Other topics
 
     For information about serving the static files (images, JavaScript, and
     CSS) associated with the admin in production, see :ref:`serving-files`.
+
+    Having problems?  Try :doc:`/faq/admin`.
 
 ``ModelAdmin`` objects
 ======================
@@ -128,8 +131,6 @@ subclass::
     Example::
 
         date_hierarchy = 'pub_date'
-
-    .. versionadded:: 1.3
 
     This will intelligently populate itself based on available data,
     e.g. if all the dates are in one month, it'll show the day-level
@@ -307,7 +308,9 @@ subclass::
     By default a ``ModelForm`` is dynamically created for your model. It is
     used to create the form presented on both the add/change pages. You can
     easily provide your own ``ModelForm`` to override any default form behavior
-    on the add/change pages.
+    on the add/change pages. Alternatively, you can customize the default
+    form rather than specifying an entirely new one by using the
+    :meth:`ModelAdmin.get_form` method.
 
     For an example see the section `Adding custom validation to the admin`_.
 
@@ -373,7 +376,8 @@ subclass::
 
 .. attribute:: ModelAdmin.inlines
 
-    See :class:`InlineModelAdmin` objects below.
+    See :class:`InlineModelAdmin` objects below as well as
+    :meth:`ModelAdmin.get_formsets`.
 
 .. attribute:: ModelAdmin.list_display
 
@@ -576,8 +580,6 @@ subclass::
           class PersonAdmin(ModelAdmin):
               list_filter = ('is_staff', 'company')
 
-      .. versionadded:: 1.3
-
       Field names in ``list_filter`` can also span relations
       using the ``__`` lookup, for example::
 
@@ -748,8 +750,6 @@ subclass::
 
 .. attribute:: ModelAdmin.paginator
 
-    .. versionadded:: 1.3
-
     The paginator class to be used for pagination. By default,
     :class:`django.core.paginator.Paginator` is used. If the custom paginator
     class doesn't have the same constructor interface as
@@ -804,18 +804,47 @@ subclass::
         class ArticleAdmin(admin.ModelAdmin):
             raw_id_fields = ("newspaper",)
 
+    The ``raw_id_fields`` ``Input`` widget should contain a primary key if the
+    field is a ``ForeignKey`` or a comma separated list of values if the field
+    is a ``ManyToManyField``.  The ``raw_id_fields`` widget shows a magnifying
+    glass button next to the field which allows users to search for and select
+    a value:
+
+    .. image:: _images/raw_id_fields.png
+
 .. attribute:: ModelAdmin.readonly_fields
 
     By default the admin shows all fields as editable. Any fields in this
     option (which should be a ``list`` or ``tuple``) will display its data
-    as-is and non-editable. This option behaves nearly identical to
-    :attr:`ModelAdmin.list_display`. Usage is the same, however, when you
-    specify :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` the
-    read-only fields must be present to be shown (they are ignored otherwise).
+    as-is and non-editable; they are also excluded from the
+    :class:`~django.forms.ModelForm` used for creating and editing. Note that
+    when specifying :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets`
+    the read-only fields must be present to be shown (they are ignored
+    otherwise).
 
     If ``readonly_fields`` is used without defining explicit ordering through
     :attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` they will be
     added last after all editable fields.
+
+    A read-only field can not only display data from a model's field, it can
+    also display the output of a a model's method or a method of the
+    ``ModelAdmin`` class itself. This is very similar to the way
+    :attr:`ModelAdmin.list_display` behaves. This provides an easy way to use
+    the admin interface to provide feedback on the status of the objects being
+    edited, for example::
+
+        class PersonAdmin(ModelAdmin):
+            readonly_fields = ('address_report',)
+
+            def address_report(self, instance):
+                return ", ".join(instance.get_full_address()) or \
+                   "<span class='errors'>I can't determine this address.</span>"
+
+            # short_description functions like a model field's verbose_name
+            address_report.short_description = "Address"
+            # in this example, we have used HTML tags in the output
+            address_report.allow_tags = True
+
 
 .. attribute:: ModelAdmin.save_as
 
@@ -966,8 +995,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.delete_model(self, request, obj)
 
-    .. versionadded:: 1.3
-
     The ``delete_model`` method is given the ``HttpRequest`` and a model
     instance. Use this method to do pre- or post-delete operations.
 
@@ -1049,6 +1076,16 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
+
+    .. versionadded:: 1.5
+
+    The ``get_inline_instances`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
+    objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
+    section.
+
 .. method:: ModelAdmin.get_urls(self)
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
@@ -1115,6 +1152,38 @@ templates used by the :class:`ModelAdmin` views:
 
         (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
+.. method:: ModelAdmin.get_form(self, request, obj=None, **kwargs)
+
+    Returns a :class:`~django.forms.ModelForm` class for use in the admin add
+    and change views, see :meth:`add_view` and :meth:`change_view`.
+
+    If you wanted to hide a field from non-superusers, for example, you could
+    override ``get_form`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_form(self, request, obj=None, **kwargs):
+                self.exclude = []
+                if not request.user.is_superuser:
+                    self.exclude.append('field_to_hide')
+                return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
+.. method:: ModelAdmin.get_formsets(self, request, obj=None)
+
+    Yields :class:`InlineModelAdmin`\s for use in admin add and change views.
+
+    For example if you wanted to display a particular inline only in the change
+    view, you could override ``get_formsets`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            inlines = [MyInline, SomeOtherInline]
+
+            def get_formsets(self, request, obj=None):
+                for inline in self.get_inline_instances(request, obj):
+                    # hide MyInline in the add view
+                    if isinstance(inline, MyInline) and obj is None:
+                        continue
+                    yield inline.get_formset(request, obj)
+
 .. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
     The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
@@ -1166,9 +1235,38 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_changelist(self, request, **kwargs)
 
-    Returns the Changelist class to be used for listing. By default,
+    Returns the ``Changelist`` class to be used for listing. By default,
     ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
     class you can change the behavior of the listing.
+
+.. method:: ModelAdmin.get_changelist_form(self, request, **kwargs)
+
+    Returns a :class:`~django.forms.ModelForm` class for use in the ``Formset``
+    on the changelist page. To use a custom form, for example::
+
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = MyModel
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_changelist_form(self, request, **kwargs):
+                return MyForm
+
+.. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
+
+    Returns a :ref:`ModelFormSet <model-formsets>` class for use on the
+    changelist page if :attr:`~ModelAdmin.list_editable` is used. To use a
+    custom formset, for example::
+
+        from django.forms.models import BaseModelFormSet
+
+        class MyAdminFormSet(BaseModelFormSet):
+            pass
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_changelist_formset(self, request, **kwargs):
+                kwargs['formset'] = MyAdminFormSet
+                return super(MyModelAdmin, self).get_changelist_formset(request, **kwargs)
 
 .. method:: ModelAdmin.has_add_permission(self, request)
 
@@ -1205,15 +1303,21 @@ templates used by the :class:`ModelAdmin` views:
                     return qs
                 return qs.filter(author=request.user)
 
-.. method:: ModelAdmin.message_user(request, message)
+.. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
-    Sends a message to the user. The default implementation creates a message
-    using the :mod:`django.contrib.messages` backend. See the
-    :ref:`custom ModelAdmin example <custom-admin-action>`.
+    Sends a message to the user using the :mod:`django.contrib.messages`
+    backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
+
+    .. versionadded:: 1.5
+
+    Keyword arguments allow you to change the message level, add extra CSS
+    tags, or fail silently if the ``contrib.messages`` framework is not
+    installed. These keyword arguments match those for
+    :func:`django.contrib.messages.add_message`, see that function's
+    documentation for more details. One difference is that the level may be
+    passed as a string label in addition to integer/constant.
 
 .. method:: ModelAdmin.get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
-
-    .. versionadded:: 1.3
 
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
@@ -1281,6 +1385,8 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the
 :doc:`TemplateResponse documentation </ref/template-response>`.
 
+.. _modeladmin-media-definitions:
+
 ``ModelAdmin`` media definitions
 --------------------------------
 
@@ -1294,8 +1400,6 @@ on your ``ModelAdmin``::
                 "all": ("my_styles.css",)
             }
             js = ("my_code.js",)
-
-.. versionchanged:: 1.3
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
@@ -1394,17 +1498,14 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.exclude`
 - :attr:`~ModelAdmin.filter_horizontal`
 - :attr:`~ModelAdmin.filter_vertical`
+- :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
-
-.. versionadded:: 1.3
-
-- :attr:`~ModelAdmin.ordering`
-- :meth:`~ModelAdmin.queryset`
 
 .. versionadded:: 1.4
 
@@ -1435,8 +1536,6 @@ The ``InlineModelAdmin`` class adds:
     The value for ``form`` defaults to ``ModelForm``. This is what is passed
     through to ``inlineformset_factory`` when creating the formset for this
     inline.
-
-    .. _ref-contrib-admin-inline-extra:
 
 .. attribute:: InlineModelAdmin.extra
 
@@ -1494,6 +1593,10 @@ The ``InlineModelAdmin`` class adds:
     Specifies whether or not inline objects can be deleted in the inline.
     Defaults to ``True``.
 
+.. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
+
+    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
+    See the example for :class:`ModelAdmin.get_formsets`.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
@@ -1812,8 +1915,6 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site login view.
 
 .. attribute:: AdminSite.login_form
-
-    .. versionadded:: 1.3
 
     Subclass of :class:`~django.contrib.auth.forms.AuthenticationForm` that
     will be used by the admin site login view.

@@ -505,15 +505,8 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-.. versionchanged:: 1.3
-
-The ``values()`` method previously did not return anything for
-:class:`~django.db.models.ManyToManyField` attributes and would raise an error
-if you tried to pass this type of field to it.
-
-This restriction has been lifted, and you can now also refer to fields on
-related models with reverse relations through ``OneToOneField``, ``ForeignKey``
-and ``ManyToManyField`` attributes::
+You can also refer to fields on related models with reverse relations through
+``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
     Blog.objects.values('name', 'entry__headline')
     [{'name': 'My blog', 'entry__headline': 'An entry'},
@@ -683,21 +676,12 @@ Note that, by default, ``select_related()`` does not follow foreign keys that
 have ``null=True``.
 
 Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, in situations with deeply nested
-sets of relationships ``select_related()`` can sometimes end up following "too
-many" relations, and can generate queries so large that they end up being slow.
+app can avoid many database calls. However, there are times you are only
+interested in specific related models, or have deeply nested sets of
+relationships, and in these cases ``select_related()`` can be optimized by
+explicitly passing the related field names you are interested in. Only
+the specified relations will be followed.
 
-In these situations, you can use the ``depth`` argument to ``select_related()``
-to control how many "levels" of relations ``select_related()`` will actually
-follow::
-
-    b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
-
-Sometimes you only want to access specific models that are related to your root
-model, not all of the related models. In these cases, you can pass the related
-field names to ``select_related()`` and it will only follow those relations.
 You can even do this for models that are more than one relation away by
 separating the field names with double underscores, just as for filters. For
 example, if you have this model::
@@ -736,6 +720,17 @@ You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
+
+.. deprecated:: 1.5
+    The ``depth`` parameter to ``select_related()`` has been deprecated. You
+    should replace it with the use of the ``(*fields)`` listing specific
+    related fields instead as documented above.
+
+A depth limit of relationships to follow can also be specified::
+
+    b = Book.objects.select_related(depth=1).get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Requires a database call.
 
 A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
 direction if you are performing a depth-based ``select_related()`` call.
@@ -1463,6 +1458,16 @@ evaluated will force it to evaluate again, repeating the query.
 Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
 ignored since these two optimizations do not make sense together.
 
+.. warning::
+
+    Some Python database drivers like ``psycopg2`` perform caching if using
+    client side cursors (instantiated with ``connection.cursor()`` and what
+    Django's ORM uses). Using ``iterator()`` does not affect caching at the
+    database driver level. To disable this caching, look at `server side
+    cursors`_.
+
+.. _server side cursors: http://initd.org/psycopg/docs/usage.html#server-side-cursors
+
 latest
 ~~~~~~
 
@@ -1571,7 +1576,8 @@ update
 .. method:: update(**kwargs)
 
 Performs an SQL update query for the specified fields, and returns
-the number of rows affected.
+the number of rows matched (which may not be equal to the number of rows
+updated if some rows already have the new value).
 
 For example, to turn comments off for all blog entries published in 2010,
 you could do this::
@@ -1631,7 +1637,7 @@ does not call any ``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
 calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
 update a bunch of records for a model that has a custom
-:meth:`~django.db.models.Model.save()`` method, loop over them and call
+:meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
 
     for e in Entry.objects.filter(pub_date__year=2010):
@@ -1664,16 +1670,30 @@ For example::
     # This will delete all Blogs and all of their Entry objects.
     blogs.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.pre_delete` and
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
+
+.. versionadded:: 1.5
+    Allow fast-path deletion of objects
+
+Django needs to fetch objects into memory to send signals and handle cascades.
+However, if there are no cascades and no signals, then Django may take a
+fast-path and delete objects without fetching into memory. For large
+deletes this can result in significantly reduced memory usage. The amount of
+executed queries can be reduced, too.
+
+ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
+DO_NOTHING do not prevent taking the fast-path in deletion.
+
+Note that the queries generated in object deletion is an implementation
+detail subject to change.
 
 .. _field-lookups:
 

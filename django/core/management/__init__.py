@@ -103,10 +103,12 @@ def get_commands():
         _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
 
         # Find the installed apps
+        from django.conf import settings
         try:
-            from django.conf import settings
             apps = settings.INSTALLED_APPS
-        except (AttributeError, ImproperlyConfigured):
+        except ImproperlyConfigured:
+            # Still useful for commands that do not require functional settings,
+            # like startproject or help
             apps = []
 
         # Find and load the management module for each installed app.
@@ -134,13 +136,14 @@ def call_command(name, *args, **options):
     # Load the command object.
     try:
         app_name = get_commands()[name]
-        if isinstance(app_name, BaseCommand):
-            # If the command is already loaded, use it directly.
-            klass = app_name
-        else:
-            klass = load_command_class(app_name, name)
     except KeyError:
         raise CommandError("Unknown command: %r" % name)
+
+    if isinstance(app_name, BaseCommand):
+        # If the command is already loaded, use it directly.
+        klass = app_name
+    else:
+        klass = load_command_class(app_name, name)
 
     # Grab out a list of defaults from the options. optparse does this for us
     # when the script runs from the command line, but since call_command can

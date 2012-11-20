@@ -57,7 +57,7 @@ def srs_output(func, argtypes):
     func.errcheck = check_srs
     return func
 
-def const_string_output(func, argtypes, offset=None):
+def const_string_output(func, argtypes, offset=None, decoding=None):
     func.argtypes = argtypes
     if offset:
         func.restype = c_int
@@ -65,12 +65,15 @@ def const_string_output(func, argtypes, offset=None):
         func.restype = c_char_p
 
     def _check_const(result, func, cargs):
-        return check_const_string(result, func, cargs, offset=offset)
+        res = check_const_string(result, func, cargs, offset=offset)
+        if res and decoding:
+            res = res.decode(decoding)
+        return res
     func.errcheck = _check_const
 
     return func
 
-def string_output(func, argtypes, offset=-1, str_result=False):
+def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     """
     Generates a ctypes prototype for the given function with the
     given argument types that returns a string from a GDAL pointer.
@@ -90,8 +93,11 @@ def string_output(func, argtypes, offset=-1, str_result=False):
     # Dynamically defining our error-checking function with the
     # given offset.
     def _check_str(result, func, cargs):
-        return check_string(result, func, cargs,
+        res = check_string(result, func, cargs,
                             offset=offset, str_result=str_result)
+        if res and decoding:
+            res = res.decode(decoding)
+        return res
     func.errcheck = _check_str
     return func
 
