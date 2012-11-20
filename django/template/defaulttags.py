@@ -401,7 +401,7 @@ class URLNode(Node):
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which cause return nothing.
+        # {% url ... as var %} construct in which case return nothing.
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
