@@ -227,10 +227,10 @@ class PaginationTests(unittest.TestCase):
         paginator = ValidAdjacentNumsPaginator(eleven, per_page=6)
         page1 = paginator.page(1)
         page2 = paginator.page(2)
-        self.assertEquals(page1.previous_page_number(), None)
-        self.assertEquals(page1.next_page_number(), 2)
-        self.assertEquals(page2.previous_page_number(), 1)
-        self.assertEquals(page2.next_page_number(), None)
+        self.assertIsNone(page1.previous_page_number())
+        self.assertEqual(page1.next_page_number(), 2)
+        self.assertEqual(page2.previous_page_number(), 1)
+        self.assertIsNone(page2.next_page_number())
 
 
 class ModelPaginationTests(TestCase):
