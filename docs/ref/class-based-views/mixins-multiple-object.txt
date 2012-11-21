@@ -72,6 +72,16 @@ MultipleObjectMixin
         expect either a ``page`` query string parameter (via ``request.GET``)
         or a ``page`` variable specified in the URLconf.
 
+    .. attribute:: paginate_orphans
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. This extends the :attr:`MultipleObjectMixin.paginate_by`
+        limit on the last page by up to
+        :attr:`MultipleObjectMixin.paginate_orphans`, in order to keep the last
+        page from having a very small number of objects.
+
     .. attribute:: page_kwarg
 
         .. versionadded:: 1.5
@@ -118,6 +128,14 @@ MultipleObjectMixin
 
         Returns an instance of the paginator to use for this view. By default,
         instantiates an instance of :attr:`paginator_class`.
+
+    .. method:: get_paginate_by()
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. By default this simply returns the value of
+        :attr:`MultipleObjectMixin.paginate_orphans`.
 
     .. method:: get_allow_empty()
 

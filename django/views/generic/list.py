@@ -15,6 +15,7 @@ class MultipleObjectMixin(ContextMixin):
     queryset = None
     model = None
     paginate_by = None
+    paginate_orphans = 0
     context_object_name = None
     paginator_class = Paginator
     page_kwarg = 'page'
@@ -39,7 +40,9 @@ class MultipleObjectMixin(ContextMixin):
         """
         Paginate the queryset, if needed.
         """
-        paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
+        paginator = self.get_paginator(
+            queryset, page_size, orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty())
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
@@ -64,11 +67,21 @@ class MultipleObjectMixin(ContextMixin):
         """
         return self.paginate_by
 
-    def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True):
+    def get_paginator(self, queryset, per_page, orphans=0,
+                      allow_empty_first_page=True, **kwargs):
         """
         Return an instance of the paginator for this view.
         """
-        return self.paginator_class(queryset, per_page, orphans=orphans, allow_empty_first_page=allow_empty_first_page)
+        return self.paginator_class(
+            queryset, per_page, orphans=orphans,
+            allow_empty_first_page=allow_empty_first_page, **kwargs)
+
+    def get_paginate_orphans(self):
+        """
+        Returns the maximum number of orphans extend the last page by when
+        paginating.
+        """
+        return self.paginate_orphans
 
     def get_allow_empty(self):
         """
