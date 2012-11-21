@@ -147,7 +147,7 @@ unzip. On GNU/Linux platforms, use the following commands:
 
 The world borders ZIP file contains a set of data files collectively known as
 an `ESRI Shapefile`__, one of the most popular geospatial data formats.  When
-unzipped, the world borders data set includes files with the following
+unzipped, the world borders dataset includes files with the following
 extensions:
 
 * ``.shp``: Holds the vector data for the world borders geometries.
@@ -218,7 +218,7 @@ Geographic Models
 Defining a Geographic Model
 ---------------------------
 
-Now that you've examined your data set using ``ogrinfo``, create a GeoDjango 
+Now that you've examined your dataset using ``ogrinfo``, create a GeoDjango 
 model to represent this data::
 
     from django.contrib.gis.db import models
@@ -376,7 +376,7 @@ You can see the layer's geometry type and how many features it contains::
     It's important to use a more general field type in models: a 
     GeoDjango ``MultiPolygonField`` will accept a ``Polygon`` geometry, but a 
     ``PolygonField`` will not accept a ``MultiPolygon`` type geometry.  This 
-    is why the WorldBorder model defined above uses a ``MultiPolygonField``.
+    is why the ``WorldBorder`` model defined above uses a ``MultiPolygonField``.
 
 The :class:`~django.contrib.gis.gdal.Layer` may also have a spatial reference
 system associated with it.  If it does, the ``srs`` attribute will return a
@@ -393,7 +393,7 @@ system associated with it.  If it does, the ``srs`` attribute will return a
     '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 This shapefile is in the popular WGS84 spatial reference
-system -- in other words, the data uses longitude, latitude pairs and 
+system -- in other words, the data uses longitude, latitude pairs in
 units of degrees.
 
 In addition, shapefiles also support attribute fields that may contain
@@ -444,7 +444,7 @@ Boundary geometries may be exported as WKT and GeoJSON::
 ``LayerMapping``
 ----------------
 
-To import the data at last, use a LayerMapping in a Python script.
+To import the data, use a LayerMapping in a Python script.
 Create a file called ``load.py`` inside the ``world`` application, 
 with the following code::
 
@@ -600,7 +600,7 @@ Now, define a point of interest [#]_::
 
 The ``pnt_wkt`` string represents the point at -95.3385 degrees longitude,
 29.7245 degrees latitude.  The geometry is in a format known as
-Well Known Text (WKT), an standard issued by the Open Geospatial
+Well Known Text (WKT), a standard issued by the Open Geospatial
 Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
 a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
 
@@ -673,7 +673,7 @@ __ http://spatialreference.org/ref/epsg/32140/
 Lazy Geometries
 ---------------
 GeoDjango loads geometries in a standardized textual representation.  When the
-the geometry field is first accessed, GeoDjango creates a `GEOS geometry object
+geometry field is first accessed, GeoDjango creates a `GEOS geometry object
 <ref-geos>`, exposing powerful functionality, such as serialization properties
 for popular geospatial formats::
 
@@ -759,7 +759,7 @@ With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
 a `Open Street Map`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
-(which uses the `Vector Map Level 0`_ WMS data set hosted at `OSGeo`_).
+(which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
 First, there are some important requirements:
 
@@ -776,7 +776,7 @@ option class in your ``admin.py`` file::
 
 .. rubric:: Footnotes
 
-.. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org <http://thematicmapping.org>`_ for providing and maintaining this data set.
+.. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org <http://thematicmapping.org>`_ for providing and maintaining this dataset.
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center <http://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
