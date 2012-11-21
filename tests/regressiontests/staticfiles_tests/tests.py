@@ -58,9 +58,9 @@ class BaseStaticFilesTestCase(object):
         testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
-        self._nonascii_filepath = os.path.join(testfiles_path, 'fi\u015fier.txt')
+        self._nonascii_filepath = os.path.join(testfiles_path, '\u2297.txt')
         with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
-            f.write("fi\u015fier in the app dir")
+            f.write("\u2297 in the app dir")
         # And also create the stupid hidden file to dwarf the setup.py's
         # package data handling.
         self._hidden_filepath = os.path.join(testfiles_path, '.hidden')
@@ -177,7 +177,7 @@ class TestDefaults(object):
         """
         Can find a file with non-ASCII character in an app static/ directory.
         """
-        self.assertFileContains('test/fişier.txt', 'fişier in the app dir')
+        self.assertFileContains('test/⊗.txt', '⊗ in the app dir')
 
     def test_camelcase_filenames(self):
         """
