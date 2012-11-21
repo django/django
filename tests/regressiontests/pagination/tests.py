@@ -9,6 +9,7 @@ from django.utils import six
 from django.utils import unittest
 
 from .models import Article
+from .custom import ValidAdjacentNumsPaginator
 
 
 class PaginationTests(unittest.TestCase):
@@ -216,6 +217,20 @@ class PaginationTests(unittest.TestCase):
         self.assertFalse('a' in page2)
         self.assertEqual(''.join(page2), 'fghijk')
         self.assertEqual(''.join(reversed(page2)), 'kjihgf')
+
+    def test_get_page_hook(self):
+        """
+        Tests that a Paginator subclass can use the ``_get_page`` hook to
+        return an alternative to the standard Page class.
+        """
+        eleven = 'abcdefghijk'
+        paginator = ValidAdjacentNumsPaginator(eleven, per_page=6)
+        page1 = paginator.page(1)
+        page2 = paginator.page(2)
+        self.assertEquals(page1.previous_page_number(), None)
+        self.assertEquals(page1.next_page_number(), 2)
+        self.assertEquals(page2.previous_page_number(), 1)
+        self.assertEquals(page2.next_page_number(), None)
 
 
 class ModelPaginationTests(TestCase):
