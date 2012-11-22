@@ -1321,10 +1321,12 @@ The above example can be rewritten using ``get_or_create()`` like so::
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
-found, ``get_or_create()`` returns a tuple of that object and ``False``. If an
-object is *not* found, ``get_or_create()`` will instantiate and save a new
-object, returning a tuple of the new object and ``True``. The new object will
-be created roughly according to this algorithm::
+found, ``get_or_create()`` returns a tuple of that object and ``False``. If
+multiple objects are found, ``get_or_create`` raises
+:exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
+found, ``get_or_create()`` will instantiate and save a new object, returning a
+tuple of the new object and ``True``. The new object will be created roughly
+according to this algorithm::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
