@@ -37,10 +37,11 @@ A class-based view is deployed into a URL pattern using the
     is modified, the actions of one user visiting your view could have an
     effect on subsequent users visiting the same view.
 
-Any argument passed into :meth:`~django.views.generic.base.View.as_view()` will
+Arguments passed into :meth:`~django.views.generic.base.View.as_view()` will
 be assigned onto the instance that is used to service a request. Using the
 previous example, this means that every request on ``MyView`` is able to use
-``self.size``.
+``self.size``. Arguments must correspond to attributes that already exist on
+the class (return ``True`` on a ``hasattr`` check).
 
 Base vs Generic views
 ---------------------
