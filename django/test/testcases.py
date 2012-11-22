@@ -505,6 +505,12 @@ class TransactionTestCase(SimpleTestCase):
         # If the test case has a multi_db=True flag, flush all databases.
         # Otherwise, just flush default.
         databases = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
+
+        # Roll back any pending transactions in order to avoid a deadlock
+        # during flush when TEST_MIRROR is used (#18984).
+        for conn in connections.all():
+            conn.rollback_unless_managed()
+
         for db in databases:
             call_command('flush', verbosity=0, interactive=False, database=db,
                          skip_validation=True, reset_sequences=False)
