@@ -10,6 +10,7 @@ import unicodedata
 from django.contrib.auth import models as auth_app, get_user_model
 from django.core import exceptions
 from django.core.management.base import CommandError
+from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import get_models, signals
 from django.utils import six
 from django.utils.six.moves import input
@@ -57,7 +58,10 @@ def _check_permission_clashing(custom, builtin, ctype):
                 (codename, ctype.app_label, ctype.model_class().__name__))
         pool.add(codename)
 
-def create_permissions(app, created_models, verbosity, **kwargs):
+def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
+    if not router.allow_syncdb(db, auth_app.Permission):
+        return
+
     from django.contrib.contenttypes.models import ContentType
 
     app_models = get_models(app)
@@ -68,7 +72,9 @@ def create_permissions(app, created_models, verbosity, **kwargs):
     # The codenames and ctypes that should exist.
     ctypes = set()
     for klass in app_models:
-        ctype = ContentType.objects.get_for_model(klass)
+        # Force looking up the content types in the current database
+        # before creating foreign keys to them.
+        ctype = ContentType.objects.db_manager(db).get_for_model(klass)
         ctypes.add(ctype)
         for perm in _get_all_permissions(klass._meta, ctype):
             searched_perms.append((ctype, perm))
@@ -76,21 +82,21 @@ def create_permissions(app, created_models, verbosity, **kwargs):
     # Find all the Permissions that have a context_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(auth_app.Permission.objects.filter(
+    all_perms = set(auth_app.Permission.objects.using(db).filter(
         content_type__in=ctypes,
     ).values_list(
         "content_type", "codename"
     ))
 
-    objs = [
+    perms = [
         auth_app.Permission(codename=codename, name=name, content_type=ctype)
         for ctype, (codename, name) in searched_perms
         if (ctype.pk, codename) not in all_perms
     ]
-    auth_app.Permission.objects.bulk_create(objs)
+    auth_app.Permission.objects.using(db).bulk_create(perms)
     if verbosity >= 2:
-        for obj in objs:
-            print("Adding permission '%s'" % obj)
+        for perm in perms:
+            print("Adding permission '%s'" % perm)
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):

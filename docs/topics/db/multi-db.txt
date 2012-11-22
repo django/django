@@ -630,3 +630,49 @@ However, if you're using SQLite or MySQL with MyISAM tables, there is
 no enforced referential integrity; as a result, you may be able to
 'fake' cross database foreign keys. However, this configuration is not
 officially supported by Django.
+
+.. _contrib_app_multiple_databases:
+
+Behavior of contrib apps
+------------------------
+
+Several contrib apps include models, and some apps depend on others. Since
+cross-database relationships are impossible, this creates some restrictions on
+how you can split these models across databases:
+
+- each one of ``contenttypes.ContentType``, ``sessions.Session`` and
+  ``sites.Site`` can be stored in any database, given a suitable router.
+- ``auth`` models — ``User``, ``Group`` and ``Permission`` — are linked
+  together and linked to ``ContentType``, so they must be stored in the same
+  database as ``ContentType``.
+- ``admin`` and ``comments`` depend on ``auth``, so their models must be in
+  the same database as ``auth``.
+- ``flatpages`` and ``redirects`` depend on ``sites``, so their models must be
+  in the same database as ``sites``.
+
+In addition, some objects are automatically created just after
+:djadmin:`syncdb` creates a table to hold them in a database:
+
+- a default ``Site``,
+- a ``ContentType`` for each model (including those not stored in that
+  database),
+- three ``Permission`` for each model (including those not stored in that
+  database).
+
+.. versionchanged:: 1.5
+    Previously, ``ContentType`` and ``Permission`` instances were created only
+    in the default database.
+
+For common setups with multiple databases, it isn't useful to have these
+objects in more than one database. Common setups include master / slave and
+connecting to external databases. Therefore, it's recommended:
+
+- either to run :djadmin:`syncdb` only for the default database;
+- or to write :ref:`database router<topics-db-multi-db-routing>` that allows
+  synchronizing these three models only to one database.
+
+.. warning::
+
+    If you're synchronizing content types to more that one database, be aware
+    that their primary keys may not match across databases. This may result in
+    data corruption or data loss.
