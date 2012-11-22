@@ -111,7 +111,7 @@ receved extensive testing via our automated test suite, it's recieved very
 little real-world testing. We've done our best to eliminate bugs, but we can't
 be sure we covered all possible uses of Django. Further, Django's more than a
 web framework; it's an ecosystem of pluggable components. At this point, very
-few third-party applications have been ported to Python 3, so it's unliukely
+few third-party applications have been ported to Python 3, so it's unlikely
 that a real-world application will have all its dependecies satisfied under
 Python 3.
 
