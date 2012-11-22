@@ -1,14 +1,16 @@
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import FieldDoesNotExist
+from django.db.models.sql.constants import REUSE_ALL
 
 class SQLEvaluator(object):
-    def __init__(self, expression, query, allow_joins=True):
+    def __init__(self, expression, query, allow_joins=True, reuse=REUSE_ALL):
         self.expression = expression
         self.opts = query.get_meta()
         self.cols = []
 
         self.contains_aggregate = False
+        self.reuse = reuse
         self.expression.prepare(self, query, allow_joins)
 
     def prepare(self):
@@ -50,9 +52,10 @@ class SQLEvaluator(object):
             try:
                 field, source, opts, join_list, last, _ = query.setup_joins(
                     field_list, query.get_meta(),
-                    query.get_initial_alias(), False)
+                    query.get_initial_alias(), self.reuse)
                 col, _, join_list = query.trim_joins(source, join_list, last, False)
-
+                if self.reuse is not None and self.reuse != REUSE_ALL:
+                    self.reuse.update(join_list)
                 self.cols.append((node, (join_list[-1], col)))
             except FieldDoesNotExist:
                 raise FieldError("Cannot resolve keyword %r into field. "

@@ -589,6 +589,12 @@ Miscellaneous
   :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
   the operators are used as boolean AND and OR operators.
 
+* In a ``filter()`` call, when :ref:`F() expressions <query-expressions>`
+  contained lookups spanning multi-valued relations, they didn't always reuse
+  the same relations as other lookups along the same chain. This was changed,
+  and now F() expressions will always use the same relations as other lookups
+  within the same ``filter()`` call.
+
 * The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
   HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
   in your pages.

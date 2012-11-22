@@ -1096,7 +1096,7 @@ class Query(object):
             value = value()
         elif isinstance(value, ExpressionNode):
             # If value is a query expression, evaluate it
-            value = SQLEvaluator(value, self)
+            value = SQLEvaluator(value, self, reuse=can_reuse)
             having_clause = value.contains_aggregate
 
         for alias, aggregate in self.aggregates.items():
