@@ -336,7 +336,7 @@ The login_required decorator
     The login_required decorator does NOT check the is_active flag on a user.
 
 Limiting access to logged-in users that pass a test
----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To limit access based on certain permissions or some other test, you'd do
 essentially the same thing as described in the previous section.
@@ -418,6 +418,15 @@ The permission_required decorator
     :exc:`~django.core.exceptions.PermissionDenied`, prompting
     :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` instead of
     redirecting to the login page.
+
+Applying permissions to generic views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To apply a permission to a :doc:`class-based generic view
+</ref/class-based-views/index>`, decorate the :meth:`View.dispatch
+<django.views.generic.base.View.dispatch>` method on the class. See
+:ref:`decorating-class-based-views` for details.
+
 
 .. _built-in-auth-views:
 
@@ -830,13 +839,92 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. currentmodule:: django.contrib.auth
 
-Applying permissions to generic views
--------------------------------------
 
-To apply a permission to a :doc:`class-based generic view
-</ref/class-based-views/index>`, decorate the :meth:`View.dispatch
-<django.views.generic.base.View.dispatch>` method on the class. See
-:ref:`decorating-class-based-views` for details.
+Authentication data in templates
+--------------------------------
+
+The currently logged-in user and his/her permissions are made available in the
+:doc:`template context </ref/templates/api>` when you use
+:class:`~django.template.context.RequestContext`.
+
+.. admonition:: Technicality
+
+   Technically, these variables are only made available in the template context
+   if you use :class:`~django.template.context.RequestContext` *and* your
+   :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting contains
+   ``"django.contrib.auth.context_processors.auth"``, which is default. For
+   more, see the :ref:`RequestContext docs <subclassing-context-requestcontext>`.
+
+Users
+~~~~~
+
+When rendering a template :class:`~django.template.context.RequestContext`, the
+currently logged-in user, either a  :class:`~django.contrib.auth.models.User`
+instance or an :class:`~django.contrib.auth.models.AnonymousUser` instance, is
+stored in the template variable ``{{ user }}``:
+
+.. code-block:: html+django
+
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+    {% else %}
+        <p>Welcome, new user. Please log in.</p>
+    {% endif %}
+
+This template context variable is not available if a ``RequestContext`` is not
+being used.
+
+Permissions
+~~~~~~~~~~~
+
+The currently logged-in user's permissions are stored in the template variable
+``{{ perms }}``. This is an instance of
+:class:`django.contrib.auth.context_processors.PermWrapper`, which is a
+template-friendly proxy of permissions.
+
+In the ``{{ perms }}`` object, single-attribute lookup is a proxy to
+:meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`.
+This example would display ``True`` if the logged-in user had any permissions
+in the ``foo`` app::
+
+    {{ perms.foo }}
+
+Two-level-attribute lookup is a proxy to
+:meth:`User.has_perm <django.contrib.auth.models.User.has_perm>`. This example
+would display ``True`` if the logged-in user had the permission
+``foo.can_vote``::
+
+    {{ perms.foo.can_vote }}
+
+Thus, you can check permissions in template ``{% if %}`` statements:
+
+.. code-block:: html+django
+
+    {% if perms.foo %}
+        <p>You have permission to do something in the foo app.</p>
+        {% if perms.foo.can_vote %}
+            <p>You can vote!</p>
+        {% endif %}
+        {% if perms.foo.can_drive %}
+            <p>You can drive!</p>
+        {% endif %}
+    {% else %}
+        <p>You don't have permission to do anything in the foo app.</p>
+    {% endif %}
+
+.. versionadded:: 1.5
+    Permission lookup by "if in".
+
+It is possible to also look permissions up by ``{% if in %}`` statements.
+For example:
+
+.. code-block:: html+django
+
+    {% if 'foo' in perms %}
+        {% if 'foo.can_vote' in perms %}
+            <p>In lookup works, too.</p>
+        {% endif %}
+    {% endif %}
 
 .. _auth-admin:
 
@@ -857,3 +945,33 @@ able to add users. Why? Because if you have permission to add users, you have
 the power to create superusers, which can then, in turn, change other users. So
 Django requires add *and* change permissions as a slight security measure.
 
+
+Adding UserProfile fields to the admin
+--------------------------------------
+
+To add the UserProfile fields to the user page in the admin, define an
+:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+add it to a ``UserAdmin`` class which is registered with the
+:class:`~django.contrib.auth.models.User` class::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from my_user_profile_app.models import UserProfile
+
+    # Define an inline admin descriptor for UserProfile model
+    # which acts a bit like a singleton
+    class UserProfileInline(admin.StackedInline):
+        model = UserProfile
+        can_delete = False
+        verbose_name_plural = 'profile'
+
+    # Define a new User admin
+    class UserAdmin(UserAdmin):
+        inlines = (UserProfileInline, )
+
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
