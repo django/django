@@ -888,6 +888,11 @@ creating the ``myapp`` app::
 
     django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
 
+Also, if you would like to use a Git repository hosted on Github,
+then you can use the path to the zip file. ::
+
+   django-admin.py startapp --template=https://github.com/epicserve/django-app-template/archive/master.zip myapp
+
 .. versionadded:: 1.4
 
 When Django copies the app template files, it also renders certain files
@@ -953,6 +958,11 @@ For example, this would look for a project template in the given directory
 when creating the ``myproject`` project::
 
     django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
+
+Also, if you would like to use a Git repository hosted on Github,
+then you can use the path to the zip file. ::
+
+   django-admin.py startproject --template=https://github.com/epicserve/django-base-site/archive/master.zip myproject
 
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
