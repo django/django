@@ -62,6 +62,9 @@ class View(object):
             self = cls(**initkwargs)
             if hasattr(self, 'get') and not hasattr(self, 'head'):
                 self.head = self.get
+            self.request = request
+            self.args = args
+            self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -80,9 +83,6 @@ class View(object):
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
             handler = self.http_method_not_allowed
-        self.request = request
-        self.args = args
-        self.kwargs = kwargs
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
