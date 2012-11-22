@@ -3,6 +3,7 @@ import traceback
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail import get_connection
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 
@@ -76,9 +77,10 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(self, include_html=False):
+    def __init__(self, include_html=False, email_backend=None):
         logging.Handler.__init__(self)
         self.include_html = include_html
+        self.email_backend = email_backend
 
     def emit(self, record):
         try:
@@ -110,7 +112,12 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
-        mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+        mail.mail_admins(subject, message, fail_silently=True,
+                         html_message=html_message,
+                         connection=self.connection())
+
+    def connection(self):
+        return get_connection(backend=self.email_backend)
 
     def format_subject(self, subject):
         """
