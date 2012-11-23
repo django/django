@@ -215,7 +215,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         res.append("SELECT %s" % ", ".join(
             "%%s AS %s" % self.quote_name(f.column) for f in fields
         ))
-        res.extend(["UNION SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
+        res.extend(["UNION ALL SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
         return " ".join(res)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
