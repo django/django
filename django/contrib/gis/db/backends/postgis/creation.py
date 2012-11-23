@@ -91,6 +91,6 @@ class PostGISCreation(DatabaseCreation):
             self.connection.settings_dict["NAME"] = test_database_name
             cursor = self.connection.cursor()
             cursor.execute("CREATE EXTENSION postgis")
-            cursor.commit()
+            cursor.connection.commit()
 
         return test_database_name
