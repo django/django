@@ -1912,18 +1912,21 @@ class SyncDBTestCase(TestCase):
 
     def test_syncdb_to_other_database(self):
         """Regression test for #16039: syncdb with --database option."""
-        count = ContentType.objects.count()
+        cts = ContentType.objects.using('other').filter(app_label='multiple_database')
+
+        count = cts.count()
         self.assertGreater(count, 0)
 
-        ContentType.objects.using('other').delete()
+        cts.delete()
         management.call_command('syncdb', verbosity=0, interactive=False,
             load_initial_data=False, database='other')
-
-        self.assertEqual(ContentType.objects.using("other").count(), count)
+        self.assertEqual(cts.count(), count)
 
     def test_syncdb_to_other_database_with_router(self):
         """Regression test for #16039: syncdb with --database option."""
-        ContentType.objects.using('other').delete()
+        cts = ContentType.objects.using('other').filter(app_label='multiple_database')
+
+        cts.delete()
         try:
             old_routers = router.routers
             router.routers = [SyncOnlyDefaultDatabaseRouter()]
@@ -1932,4 +1935,4 @@ class SyncDBTestCase(TestCase):
         finally:
             router.routers = old_routers
 
-        self.assertEqual(ContentType.objects.using("other").count(), 0)
+        self.assertEqual(cts.count(), 0)
