@@ -999,17 +999,36 @@ For example:
 Managing users in the admin
 ===========================
 
-You can also create users using the Django admin site. Assuming you've enabled
-the admin site and hooked it to the URL ``/admin/``. You should see a link to "Users" in the "Auth"
+When you have both ``django.contrib.admin`` and ``django.contrib.auth``
+installed, the admin provides a convenient way to view and manage users,
+groups, and permissions. Users can be created and deleted like any Django
+model. Groups can be created, and permissions can be assigned to users or
+groups. A log of user edits to models made within the admin is also stored and
+displayed.
+
+Creating Users
+--------------
+
+You should see a link to "Users" in the "Auth"
 section of the main admin index page. The "Add user" admin page is different
 than standard admin pages in that it requires you to choose a username and
 password before allowing you to edit the rest of the user's fields.
 
-Also note: if you want your own user account to be able to create users using
-the Django admin site, you'll need to give yourself permission to add users
-*and* change users (i.e., the "Add user" and "Change user" permissions). If
-your account has permission to add users but not to change them, you won't be
-able to add users. Why? Because if you have permission to add users, you have
-the power to create superusers, which can then, in turn, change other users. So
-Django requires add *and* change permissions as a slight security measure.
+Also note: if you want a user account to be able to create users using the
+Django admin site, you'll need to give them permission to add users *and*
+change users (i.e., the "Add user" and "Change user" permissions). If an
+account has permission to add users but not to change them, that account won't
+be able to add users. Why? Because if you have permission to add users, you
+have the power to create superusers, which can then, in turn, change other
+users. So Django requires add *and* change permissions as a slight security
+measure.
+
+Changing Passwords
+------------------
+
+User passwords are not displayed in the admin (nor stored in the database), but
+the :doc:`password storage details </topics/auth/passwords>` are displayed.
+Included in the display of this information for the password field is a link to
+a password change form that allows admins to change user passwords.
+
 
