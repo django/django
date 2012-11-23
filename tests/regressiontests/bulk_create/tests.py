@@ -103,6 +103,14 @@ class BulkCreateTests(TestCase):
         self.assertEqual(TwoFields.objects.filter(f2__gte=901).count(), 101)
 
     @skipUnlessDBFeature('has_bulk_insert')
+    def test_large_single_field_batch(self):
+        # SQLite had a problem with more than 500 UNIONed selects in single
+        # query.
+        Restaurant.objects.bulk_create([
+            Restaurant() for i in range(0, 501)
+        ])
+
+    @skipUnlessDBFeature('has_bulk_insert')
     def test_large_batch_efficiency(self):
         with override_settings(DEBUG=True):
             connection.queries = []
