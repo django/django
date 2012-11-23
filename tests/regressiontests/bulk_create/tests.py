@@ -82,6 +82,14 @@ class BulkCreateTests(TestCase):
         with self.assertRaises(ValueError):
             Country.objects.bulk_create([valid_country, invalid_country])
 
+    def test_batch_same_vals(self):
+        # Sqlite had a problem where all the same-valued models were
+        # collapsed to one insert.
+        Restaurant.objects.bulk_create([
+            Restaurant(name='foo') for i in range(0, 2)
+        ])
+        self.assertEqual(Restaurant.objects.count(), 2)
+
     def test_large_batch(self):
         with override_settings(DEBUG=True):
             connection.queries = []
