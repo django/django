@@ -120,8 +120,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
         999 variables per query.
+
+        If there is just single field to insert, then we can hit another
+        limit, SQLITE_MAX_COMPOUND_SELECT which defaults to 500.
         """
-        return (999 // len(fields)) if len(fields) > 0 else len(objs)
+        limit = 999 if len(fields) > 1 else 500
+        return (limit // len(fields)) if len(fields) > 0 else len(objs)
 
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
