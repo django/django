@@ -108,8 +108,6 @@ add it to a ``UserAdmin`` class which is registered with the
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
-
-
 Customizing the User model
 ==========================
 
@@ -679,4 +677,33 @@ object permissions will always return ``False`` or an empty list (depending on
 the check performed). An authentication backend will receive the keyword
 parameters ``obj`` and ``user_obj`` for each object related authorization
 method and can return the object level permission as appropriate.
+
+.. _custom-permissions:
+
+Custom permissions
+------------------
+
+To create custom permissions for a given model object, use the ``permissions``
+:ref:`model Meta attribute <meta-options>`.
+
+This example Task model creates three custom permissions, i.e., actions users
+can or cannot do with Task instances, specific to your application::
+
+    class Task(models.Model):
+        ...
+        class Meta:
+            permissions = (
+                ("view_task", "Can see available tasks"),
+                ("change_task_status", "Can change the status of tasks"),
+                ("close_task", "Can remove a task by setting its status as closed"),
+            )
+
+The only thing this does is create those extra permissions when you run
+:djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
+value of these permissions when an user is trying to access the functionality
+provided by the application (viewing tasks, changing the status of tasks,
+closing tasks.) Continuing the above example, the following checks if a user may
+view tasks::
+
+    user.has_perm('app.view_task')
 
