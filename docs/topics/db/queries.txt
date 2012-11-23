@@ -920,7 +920,7 @@ Things get more complicated if you use inheritance. Consider a subclass of
     class ThemeBlog(Blog):
         theme = models.CharField(max_length=200)
 
-    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme = 'python')
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
     django_blog.save() # django_blog.pk == 3
 
 Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
