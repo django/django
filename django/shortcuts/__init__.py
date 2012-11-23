@@ -46,7 +46,7 @@ def render(request, *args, **kwargs):
 
 def redirect(to, *args, **kwargs):
     """
-    Returns an HttpResponseRedirect to the apropriate URL for the arguments
+    Returns an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
 
     The arguments could be:
