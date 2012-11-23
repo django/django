@@ -130,6 +130,74 @@ Authenticating Users
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
 
+Permissions and Authorization
+=============================
+
+Django comes with a simple permissions system. It provides a way to assign
+permissions to specific users and groups of users.
+
+It's used by the Django admin site, but you're welcome to use it in your own
+code.
+
+The Django admin site uses permissions as follows:
+
+* Access to view the "add" form and add an object is limited to users with
+  the "add" permission for that type of object.
+* Access to view the change list, view the "change" form and change an
+  object is limited to users with the "change" permission for that type of
+  object.
+* Access to delete an object is limited to users with the "delete"
+  permission for that type of object.
+
+Permissions can be set not only per type of object, but also per specific
+object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
+:meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
+by the :class:`~django.contrib.admin.ModelAdmin` class, it is possible to
+customize permissions for different object instances of the same type.
+
+Default permissions
+-------------------
+
+When ``django.contrib.auth`` is listed in your :setting:`INSTALLED_APPS`
+setting, it will ensure that three default permissions -- add, change and
+delete -- are created for each Django model defined in one of your installed
+applications.
+
+These permissions will be created when you run :djadmin:`manage.py syncdb
+<syncdb>`; the first time you run ``syncdb`` after adding
+``django.contrib.auth`` to :setting:`INSTALLED_APPS`, the default permissions
+will be created for all previously-installed models, as well as for any new
+models being installed at that time. Afterward, it will create default
+permissions for new models each time you run :djadmin:`manage.py syncdb
+<syncdb>`.
+
+Assuming you have an application with an
+:attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
+to test for basic permissions you should use:
+
+* add: ``user.has_perm('foo.add_bar')``
+* change: ``user.has_perm('foo.change_bar')``
+* delete: ``user.has_perm('foo.delete_bar')``
+
+--- link to custom permissions docs
+
+Groups
+------
+
+Groups are a generic way of categorizing users so you can apply permissions, or
+some other label, to those users. A user can belong to any number of groups.
+
+A user in a group automatically has the permissions granted to that group. For
+example, if the group ``Site editors`` has the permission
+``can_edit_home_page``, any user in that group will have that permission.
+
+Beyond permissions, groups are a convenient way to categorize users to give
+them some label, or extended functionality. For example, you could create a
+group ``'Special users'``, and you could write code that could, say, give them
+access to a members-only portion of your site, or send them members-only email
+messages.
 
 Authentication in Web requests
 ==============================
@@ -945,33 +1013,3 @@ able to add users. Why? Because if you have permission to add users, you have
 the power to create superusers, which can then, in turn, change other users. So
 Django requires add *and* change permissions as a slight security measure.
 
-
-Adding UserProfile fields to the admin
---------------------------------------
-
-To add the UserProfile fields to the user page in the admin, define an
-:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
-:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
-add it to a ``UserAdmin`` class which is registered with the
-:class:`~django.contrib.auth.models.User` class::
-
-    from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
-    from django.contrib.auth.models import User
-
-    from my_user_profile_app.models import UserProfile
-
-    # Define an inline admin descriptor for UserProfile model
-    # which acts a bit like a singleton
-    class UserProfileInline(admin.StackedInline):
-        model = UserProfile
-        can_delete = False
-        verbose_name_plural = 'profile'
-
-    # Define a new User admin
-    class UserAdmin(UserAdmin):
-        inlines = (UserProfileInline, )
-
-    # Re-register UserAdmin
-    admin.site.unregister(User)
-    admin.site.register(User, UserAdmin)
