@@ -26,8 +26,8 @@ class SwappableModelTests(TestCase):
         "Permissions and content types are not created for a swapped model"
 
         # Delete all permissions and content_types
-        Permission.objects.all().delete()
-        ContentType.objects.all().delete()
+        Permission.objects.filter(content_type__app_label='swappable_models').delete()
+        ContentType.objects.filter(app_label='swappable_models').delete()
 
         # Re-run syncdb. This will re-build the permissions and content types.
         new_io = StringIO()
