@@ -206,7 +206,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
         uid_int = base36_to_int(uidb36)
-        user = UserModel.objects.get(id=uid_int)
+        user = UserModel.objects.get(pk=uid_int)
     except (ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
 
