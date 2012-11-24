@@ -35,9 +35,6 @@ def get_validation_errors(outfile, app=None):
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
 
-    inc = set(models.get_models(app, include_swapped=True))
-    no_inc = set(models.get_models(app))
-
     for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
