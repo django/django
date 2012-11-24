@@ -14,3 +14,16 @@ from django.contrib.auth.tests.tokens import *
 from django.contrib.auth.tests.views import *
 
 # The password for the fixture data users is 'password'
+
+from django.dispatch import receiver
+from django.test.signals import setting_changed
+
+
+@receiver(setting_changed)
+def user_model_swapped(**kwargs):
+    if kwargs['setting'] == 'AUTH_USER_MODEL':
+        from django.db.models.manager import ensure_default_manager
+        from django.contrib.auth.models import User
+        # Reset User manager
+        setattr(User, 'objects', User._default_manager)
+        ensure_default_manager(User)

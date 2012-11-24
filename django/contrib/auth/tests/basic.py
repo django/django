@@ -162,6 +162,8 @@ class BasicTestCase(TestCase):
     def test_swappable_user(self):
         "The current user model can be swapped out for another"
         self.assertEqual(get_user_model(), CustomUser)
+        with self.assertRaises(AttributeError):
+            User.objects.all()
 
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
