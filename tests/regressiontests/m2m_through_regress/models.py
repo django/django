@@ -75,6 +75,9 @@ class Driver(models.Model):
     def __str__(self):
         return "%s" % self.name
 
+    class Meta:
+        ordering = ('name',)
+
 @python_2_unicode_compatible
 class CarDriver(models.Model):
     car = models.ForeignKey('Car', to_field='make')

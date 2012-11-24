@@ -168,7 +168,7 @@ class ToFieldThroughTests(TestCase):
         self.car.drivers._add_items('car', 'driver', self.unused_driver)
         self.assertQuerysetEqual(
             self.car.drivers.all(),
-            ["<Driver: Ryan Briscoe>", "<Driver: Barney Gumble>"]
+            ["<Driver: Barney Gumble>", "<Driver: Ryan Briscoe>"]
         )
 
     def test_add_null(self):
