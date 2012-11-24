@@ -66,6 +66,9 @@ class Driver(models.Model):
     def __unicode__(self):
         return "%s" % self.name
 
+    class Meta:
+        ordering = ('name',)
+
 class CarDriver(models.Model):
     car = models.ForeignKey('Car', to_field='make')
     driver = models.ForeignKey('Driver', to_field='name')
