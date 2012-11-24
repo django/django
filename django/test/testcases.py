@@ -416,6 +416,15 @@ class TransactionTestCase(SimpleTestCase):
         self._urlconf_setup()
         mail.outbox = []
 
+    def _databases_names(self, include_mirrors=True):
+        # If the test case has a multi_db=True flag, act on all databases,
+        # including mirrors or not. Otherwise, just on the default DB.
+        if getattr(self, 'multi_db', False):
+            return [alias for alias in connections
+                    if include_mirrors or not connections[alias].settings_dict['TEST_MIRROR']]
+        else:
+            return [DEFAULT_DB_ALIAS]
+
     def _reset_sequences(self, db_name):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
@@ -433,10 +442,7 @@ class TransactionTestCase(SimpleTestCase):
                 transaction.commit_unless_managed(using=db_name)
 
     def _fixture_setup(self):
-        # If the test case has a multi_db=True flag, act on all databases.
-        # Otherwise, just on the default DB.
-        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-        for db_name in db_names:
+        for db_name in self._databases_names(include_mirrors=False):
             # Reset sequences
             if self.reset_sequences:
                 self._reset_sequences(db_name)
@@ -502,16 +508,12 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        # If the test case has a multi_db=True flag, flush all databases.
-        # Otherwise, just flush default.
-        databases = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-
         # Roll back any pending transactions in order to avoid a deadlock
         # during flush when TEST_MIRROR is used (#18984).
         for conn in connections.all():
             conn.rollback_unless_managed()
 
-        for db in databases:
+        for db in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False, database=db,
                          skip_validation=True, reset_sequences=False)
 
@@ -796,11 +798,7 @@ class TestCase(TransactionTestCase):
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
 
-        # If the test case has a multi_db=True flag, setup all databases.
-        # Otherwise, just use default.
-        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-
-        for db_name in db_names:
+        for db_name in self._databases_names():
             transaction.enter_transaction_management(using=db_name)
             transaction.managed(True, using=db_name)
         disable_transaction_methods()
@@ -808,7 +806,7 @@ class TestCase(TransactionTestCase):
         from django.contrib.sites.models import Site
         Site.objects.clear_cache()
 
-        for db in db_names:
+        for db in self._databases_names(include_mirrors=False):
             if hasattr(self, 'fixtures'):
                 call_command('loaddata', *self.fixtures,
                              **{
@@ -822,15 +820,8 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
-        # If the test case has a multi_db=True flag, teardown all databases.
-        # Otherwise, just teardown default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
-
         restore_transaction_methods()
-        for db in databases:
+        for db in self._databases_names():
             transaction.rollback(using=db)
             transaction.leave_transaction_management(using=db)
 
