@@ -188,7 +188,11 @@ class override_settings(object):
 
     def __call__(self, test_func):
         from django.test import TransactionTestCase
-        if isinstance(test_func, type) and issubclass(test_func, TransactionTestCase):
+        if isinstance(test_func, type):
+            if not issubclass(test_func, TransactionTestCase):
+                raise Exception(
+                    "Only subclasses of Django TransactionTestCase can be decorated "
+                    "with override_settings")
             original_pre_setup = test_func._pre_setup
             original_post_teardown = test_func._post_teardown
 
