@@ -1274,11 +1274,17 @@ class Query(object):
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
         (which gives the table we are joining to), 'alias' is the alias for the
-        table we are joining to. If dupe_multis is True, any many-to-many or
-        many-to-one joins will always create a new alias (necessary for
-        disjunctive filters). If can_reuse is not None, it's a list of aliases
-        that can be reused in these joins (nothing else can be reused in this
-        case). Finally, 'negate' is used in the same sense as for add_filter()
+        table we are joining to.
+
+        The 'can_reuse' defines the reverse foreign key joins we can reuse. It
+        can be either sql.constants.REUSE_ALL in which case all joins are
+        reusable or a set of aliases that can be reused. Non-reverse foreign
+        keys are always reusable.
+
+        The 'allow_explicit_fk' controls if field.attname is allowed in the
+        lookups.
+
+        Finally, 'negate' is used in the same sense as for add_filter()
         -- it indicates an exclude() filter, or something similar. It is only
         passed in here so that it can be passed to a field's extra_filter() for
         customized behavior.
