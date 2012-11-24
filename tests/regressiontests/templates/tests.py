@@ -23,7 +23,7 @@ from django.template import base as template_base, RequestContext, Template, Con
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
 from django.utils import unittest
@@ -156,7 +156,7 @@ class UTF8Class:
         return 'ŠĐĆŽćžšđ'
 
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
-class Templates(unittest.TestCase):
+class Templates(TestCase):
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
