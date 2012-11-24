@@ -19,7 +19,8 @@ except ImportError:     # Python 2
     from urlparse import urljoin
 
 from django import template
-from django.template import base as template_base, RequestContext, Template, Context
+from django.template import (base as template_base, Context, RequestContext,
+    Template, TemplateSyntaxError)
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
@@ -362,6 +363,14 @@ class Templates(TestCase):
         t = Template('{% url will_not_match %}')
         c = Context()
         with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(c)
+
+    def test_url_explicit_exception_for_old_syntax(self):
+        # Regression test for #19280
+        t = Template('{% url path.to.view %}')      # not quoted = old syntax
+        c = Context()
+        with self.assertRaisesRegexp(TemplateSyntaxError,
+                "The syntax changed in Django 1.5, see the docs."):
             t.render(c)
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
