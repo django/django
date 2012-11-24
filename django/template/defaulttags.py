@@ -414,6 +414,11 @@ class URLNode(Node):
                               current_app=context.current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
+                        # If no args or kwargs are set, print help text
+                        # about url tag syntax being modified in Django 1.5
+                        if not args and not kwargs:
+                            e.args = ("%s Note: url tag syntax is changed in Django 1.5 - "
+                                      "see the documentation." % e.args[0],)
                         # Re-raise the original exception, not the one with
                         # the path relative to the project. This makes a
                         # better error message.
