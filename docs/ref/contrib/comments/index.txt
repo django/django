@@ -11,12 +11,6 @@ Django includes a simple, yet customizable comments framework. The built-in
 comments framework can be used to attach comments to any model, so you can use
 it for comments on blog entries, photos, book chapters, or anything else.
 
-.. note::
-
-    If you used to use Django's older (undocumented) comments framework, you'll
-    need to upgrade. See the :doc:`upgrade guide </ref/contrib/comments/upgrade>`
-    for instructions.
-
 Quick start guide
 =================
 
@@ -350,7 +344,6 @@ More information
    models
    settings
    signals
-   upgrade
    custom
    forms
    moderation
