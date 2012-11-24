@@ -272,7 +272,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'lb',
         'name': 'Luxembourgish',
-        'name_local': 'Lëtzebuergesch',
+        'name_local': 'L\u00ebtzebuergesch',
     },
     'lt': {
         'bidi': False,
