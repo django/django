@@ -5,6 +5,7 @@ from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
 
+
 def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
@@ -76,6 +77,7 @@ If you're unsure, answer 'no'.
         else:
             if verbosity >= 2:
                 print("Stale content types remain.")
+
 
 def update_all_contenttypes(verbosity=2, **kwargs):
     for app in get_apps():
