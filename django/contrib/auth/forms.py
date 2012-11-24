@@ -241,7 +241,7 @@ class PasswordResetForm(forms.Form):
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': int_to_base36(user.id),
+                'uid': int_to_base36(user.pk),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',

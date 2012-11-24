@@ -618,7 +618,7 @@ Output the contents of the block if the two arguments equal each other.
 
 Example::
 
-    {% ifequal user.id comment.user_id %}
+    {% ifequal user.pk comment.user_id %}
         ...
     {% endifequal %}
 
