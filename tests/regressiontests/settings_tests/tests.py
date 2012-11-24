@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import TransactionTestCase, TestCase, signals
 from django.test.utils import override_settings
+from django.utils import unittest, six
 
 
 @override_settings(TEST='override')
@@ -67,11 +68,6 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
             self.fail()
 
 
-class SettingGetter(object):
-    def __init__(self):
-        self.test = getattr(settings, 'TEST', 'undefined')
-
-
 class SettingsTests(TestCase):
     def setUp(self):
         self.testvalue = None
@@ -122,10 +118,20 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
 
     def test_class_decorator(self):
-        self.assertEqual(SettingGetter().test, 'undefined')
-        DecoratedSettingGetter = override_settings(TEST='override')(SettingGetter)
-        self.assertEqual(DecoratedSettingGetter().test, 'override')
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        # TransactionTestCase can be decorated by override_settings, but not ut.TestCase
+        class TransactionTestCaseSubclass(TransactionTestCase):
+            pass
+
+        class UnittestTestCaseSubclass(unittest.TestCase):
+            pass
+
+        decorated = override_settings(TEST='override')(TransactionTestCaseSubclass)
+        self.assertIsInstance(decorated, type)
+        self.assertTrue(issubclass(decorated, TransactionTestCase))
+
+        with six.assertRaisesRegex(self, Exception,
+                "Only subclasses of Django TransactionTestCase*"):
+            decorated = override_settings(TEST='override')(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
