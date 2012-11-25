@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import re
+
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
@@ -251,7 +253,7 @@ class FixtureLoadingTests(TestCase):
         if connection.vendor == 'mysql':
             connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
         with six.assertRaisesRegex(self, IntegrityError,
-                "Could not load fixtures.Article\(pk=1\): .*$"):
+                re.compile(".*Could not load fixtures.Article\(pk=1\): .*$", re.MULTILINE)):
             management.call_command('loaddata', 'invalid.json', verbosity=0, commit=False)
 
     def test_loading_using(self):
