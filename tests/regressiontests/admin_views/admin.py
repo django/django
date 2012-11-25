@@ -27,7 +27,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple)
+    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice)
 
 
 def callable_year(dt_value):
@@ -615,6 +615,12 @@ class MessageTestingAdmin(admin.ModelAdmin):
         self.message_user(request, "Test tags", extra_tags="extra_tag")
 
 
+class ChoiceList(admin.ModelAdmin):
+    list_display = ['choice']
+    readonly_fields = ['choice']
+    fields = ['choice']
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -690,6 +696,7 @@ site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
 site.register(UserMessenger, MessageTestingAdmin)
+site.register(Choice, ChoiceList)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
