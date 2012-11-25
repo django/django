@@ -318,6 +318,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   :func:`django.contrib.messages.add_message`. This is useful for generating
   error messages from admin actions.
 
+* The admin's list filters can now be customized per-request thanks to the new
+  :meth:`django.contrib.admin.ModelAdmin.get_list_filter` method.
+
 Backwards incompatible changes in 1.5
 =====================================
 

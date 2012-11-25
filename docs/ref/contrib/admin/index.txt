@@ -570,8 +570,8 @@ subclass::
 
     .. image:: _images/users_changelist.png
 
-    ``list_filter`` should be a list of elements, where each element should be
-    of one of the following types:
+    ``list_filter`` should be a list or tuple of elements, where each element
+    should be of one of the following types:
 
     * a field name, where the specified field should be either a
       ``BooleanField``, ``CharField``, ``DateField``, ``DateTimeField``,
@@ -1075,6 +1075,14 @@ templates used by the :class:`ModelAdmin` views:
     It is expected to return a ``list`` or ``tuple`` of field names on the
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
+
+.. method:: ModelAdmin.get_list_filter(self, request)
+
+    .. versionadded:: 1.5
+
+    The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
+    to return the same kind of sequence type as for the
+    :attr:`~ModelAdmin.list_filter` attribute.
 
 .. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
 
