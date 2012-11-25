@@ -1040,7 +1040,7 @@ by the context as to the current application.
     Don't forget to put quotes around the function path or pattern name!
 
     .. versionchanged:: 1.5
-        The first paramater used not to be quoted, which was inconsistent with
+        The first parameter used not to be quoted, which was inconsistent with
         other template tags. Since Django 1.5, it is evaluated according to
         the usual rules: it can be a quoted string or a variable that will be
         looked up in the context.
