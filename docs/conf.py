@@ -16,8 +16,8 @@ from __future__ import unicode_literals
 import sys
 from os.path import abspath, dirname, join
 
-# Make sure we use this copy of Django
-sys.path.insert(1, abspath(dirname(dirname(__file__))))
+# Make sure we iget the version of this copy of Django
+sys.path.insert(1, dirname(dirname(abspath(__file__))))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
