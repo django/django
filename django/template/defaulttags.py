@@ -399,8 +399,8 @@ class URLNode(Node):
         view_name = self.view_name.resolve(context)
 
         if not view_name:
-            raise TemplateSyntaxError("'url' takes requires a non-empty first"
-                " argument. The syntax changed in Django 1.5, see the docs.")
+            raise NoReverseMatch("'url' requires a non-empty first argument. "
+                "The syntax changed in Django 1.5, see the docs.")
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,

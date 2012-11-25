@@ -20,7 +20,7 @@ except ImportError:     # Python 2
 
 from django import template
 from django.template import (base as template_base, Context, RequestContext,
-    Template, TemplateSyntaxError)
+    Template)
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
@@ -369,7 +369,7 @@ class Templates(TestCase):
         # Regression test for #19280
         t = Template('{% url path.to.view %}')      # not quoted = old syntax
         c = Context()
-        with self.assertRaisesRegexp(TemplateSyntaxError,
+        with self.assertRaisesRegexp(urlresolvers.NoReverseMatch,
                 "The syntax changed in Django 1.5, see the docs."):
             t.render(c)
 
