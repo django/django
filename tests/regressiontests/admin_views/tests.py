@@ -46,7 +46,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject)
+    Simple, UndeletableObject, Choice)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3201,6 +3201,15 @@ class ReadonlyTest(TestCase):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
         self.assertEqual(response.status_code, 404)
+
+    def test_change_form_renders_correct_null_choice_value(self):
+        """
+        Regression test for #17911.
+        """
+        choice = Choice.objects.create(choice=None)
+        response = self.client.get('/test_admin/admin/admin_views/choice/%s/' % choice.pk)
+        self.assertContains(response, '<p>No opinion</p>', html=True)
+        self.assertNotContains(response, '<p>(None)</p>')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

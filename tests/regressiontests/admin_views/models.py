@@ -660,3 +660,7 @@ class Simple(models.Model):
     """
     Simple model with nothing on it for use in testing
     """
+
+class Choice(models.Model):
+    choice = models.CharField(max_length=1, blank=True, null=True,
+        choices=(('y','Yes'), ('n','No'), (None, 'No opinion')))
