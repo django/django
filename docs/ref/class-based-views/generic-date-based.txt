@@ -46,7 +46,7 @@ ArchiveIndexView
     **Notes**
 
     * Uses a default ``context_object_name`` of ``latest``.
-    * Uses a default ``template_name_suffix`` of ``_archive.html``.
+    * Uses a default ``template_name_suffix`` of ``_archive``.
     * Defaults to providing ``date_list`` by year, but this can be altered to
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
@@ -149,16 +149,6 @@ YearArchiveView
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
-    
-    ArchiveView's use :doc:`date-based mixins</ref/class-based-views/mixins-date-based>`. and uses the 
-    :func:`~time.strftime` format. Below is a list of attributes which 
-    can be set and their defaults:
-
-    * ``year_format``  By default, this is ``'%Y'``, which is a 4 digit year.
-    * ``month_format`` By default, this is ``'%b'``, a 3 letters lowercase month abbreviation.
-    * ``day_format``   By default, this is ``'%d'``, or 2 digits with leading zeros.
-    * ``week_format``  By default, this is ``'%U'``, which means the week starts 
-      on Sunday. Set it to ``'%W'`` if your week starts on Monday.
 
     **Example views.py**
 
@@ -184,8 +174,8 @@ YearArchiveView
 
         urlpatterns = patterns('',
             url(r'^(?P<year>\d{4})/$', 
-                    ArticleYearArchiveView.as_view(), 
-                    name="article_year_archive"),
+                ArticleYearArchiveView.as_view(), 
+                name="article_year_archive"),
         )
 
     **Example myapp/article_archive_year.html**
@@ -382,8 +372,8 @@ WeekArchiveView
         from myapp.views import ArticleWeekArchiveView
 
         urlpatterns = patterns('',
-           # Example: /2012/week/23/
-           url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
+            # Example: /2012/week/23/
+            url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$', 
                 ArticleWeekArchiveView.as_view(),
                 name="archive_week"),       
         )
@@ -415,9 +405,9 @@ WeekArchiveView
     begins on a Monday.  The ``'%W'`` format is the same in both the 
     :func:`~time.strftime` and the :tfilter:`date`.  
 
-    However, the :tfilter:`date` template filter does not have an equvilant output 
-    format that supports the US based week system. The :tfilter:`date` 
-    filter ``'%U'`` outputs the number of seconds since the unix epoch.
+    However, the :tfilter:`date` template filter does not have an equivalent 
+    output format that supports the US based week system. The :tfilter:`date` 
+    filter ``'%U'`` outputs the number of seconds since the Unix epoch.
 
 
 DayArchiveView
@@ -503,8 +493,8 @@ DayArchiveView
         urlpatterns = patterns('',
             # Example: /2012/nov/10/
             url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$', 
-                    ArticleDayArchiveView.as_view(), 
-                    name="archive_day"),
+                ArticleDayArchiveView.as_view(), 
+                name="archive_day"),
         )
 
     **Example myapp/article_archive_day.html**::
@@ -553,7 +543,7 @@ TodayArchiveView
 
     **Notes**
 
-    * Uses a default template name of ``<model>_archive_today.html``.
+    * Uses a default ``template_name_suffix`` of ``_archive_today``.
 
     **Example views.py**
 
@@ -580,8 +570,8 @@ TodayArchiveView
 
         urlpatterns = patterns('',
             url(r'^today/$', 
-                    ArticleTodayArchiveView.as_view(),
-                    name="archive_today"),  
+                ArticleTodayArchiveView.as_view(),
+                name="archive_today"),  
         )
 
     .. admonition:: Where is the example template for TodayArchiveView?
@@ -614,6 +604,29 @@ DateDetailView
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
+
+**Notes**
+
+* Uses a default ``template_name_suffix`` of ``_archive_today``.
+
+
+**Example urls.py**
+
+.. code-block:: python
+
+    from django.conf.urls import patterns, url
+    from django.views.generic.dates import DateDetailView
+
+    urlpatterns = patterns('',
+        url(r'^(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
+                DateDetailView.as_view(model=Article, date_field="pub_date"), 
+                name="archive_date_detail"),
+    )
+
+**Example myapp/article_detail.html**::
+    
+    <h1>{{ object.title }}</h1>
+    
 .. note::
 
     All of the generic views listed above have matching ``Base`` views that
@@ -637,26 +650,3 @@ DateDetailView
     **Context**
 
     * Includes the single object associated with the ``model`` specified in the ``DateDetailView``.
-
-**Notes**
-
-* Uses a default template name of  ``<app_name>/<model>_detail.html``.
-
-
-**Example urls.py**
-
-.. code-block:: python
-
-    from django.conf.urls import patterns, url
-    from django.views.generic.dates import DateDetailView
-
-    urlpatterns = patterns('',
-        url(r'^(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$', 
-                DateDetailView.as_view(model=Article, date_field="pub_date"), 
-                name="archive_date_detail"),
-    )
-
-**Example myapp/article_detail.html**::
-    
-    <h1>{{ object.title }}</h1>
-    
