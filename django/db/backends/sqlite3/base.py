@@ -266,7 +266,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
 
-    def _sqlite_create_connection(self):
+    def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
             from django.core.exceptions import ImproperlyConfigured
@@ -293,12 +293,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning
             )
         kwargs.update({'check_same_thread': False})
-        self.connection = Database.connect(**kwargs)
+        return kwargs
+
+    def get_new_connection(self, conn_params):
+        conn = Database.connect(**conn_params)
         # Register extract, date_trunc, and regexp functions.
-        self.connection.create_function("django_extract", 2, _sqlite_extract)
-        self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
-        self.connection.create_function("regexp", 2, _sqlite_regexp)
-        self.connection.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        conn.create_function("django_extract", 2, _sqlite_extract)
+        conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
+        conn.create_function("regexp", 2, _sqlite_regexp)
+        conn.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        return conn
+
+    def init_connection_state(self):
+        pass
+
+    def _sqlite_create_connection(self):
+        conn_params = self.get_connection_params()
+        self.connection = self.get_new_connection(conn_params)
+        self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
 
     def _cursor(self):

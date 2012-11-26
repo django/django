@@ -156,48 +156,59 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self._pg_version
     pg_version = property(_get_pg_version)
 
-    def _cursor(self):
+    def get_connection_params(self):
         settings_dict = self.settings_dict
-        if self.connection is None:
-            if not settings_dict['NAME']:
-                from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured(
-                    "settings.DATABASES is improperly configured. "
-                    "Please supply the NAME value.")
-            conn_params = {
-                'database': settings_dict['NAME'],
-            }
-            conn_params.update(settings_dict['OPTIONS'])
-            if 'autocommit' in conn_params:
-                del conn_params['autocommit']
-            if settings_dict['USER']:
-                conn_params['user'] = settings_dict['USER']
-            if settings_dict['PASSWORD']:
-                conn_params['password'] = force_str(settings_dict['PASSWORD'])
-            if settings_dict['HOST']:
-                conn_params['host'] = settings_dict['HOST']
-            if settings_dict['PORT']:
-                conn_params['port'] = settings_dict['PORT']
-            self.connection = Database.connect(**conn_params)
-            self.connection.set_client_encoding('UTF8')
-            tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
-            if tz:
-                try:
-                    get_parameter_status = self.connection.get_parameter_status
-                except AttributeError:
-                    # psycopg2 < 2.0.12 doesn't have get_parameter_status
-                    conn_tz = None
-                else:
-                    conn_tz = get_parameter_status('TimeZone')
+        if not settings_dict['NAME']:
+            from django.core.exceptions import ImproperlyConfigured
+            raise ImproperlyConfigured(
+                "settings.DATABASES is improperly configured. "
+                "Please supply the NAME value.")
+        conn_params = {
+            'database': settings_dict['NAME'],
+        }
+        conn_params.update(settings_dict['OPTIONS'])
+        if 'autocommit' in conn_params:
+            del conn_params['autocommit']
+        if settings_dict['USER']:
+            conn_params['user'] = settings_dict['USER']
+        if settings_dict['PASSWORD']:
+            conn_params['password'] = force_str(settings_dict['PASSWORD'])
+        if settings_dict['HOST']:
+            conn_params['host'] = settings_dict['HOST']
+        if settings_dict['PORT']:
+            conn_params['port'] = settings_dict['PORT']
+        return conn_params
 
-                if conn_tz != tz:
-                    # Set the time zone in autocommit mode (see #17062)
-                    self.connection.set_isolation_level(
-                            psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-                    self.connection.cursor().execute(
-                            self.ops.set_time_zone_sql(), [tz])
-            self.connection.set_isolation_level(self.isolation_level)
-            self._get_pg_version()
+    def get_new_connection(self, conn_params):
+        return Database.connect(**conn_params)
+
+    def init_connection_state(self):
+        settings_dict = self.settings_dict
+        self.connection.set_client_encoding('UTF8')
+        tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
+        if tz:
+            try:
+                get_parameter_status = self.connection.get_parameter_status
+            except AttributeError:
+                # psycopg2 < 2.0.12 doesn't have get_parameter_status
+                conn_tz = None
+            else:
+                conn_tz = get_parameter_status('TimeZone')
+
+            if conn_tz != tz:
+                # Set the time zone in autocommit mode (see #17062)
+                self.connection.set_isolation_level(
+                        psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+                self.connection.cursor().execute(
+                        self.ops.set_time_zone_sql(), [tz])
+        self.connection.set_isolation_level(self.isolation_level)
+        self._get_pg_version()
+
+    def _cursor(self):
+        if self.connection is None:
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.init_connection_state()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None

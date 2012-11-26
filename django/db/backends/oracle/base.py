@@ -489,66 +489,78 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return "%s/%s@%s" % (settings_dict['USER'],
                              settings_dict['PASSWORD'], dsn)
 
+    def create_cursor(self, conn):
+        return FormatStylePlaceholderCursor(conn)
+
+    def get_connection_params(self):
+        conn_params = self.settings_dict['OPTIONS'].copy()
+        if 'use_returning_into' in conn_params:
+            del conn_params['use_returning_into']
+        return conn_params
+
+    def get_new_connection(self, conn_params):
+        conn_string = convert_unicode(self._connect_string())
+        return Database.connect(conn_string, **conn_params)
+
+    def init_connection_state(self):
+        cursor = self.create_cursor(self.connection)
+        # Set the territory first. The territory overrides NLS_DATE_FORMAT
+        # and NLS_TIMESTAMP_FORMAT to the territory default. When all of
+        # these are set in single statement it isn't clear what is supposed
+        # to happen.
+        cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
+        # Set oracle date to ansi date format.  This only needs to execute
+        # once when we create a new connection. We also set the Territory
+        # to 'AMERICA' which forces Sunday to evaluate to a '1' in
+        # TO_CHAR().
+        cursor.execute(
+            "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
+            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
+            + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
+        cursor.close()
+        if 'operators' not in self.__dict__:
+            # Ticket #14149: Check whether our LIKE implementation will
+            # work for this connection or we need to fall back on LIKEC.
+            # This check is performed only once per DatabaseWrapper
+            # instance per thread, since subsequent connections will use
+            # the same settings.
+            cursor = self.create_cursor(self.connection)
+            try:
+                cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
+                               % self._standard_operators['contains'],
+                               ['X'])
+            except utils.DatabaseError:
+                self.operators = self._likec_operators
+            else:
+                self.operators = self._standard_operators
+            cursor.close()
+
+        try:
+            self.oracle_version = int(self.connection.version.split('.')[0])
+            # There's no way for the DatabaseOperations class to know the
+            # currently active Oracle version, so we do some setups here.
+            # TODO: Multi-db support will need a better solution (a way to
+            # communicate the current version).
+            if self.oracle_version <= 9:
+                self.ops.regex_lookup = self.ops.regex_lookup_9
+            else:
+                self.ops.regex_lookup = self.ops.regex_lookup_10
+        except ValueError:
+            pass
+        try:
+            self.connection.stmtcachesize = 20
+        except:
+            # Django docs specify cx_Oracle version 4.3.1 or higher, but
+            # stmtcachesize is available only in 4.3.2 and up.
+            pass
+
     def _cursor(self):
-        cursor = None
         if not self._valid_connection():
-            conn_string = convert_unicode(self._connect_string())
-            conn_params = self.settings_dict['OPTIONS'].copy()
-            if 'use_returning_into' in conn_params:
-                del conn_params['use_returning_into']
-            self.connection = Database.connect(conn_string, **conn_params)
-            cursor = FormatStylePlaceholderCursor(self.connection)
-            # Set the territory first. The territory overrides NLS_DATE_FORMAT
-            # and NLS_TIMESTAMP_FORMAT to the territory default. When all of
-            # these are set in single statement it isn't clear what is supposed
-            # to happen.
-            cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
-            # Set oracle date to ansi date format.  This only needs to execute
-            # once when we create a new connection. We also set the Territory
-            # to 'AMERICA' which forces Sunday to evaluate to a '1' in
-            # TO_CHAR().
-            cursor.execute(
-                "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
-                " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
-                + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
-
-            if 'operators' not in self.__dict__:
-                # Ticket #14149: Check whether our LIKE implementation will
-                # work for this connection or we need to fall back on LIKEC.
-                # This check is performed only once per DatabaseWrapper
-                # instance per thread, since subsequent connections will use
-                # the same settings.
-                try:
-                    cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
-                                   % self._standard_operators['contains'],
-                                   ['X'])
-                except utils.DatabaseError:
-                    self.operators = self._likec_operators
-                else:
-                    self.operators = self._standard_operators
-
-            try:
-                self.oracle_version = int(self.connection.version.split('.')[0])
-                # There's no way for the DatabaseOperations class to know the
-                # currently active Oracle version, so we do some setups here.
-                # TODO: Multi-db support will need a better solution (a way to
-                # communicate the current version).
-                if self.oracle_version <= 9:
-                    self.ops.regex_lookup = self.ops.regex_lookup_9
-                else:
-                    self.ops.regex_lookup = self.ops.regex_lookup_10
-            except ValueError:
-                pass
-            try:
-                self.connection.stmtcachesize = 20
-            except:
-                # Django docs specify cx_Oracle version 4.3.1 or higher, but
-                # stmtcachesize is available only in 4.3.2 and up.
-                pass
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.init_connection_state()
             connection_created.send(sender=self.__class__, connection=self)
-        if not cursor:
-            cursor = FormatStylePlaceholderCursor(self.connection)
-        return cursor
+        return self.create_cursor(self.connection)
 
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):
