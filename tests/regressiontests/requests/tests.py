@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import time
 from datetime import datetime, timedelta
 from StringIO import StringIO
@@ -110,13 +111,15 @@ class RequestsTests(unittest.TestCase):
                 '12.34.56.78:443',
                 '[2001:19f0:feee::dead:beef:cafe]',
                 '[2001:19f0:feee::dead:beef:cafe]:8080',
+                'xn--4ca9at.com', # Punnycode for öäü.com
             ]
 
             poisoned_hosts = [
                 'example.com@evil.tld',
                 'example.com:dr.frankenstein@evil.tld',
-                'example.com:someone@somestie.com:80',
-                'example.com:80/badpath'
+                'example.com:dr.frankenstein@evil.tld:80',
+                'example.com:80/badpath',
+                'example.com: recovermypassword.com',
             ]
 
             for host in legit_hosts:
@@ -187,13 +190,15 @@ class RequestsTests(unittest.TestCase):
                 '12.34.56.78:443',
                 '[2001:19f0:feee::dead:beef:cafe]',
                 '[2001:19f0:feee::dead:beef:cafe]:8080',
+                'xn--4ca9at.com', # Punnycode for öäü.com
             ]
 
             poisoned_hosts = [
                 'example.com@evil.tld',
                 'example.com:dr.frankenstein@evil.tld',
                 'example.com:dr.frankenstein@evil.tld:80',
-                'example.com:80/badpath'
+                'example.com:80/badpath',
+                'example.com: recovermypassword.com',
             ]
 
             for host in legit_hosts:

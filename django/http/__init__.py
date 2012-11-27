@@ -129,6 +129,8 @@ from utils import *
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
 absolute_http_url_re = re.compile(r"^https?://", re.I)
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
+
 
 class Http404(Exception):
     pass
@@ -167,7 +169,7 @@ class HttpRequest(object):
                 host = '%s:%s' % (host, server_port)
 
         # Disallow potentially poisoned hostnames.
-        if set(';/?@&=+$,').intersection(host):
+        if not host_validation_re.match(host.lower()):
             raise SuspiciousOperation('Invalid HTTP_HOST header: %s' % host)
 
         return host
