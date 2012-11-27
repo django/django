@@ -88,7 +88,7 @@ Python 3 support
 Django 1.5 introduces support for Python 3 - specifically, Python
 3.2 and above. This comes in the form of a **single** codebase; you don't
 need to install a different version of Django on Python 3. This means that
-you can write application targeted for just Python 2, just Python 3, or single
+you can write applications targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
 However, we're labeling this support "experimental" for now: although it's
