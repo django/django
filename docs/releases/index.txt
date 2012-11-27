@@ -99,6 +99,7 @@ notes.
 .. toctree::
    :maxdepth: 1
 
+   1.5-beta-1
    1.5-alpha-1
    1.4-beta-1
    1.4-alpha-1
