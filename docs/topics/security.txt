@@ -167,6 +167,33 @@ recommend you ensure your Web server is configured such that:
 Additionally, as of 1.3.1, Django requires you to explicitly enable support for
 the ``X-Forwarded-Host`` header if your configuration requires it.
 
+Configuration for Apache
+------------------------
+
+The easiest way to get the described behavior in Apache is as follows. Create
+a `virtual host`_ using the ServerName_ and ServerAlias_ directives to restrict
+the domains Apache reacts to. Please keep in mind that while the directives do
+support ports the match is only performed against the hostname. This means that
+the ``Host`` header could still contain a port pointing to another webserver on
+the same machine. The next step is to make sure that your newly created virtual
+host is not also the default virtual host. Apache uses the first virtual host
+found in the configuration file as default virtual host.  As such you have to
+ensure that you have another virtual host which will act as catch-all virtual
+host. Just add one if you do not have one already, there is nothing special
+about it aside from ensuring it is the first virtual host in the configuration
+file. Debian/Ubuntu users usually don't have to take any action, since Apache
+ships with a default virtual host in ``sites-available`` which is linked into
+``sites-enabled`` as ``000-default`` and included from ``apache2.conf``. Just
+make sure not to name your site ``000-abc``, since files are included in
+alphabetical order.
+
+.. _virtual host: http://httpd.apache.org/docs/2.2/vhosts/
+.. _ServerName: http://httpd.apache.org/docs/2.2/mod/core.html#servername
+.. _ServerAlias: http://httpd.apache.org/docs/2.2/mod/core.html#serveralias
+
+
+
+
 Additional security topics
 ==========================
 
