@@ -6,6 +6,7 @@ from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
 from django.test.utils import override_settings
+from django.utils.safestring import SafeData, mark_safe
 
 
 def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
@@ -132,3 +133,13 @@ class CookieTest(BaseTest):
         value = encoder.encode(messages)
         decoded_messages = json.loads(value, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
+
+    def test_safedata(self):
+        def encode_decode(data):
+            message = Message(constants.DEBUG, data)
+            storage = self.get_storage()
+            encoded = storage._encode(message)
+            decoded = storage._decode(encoded)
+            return decoded.message
+        self.assertTrue(isinstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData))
+        self.assertFalse(isinstance(encode_decode("<b>Hello Django!</b>"), SafeData))
