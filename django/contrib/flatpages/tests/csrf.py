@@ -16,6 +16,8 @@ class FlatpageCSRFTests(TestCase):
             settings.MIDDLEWARE_CLASSES += (csrf_middleware_class,)
         if flatpage_middleware_class not in settings.MIDDLEWARE_CLASSES:
             settings.MIDDLEWARE_CLASSES += (flatpage_middleware_class,)
+        self.old_CSRF_FAILURE_VIEW = settings.CSRF_FAILURE_VIEW
+        settings.CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = (
             os.path.join(
@@ -30,6 +32,8 @@ class FlatpageCSRFTests(TestCase):
         settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
         settings.LOGIN_URL = self.old_LOGIN_URL
+        settings.CSRF_FAILURE_VIEW = self.old_CSRF_FAILURE_VIEW
+
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view, even when the middleware is in use"
