@@ -79,7 +79,7 @@ Python compatibility
 ====================
 
 Django 1.5 requires Python 2.6.5 or above, though we **highly recommend**
-Python 2.7.3 or above. Support for Python 2.5 and below as been dropped.
+Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
