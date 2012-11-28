@@ -55,6 +55,10 @@ class Feature(models.Model):
 class SpecialFeature(models.Model):
     feature = models.ForeignKey(Feature)
 
+class OneToOneItem(models.Model):
+    item = models.OneToOneField(Item, related_name="one_to_one_item")
+    name = models.CharField(max_length=15)
+
 class ItemAndSimpleItem(models.Model):
     item = models.ForeignKey(Item)
     simple = models.ForeignKey(SimpleItem)
