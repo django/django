@@ -149,27 +149,30 @@ class ListMixin(object):
         return self
 
     def __eq__(self, other):
-        for i in range(len(self)):
+        olen = len(other)
+        for i in range(olen):
             try:
                 c = self[i] == other[i]
-            except IndexError:
-                # must be other is shorter
+            except self._IndexError:
+                # self must be shorter
                 return False
             if not c:
                 return False
-        return True
+        return len(self) == olen
 
     def __lt__(self, other):
-        slen = len(self)
-        for i in range(slen):
+        olen = len(other)
+        for i in range(olen):
             try:
                 c = self[i] < other[i]
-            except IndexError:
-                # must be other is shorter
-                return False
+            except self._IndexError:
+                # self must be shorter
+                return True
             if c:
                 return c
-        return slen < len(other)
+            elif other[i] < self[i]:
+                return False
+        return len(self) < olen
 
     ### Public list interface Methods ###
     ## Non-mutating ##
