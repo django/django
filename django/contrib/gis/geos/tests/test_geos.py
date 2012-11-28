@@ -451,6 +451,21 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(poly.wkt, Polygon(*tuple(r for r in poly)).wkt)
             self.assertEqual(poly.wkt, Polygon(*tuple(LinearRing(r.tuple) for r in poly)).wkt)
 
+    def test_polygon_comparison(self):
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        p2 = Polygon(((0, 0), (0, 1), (1, 0), (0, 0)))
+        self.assertTrue(p1 > p2)
+        self.assertFalse(p1 < p2)
+        self.assertFalse(p2 > p1)
+        self.assertTrue(p2 < p1)
+
+        p3 = Polygon(((0, 0), (0, 1), (1, 1), (2, 0), (0, 0)))
+        p4 = Polygon(((0, 0), (0, 1), (2, 2), (1, 0), (0, 0)))
+        self.assertFalse(p4 < p3)
+        self.assertTrue(p3 < p4)
+        self.assertTrue(p4 > p3)
+        self.assertFalse(p3 > p4)
+
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
         prev = fromstr('POINT (0 0)')
