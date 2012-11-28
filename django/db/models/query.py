@@ -1478,9 +1478,14 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0):
                 # If the related object exists, populate
                 # the descriptor cache.
                 setattr(rel_obj, f.get_cache_name(), obj)
-                # Now populate all the non-local field values
-                # on the related object
-                for rel_field, rel_model in rel_obj._meta.get_fields_with_model():
+                # Now populate all the non-local field values on the related
+                # object. If this object has deferred fields, we need to use
+                # the opts from the original model to get non-local fields
+                # correctly.
+                opts = rel_obj._meta
+                if getattr(rel_obj, '_deferred'):
+                    opts = opts.proxy_for_model._meta
+                for rel_field, rel_model in opts.get_fields_with_model():
                     if rel_model is not None:
                         setattr(rel_obj, rel_field.attname, getattr(obj, rel_field.attname))
                         # populate the field cache for any related object
