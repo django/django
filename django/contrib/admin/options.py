@@ -707,7 +707,7 @@ class ModelAdmin(BaseModelAdmin):
         Exposes almost the same API as messages.add_message(), but accepts the
         positional arguments in a different order to maintain backwards
         compatibility. For convenience, it accepts the `level` argument as
-        a string rather than the ususal level number.
+        a string rather than the usual level number.
         """
 
         if not isinstance(level, int):
