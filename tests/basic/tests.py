@@ -1,11 +1,13 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+import threading
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
+from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import Field, FieldDoesNotExist
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
@@ -691,3 +693,28 @@ class ModelTest(TestCase):
         qs = Article.objects.order_by('invalid_column')
         self.assertRaises(FieldError, list, qs)
         self.assertRaises(FieldError, list, qs)
+
+class ConcurrentSaveTests(TransactionTestCase):
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_concurrent_delete_with_save(self):
+        """
+        Test fetching, deleting and finally saving an object - we should get
+        an insert in this case.
+        """
+        a = Article.objects.create(headline='foo', pub_date=datetime.now())
+        exceptions = []
+        def deleter():
+            try:
+                # Do not delete a directly - doing so alters its state.
+                Article.objects.filter(pk=a.pk).delete()
+                connections[DEFAULT_DB_ALIAS].commit_unless_managed()
+            except Exception as e:
+                exceptions.append(e)
+            finally:
+                connections[DEFAULT_DB_ALIAS].close()
+        self.assertEqual(len(exceptions), 0)
+        t = threading.Thread(target=deleter)
+        t.start()
+        t.join()
+        a.save()
+        self.assertEqual(Article.objects.get(pk=a.pk).headline, 'foo')

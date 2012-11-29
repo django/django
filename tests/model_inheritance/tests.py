@@ -294,7 +294,7 @@ class ModelInheritanceTests(TestCase):
             rating=4,
             chef=c
         )
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(3):
             ir.save()
 
     def test_update_parent_filtering(self):

@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError
+from django.db import (connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError,
+                       IntegrityError)
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
@@ -8,8 +9,25 @@ from django.utils.unittest import skipIf, skipUnless
 
 from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
-from .models import Mod, M2mA, M2mB
+from .models import Mod, M2mA, M2mB, SubMod
 
+class ModelInheritanceTests(TransactionTestCase):
+    def test_save(self):
+        # First, create a SubMod, then try to save another with conflicting
+        # cnt field. The problem was that transactions were committed after
+        # every parent save when not in managed transaction. As the cnt
+        # conflict is in the second model, we can check if the first save
+        # was committed or not.
+        SubMod(fld=1, cnt=1).save()
+        # We should have committed the transaction for the above - assert this.
+        connection.rollback()
+        self.assertEqual(SubMod.objects.count(), 1)
+        try:
+            SubMod(fld=2, cnt=1).save()
+        except IntegrityError:
+            connection.rollback()
+        self.assertEqual(SubMod.objects.count(), 1)
+        self.assertEqual(Mod.objects.count(), 1)
 
 class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """

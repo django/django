@@ -150,6 +150,10 @@ Minor features
 * Generic :class:`~django.contrib.gis.db.models.GeometryField` is now editable
   with the OpenLayers widget in the admin.
 
+* The :meth:`Model.save() <django.db.models.Model.save()>` will do
+  ``UPDATE`` - if not updated - ``INSERT`` instead of ``SELECT`` - if not
+  found ``INSERT`` else ``UPDATE`` in case the model's primary key is set.
+
 Backwards incompatible changes in 1.6
 =====================================
 
