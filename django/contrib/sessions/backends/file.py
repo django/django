@@ -4,7 +4,7 @@ import os
 import tempfile
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase, CreateError
+from django.contrib.sessions.backends.base import SessionBase, CreateError, VALID_KEY_CHARS
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.utils import timezone
 
@@ -36,8 +36,6 @@ class SessionStore(SessionBase):
             cls._storage_path = storage_path
             return storage_path
 
-    VALID_KEY_CHARS = set("abcdef0123456789")
-
     def _key_to_file(self, session_key=None):
         """
         Get the file associated with this session key.
@@ -48,7 +46,7 @@ class SessionStore(SessionBase):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if not set(session_key).issubset(self.VALID_KEY_CHARS):
+        if not set(session_key).issubset(set(VALID_KEY_CHARS)):
             raise SuspiciousOperation(
                 "Invalid characters in session key")
 
