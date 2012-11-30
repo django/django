@@ -2009,7 +2009,7 @@ additional methods:
 
     .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
 
-        The prototype of `create_user()` should accept the username field,
+        The prototype of `create_superuser()` should accept the username field,
         plus all required fields as arguments. For example, if your user model
         uses `email` as the username field, and has `date_of_birth` as a required
         fields, then create_superuser should be defined as::
