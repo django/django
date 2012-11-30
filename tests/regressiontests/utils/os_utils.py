@@ -1,3 +1,4 @@
+# No unicode_literals, filesystem paths are native strings.
 import os
 
 from django.utils import unittest
@@ -24,3 +25,8 @@ class SafeJoinTests(unittest.TestCase):
             path,
             os.path.sep,
         )
+
+    def test_safe_join_returns_native_string(self):
+        # Regression test for #19398
+        base = os.path.dirname(__file__)
+        self.assertIsInstance(safe_join(base, 'foo'), str)

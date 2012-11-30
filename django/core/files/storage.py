@@ -15,7 +15,7 @@ from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
-from django.utils._os import safe_join, abspathu
+from django.utils._os import path_as_str, path_as_text, safe_join
 
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
@@ -150,7 +150,7 @@ class FileSystemStorage(Storage):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
-        self.location = abspathu(self.base_location)
+        self.location = path_as_text(os.path.abspath(path_as_str(self.base_location)))
         if base_url is None:
             base_url = settings.MEDIA_URL
         self.base_url = base_url
@@ -254,7 +254,7 @@ class FileSystemStorage(Storage):
 
     def path(self, name):
         try:
-            path = safe_join(self.location, name)
+            path = path_as_text(safe_join(path_as_str(self.location), path_as_str(name)))
         except ValueError:
             raise SuspiciousOperation("Attempted access to '%s' denied." % name)
         return os.path.normpath(path)

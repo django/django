@@ -1,7 +1,7 @@
 import os
 import stat
+import sys
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
-from django.utils.encoding import force_text
 from django.utils import six
 
 try:
@@ -11,23 +11,28 @@ except NameError:
         pass
 
 
-# Under Python 2, define our own abspath function that can handle joining
-# unicode paths to a current working directory that has non-ASCII characters
-# in it.  This isn't necessary on Windows since the Windows version of abspath
-# handles this correctly. It also handles drive letters differently than the
-# pure Python implementation, so it's best not to replace it.
-if six.PY3 or os.name == 'nt':
-    abspathu = abspath
+if six.PY3:
+    fs_encoding = sys.getfilesystemencoding()
+
+    def path_as_str(path):
+        """Convert a filesystem path from bytes to str, if necessary."""
+        return path if isinstance(path, str) else path.decode(fs_encoding)
+
+    def path_as_text(path):
+        """No-op -- paths are unicode by default on Python 3."""
+        return path
 else:
-    def abspathu(path):
-        """
-        Version of os.path.abspath that uses the unicode representation
-        of the current working directory, thus avoiding a UnicodeDecodeError
-        in join when the cwd has non-ASCII characters.
-        """
-        if not isabs(path):
-            path = join(os.getcwdu(), path)
-        return normpath(path)
+    # In Python < 3.2, sys.getfilesystemencoding() may return None under Unix.
+    fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
+
+    def path_as_str(path):
+        """Convert a filesystem path from unicode to str, if necessary."""
+        return path if isinstance(path, str) else path.encode(fs_encoding)
+
+    def path_as_text(path):
+        """Convert a filesystem path from str to unicode, if necessary."""
+        return path if isinstance(path, six.text_type) else path.decode(fs_encoding)
+
 
 def safe_join(base, *paths):
     """
@@ -37,10 +42,8 @@ def safe_join(base, *paths):
     The final path must be located inside of the base path component (otherwise
     a ValueError is raised).
     """
-    base = force_text(base)
-    paths = [force_text(p) for p in paths]
-    final_path = abspathu(join(base, *paths))
-    base_path = abspathu(base)
+    final_path = os.path.abspath(join(base, *paths))
+    base_path = os.path.abspath(base)
     # Ensure final_path starts with base_path (using normcase to ensure we
     # don't false-negative on case insensitive operating systems like Windows),
     # further, one of the following conditions must be true:
