@@ -682,14 +682,12 @@ class BaseInlineFormSet(BaseModelFormSet):
     """A formset for child objects related to a parent."""
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None, **kwargs):
-        from django.db.models.fields.related import RelatedObject
         if instance is None:
             self.instance = self.fk.rel.to()
         else:
             self.instance = instance
         self.save_as_new = save_as_new
-        # is there a better way to get the object descriptor?
-        self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
+        self.rel_name = self.fk.related.get_accessor_name()
         if queryset is None:
             queryset = self.model._default_manager
         if self.instance.pk:
@@ -721,8 +719,7 @@ class BaseInlineFormSet(BaseModelFormSet):
 
     @classmethod
     def get_default_prefix(cls):
-        from django.db.models.fields.related import RelatedObject
-        return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name().replace('+','')
+        return cls.fk.related.get_accessor_name().replace('+','')
 
     def save_new(self, form, commit=True):
         # Use commit=False so we can assign the parent key afterwards, then
