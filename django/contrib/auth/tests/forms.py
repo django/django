@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
-    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
+    ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField
@@ -282,6 +283,14 @@ class UserChangeFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['password'], 'sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161')
 
+    def test_bug_19349_bound_password_field(self):
+        user = User.objects.get(username='testclient')
+        form = UserChangeForm(data={}, instance=user)
+        # When rendering the bound password field,
+        # ReadOnlyPasswordHashWidget needs the initial
+        # value to render correctly
+        self.assertEqual(form.initial['password'], form['password'].value())
+
 
 @skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -362,3 +371,13 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
                          [_("The user account associated with this email address cannot reset the password.")])
+
+
+class ReadOnlyPasswordHashWidgetTest(TestCase):
+
+    def test_bug_19349_render_with_none_value(self):
+        # Rendering the widget with value set to None
+        # mustn't raise an exception.
+        widget = ReadOnlyPasswordHashWidget()
+        html = widget.render(name='password', value=None, attrs={})
+        self.assertIn(_("No password set."), html)
