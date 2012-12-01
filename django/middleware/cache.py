@@ -126,7 +126,6 @@ class FetchFromCacheMiddleware(object):
     def __init__(self):
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-        self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = get_cache(self.cache_alias)
 
