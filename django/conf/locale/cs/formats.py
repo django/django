@@ -19,9 +19,9 @@ FIRST_DAY_OF_WEEK = 1 # Monday
 DATE_INPUT_FORMATS = (
     '%d.%m.%Y', '%d.%m.%y',     # '05.01.2006', '05.01.06'
     '%d. %m. %Y', '%d. %m. %y', # '5. 1. 2006', '5. 1. 06'
-    '%Y-%m-%d', '%y-%m-%d',     # '2006-01-05', '06-01-05'
     # '%d. %B %Y', '%d. %b. %Y',  # '25. October 2006', '25. Oct. 2006'
 )
+# Kept ISO formats as one is in first position
 TIME_INPUT_FORMATS = (
     '%H:%M:%S', # '04:30:59'
     '%H.%M',    # '04.30'
@@ -36,10 +36,7 @@ DATETIME_INPUT_FORMATS = (
     '%d. %m. %Y %H.%M',     # '05. 01. 2006 04.30'
     '%d. %m. %Y %H:%M',     # '05. 01. 2006 04:30'
     '%d. %m. %Y',           # '05. 01. 2006'
-    '%Y-%m-%d %H:%M:%S',    # '2006-01-05 04:30:59'
     '%Y-%m-%d %H.%M',       # '2006-01-05 04.30'
-    '%Y-%m-%d %H:%M',       # '2006-01-05 04:30'
-    '%Y-%m-%d',             # '2006-01-05'
 )
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '\xa0' # non-breaking space
