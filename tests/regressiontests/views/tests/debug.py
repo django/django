@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
 from django.test.utils import (override_settings, setup_test_template_loader,
     restore_template_loaders)
+from django.utils.encoding import force_text
 from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
@@ -306,15 +307,16 @@ class ExceptionReportTestMixin(object):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body)
+            self.assertNotIn('scrambled', body)
+            self.assertNotIn('sauce', body)
+            self.assertNotIn('worcestershire', body)
             if check_for_POST_params:
                 for k, v in self.breakfast_data.items():
                     # All POST parameters are shown.
-                    self.assertIn(k, email.body)
-                    self.assertIn(v, email.body)
+                    self.assertIn(k, body)
+                    self.assertIn(v, body)
 
     def verify_safe_email(self, view, check_for_POST_params=True):
         """
@@ -327,20 +329,21 @@ class ExceptionReportTestMixin(object):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body)
+            self.assertNotIn('scrambled', body)
+            self.assertNotIn('sauce', body)
+            self.assertNotIn('worcestershire', body)
             if check_for_POST_params:
                 for k, v in self.breakfast_data.items():
                     # All POST parameters' names are shown.
-                    self.assertIn(k, email.body)
+                    self.assertIn(k, body)
                 # Non-sensitive POST parameters' values are shown.
-                self.assertIn('baked-beans-value', email.body)
-                self.assertIn('hash-brown-value', email.body)
+                self.assertIn('baked-beans-value', body)
+                self.assertIn('hash-brown-value', body)
                 # Sensitive POST parameters' values are not shown.
-                self.assertNotIn('sausage-value', email.body)
-                self.assertNotIn('bacon-value', email.body)
+                self.assertNotIn('sausage-value', body)
+                self.assertNotIn('bacon-value', body)
 
     def verify_paranoid_email(self, view):
         """
@@ -353,15 +356,16 @@ class ExceptionReportTestMixin(object):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body)
+            self.assertNotIn('scrambled', body)
+            self.assertNotIn('sauce', body)
+            self.assertNotIn('worcestershire', body)
             for k, v in self.breakfast_data.items():
                 # All POST parameters' names are shown.
-                self.assertIn(k, email.body)
+                self.assertIn(k, body)
                 # No POST parameters' values are shown.
-                self.assertNotIn(v, email.body)
+                self.assertNotIn(v, body)
 
 
 class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):

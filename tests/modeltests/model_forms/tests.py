@@ -10,6 +10,7 @@ from django.core.validators import ValidationError
 from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
+from django.utils._os import upath
 from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
@@ -1282,9 +1283,9 @@ class OldFormForXTests(TestCase):
         # it comes to validation. This specifically tests that #6302 is fixed for
         # both file fields and image fields.
 
-        with open(os.path.join(os.path.dirname(__file__), "test.png"), 'rb') as fp:
+        with open(os.path.join(os.path.dirname(upath(__file__)), "test.png"), 'rb') as fp:
             image_data = fp.read()
-        with open(os.path.join(os.path.dirname(__file__), "test2.png"), 'rb') as fp:
+        with open(os.path.join(os.path.dirname(upath(__file__)), "test2.png"), 'rb') as fp:
             image_data2 = fp.read()
 
         f = ImageFileForm(

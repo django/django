@@ -13,6 +13,7 @@ from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_apps
 from django.utils.encoding import force_text
+from django.utils._os import upath
 from itertools import product
 
 try:
@@ -97,10 +98,10 @@ class Command(BaseCommand):
             if hasattr(app, '__path__'):
                 # It's a 'models/' subpackage
                 for path in app.__path__:
-                    app_module_paths.append(path)
+                    app_module_paths.append(upath(path))
             else:
                 # It's a models.py module
-                app_module_paths.append(app.__file__)
+                app_module_paths.append(upath(app.__file__))
 
         app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
 

@@ -11,6 +11,7 @@ from django.http import QueryDict
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
+from django.utils._os import upath
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -27,7 +28,7 @@ from django.contrib.auth.tests.utils import skipIfCustomUser
     LANGUAGE_CODE='en',
     TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
     TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),

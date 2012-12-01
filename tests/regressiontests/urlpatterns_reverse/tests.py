@@ -237,7 +237,7 @@ class ResolverTests(unittest.TestCase):
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), '%s is not an instance of %s' % (t, e['type']))
+                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)

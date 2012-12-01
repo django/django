@@ -16,12 +16,13 @@ from django.test import Client, TestCase
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, override_settings, str_prefix
 from django.template.response import SimpleTemplateResponse
+from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
 
 
 @override_settings(
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
 )
 class AssertContainsTests(TestCase):
     def test_contains(self):
@@ -629,7 +630,7 @@ class TemplateExceptionTests(TestCase):
                     template_loader.reset()
 
     @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'bad_templates'),)
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
     )
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"

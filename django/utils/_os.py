@@ -1,6 +1,8 @@
 import os
 import stat
+import sys
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
+
 from django.utils.encoding import force_text
 from django.utils import six
 
@@ -75,3 +77,7 @@ def rmtree_errorhandler(func, path, exc_info):
     # use the original function to repeat the operation
     func(path)
 
+def upath(path):
+    if not six.PY3:
+        return path.decode(sys.getfilesystemencoding())
+    return path

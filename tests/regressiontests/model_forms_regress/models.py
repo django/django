@@ -5,6 +5,7 @@ import os
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils._os import upath
 
 
 class Person(models.Model):
@@ -19,7 +20,7 @@ class Triple(models.Model):
         unique_together = (('left', 'middle'), ('middle', 'right'))
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
 
 @python_2_unicode_compatible
 class Publication(models.Model):

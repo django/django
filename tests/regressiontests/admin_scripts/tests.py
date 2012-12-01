@@ -19,13 +19,15 @@ from django.conf import settings
 from django.db import connection
 from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest
+from django.utils.encoding import force_str, force_text
+from django.utils._os import upath
 from django.test import LiveServerTestCase
 
-test_dir = os.path.dirname(os.path.dirname(__file__))
+test_dir = os.path.dirname(os.path.dirname(upath(__file__)))
 
 class AdminScriptTestCase(unittest.TestCase):
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None):
-        test_dir = os.path.dirname(os.path.dirname(__file__))
+        test_dir = os.path.dirname(os.path.dirname(upath(__file__)))
         if is_dir:
             settings_dir = os.path.join(test_dir, filename)
             os.mkdir(settings_dir)
@@ -89,7 +91,7 @@ class AdminScriptTestCase(unittest.TestCase):
             result = first_package_re.findall(backend['ENGINE'])
             if result and result != 'django':
                 backend_pkg = __import__(result[0])
-                backend_dir = os.path.dirname(backend_pkg.__file__)
+                backend_dir = os.path.dirname(upath(backend_pkg.__file__))
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
@@ -115,7 +117,7 @@ class AdminScriptTestCase(unittest.TestCase):
             del os.environ['DJANGO_SETTINGS_MODULE']
         python_path = [project_dir, base_dir]
         python_path.extend(ext_backend_base_dirs)
-        os.environ[python_path_var_name] = os.pathsep.join(python_path)
+        os.environ[python_path_var_name] = force_str(os.pathsep.join(python_path))
 
         # Move to the test directory and run
         os.chdir(test_dir)
@@ -134,7 +136,7 @@ class AdminScriptTestCase(unittest.TestCase):
         return out, err
 
     def run_django_admin(self, args, settings_file=None):
-        bin_dir = os.path.abspath(os.path.dirname(bin.__file__))
+        bin_dir = os.path.abspath(os.path.dirname(upath(bin.__file__)))
         return self.run_test(os.path.join(bin_dir, 'django-admin.py'), args, settings_file)
 
     def run_manage(self, args, settings_file=None):
@@ -144,7 +146,7 @@ class AdminScriptTestCase(unittest.TestCase):
             except OSError:
                 pass
 
-        conf_dir = os.path.dirname(conf.__file__)
+        conf_dir = os.path.dirname(upath(conf.__file__))
         template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py')
 
         test_manage_py = os.path.join(test_dir, 'manage.py')
@@ -166,10 +168,12 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def assertOutput(self, stream, msg):
         "Utility assertion: assert that the given message exists in the output"
+        stream = force_text(stream)
         self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
     def assertNotInOutput(self, stream, msg):
         "Utility assertion: assert that the given message doesn't exist in the output"
+        stream = force_text(stream)
         self.assertFalse(msg in stream, "'%s' matches actual output text '%s'" % (msg, stream))
 
 ##########################################################################
@@ -1553,7 +1557,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py, 'r') as fp:
-            content = fp.read()
+            content = force_text(fp.read())
             self.assertIn("project_name = 'another_project'", content)
             self.assertIn("project_directory = '%s'" % testproject_dir, content)
 

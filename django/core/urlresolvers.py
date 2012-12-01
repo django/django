@@ -251,9 +251,9 @@ class RegexURLResolver(LocaleRegexProvider):
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return force_str('<%s %s (%s:%s) %s>' % (
+        return str('<%s %s (%s:%s) %s>') % (
             self.__class__.__name__, urlconf_repr, self.app_name,
-            self.namespace, self.regex.pattern))
+            self.namespace, self.regex.pattern)
 
     def _populate(self):
         lookups = MultiValueDict()

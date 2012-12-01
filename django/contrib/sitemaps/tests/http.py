@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils.unittest import skipUnless
 from django.utils.formats import localize
+from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 
 from .base import SitemapTestsBase
@@ -29,7 +30,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
     )
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
@@ -64,7 +65,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
     )
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
