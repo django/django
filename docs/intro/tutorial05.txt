@@ -381,28 +381,22 @@ Let's change the queryset so that it also checks the date by comparing it with
 
     from django.utils import timezone
 
-and then we must amend the existing url function::
+and then we must amend the existing ``url`` function to::
 
     url(r'^$',
         ListView.as_view(
-            queryset=Poll.objects.order_by('-pub_date')[:5],
-            context_object_name='latest_poll_list',
-            template_name='polls/index.html'),
-        name='index'),
-
-to::
-
-    url(r'^$',
-        ListView.as_view(
-            queryset=Poll.objects.filter(pub_date__lte=timezone.now()) \
+            queryset=Poll.objects.filter(pub_date__lte=timezone.now) \
                 .order_by('-pub_date')[:5],
             context_object_name='latest_poll_list',
             template_name='polls/index.html'),
         name='index'),
 
-``Poll.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
+``Poll.objects.filter(pub_date__lte=timezone.now)`` returns a queryset
 containing Polls whose ``pub_date`` is less than or equal to - that is, earlier
-than or equal to - ``timezone.now()``.
+than or equal to - ``timezone.now``. Notice that we use a callable queryset
+argument, ``timezone.now``, which will be evaluated at request time. If we had
+included the parentheses, ``timezone.now()`` would be evaluated just once when
+the web server is started.
 
 Testing our new view
 --------------------
@@ -516,13 +510,13 @@ What we have works well; however, even though future polls don't appear in the
 *index*, users can still reach them if they know or guess the right URL. So we
 need similar constraints in the ``DetailViews``, by adding::
 
-    queryset=Poll.objects.filter(pub_date__lte=timezone.now())
+    queryset=Poll.objects.filter(pub_date__lte=timezone.now)
 
 to them - for example::
 
     url(r'^(?P<pk>\d+)/$',
         DetailView.as_view(
-            queryset=Poll.objects.filter(pub_date__lte=timezone.now()),
+            queryset=Poll.objects.filter(pub_date__lte=timezone.now),
             model=Poll,
             template_name='polls/detail.html'),
         name='detail'),
