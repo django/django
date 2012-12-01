@@ -312,12 +312,29 @@ class TemplateViewTest(TestCase):
 
         self.assertNotEqual(response.content, response2.content)
 
-class RedirectViewTest(unittest.TestCase):
+class RedirectViewTest(TestCase):
+    urls = 'regressiontests.generic_views.urls'
+    
     rf = RequestFactory()
 
     def test_no_url(self):
         "Without any configuration, returns HTTP 410 GONE"
         response = RedirectView.as_view()(self.rf.get('/foo/'))
+        self.assertEqual(response.status_code, 410)
+
+    def test_named_url_pattern(self):
+        "Named pattern parameter should reverse to the matching pattern"
+        response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), pk=1)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/detail/artist/1/')
+        
+        response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), 1)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/detail/artist/1/')
+
+    def test_wrong_named_url_pattern(self):
+        "In production mode a wrong pattern name returns 410 GONE"
+        response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 410)
 
     def test_permanent_redirect(self):
