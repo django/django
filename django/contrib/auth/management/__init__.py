@@ -138,7 +138,7 @@ def get_system_username():
             return ''
         try:
             result = result.decode(default_locale)
-        except UnicodeDecodeError:
+        except (LookupError, UnicodeDecodeError):
             # UnicodeDecodeError - preventive treatment for non-latin Windows.
             return ''
     return result
