@@ -8,8 +8,6 @@ import shutil
 import stat
 import sys
 import tempfile
-import codecs
-
 try:
     from urllib.request import urlretrieve
 except ImportError:     # Python 2
@@ -156,12 +154,14 @@ class TemplateCommand(BaseCommand):
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
-                with codecs.open(old_path, 'r', 'utf-8') as template_file:
+                with open(old_path, 'rb') as template_file:
                     content = template_file.read()
                 if filename.endswith(extensions) or filename in extra_files:
+                    content = content.decode('utf-8')
                     template = Template(content)
                     content = template.render(context)
-                with codecs.open(new_path, 'w', 'utf-8') as new_file:
+                    content = content.encode('utf-8')
+                with open(new_path, 'wb') as new_file:
                     new_file.write(content)
 
                 if self.verbosity >= 2:
