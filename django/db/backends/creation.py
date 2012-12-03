@@ -281,6 +281,7 @@ class BaseDatabaseCreation(object):
         self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
+        settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
         # Report syncdb messages at one level lower than that requested.

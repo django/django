@@ -28,6 +28,14 @@ class Article(models.Model):
         return self.headline
 
 @python_2_unicode_compatible
+class BrokenArticle(models.Model):
+    headline = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+
+    def __unicode__(self):      # instead of __str__
+        return self.headline
+
+@python_2_unicode_compatible
 class InternationalArticle(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()

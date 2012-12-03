@@ -27,7 +27,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if encoded == '' or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded == UNUSABLE_PASSWORD:
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -51,6 +51,11 @@ class ReadOnlyPasswordHashField(forms.Field):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("required", False)
         super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
+
+    def bound_data(self, data, initial):
+        # Always return initial because the widget doesn't
+        # render an input field.
+        return initial
 
 
 class UserCreationForm(forms.ModelForm):
@@ -241,7 +246,7 @@ class PasswordResetForm(forms.Form):
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': int_to_base36(user.id),
+                'uid': int_to_base36(user.pk),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',

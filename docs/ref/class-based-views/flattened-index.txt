@@ -116,6 +116,7 @@ ListView
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.model`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -290,6 +291,7 @@ ArchiveIndexView
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.model`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -325,6 +327,7 @@ YearArchiveView
 * :attr:`~django.views.generic.dates.BaseYearArchiveView.make_object_list` [:meth:`~django.views.generic.dates.BaseYearArchiveView.get_make_object_list`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.model`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -363,6 +366,7 @@ MonthArchiveView
 * :attr:`~django.views.generic.dates.MonthMixin.month` [:meth:`~django.views.generic.dates.MonthMixin.get_month`]
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -401,6 +405,7 @@ WeekArchiveView
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.model`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -443,6 +448,7 @@ DayArchiveView
 * :attr:`~django.views.generic.dates.MonthMixin.month` [:meth:`~django.views.generic.dates.MonthMixin.get_month`]
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
@@ -487,6 +493,7 @@ TodayArchiveView
 * :attr:`~django.views.generic.dates.MonthMixin.month` [:meth:`~django.views.generic.dates.MonthMixin.get_month`]
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`

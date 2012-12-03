@@ -351,7 +351,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
 
         def should_delete(self):
             """ delete form if odd PK """
-            return self.instance.id % 2 != 0
+            return self.instance.pk % 2 != 0
 
     NormalFormset = modelformset_factory(User, form=CustomDeleteUserForm, can_delete=True)
     DeleteFormset = modelformset_factory(User, form=CustomDeleteUserForm, formset=BaseCustomDeleteModelFormSet)
@@ -392,7 +392,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
-            ('form-%d-id' % i, user.id)
+            ('form-%d-id' % i, user.pk)
             for i,user in enumerate(User.objects.all())
         ))
         formset = self.NormalFormset(data, queryset=User.objects.all())
@@ -409,7 +409,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
-            ('form-%d-id' % i, user.id)
+            ('form-%d-id' % i, user.pk)
             for i,user in enumerate(User.objects.all())
         ))
         data.update(self.delete_all_ids)
@@ -428,7 +428,7 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
         data.update(dict(
-            ('form-%d-id' % i, user.id)
+            ('form-%d-id' % i, user.pk)
             for i,user in enumerate(User.objects.all())
         ))
         data.update(self.delete_all_ids)
@@ -440,5 +440,5 @@ class FormfieldShouldDeleteFormTests(TestCase):
         self.assertEqual(len(User.objects.all()), 2)
 
         # verify no "odd" PKs left
-        odd_ids = [user.id for user in User.objects.all() if user.id % 2]
+        odd_ids = [user.pk for user in User.objects.all() if user.pk % 2]
         self.assertEqual(len(odd_ids), 0)

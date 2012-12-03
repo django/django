@@ -140,7 +140,7 @@ class TestTransactionClosing(TransactionTestCase):
             "Create a user in a transaction"
             user = User.objects.create_user(username='system', password='iamr00t', email='root@SITENAME.com')
             # Redundant, just makes sure the user id was read back from DB
-            Mod.objects.create(fld=user.id)
+            Mod.objects.create(fld=user.pk)
 
         # Create a user
         create_system_user()

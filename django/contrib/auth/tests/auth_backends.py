@@ -338,6 +338,7 @@ class PermissionDeniedBackend(object):
         raise PermissionDenied
 
 
+@skipIfCustomUser
 class PermissionDeniedBackendTest(TestCase):
     """
     Tests that other backends are not checked once a backend raises PermissionDenied

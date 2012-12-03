@@ -118,7 +118,7 @@ Invoke the Django shell from your project and execute the
 
 .. code-block:: pycon
 
-    $ python manage shell
+    $ python manage.py shell
     >>> from django.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(900913)
 

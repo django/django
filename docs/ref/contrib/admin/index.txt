@@ -570,8 +570,8 @@ subclass::
 
     .. image:: _images/users_changelist.png
 
-    ``list_filter`` should be a list of elements, where each element should be
-    of one of the following types:
+    ``list_filter`` should be a list or tuple of elements, where each element
+    should be of one of the following types:
 
     * a field name, where the specified field should be either a
       ``BooleanField``, ``CharField``, ``DateField``, ``DateTimeField``,
@@ -1076,6 +1076,14 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_list_filter(self, request)
+
+    .. versionadded:: 1.5
+
+    The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
+    to return the same kind of sequence type as for the
+    :attr:`~ModelAdmin.list_filter` attribute.
+
 .. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
 
     .. versionadded:: 1.5
@@ -1303,11 +1311,19 @@ templates used by the :class:`ModelAdmin` views:
                     return qs
                 return qs.filter(author=request.user)
 
-.. method:: ModelAdmin.message_user(request, message)
+.. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
-    Sends a message to the user. The default implementation creates a message
-    using the :mod:`django.contrib.messages` backend. See the
-    :ref:`custom ModelAdmin example <custom-admin-action>`.
+    Sends a message to the user using the :mod:`django.contrib.messages`
+    backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
+
+    .. versionadded:: 1.5
+
+    Keyword arguments allow you to change the message level, add extra CSS
+    tags, or fail silently if the ``contrib.messages`` framework is not
+    installed. These keyword arguments match those for
+    :func:`django.contrib.messages.add_message`, see that function's
+    documentation for more details. One difference is that the level may be
+    passed as a string label in addition to integer/constant.
 
 .. method:: ModelAdmin.get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
 

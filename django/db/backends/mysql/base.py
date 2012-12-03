@@ -372,47 +372,56 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.connection.ping()
                 return True
             except DatabaseError:
-                self.connection.close()
-                self.connection = None
+                self.close()
         return False
 
+    def get_connection_params(self):
+        kwargs = {
+            'conv': django_conversions,
+            'charset': 'utf8',
+            'use_unicode': True,
+        }
+        settings_dict = self.settings_dict
+        if settings_dict['USER']:
+            kwargs['user'] = settings_dict['USER']
+        if settings_dict['NAME']:
+            kwargs['db'] = settings_dict['NAME']
+        if settings_dict['PASSWORD']:
+            kwargs['passwd'] = force_str(settings_dict['PASSWORD'])
+        if settings_dict['HOST'].startswith('/'):
+            kwargs['unix_socket'] = settings_dict['HOST']
+        elif settings_dict['HOST']:
+            kwargs['host'] = settings_dict['HOST']
+        if settings_dict['PORT']:
+            kwargs['port'] = int(settings_dict['PORT'])
+        # We need the number of potentially affected rows after an
+        # "UPDATE", not the number of changed rows.
+        kwargs['client_flag'] = CLIENT.FOUND_ROWS
+        kwargs.update(settings_dict['OPTIONS'])
+        return kwargs
+
+    def get_new_connection(self, conn_params):
+        conn = Database.connect(**conn_params)
+        conn.encoders[SafeText] = conn.encoders[six.text_type]
+        conn.encoders[SafeBytes] = conn.encoders[bytes]
+        return conn
+
+    def init_connection_state(self):
+        cursor = self.connection.cursor()
+        # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
+        # on a recently-inserted row will return when the field is tested for
+        # NULL.  Disabling this value brings this aspect of MySQL in line with
+        # SQL standards.
+        cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+        cursor.close()
+
     def _cursor(self):
-        new_connection = False
         if not self._valid_connection():
-            new_connection = True
-            kwargs = {
-                'conv': django_conversions,
-                'charset': 'utf8',
-                'use_unicode': True,
-            }
-            settings_dict = self.settings_dict
-            if settings_dict['USER']:
-                kwargs['user'] = settings_dict['USER']
-            if settings_dict['NAME']:
-                kwargs['db'] = settings_dict['NAME']
-            if settings_dict['PASSWORD']:
-                kwargs['passwd'] = force_str(settings_dict['PASSWORD'])
-            if settings_dict['HOST'].startswith('/'):
-                kwargs['unix_socket'] = settings_dict['HOST']
-            elif settings_dict['HOST']:
-                kwargs['host'] = settings_dict['HOST']
-            if settings_dict['PORT']:
-                kwargs['port'] = int(settings_dict['PORT'])
-            # We need the number of potentially affected rows after an
-            # "UPDATE", not the number of changed rows.
-            kwargs['client_flag'] = CLIENT.FOUND_ROWS
-            kwargs.update(settings_dict['OPTIONS'])
-            self.connection = Database.connect(**kwargs)
-            self.connection.encoders[SafeText] = self.connection.encoders[six.text_type]
-            self.connection.encoders[SafeBytes] = self.connection.encoders[bytes]
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.init_connection_state()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
-        if new_connection:
-            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-            # on a recently-inserted row will return when the field is tested for
-            # NULL.  Disabling this value brings this aspect of MySQL in line with
-            # SQL standards.
-            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
         return CursorWrapper(cursor)
 
     def _rollback(self):
@@ -433,8 +442,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             server_info = self.connection.get_server_info()
             if new_connection:
                 # Make sure we close the connection
-                self.connection.close()
-                self.connection = None
+                self.close()
             m = server_version_re.match(server_info)
             if not m:
                 raise Exception('Unable to determine MySQL version from version string %r' % server_info)

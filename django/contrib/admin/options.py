@@ -552,7 +552,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
-            user_id         = request.user.id,
+            user_id         = request.user.pk,
             content_type_id = ContentType.objects.get_for_model(self.model).pk,
             object_id       = object.pk,
             object_repr     = object_repr,
@@ -665,6 +665,13 @@ class ModelAdmin(BaseModelAdmin):
             # Use only the first item in list_display as link
             return list(list_display)[:1]
 
+    def get_list_filter(self, request):
+        """
+        Returns a sequence containing the fields to be displayed as filters in
+        the right sidebar of the changelist page.
+        """
+        return self.list_filter
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
@@ -691,12 +698,30 @@ class ModelAdmin(BaseModelAdmin):
         change_message = ' '.join(change_message)
         return change_message or _('No fields changed.')
 
-    def message_user(self, request, message):
+    def message_user(self, request, message, level=messages.INFO, extra_tags='',
+                     fail_silently=False):
         """
         Send a message to the user. The default implementation
         posts a message using the django.contrib.messages backend.
+
+        Exposes almost the same API as messages.add_message(), but accepts the
+        positional arguments in a different order to maintain backwards
+        compatibility. For convenience, it accepts the `level` argument as
+        a string rather than the usual level number.
         """
-        messages.info(request, message)
+
+        if not isinstance(level, int):
+            # attempt to get the level if passed a string
+            try:
+                level = getattr(messages.constants, level.upper())
+            except AttributeError:
+                levels = messages.constants.DEFAULT_TAGS.values()
+                levels_repr = ', '.join('`%s`' % l for l in levels)
+                raise ValueError('Bad message level string: `%s`. '
+                        'Possible values are: %s' % (level, levels_repr))
+
+        messages.add_message(request, level, message, extra_tags=extra_tags,
+                fail_silently=fail_silently)
 
     def save_form(self, request, form, change):
         """
@@ -1174,6 +1199,7 @@ class ModelAdmin(BaseModelAdmin):
 
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
+        list_filter = self.get_list_filter(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1184,7 +1210,7 @@ class ModelAdmin(BaseModelAdmin):
         ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display,
-                list_display_links, self.list_filter, self.date_hierarchy,
+                list_display_links, list_filter, self.date_hierarchy,
                 self.search_fields, self.list_select_related,
                 self.list_per_page, self.list_max_show_all, self.list_editable,
                 self)

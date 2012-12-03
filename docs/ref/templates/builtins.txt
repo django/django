@@ -618,7 +618,7 @@ Output the contents of the block if the two arguments equal each other.
 
 Example::
 
-    {% ifequal user.id comment.user_id %}
+    {% ifequal user.pk comment.user_id %}
         ...
     {% endifequal %}
 
@@ -1034,6 +1034,16 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
+
+.. warning::
+
+    Don't forget to put quotes around the function path or pattern name!
+
+    .. versionchanged:: 1.5
+        The first parameter used not to be quoted, which was inconsistent with
+        other template tags. Since Django 1.5, it is evaluated according to
+        the usual rules: it can be a quoted string or a variable that will be
+        looked up in the context.
 
 .. templatetag:: verbatim
 
@@ -1455,6 +1465,14 @@ For example::
     {{ value|filesizeformat }}
 
 If ``value`` is 123456789, the output would be ``117.7 MB``.
+
+.. admonition:: File sizes and SI units
+
+    Strictly speaking, ``filesizeformat`` does not conform to the International
+    System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
+    are calculated in powers of 1024 (which is the case here). Instead, Django
+    uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
+    are more commonly used.
 
 .. templatefilter:: first
 

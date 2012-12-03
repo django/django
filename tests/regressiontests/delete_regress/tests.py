@@ -3,7 +3,8 @@ from __future__ import absolute_import
 import datetime
 
 from django.conf import settings
-from django.db import backend, transaction, DEFAULT_DB_ALIAS, models
+from django.db import transaction, DEFAULT_DB_ALIAS, models
+from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
@@ -17,17 +18,8 @@ from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
 class DeleteLockingTest(TransactionTestCase):
     def setUp(self):
         # Create a second connection to the default database
-        conn_settings = settings.DATABASES[DEFAULT_DB_ALIAS]
-        self.conn2 = backend.DatabaseWrapper({
-            'HOST': conn_settings['HOST'],
-            'NAME': conn_settings['NAME'],
-            'OPTIONS': conn_settings['OPTIONS'],
-            'PASSWORD': conn_settings['PASSWORD'],
-            'PORT': conn_settings['PORT'],
-            'USER': conn_settings['USER'],
-            'TIME_ZONE': settings.TIME_ZONE,
-        })
-
+        new_connections = ConnectionHandler(settings.DATABASES)
+        self.conn2 = new_connections[DEFAULT_DB_ALIAS]
         # Put both DB connections into managed transaction mode
         transaction.enter_transaction_management()
         transaction.managed(True)

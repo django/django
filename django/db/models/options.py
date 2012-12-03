@@ -176,8 +176,10 @@ class Options(object):
             field.serialize = False
 
     def pk_index(self):
-        return [pos for pos, field in enumerate(self.fields)
-                if field == self.pk][0]
+        """
+        Returns the index of the primary key field in the self.fields list.
+        """
+        return self.fields.index(self.pk)
 
     def setup_proxy(self, target):
         """
@@ -518,9 +520,3 @@ class Options(object):
             #        objects.append(opts)
             self._ordered_objects = objects
         return self._ordered_objects
-
-    def pk_index(self):
-        """
-        Returns the index of the primary key field in the self.fields list.
-        """
-        return self.fields.index(self.pk)

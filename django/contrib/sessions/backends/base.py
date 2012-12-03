@@ -6,6 +6,7 @@ try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
+import string
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -14,6 +15,10 @@ from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+
+# session_key should not be case sensitive because some backends can store it
+# on case insensitive file systems.
+VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 
 class CreateError(Exception):
     """
@@ -132,12 +137,8 @@ class SessionBase(object):
 
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
-        # Todo: move to 0-9a-z charset in 1.5
-        hex_chars = '1234567890abcdef'
-        # session_key should not be case sensitive because some backends
-        # can store it on case insensitive file systems.
         while True:
-            session_key = get_random_string(32, hex_chars)
+            session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
                 break
         return session_key
