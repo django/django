@@ -1077,7 +1077,7 @@ class ValuesQuerySet(QuerySet):
 
     def _as_sql(self, connection):
         """
-        For ValueQuerySet (and subclasses like ValuesListQuerySet), they can
+        For ValuesQuerySet (and subclasses like ValuesListQuerySet), they can
         only be used as nested queries if they're already set up to select only
         a single field (in which case, that is the field column that is
         returned). This differs from QuerySet.as_sql(), where the column to
