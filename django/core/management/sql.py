@@ -145,15 +145,15 @@ def sql_all(app, style, connection):
 def _split_statements(content):
     comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
     statements = []
-    statement = ""
+    statement = []
     for line in content.split("\n"):
         cleaned_line = comment_re.sub(r"\1", line).strip()
         if not cleaned_line:
             continue
-        statement += cleaned_line
-        if statement.endswith(";"):
-            statements.append(statement)
-            statement = ""
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
     return statements
 
 
