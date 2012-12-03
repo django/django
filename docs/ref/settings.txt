@@ -1242,9 +1242,8 @@ Example::
         '/var/local/translations/locale'
     )
 
-Note that in the paths you add to the value of this setting, if you have the
-typical ``/path/to/locale/xx/LC_MESSAGES`` hierarchy, you should use the path to
-the ``locale`` directory (i.e. ``'/path/to/locale'``).
+Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
+directories containing the actual translation files.
 
 .. setting:: LOGGING
 
