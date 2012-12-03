@@ -3391,7 +3391,11 @@ class CSSTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_css_classes(self):
+    def test_field_prefix_css_classes(self):
+        """
+        Ensure that fields have a CSS class name with a 'field-' prefix.
+        Refs #16371.
+        """
         response = self.client.get('/test_admin/admin/admin_views/post/add/')
 
         # The main form
@@ -3407,6 +3411,23 @@ class CSSTest(TestCase):
         self.assertContains(response, '<td class="field-url">')
         self.assertContains(response, '<td class="field-posted">')
 
+    def test_index_css_classes(self):
+        """
+        Ensure that CSS class names are used for each app and model on the
+        admin index pages.
+        Refs #17050.
+        """
+        # General index page
+        response = self.client.get("/test_admin/admin/")
+        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<tr class="model-actor">')
+        self.assertContains(response, '<tr class="model-album">')
+
+        # App index page
+        response = self.client.get("/test_admin/admin/admin_views/")
+        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<tr class="model-actor">')
+        self.assertContains(response, '<tr class="model-album">')
 
 try:
     import docutils
