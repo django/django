@@ -90,6 +90,15 @@ original developers, says "Code without tests is broken by design."
 That other developers want to see tests in your software before they take it
 seriously is yet another reason for you to start writing tests.
 
+Tests help teams work together
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The previous points are written from the point of view of a single developer
+maintaining an application. Complex applications will be maintained by teams.
+Tests guarantee that colleagues don't inadvertently break your code (and that
+you don't break theirs without knowing). If you want to make a living as a
+Django programmer, you must be good at writing tests!
+
 Basic testing strategies
 ========================
 
@@ -160,13 +169,14 @@ notice  ``tests.py`` contains some dummy tests, you can remove those)::
 
     from polls.models import Poll
 
-    # we'll put all the Poll method tests in a class together
     class PollMethodTests(TestCase):
 
         def test_was_published_recently_with_future_poll(self):
-            # create a Poll instance whose pub_date is in the future
+            """
+            was_published_recently() should return False for polls whose
+            pub_date is in the future
+            """
             future_poll = Poll(pub_date=timezone.now() + datetime.timedelta(days=30))
-            # was_published_recently() should return False
             self.assertEqual(future_poll.was_published_recently(), False)
 
 What we have done here is created a :class:`django.test.TestCase` subclass
@@ -189,12 +199,12 @@ and you'll see something like::
     FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/home/daniele/django-testing-tutorial/mysite/polls/tests.py", line 18, in test_was_published_recently_with_future_poll
+      File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
         self.assertEqual(future_poll.was_published_recently(), False)
     AssertionError: True != False
 
     ----------------------------------------------------------------------
-    Ran 1 test in 0.000s
+    Ran 1 test in 0.001s
 
     FAILED (failures=1)
     Destroying test database for alias 'default'...
@@ -216,9 +226,8 @@ What happened is this:
   ``was_published_recently()`` returns ``True``, though we wanted it to return
   ``False``
 
-The test informs us which test failed -
-``test_was_published_recently_with_future_poll`` - and even the line on which
-the failure occurred.
+The test informs us which test failed and even the line on which the failure
+occurred.
 
 Fixing the bug
 --------------
@@ -229,15 +238,15 @@ return ``False`` if its ``pub_date`` is in the future. Amend the method in
 past::
 
     def was_published_recently(self):
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1) and \
-          self.pub_date < timezone.now()
+        return (self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+            and self.pub_date < timezone.now())
 
 and run the test again::
 
     Creating test database for alias 'default'...
     .
     ----------------------------------------------------------------------
-    Ran 1 test in 0.000s
+    Ran 1 test in 0.001s
 
     OK
     Destroying test database for alias 'default'...
@@ -261,15 +270,19 @@ Add two more test methods to the same class, to test the behavior of the method
 more comprehensively::
 
     def test_was_published_recently_with_old_poll(self):
-        # create a Poll instance whose pub_date is 30 days ago
+        """
+        was_published_recently() should return False for polls whose pub_date
+        is older than 1 day
+        """
         old_poll = Poll(pub_date=timezone.now() - datetime.timedelta(days=30))
-        # was_published_recently() should return False
         self.assertEqual(old_poll.was_published_recently(), False)
 
     def test_was_published_recently_with_recent_poll(self):
-        # create a Poll instance whose pub_date is one hour ago
+        """
+        was_published_recently() should return True for polls whose pub_date
+        is within the last day
+        """
         recent_poll = Poll(pub_date=timezone.now() - datetime.timedelta(hours=1))
-        # was_published_recently() should return True
         self.assertEqual(recent_poll.was_published_recently(), True)
 
 And now we have three tests that confirm that ``Poll.was_published_recently()``
@@ -410,94 +423,93 @@ shell session above.
 
 Add the following to ``polls/tests.py``::
 
-    # to work out URLs from the view we need urlresolvers.reverse
     from django.core.urlresolvers import reverse
 
-and we'll create a new class too::
+and we'll create a factory method to create polls as well as a new test class::
 
-    # we'll put all the view tests in a class together
+    def create_poll(question, days):
+        """
+        Creates a poll with the given `question` published the given number of
+        `days` offset to now (negative for polls published in the past,
+        positive for polls that have yet to be published).
+        """
+        return Poll.objects.create(question=question,
+            pub_date=timezone.now() + datetime.timedelta(days=days))
+
     class PollViewTests(TestCase):
-        # setUp will set up our testing environment for each and every test method
-        # in the class
-        def setUp(self):
-            # We'll set up some objects that we'll over and over again in our tests,
-            # so that we don't have to repeat ourselves. Note that we don't save
-            # them until we need them in the database - we do that in the test
-            # methods themselves.
-
-            # a Poll instance whose pub_date is 30 days ago
-            self.beatles_poll = Poll(
-                question="Who is your favorite Beatle?",
-                pub_date=timezone.now() - datetime.timedelta(days=30)
-            )
-
-            # a Poll instance whose pub_date is 30 in the future
-            self.stones_poll = Poll(
-                question="Who is your favorite Rolling Stone?",
-                pub_date=timezone.now() + datetime.timedelta(days=30)
-            )
-
         def test_index_view_with_no_polls(self):
-            # issue a GET request.
+            """
+            If no polls exist, an appropriate message should be displayed.
+            """
             response = self.client.get(reverse('polls:index'))
-            # we should get a 200 OK
             self.assertEqual(response.status_code, 200)
-            # the response should contain a message
             self.assertContains(response, "No polls are available.")
-            # there should be nothing in the latest_poll_list
-            self.assertEqual(len(response.context['latest_poll_list']), 0)
+            self.assertQuerysetEqual(response.context['latest_poll_list'], [])
 
         def test_index_view_with_a_past_poll(self):
-            self.beatles_poll.save()
+            """
+            Polls with a pub_date in the past should be displayed on the index page.
+            """
+            create_poll(question="Past poll.", days=-30)
             response = self.client.get(reverse('polls:index'))
-            # the only item in the list should be beatles_poll
-            self.assertEqual(len(response.context['latest_poll_list']), 1)
-            self.assertEqual(response.context['latest_poll_list'][0], self.beatles_poll)
+            self.assertQuerysetEqual(
+                response.context['latest_poll_list'],
+                ['<Poll: Past poll.>']
+            )
 
         def test_index_view_with_a_future_poll(self):
-            self.stones_poll.save()
+            """
+            Polls with a pub_date in the future should not be displayed on the
+            index page.
+            """
+            create_poll(question="Future poll.", days=30)
             response = self.client.get(reverse('polls:index'))
-            # there should be no polls in the index
-            # assertContains() allows us to check a number of things in one go
             self.assertContains(response, "No polls are available.", status_code=200)
-            self.assertEqual(len(response.context['latest_poll_list']), 0)
+            self.assertQuerysetEqual(response.context['latest_poll_list'], [])
 
         def test_index_view_with_future_poll_and_past_poll(self):
-            self.beatles_poll.save()
-            self.stones_poll.save()
+            """
+            Even if both past and future polls exist, only past polls should be
+            displayed.
+            """
+            create_poll(question="Past poll.", days=-30)
+            create_poll(question="Future poll.", days=30)
             response = self.client.get(reverse('polls:index'))
-            # the only item in the list should *still* be beatles_poll
-            self.assertEqual(len(response.context['latest_poll_list']), 1)
-            self.assertEqual(response.context['latest_poll_list'][0], self.beatles_poll)
+            self.assertQuerysetEqual(
+                response.context['latest_poll_list'],
+                ['<Poll: Past poll.>']
+            )
 
         def test_index_view_with_two_past_polls(self):
-            self.beatles_poll.save()
-            # change the date on the stones_poll - put it in the past
-            self.stones_poll.pub_date = timezone.now() - datetime.timedelta(days=5)
-            self.stones_poll.save()
+            """
+            The polls index page may display multiple polls.
+            """
+            create_poll(question="Past poll 1.", days=-30)
+            create_poll(question="Past poll 2.", days=-5)
             response = self.client.get(reverse('polls:index'))
-            # we should have 2 items now, stones_poll first and beatles_poll second
-            self.assertEqual(len(response.context['latest_poll_list']), 2)
-            self.assertEqual(response.context['latest_poll_list'][0], self.stones_poll)
-            self.assertEqual(response.context['latest_poll_list'][1], self.beatles_poll)
+            self.assertQuerysetEqual(
+                response.context['latest_poll_list'],
+                 ['<Poll: Past poll 2.>', '<Poll: Past poll 1.>']
+            )
 
 Let's look at some of these more closely.
 
-All the test methods run ``setUp()``, which creates the two ``Poll`` instances.
-It doesn't save them though; we only call ``save()`` when we need them.
+First is a poll factory method, ``create_poll``, to take some repetition out
+of the process of creating polls.
 
-``test_index_view_with_no_polls`` hasn't saved either of the ``Polls``, so we
-expect the poll index view load a page, but to return the message: "No polls are
-available.", and the ``latest_poll_list`` variable to be empty.
+``test_index_view_with_no_polls`` doesn't create any polls, but checks the
+message: "No polls are available." and verifies the ``latest_poll_list`` is
+empty. Note that the :class:`django.test.TestCase` class provides some
+additional assertion methods. In these examples, we use
+:meth:`~django.test.TestCase.assertContains()` and
+:meth:`~django.test.TestCase.assertQuerysetEqual()`.
 
-In ``test_index_view_with_a_past_poll``, a poll has been saved to the database,
-so we *do* expect to find it in the list.
+In ``test_index_view_with_a_past_poll``, we create a poll and verify that it
+appears in the list.
 
-In ``test_index_view_with_a_future_poll``, we save the other poll. The database
-is reset for each test method, so the first poll is no longer there, and so
-again the index shouldn't have any polls in it. Note that there is more than
-one ``assert`` method at our disposal; here we are using a new one,
-:meth:`~django.test.TestCase.assertContains()`.
+In ``test_index_view_with_a_future_poll``, we create a poll with a ``pub_date``
+in the future. The database is reset for each test method, so the first poll is
+no longer there, and so again the index shouldn't have any polls in it.
 
 And so on. In effect, we are using the tests to tell a story of admin input
 and user experience on the site, and checking that at every state and for every
@@ -525,27 +537,24 @@ and of course, we will add some tests, to check that a ``Poll`` whose
 ``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
 in the future is not::
 
-    class PollIndexDetailTests(TestCase):
-        def setUp(self):
-            # a Poll instance whose pub_date is 30 in the future
-            self.stones_poll = Poll(
-                question="Who is your favorite Rolling Stone?",
-                pub_date=timezone.now() + datetime.timedelta(days=30)
-            )
+class PollIndexDetailTests(TestCase):
+    def test_detail_view_with_a_future_poll(self):
+        """
+        The detail view of a poll with a pub_date in the future should
+        return a 404 not found.
+        """
+        future_poll = create_poll(question='Future poll.', days=5)
+        response = self.client.get(reverse('polls:detail', args=(future_poll.id,)))
+        self.assertEqual(response.status_code, 404)
 
-        def test_detail_view_with_a_future_poll(self):
-            self.stones_poll.save()
-            response = self.client.get(reverse('polls:detail', args=(self.stones_poll.id,)))
-            # should return a 404 not found
-            self.assertEqual(response.status_code, 404)
-
-        def test_detail_view_with_a_past_poll(self):
-            # change the date on the stones_poll - put it in the past
-            self.stones_poll.pub_date = timezone.now() - datetime.timedelta(days=5)
-            self.stones_poll.save()
-            response = self.client.get(reverse('polls:detail', args=(self.stones_poll.id,)))
-            # now the same poll should return a 200 OK
-            self.assertContains(response, self.stones_poll.question, status_code=200)
+    def test_detail_view_with_a_past_poll(self):
+        """
+        The detail view of a poll with a pub_date in the past should display
+        the poll's question.
+        """
+        past_poll = create_poll(question='Past Poll.', days=-5)
+        response = self.client.get(reverse('polls:detail', args=(past_poll.id,)))
+        self.assertContains(response, past_poll.question, status_code=200)
 
 Ideas for more tests
 --------------------
@@ -616,6 +625,12 @@ to facilitate integration with tools like Selenium.
 If you have a complex application, you may want to run tests automatically
 with every commit for the purposes of `continuous integration`_, so that
 quality control is itself - at least partially - automated.
+
+A good way to spot untested parts of your application is to check code
+coverage. This also helps identify fragile or even dead code. If you can't test
+a piece of code, it usually means that code should be refactored or removed.
+Coverage will help to identify dead code. See
+:ref:`topics-testing-code-coverage` for details.
 
 :doc:`Testing Django applications </topics/testing>` has comprehensive
 information about testing.
