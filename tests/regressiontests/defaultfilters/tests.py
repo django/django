@@ -310,6 +310,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('[see www.example.com]'),
             '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
 
+        # Check urlize doesn't crash when square bracket is prepended to url (#19070)
+        self.assertEqual(urlize('see test[at[example.com'),
+            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
+
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
