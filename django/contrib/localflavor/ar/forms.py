@@ -24,7 +24,9 @@ class ARPostalCodeField(RegexField):
     """
     A field that accepts a 'classic' NNNN Postal Code or a CPA.
 
-    See http://www.correoargentino.com.ar/consulta_cpa/home.php
+    See:
+        http://www.correoargentino.com.ar/cpa/que_es
+        http://www.correoargentino.com.ar/cpa/como_escribirlo
     """
     default_error_messages = {
         'invalid': _("Enter a postal code in the format NNNN or ANNNNAAA."),
@@ -120,8 +122,7 @@ class ARCUITField(RegexField):
         return str(result)
 
     def _format(self, cuit, check_digit=None):
-        if check_digit == None:
+        if check_digit is None:
             check_digit = cuit[-1]
             cuit = cuit[:-1]
         return '%s-%s-%s' % (cuit[:2], cuit[2:], check_digit)
-
