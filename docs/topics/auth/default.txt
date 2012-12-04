@@ -49,8 +49,8 @@ The most direct way to create users is to use the included
     >>> user.last_name = 'Lennon'
     >>> user.save()
 
-If you have the Django admin installed, you can also create users there.
---- link to section in admin docs
+If you have the Django admin installed, you can also :ref:`create users
+interactively <auth-admin>`.
 
 .. _topics-auth-creating-superusers:
 
@@ -269,12 +269,12 @@ If you have an authenticated user you want to attach to the current session
     later during the login process. An error will be raise if you try to login
     a user object retrieved from the database directly.
 
----todo - update link to backends docs:
+--- todo - update link to backends docs:
 
 .. _backends documentation: #other-authentication-sources
 
 
----link to managing passwords?
+--- link to managing passwords?
 
 
 How to log a user out
@@ -503,20 +503,23 @@ Authentication Views
 
 .. module:: django.contrib.auth.views
 
----TODO intro to all view here - include bits immediately below
+Django provides several views that you can use for handling login, logout, and
+password management. These make use of the :ref:`stock auth forms
+<built-in-auth-forms>` but you can pass in your own forms as well.
+
+Django provides no default template for the authentication views - however the
+template context is documented for each view below.
 
 .. versionadded:: 1.4
 
-The :func:`~views.login` view and the :ref:`other-built-in-views` now all
-return a :class:`~django.template.response.TemplateResponse` instance,
-which allows you to easily customize the response data before rendering.
-For more details, see the
-:doc:`TemplateResponse documentation </ref/template-response>`.
+The built-in views all return
+a :class:`~django.template.response.TemplateResponse` instance, which allows
+you to easily customize the response data before rendering.  For more details,
+see the :doc:`TemplateResponse documentation </ref/template-response>`.
 
----also generally noted for all views:
-
-See :doc:`the URL documentation </topics/http/urls>` for details on using
-named URL patterns.
+Most built-in authentication views provide a URL name for easier reference. See
+:doc:`the URL documentation </topics/http/urls>` for details on using named URL
+patterns.
 
 
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
@@ -1028,7 +1031,7 @@ Changing Passwords
 
 User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
-Included in the display of this information for the password field is a link to
+Included in the display of this information is a link to
 a password change form that allows admins to change user passwords.
 
 
