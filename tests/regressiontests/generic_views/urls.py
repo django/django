@@ -56,6 +56,10 @@ urlpatterns = patterns('',
     (r'^detail/nonmodel/1/$',
         views.NonModelDetail.as_view()),
 
+    # FormView
+    (r'^contact/$',
+        views.ContactView.as_view()),
+
     # Create/UpdateView
     (r'^edit/artists/create/$',
         views.ArtistCreate.as_view()),
