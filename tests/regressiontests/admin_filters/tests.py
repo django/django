@@ -671,7 +671,7 @@ class ListFiltersTests(TestCase):
         """
 
         modeladmin = DepartmentFilterEmployeeAdmin(Employee, site)
-        request = self.request_factory.get('/', {'department': '1'})
+        request = self.request_factory.get('/', {'department': self.john.pk})
         changelist = self.get_changelist(request, Employee, modeladmin)
 
         queryset = changelist.get_query_set(request)
@@ -684,7 +684,7 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[2]['display'], u'DEV')
         self.assertEqual(choices[2]['selected'], True)
-        self.assertEqual(choices[2]['query_string'], '?department=1')
+        self.assertEqual(choices[2]['query_string'], '?department=%s' % self.john.pk)
 
     def test_fk_with_to_field(self):
         """
