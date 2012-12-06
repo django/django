@@ -346,7 +346,10 @@ class LinkInline(admin.TabularInline):
     model = Link
     extra = 1
 
-    readonly_fields = ("posted",)
+    readonly_fields = ("posted", "multiline")
+
+    def multiline(self, instance):
+        return "InlineMultiline\ntest\nstring"
 
 
 class SubPostInline(admin.TabularInline):
