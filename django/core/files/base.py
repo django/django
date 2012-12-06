@@ -6,7 +6,7 @@ from io import BytesIO, StringIO, UnsupportedOperation
 from django.utils.encoding import smart_text
 from django.core.files.utils import FileProxyMixin
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import force_bytes, python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class File(FileProxyMixin):
@@ -134,8 +134,11 @@ class ContentFile(File):
     A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
-        content = content or b''
-        stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
+        if six.PY3:
+            stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
+        else:
+            stream_class = BytesIO
+            content = force_bytes(content)
         super(ContentFile, self).__init__(stream_class(content), name=name)
         self.size = len(content)
 

@@ -560,6 +560,13 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
 
 class ContentFileTestCase(unittest.TestCase):
 
+    def setUp(self):
+        self.storage_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(self.storage_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.storage_dir)
+
     def test_content_file_default_name(self):
         self.assertEqual(ContentFile(b"content").name, None)
 
@@ -576,7 +583,18 @@ class ContentFileTestCase(unittest.TestCase):
         retrieved content is of the same type.
         """
         self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
-        self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+        if six.PY3:
+            self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+        else:
+            self.assertTrue(isinstance(ContentFile("español").read(), bytes))
+
+    def test_content_saving(self):
+        """
+        Test that ContentFile can be saved correctly with the filesystem storage,
+        both if it was initialized with string or unicode content"""
+        self.storage.save('bytes.txt', ContentFile(b"content"))
+        self.storage.save('unicode.txt', ContentFile("español"))
+
 
 class NoNameFileTestCase(unittest.TestCase):
     """
