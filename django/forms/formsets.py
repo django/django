@@ -267,7 +267,7 @@ class BaseFormSet(object):
 
     def is_valid(self):
         """
-        Returns True if form.errors is empty for every form in self.forms.
+        Returns True if every form in self.forms is valid.
         """
         if not self.is_bound:
             return False
@@ -282,8 +282,7 @@ class BaseFormSet(object):
                     # This form is going to be deleted so any of its errors
                     # should not cause the entire formset to be invalid.
                     continue
-            if bool(self.errors[i]):
-                forms_valid = False
+            forms_valid &= form.is_valid()
         return forms_valid and not bool(self.non_form_errors())
 
     def full_clean(self):
