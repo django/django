@@ -12,7 +12,7 @@ from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_ob
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-from django.core.exceptions import PermissionDenied, ValidationError, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -1424,10 +1424,6 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def get_extra(self, request, obj=None, **kwargs):
         """Get the number of extra inline forms needed"""
-        # extra = 3
-        if not isinstance(self.extra, int):
-            raise ImproperlyConfigured("'%s.extra' should be a integer."
-                                       % self.__class__.__name__)
         return self.extra
 
     def get_formset(self, request, obj=None, **kwargs):
