@@ -199,11 +199,6 @@ def validate_inline(cls, parent, parent_model):
 
     fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
 
-    # extra = 3
-    if not isinstance(cls.extra, int):
-        raise ImproperlyConfigured("'%s.extra' should be a integer."
-                % cls.__name__)
-
     # max_num = None
     max_num = getattr(cls, 'max_num', None)
     if max_num is not None and not isinstance(max_num, int):
