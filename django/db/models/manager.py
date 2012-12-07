@@ -51,12 +51,15 @@ class Manager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
-    def __init__(self):
+    def __init__(self, query_set_class=QuerySet, empty_query_set_class=EmptyQuerySet, raw_query_set_class=RawQuerySet):
         super(Manager, self).__init__()
         self._set_creation_counter()
         self.model = None
         self._inherited = False
         self._db = None
+        self.query_set_class = query_set_class
+        self.empty_query_set_class = empty_query_set_class
+        self.raw_query_set_class = raw_query_set_class
 
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
@@ -113,13 +116,13 @@ class Manager(object):
     #######################
 
     def get_empty_query_set(self):
-        return EmptyQuerySet(self.model, using=self._db)
+        return self.empty_query_set_class(self.model, using=self._db)
 
     def get_query_set(self):
         """Returns a new QuerySet object.  Subclasses can override this method
         to easily customize the behavior of the Manager.
         """
-        return QuerySet(self.model, using=self._db)
+        return self.query_set_class(self.model, using=self._db)
 
     def none(self):
         return self.get_empty_query_set()
@@ -218,7 +221,7 @@ class Manager(object):
         return self.get_query_set()._update(values, **kwargs)
 
     def raw(self, raw_query, params=None, *args, **kwargs):
-        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
+        return self.raw_query_set_class(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
 
 
 class ManagerDescriptor(object):

@@ -12,6 +12,7 @@ returns.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils.encoding import python_2_unicode_compatible
 
 # An example of a custom manager called "objects".
@@ -63,3 +64,20 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+
+# An example of providing custom QuerySet directly into Model, without custom manager.
+
+class UserQuerySet(QuerySet):
+    def join(self, glue, fields):
+        """Add some useful method"""
+        return [glue.join(l) for l in self.values_list(*fields)]
+
+@python_2_unicode_compatible
+class User(models.Model):
+    firstname = models.CharField(max_length=10)
+    middlename = models.CharField(max_length=10)
+    lastname = models.CharField(max_length=10)
+    objects = models.Manager(query_set_class=UserQuerySet)
+
+    def __str__(self):
+        return self.firstname
