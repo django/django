@@ -1119,9 +1119,11 @@ Default: ``()``
 
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
-:doc:`/howto/error-reporting`). Use this if your site does not provide a
-commonly requested file such as ``favicon.ico`` or ``robots.txt``, or if it
-gets hammered by script kiddies.
+:doc:`/howto/error-reporting`). Regular expressions are matched against
+:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
+query string, if any). Use this if your site does not provide a commonly
+requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
+hammered by script kiddies.
 
 This is only used if :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True`` and
 ``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
