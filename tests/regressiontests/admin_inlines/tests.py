@@ -12,7 +12,7 @@ from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Title)
+    Sighting, Title, BinaryTree)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -146,6 +146,7 @@ class TestInline(TestCase):
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
                 'name="-2-0-name" maxlength="100" />', html=True)
 
+
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
         """
@@ -188,6 +189,20 @@ class TestInline(TestCase):
         response = self.client.post('/admin/admin_inlines/extraterrestrial/add/', data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Sighting.objects.filter(et__name='Martian').count(), 1)
+
+
+    def test_custom_get_extra_form(self):
+        bt_head = BinaryTree(name="Tree Head")
+        bt_head.save()
+        bt_child = BinaryTree(name="First Child", parent=bt_head)
+        bt_child.save()
+
+        inline_form = '<input type="hidden" name="binarytree_set-2-id" id="id_binarytree_set-2-id" />'
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertNotContains(response, inline_form)
+
+        response = self.client.get('/admin/admin_inlines/binarytree/' + str(bt_head.id) + '/')
+        self.assertNotContains(response, inline_form)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
