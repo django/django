@@ -7,6 +7,7 @@ import tempfile
 import warnings
 
 from django import contrib
+from django.utils._os import upath
 from django.utils import six
 
 # databrowse is deprecated, but we still want to run its tests
@@ -19,8 +20,8 @@ REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
-RUNTESTS_DIR = os.path.dirname(__file__)
-CONTRIB_DIR = os.path.dirname(contrib.__file__)
+RUNTESTS_DIR = os.path.dirname(upath(__file__))
+CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
@@ -192,7 +193,7 @@ def bisect_tests(bisection_label, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, __file__, '--settings=%s' % options.settings]
+        sys.executable, upath(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -253,7 +254,7 @@ def paired_tests(paired_test, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, __file__, '--settings=%s' % options.settings]
+        sys.executable, upath(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:

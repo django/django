@@ -18,6 +18,7 @@ from django.utils.formats import (get_format, date_format, time_format,
     number_format)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
+from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
 from django.utils import six
 from django.utils.six import PY3
@@ -44,7 +45,7 @@ from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
     URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests)
 
 
-here = os.path.dirname(os.path.abspath(__file__))
+here = os.path.dirname(os.path.abspath(upath(__file__)))
 extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
@@ -666,8 +667,8 @@ class FormattingTests(TestCase):
         with self.settings(USE_L10N=True,
                 FORMAT_MODULE_PATH='regressiontests.i18n.other.locale'):
             with translation.override('de', deactivate=True):
-                old = "%r" % get_format_modules(reverse=True)
-                new = "%r" % get_format_modules(reverse=True) # second try
+                old = str("%r") % get_format_modules(reverse=True)
+                new = str("%r") % get_format_modules(reverse=True) # second try
                 self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
 
     def test_localize_templatetag_and_filter(self):

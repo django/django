@@ -11,6 +11,7 @@ from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
+from django.utils._os import upath
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
@@ -331,7 +332,7 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(form.cleaned_data['email'], email)
 
     def test_custom_email_subject(self):
-        template_path = os.path.join(os.path.dirname(__file__), 'templates')
+        template_path = os.path.join(os.path.dirname(upath(__file__)), 'templates')
         with self.settings(TEMPLATE_DIRS=(template_path,)):
             data = {'email': 'testclient@example.com'}
             form = PasswordResetForm(data)

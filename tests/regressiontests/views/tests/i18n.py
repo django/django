@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.test import LiveServerTestCase, TestCase
 from django.test.utils import override_settings
 from django.utils import six, unittest
+from django.utils._os import upath
 from django.utils.translation import override
 from django.utils.text import javascript_quote
 
@@ -152,7 +153,7 @@ class JsI18NTestsMultiPackage(TestCase):
     def testI18NWithLocalePaths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (
             path.join(path.dirname(
-                path.dirname(path.abspath(__file__))), 'app3', 'locale'),)
+                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/views/jsi18n/')
