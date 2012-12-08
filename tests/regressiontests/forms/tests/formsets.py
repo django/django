@@ -856,6 +856,27 @@ class FormsFormsetTestCase(TestCase):
         formset = FavoriteDrinksFormSet(error_class=CustomErrorList)
         self.assertEqual(formset.forms[0].error_class, CustomErrorList)
 
+    def test_formset_calls_forms_is_valid(self):
+        # Regression tests for #18574 -- make sure formsets call
+        # is_valid() on each form.
+
+        class AnotherChoice(Choice):
+            def is_valid(self):
+                self.is_valid_called = True
+                return super(AnotherChoice, self).is_valid()
+
+        AnotherChoiceFormSet = formset_factory(AnotherChoice)
+        data = {
+            'choices-TOTAL_FORMS': '1',  # number of forms rendered
+            'choices-INITIAL_FORMS': '0',  # number of forms with initial data
+            'choices-MAX_NUM_FORMS': '0',  # max number of forms
+            'choices-0-choice': 'Calexico',
+            'choices-0-votes': '100',
+        }
+        formset = AnotherChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertTrue(formset.is_valid())
+        self.assertTrue(all([form.is_valid_called for form in formset.forms]))
+
 
 data = {
     'choices-TOTAL_FORMS': '1', # the number of forms rendered

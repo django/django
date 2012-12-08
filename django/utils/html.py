@@ -150,13 +150,17 @@ fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     # Handle IDN before quoting.
-    scheme, netloc, path, query, fragment = urlsplit(url)
     try:
-        netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-    except UnicodeError: # invalid domain part
+        scheme, netloc, path, query, fragment = urlsplit(url)
+        try:
+            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
+        except UnicodeError: # invalid domain part
+            pass
+        else:
+            url = urlunsplit((scheme, netloc, path, query, fragment))
+    except ValueError:
+        # invalid IPv6 URL (normally square brackets in hostname part).
         pass
-    else:
-        url = urlunsplit((scheme, netloc, path, query, fragment))
 
     # An URL is considered unquoted if it contains no % characters or
     # contains a % not followed by two hexadecimal digits. See #9655.

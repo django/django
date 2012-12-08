@@ -1,6 +1,8 @@
 import os
 import stat
+import sys
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
+
 from django.utils.encoding import force_text
 from django.utils import six
 
@@ -9,6 +11,9 @@ try:
 except NameError:
     class WindowsError(Exception):
         pass
+
+if not six.PY3:
+    fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 
 
 # Under Python 2, define our own abspath function that can handle joining
@@ -28,6 +33,23 @@ else:
         if not isabs(path):
             path = join(os.getcwdu(), path)
         return normpath(path)
+
+def upath(path):
+    """
+    Always return a unicode path.
+    """
+    if not six.PY3:
+        return path.decode(fs_encoding)
+    return path
+
+def npath(path):
+    """
+    Always return a native path, that is unicode on Python 3 and bytestring on
+    Python 2.
+    """
+    if not six.PY3 and not isinstance(path, bytes):
+        return path.encode(fs_encoding)
+    return path
 
 def safe_join(base, *paths):
     """
@@ -74,4 +96,3 @@ def rmtree_errorhandler(func, path, exc_info):
     os.chmod(path, stat.S_IWRITE)
     # use the original function to repeat the operation
     func(path)
-

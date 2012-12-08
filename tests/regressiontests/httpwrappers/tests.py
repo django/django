@@ -14,6 +14,7 @@ from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          parse_cookie)
 from django.test import TestCase
 from django.utils.encoding import smart_str
+from django.utils._os import upath
 from django.utils import six
 from django.utils import unittest
 
@@ -483,7 +484,7 @@ class StreamingHttpResponseTests(TestCase):
 
 class FileCloseTests(TestCase):
     def test_response(self):
-        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -516,7 +517,7 @@ class FileCloseTests(TestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)

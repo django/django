@@ -20,6 +20,15 @@ class FormMixinTests(TestCase):
          initial_2 = FormMixin().get_initial()
          self.assertNotEqual(initial_1, initial_2)
 
+
+class BasicFormTests(TestCase):
+    urls = 'regressiontests.generic_views.urls'
+
+    def test_post_data(self):
+        res = self.client.post('/contact/', {'name': "Me", 'message': "Hello"})
+        self.assertRedirects(res, 'http://testserver/list/authors/')
+
+
 class ModelFormMixinTests(TestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()

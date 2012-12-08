@@ -9,6 +9,7 @@ from django.conf import compat_patch_logging_config, LazySettings
 from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.log import CallbackFilter, RequireDebugFalse
 from django.utils.six import StringIO
 from django.utils.unittest import skipUnless
@@ -154,13 +155,13 @@ class WarningLoggerTests(TestCase):
         output = StringIO()
         self.logger.handlers[0].stream = output
         warnings.warn('Foo Deprecated', DeprecationWarning)
-        self.assertTrue('Foo Deprecated' in output.getvalue())
+        self.assertTrue('Foo Deprecated' in force_text(output.getvalue()))
 
     def test_warnings_capture_debug_false(self):
         output = StringIO()
         self.logger.handlers[0].stream = output
         warnings.warn('Foo Deprecated', DeprecationWarning)
-        self.assertFalse('Foo Deprecated' in output.getvalue())
+        self.assertFalse('Foo Deprecated' in force_text(output.getvalue()))
 
 
 class CallbackFilterTest(TestCase):

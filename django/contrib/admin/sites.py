@@ -391,9 +391,9 @@ class AdminSite(object):
             'app_list': app_list,
         }
         context.update(extra_context or {})
-        return TemplateResponse(request, [
-            self.index_template or 'admin/index.html',
-        ], context, current_app=self.name)
+        return TemplateResponse(request, self.index_template or
+                                'admin/index.html', context,
+                                current_app=self.name)
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user

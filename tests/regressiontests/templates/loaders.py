@@ -18,6 +18,7 @@ from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
 from django.utils import unittest, six
+from django.utils._os import upath
 from django.utils.six import StringIO
 
 
@@ -111,9 +112,9 @@ class CachedLoader(unittest.TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
         # Retrive a template specifying a template directory to check
-        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'first'),))
+        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
-        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'second'),))
+        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
@@ -123,7 +124,7 @@ class RenderToStringTest(unittest.TestCase):
     def setUp(self):
         self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(__file__), 'templates'),
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
         )
 
     def tearDown(self):

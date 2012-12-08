@@ -8,6 +8,7 @@ from django.utils.translation import check_for_language, activate, to_locale, ge
 from django.utils.text import javascript_quote
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
+from django.utils._os import upath
 from django.utils import six
 
 def set_language(request):
@@ -197,7 +198,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
-        path = os.path.join(os.path.dirname(p.__file__), 'locale')
+        path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
     paths.extend(list(reversed(settings.LOCALE_PATHS)))

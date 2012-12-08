@@ -11,6 +11,7 @@ from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test.utils import override_settings
+from django.utils._os import upath
 
 def test_processor(request):
     return {'processors': 'yes'}
@@ -206,7 +207,7 @@ class SimpleTemplateResponseTest(TestCase):
 
 @override_settings(
     TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__),'templates')),
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
 )
 class TemplateResponseTest(TestCase):
 

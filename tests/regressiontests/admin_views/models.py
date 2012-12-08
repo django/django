@@ -662,5 +662,5 @@ class Simple(models.Model):
     """
 
 class Choice(models.Model):
-    choice = models.CharField(max_length=1, blank=True, null=True,
-        choices=(('y','Yes'), ('n','No'), (None, 'No opinion')))
+    choice = models.IntegerField(blank=True, null=True,
+        choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))

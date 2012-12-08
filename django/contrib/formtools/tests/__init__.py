@@ -14,6 +14,7 @@ from django.contrib.formtools.wizard import FormWizard
 from django.test import TestCase
 from django.test.html import parse_html
 from django.test.utils import override_settings
+from django.utils._os import upath
 from django.utils import unittest
 
 from django.contrib.formtools.tests.wizard import *
@@ -36,7 +37,7 @@ class TestFormPreview(preview.FormPreview):
 
 @override_settings(
     TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
 )
 class PreviewTests(TestCase):
@@ -214,7 +215,7 @@ class DummyRequest(http.HttpRequest):
 @override_settings(
     SECRET_KEY="123",
     TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
 )
 class WizardTests(TestCase):

@@ -7,16 +7,17 @@ from django.core.urlresolvers import reverse, clear_url_caches
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.template import Template, Context
+from django.utils._os import upath
 from django.utils import translation
 
 
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=(
-        os.path.join(os.path.dirname(__file__), 'locale'),
+        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
     ),
     TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
     LANGUAGE_CODE='en',
     LANGUAGES=(

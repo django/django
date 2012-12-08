@@ -2,11 +2,11 @@ from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .forms import AuthorForm
+from .forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, Page, BookSigning
 
 
@@ -74,6 +74,13 @@ class AuthorListCustomPaginator(AuthorList):
             page_size,
             orphans=2,
             allow_empty_first_page=allow_empty_first_page)
+
+
+class ContactView(generic.FormView):
+    form_class = ContactForm
+    success_url = reverse_lazy('authors_list')
+    template_name = 'generic_views/form.html'
+
 
 class ArtistCreate(generic.CreateView):
     model = Artist

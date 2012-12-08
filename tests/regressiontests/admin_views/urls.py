@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     (r'^test_admin/admin/', include(admin.site.urls)),
     (r'^test_admin/admin2/', include(customadmin.site.urls)),
     (r'^test_admin/admin3/', include(admin.site.urls), dict(form_url='pony')),
+    (r'^test_admin/admin4/', include(customadmin.simple_site.urls)),
 )

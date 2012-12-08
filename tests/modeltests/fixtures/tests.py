@@ -226,9 +226,9 @@ class FixtureLoadingTests(TestCase):
 
     def test_ambiguous_compressed_fixture(self):
         # The name "fixture5" is ambigous, so loading it will raise an error
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Multiple fixtures named 'fixture5'"):
+        with self.assertRaises(management.CommandError) as cm:
             management.call_command('loaddata', 'fixture5', verbosity=0, commit=False)
+            self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])
 
     def test_db_loading(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
@@ -250,9 +250,9 @@ class FixtureLoadingTests(TestCase):
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
             connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
-        with six.assertRaisesRegex(self, IntegrityError,
-                "Could not load fixtures.Article\(pk=1\): .*$"):
+        with self.assertRaises(IntegrityError) as cm:
             management.call_command('loaddata', 'invalid.json', verbosity=0, commit=False)
+            self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
@@ -308,9 +308,9 @@ class FixtureTransactionTests(TransactionTestCase):
 
         # Try to load fixture 2 using format discovery; this will fail
         # because there are two fixture2's in the fixtures directory
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Multiple fixtures named 'fixture2'"):
+        with self.assertRaises(management.CommandError) as cm:
             management.call_command('loaddata', 'fixture2', verbosity=0)
+            self.assertIn("Multiple fixtures named 'fixture2'", cm.exception.args[0])
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [

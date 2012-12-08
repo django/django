@@ -15,11 +15,12 @@ from django.test import LiveServerTestCase
 from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
 from django.utils.http import urlencode
+from django.utils._os import upath
 
 from .models import Person
 
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),

@@ -33,6 +33,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils._os import upath
 from django.utils import six
 from django.test.utils import override_settings
 
@@ -633,7 +634,7 @@ class AdminViewFormUrlTest(TestCase):
         Refs #17515.
         """
         template_dirs = settings.TEMPLATE_DIRS + (
-            os.path.join(os.path.dirname(__file__), 'templates'),)
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get("/test_admin/admin/admin_views/color2/")
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
@@ -770,7 +771,10 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.assertContains(response, 'Hello from a custom logout template')
 
     def testCustomAdminSiteIndexViewAndTemplate(self):
-        response = self.client.get('/test_admin/admin2/')
+        try:
+            response = self.client.get('/test_admin/admin2/')
+        except TypeError:
+            self.fail('AdminSite.index_template should accept a list of template paths')
         self.assertIsInstance(response, TemplateResponse)
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
@@ -791,6 +795,15 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.client.login(username='super', password='secret')
         response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
         self.assertEqual(response.content, b"Django is a magical pony!")
+
+    def test_pwd_change_custom_template(self):
+        self.client.login(username='super', password='secret')
+        su = User.objects.get(username='super')
+        try:
+            response = self.client.get('/test_admin/admin4/auth/user/%s/password/' % su.pk)
+        except TypeError:
+            self.fail('ModelAdmin.change_user_password_template should accept a list of template paths')
+        self.assertEqual(response.status_code, 200)
 
 
 def get_perm(Model, perm):
@@ -3152,6 +3165,7 @@ class ReadonlyTest(TestCase):
 
         # Checks that multiline text in a readonly field gets <br /> tags
         self.assertContains(response, "Multiline<br />test<br />string")
+        self.assertContains(response, "InlineMultiline<br />test<br />string")
 
         self.assertContains(response,
             formats.localize(datetime.date.today() - datetime.timedelta(days=7))

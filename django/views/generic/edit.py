@@ -1,6 +1,7 @@
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
+from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
@@ -50,7 +51,8 @@ class FormMixin(ContextMixin):
         Returns the supplied success URL.
         """
         if self.success_url:
-            url = self.success_url
+            # Forcing possible reverse_lazy evaluation
+            url = force_text(self.success_url)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

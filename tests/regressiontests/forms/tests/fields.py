@@ -36,6 +36,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
 from django.utils import six
+from django.utils._os import upath
 
 
 def fix_os_paths(x):
@@ -928,12 +929,12 @@ class FieldsTests(SimpleTestCase):
     # FilePathField ###############################################################
 
     def test_filepathfield_1(self):
-        path = os.path.abspath(forms.__file__)
+        path = os.path.abspath(upath(forms.__file__))
         path = os.path.dirname(path) + '/'
         self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
 
     def test_filepathfield_2(self):
-        path = forms.__file__
+        path = upath(forms.__file__)
         path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path)
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
@@ -954,7 +955,7 @@ class FieldsTests(SimpleTestCase):
         assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py')
 
     def test_filepathfield_3(self):
-        path = forms.__file__
+        path = upath(forms.__file__)
         path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
@@ -972,7 +973,7 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_4(self):
-        path = os.path.abspath(forms.__file__)
+        path = os.path.abspath(upath(forms.__file__))
         path = os.path.dirname(path) + '/'
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
@@ -992,7 +993,7 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_folders(self):
-        path = os.path.dirname(__file__) + '/filepath_test_files/'
+        path = os.path.dirname(upath(__file__)) + '/filepath_test_files/'
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [

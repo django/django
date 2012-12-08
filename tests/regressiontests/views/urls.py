@@ -4,11 +4,12 @@ from __future__ import absolute_import
 from os import path
 
 from django.conf.urls import patterns, url, include
+from django.utils._os import upath
 
 from . import views
 
 
-base_dir = path.dirname(path.abspath(__file__))
+base_dir = path.dirname(path.abspath(upath(__file__)))
 media_dir = path.join(base_dir, 'media')
 locale_dir = path.join(base_dir, 'locale')
 
