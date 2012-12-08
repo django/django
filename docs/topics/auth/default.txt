@@ -10,6 +10,12 @@ may handle the majority of cases as is, Django supports extensive extension and
 customization of authentication, :doc:`documented here
 </topics/auth/customizing>`.
 
+Django authentication provides both authentication and authorization, together
+and is generally referred to as the authenticaiton system, as these features
+somewhat coupled.
+
+.. _user-objects:
+
 User objects
 ============
 
@@ -130,6 +136,8 @@ Authenticating Users
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
 
+.. _topic-authorization:
+
 Permissions and Authorization
 =============================
 
@@ -198,6 +206,8 @@ them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
 access to a members-only portion of your site, or send them members-only email
 messages.
+
+.. _auth-web-requests:
 
 Authentication in Web requests
 ==============================
