@@ -20,6 +20,7 @@ class Member(models.Model):
 @python_2_unicode_compatible
 class Band(models.Model):
     name = models.CharField(max_length=100)
+    style = models.CharField(max_length=20)
     members = models.ManyToManyField(Member)
 
     def __str__(self):
