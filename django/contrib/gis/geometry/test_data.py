@@ -7,13 +7,14 @@ import os
 
 from django.contrib import gis
 from django.utils import six
+from django.utils._os import upath
 
 
 # This global used to store reference geometry data.
 GEOMETRIES = None
 
 # Path where reference test data is located.
-TEST_DATA = os.path.join(os.path.dirname(gis.__file__), 'tests', 'data')
+TEST_DATA = os.path.join(os.path.dirname(upath(gis.__file__)), 'tests', 'data')
 
 
 def tuplize(seq):

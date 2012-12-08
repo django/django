@@ -10,6 +10,7 @@ from threading import local
 
 from django.utils.importlib import import_module
 from django.utils.encoding import force_str, force_text
+from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
@@ -109,7 +110,7 @@ def translation(language):
 
     from django.conf import settings
 
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
 
     def _fetch(lang, fallback=None):
 
@@ -151,7 +152,7 @@ def translation(language):
 
         for appname in reversed(settings.INSTALLED_APPS):
             app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
@@ -337,7 +338,7 @@ def all_locale_paths():
     """
     from django.conf import settings
     globalpath = os.path.join(
-        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 def check_for_language(lang_code):

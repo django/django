@@ -6,6 +6,7 @@ from zipimport import zipimporter
 from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.utils._os import upath
 
 
 class DefaultLoader(unittest.TestCase):
@@ -50,7 +51,7 @@ class DefaultLoader(unittest.TestCase):
 class EggLoader(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path[:]
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
     def tearDown(self):
         sys.path = self.old_path

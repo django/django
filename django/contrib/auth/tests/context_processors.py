@@ -9,6 +9,7 @@ from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils._os import upath
 
 
 class MockUser(object):
@@ -63,7 +64,7 @@ class PermWrapperTests(TestCase):
 @skipIfCustomUser
 @override_settings(
     TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(__file__), 'templates'),
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
         ),
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),

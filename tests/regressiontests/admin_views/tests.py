@@ -33,6 +33,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils._os import upath
 from django.utils import six
 from django.test.utils import override_settings
 
@@ -633,7 +634,7 @@ class AdminViewFormUrlTest(TestCase):
         Refs #17515.
         """
         template_dirs = settings.TEMPLATE_DIRS + (
-            os.path.join(os.path.dirname(__file__), 'templates'),)
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get("/test_admin/admin/admin_views/color2/")
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])

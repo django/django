@@ -30,6 +30,7 @@ from django.test.utils import (setup_test_template_loader,
 from django.utils import unittest
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
+from django.utils._os import upath
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -423,7 +424,7 @@ class Templates(TestCase):
         # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
         old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
         settings.ALLOWED_INCLUDE_ROOTS = (
-            os.path.dirname(os.path.abspath(__file__)),
+            os.path.dirname(os.path.abspath(upath(__file__))),
         )
 
         # Warm the URL reversing cache. This ensures we don't pay the cost
@@ -514,7 +515,7 @@ class Templates(TestCase):
     def get_template_tests(self):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
-        basedir = os.path.dirname(os.path.abspath(__file__))
+        basedir = os.path.dirname(os.path.abspath(upath(__file__)))
         tests = {
             ### BASIC SYNTAX ################################################
 
@@ -1649,7 +1650,7 @@ class TemplateTagLoading(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path[:]
         self.old_apps = settings.INSTALLED_APPS
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 

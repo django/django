@@ -24,6 +24,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils import unittest
+from django.utils._os import upath
 from django.test.utils import override_settings
 from ..servers.tests import LiveServerBase
 
@@ -104,7 +105,7 @@ class FileStorageTests(unittest.TestCase):
         """
         storage = self.storage_class(location='')
         self.assertEqual(storage.base_location, '')
-        self.assertEqual(storage.location, os.getcwd())
+        self.assertEqual(storage.location, upath(os.getcwd()))
 
     def test_file_access_options(self):
         """
@@ -534,7 +535,7 @@ class DimensionClosingBug(unittest.TestCase):
         from django.core.files import images
         images.open = catching_open
         try:
-            get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
+            get_image_dimensions(os.path.join(os.path.dirname(upath(__file__)), "test1.png"))
         finally:
             del images.open
         self.assertTrue(FileWrapper._closed)
@@ -551,7 +552,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         """
         from django.core.files.images import ImageFile
 
-        img_path = os.path.join(os.path.dirname(__file__), "test.png")
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
         image = ImageFile(open(img_path, 'rb'))
         image_pil = Image.open(img_path)
         size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
