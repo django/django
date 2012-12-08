@@ -33,8 +33,12 @@ class GetDefaultUsernameTestCase(TestCase):
 
     def test_unknown_encoding(self):
         import locale
-        locale.getdefaultlocale = lambda: ("en_US", "x-mac-simp-chinese")
-        self.assertEqual(management.get_default_username(), '')
+        try:
+            origin = locale.getdefaultlocale
+            locale.getdefaultlocale = lambda: ("en_US", "x-mac-simp-chinese")
+            self.assertEqual(management.get_default_username(), '')
+        finally:
+            locale.getdefaultlocale = origin
 
     def test_existing(self):
         models.User.objects.create(username='joe')
