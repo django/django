@@ -18,7 +18,7 @@ from django.utils import six
 from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
-    ImprovedArticleWithParentLink, Inventory, PhoneNumber, Post, Price,
+    ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, Writer, WriterProfile, test_images)
 
 if test_images:
@@ -148,10 +148,6 @@ class WriterProfileForm(forms.ModelForm):
     class Meta:
         model = WriterProfile
 
-class PhoneNumberForm(forms.ModelForm):
-    class Meta:
-        model = PhoneNumber
-
 class TextFileForm(forms.ModelForm):
     class Meta:
         model = TextFile
@@ -167,7 +163,7 @@ class ModelFormWithMedia(forms.ModelForm):
             'all': ('/some/form/css',)
         }
     class Meta:
-        model = PhoneNumber
+        model = TextFile
 
 class CommaSeparatedIntegerForm(forms.ModelForm):
    class Meta:
@@ -1148,12 +1144,6 @@ class OldFormForXTests(TestCase):
 <option value="%s">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
-
-    def test_phone_number_field(self):
-        f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
-        self.assertEqual(f.is_valid(), True)
-        self.assertEqual(f.cleaned_data['phone'], '312-555-1212')
-        self.assertEqual(f.cleaned_data['description'], 'Assistance')
 
     def test_file_field(self):
         # Test conditions when files is either not given or empty.
