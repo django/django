@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-WSGI config for {{ project_name }} project.
+WSGI config for {{ project_name|title }} Django project.
 
 This module contains the WSGI application used by Django's development server
 and any production WSGI deployments. It should expose a module-level variable
@@ -11,15 +12,14 @@ might make sense to replace the whole Django WSGI application with a custom one
 that later delegates to the Django one. For example, you could introduce WSGI
 middleware here, or combine a Django application with an application of another
 framework.
-
 """
 import os
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
 # if running multiple sites in the same mod_wsgi process. To fix this, use
 # mod_wsgi daemon mode with each site in its own daemon process, or use
-# os.environ["DJANGO_SETTINGS_MODULE"] = "{{ project_name }}.settings"
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
+# os.environ['DJANGO_SETTINGS_MODULE'] = '{{ project_name }}.settings'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{{ project_name }}.settings')
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
