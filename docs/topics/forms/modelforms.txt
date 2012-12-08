@@ -90,9 +90,6 @@ Model field                      Form field
 
 ``NullBooleanField``             ``CharField``
 
-``PhoneNumberField``             ``USPhoneNumberField``
-                                 (from ``django.contrib.localflavor.us``)
-
 ``PositiveIntegerField``         ``IntegerField``
 
 ``PositiveSmallIntegerField``    ``IntegerField``
