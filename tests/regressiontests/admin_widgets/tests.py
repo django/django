@@ -10,7 +10,7 @@ from django.contrib.admin import widgets
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import DateField
+from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 from django.utils import translation
@@ -111,6 +111,23 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def testFormfieldOverrides(self):
         self.assertFormfield(models.Event, 'start_date', forms.TextInput,
                              formfield_overrides={DateField: {'widget': forms.TextInput}})
+
+    def testFormfieldOverridesWidgetInstances(self):
+        """
+        Test that widget instances in formfield_overrides are not shared between
+        different fields. (#19423)
+        """
+        class BandAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {'widget': forms.TextInput(attrs={'size':'10'})}
+            }
+        ma = BandAdmin(models.Band, admin.site)
+        f1 = ma.formfield_for_dbfield(models.Band._meta.get_field('name'), request=None)
+        f2 = ma.formfield_for_dbfield(models.Band._meta.get_field('style'), request=None)
+        self.assertNotEqual(f1.widget, f2.widget)
+        self.assertEqual(f1.widget.attrs['maxlength'], '100')
+        self.assertEqual(f2.widget.attrs['maxlength'], '20')
+        self.assertEqual(f2.widget.attrs['size'], '10')
 
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
