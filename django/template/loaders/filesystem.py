@@ -5,7 +5,7 @@ Wrapper for loading templates from the filesystem.
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
-from django.utils._os import safe_join
+from django.utils._os import path_as_str, path_as_text, safe_join
 
 class Loader(BaseLoader):
     is_usable = True
@@ -20,9 +20,13 @@ class Loader(BaseLoader):
             template_dirs = settings.TEMPLATE_DIRS
         for template_dir in template_dirs:
             try:
-                yield safe_join(template_dir, template_name)
-            except UnicodeDecodeError:
-                # The template dir name was a bytestring that wasn't valid UTF-8.
+                # For backwards-compatibility, paths are returned as unicode strings. See #19398.
+                yield path_as_text(safe_join(path_as_str(template_dir), path_as_str(template_name)))
+            except UnicodeError:
+                # UnicodeEncodeError: the template dir name was a unicode string
+                # that can't be expressed in the filesystem's charset (extremely unlikely).
+                # UnicodeDecodeError: the template dir name was a bytestring
+                # that wasn't valid UTF-8.
                 raise
             except ValueError:
                 # The joined path was located outside of this particular
