@@ -91,11 +91,12 @@ class AdminScriptTestCase(unittest.TestCase):
             result = first_package_re.findall(backend['ENGINE'])
             if result and result != 'django':
                 backend_pkg = __import__(result[0])
-                backend_dir = os.path.dirname(upath(backend_pkg.__file__))
+                backend_dir = os.path.dirname(backend_pkg.__file__)
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
     def run_test(self, script, args, settings_file=None, apps=None):
+        test_dir = os.path.dirname(os.path.dirname(__file__))
         project_dir = os.path.dirname(test_dir)
         base_dir = os.path.dirname(project_dir)
         ext_backend_base_dirs = self._ext_backend_paths()
@@ -117,7 +118,7 @@ class AdminScriptTestCase(unittest.TestCase):
             del os.environ['DJANGO_SETTINGS_MODULE']
         python_path = [project_dir, base_dir]
         python_path.extend(ext_backend_base_dirs)
-        os.environ[python_path_var_name] = force_str(os.pathsep.join(python_path))
+        os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
         # Move to the test directory and run
         os.chdir(test_dir)

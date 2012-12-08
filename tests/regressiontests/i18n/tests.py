@@ -667,8 +667,8 @@ class FormattingTests(TestCase):
         with self.settings(USE_L10N=True,
                 FORMAT_MODULE_PATH='regressiontests.i18n.other.locale'):
             with translation.override('de', deactivate=True):
-                old = str(get_format_modules(reverse=True))
-                new = str(get_format_modules(reverse=True)) # second try
+                old = str("%r") % get_format_modules(reverse=True)
+                new = str("%r") % get_format_modules(reverse=True) # second try
                 self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
 
     def test_localize_templatetag_and_filter(self):
