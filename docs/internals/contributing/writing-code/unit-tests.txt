@@ -9,7 +9,8 @@ The tests cover:
 
 * Models and the database API (``tests/modeltests``),
 * Everything else in core Django code (``tests/regressiontests``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests``).
+* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or
+  ``tests/regressiontests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
