@@ -32,17 +32,20 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
         'django.contrib.messages.middleware.MessageMiddleware',
     )
 
-During the request phases (:meth:`process_request` and :meth:`process_view`
-middleware), Django applies middleware in the order it's defined in
+During the request phases (:meth:`process_request` and :meth:`process_view`),
+Django applies middleware in the order it's defined in
 :setting:`MIDDLEWARE_CLASSES`, top-down. During the response phases
-(:meth:`process_response` and :meth:`process_exception` middleware), the
-classes are applied in reverse order, from the bottom up. You can think of it
-like an onion: each middleware class is a "layer" that wraps the view:
+(:meth:`process_template_response`, :meth:`process_response`, and
+:meth:`process_exception`), the classes are applied in reverse order, from the
+bottom up.
 
-.. image:: _images/middleware.png
-   :width: 502
-   :height: 417
-   :alt: Middleware application order.
+.. image:: _images/middleware.svg
+   :alt: middleware application order
+   :width: 480
+   :height: 408
+
+If you prefer, you can also think of it like an onion: each middleware class
+is a "layer" that wraps the view.
 
 A Django installation doesn't require any middleware -- e.g.,
 :setting:`MIDDLEWARE_CLASSES` can be empty, if you'd like -- but it's strongly
