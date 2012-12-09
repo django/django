@@ -366,13 +366,19 @@ class Templates(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
 
-    def test_url_explicit_exception_for_old_syntax(self):
+    def test_url_explicit_exception_for_old_syntax_at_run_time(self):
         # Regression test for #19280
         t = Template('{% url path.to.view %}')      # not quoted = old syntax
         c = Context()
         with self.assertRaisesRegexp(urlresolvers.NoReverseMatch,
                 "The syntax changed in Django 1.5, see the docs."):
             t.render(c)
+
+    def test_url_explicit_exception_for_old_syntax_at_compile_time(self):
+        # Regression test for #19392
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+                "The syntax of 'url' changed in Django 1.5, see the docs."):
+            t = Template('{% url my-view %}')      # not a variable = old syntax
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
