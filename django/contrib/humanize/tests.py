@@ -11,11 +11,14 @@ from django.utils.timezone import utc
 
 class HumanizeTests(TestCase):
 
-    def humanize_tester(self, test_list, result_list, method):
+    def humanize_tester(self, test_list, result_list, method, arg = None):
         # Using max below ensures we go through both lists
         # However, if the lists are not equal length, this raises an exception
         for test_content, result in zip(test_list, result_list):
-            t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
+            if arg:
+                t = Template('{%% load humanize %%}{{ test_content|%s:%s }}' % (method, arg) )
+            else:
+                t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
             self.assertEqual(rendered, escape(result),
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
@@ -67,6 +70,28 @@ class HumanizeTests(TestCase):
                        '1.3 quadrillion', '3.5 sextillion',
                        '8.1 decillion', None)
         self.humanize_tester(test_list, result_list, 'intword')
+
+    def test_intword_precision(self):
+        test_list = ('100', '1000000', '1200000', '1290000',
+                     '1000000000', '2000000000', '6000000000000',
+                     '1300000000000000', '3500000000000000000000',
+                     '8100000000000000000000000000000000', None)
+        result_list = ('100', '1.000 million', '1.200 million', '1.290 million',
+                       '1.000 billion', '2.000 billion', '6.000 trillion',
+                       '1.300 quadrillion', '3.500 sextillion',
+                       '8.100 decillion', None)
+        self.humanize_tester(test_list, result_list, 'intword',3)
+
+    def test_intabr(self):
+        test_list = ('100', '1000000', '1200000', '1290000',
+                     '1000000000', '2000000000', '6000000000000',
+                     '1300000000000000', '3500000000000000000000',
+                     '8100000000000000000000000000000000', None)
+        result_list = ('100', '1.0M', '1.2M', '1.3M',
+                       '1.0B', '2.0B', '6.0T',
+                       '1.3Qd', '3.5Sx',
+                       '8.1D', None)
+        self.humanize_tester(test_list, result_list, 'intabr')
 
     def test_i18n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,

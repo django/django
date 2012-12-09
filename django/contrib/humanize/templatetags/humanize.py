@@ -48,66 +48,55 @@ def intcomma(value, use_l10n=True):
         return intcomma(new, use_l10n)
 
 # A tuple of standard large number to their converters
-intword_converters = (
-    (6, lambda number: (
-        ungettext('%(value).1f million', '%(value).1f million', number),
-        ungettext('%(value)s million', '%(value)s million', number),
-    )),
-    (9, lambda number: (
-        ungettext('%(value).1f billion', '%(value).1f billion', number),
-        ungettext('%(value)s billion', '%(value)s billion', number),
-    )),
-    (12, lambda number: (
-        ungettext('%(value).1f trillion', '%(value).1f trillion', number),
-        ungettext('%(value)s trillion', '%(value)s trillion', number),
-    )),
-    (15, lambda number: (
-        ungettext('%(value).1f quadrillion', '%(value).1f quadrillion', number),
-        ungettext('%(value)s quadrillion', '%(value)s quadrillion', number),
-    )),
-    (18, lambda number: (
-        ungettext('%(value).1f quintillion', '%(value).1f quintillion', number),
-        ungettext('%(value)s quintillion', '%(value)s quintillion', number),
-    )),
-    (21, lambda number: (
-        ungettext('%(value).1f sextillion', '%(value).1f sextillion', number),
-        ungettext('%(value)s sextillion', '%(value)s sextillion', number),
-    )),
-    (24, lambda number: (
-        ungettext('%(value).1f septillion', '%(value).1f septillion', number),
-        ungettext('%(value)s septillion', '%(value)s septillion', number),
-    )),
-    (27, lambda number: (
-        ungettext('%(value).1f octillion', '%(value).1f octillion', number),
-        ungettext('%(value)s octillion', '%(value)s octillion', number),
-    )),
-    (30, lambda number: (
-        ungettext('%(value).1f nonillion', '%(value).1f nonillion', number),
-        ungettext('%(value)s nonillion', '%(value)s nonillion', number),
-    )),
-    (33, lambda number: (
-        ungettext('%(value).1f decillion', '%(value).1f decillion', number),
-        ungettext('%(value)s decillion', '%(value)s decillion', number),
-    )),
-    (100, lambda number: (
-        ungettext('%(value).1f googol', '%(value).1f googol', number),
-        ungettext('%(value)s googol', '%(value)s googol', number),
-    )),
-)
+class Converter(object):
+    def __init__(self, precision=1, word_abr_symbol=0, word_abr_list=None):
+        self.precision = str(precision)
+        if word_abr_list == None:
+            word_abr_list = (
+                             (' thousand', 'K','K',),
+                             (' million', 'M','M',),
+                             (' billion', 'B','G',),
+                             (' trillion', 'T','T',),
+                             (' quadrillion', 'Qd','P',),
+                             (' quintillion', 'Qt','E',),
+                             (' sextillion', 'Sx','Z'),
+                             (' septillion', 'Sp','Y',),
+                             (' octillion', 'O','',),
+                             (' nonillion', 'N',''),
+                             (' decillion', 'D',''),
+                             (' googol', 'G',''),
+                             )
+        self.intword_converters = []
+        for k, converter in enumerate(word_abr_list):
+            self.intword_converters.append(self._ungettext(3*(k+1), converter[word_abr_symbol]))
+        self.len_converters = len(self.intword_converters)
+    
+    def _ungettext(self, exponent, arg):
+        return (exponent, lambda number: (
+                ungettext('%(value).{0}f{1}'.format(self.precision, arg), '%(value).{0}f{1}'.format(self.precision, arg), number),
+                ungettext('%(value)s{0}'.format(arg), '%(value)s{0}'.format(arg), number),
+            ))
+    def __iter__(self):
+        self.current = 0
+        return self
 
-@register.filter(is_safe=False)
-def intword(value):
-    """
-    Converts a large integer to a friendly text representation. Works best
-    for numbers over 1 million. For example, 1000000 becomes '1.0 million',
-    1200000 becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
-    """
+    def next(self):
+        if self.current == self.len_converters:
+            self.current = 0
+            raise StopIteration
+        else:
+            r = self.intword_converters[self.current]
+            self.current += 1
+            return r
+
+
+def _intword(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter):
     try:
         value = int(value)
     except (TypeError, ValueError):
         return value
 
-    if value < 1000000:
+    if value < max_num:
         return value
 
     def _check_for_i18n(value, float_formatted, string_formatted):
@@ -115,18 +104,29 @@ def intword(value):
         Use the i18n enabled defaultfilters.floatformat if possible
         """
         if settings.USE_L10N:
-            value = defaultfilters.floatformat(value, 1)
+            value = defaultfilters.floatformat(value, precision)
             template = string_formatted
         else:
             template = float_formatted
         return template % {'value': value}
-
+    intword_converters = converter(precision, word_abr_symbol)#.intword_converters
     for exponent, converters in intword_converters:
         large_number = 10 ** exponent
         if value < large_number * 1000:
             new_value = value / float(large_number)
             return _check_for_i18n(new_value, *converters(new_value))
     return value
+
+def intword_internal(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter):
+    return _intword(value, precision, word_abr_symbol, max_num, converter)
+
+@register.filter(is_safe=False)
+def intword(value, precision=1):
+    return _intword(value, precision, word_abr_symbol=0)
+
+@register.filter(is_safe=False)
+def intabr(value, precision=1):
+    return _intword(value, precision, word_abr_symbol=1)
 
 @register.filter(is_safe=True)
 def apnumber(value):
