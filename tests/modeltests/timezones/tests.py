@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
+
 import datetime
 import os
 import sys
 import time
 import warnings
+from xml.dom.minidom import parseString
 
 try:
     import pytz
@@ -18,6 +21,7 @@ from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
 from django.utils.unittest import skipIf, skipUnless
@@ -464,6 +468,7 @@ class NewDatabaseTests(TestCase):
                 [event],
                 transform=lambda d: d)
 
+    @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
         day = datetime.date(2011, 9, 1)
@@ -488,27 +493,40 @@ class SerializationTests(TestCase):
     #   returns a naive datetime object in UTC (http://pyyaml.org/ticket/202).
     # Tests are adapted to take these quirks into account.
 
+    def assert_python_contains_datetime(self, objects, dt):
+        self.assertEqual(objects[0]['fields']['dt'], dt)
+
+    def assert_json_contains_datetime(self, json, dt):
+        self.assertIn('"fields": {"dt": "%s"}' % dt, json)
+
+    def assert_xml_contains_datetime(self, xml, dt):
+        field = parseString(xml).getElementsByTagName('field')[0]
+        self.assertXMLEqual(field.childNodes[0].wholeText, dt)
+
+    def assert_yaml_contains_datetime(self, yaml, dt):
+        self.assertIn("- fields: {dt: !!timestamp '%s'}" % dt, yaml)
+
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T13:20:30"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T13:20:30")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T13:20:30")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt, dt)
 
@@ -516,23 +534,23 @@ class SerializationTests(TestCase):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T13:20:30.405"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T13:20:30.405")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt.replace(microsecond=405000))
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30.405060</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T13:20:30.405060")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30.405060'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30.405060")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt, dt)
 
@@ -540,23 +558,23 @@ class SerializationTests(TestCase):
         dt = datetime.datetime(2011, 9, 1, 17, 20, 30, 405060, tzinfo=ICT)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T17:20:30.405+07:00"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T17:20:30.405+07:00")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt.replace(microsecond=405000))
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T17:20:30.405060+07:00</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T17:20:30.405060+07:00")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 17:20:30.405060+07:00'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30.405060+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
@@ -564,23 +582,23 @@ class SerializationTests(TestCase):
         dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T10:20:30Z"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T10:20:30Z")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T10:20:30+00:00</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T10:20:30+00:00")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 10:20:30+00:00'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 10:20:30+00:00")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
@@ -588,23 +606,23 @@ class SerializationTests(TestCase):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T13:20:30+03:00"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T13:20:30+03:00")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30+03:00</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T13:20:30+03:00")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30+03:00'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30+03:00")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
@@ -612,23 +630,23 @@ class SerializationTests(TestCase):
         dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT)
 
         data = serializers.serialize('python', [Event(dt=dt)])
-        self.assertEqual(data[0]['fields']['dt'], dt)
+        self.assert_python_contains_datetime(data, dt)
         obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
-        self.assertIn('"fields": {"dt": "2011-09-01T17:20:30+07:00"}', data)
+        self.assert_json_contains_datetime(data, "2011-09-01T17:20:30+07:00")
         obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
-        self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T17:20:30+07:00</field>', data)
+        self.assert_xml_contains_datetime(data, "2011-09-01T17:20:30+07:00")
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
-            self.assertIn("- fields: {dt: !!timestamp '2011-09-01 17:20:30+07:00'}", data)
+            self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
@@ -688,8 +706,8 @@ class TemplateTests(TestCase):
             }
         }
 
-        for k1, dt in datetimes.iteritems():
-            for k2, tpl in templates.iteritems():
+        for k1, dt in six.iteritems(datetimes):
+            for k2, tpl in six.iteritems(templates):
                 ctx = Context({'dt': dt, 'ICT': ICT})
                 actual = tpl.render(ctx)
                 expected = results[k1][k2]
@@ -701,8 +719,8 @@ class TemplateTests(TestCase):
         results['ict']['notag'] = t('ict', 'eat', 'utc', 'ict')
 
         with self.settings(USE_TZ=False):
-            for k1, dt in datetimes.iteritems():
-                for k2, tpl in templates.iteritems():
+            for k1, dt in six.iteritems(datetimes):
+                for k2, tpl in six.iteritems(templates):
                     ctx = Context({'dt': dt, 'ICT': ICT})
                     actual = tpl.render(ctx)
                     expected = results[k1][k2]
@@ -873,13 +891,13 @@ class TemplateTests(TestCase):
 class LegacyFormsTests(TestCase):
 
     def test_form(self):
-        form = EventForm({'dt': u'2011-09-01 13:20:30'})
+        form = EventForm({'dt': '2011-09-01 13:20:30'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 13, 20, 30))
 
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_non_existent_time(self):
-        form = EventForm({'dt': u'2011-03-27 02:30:00'})
+        form = EventForm({'dt': '2011-03-27 02:30:00'})
         with timezone.override(pytz.timezone('Europe/Paris')):
             # this is obviously a bug
             self.assertTrue(form.is_valid())
@@ -887,19 +905,19 @@ class LegacyFormsTests(TestCase):
 
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_ambiguous_time(self):
-        form = EventForm({'dt': u'2011-10-30 02:30:00'})
+        form = EventForm({'dt': '2011-10-30 02:30:00'})
         with timezone.override(pytz.timezone('Europe/Paris')):
             # this is obviously a bug
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 10, 30, 2, 30, 0))
 
     def test_split_form(self):
-        form = EventSplitForm({'dt_0': u'2011-09-01', 'dt_1': u'13:20:30'})
+        form = EventSplitForm({'dt_0': '2011-09-01', 'dt_1': '13:20:30'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 13, 20, 30))
 
     def test_model_form(self):
-        EventModelForm({'dt': u'2011-09-01 13:20:30'}).save()
+        EventModelForm({'dt': '2011-09-01 13:20:30'}).save()
         e = Event.objects.get()
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
@@ -909,12 +927,12 @@ class NewFormsTests(TestCase):
 
     @requires_tz_support
     def test_form(self):
-        form = EventForm({'dt': u'2011-09-01 13:20:30'})
+        form = EventForm({'dt': '2011-09-01 13:20:30'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
     def test_form_with_other_timezone(self):
-        form = EventForm({'dt': u'2011-09-01 17:20:30'})
+        form = EventForm({'dt': '2011-09-01 17:20:30'})
         with timezone.override(ICT):
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
@@ -922,30 +940,30 @@ class NewFormsTests(TestCase):
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_non_existent_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
-            form = EventForm({'dt': u'2011-03-27 02:30:00'})
+            form = EventForm({'dt': '2011-03-27 02:30:00'})
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['dt'],
-                [u"2011-03-27 02:30:00 couldn't be interpreted in time zone "
-                 u"Europe/Paris; it may be ambiguous or it may not exist."])
+                ["2011-03-27 02:30:00 couldn't be interpreted in time zone "
+                 "Europe/Paris; it may be ambiguous or it may not exist."])
 
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_ambiguous_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
-            form = EventForm({'dt': u'2011-10-30 02:30:00'})
+            form = EventForm({'dt': '2011-10-30 02:30:00'})
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['dt'],
-                [u"2011-10-30 02:30:00 couldn't be interpreted in time zone "
-                 u"Europe/Paris; it may be ambiguous or it may not exist."])
+                ["2011-10-30 02:30:00 couldn't be interpreted in time zone "
+                 "Europe/Paris; it may be ambiguous or it may not exist."])
 
     @requires_tz_support
     def test_split_form(self):
-        form = EventSplitForm({'dt_0': u'2011-09-01', 'dt_1': u'13:20:30'})
+        form = EventSplitForm({'dt_0': '2011-09-01', 'dt_1': '13:20:30'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
     @requires_tz_support
     def test_model_form(self):
-        EventModelForm({'dt': u'2011-09-01 13:20:30'}).save()
+        EventModelForm({'dt': '2011-09-01 13:20:30'}).save()
         e = Event.objects.get()
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 

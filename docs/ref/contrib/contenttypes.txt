@@ -187,13 +187,21 @@ The ``ContentTypeManager``
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
 
-    .. method:: get_for_model(model)
+    .. method:: get_for_id(id)
+
+        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
+        Since this method uses the same shared cache as
+        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
+        it's preferred to use this method over the usual
+        ``ContentType.objects.get(pk=id)``
+
+    .. method:: get_for_model(model[, for_concrete_model=True])
 
         Takes either a model class or an instance of a model, and returns the
         :class:`~django.contrib.contenttypes.models.ContentType` instance
         representing that model.
 
-    .. method:: get_for_models(*models)
+    .. method:: get_for_models(*models[, for_concrete_models=True])
 
         Takes a variadic number of model classes, and returns a dictionary
         mapping the model classes to the
@@ -223,6 +231,19 @@ lookup::
 .. module:: django.contrib.contenttypes.generic
 
 .. _generic-relations:
+
+.. versionadded:: 1.5
+
+Prior to Django 1.5 :meth:`~ContentTypeManager.get_for_model()` and
+:meth:`~ContentTypeManager.get_for_models()` always returned the
+:class:`~django.contrib.contenttypes.models.ContentType` associated with the
+concrete model of the specified one(s). That means there was no way to retreive
+the :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
+using those methods. As of Django 1.5 you can now pass a boolean flag –
+respectively ``for_concrete_model`` and ``for_concrete_models`` – to specify
+wether or not you want to retreive the
+:class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
+direct model.
 
 Generic relations
 =================
@@ -401,8 +422,6 @@ which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
 pointing at it will be deleted as well. In the example above, this means that
 if a ``Bookmark`` object were deleted, any ``TaggedItem`` objects pointing at
 it would be deleted at the same time.
-
-.. versionadded:: 1.3
 
 Unlike :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey` does not accept

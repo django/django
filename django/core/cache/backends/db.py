@@ -4,14 +4,15 @@ import time
 from datetime import datetime
 
 try:
-    import cPickle as pickle
+    from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.db import connections, router, transaction, DatabaseError
-from django.utils import timezone
+from django.utils import timezone, six
+from django.utils.encoding import force_bytes
 
 
 class Options(object):
@@ -72,7 +73,7 @@ class DatabaseCache(BaseDatabaseCache):
             transaction.commit_unless_managed(using=db)
             return default
         value = connections[db].ops.process_clob(row[1])
-        return pickle.loads(base64.decodestring(value))
+        return pickle.loads(base64.b64decode(force_bytes(value)))
 
     def set(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)
@@ -103,7 +104,11 @@ class DatabaseCache(BaseDatabaseCache):
         if num > self._max_entries:
             self._cull(db, cursor, now)
         pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        encoded = base64.encodestring(pickled).strip()
+        b64encoded = base64.b64encode(pickled)
+        # The DB column is expecting a string, so make sure the value is a
+        # string, not bytes. Refs #19274.
+        if six.PY3:
+            b64encoded = b64encoded.decode('latin1')
         cursor.execute("SELECT cache_key, expires FROM %s "
                        "WHERE cache_key = %%s" % table, [key])
         try:
@@ -112,11 +117,11 @@ class DatabaseCache(BaseDatabaseCache):
                     (mode == 'add' and result[1] < now)):
                 cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
                                "WHERE cache_key = %%s" % table,
-                               [encoded, connections[db].ops.value_to_db_datetime(exp), key])
+                               [b64encoded, connections[db].ops.value_to_db_datetime(exp), key])
             else:
                 cursor.execute("INSERT INTO %s (cache_key, value, expires) "
                                "VALUES (%%s, %%s, %%s)" % table,
-                               [key, encoded, connections[db].ops.value_to_db_datetime(exp)])
+                               [key, b64encoded, connections[db].ops.value_to_db_datetime(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
             transaction.rollback_unless_managed(using=db)
@@ -166,18 +171,10 @@ class DatabaseCache(BaseDatabaseCache):
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:
-                cull_num = num / self._cull_frequency
-                if connections[db].vendor == 'oracle':
-                    # Oracle doesn't support LIMIT + OFFSET
-                    cursor.execute("""SELECT cache_key FROM
-(SELECT ROW_NUMBER() OVER (ORDER BY cache_key) AS counter, cache_key FROM %s)
-WHERE counter > %%s AND COUNTER <= %%s""" % table, [cull_num, cull_num + 1])
-                else:
-                    # This isn't standard SQL, it's likely to break
-                    # with some non officially supported databases
-                    cursor.execute("SELECT cache_key FROM %s "
-                                   "ORDER BY cache_key "
-                                   "LIMIT 1 OFFSET %%s" % table, [cull_num])
+                cull_num = num // self._cull_frequency
+                cursor.execute(
+                    connections[db].ops.cache_key_culling_sql() % table,
+                    [cull_num])
                 cursor.execute("DELETE FROM %s "
                                "WHERE cache_key < %%s" % table,
                                [cursor.fetchone()[0]])

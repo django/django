@@ -4,12 +4,15 @@ import time
 from django.conf import settings
 from django.db import connections
 from django.dispatch import receiver, Signal
-from django.template import context
 from django.utils import timezone
+from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
 
 setting_changed = Signal(providing_args=["setting", "value"])
+
+# Most setting_changed receivers are supposed to be added below,
+# except for cases where the receiver is related to a contrib app.
 
 
 @receiver(setting_changed)
@@ -45,4 +48,34 @@ def update_connections_time_zone(**kwargs):
 @receiver(setting_changed)
 def clear_context_processors_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
+        from django.template import context
         context._standard_context_processors = None
+
+
+@receiver(setting_changed)
+def clear_template_loaders_cache(**kwargs):
+    if kwargs['setting'] == 'TEMPLATE_LOADERS':
+        from django.template import loader
+        loader.template_source_loaders = None
+
+
+@receiver(setting_changed)
+def clear_serializers_cache(**kwargs):
+    if kwargs['setting'] == 'SERIALIZATION_MODULES':
+        from django.core import serializers
+        serializers._serializers = {}
+
+
+@receiver(setting_changed)
+def language_changed(**kwargs):
+    if kwargs['setting'] in ('LOCALE_PATHS', 'LANGUAGE_CODE'):
+        from django.utils.translation import trans_real
+        trans_real._default = None
+        if kwargs['setting'] == 'LOCALE_PATHS':
+            trans_real._translations = {}
+
+@receiver(setting_changed)
+def file_storage_changed(**kwargs):
+    if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
+        from django.core.files.storage import default_storage
+        default_storage._wrapped = empty

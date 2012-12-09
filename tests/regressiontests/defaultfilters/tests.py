@@ -1,59 +1,62 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import datetime
 import decimal
 
 from django.template.defaultfilters import *
 from django.test import TestCase
+from django.utils import six
 from django.utils import unittest, translation
 from django.utils.safestring import SafeData
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class DefaultFiltersTests(TestCase):
 
     def test_floatformat(self):
-        self.assertEqual(floatformat(7.7), u'7.7')
-        self.assertEqual(floatformat(7.0), u'7')
-        self.assertEqual(floatformat(0.7), u'0.7')
-        self.assertEqual(floatformat(0.07), u'0.1')
-        self.assertEqual(floatformat(0.007), u'0.0')
-        self.assertEqual(floatformat(0.0), u'0')
-        self.assertEqual(floatformat(7.7, 3), u'7.700')
-        self.assertEqual(floatformat(6.000000, 3), u'6.000')
-        self.assertEqual(floatformat(6.200000, 3), u'6.200')
-        self.assertEqual(floatformat(6.200000, -3), u'6.200')
-        self.assertEqual(floatformat(13.1031, -3), u'13.103')
-        self.assertEqual(floatformat(11.1197, -2), u'11.12')
-        self.assertEqual(floatformat(11.0000, -2), u'11')
-        self.assertEqual(floatformat(11.000001, -2), u'11.00')
-        self.assertEqual(floatformat(8.2798, 3), u'8.280')
-        self.assertEqual(floatformat(5555.555, 2), u'5555.56')
-        self.assertEqual(floatformat(001.3000, 2), u'1.30')
-        self.assertEqual(floatformat(0.12345, 2), u'0.12')
-        self.assertEqual(floatformat(decimal.Decimal('555.555'), 2), u'555.56')
-        self.assertEqual(floatformat(decimal.Decimal('09.000')), u'9')
-        self.assertEqual(floatformat(u'foo'), u'')
-        self.assertEqual(floatformat(13.1031, u'bar'), u'13.1031')
-        self.assertEqual(floatformat(18.125, 2), u'18.13')
-        self.assertEqual(floatformat(u'foo', u'bar'), u'')
-        self.assertEqual(floatformat(u'¿Cómo esta usted?'), u'')
-        self.assertEqual(floatformat(None), u'')
+        self.assertEqual(floatformat(7.7), '7.7')
+        self.assertEqual(floatformat(7.0), '7')
+        self.assertEqual(floatformat(0.7), '0.7')
+        self.assertEqual(floatformat(0.07), '0.1')
+        self.assertEqual(floatformat(0.007), '0.0')
+        self.assertEqual(floatformat(0.0), '0')
+        self.assertEqual(floatformat(7.7, 3), '7.700')
+        self.assertEqual(floatformat(6.000000, 3), '6.000')
+        self.assertEqual(floatformat(6.200000, 3), '6.200')
+        self.assertEqual(floatformat(6.200000, -3), '6.200')
+        self.assertEqual(floatformat(13.1031, -3), '13.103')
+        self.assertEqual(floatformat(11.1197, -2), '11.12')
+        self.assertEqual(floatformat(11.0000, -2), '11')
+        self.assertEqual(floatformat(11.000001, -2), '11.00')
+        self.assertEqual(floatformat(8.2798, 3), '8.280')
+        self.assertEqual(floatformat(5555.555, 2), '5555.56')
+        self.assertEqual(floatformat(001.3000, 2), '1.30')
+        self.assertEqual(floatformat(0.12345, 2), '0.12')
+        self.assertEqual(floatformat(decimal.Decimal('555.555'), 2), '555.56')
+        self.assertEqual(floatformat(decimal.Decimal('09.000')), '9')
+        self.assertEqual(floatformat('foo'), '')
+        self.assertEqual(floatformat(13.1031, 'bar'), '13.1031')
+        self.assertEqual(floatformat(18.125, 2), '18.13')
+        self.assertEqual(floatformat('foo', 'bar'), '')
+        self.assertEqual(floatformat('¿Cómo esta usted?'), '')
+        self.assertEqual(floatformat(None), '')
 
         # Check that we're not converting to scientific notation.
-        self.assertEqual(floatformat(0, 6), u'0.000000')
-        self.assertEqual(floatformat(0, 7), u'0.0000000')
-        self.assertEqual(floatformat(0, 10), u'0.0000000000')
+        self.assertEqual(floatformat(0, 6), '0.000000')
+        self.assertEqual(floatformat(0, 7), '0.0000000')
+        self.assertEqual(floatformat(0, 10), '0.0000000000')
         self.assertEqual(floatformat(0.000000000000000000015, 20),
-                                     u'0.00000000000000000002')
+                                     '0.00000000000000000002')
 
         pos_inf = float(1e30000)
-        self.assertEqual(floatformat(pos_inf), unicode(pos_inf))
+        self.assertEqual(floatformat(pos_inf), six.text_type(pos_inf))
 
         neg_inf = float(-1e30000)
-        self.assertEqual(floatformat(neg_inf), unicode(neg_inf))
+        self.assertEqual(floatformat(neg_inf), six.text_type(neg_inf))
 
         nan = pos_inf / pos_inf
-        self.assertEqual(floatformat(nan), unicode(nan))
+        self.assertEqual(floatformat(nan), six.text_type(nan))
 
         class FloatWrapper(object):
             def __init__(self, value):
@@ -61,311 +64,327 @@ class DefaultFiltersTests(TestCase):
             def __float__(self):
                 return self.value
 
-        self.assertEqual(floatformat(FloatWrapper(11.000001), -2), u'11.00')
+        self.assertEqual(floatformat(FloatWrapper(11.000001), -2), '11.00')
 
         # Regression for #15789
         decimal_ctx = decimal.getcontext()
         old_prec, decimal_ctx.prec = decimal_ctx.prec, 2
         try:
-            self.assertEqual(floatformat(1.2345, 2), u'1.23')
-            self.assertEqual(floatformat(15.2042, -3), u'15.204')
-            self.assertEqual(floatformat(1.2345, '2'), u'1.23')
-            self.assertEqual(floatformat(15.2042, '-3'), u'15.204')
-            self.assertEqual(floatformat(decimal.Decimal('1.2345'), 2), u'1.23')
-            self.assertEqual(floatformat(decimal.Decimal('15.2042'), -3), u'15.204')
+            self.assertEqual(floatformat(1.2345, 2), '1.23')
+            self.assertEqual(floatformat(15.2042, -3), '15.204')
+            self.assertEqual(floatformat(1.2345, '2'), '1.23')
+            self.assertEqual(floatformat(15.2042, '-3'), '15.204')
+            self.assertEqual(floatformat(decimal.Decimal('1.2345'), 2), '1.23')
+            self.assertEqual(floatformat(decimal.Decimal('15.2042'), -3), '15.204')
         finally:
             decimal_ctx.prec = old_prec
 
 
-    # This fails because of Python's float handling. Floats with many zeroes
-    # after the decimal point should be passed in as another type such as
-    # unicode or Decimal.
-    @unittest.expectedFailure
-    def test_floatformat_fail(self):
-        self.assertEqual(floatformat(1.00000000000000015, 16), u'1.0000000000000002')
+    def test_floatformat_py2_fail(self):
+        self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
+
+    # The test above fails because of Python 2's float handling. Floats with
+    # many zeroes after the decimal point should be passed in as another type
+    # such as unicode or Decimal.
+    if not six.PY3:
+        test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
+
 
     def test_addslashes(self):
-        self.assertEqual(addslashes(u'"double quotes" and \'single quotes\''),
-                          u'\\"double quotes\\" and \\\'single quotes\\\'')
+        self.assertEqual(addslashes('"double quotes" and \'single quotes\''),
+                          '\\"double quotes\\" and \\\'single quotes\\\'')
 
-        self.assertEqual(addslashes(ur'\ : backslashes, too'),
-                          u'\\\\ : backslashes, too')
+        self.assertEqual(addslashes(r'\ : backslashes, too'),
+                          '\\\\ : backslashes, too')
 
     def test_capfirst(self):
-        self.assertEqual(capfirst(u'hello world'), u'Hello world')
+        self.assertEqual(capfirst('hello world'), 'Hello world')
 
     def test_escapejs(self):
-        self.assertEqual(escapejs_filter(u'"double quotes" and \'single quotes\''),
-            u'\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027')
-        self.assertEqual(escapejs_filter(ur'\ : backslashes, too'),
-            u'\\u005C : backslashes, too')
-        self.assertEqual(escapejs_filter(u'and lots of whitespace: \r\n\t\v\f\b'),
-            u'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008')
-        self.assertEqual(escapejs_filter(ur'<script>and this</script>'),
-            u'\\u003Cscript\\u003Eand this\\u003C/script\\u003E')
+        self.assertEqual(escapejs_filter('"double quotes" and \'single quotes\''),
+            '\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027')
+        self.assertEqual(escapejs_filter(r'\ : backslashes, too'),
+            '\\u005C : backslashes, too')
+        self.assertEqual(escapejs_filter('and lots of whitespace: \r\n\t\v\f\b'),
+            'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008')
+        self.assertEqual(escapejs_filter(r'<script>and this</script>'),
+            '\\u003Cscript\\u003Eand this\\u003C/script\\u003E')
         self.assertEqual(
-            escapejs_filter(u'paragraph separator:\u2029and line separator:\u2028'),
-            u'paragraph separator:\\u2029and line separator:\\u2028')
+            escapejs_filter('paragraph separator:\u2029and line separator:\u2028'),
+            'paragraph separator:\\u2029and line separator:\\u2028')
 
     def test_fix_ampersands(self):
-        self.assertEqual(fix_ampersands_filter(u'Jack & Jill & Jeroboam'),
-                          u'Jack &amp; Jill &amp; Jeroboam')
+        self.assertEqual(fix_ampersands_filter('Jack & Jill & Jeroboam'),
+                          'Jack &amp; Jill &amp; Jeroboam')
 
     def test_linenumbers(self):
-        self.assertEqual(linenumbers(u'line 1\nline 2'),
-                          u'1. line 1\n2. line 2')
-        self.assertEqual(linenumbers(u'\n'.join([u'x'] * 10)),
-                          u'01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '\
-                          u'x\n08. x\n09. x\n10. x')
+        self.assertEqual(linenumbers('line 1\nline 2'),
+                          '1. line 1\n2. line 2')
+        self.assertEqual(linenumbers('\n'.join(['x'] * 10)),
+                          '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. '\
+                          'x\n08. x\n09. x\n10. x')
 
     def test_lower(self):
-        self.assertEqual(lower('TEST'), u'test')
+        self.assertEqual(lower('TEST'), 'test')
 
         # uppercase E umlaut
-        self.assertEqual(lower(u'\xcb'), u'\xeb')
+        self.assertEqual(lower('\xcb'), '\xeb')
 
     def test_make_list(self):
-        self.assertEqual(make_list('abc'), [u'a', u'b', u'c'])
-        self.assertEqual(make_list(1234), [u'1', u'2', u'3', u'4'])
+        self.assertEqual(make_list('abc'), ['a', 'b', 'c'])
+        self.assertEqual(make_list(1234), ['1', '2', '3', '4'])
 
     def test_slugify(self):
         self.assertEqual(slugify(' Jack & Jill like numbers 1,2,3 and 4 and'\
             ' silly characters ?%.$!/'),
-            u'jack-jill-like-numbers-123-and-4-and-silly-characters')
+            'jack-jill-like-numbers-123-and-4-and-silly-characters')
 
-        self.assertEqual(slugify(u"Un \xe9l\xe9phant \xe0 l'or\xe9e du bois"),
-                          u'un-elephant-a-loree-du-bois')
+        self.assertEqual(slugify("Un \xe9l\xe9phant \xe0 l'or\xe9e du bois"),
+                          'un-elephant-a-loree-du-bois')
 
     def test_stringformat(self):
-        self.assertEqual(stringformat(1, u'03d'), u'001')
-        self.assertEqual(stringformat(1, u'z'), u'')
+        self.assertEqual(stringformat(1, '03d'), '001')
+        self.assertEqual(stringformat(1, 'z'), '')
 
     def test_title(self):
         self.assertEqual(title('a nice title, isn\'t it?'),
-                          u"A Nice Title, Isn't It?")
-        self.assertEqual(title(u'discoth\xe8que'), u'Discoth\xe8que')
+                          "A Nice Title, Isn't It?")
+        self.assertEqual(title('discoth\xe8que'), 'Discoth\xe8que')
 
     def test_truncatewords(self):
         self.assertEqual(
-            truncatewords(u'A sentence with a few words in it', 1), u'A ...')
+            truncatewords('A sentence with a few words in it', 1), 'A ...')
         self.assertEqual(
-            truncatewords(u'A sentence with a few words in it', 5),
-            u'A sentence with a few ...')
+            truncatewords('A sentence with a few words in it', 5),
+            'A sentence with a few ...')
         self.assertEqual(
-            truncatewords(u'A sentence with a few words in it', 100),
-            u'A sentence with a few words in it')
+            truncatewords('A sentence with a few words in it', 100),
+            'A sentence with a few words in it')
         self.assertEqual(
-            truncatewords(u'A sentence with a few words in it',
-            'not a number'), u'A sentence with a few words in it')
+            truncatewords('A sentence with a few words in it',
+            'not a number'), 'A sentence with a few words in it')
 
     def test_truncatewords_html(self):
         self.assertEqual(truncatewords_html(
-            u'<p>one <a href="#">two - three <br>four</a> five</p>', 0), u'')
-        self.assertEqual(truncatewords_html(u'<p>one <a href="#">two - '\
-            u'three <br>four</a> five</p>', 2),
-            u'<p>one <a href="#">two ...</a></p>')
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '')
+        self.assertEqual(truncatewords_html('<p>one <a href="#">two - '\
+            'three <br>four</a> five</p>', 2),
+            '<p>one <a href="#">two ...</a></p>')
         self.assertEqual(truncatewords_html(
-            u'<p>one <a href="#">two - three <br>four</a> five</p>', 4),
-            u'<p>one <a href="#">two - three <br>four ...</a></p>')
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 4),
+            '<p>one <a href="#">two - three <br>four ...</a></p>')
         self.assertEqual(truncatewords_html(
-            u'<p>one <a href="#">two - three <br>four</a> five</p>', 5),
-            u'<p>one <a href="#">two - three <br>four</a> five</p>')
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 5),
+            '<p>one <a href="#">two - three <br>four</a> five</p>')
         self.assertEqual(truncatewords_html(
-            u'<p>one <a href="#">two - three <br>four</a> five</p>', 100),
-            u'<p>one <a href="#">two - three <br>four</a> five</p>')
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 100),
+            '<p>one <a href="#">two - three <br>four</a> five</p>')
         self.assertEqual(truncatewords_html(
-            u'\xc5ngstr\xf6m was here', 1), u'\xc5ngstr\xf6m ...')
+            '\xc5ngstr\xf6m was here', 1), '\xc5ngstr\xf6m ...')
 
     def test_upper(self):
-        self.assertEqual(upper(u'Mixed case input'), u'MIXED CASE INPUT')
+        self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
         # lowercase e umlaut
-        self.assertEqual(upper(u'\xeb'), u'\xcb')
+        self.assertEqual(upper('\xeb'), '\xcb')
 
     def test_urlencode(self):
-        self.assertEqual(urlencode(u'fran\xe7ois & jill'),
-                          u'fran%C3%A7ois%20%26%20jill')
-        self.assertEqual(urlencode(1), u'1')
+        self.assertEqual(urlencode('fran\xe7ois & jill'),
+                          'fran%C3%A7ois%20%26%20jill')
+        self.assertEqual(urlencode(1), '1')
 
     def test_iriencode(self):
-        self.assertEqual(iriencode(u'S\xf8r-Tr\xf8ndelag'),
-                          u'S%C3%B8r-Tr%C3%B8ndelag')
-        self.assertEqual(iriencode(urlencode(u'fran\xe7ois & jill')),
-                          u'fran%C3%A7ois%20%26%20jill')
+        self.assertEqual(iriencode('S\xf8r-Tr\xf8ndelag'),
+                          'S%C3%B8r-Tr%C3%B8ndelag')
+        self.assertEqual(iriencode(urlencode('fran\xe7ois & jill')),
+                          'fran%C3%A7ois%20%26%20jill')
 
     def test_urlizetrunc(self):
-        self.assertEqual(urlizetrunc(u'http://short.com/', 20), u'<a href='\
-            u'"http://short.com/" rel="nofollow">http://short.com/</a>')
-
-        self.assertEqual(urlizetrunc(u'http://www.google.co.uk/search?hl=en'\
-            u'&q=some+long+url&btnG=Search&meta=', 20), u'<a href="http://'\
-            u'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&'\
-            u'meta=" rel="nofollow">http://www.google...</a>')
+        self.assertEqual(urlizetrunc('http://short.com/', 20), '<a href='\
+            '"http://short.com/" rel="nofollow">http://short.com/</a>')
 
         self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'\
-            u'&q=some+long+url&btnG=Search&meta=', 20), u'<a href="http://'\
-            u'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search'\
-            u'&meta=" rel="nofollow">http://www.google...</a>')
+            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'\
+            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&'\
+            'meta=" rel="nofollow">http://www.google...</a>')
+
+        self.assertEqual(urlizetrunc('http://www.google.co.uk/search?hl=en'\
+            '&q=some+long+url&btnG=Search&meta=', 20), '<a href="http://'\
+            'www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search'\
+            '&meta=" rel="nofollow">http://www.google...</a>')
 
         # Check truncating of URIs which are the exact length
         uri = 'http://31characteruri.com/test/'
         self.assertEqual(len(uri), 31)
 
         self.assertEqual(urlizetrunc(uri, 31),
-            u'<a href="http://31characteruri.com/test/" rel="nofollow">'\
-            u'http://31characteruri.com/test/</a>')
+            '<a href="http://31characteruri.com/test/" rel="nofollow">'\
+            'http://31characteruri.com/test/</a>')
 
         self.assertEqual(urlizetrunc(uri, 30),
-            u'<a href="http://31characteruri.com/test/" rel="nofollow">'\
-            u'http://31characteruri.com/t...</a>')
+            '<a href="http://31characteruri.com/test/" rel="nofollow">'\
+            'http://31characteruri.com/t...</a>')
 
         self.assertEqual(urlizetrunc(uri, 2),
-            u'<a href="http://31characteruri.com/test/"'\
-            u' rel="nofollow">...</a>')
+            '<a href="http://31characteruri.com/test/"'\
+            ' rel="nofollow">...</a>')
 
     def test_urlize(self):
         # Check normal urlize
         self.assertEqual(urlize('http://google.com'),
-            u'<a href="http://google.com" rel="nofollow">http://google.com</a>')
+            '<a href="http://google.com" rel="nofollow">http://google.com</a>')
         self.assertEqual(urlize('http://google.com/'),
-            u'<a href="http://google.com/" rel="nofollow">http://google.com/</a>')
+            '<a href="http://google.com/" rel="nofollow">http://google.com/</a>')
         self.assertEqual(urlize('www.google.com'),
-            u'<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
+            '<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
         self.assertEqual(urlize('djangoproject.org'),
-            u'<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
+            '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
         self.assertEqual(urlize('info@djangoproject.org'),
-            u'<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
+            '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
 
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
-            u'<a href="https://google.com" rel="nofollow">https://google.com</a>')
+            '<a href="https://google.com" rel="nofollow">https://google.com</a>')
 
         # Check urlize doesn't overquote already quoted urls - see #9655
         self.assertEqual(urlize('http://hi.baidu.com/%D6%D8%D0%C2%BF'),
-            u'<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
-            u'http://hi.baidu.com/%D6%D8%D0%C2%BF</a>')
+            '<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
+            'http://hi.baidu.com/%D6%D8%D0%C2%BF</a>')
         self.assertEqual(urlize('www.mystore.com/30%OffCoupons!'),
-            u'<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
-            u'www.mystore.com/30%OffCoupons!</a>')
+            '<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
+            'www.mystore.com/30%OffCoupons!</a>')
         self.assertEqual(urlize('http://en.wikipedia.org/wiki/Caf%C3%A9'),
-            u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            u'http://en.wikipedia.org/wiki/Caf%C3%A9</a>')
+            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Caf%C3%A9</a>')
         self.assertEqual(urlize('http://en.wikipedia.org/wiki/Café'),
-            u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            u'http://en.wikipedia.org/wiki/Café</a>')
+            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Café</a>')
 
         # Check urlize keeps balanced parentheses - see #11911
         self.assertEqual(urlize('http://en.wikipedia.org/wiki/Django_(web_framework)'),
-            u'<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            u'http://en.wikipedia.org/wiki/Django_(web_framework)</a>')
+            '<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>')
         self.assertEqual(urlize('(see http://en.wikipedia.org/wiki/Django_(web_framework))'),
-            u'(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            u'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)')
+            '(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)')
 
         # Check urlize adds nofollow properly - see #12183
         self.assertEqual(urlize('foo@bar.com or www.bar.com'),
-            u'<a href="mailto:foo@bar.com">foo@bar.com</a> or '
-            u'<a href="http://www.bar.com" rel="nofollow">www.bar.com</a>')
+            '<a href="mailto:foo@bar.com">foo@bar.com</a> or '
+            '<a href="http://www.bar.com" rel="nofollow">www.bar.com</a>')
 
         # Check urlize handles IDN correctly - see #13704
         self.assertEqual(urlize('http://c✶.ws'),
-            u'<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>')
+            '<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>')
         self.assertEqual(urlize('www.c✶.ws'),
-            u'<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>')
+            '<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>')
         self.assertEqual(urlize('c✶.org'),
-            u'<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>')
+            '<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>')
         self.assertEqual(urlize('info@c✶.org'),
-            u'<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>')
+            '<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>')
 
         # Check urlize doesn't highlight malformed URIs - see #16395
         self.assertEqual(urlize('http:///www.google.com'),
-           u'http:///www.google.com')
+           'http:///www.google.com')
         self.assertEqual(urlize('http://.google.com'),
-            u'http://.google.com')
+            'http://.google.com')
         self.assertEqual(urlize('http://@foo.com'),
-            u'http://@foo.com')
+            'http://@foo.com')
 
         # Check urlize accepts more TLDs - see #16656
         self.assertEqual(urlize('usa.gov'),
-            u'<a href="http://usa.gov" rel="nofollow">usa.gov</a>')
+            '<a href="http://usa.gov" rel="nofollow">usa.gov</a>')
 
         # Check urlize don't crash on invalid email with dot-starting domain - see #17592
         self.assertEqual(urlize('email@.stream.ru'),
-            u'email@.stream.ru')
+            'email@.stream.ru')
 
         # Check urlize accepts uppercased URL schemes - see #18071
         self.assertEqual(urlize('HTTPS://github.com/'),
-            u'<a href="https://github.com/" rel="nofollow">HTTPS://github.com/</a>')
+            '<a href="https://github.com/" rel="nofollow">HTTPS://github.com/</a>')
+
+        # Check urlize trims trailing period when followed by parenthesis - see #18644
+        self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
+            '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+
+        # Check urlize doesn't crash when square bracket is appended to url (#19070)
+        self.assertEqual(urlize('[see www.example.com]'),
+            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
+
+        # Check urlize doesn't crash when square bracket is prepended to url (#19070)
+        self.assertEqual(urlize('see test[at[example.com'),
+            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
+
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
-        self.assertEqual(wordcount(u'oneword'), 1)
-        self.assertEqual(wordcount(u'lots of words'), 3)
+        self.assertEqual(wordcount('oneword'), 1)
+        self.assertEqual(wordcount('lots of words'), 3)
 
-        self.assertEqual(wordwrap(u'this is a long paragraph of text that '\
-            u'really needs to be wrapped I\'m afraid', 14),
-            u"this is a long\nparagraph of\ntext that\nreally needs\nto be "\
-            u"wrapped\nI'm afraid")
+        self.assertEqual(wordwrap('this is a long paragraph of text that '\
+            'really needs to be wrapped I\'m afraid', 14),
+            "this is a long\nparagraph of\ntext that\nreally needs\nto be "\
+            "wrapped\nI'm afraid")
 
-        self.assertEqual(wordwrap(u'this is a short paragraph of text.\n  '\
-            u'But this line should be indented', 14),
-            u'this is a\nshort\nparagraph of\ntext.\n  But this\nline '\
-            u'should be\nindented')
+        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '\
+            'But this line should be indented', 14),
+            'this is a\nshort\nparagraph of\ntext.\n  But this\nline '\
+            'should be\nindented')
 
-        self.assertEqual(wordwrap(u'this is a short paragraph of text.\n  '\
-            u'But this line should be indented',15), u'this is a short\n'\
-            u'paragraph of\ntext.\n  But this line\nshould be\nindented')
+        self.assertEqual(wordwrap('this is a short paragraph of text.\n  '\
+            'But this line should be indented',15), 'this is a short\n'\
+            'paragraph of\ntext.\n  But this line\nshould be\nindented')
 
     def test_rjust(self):
-        self.assertEqual(ljust(u'test', 10), u'test      ')
-        self.assertEqual(ljust(u'test', 3), u'test')
-        self.assertEqual(rjust(u'test', 10), u'      test')
-        self.assertEqual(rjust(u'test', 3), u'test')
+        self.assertEqual(ljust('test', 10), 'test      ')
+        self.assertEqual(ljust('test', 3), 'test')
+        self.assertEqual(rjust('test', 10), '      test')
+        self.assertEqual(rjust('test', 3), 'test')
 
     def test_center(self):
-        self.assertEqual(center(u'test', 6), u' test ')
+        self.assertEqual(center('test', 6), ' test ')
 
     def test_cut(self):
-        self.assertEqual(cut(u'a string to be mangled', 'a'),
-                          u' string to be mngled')
-        self.assertEqual(cut(u'a string to be mangled', 'ng'),
-                          u'a stri to be maled')
-        self.assertEqual(cut(u'a string to be mangled', 'strings'),
-                          u'a string to be mangled')
+        self.assertEqual(cut('a string to be mangled', 'a'),
+                          ' string to be mngled')
+        self.assertEqual(cut('a string to be mangled', 'ng'),
+                          'a stri to be maled')
+        self.assertEqual(cut('a string to be mangled', 'strings'),
+                          'a string to be mangled')
 
     def test_force_escape(self):
-        escaped = force_escape(u'<some html & special characters > here')
+        escaped = force_escape('<some html & special characters > here')
         self.assertEqual(
-            escaped, u'&lt;some html &amp; special characters &gt; here')
+            escaped, '&lt;some html &amp; special characters &gt; here')
         self.assertTrue(isinstance(escaped, SafeData))
         self.assertEqual(
-            force_escape(u'<some html & special characters > here ĐÅ€£'),
-            u'&lt;some html &amp; special characters &gt; here'\
-            u' \u0110\xc5\u20ac\xa3')
+            force_escape('<some html & special characters > here ĐÅ€£'),
+            '&lt;some html &amp; special characters &gt; here'\
+            ' \u0110\xc5\u20ac\xa3')
 
     def test_linebreaks(self):
-        self.assertEqual(linebreaks_filter(u'line 1'), u'<p>line 1</p>')
-        self.assertEqual(linebreaks_filter(u'line 1\nline 2'),
-                          u'<p>line 1<br />line 2</p>')
-        self.assertEqual(linebreaks_filter(u'line 1\rline 2'),
-                          u'<p>line 1<br />line 2</p>')
-        self.assertEqual(linebreaks_filter(u'line 1\r\nline 2'),
-                          u'<p>line 1<br />line 2</p>')
+        self.assertEqual(linebreaks_filter('line 1'), '<p>line 1</p>')
+        self.assertEqual(linebreaks_filter('line 1\nline 2'),
+                          '<p>line 1<br />line 2</p>')
+        self.assertEqual(linebreaks_filter('line 1\rline 2'),
+                          '<p>line 1<br />line 2</p>')
+        self.assertEqual(linebreaks_filter('line 1\r\nline 2'),
+                          '<p>line 1<br />line 2</p>')
 
     def test_linebreaksbr(self):
-        self.assertEqual(linebreaksbr(u'line 1\nline 2'),
-                          u'line 1<br />line 2')
-        self.assertEqual(linebreaksbr(u'line 1\rline 2'),
-                          u'line 1<br />line 2')
-        self.assertEqual(linebreaksbr(u'line 1\r\nline 2'),
-                          u'line 1<br />line 2')
+        self.assertEqual(linebreaksbr('line 1\nline 2'),
+                          'line 1<br />line 2')
+        self.assertEqual(linebreaksbr('line 1\rline 2'),
+                          'line 1<br />line 2')
+        self.assertEqual(linebreaksbr('line 1\r\nline 2'),
+                          'line 1<br />line 2')
 
     def test_removetags(self):
-        self.assertEqual(removetags(u'some <b>html</b> with <script>alert'\
-            u'("You smell")</script> disallowed <img /> tags', 'script img'),
-            u'some <b>html</b> with alert("You smell") disallowed  tags')
-        self.assertEqual(striptags(u'some <b>html</b> with <script>alert'\
-            u'("You smell")</script> disallowed <img /> tags'),
-            u'some html with alert("You smell") disallowed  tags')
+        self.assertEqual(removetags('some <b>html</b> with <script>alert'\
+            '("You smell")</script> disallowed <img /> tags', 'script img'),
+            'some <b>html</b> with alert("You smell") disallowed  tags')
+        self.assertEqual(striptags('some <b>html</b> with <script>alert'\
+            '("You smell")</script> disallowed <img /> tags'),
+            'some html with alert("You smell") disallowed  tags')
 
     def test_dictsort(self):
         sorted_dicts = dictsort([{'age': 23, 'name': 'Barbara-Ann'},
@@ -404,81 +423,82 @@ class DefaultFiltersTests(TestCase):
 
     def test_first(self):
         self.assertEqual(first([0,1,2]), 0)
-        self.assertEqual(first(u''), u'')
-        self.assertEqual(first(u'test'), u't')
+        self.assertEqual(first(''), '')
+        self.assertEqual(first('test'), 't')
 
     def test_join(self):
-        self.assertEqual(join([0,1,2], u'glue'), u'0glue1glue2')
+        self.assertEqual(join([0,1,2], 'glue'), '0glue1glue2')
 
     def test_length(self):
-        self.assertEqual(length(u'1234'), 4)
+        self.assertEqual(length('1234'), 4)
         self.assertEqual(length([1,2,3,4]), 4)
         self.assertEqual(length_is([], 0), True)
         self.assertEqual(length_is([], 1), False)
         self.assertEqual(length_is('a', 1), True)
-        self.assertEqual(length_is(u'a', 10), False)
+        self.assertEqual(length_is('a', 10), False)
 
     def test_slice(self):
-        self.assertEqual(slice_filter(u'abcdefg', u'0'), u'')
-        self.assertEqual(slice_filter(u'abcdefg', u'1'), u'a')
-        self.assertEqual(slice_filter(u'abcdefg', u'-1'), u'abcdef')
-        self.assertEqual(slice_filter(u'abcdefg', u'1:2'), u'b')
-        self.assertEqual(slice_filter(u'abcdefg', u'1:3'), u'bc')
-        self.assertEqual(slice_filter(u'abcdefg', u'0::2'), u'aceg')
+        self.assertEqual(slice_filter('abcdefg', '0'), '')
+        self.assertEqual(slice_filter('abcdefg', '1'), 'a')
+        self.assertEqual(slice_filter('abcdefg', '-1'), 'abcdef')
+        self.assertEqual(slice_filter('abcdefg', '1:2'), 'b')
+        self.assertEqual(slice_filter('abcdefg', '1:3'), 'bc')
+        self.assertEqual(slice_filter('abcdefg', '0::2'), 'aceg')
 
     def test_unordered_list(self):
-        self.assertEqual(unordered_list([u'item 1', u'item 2']),
-            u'\t<li>item 1</li>\n\t<li>item 2</li>')
-        self.assertEqual(unordered_list([u'item 1', [u'item 1.1']]),
-            u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
+        self.assertEqual(unordered_list(['item 1', 'item 2']),
+            '\t<li>item 1</li>\n\t<li>item 2</li>')
+        self.assertEqual(unordered_list(['item 1', ['item 1.1']]),
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(
-            unordered_list([u'item 1', [u'item 1.1', u'item1.2'], u'item 2']),
-            u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2'\
-            u'</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>')
+            unordered_list(['item 1', ['item 1.1', 'item1.2'], 'item 2']),
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2'\
+            '</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>')
 
         self.assertEqual(
-            unordered_list([u'item 1', [u'item 1.1', [u'item 1.1.1',
-                                                      [u'item 1.1.1.1']]]]),
-            u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>'\
-            u'item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t'\
-            u'</ul>\n\t\t\t</li>\n\t\t</ul>\n\t\t</li>\n\t</ul>\n\t</li>')
+            unordered_list(['item 1', ['item 1.1', ['item 1.1.1',
+                                                      ['item 1.1.1.1']]]]),
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>'\
+            'item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t'\
+            '</ul>\n\t\t\t</li>\n\t\t</ul>\n\t\t</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(unordered_list(
             ['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]),
-            u'\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>'\
-            u'Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>'\
-            u'\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>')
+            '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>'\
+            'Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>'\
+            '\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>')
 
+        @python_2_unicode_compatible
         class ULItem(object):
             def __init__(self, title):
               self.title = title
-            def __unicode__(self):
-                return u'ulitem-%s' % str(self.title)
+            def __str__(self):
+                return 'ulitem-%s' % str(self.title)
 
         a = ULItem('a')
         b = ULItem('b')
         self.assertEqual(unordered_list([a,b]),
-                          u'\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+                          '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
         # Old format for unordered lists should still work
-        self.assertEqual(unordered_list([u'item 1', []]), u'\t<li>item 1</li>')
+        self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
 
-        self.assertEqual(unordered_list([u'item 1', [[u'item 1.1', []]]]),
-            u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
+        self.assertEqual(unordered_list(['item 1', [['item 1.1', []]]]),
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
 
-        self.assertEqual(unordered_list([u'item 1', [[u'item 1.1', []],
-            [u'item 1.2', []]]]), u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'\
-            u'</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
+        self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
+            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'\
+            '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
 
         self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
-            []], ['Topeka', []]]], ['Illinois', []]]]), u'\t<li>States\n\t'\
-            u'<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'\
-            u'\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'\
-            u'Illinois</li>\n\t</ul>\n\t</li>')
+            []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'\
+            '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'\
+            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'\
+            'Illinois</li>\n\t</ul>\n\t</li>')
 
     def test_add(self):
-        self.assertEqual(add(u'1', u'2'), 3)
+        self.assertEqual(add('1', '2'), 3)
 
     def test_get_digit(self):
         self.assertEqual(get_digit(123, 1), 3)
@@ -486,148 +506,148 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(get_digit(123, 3), 1)
         self.assertEqual(get_digit(123, 4), 0)
         self.assertEqual(get_digit(123, 0), 123)
-        self.assertEqual(get_digit(u'xyz', 0), u'xyz')
+        self.assertEqual(get_digit('xyz', 0), 'xyz')
 
     def test_date(self):
         # real testing of date() is in dateformat.py
-        self.assertEqual(date(datetime.datetime(2005, 12, 29), u"d F Y"),
-                          u'29 December 2005')
-        self.assertEqual(date(datetime.datetime(2005, 12, 29), ur'jS \o\f F'),
-                          u'29th of December')
+        self.assertEqual(date(datetime.datetime(2005, 12, 29), "d F Y"),
+                          '29 December 2005')
+        self.assertEqual(date(datetime.datetime(2005, 12, 29), r'jS \o\f F'),
+                          '29th of December')
 
     def test_time(self):
         # real testing of time() is done in dateformat.py
-        self.assertEqual(time(datetime.time(13), u"h"), u'01')
-        self.assertEqual(time(datetime.time(0), u"h"), u'12')
+        self.assertEqual(time(datetime.time(13), "h"), '01')
+        self.assertEqual(time(datetime.time(0), "h"), '12')
 
     def test_timesince(self):
         # real testing is done in timesince.py, where we can provide our own 'now'
         self.assertEqual(
             timesince_filter(datetime.datetime.now() - datetime.timedelta(1)),
-            u'1 day')
+            '1 day')
 
         self.assertEqual(
             timesince_filter(datetime.datetime(2005, 12, 29),
                              datetime.datetime(2005, 12, 30)),
-            u'1 day')
+            '1 day')
 
     def test_timeuntil(self):
         self.assertEqual(
             timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1, 1)),
-            u'1 day')
+            '1 day')
 
         self.assertEqual(
             timeuntil_filter(datetime.datetime(2005, 12, 30),
                              datetime.datetime(2005, 12, 29)),
-            u'1 day')
+            '1 day')
 
     def test_default(self):
-        self.assertEqual(default(u"val", u"default"), u'val')
-        self.assertEqual(default(None, u"default"), u'default')
-        self.assertEqual(default(u'', u"default"), u'default')
+        self.assertEqual(default("val", "default"), 'val')
+        self.assertEqual(default(None, "default"), 'default')
+        self.assertEqual(default('', "default"), 'default')
 
     def test_if_none(self):
-        self.assertEqual(default_if_none(u"val", u"default"), u'val')
-        self.assertEqual(default_if_none(None, u"default"), u'default')
-        self.assertEqual(default_if_none(u'', u"default"), u'')
+        self.assertEqual(default_if_none("val", "default"), 'val')
+        self.assertEqual(default_if_none(None, "default"), 'default')
+        self.assertEqual(default_if_none('', "default"), '')
 
     def test_divisibleby(self):
         self.assertEqual(divisibleby(4, 2), True)
         self.assertEqual(divisibleby(4, 3), False)
 
     def test_yesno(self):
-        self.assertEqual(yesno(True), u'yes')
-        self.assertEqual(yesno(False), u'no')
-        self.assertEqual(yesno(None), u'maybe')
-        self.assertEqual(yesno(True, u'certainly,get out of town,perhaps'),
-                          u'certainly')
-        self.assertEqual(yesno(False, u'certainly,get out of town,perhaps'),
-                          u'get out of town')
-        self.assertEqual(yesno(None, u'certainly,get out of town,perhaps'),
-                          u'perhaps')
-        self.assertEqual(yesno(None, u'certainly,get out of town'),
-                          u'get out of town')
+        self.assertEqual(yesno(True), 'yes')
+        self.assertEqual(yesno(False), 'no')
+        self.assertEqual(yesno(None), 'maybe')
+        self.assertEqual(yesno(True, 'certainly,get out of town,perhaps'),
+                          'certainly')
+        self.assertEqual(yesno(False, 'certainly,get out of town,perhaps'),
+                          'get out of town')
+        self.assertEqual(yesno(None, 'certainly,get out of town,perhaps'),
+                          'perhaps')
+        self.assertEqual(yesno(None, 'certainly,get out of town'),
+                          'get out of town')
 
     def test_filesizeformat(self):
-        self.assertEqual(filesizeformat(1023), u'1023 bytes')
-        self.assertEqual(filesizeformat(1024), u'1.0 KB')
-        self.assertEqual(filesizeformat(10*1024), u'10.0 KB')
-        self.assertEqual(filesizeformat(1024*1024-1), u'1024.0 KB')
-        self.assertEqual(filesizeformat(1024*1024), u'1.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*50), u'50.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024-1), u'1024.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024), u'1.0 GB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024), u'1.0 TB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), u'1.0 PB')
+        self.assertEqual(filesizeformat(1023), '1023 bytes')
+        self.assertEqual(filesizeformat(1024), '1.0 KB')
+        self.assertEqual(filesizeformat(10*1024), '10.0 KB')
+        self.assertEqual(filesizeformat(1024*1024-1), '1024.0 KB')
+        self.assertEqual(filesizeformat(1024*1024), '1.0 MB')
+        self.assertEqual(filesizeformat(1024*1024*50), '50.0 MB')
+        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0 MB')
+        self.assertEqual(filesizeformat(1024*1024*1024), '1.0 GB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0 TB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0 PB')
         self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                          u'2000.0 PB')
-        self.assertEqual(filesizeformat(complex(1,-1)), u'0 bytes')
-        self.assertEqual(filesizeformat(""), u'0 bytes')
-        self.assertEqual(filesizeformat(u"\N{GREEK SMALL LETTER ALPHA}"),
-                          u'0 bytes')
+                          '2000.0 PB')
+        self.assertEqual(filesizeformat(complex(1,-1)), '0 bytes')
+        self.assertEqual(filesizeformat(""), '0 bytes')
+        self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
+                          '0 bytes')
 
     def test_localized_filesizeformat(self):
         with self.settings(USE_L10N=True):
             with translation.override('de', deactivate=True):
-                self.assertEqual(filesizeformat(1023), u'1023 Bytes')
-                self.assertEqual(filesizeformat(1024), u'1,0 KB')
-                self.assertEqual(filesizeformat(10*1024), u'10,0 KB')
-                self.assertEqual(filesizeformat(1024*1024-1), u'1024,0 KB')
-                self.assertEqual(filesizeformat(1024*1024), u'1,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*50), u'50,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024-1), u'1024,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024), u'1,0 GB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024), u'1,0 TB')
+                self.assertEqual(filesizeformat(1023), '1023 Bytes')
+                self.assertEqual(filesizeformat(1024), '1,0 KB')
+                self.assertEqual(filesizeformat(10*1024), '10,0 KB')
+                self.assertEqual(filesizeformat(1024*1024-1), '1024,0 KB')
+                self.assertEqual(filesizeformat(1024*1024), '1,0 MB')
+                self.assertEqual(filesizeformat(1024*1024*50), '50,0 MB')
+                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0 MB')
+                self.assertEqual(filesizeformat(1024*1024*1024), '1,0 GB')
+                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0 TB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
-                                  u'1,0 PB')
+                                  '1,0 PB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                                  u'2000,0 PB')
-                self.assertEqual(filesizeformat(complex(1,-1)), u'0 Bytes')
-                self.assertEqual(filesizeformat(""), u'0 Bytes')
-                self.assertEqual(filesizeformat(u"\N{GREEK SMALL LETTER ALPHA}"),
-                                  u'0 Bytes')
+                                  '2000,0 PB')
+                self.assertEqual(filesizeformat(complex(1,-1)), '0 Bytes')
+                self.assertEqual(filesizeformat(""), '0 Bytes')
+                self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
+                                  '0 Bytes')
 
     def test_pluralize(self):
-        self.assertEqual(pluralize(1), u'')
-        self.assertEqual(pluralize(0), u's')
-        self.assertEqual(pluralize(2), u's')
-        self.assertEqual(pluralize([1]), u'')
-        self.assertEqual(pluralize([]), u's')
-        self.assertEqual(pluralize([1,2,3]), u's')
-        self.assertEqual(pluralize(1,u'es'), u'')
-        self.assertEqual(pluralize(0,u'es'), u'es')
-        self.assertEqual(pluralize(2,u'es'), u'es')
-        self.assertEqual(pluralize(1,u'y,ies'), u'y')
-        self.assertEqual(pluralize(0,u'y,ies'), u'ies')
-        self.assertEqual(pluralize(2,u'y,ies'), u'ies')
-        self.assertEqual(pluralize(0,u'y,ies,error'), u'')
+        self.assertEqual(pluralize(1), '')
+        self.assertEqual(pluralize(0), 's')
+        self.assertEqual(pluralize(2), 's')
+        self.assertEqual(pluralize([1]), '')
+        self.assertEqual(pluralize([]), 's')
+        self.assertEqual(pluralize([1,2,3]), 's')
+        self.assertEqual(pluralize(1,'es'), '')
+        self.assertEqual(pluralize(0,'es'), 'es')
+        self.assertEqual(pluralize(2,'es'), 'es')
+        self.assertEqual(pluralize(1,'y,ies'), 'y')
+        self.assertEqual(pluralize(0,'y,ies'), 'ies')
+        self.assertEqual(pluralize(2,'y,ies'), 'ies')
+        self.assertEqual(pluralize(0,'y,ies,error'), '')
 
     def test_phone2numeric(self):
-        self.assertEqual(phone2numeric_filter(u'0800 flowers'), u'0800 3569377')
+        self.assertEqual(phone2numeric_filter('0800 flowers'), '0800 3569377')
 
     def test_non_string_input(self):
         # Filters shouldn't break if passed non-strings
-        self.assertEqual(addslashes(123), u'123')
-        self.assertEqual(linenumbers(123), u'1. 123')
-        self.assertEqual(lower(123), u'123')
-        self.assertEqual(make_list(123), [u'1', u'2', u'3'])
-        self.assertEqual(slugify(123), u'123')
-        self.assertEqual(title(123), u'123')
-        self.assertEqual(truncatewords(123, 2), u'123')
-        self.assertEqual(upper(123), u'123')
-        self.assertEqual(urlencode(123), u'123')
-        self.assertEqual(urlize(123), u'123')
-        self.assertEqual(urlizetrunc(123, 1), u'123')
+        self.assertEqual(addslashes(123), '123')
+        self.assertEqual(linenumbers(123), '1. 123')
+        self.assertEqual(lower(123), '123')
+        self.assertEqual(make_list(123), ['1', '2', '3'])
+        self.assertEqual(slugify(123), '123')
+        self.assertEqual(title(123), '123')
+        self.assertEqual(truncatewords(123, 2), '123')
+        self.assertEqual(upper(123), '123')
+        self.assertEqual(urlencode(123), '123')
+        self.assertEqual(urlize(123), '123')
+        self.assertEqual(urlizetrunc(123, 1), '123')
         self.assertEqual(wordcount(123), 1)
-        self.assertEqual(wordwrap(123, 2), u'123')
-        self.assertEqual(ljust('123', 4), u'123 ')
-        self.assertEqual(rjust('123', 4), u' 123')
-        self.assertEqual(center('123', 5), u' 123 ')
-        self.assertEqual(center('123', 6), u' 123  ')
-        self.assertEqual(cut(123, '2'), u'13')
-        self.assertEqual(escape(123), u'123')
-        self.assertEqual(linebreaks_filter(123), u'<p>123</p>')
-        self.assertEqual(linebreaksbr(123), u'123')
-        self.assertEqual(removetags(123, 'a'), u'123')
-        self.assertEqual(striptags(123), u'123')
+        self.assertEqual(wordwrap(123, 2), '123')
+        self.assertEqual(ljust('123', 4), '123 ')
+        self.assertEqual(rjust('123', 4), ' 123')
+        self.assertEqual(center('123', 5), ' 123 ')
+        self.assertEqual(center('123', 6), ' 123  ')
+        self.assertEqual(cut(123, '2'), '13')
+        self.assertEqual(escape(123), '123')
+        self.assertEqual(linebreaks_filter(123), '<p>123</p>')
+        self.assertEqual(linebreaksbr(123), '123')
+        self.assertEqual(removetags(123, 'a'), '123')
+        self.assertEqual(striptags(123), '123')
 

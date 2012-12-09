@@ -1,6 +1,7 @@
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
+from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
@@ -46,17 +47,28 @@ class FormMixin(ContextMixin):
         return kwargs
 
     def get_success_url(self):
+        """
+        Returns the supplied success URL.
+        """
         if self.success_url:
-            url = self.success_url
+            # Forcing possible reverse_lazy evaluation
+            url = force_text(self.success_url)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
         return url
 
     def form_valid(self, form):
+        """
+        If the form is valid, redirect to the supplied URL.
+        """
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
+        """
+        If the form is invalid, re-render the context data with the
+        data-filled form and errors.
+        """
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -67,7 +79,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
     def get_form_class(self):
         """
-        Returns the form class to use in this view
+        Returns the form class to use in this view.
         """
         if self.form_class:
             return self.form_class
@@ -94,6 +106,9 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         return kwargs
 
     def get_success_url(self):
+        """
+        Returns the supplied URL.
+        """
         if self.success_url:
             url = self.success_url % self.object.__dict__
         else:
@@ -106,10 +121,17 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         return url
 
     def form_valid(self, form):
+        """
+        If the form is valid, save the associated model.
+        """
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
+        """
+        If an object has been supplied, inject it into the context with the
+        supplied context_object_name name.
+        """
         context = {}
         if self.object:
             context['object'] = self.object
@@ -122,14 +144,21 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
 class ProcessFormView(View):
     """
-    A mixin that processes a form on POST.
+    A mixin that renders a form on GET and processes it on POST.
     """
     def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests and instantiates a blank version of the form.
+        """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests, instantiating a form instance with the passed
+        POST variables and then checked for validity.
+        """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         if form.is_valid():
@@ -172,7 +201,7 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
 
 class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
     """
-    View for creating an new object instance,
+    View for creating a new object instance,
     with a response rendered by template.
     """
     template_name_suffix = '_form'
@@ -196,7 +225,7 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
 class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):
     """
     View for updating an object,
-    with a response rendered by template..
+    with a response rendered by template.
     """
     template_name_suffix = '_form'
 
@@ -208,6 +237,10 @@ class DeletionMixin(object):
     success_url = None
 
     def delete(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
         self.object = self.get_object()
         self.object.delete()
         return HttpResponseRedirect(self.get_success_url())

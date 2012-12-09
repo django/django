@@ -110,22 +110,19 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :doc:`authentication backends documentation
 </ref/authbackends>` for details.
 
-.. setting:: AUTH_PROFILE_MODULE
+.. setting:: AUTH_USER_MODEL
 
-AUTH_PROFILE_MODULE
--------------------
+AUTH_USER_MODEL
+---------------
 
-Default: Not defined
+Default: 'auth.User'
 
-The site-specific user profile model used by this site. See
-:ref:`auth-profiles`.
+The model to use to represent a User. See :ref:`auth-custom-user`.
 
 .. setting:: CACHES
 
 CACHES
 ------
-
-.. versionadded:: 1.3
 
 Default::
 
@@ -167,12 +164,6 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 Writing a whole new cache backend from scratch is left as an exercise
 to the reader; see the other backends for examples.
 
-.. note::
-    Prior to Django 1.3, you could use a URI based version of the backend
-    name to reference the built-in cache backends (e.g., you could use
-    ``'db://tablename'`` to refer to the database backend). This format has
-    been deprecated, and will be removed in Django 1.5.
-
 .. setting:: CACHES-KEY_FUNCTION
 
 KEY_FUNCTION
@@ -183,7 +174,7 @@ compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), smart_str(key)])
+        return ':'.join([key_prefix, str(version), key])
 
 You may use any key function you want, as long as it has the same
 argument signature.
@@ -307,14 +298,12 @@ See :doc:`/topics/cache`.
 CSRF_COOKIE_DOMAIN
 ------------------
 
-.. versionadded:: 1.2
-
 Default: ``None``
 
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
+``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -325,8 +314,6 @@ protection is safe from cross-subdomain attacks by default - please see the
 
 CSRF_COOKIE_NAME
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``'csrftoken'``
 
@@ -367,8 +354,6 @@ cookie is only sent under an HTTPS connection.
 CSRF_FAILURE_VIEW
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``'django.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request
@@ -385,8 +370,6 @@ end users) indicating the reason the request was rejected.  See
 
 DATABASES
 ---------
-
-.. versionadded:: 1.2
 
 Default: ``{}`` (Empty dictionary)
 
@@ -429,12 +412,6 @@ You can use a database backend that doesn't ship with Django by setting
 ``mypackage.backends.whatever``). Writing a whole new database backend from
 scratch is left as an exercise to the reader; see the other backends for
 examples.
-
-.. note::
-    Prior to Django 1.2, you could use a short version of the backend name
-    to reference the built-in database backends (e.g., you could use
-    ``'sqlite3'`` to refer to the SQLite backend). This format has been
-    deprecated, and will be removed in Django 1.4.
 
 .. setting:: HOST
 
@@ -547,8 +524,6 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 TEST_DEPENDENCIES
 ~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
@@ -664,8 +639,6 @@ not provided, Django will use ``'test_' + NAME + '_temp'``.
 DATABASE_ROUTERS
 ----------------
 
-.. versionadded:: 1.2
-
 Default: ``[]`` (Empty list)
 
 The list of routers that will be used to determine which database
@@ -686,17 +659,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: DATE_INPUT_FORMATS
 
 DATE_INPUT_FORMATS
 ------------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -728,17 +696,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: DATETIME_INPUT_FORMATS
 
 DATETIME_INPUT_FORMATS
 ----------------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -773,14 +736,15 @@ Did you catch that? NEVER deploy a site into production with :setting:`DEBUG`
 turned on.
 
 One of the main features of debug mode is the display of detailed error pages.
-If your app raises an exception when ``DEBUG`` is ``True``, Django will display
-a detailed traceback, including a lot of metadata about your environment, such
-as all the currently defined Django settings (from ``settings.py``).
+If your app raises an exception when :setting:`DEBUG` is ``True``, Django will
+display a detailed traceback, including a lot of metadata about your
+environment, such as all the currently defined Django settings (from
+``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as ``SECRET_KEY`` or ``PROFANITIES_LIST``.
-Specifically, it will exclude any setting whose name includes any of the
-following:
+sensitive (or offensive), such as :setting:`SECRET_KEY` or
+:setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
+name includes any of the following:
 
     * API
     * KEY
@@ -822,8 +786,6 @@ site.
 
 DECIMAL_SEPARATOR
 -----------------
-
-.. versionadded:: 1.2
 
 Default: ``'.'`` (Dot)
 
@@ -926,8 +888,6 @@ This is only used if ``CommonMiddleware`` is installed (see
 EMAIL_BACKEND
 -------------
 
-.. versionadded:: 1.2
-
 Default: ``'django.core.mail.backends.smtp.EmailBackend'``
 
 The backend to use for sending emails. For the list of available backends see
@@ -937,8 +897,6 @@ The backend to use for sending emails. For the list of available backends see
 
 EMAIL_FILE_PATH
 ---------------
-
-.. versionadded:: 1.2
 
 Default: Not defined
 
@@ -1086,8 +1044,6 @@ See :doc:`/topics/files` for details.
 FIRST_DAY_OF_WEEK
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``0`` (Sunday)
 
 Number representing the first day of the week. This is especially useful
@@ -1127,8 +1083,6 @@ of the preferred value or not supplied at all.
 FORMAT_MODULE_PATH
 ------------------
 
-.. versionadded:: 1.2
-
 Default: ``None``
 
 A full Python path to a Python package that contains format definitions for
@@ -1165,9 +1119,11 @@ Default: ``()``
 
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
-:doc:`/howto/error-reporting`). Use this if your site does not provide a
-commonly requested file such as ``favicon.ico`` or ``robots.txt``, or if it
-gets hammered by script kiddies.
+:doc:`/howto/error-reporting`). Regular expressions are matched against
+:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
+query string, if any). Use this if your site does not provide a commonly
+requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
+hammered by script kiddies.
 
 This is only used if :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True`` and
 ``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
@@ -1288,16 +1244,13 @@ Example::
         '/var/local/translations/locale'
     )
 
-Note that in the paths you add to the value of this setting, if you have the
-typical ``/path/to/locale/xx/LC_MESSAGES`` hierarchy, you should use the path to
-the ``locale`` directory (i.e. ``'/path/to/locale'``).
+Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
+directories containing the actual translation files.
 
 .. setting:: LOGGING
 
 LOGGING
 -------
-
-.. versionadded:: 1.3
 
 Default: A logging configuration dictionary.
 
@@ -1312,8 +1265,6 @@ email log handler; all other log messages are given to a NullHandler.
 
 LOGGING_CONFIG
 --------------
-
-.. versionadded:: 1.3
 
 Default: ``'django.utils.log.dictConfig'``
 
@@ -1339,25 +1290,13 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-.. _`note on LOGIN_REDIRECT_URL setting`:
+.. versionchanged:: 1.5
 
-.. note::
-    You can use :func:`~django.core.urlresolvers.reverse_lazy` to reference
-    URLs by their name instead of providing a hardcoded value. Assuming a
-    ``urls.py`` with an URLpattern named ``home``::
-
-        urlpatterns = patterns('',
-            url('^welcome/$', 'test_app.views.home', name='home'),
-        )
-
-    You can use :func:`~django.core.urlresolvers.reverse_lazy` like this::
-
-        from django.core.urlresolvers import reverse_lazy
-
-        LOGIN_REDIRECT_URL = reverse_lazy('home')
-
-    This also works fine with localized URLs using
-    :func:`~django.conf.urls.i18n.i18n_patterns`.
+This setting now also accepts view function names and
+:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+configuration duplication since you no longer have to define the URL in two
+places (``settings`` and URLconf).
+For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGIN_URL
 
@@ -1369,8 +1308,13 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-.. note::
-    See the `note on LOGIN_REDIRECT_URL setting`_
+.. versionchanged:: 1.5
+
+This setting now also accepts view function names and
+:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+configuration duplication since you no longer have to define the URL in two
+places (``settings`` and URLconf).
+For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGOUT_URL
 
@@ -1381,9 +1325,6 @@ Default: ``'/accounts/logout/'``
 
 LOGIN_URL counterpart.
 
-.. note::
-    See the `note on LOGIN_REDIRECT_URL setting`_
-
 .. setting:: MANAGERS
 
 MANAGERS
@@ -1392,7 +1333,7 @@ MANAGERS
 Default: ``()`` (Empty tuple)
 
 A tuple in the same format as :setting:`ADMINS` that specifies who should get
-broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
+broken-link notifications when :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``.
 
 .. setting:: MEDIA_ROOT
 
@@ -1401,10 +1342,10 @@ MEDIA_ROOT
 
 Default: ``''`` (Empty string)
 
-Absolute path to the directory that holds media for this installation, used
-for :doc:`managing stored files </topics/files>`.
+Absolute filesystem path to the directory that will hold :doc:`user-uploaded
+files </topics/files>`.
 
-Example: ``"/home/media/media.lawrence.com/"``
+Example: ``"/var/www/example.com/media/"``
 
 See also :setting:`MEDIA_URL`.
 
@@ -1416,17 +1357,13 @@ MEDIA_URL
 Default: ``''`` (Empty string)
 
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
-for :doc:`managing stored files </topics/files>`.
+for :doc:`managing stored files </topics/files>`. It must end in a slash if set
+to a non-empty value.
 
-Example: ``"http://media.lawrence.com/"``
-
-.. versionchanged:: 1.3
-   It must end in a slash if set to a non-empty value.
+Example: ``"http://media.example.com/"``
 
 MESSAGE_LEVEL
 -------------
-
-.. versionadded:: 1.2
 
 Default: `messages.INFO`
 
@@ -1437,17 +1374,13 @@ more details.
 MESSAGE_STORAGE
 ---------------
 
-.. versionadded:: 1.2
-
-Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
+Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
 Controls where Django stores message data.  See the
 :doc:`messages documentation </ref/contrib/messages>` for more details.
 
 MESSAGE_TAGS
 ------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -1475,11 +1408,6 @@ Default::
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
-.. versionchanged:: 1.2
-   ``'django.contrib.messages.middleware.MessageMiddleware'`` was added to the
-   default.  For more information, see the :doc:`messages documentation
-   </ref/contrib/messages>`.
-
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT
@@ -1504,8 +1432,6 @@ See :tfilter:`allowed date format strings <date>`. See also
 
 NUMBER_GROUPING
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``0``
 
@@ -1586,9 +1512,23 @@ SECRET_KEY
 
 Default: ``''`` (Empty string)
 
-A secret key for this particular Django installation. Used to provide a seed in
-secret-key hashing algorithms. Set this to a random string -- the longer, the
-better. ``django-admin.py startproject`` creates one automatically.
+A secret key for a particular Django installation. This is used to provide
+:doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
+unpredictable value.
+
+:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+randomly-generated ``SECRET_KEY`` to each new project.
+
+.. warning::
+
+    **Keep this value secret.**
+
+    Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
+    security protections, and can lead to privilege escalation and remote code
+    execution vulnerabilities.
+
+.. versionchanged:: 1.5
+    Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
@@ -1605,7 +1545,8 @@ method.
 
 This takes some explanation. By default, ``is_secure()`` is able to determine
 whether a request is secure by looking at whether the requested URL uses
-"https://".
+"https://". This is important for Django's CSRF protection, and may be used
+by your own code or third-party apps.
 
 If your Django app is behind a proxy, though, the proxy may be "swallowing" the
 fact that a request is HTTPS, using a non-HTTPS connection between the proxy
@@ -1620,9 +1561,9 @@ for.
 You'll need to set a tuple with two elements -- the name of the header to look
 for and the required value. For example::
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-Here, we're telling Django that we trust the ``X-Forwarded-Protocol`` header
+Here, we're telling Django that we trust the ``X-Forwarded-Proto`` header
 that comes from our proxy, and any time its value is ``'https'``, then the
 request is guaranteed to be secure (i.e., it originally came in via HTTPS).
 Obviously, you should *only* set this setting if you control your proxy or
@@ -1635,16 +1576,18 @@ available in ``request.META``.)
 
 .. warning::
 
-    **You will probably open security holes in your site if you set this without knowing what you're doing. Seriously.**
+    **You will probably open security holes in your site if you set this
+    without knowing what you're doing. And if you fail to set it when you
+    should. Seriously.**
 
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
 
     * Your Django app is behind a proxy.
-    * Your proxy strips the 'X-Forwarded-Protocol' header from all incoming
+    * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
       requests. In other words, if end users include that header in their
       requests, the proxy will discard it.
-    * Your proxy sets the 'X-Forwarded-Protocol' header and sends it to Django,
+    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 
     If any of those are not true, you should keep this setting set to ``None``
@@ -1703,7 +1646,7 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
+``".example.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie. See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
@@ -1723,7 +1666,7 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
-.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. versionchanged:: 1.4
     The default value of the setting was changed from ``False`` to ``True``.
@@ -1752,6 +1695,16 @@ Django installation or be parent of that path.
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
+
+.. setting:: SESSION_CACHE_ALIAS
+
+SESSION_CACHE_ALIAS
+-------------------
+
+Default: ``default``
+
+If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
+this selects the cache to use.
 
 .. setting:: SESSION_COOKIE_SECURE
 
@@ -1819,8 +1772,6 @@ Whether to save the session data on every request. See
 SHORT_DATE_FORMAT
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``m/d/Y`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
@@ -1834,8 +1785,6 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 SHORT_DATETIME_FORMAT
 ---------------------
-
-.. versionadded:: 1.2
 
 Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
 
@@ -1884,7 +1833,7 @@ Default: ``''`` (Empty string)
 The absolute path to the directory where :djadmin:`collectstatic` will collect
 static files for deployment.
 
-Example: ``"/home/example.com/static/"``
+Example: ``"/var/www/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default) the :djadmin:`collectstatic` management command will collect static
@@ -1914,7 +1863,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"/site_media/static/"`` or ``"http://static.example.com/"``
+Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`media definitions<form-media-paths>` and the
@@ -1942,20 +1891,6 @@ Default::
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
-
-.. versionchanged:: 1.2
-   ``django.contrib.messages.context_processors.messages`` was added to the
-   default.  For more information, see the :doc:`messages documentation
-   </ref/contrib/messages>`.
-
-.. versionchanged:: 1.2
-    The auth context processor was moved in this release from its old location
-    ``django.core.context_processors.auth`` to
-    ``django.contrib.auth.context_processors.auth``.
-
-.. versionadded:: 1.3
-    The ``django.core.context_processors.static`` context processor
-    was added in this release.
 
 .. versionadded:: 1.4
     The ``django.core.context_processors.tz`` context processor
@@ -2008,12 +1943,6 @@ used instead of a string. The first item in the tuple should be the ``Loader``'s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
-.. versionchanged:: 1.2
-    The class-based API for template loaders was introduced in Django 1.2
-    although  the :setting:`TEMPLATE_LOADERS` setting will accept strings
-    that specify function-based loaders until compatibility with them is
-    completely removed in Django 1.4.
-
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
 TEMPLATE_STRING_IF_INVALID
@@ -2031,9 +1960,6 @@ TEST_RUNNER
 
 Default: ``'django.test.simple.DjangoTestSuiteRunner'``
 
-.. versionchanged:: 1.2
-   Prior to 1.2, test runners were a function, not a class.
-
 The name of the class to use for starting the test suite. See
 :doc:`/topics/testing`.
 
@@ -2043,8 +1969,6 @@ The name of the class to use for starting the test suite. See
 
 THOUSAND_SEPARATOR
 ------------------
-
-.. versionadded:: 1.2
 
 Default: ``,`` (Comma)
 
@@ -2070,17 +1994,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
 .. setting:: TIME_INPUT_FORMATS
 
 TIME_INPUT_FORMATS
 ------------------
-
-.. versionadded:: 1.2
 
 Default: ``('%H:%M:%S', '%H:%M')``
 
@@ -2102,9 +2021,6 @@ TIME_ZONE
 ---------
 
 Default: ``'America/Chicago'``
-
-.. versionchanged:: 1.2
-   ``None`` was added as an allowed value.
 
 .. versionchanged:: 1.4
    The meaning of this setting now depends on the value of :setting:`USE_TZ`.
@@ -2182,8 +2098,6 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 USE_L10N
 --------
 
-.. versionadded:: 1.2
-
 Default: ``False``
 
 A boolean that specifies if localized formatting of data will be enabled by
@@ -2201,8 +2115,6 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 USE_THOUSAND_SEPARATOR
 ----------------------
-
-.. versionadded:: 1.2
 
 Default: ``False``
 
@@ -2239,8 +2151,6 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 USE_X_FORWARDED_HOST
 --------------------
-
-.. versionadded:: 1.3.1
 
 Default: ``False``
 
@@ -2301,15 +2211,21 @@ The default value for the X-Frame-Options header used by
 Deprecated settings
 ===================
 
-.. setting:: ADMIN_MEDIA_PREFIX
+.. setting:: AUTH_PROFILE_MODULE
 
-ADMIN_MEDIA_PREFIX
-------------------
+AUTH_PROFILE_MODULE
+-------------------
 
-.. deprecated:: 1.4
-   This setting has been obsoleted by the ``django.contrib.staticfiles`` app
-   integration. See the :doc:`Django 1.4 release notes</releases/1.4>` for
-   more information.
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See
+:ref:`auth-profiles`.
 
 .. setting:: IGNORABLE_404_ENDS
 

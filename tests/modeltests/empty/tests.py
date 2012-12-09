@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.loading import get_app
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import six
 
 from .models import Empty
 
@@ -14,11 +14,12 @@ class EmptyModelTests(TestCase):
         m = Empty()
         self.assertEqual(m.id, None)
         m.save()
-        m2 = Empty.objects.create()
+        Empty.objects.create()
         self.assertEqual(len(Empty.objects.all()), 2)
         self.assertTrue(m.id is not None)
         existing = Empty(m.id)
         existing.save()
+
 
 class NoModelTests(TestCase):
     """
@@ -32,6 +33,6 @@ class NoModelTests(TestCase):
     """
     @override_settings(INSTALLED_APPS=("modeltests.empty.no_models",))
     def test_no_models(self):
-        with self.assertRaisesRegexp(ImproperlyConfigured,
+        with six.assertRaisesRegex(self, ImproperlyConfigured,
                     'App with label no_models is missing a models.py module.'):
             get_app('no_models')

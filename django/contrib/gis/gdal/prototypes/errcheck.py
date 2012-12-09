@@ -5,9 +5,10 @@
 from ctypes import c_void_p, string_at
 from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
 from django.contrib.gis.gdal.libgdal import lgdal
+from django.utils import six
 
-# Helper routines for retrieving pointers and/or values from 
-# arguments passed in by reference. 
+# Helper routines for retrieving pointers and/or values from
+# arguments passed in by reference.
 def arg_byref(args, offset=-1):
     "Returns the pointer argument's by-refernece value."
     return args[offset]._obj.value
@@ -53,7 +54,7 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         ptr = ptr_byref(cargs, offset)
         # Getting the string value
         s = ptr.value
-    # Correctly freeing the allocated memory beind GDAL pointer 
+    # Correctly freeing the allocated memory beind GDAL pointer
     # w/the VSIFree routine.
     if ptr: lgdal.VSIFree(ptr)
     return s
@@ -71,9 +72,9 @@ def check_geom(result, func, cargs):
     "Checks a function that returns a geometry."
     # OGR_G_Clone may return an integer, even though the
     # restype is set to c_void_p
-    if isinstance(result, (int, long)):
+    if isinstance(result, six.integer_types):
         result = c_void_p(result)
-    if not result: 
+    if not result:
         raise OGRException('Invalid geometry pointer returned from "%s".' % func.__name__)
     return result
 
@@ -85,7 +86,7 @@ def check_geom_offset(result, func, cargs, offset=-1):
 
 ### Spatial Reference error-checking routines ###
 def check_srs(result, func, cargs):
-    if isinstance(result, (int, long)):
+    if isinstance(result, six.integer_types):
         result = c_void_p(result)
     if not result:
         raise SRSException('Invalid spatial reference pointer returned from "%s".' % func.__name__)
@@ -109,11 +110,11 @@ def check_errcode(result, func, cargs):
 
 def check_pointer(result, func, cargs):
     "Makes sure the result pointer is valid."
-    if isinstance(result, (int, long)):
+    if isinstance(result, six.integer_types):
         result = c_void_p(result)
-    if bool(result): 
+    if bool(result):
         return result
-    else: 
+    else:
         raise OGRException('Invalid pointer returned from "%s"' % func.__name__)
 
 def check_str_arg(result, func, cargs):
@@ -124,4 +125,4 @@ def check_str_arg(result, func, cargs):
     """
     dbl = result
     ptr = cargs[-1]._obj
-    return dbl, ptr.value
+    return dbl, ptr.value.decode()

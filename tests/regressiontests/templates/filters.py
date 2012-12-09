@@ -6,20 +6,25 @@ The tests are hidden inside a function so that things like timestamps and
 timezones are only evaluated at the moment of execution and will therefore be
 consistent.
 """
+from __future__ import unicode_literals
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
+from django.test.utils import str_prefix
 from django.utils.tzinfo import LocalTimezone, FixedOffset
 from django.utils.safestring import mark_safe
+from django.utils.encoding import python_2_unicode_compatible
 
 # These two classes are used to test auto-escaping of __unicode__ output.
+@python_2_unicode_compatible
 class UnsafeClass:
-    def __unicode__(self):
-        return u'you & me'
+    def __str__(self):
+        return 'you & me'
 
+@python_2_unicode_compatible
 class SafeClass:
-    def __unicode__(self):
-        return mark_safe(u'you &gt; me')
+    def __str__(self):
+        return mark_safe('you &gt; me')
 
 # RESULT SYNTAX --
 # 'template_name': ('template contents', 'context dict',
@@ -84,66 +89,66 @@ def get_filter_tests():
         'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0 minutes'),
         'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1 day'),
 
-        'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"<a>\' <a>\'"),
-        'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, ur"&lt;a&gt;\&#39; <a>\'"),
+        'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"<a>\' <a>\'"),
+        'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"&lt;a&gt;\&#39; <a>\'"),
 
-        'filter-capfirst01': ("{% autoescape off %}{{ a|capfirst }} {{ b|capfirst }}{% endautoescape %}", {"a": "fred>", "b": mark_safe("fred&gt;")}, u"Fred> Fred&gt;"),
-        'filter-capfirst02': ("{{ a|capfirst }} {{ b|capfirst }}", {"a": "fred>", "b": mark_safe("fred&gt;")}, u"Fred&gt; Fred&gt;"),
+        'filter-capfirst01': ("{% autoescape off %}{{ a|capfirst }} {{ b|capfirst }}{% endautoescape %}", {"a": "fred>", "b": mark_safe("fred&gt;")}, "Fred> Fred&gt;"),
+        'filter-capfirst02': ("{{ a|capfirst }} {{ b|capfirst }}", {"a": "fred>", "b": mark_safe("fred&gt;")}, "Fred&gt; Fred&gt;"),
 
         # Note that applying fix_ampsersands in autoescape mode leads to
         # double escaping.
-        'filter-fix_ampersands01': ("{% autoescape off %}{{ a|fix_ampersands }} {{ b|fix_ampersands }}{% endautoescape %}", {"a": "a&b", "b": mark_safe("a&b")}, u"a&amp;b a&amp;b"),
-        'filter-fix_ampersands02': ("{{ a|fix_ampersands }} {{ b|fix_ampersands }}", {"a": "a&b", "b": mark_safe("a&b")}, u"a&amp;amp;b a&amp;b"),
+        'filter-fix_ampersands01': ("{% autoescape off %}{{ a|fix_ampersands }} {{ b|fix_ampersands }}{% endautoescape %}", {"a": "a&b", "b": mark_safe("a&b")}, "a&amp;b a&amp;b"),
+        'filter-fix_ampersands02': ("{{ a|fix_ampersands }} {{ b|fix_ampersands }}", {"a": "a&b", "b": mark_safe("a&b")}, "a&amp;amp;b a&amp;b"),
 
-        'filter-floatformat01': ("{% autoescape off %}{{ a|floatformat }} {{ b|floatformat }}{% endautoescape %}", {"a": "1.42", "b": mark_safe("1.42")}, u"1.4 1.4"),
-        'filter-floatformat02': ("{{ a|floatformat }} {{ b|floatformat }}", {"a": "1.42", "b": mark_safe("1.42")}, u"1.4 1.4"),
+        'filter-floatformat01': ("{% autoescape off %}{{ a|floatformat }} {{ b|floatformat }}{% endautoescape %}", {"a": "1.42", "b": mark_safe("1.42")}, "1.4 1.4"),
+        'filter-floatformat02': ("{{ a|floatformat }} {{ b|floatformat }}", {"a": "1.42", "b": mark_safe("1.42")}, "1.4 1.4"),
 
         # The contents of "linenumbers" is escaped according to the current
         # autoescape setting.
-        'filter-linenumbers01': ("{{ a|linenumbers }} {{ b|linenumbers }}", {"a": "one\n<two>\nthree", "b": mark_safe("one\n&lt;two&gt;\nthree")}, u"1. one\n2. &lt;two&gt;\n3. three 1. one\n2. &lt;two&gt;\n3. three"),
-        'filter-linenumbers02': ("{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}", {"a": "one\n<two>\nthree", "b": mark_safe("one\n&lt;two&gt;\nthree")}, u"1. one\n2. <two>\n3. three 1. one\n2. &lt;two&gt;\n3. three"),
+        'filter-linenumbers01': ("{{ a|linenumbers }} {{ b|linenumbers }}", {"a": "one\n<two>\nthree", "b": mark_safe("one\n&lt;two&gt;\nthree")}, "1. one\n2. &lt;two&gt;\n3. three 1. one\n2. &lt;two&gt;\n3. three"),
+        'filter-linenumbers02': ("{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}", {"a": "one\n<two>\nthree", "b": mark_safe("one\n&lt;two&gt;\nthree")}, "1. one\n2. <two>\n3. three 1. one\n2. &lt;two&gt;\n3. three"),
 
-        'filter-lower01': ("{% autoescape off %}{{ a|lower }} {{ b|lower }}{% endautoescape %}", {"a": "Apple & banana", "b": mark_safe("Apple &amp; banana")}, u"apple & banana apple &amp; banana"),
-        'filter-lower02': ("{{ a|lower }} {{ b|lower }}", {"a": "Apple & banana", "b": mark_safe("Apple &amp; banana")}, u"apple &amp; banana apple &amp; banana"),
+        'filter-lower01': ("{% autoescape off %}{{ a|lower }} {{ b|lower }}{% endautoescape %}", {"a": "Apple & banana", "b": mark_safe("Apple &amp; banana")}, "apple & banana apple &amp; banana"),
+        'filter-lower02': ("{{ a|lower }} {{ b|lower }}", {"a": "Apple & banana", "b": mark_safe("Apple &amp; banana")}, "apple &amp; banana apple &amp; banana"),
 
         # The make_list filter can destroy existing escaping, so the results are
         # escaped.
-        'filter-make_list01': ("{% autoescape off %}{{ a|make_list }}{% endautoescape %}", {"a": mark_safe("&")}, u"[u'&']"),
-        'filter-make_list02': ("{{ a|make_list }}", {"a": mark_safe("&")}, u"[u&#39;&amp;&#39;]"),
-        'filter-make_list03': ('{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}', {"a": mark_safe("&")}, u"[u'&']"),
-        'filter-make_list04': ('{{ a|make_list|stringformat:"s"|safe }}', {"a": mark_safe("&")}, u"[u'&']"),
+        'filter-make_list01': ("{% autoescape off %}{{ a|make_list }}{% endautoescape %}", {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
+        'filter-make_list02': ("{{ a|make_list }}", {"a": mark_safe("&")}, str_prefix("[%(_)s&#39;&amp;&#39;]")),
+        'filter-make_list03': ('{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}', {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
+        'filter-make_list04': ('{{ a|make_list|stringformat:"s"|safe }}', {"a": mark_safe("&")}, str_prefix("[%(_)s'&']")),
 
         # Running slugify on a pre-escaped string leads to odd behavior,
         # but the result is still safe.
-        'filter-slugify01': ("{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),
-        'filter-slugify02': ("{{ a|slugify }} {{ b|slugify }}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),
+        'filter-slugify01': ("{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}", {"a": "a & b", "b": mark_safe("a &amp; b")}, "a-b a-amp-b"),
+        'filter-slugify02': ("{{ a|slugify }} {{ b|slugify }}", {"a": "a & b", "b": mark_safe("a &amp; b")}, "a-b a-amp-b"),
 
         # Notice that escaping is applied *after* any filters, so the string
         # formatting here only needs to deal with pre-escaped characters.
         'filter-stringformat01': ('{% autoescape off %}.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.{% endautoescape %}',
-            {"a": "a<b", "b": mark_safe("a<b")}, u".  a<b. .  a<b."),
+            {"a": "a<b", "b": mark_safe("a<b")}, ".  a<b. .  a<b."),
         'filter-stringformat02': ('.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.', {"a": "a<b", "b": mark_safe("a<b")},
-            u".  a&lt;b. .  a<b."),
+            ".  a&lt;b. .  a<b."),
 
         # Test the title filter
-        'filter-title1' : ('{{ a|title }}', {'a' : 'JOE\'S CRAB SHACK'}, u'Joe&#39;s Crab Shack'),
-        'filter-title2' : ('{{ a|title }}', {'a' : '555 WEST 53RD STREET'}, u'555 West 53rd Street'),
+        'filter-title1' : ('{{ a|title }}', {'a' : 'JOE\'S CRAB SHACK'}, 'Joe&#39;s Crab Shack'),
+        'filter-title2' : ('{{ a|title }}', {'a' : '555 WEST 53RD STREET'}, '555 West 53rd Street'),
 
         'filter-truncatewords01': ('{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}{% endautoescape %}',
-            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha & ... alpha &amp; ..."),
+            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, "alpha & ... alpha &amp; ..."),
         'filter-truncatewords02': ('{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}',
-            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha &amp; ... alpha &amp; ..."),
+            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, "alpha &amp; ... alpha &amp; ..."),
 
-        'filter-truncatechars01': ('{{ a|truncatechars:5 }}', {'a': "Testing, testing"}, u"Te..."),
-        'filter-truncatechars02': ('{{ a|truncatechars:7 }}', {'a': "Testing"}, u"Testing"),
+        'filter-truncatechars01': ('{{ a|truncatechars:5 }}', {'a': "Testing, testing"}, "Te..."),
+        'filter-truncatechars02': ('{{ a|truncatechars:7 }}', {'a': "Testing"}, "Testing"),
 
         # The "upper" filter messes up entities (which are case-sensitive),
         # so it's not safe for non-escaping purposes.
-        'filter-upper01': ('{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a &amp; b")}, u"A & B A &AMP; B"),
-        'filter-upper02': ('{{ a|upper }} {{ b|upper }}', {"a": "a & b", "b": mark_safe("a &amp; b")}, u"A &amp; B A &amp;AMP; B"),
+        'filter-upper01': ('{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "A & B A &AMP; B"),
+        'filter-upper02': ('{{ a|upper }} {{ b|upper }}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "A &amp; B A &amp;AMP; B"),
 
-        'filter-urlize01': ('{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, u'<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
-        'filter-urlize02': ('{{ a|urlize }} {{ b|urlize }}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, u'<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&amp;y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
+        'filter-urlize01': ('{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
+        'filter-urlize02': ('{{ a|urlize }} {{ b|urlize }}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&amp;y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
         'filter-urlize03': ('{% autoescape off %}{{ a|urlize }}{% endautoescape %}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
         'filter-urlize04': ('{{ a|urlize }}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
 
@@ -156,73 +161,73 @@ def get_filter_tests():
         'filter-urlize07': ('{{ a|urlize }}', {"a": "Email me at me@example.com"}, 'Email me at <a href="mailto:me@example.com">me@example.com</a>'),
         'filter-urlize08': ('{{ a|urlize }}', {"a": "Email me at <me@example.com>"}, 'Email me at &lt;<a href="mailto:me@example.com">me@example.com</a>&gt;'),
 
-        'filter-urlizetrunc01': ('{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, u'"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
-        'filter-urlizetrunc02': ('{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, u'&quot;Unsafe&quot; <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
+        'filter-urlizetrunc01': ('{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
+        'filter-urlizetrunc02': ('{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '&quot;Unsafe&quot; <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
 
         'filter-wordcount01': ('{% autoescape off %}{{ a|wordcount }} {{ b|wordcount }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "3 3"),
         'filter-wordcount02': ('{{ a|wordcount }} {{ b|wordcount }}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "3 3"),
 
-        'filter-wordwrap01': ('{% autoescape off %}{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a & b")}, u"a &\nb a &\nb"),
-        'filter-wordwrap02': ('{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}', {"a": "a & b", "b": mark_safe("a & b")}, u"a &amp;\nb a &\nb"),
+        'filter-wordwrap01': ('{% autoescape off %}{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a & b")}, "a &\nb a &\nb"),
+        'filter-wordwrap02': ('{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}', {"a": "a & b", "b": mark_safe("a & b")}, "a &amp;\nb a &\nb"),
 
-        'filter-ljust01': ('{% autoescape off %}.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, u".a&b  . .a&b  ."),
-        'filter-ljust02': ('.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, u".a&amp;b  . .a&b  ."),
+        'filter-ljust01': ('{% autoescape off %}.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, ".a&b  . .a&b  ."),
+        'filter-ljust02': ('.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, ".a&amp;b  . .a&b  ."),
 
-        'filter-rjust01': ('{% autoescape off %}.{{ a|rjust:"5" }}. .{{ b|rjust:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, u".  a&b. .  a&b."),
-        'filter-rjust02': ('.{{ a|rjust:"5" }}. .{{ b|rjust:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, u".  a&amp;b. .  a&b."),
+        'filter-rjust01': ('{% autoescape off %}.{{ a|rjust:"5" }}. .{{ b|rjust:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, ".  a&b. .  a&b."),
+        'filter-rjust02': ('.{{ a|rjust:"5" }}. .{{ b|rjust:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, ".  a&amp;b. .  a&b."),
 
-        'filter-center01': ('{% autoescape off %}.{{ a|center:"5" }}. .{{ b|center:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, u". a&b . . a&b ."),
-        'filter-center02': ('.{{ a|center:"5" }}. .{{ b|center:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, u". a&amp;b . . a&b ."),
+        'filter-center01': ('{% autoescape off %}.{{ a|center:"5" }}. .{{ b|center:"5" }}.{% endautoescape %}', {"a": "a&b", "b": mark_safe("a&b")}, ". a&b . . a&b ."),
+        'filter-center02': ('.{{ a|center:"5" }}. .{{ b|center:"5" }}.', {"a": "a&b", "b": mark_safe("a&b")}, ". a&amp;b . . a&b ."),
 
-        'filter-cut01': ('{% autoescape off %}{{ a|cut:"x" }} {{ b|cut:"x" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"&y &amp;y"),
-        'filter-cut02': ('{{ a|cut:"x" }} {{ b|cut:"x" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"&amp;y &amp;y"),
-        'filter-cut03': ('{% autoescape off %}{{ a|cut:"&" }} {{ b|cut:"&" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"xy xamp;y"),
-        'filter-cut04': ('{{ a|cut:"&" }} {{ b|cut:"&" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"xy xamp;y"),
+        'filter-cut01': ('{% autoescape off %}{{ a|cut:"x" }} {{ b|cut:"x" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "&y &amp;y"),
+        'filter-cut02': ('{{ a|cut:"x" }} {{ b|cut:"x" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "&amp;y &amp;y"),
+        'filter-cut03': ('{% autoescape off %}{{ a|cut:"&" }} {{ b|cut:"&" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "xy xamp;y"),
+        'filter-cut04': ('{{ a|cut:"&" }} {{ b|cut:"&" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "xy xamp;y"),
         # Passing ';' to cut can break existing HTML entities, so those strings
         # are auto-escaped.
-        'filter-cut05': ('{% autoescape off %}{{ a|cut:";" }} {{ b|cut:";" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"x&y x&ampy"),
-        'filter-cut06': ('{{ a|cut:";" }} {{ b|cut:";" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, u"x&amp;y x&amp;ampy"),
+        'filter-cut05': ('{% autoescape off %}{{ a|cut:";" }} {{ b|cut:";" }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "x&y x&ampy"),
+        'filter-cut06': ('{{ a|cut:";" }} {{ b|cut:";" }}', {"a": "x&y", "b": mark_safe("x&amp;y")}, "x&amp;y x&amp;ampy"),
 
         # The "escape" filter works the same whether autoescape is on or off,
         # but it has no effect on strings already marked as safe.
-        'filter-escape01': ('{{ a|escape }} {{ b|escape }}', {"a": "x&y", "b": mark_safe("x&y")}, u"x&amp;y x&y"),
+        'filter-escape01': ('{{ a|escape }} {{ b|escape }}', {"a": "x&y", "b": mark_safe("x&y")}, "x&amp;y x&y"),
         'filter-escape02': ('{% autoescape off %}{{ a|escape }} {{ b|escape }}{% endautoescape %}', {"a": "x&y", "b": mark_safe("x&y")}, "x&amp;y x&y"),
 
         # It is only applied once, regardless of the number of times it
         # appears in a chain.
-        'filter-escape03': ('{% autoescape off %}{{ a|escape|escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-escape04': ('{{ a|escape|escape }}', {"a": "x&y"}, u"x&amp;y"),
+        'filter-escape03': ('{% autoescape off %}{{ a|escape|escape }}{% endautoescape %}', {"a": "x&y"}, "x&amp;y"),
+        'filter-escape04': ('{{ a|escape|escape }}', {"a": "x&y"}, "x&amp;y"),
 
         # Force_escape is applied immediately. It can be used to provide
         # double-escaping, for example.
-        'filter-force-escape01': ('{% autoescape off %}{{ a|force_escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape02': ('{{ a|force_escape }}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape03': ('{% autoescape off %}{{ a|force_escape|force_escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;amp;y"),
-        'filter-force-escape04': ('{{ a|force_escape|force_escape }}', {"a": "x&y"}, u"x&amp;amp;y"),
+        'filter-force-escape01': ('{% autoescape off %}{{ a|force_escape }}{% endautoescape %}', {"a": "x&y"}, "x&amp;y"),
+        'filter-force-escape02': ('{{ a|force_escape }}', {"a": "x&y"}, "x&amp;y"),
+        'filter-force-escape03': ('{% autoescape off %}{{ a|force_escape|force_escape }}{% endautoescape %}', {"a": "x&y"}, "x&amp;amp;y"),
+        'filter-force-escape04': ('{{ a|force_escape|force_escape }}', {"a": "x&y"}, "x&amp;amp;y"),
 
         # Because the result of force_escape is "safe", an additional
         # escape filter has no effect.
-        'filter-force-escape05': ('{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape06': ('{{ a|force_escape|escape }}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape07': ('{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}', {"a": "x&y"}, u"x&amp;y"),
-        'filter-force-escape08': ('{{ a|escape|force_escape }}', {"a": "x&y"}, u"x&amp;y"),
+        'filter-force-escape05': ('{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}', {"a": "x&y"}, "x&amp;y"),
+        'filter-force-escape06': ('{{ a|force_escape|escape }}', {"a": "x&y"}, "x&amp;y"),
+        'filter-force-escape07': ('{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}', {"a": "x&y"}, "x&amp;y"),
+        'filter-force-escape08': ('{{ a|escape|force_escape }}', {"a": "x&y"}, "x&amp;y"),
 
         # The contents in "linebreaks" and "linebreaksbr" are escaped
         # according to the current autoescape setting.
-        'filter-linebreaks01': ('{{ a|linebreaks }} {{ b|linebreaks }}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, u"<p>x&amp;<br />y</p> <p>x&<br />y</p>"),
-        'filter-linebreaks02': ('{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, u"<p>x&<br />y</p> <p>x&<br />y</p>"),
+        'filter-linebreaks01': ('{{ a|linebreaks }} {{ b|linebreaks }}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, "<p>x&amp;<br />y</p> <p>x&<br />y</p>"),
+        'filter-linebreaks02': ('{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, "<p>x&<br />y</p> <p>x&<br />y</p>"),
 
-        'filter-linebreaksbr01': ('{{ a|linebreaksbr }} {{ b|linebreaksbr }}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, u"x&amp;<br />y x&<br />y"),
-        'filter-linebreaksbr02': ('{% autoescape off %}{{ a|linebreaksbr }} {{ b|linebreaksbr }}{% endautoescape %}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, u"x&<br />y x&<br />y"),
+        'filter-linebreaksbr01': ('{{ a|linebreaksbr }} {{ b|linebreaksbr }}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, "x&amp;<br />y x&<br />y"),
+        'filter-linebreaksbr02': ('{% autoescape off %}{{ a|linebreaksbr }} {{ b|linebreaksbr }}{% endautoescape %}', {"a": "x&\ny", "b": mark_safe("x&\ny")}, "x&<br />y x&<br />y"),
 
-        'filter-safe01': ("{{ a }} -- {{ a|safe }}", {"a": u"<b>hello</b>"}, "&lt;b&gt;hello&lt;/b&gt; -- <b>hello</b>"),
-        'filter-safe02': ("{% autoescape off %}{{ a }} -- {{ a|safe }}{% endautoescape %}", {"a": "<b>hello</b>"}, u"<b>hello</b> -- <b>hello</b>"),
+        'filter-safe01': ("{{ a }} -- {{ a|safe }}", {"a": "<b>hello</b>"}, "&lt;b&gt;hello&lt;/b&gt; -- <b>hello</b>"),
+        'filter-safe02': ("{% autoescape off %}{{ a }} -- {{ a|safe }}{% endautoescape %}", {"a": "<b>hello</b>"}, "<b>hello</b> -- <b>hello</b>"),
 
         'filter-safeseq01': ('{{ a|join:", " }} -- {{ a|safeseq|join:", " }}', {"a": ["&", "<"]}, "&amp;, &lt; -- &, <"),
         'filter-safeseq02': ('{% autoescape off %}{{ a|join:", " }} -- {{ a|safeseq|join:", " }}{% endautoescape %}', {"a": ["&", "<"]}, "&, < -- &, <"),
 
-        'filter-removetags01': ('{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, u"x &lt;p&gt;y&lt;/p&gt; x <p>y</p>"),
-        'filter-removetags02': ('{% autoescape off %}{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, u"x <p>y</p> x <p>y</p>"),
+        'filter-removetags01': ('{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, "x &lt;p&gt;y&lt;/p&gt; x <p>y</p>"),
+        'filter-removetags02': ('{% autoescape off %}{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, "x <p>y</p> x <p>y</p>"),
 
         'filter-striptags01': ('{{ a|striptags }} {{ b|striptags }}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, "x y x y"),
         'filter-striptags02': ('{% autoescape off %}{{ a|striptags }} {{ b|striptags }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": mark_safe("<a>x</a> <p><b>y</b></p>")}, "x y x y"),
@@ -336,11 +341,11 @@ def get_filter_tests():
         'join04': (r'{% autoescape off %}{{ a|join:" &amp; " }}{% endautoescape %}', {'a': ['alpha', 'beta & me']}, 'alpha &amp; beta & me'),
 
         # Test that joining with unsafe joiners don't result in unsafe strings (#11377)
-        'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'), 
-        'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'), 
-        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'), 
-        'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'), 
-        
+        'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
+        'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
+        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'),
+        'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
+
         'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
         #Ticket 9520: Make sure |date doesn't blow up on non-dates
@@ -351,6 +356,9 @@ def get_filter_tests():
         # Timezone name
         'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
         'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
+        # Ticket 19370: Make sure |date doesn't blow up on a midnight time object
+        'date08': (r'{{ t|date:"H:i" }}', {'t': time(0, 1)}, '00:01'),
+        'date09': (r'{{ t|date:"H:i" }}', {'t': time(0, 0)}, '00:00'),
 
          # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),

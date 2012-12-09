@@ -1,11 +1,12 @@
 import copy
 import sys
-from io import BytesIO
 
 from django.core.management.validation import get_validation_errors
 from django.db.models.loading import cache, load_app
 
+from django.test.utils import override_settings
 from django.utils import unittest
+from django.utils.six import StringIO
 
 
 class InvalidModelTestCase(unittest.TestCase):
@@ -16,7 +17,7 @@ class InvalidModelTestCase(unittest.TestCase):
         # coloring attached (makes matching the results easier). We restore
         # sys.stderr afterwards.
         self.old_stdout = sys.stdout
-        self.stdout = BytesIO()
+        self.stdout = StringIO()
         sys.stdout = self.stdout
 
         # This test adds dummy applications to the app cache. These
@@ -31,14 +32,22 @@ class InvalidModelTestCase(unittest.TestCase):
         cache._get_models_cache = {}
         sys.stdout = self.old_stdout
 
+    # Technically, this isn't an override -- TEST_SWAPPED_MODEL must be
+    # set to *something* in order for the test to work. However, it's
+    # easier to set this up as an override than to require every developer
+    # to specify a value in their test settings.
+    @override_settings(
+        TEST_SWAPPED_MODEL='invalid_models.ReplacementModel',
+        TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model',
+        TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
+    )
     def test_invalid_models(self):
-
         try:
             module = load_app("modeltests.invalid_models.invalid_models")
         except Exception:
             self.fail('Unable to load invalid model module')
 
-        count = get_validation_errors(self.stdout, module)
+        get_validation_errors(self.stdout, module)
         self.stdout.seek(0)
         error_log = self.stdout.read()
         actual = error_log.split('\n')

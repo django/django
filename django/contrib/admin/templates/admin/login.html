@@ -30,7 +30,7 @@
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {% if not form.this_is_the_login_form.errors %}{{ form.username.errors }}{% endif %}
-    <label for="id_username" class="required">{% trans 'Username:' %}</label> {{ form.username }}
+    <label for="id_username" class="required">{{ form.username.label }}:</label> {{ form.username }}
   </div>
   <div class="form-row">
     {% if not form.this_is_the_login_form.errors %}{{ form.password.errors }}{% endif %}

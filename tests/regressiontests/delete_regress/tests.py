@@ -3,12 +3,14 @@ from __future__ import absolute_import
 import datetime
 
 from django.conf import settings
-from django.db import backend, transaction, DEFAULT_DB_ALIAS
+from django.db import transaction, DEFAULT_DB_ALIAS, models
+from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
-    Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy)
+    Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy, Login,
+    OrgUnit)
 
 
 # Can't run this test under SQLite, because you can't
@@ -16,17 +18,8 @@ from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
 class DeleteLockingTest(TransactionTestCase):
     def setUp(self):
         # Create a second connection to the default database
-        conn_settings = settings.DATABASES[DEFAULT_DB_ALIAS]
-        self.conn2 = backend.DatabaseWrapper({
-            'HOST': conn_settings['HOST'],
-            'NAME': conn_settings['NAME'],
-            'OPTIONS': conn_settings['OPTIONS'],
-            'PASSWORD': conn_settings['PASSWORD'],
-            'PORT': conn_settings['PORT'],
-            'USER': conn_settings['USER'],
-            'TIME_ZONE': settings.TIME_ZONE,
-        })
-
+        new_connections = ConnectionHandler(settings.DATABASES)
+        self.conn2 = new_connections[DEFAULT_DB_ALIAS]
         # Put both DB connections into managed transaction mode
         transaction.enter_transaction_management()
         transaction.managed(True)
@@ -139,15 +132,22 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
         eaten = Eaten.objects.create(food=apple, meal="lunch")
 
         apple.delete()
+        self.assertFalse(Food.objects.exists())
+        self.assertFalse(Eaten.objects.exists())
+
 
 class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
         "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
         for x in range(300):
             track = Book.objects.create(pagecount=x+100)
+        # attach a signal to make sure we will not fast-delete
+        def noop(*args, **kwargs):
+            pass
+        models.signals.post_delete.connect(noop, sender=Book)
         Book.objects.all().delete()
+        models.signals.post_delete.disconnect(noop, sender=Book)
         self.assertEqual(Book.objects.count(), 0)
-
 
 
 class ProxyDeleteTest(TestCase):
@@ -258,3 +258,92 @@ class ProxyDeleteTest(TestCase):
         Image.objects.all().delete()
 
         self.assertEqual(len(FooFileProxy.objects.all()), 0)
+
+    def test_19187_values(self):
+        with self.assertRaises(TypeError):
+            Image.objects.values().delete()
+        with self.assertRaises(TypeError):
+            Image.objects.values_list().delete()
+
+class Ticket19102Tests(TestCase):
+    """
+    Test different queries which alter the SELECT clause of the query. We
+    also must be using a subquery for the deletion (that is, the original
+    query has a join in it). The deletion should be done as "fast-path"
+    deletion (that is, just one query for the .delete() call).
+
+    Note that .values() is not tested here on purpose. .values().delete()
+    doesn't work for non fast-path deletes at all.
+    """
+    def setUp(self):
+        self.o1 = OrgUnit.objects.create(name='o1')
+        self.o2 = OrgUnit.objects.create(name='o2')
+        self.l1 = Login.objects.create(description='l1', orgunit=self.o1)
+        self.l2 = Login.objects.create(description='l2', orgunit=self.o2)
+
+    @skipUnlessDBFeature("update_can_self_select")
+    def test_ticket_19102_annotate(self):
+        with self.assertNumQueries(1):
+            Login.objects.order_by('description').filter(
+                orgunit__name__isnull=False
+            ).annotate(
+                n=models.Count('description')
+            ).filter(
+                n=1, pk=self.l1.pk
+            ).delete()
+        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
+        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
+
+    @skipUnlessDBFeature("update_can_self_select")
+    def test_ticket_19102_extra(self):
+        with self.assertNumQueries(1):
+            Login.objects.order_by('description').filter(
+                orgunit__name__isnull=False
+            ).extra(
+                select={'extraf':'1'}
+            ).filter(
+                pk=self.l1.pk
+            ).delete()
+        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
+        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
+
+    @skipUnlessDBFeature("update_can_self_select")
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_ticket_19102_distinct_on(self):
+        # Both Login objs should have same description so that only the one
+        # having smaller PK will be deleted.
+        Login.objects.update(description='description')
+        with self.assertNumQueries(1):
+            Login.objects.distinct('description').order_by('pk').filter(
+                orgunit__name__isnull=False
+            ).delete()
+        # Assumed that l1 which is created first has smaller PK.
+        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
+        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
+
+    @skipUnlessDBFeature("update_can_self_select")
+    def test_ticket_19102_select_related(self):
+        with self.assertNumQueries(1):
+            Login.objects.filter(
+                pk=self.l1.pk
+            ).filter(
+                orgunit__name__isnull=False
+            ).order_by(
+                'description'
+            ).select_related('orgunit').delete()
+        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
+        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
+    
+    @skipUnlessDBFeature("update_can_self_select")
+    def test_ticket_19102_defer(self):
+        with self.assertNumQueries(1):
+            Login.objects.filter(
+                pk=self.l1.pk
+            ).filter(
+                orgunit__name__isnull=False
+            ).order_by(
+                'description'
+            ).only('id').delete()
+        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
+        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
+

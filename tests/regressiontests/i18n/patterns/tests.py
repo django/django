@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 
 from django.core.exceptions import ImproperlyConfigured
@@ -5,16 +7,17 @@ from django.core.urlresolvers import reverse, clear_url_caches
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.template import Template, Context
+from django.utils._os import upath
 from django.utils import translation
 
 
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=(
-        os.path.join(os.path.dirname(__file__), 'locale'),
+        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
     ),
     TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
     LANGUAGE_CODE='en',
     LANGUAGES=(
@@ -247,7 +250,7 @@ class URLTagTests(URLTestCaseBase):
             {% language 'nl' %}{% url 'no-prefix-translated' %}{% endlanguage %}
             {% language 'pt-br' %}{% url 'no-prefix-translated' %}{% endlanguage %}""")
         self.assertEqual(t.render(Context({})).strip().split(),
-                         [u'/vertaald/', u'/traduzidos/'])
+                         ['/vertaald/', '/traduzidos/'])
 
     def test_context(self):
         ctx = Context({'lang1':'nl', 'lang2':'pt-br'})
@@ -255,18 +258,18 @@ class URLTagTests(URLTestCaseBase):
             {% language lang1 %}{% url 'no-prefix-translated' %}{% endlanguage %}
             {% language lang2 %}{% url 'no-prefix-translated' %}{% endlanguage %}""")
         self.assertEqual(tpl.render(ctx).strip().split(),
-                         [u'/vertaald/', u'/traduzidos/'])
+                         ['/vertaald/', '/traduzidos/'])
 
     def test_args(self):
         tpl = Template("""{% load i18n %}
             {% language 'nl' %}{% url 'no-prefix-translated-slug' 'apo' %}{% endlanguage %}
             {% language 'pt-br' %}{% url 'no-prefix-translated-slug' 'apo' %}{% endlanguage %}""")
         self.assertEqual(tpl.render(Context({})).strip().split(),
-                         [u'/vertaald/apo/', u'/traduzidos/apo/'])
+                         ['/vertaald/apo/', '/traduzidos/apo/'])
 
     def test_kwargs(self):
         tpl = Template("""{% load i18n %}
             {% language 'nl'  %}{% url 'no-prefix-translated-slug' slug='apo' %}{% endlanguage %}
             {% language 'pt-br' %}{% url 'no-prefix-translated-slug' slug='apo' %}{% endlanguage %}""")
         self.assertEqual(tpl.render(Context({})).strip().split(),
-                         [u'/vertaald/apo/', u'/traduzidos/apo/'])
+                         ['/vertaald/apo/', '/traduzidos/apo/'])

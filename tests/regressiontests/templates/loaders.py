@@ -12,13 +12,14 @@ if __name__ == '__main__':
 import sys
 import pkg_resources
 import imp
-import StringIO
 import os.path
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.utils import unittest
+from django.utils import unittest, six
+from django.utils._os import upath
+from django.utils.six import StringIO
 
 
 # Mock classes and objects for pkg_resources functions.
@@ -30,7 +31,7 @@ class MockProvider(pkg_resources.NullProvider):
     def _has(self, path):
         return path in self.module._resources
 
-    def _isdir(self,path):
+    def _isdir(self, path):
         return False
 
     def get_resource_stream(self, manager, resource_name):
@@ -61,8 +62,8 @@ class EggLoaderTest(unittest.TestCase):
 
         self.empty_egg = create_egg("egg_empty", {})
         self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
+            os.path.normcase('templates/x.txt'): StringIO("x"),
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
@@ -111,9 +112,9 @@ class CachedLoader(unittest.TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
         # Retrive a template specifying a template directory to check
-        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'first'),))
+        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
-        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'second'),))
+        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
@@ -123,7 +124,7 @@ class RenderToStringTest(unittest.TestCase):
     def setUp(self):
         self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(__file__), 'templates'),
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
         )
 
     def tearDown(self):
@@ -144,12 +145,12 @@ class RenderToStringTest(unittest.TestCase):
         self.assertEqual(context['obj'], 'before')
 
     def test_empty_list(self):
-        self.assertRaisesRegexp(TemplateDoesNotExist,
+        six.assertRaisesRegex(self, TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.render_to_string, [])
 
 
     def test_select_templates_from_empty_list(self):
-        self.assertRaisesRegexp(TemplateDoesNotExist,
+        six.assertRaisesRegex(self, TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.select_template, [])

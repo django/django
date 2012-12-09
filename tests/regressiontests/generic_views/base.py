@@ -69,7 +69,7 @@ class ViewTest(unittest.TestCase):
 
     def _assert_simple(self, response):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'This is a simple view')
+        self.assertEqual(response.content, b'This is a simple view')
 
     def test_no_init_kwargs(self):
         """
@@ -173,6 +173,60 @@ class ViewTest(unittest.TestCase):
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
+    def test_options(self):
+        """
+        Test that views respond to HTTP OPTIONS requests with an Allow header
+        appropriate for the methods implemented by the view class.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response['Allow'])
+
+    def test_options_for_get_view(self):
+        """
+        Test that a view implementing GET allows GET and HEAD.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD')
+
+    def test_options_for_get_and_post_view(self):
+        """
+        Test that a view implementing GET and POST allows GET, HEAD, and POST.
+        """
+        request = self.rf.options('/')
+        view = SimplePostView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD', 'POST')
+
+    def test_options_for_post_view(self):
+        """
+        Test that a view implementing POST allows POST.
+        """
+        request = self.rf.options('/')
+        view = PostOnlyView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'POST')
+
+    def _assert_allows(self, response, *expected_methods):
+        "Assert allowed HTTP methods reported in the Allow response header"
+        response_allows = set(response['Allow'].split(', '))
+        self.assertEqual(set(expected_methods + ('OPTIONS',)), response_allows)
+
+    def test_args_kwargs_request_on_self(self):
+        """
+        Test a view only has args, kwargs & request once `as_view`
+        has been called.
+        """
+        bare_view = InstanceView()
+        view = InstanceView.as_view()(self.rf.get('/'))
+        for attribute in ('args', 'kwargs', 'request'):
+            self.assertNotIn(attribute, dir(bare_view))
+            self.assertIn(attribute, dir(view))
+
 
 class TemplateViewTest(TestCase):
     urls = 'regressiontests.generic_views.urls'
@@ -223,7 +277,8 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/simple/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_extra_template_params(self):
         """
@@ -231,8 +286,9 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/custom/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
         self.assertEqual(response.context['key'], 'value')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_cached_views(self):
         """

@@ -10,6 +10,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
 from django.db.utils import DatabaseError
+from django.utils import six
 
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
@@ -102,11 +103,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             self.geom_func_prefix = prefix
             self.spatial_version = version
         except DatabaseError:
-            raise ImproperlyConfigured('Cannot determine PostGIS version for database "%s". '
-                                       'GeoDjango requires at least PostGIS version 1.3. '
-                                       'Was the database created from a spatial database '
-                                       'template?' % self.connection.settings_dict['NAME']
-                                       )
+            raise ImproperlyConfigured(
+                'Cannot determine PostGIS version for database "%s". '
+                'GeoDjango requires at least PostGIS version 1.3. '
+                'Was the database created from a spatial database '
+                'template?' % self.connection.settings_dict['NAME']
+                )
         # TODO: Raise helpful exceptions as they become known.
 
         # PostGIS-specific operators. The commented descriptions of these
@@ -161,11 +163,13 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'overlaps' : PostGISFunction(prefix, 'Overlaps'),
             'contains' : PostGISFunction(prefix, 'Contains'),
             'intersects' : PostGISFunction(prefix, 'Intersects'),
-            'relate' : (PostGISRelate, basestring),
-            }
+            'relate' : (PostGISRelate, six.string_types),
+            'coveredby' : PostGISFunction(prefix, 'CoveredBy'),
+            'covers' : PostGISFunction(prefix, 'Covers'),
+        }
 
         # Valid distance types and substitutions
-        dtypes = (Decimal, Distance, float, int, long)
+        dtypes = (Decimal, Distance, float) + six.integer_types
         def get_dist_ops(operator):
             "Returns operations for both regular and spherical distances."
             return {'cartesian' : PostGISDistance(prefix, operator),
@@ -177,32 +181,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'distance_gte' : (get_dist_ops('>='), dtypes),
             'distance_lt' : (get_dist_ops('<'), dtypes),
             'distance_lte' : (get_dist_ops('<='), dtypes),
-            }
-
-        # Versions 1.2.2+ have KML serialization support.
-        if version < (1, 2, 2):
-            ASKML = False
-        else:
-            ASKML = 'ST_AsKML'
-            self.geometry_functions.update(
-                {'coveredby' : PostGISFunction(prefix, 'CoveredBy'),
-                 'covers' : PostGISFunction(prefix, 'Covers'),
-                 })
-            self.distance_functions['dwithin'] = (PostGISFunctionParam(prefix, 'DWithin'), dtypes)
+            'dwithin' : (PostGISFunctionParam(prefix, 'DWithin'), dtypes)
+        }
 
         # Adding the distance functions to the geometries lookup.
         self.geometry_functions.update(self.distance_functions)
-
-        # The union aggregate and topology operation use the same signature
-        # in versions 1.3+.
-        if version < (1, 3, 0):
-            UNIONAGG = 'GeomUnion'
-            UNION = 'Union'
-            MAKELINE = False
-        else:
-            UNIONAGG = 'ST_Union'
-            UNION = 'ST_Union'
-            MAKELINE = 'ST_MakeLine'
 
         # Only PostGIS versions 1.3.4+ have GeoJSON serialization support.
         if version < (1, 3, 4):
@@ -233,10 +216,14 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 'bboverlaps' : PostGISOperator('&&'),
                 }
 
+        # Native geometry type support added in PostGIS 2.0.
+        if version >= (2, 0, 0):
+            self.geometry = True
+
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         gis_terms = ['isnull']
-        gis_terms += self.geometry_operators.keys()
-        gis_terms += self.geometry_functions.keys()
+        gis_terms += list(self.geometry_operators)
+        gis_terms += list(self.geometry_functions)
         self.gis_terms = dict([(term, None) for term in gis_terms])
 
         self.area = prefix + 'Area'
@@ -249,22 +236,19 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.distance_spheroid = prefix + 'distance_spheroid'
         self.envelope = prefix + 'Envelope'
         self.extent = prefix + 'Extent'
-        self.extent3d = prefix + 'Extent3D'
         self.force_rhr = prefix + 'ForceRHR'
         self.geohash = GEOHASH
         self.geojson = GEOJSON
         self.gml = prefix + 'AsGML'
         self.intersection = prefix + 'Intersection'
-        self.kml = ASKML
+        self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
-        self.length3d = prefix + 'Length3D'
         self.length_spheroid = prefix + 'length_spheroid'
-        self.makeline = MAKELINE
+        self.makeline = prefix + 'MakeLine'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points =prefix + 'npoints'
         self.perimeter = prefix + 'Perimeter'
-        self.perimeter3d = prefix + 'Perimeter3D'
         self.point_on_surface = prefix + 'PointOnSurface'
         self.polygonize = prefix + 'Polygonize'
         self.reverse = prefix + 'Reverse'
@@ -274,8 +258,17 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.sym_difference = prefix + 'SymDifference'
         self.transform = prefix + 'Transform'
         self.translate = prefix + 'Translate'
-        self.union = UNION
-        self.unionagg = UNIONAGG
+        self.union = prefix + 'Union'
+        self.unionagg = prefix + 'Union'
+
+        if version >= (2, 0, 0):
+            self.extent3d = prefix + '3DExtent'
+            self.length3d = prefix + '3DLength'
+            self.perimeter3d = prefix + '3DPerimeter'
+        else:
+            self.extent3d = prefix + 'Extent3D'
+            self.length3d = prefix + 'Length3D'
+            self.perimeter3d = prefix + 'Perimeter3D'
 
     def check_aggregate_support(self, aggregate):
         """
@@ -332,6 +325,14 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                                           'only with an SRID of 4326.')
 
             return 'geography(%s,%d)'% (f.geom_type, f.srid)
+        elif self.geometry:
+            # Postgis 2.0 supports type-based geometries.
+            # TODO: Support 'M' extension.
+            if f.dim == 3:
+                geom_type = f.geom_type + 'Z'
+            else:
+                geom_type = f.geom_type
+            return 'geometry(%s,%d)' % (geom_type, f.srid)
         else:
             return None
 
@@ -393,7 +394,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            placeholder = placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            placeholder = placeholder % self.get_expression_column(value)
 
         return placeholder
 

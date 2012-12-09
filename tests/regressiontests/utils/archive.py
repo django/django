@@ -4,9 +4,10 @@ import tempfile
 from django.utils import unittest
 
 from django.utils.archive import Archive, extract
+from django.utils._os import upath
 
 
-TEST_DIR = os.path.join(os.path.dirname(__file__), 'archives')
+TEST_DIR = os.path.join(os.path.dirname(upath(__file__)), 'archives')
 
 
 class ArchiveTester(object):
@@ -27,12 +28,14 @@ class ArchiveTester(object):
         os.chdir(self.old_cwd)
 
     def test_extract_method(self):
-        Archive(self.archive).extract(self.tmpdir)
+        with Archive(self.archive) as archive:
+            archive.extract(self.tmpdir)
         self.check_files(self.tmpdir)
 
     def test_extract_method_no_to_path(self):
         os.chdir(self.tmpdir)
-        Archive(self.archive_path).extract()
+        with Archive(self.archive_path) as archive:
+            archive.extract()
         self.check_files(self.tmpdir)
 
     def test_extract_function(self):

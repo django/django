@@ -90,9 +90,6 @@ Model field                      Form field
 
 ``NullBooleanField``             ``CharField``
 
-``PhoneNumberField``             ``USPhoneNumberField``
-                                 (from ``django.contrib.localflavor.us``)
-
 ``PositiveIntegerField``         ``IntegerField``
 
 ``PositiveSmallIntegerField``    ``IntegerField``
@@ -108,9 +105,6 @@ Model field                      Form field
 
 ``URLField``                     ``URLField``
 ===============================  ========================================
-
-.. versionadded:: 1.2
-    The ``BigIntegerField`` is new in Django 1.2.
 
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
@@ -195,14 +189,19 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
+.. _modelform-is-valid-and-errors:
+
 The ``is_valid()`` method and ``errors``
 ----------------------------------------
 
 The first time you call ``is_valid()`` or access the ``errors`` attribute of a
-``ModelForm`` triggers form validation as well as :ref:`model validation
-<validating-objects>`. This has the side-effect of cleaning the model you pass
-to the ``ModelForm`` constructor. For instance, calling ``is_valid()`` on your
-form will convert any date fields on your model to actual date objects.
+``ModelForm`` triggers :ref:`form validation <form-and-field-validation>` as
+well as :ref:`model validation <validating-objects>`. This has the side-effect
+of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
+calling ``is_valid()`` on your form will convert any date fields on your model
+to actual date objects. If form validation fails, only some of the updates
+may be applied. For this reason, you'll probably want to avoid reusing the
+model instance passed to the form, especially if validation fails.
 
 
 The ``save()`` method
@@ -213,7 +212,9 @@ method. This method creates and saves a database object from the data
 bound to the form. A subclass of ``ModelForm`` can accept an existing
 model instance as the keyword argument ``instance``; if this is
 supplied, ``save()`` will update that instance. If it's not supplied,
-``save()`` will create a new instance of the specified model::
+``save()`` will create a new instance of the specified model:
+
+.. code-block:: python
 
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
@@ -232,8 +233,10 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     >>> f = ArticleForm(request.POST, instance=a)
     >>> f.save()
 
-Note that ``save()`` will raise a ``ValueError`` if the data in the form
-doesn't validate -- i.e., if form.errors evaluates to True.
+Note that if the form :ref:`hasn't been validated
+<modelform-is-valid-and-errors>`, calling ``save()`` will do so by checking
+``form.errors``. A ``ValueError`` will be raised if the data in the form
+doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with
@@ -311,18 +314,18 @@ model fields:
    to exclude from the form.
 
 For example, if you want a form for the ``Author`` model (defined
-above) that includes only the ``name`` and ``title`` fields, you would
+above) that includes only the ``name`` and ``birth_date`` fields, you would
 specify ``fields`` or ``exclude`` like this::
 
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ('name', 'title')
+            fields = ('name', 'birth_date')
 
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
-            exclude = ('birth_date',)
+            exclude = ('title',)
 
 Since the Author model has only 3 fields, 'name', 'title', and
 'birth_date', the forms above will contain exactly the same fields.
@@ -361,9 +364,6 @@ Since the Author model has only 3 fields, 'name', 'title', and
 
 Overriding the default field types or widgets
 ---------------------------------------------
-
-.. versionadded:: 1.2
-    The ``widgets`` attribute is new in Django 1.2.
 
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
@@ -441,6 +441,10 @@ parameter when declaring the form field::
 
             class Meta:
                 model = Article
+
+    You must ensure that the type of the form field can be used to set the
+    contents of the corresponding model field. When they are not compatible,
+    you will get a ``ValueError`` as no implicit conversion takes place.
 
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
@@ -670,8 +674,6 @@ are saved properly.
 Limiting the number of editable objects
 ---------------------------------------
 
-.. versionchanged:: 1.2
-
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
 to ``modelformset_factory`` to limit the number of extra forms displayed.
 
@@ -697,8 +699,6 @@ so long as the total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
-
-.. versionchanged:: 1.2
 
 A ``max_num`` value of ``None`` (the default) puts no limit on the number of
 forms displayed.
@@ -886,7 +886,8 @@ of a model. Here's how you can do that::
             formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
             if formset.is_valid():
                 formset.save()
-                # Do something.
+                # Do something. Should generally end with a redirect. For example:
+                return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
         return render_to_response("manage_books.html", {

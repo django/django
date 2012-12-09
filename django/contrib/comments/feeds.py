@@ -1,30 +1,27 @@
-from django.conf import settings
 from django.contrib.syndication.views import Feed
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import get_current_site
 from django.contrib import comments
 from django.utils.translation import ugettext as _
 
 class LatestCommentFeed(Feed):
     """Feed of latest comments on the current site."""
 
+    def __call__(self, request, *args, **kwargs):
+        self.site = get_current_site(request)
+        return super(LatestCommentFeed, self).__call__(request, *args, **kwargs)
+
     def title(self):
-        if not hasattr(self, '_site'):
-            self._site = Site.objects.get_current()
-        return _("%(site_name)s comments") % dict(site_name=self._site.name)
+        return _("%(site_name)s comments") % dict(site_name=self.site.name)
 
     def link(self):
-        if not hasattr(self, '_site'):
-            self._site = Site.objects.get_current()
-        return "http://%s/" % (self._site.domain)
+        return "http://%s/" % (self.site.domain)
 
     def description(self):
-        if not hasattr(self, '_site'):
-            self._site = Site.objects.get_current()
-        return _("Latest comments on %(site_name)s") % dict(site_name=self._site.name)
+        return _("Latest comments on %(site_name)s") % dict(site_name=self.site.name)
 
     def items(self):
         qs = comments.get_model().objects.filter(
-            site__pk = settings.SITE_ID,
+            site__pk = self.site.pk,
             is_public = True,
             is_removed = False,
         )

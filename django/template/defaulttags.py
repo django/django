@@ -1,4 +1,5 @@
 """Default tags used by the template system, available to all templates."""
+from __future__ import unicode_literals
 
 import sys
 import re
@@ -6,15 +7,17 @@ from datetime import datetime
 from itertools import groupby, cycle as itertools_cycle
 
 from django.conf import settings
-from django.template.base import (Node, NodeList, Template, Library,
+from django.template.base import (Node, NodeList, Template, Context, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
     VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
+from django.utils import six
 from django.utils import timezone
 
 register = Library()
@@ -43,9 +46,9 @@ class CsrfTokenNode(Node):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
-                return mark_safe(u"")
+                return format_html("")
             else:
-                return mark_safe(u"<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % csrf_token)
+                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -53,7 +56,7 @@ class CsrfTokenNode(Node):
             if settings.DEBUG:
                 import warnings
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
-            return u''
+            return ''
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None, silent=False):
@@ -101,8 +104,8 @@ class FirstOfNode(Node):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return smart_unicode(value)
-        return u''
+                return smart_text(value)
+        return ''
 
 class ForNode(Node):
     child_nodelists = ('nodelist_loop', 'nodelist_empty')
@@ -390,15 +393,19 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_str(k, 'ascii'), v.resolve(context))
+        kwargs = dict([(smart_text(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
 
         view_name = self.view_name.resolve(context)
 
+        if not view_name:
+            raise NoReverseMatch("'url' requires a non-empty first argument. "
+                "The syntax changed in Django 1.5, see the docs.")
+
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which cause return nothing.
+        # {% url ... as var %} construct in which case return nothing.
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
@@ -425,6 +432,13 @@ class URLNode(Node):
         else:
             return url
 
+class VerbatimNode(Node):
+    def __init__(self, content):
+        self.content = content
+
+    def render(self, context):
+        return self.content
+
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
         self.val_expr = val_expr
@@ -438,7 +452,7 @@ class WidthRatioNode(Node):
             max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ''
-        except ValueError:
+        except (ValueError, TypeError):
             raise TemplateSyntaxError("widthratio final argument must be an number")
         try:
             value = float(value)
@@ -446,7 +460,7 @@ class WidthRatioNode(Node):
             ratio = (value / max_value) * max_width
         except ZeroDivisionError:
             return '0'
-        except ValueError:
+        except (ValueError, TypeError):
             return ''
         return str(int(round(ratio)))
 
@@ -464,7 +478,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
-                       self.extra_context.iteritems()])
+                       six.iteritems(self.extra_context)])
         context.update(values)
         output = self.nodelist.render(context)
         context.pop()
@@ -479,7 +493,7 @@ def autoescape(parser, token):
     if len(args) != 2:
         raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
     arg = args[1]
-    if arg not in (u'on', u'off'):
+    if arg not in ('on', 'off'):
         raise TemplateSyntaxError("'autoescape' argument should be 'on' or 'off'")
     nodelist = parser.parse(('endautoescape',))
     parser.delete_first_token()
@@ -521,11 +535,9 @@ def cycle(parser, token):
     The optional flag "silent" can be used to prevent the cycle declaration
     from returning any value::
 
-        {% cycle 'row1' 'row2' as rowcolors silent %}{# no value here #}
         {% for o in some_list %}
-            <tr class="{% cycle rowcolors %}">{# first value will be "row1" #}
-                ...
-            </tr>
+            {% cycle 'row1' 'row2' as rowcolors silent %}
+            <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
         {% endfor %}
 
     """
@@ -1179,7 +1191,7 @@ def templatetag(parser, token):
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError("Invalid templatetag argument: '%s'."
                                   " Must be one of: %s" %
-                                  (tag, TemplateTagNode.mapping.keys()))
+                                  (tag, list(TemplateTagNode.mapping)))
     return TemplateTagNode(tag)
 
 @register.tag
@@ -1271,6 +1283,28 @@ def url(parser, token):
                 args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar)
+
+@register.tag
+def verbatim(parser, token):
+    """
+    Stops the template engine from rendering the contents of this block tag.
+
+    Usage::
+
+        {% verbatim %}
+            {% don't process this %}
+        {% endverbatim %}
+
+    You can also designate a specific closing tag block (allowing the
+    unrendered use of ``{% endverbatim %}``)::
+
+        {% verbatim myblock %}
+            ...
+        {% endverbatim myblock %}
+    """
+    nodelist = parser.parse(('endverbatim',))
+    parser.delete_first_token()
+    return VerbatimNode(nodelist.render(Context()))
 
 @register.tag
 def widthratio(parser, token):

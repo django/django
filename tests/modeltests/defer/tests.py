@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from django.db.models.query_utils import DeferredAttribute
+from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
 from .models import Secondary, Primary, Child, BigChild, ChildProxy
@@ -73,9 +73,19 @@ class DeferTests(TestCase):
         self.assert_delayed(qs.defer("name").get(pk=p1.pk), 1)
         self.assert_delayed(qs.only("name").get(pk=p1.pk), 2)
 
-        # DOES THIS WORK?
-        self.assert_delayed(qs.only("name").select_related("related")[0], 1)
-        self.assert_delayed(qs.defer("related").select_related("related")[0], 0)
+        # When we defer a field and also select_related it, the query is
+        # invalid and raises an exception.
+        with self.assertRaises(InvalidQuery):
+            qs.only("name").select_related("related")[0]
+        with self.assertRaises(InvalidQuery):
+            qs.defer("related").select_related("related")[0]
+
+        # With a depth-based select_related, all deferred ForeignKeys are
+        # deferred instead of traversed.
+        with self.assertNumQueries(3):
+            obj = qs.defer("related").select_related()[0]
+            self.assert_delayed(obj, 1)
+            self.assertEqual(obj.related.id, s1.pk)
 
         # Saving models with deferred fields is possible (but inefficient,
         # since every field has to be retrieved first).
@@ -155,6 +165,21 @@ class DeferTests(TestCase):
         children = ChildProxy.objects.all().select_related().only('id', 'name')
         self.assertEqual(len(children), 1)
         child = children[0]
-        self.assert_delayed(child, 1)
+        self.assert_delayed(child, 2)
         self.assertEqual(child.name, 'p1')
         self.assertEqual(child.value, 'xx')
+
+    def test_defer_inheritance_pk_chaining(self):
+        """
+        When an inherited model is fetched from the DB, its PK is also fetched.
+        When getting the PK of the parent model it is useful to use the already
+        fetched parent model PK if it happens to be available. Tests that this
+        is done.
+        """
+        s1 = Secondary.objects.create(first="x1", second="y1")
+        bc = BigChild.objects.create(name="b1", value="foo", related=s1,
+                                     other="bar")
+        bc_deferred = BigChild.objects.only('name').get(pk=bc.pk)
+        with self.assertNumQueries(0):
+            bc_deferred.id
+        self.assertEqual(bc_deferred.pk, bc_deferred.id)

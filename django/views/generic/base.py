@@ -1,11 +1,15 @@
+from __future__ import unicode_literals
+
+import logging
 from functools import update_wrapper
+
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
-from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod
+from django.utils import six
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 class ContextMixin(object):
@@ -15,6 +19,8 @@ class ContextMixin(object):
     """
 
     def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
         return kwargs
 
 
@@ -33,7 +39,7 @@ class View(object):
         """
         # Go through keyword arguments, and either save their values to our
         # instance, or raise an error.
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             setattr(self, key, value)
 
     @classonlymethod
@@ -44,17 +50,21 @@ class View(object):
         # sanitize keyword arguments
         for key in initkwargs:
             if key in cls.http_method_names:
-                raise TypeError(u"You tried to pass in the %s method name as a "
-                                u"keyword argument to %s(). Don't do that."
+                raise TypeError("You tried to pass in the %s method name as a "
+                                "keyword argument to %s(). Don't do that."
                                 % (key, cls.__name__))
             if not hasattr(cls, key):
-                raise TypeError(u"%s() received an invalid keyword %r" % (
-                    cls.__name__, key))
+                raise TypeError("%s() received an invalid keyword %r. as_view "
+                                "only accepts arguments that are already "
+                                "attributes of the class." % (cls.__name__, key))
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
             if hasattr(self, 'get') and not hasattr(self, 'head'):
                 self.head = self.get
+            self.request = request
+            self.args = args
+            self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -73,20 +83,28 @@ class View(object):
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
             handler = self.http_method_not_allowed
-        self.request = request
-        self.args = args
-        self.kwargs = kwargs
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
         logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
             }
         )
-        return http.HttpResponseNotAllowed(allowed_methods)
+        return http.HttpResponseNotAllowed(self._allowed_methods())
+
+    def options(self, request, *args, **kwargs):
+        """
+        Handles responding to requests for the OPTIONS HTTP verb.
+        """
+        response = http.HttpResponse()
+        response['Allow'] = ', '.join(self._allowed_methods())
+        response['Content-Length'] = '0'
+        return response
+
+    def _allowed_methods(self):
+        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
 
 class TemplateResponseMixin(object):
@@ -98,7 +116,11 @@ class TemplateResponseMixin(object):
 
     def render_to_response(self, context, **response_kwargs):
         """
-        Returns a response with a template rendered with the given context.
+        Returns a response, using the `response_class` for this
+        view, with a template rendered with the given context.
+
+        If any keyword arguments are provided, they will be
+        passed to the constructor of the response class.
         """
         return self.response_class(
             request = self.request,
@@ -122,11 +144,11 @@ class TemplateResponseMixin(object):
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.  This view is different from all the others
-    insofar as it also passes ``kwargs`` as ``params`` to the template context.
+    A view that renders a template.  This view will also pass into the context
+    any keyword arguments passed by the url conf.
     """
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(params=kwargs)
+        context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
 

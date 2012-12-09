@@ -2,7 +2,7 @@
 ID-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 import time
@@ -11,7 +11,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 
 postcode_re = re.compile(r'^[1-9]\d{4}$')
@@ -34,7 +34,7 @@ class IDPostCodeField(Field):
     def clean(self, value):
         super(IDPostCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
         if not postcode_re.search(value):
@@ -47,7 +47,7 @@ class IDPostCodeField(Field):
         if value[0] == '1' and value[4] != '0':
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s' % (value, )
+        return '%s' % (value, )
 
 
 class IDProvinceSelect(Select):
@@ -75,12 +75,12 @@ class IDPhoneNumberField(Field):
     def clean(self, value):
         super(IDPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
-        phone_number = re.sub(r'[\-\s\(\)]', '', smart_unicode(value))
+        phone_number = re.sub(r'[\-\s\(\)]', '', smart_text(value))
 
         if phone_re.search(phone_number):
-            return smart_unicode(value)
+            return smart_text(value)
 
         raise ValidationError(self.error_messages['invalid'])
 
@@ -117,10 +117,10 @@ class IDLicensePlateField(Field):
         from django.contrib.localflavor.id.id_choices import LICENSE_PLATE_PREFIX_CHOICES
         super(IDLicensePlateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         plate_number = re.sub(r'\s+', ' ',
-            smart_unicode(value.strip())).upper()
+            smart_text(value.strip())).upper()
 
         matches = plate_re.search(plate_number)
         if matches is None:
@@ -179,9 +179,9 @@ class IDNationalIdentityNumberField(Field):
     def clean(self, value):
         super(IDNationalIdentityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
-        value = re.sub(r'[\s.]', '', smart_unicode(value))
+        value = re.sub(r'[\s.]', '', smart_text(value))
 
         if not nik_re.search(value):
             raise ValidationError(self.error_messages['invalid'])

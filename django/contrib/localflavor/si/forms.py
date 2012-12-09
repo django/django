@@ -2,7 +2,7 @@
 Slovenian specific form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import re
@@ -21,16 +21,16 @@ class SIEMSOField(CharField):
     """
 
     default_error_messages = {
-        'invalid': _(u'This field should contain exactly 13 digits.'),
-        'date': _(u'The first 7 digits of the EMSO must represent a valid past date.'),
-        'checksum': _(u'The EMSO is not valid.'),
+        'invalid': _('This field should contain exactly 13 digits.'),
+        'date': _('The first 7 digits of the EMSO must represent a valid past date.'),
+        'checksum': _('The EMSO is not valid.'),
     }
     emso_regex = re.compile('^(\d{2})(\d{2})(\d{3})(\d{2})(\d{3})(\d)$')
 
     def clean(self, value):
         super(SIEMSOField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
 
@@ -41,7 +41,7 @@ class SIEMSOField(CharField):
         # Validate EMSO
         s = 0
         int_values = [int(i) for i in value]
-        for a, b in zip(int_values, range(7, 1, -1) * 2):
+        for a, b in zip(int_values, list(range(7, 1, -1)) * 2):
             s += a * b
         chk = s % 11
         if chk == 0:
@@ -83,14 +83,14 @@ class SITaxNumberField(CharField):
     """
 
     default_error_messages = {
-        'invalid': _(u'Enter a valid tax number in form SIXXXXXXXX'),
+        'invalid': _('Enter a valid tax number in form SIXXXXXXXX'),
     }
     sitax_regex = re.compile('^(?:SI)?([1-9]\d{7})$')
 
     def clean(self, value):
         super(SITaxNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
 
@@ -148,14 +148,14 @@ class SIPhoneNumberField(CharField):
     """
 
     default_error_messages = {
-        'invalid': _(u'Enter phone number in form +386XXXXXXXX or 0XXXXXXXX.'),
+        'invalid': _('Enter phone number in form +386XXXXXXXX or 0XXXXXXXX.'),
     }
     phone_regex = re.compile('^(?:(?:00|\+)386|0)(\d{7,8})$')
 
     def clean(self, value):
         super(SIPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.replace(' ', '').replace('-', '').replace('/', '')
         m = self.phone_regex.match(value)

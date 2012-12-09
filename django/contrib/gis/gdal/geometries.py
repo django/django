@@ -40,15 +40,17 @@
 """
 # Python library requisites.
 import sys
-from binascii import a2b_hex
+from binascii import a2b_hex, b2a_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
+
+from django.contrib.gis import memoryview
 
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GEOJSON, GDAL_VERSION
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # Getting the ctypes prototype functions that interface w/the GDAL C library.
@@ -56,6 +58,9 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 
 # For recognizing geometry input.
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
+
+from django.utils import six
+from django.utils.six.moves import xrange
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -69,20 +74,15 @@ class OGRGeometry(GDALBase):
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        str_instance = isinstance(geom_input, basestring)
+        str_instance = isinstance(geom_input, six.string_types)
 
         # If HEX, unpack input to to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = buffer(a2b_hex(geom_input.upper()))
+            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
 
         # Constructing the geometry,
         if str_instance:
-            # Checking if unicode
-            if isinstance(geom_input, unicode):
-                # Encoding to ASCII, WKT or HEX doesn't need any more.
-                geom_input = geom_input.encode('ascii')
-
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
@@ -93,22 +93,19 @@ class OGRGeometry(GDALBase):
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See http://trac.osgeo.org/gdal/ticket/1992.
                     g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt'))))
+                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt').encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt'))), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
             elif json_m:
-                if GEOJSON:
-                    g = capi.from_json(geom_input)
-                else:
-                    raise NotImplementedError('GeoJSON input only supported on GDAL 1.5+.')
+                g = capi.from_json(geom_input.encode())
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
                 ogr_t = OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, buffer):
+        elif isinstance(geom_input, memoryview):
             # WKB was passed in
-            g = capi.from_wkb(str(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
@@ -141,7 +138,7 @@ class OGRGeometry(GDALBase):
             srs = srs.wkt
         else:
             srs = None
-        return str(self.wkb), srs
+        return bytes(self.wkb), srs
 
     def __setstate__(self, state):
         wkb, srs = state
@@ -284,7 +281,7 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, (int, long, basestring)):
+        elif isinstance(srs, six.integer_types + six.string_types):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
         else:
@@ -300,7 +297,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, (int, long)):
+        if isinstance(srid, six.integer_types):
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -322,28 +319,20 @@ class OGRGeometry(GDALBase):
     @property
     def hex(self):
         "Returns the hexadecimal representation of the WKB (a string)."
-        return str(self.wkb).encode('hex').upper()
-        #return b2a_hex(self.wkb).upper()
+        return b2a_hex(self.wkb).upper()
 
     @property
     def json(self):
         """
-        Returns the GeoJSON representation of this Geometry (requires
-        GDAL 1.5+).
+        Returns the GeoJSON representation of this Geometry.
         """
-        if GEOJSON:
-            return capi.to_json(self.ptr)
-        else:
-            raise NotImplementedError('GeoJSON output only supported on GDAL 1.5+.')
+        return capi.to_json(self.ptr)
     geojson = json
 
     @property
     def kml(self):
         "Returns the KML representation of the Geometry."
-        if GEOJSON:
-            return capi.to_kml(self.ptr, None)
-        else:
-            raise NotImplementedError('KML output only supported on GDAL 1.5+.')
+        return capi.to_kml(self.ptr, None)
 
     @property
     def wkb_size(self):
@@ -362,7 +351,7 @@ class OGRGeometry(GDALBase):
         buf = (c_ubyte * sz)()
         wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
-        return buffer(string_at(buf, sz))
+        return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
@@ -420,7 +409,7 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, (int, long, basestring)):
+        elif isinstance(coord_trans, six.integer_types + six.string_types):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
@@ -695,7 +684,7 @@ class GeometryCollection(OGRGeometry):
                 for g in geom: capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
-        elif isinstance(geom, basestring):
+        elif isinstance(geom, six.string_types):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:

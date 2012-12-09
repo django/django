@@ -2,13 +2,15 @@ from functools import update_wrapper
 
 from django.contrib import admin
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -26,7 +28,7 @@ class ActionAdmin(admin.ModelAdmin):
         Remove all entries named 'name' from the ModelAdmin instance URL
         patterns list
         """
-        return filter(lambda e: e.name != name, super(ActionAdmin, self).get_urls())
+        return [url for url in super(ActionAdmin, self).get_urls() if url.name != name]
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
@@ -48,3 +50,40 @@ class ActionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Action, ActionAdmin)
+
+
+class Person(models.Model):
+    nick = models.CharField(max_length=20)
+
+
+class PersonAdmin(admin.ModelAdmin):
+    """A custom ModelAdmin that customizes the deprecated post_url_continue
+    argument to response_add()"""
+    def response_add(self, request, obj, post_url_continue='../%s/continue/',
+                     continue_url=None, add_url=None, hasperm_url=None,
+                     noperm_url=None):
+        return super(PersonAdmin, self).response_add(request, obj,
+                                                     post_url_continue,
+                                                     continue_url, add_url,
+                                                     hasperm_url, noperm_url)
+
+
+admin.site.register(Person, PersonAdmin)
+
+
+class City(models.Model):
+    name = models.CharField(max_length=20)
+
+
+class CityAdmin(admin.ModelAdmin):
+    """A custom ModelAdmin that redirects to the changelist when the user
+    presses the 'Save and add another' button when adding a model instance."""
+    def response_add(self, request, obj,
+                     add_another_url='admin:admin_custom_urls_city_changelist',
+                     **kwargs):
+        return super(CityAdmin, self).response_add(request, obj,
+                                                   add_another_url=add_another_url,
+                                                   **kwargs)
+
+
+admin.site.register(City, CityAdmin)

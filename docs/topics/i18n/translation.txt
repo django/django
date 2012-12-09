@@ -37,6 +37,13 @@ from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
     controls if Django should implement format localization. See
     :doc:`/topics/i18n/formatting` for more details.
 
+.. note::
+
+    Make sure you've activated translation for your project (the fastest way is
+    to check if :setting:`MIDDLEWARE_CLASSES` includes
+    :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
+    see :ref:`how-django-discovers-language-preference`.
+
 Internationalization: in Python code
 ====================================
 
@@ -126,8 +133,6 @@ translations wouldn't be able to reorder placeholder text.
 
 Comments for translators
 ------------------------
-
-.. versionadded:: 1.3
 
 If you would like to give translators hints about a translatable string, you
 can add a comment prefixed with the ``Translators`` keyword on the line
@@ -248,8 +253,6 @@ cardinality of the elements at play.
 Contextual markers
 ------------------
 
-.. versionadded:: 1.3
-
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
@@ -317,10 +320,10 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
-        name = models.CharField(help_text=ugettext_lazy('This is the help text'))
+        name = models.CharField(help_text=_('This is the help text'))
 
 You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
 relationship as translatable by using their ``verbose_name`` options::
@@ -344,14 +347,14 @@ It is recommended to always provide explicit
 relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs bu looking at the model's class name::
 
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
-        name = models.CharField(_('name'), help_text=ugettext_lazy('This is the help text'))
+        name = models.CharField(_('name'), help_text=_('This is the help text'))
 
         class Meta:
-            verbose_name = ugettext_lazy('my thing')
-            verbose_name_plural = ugettext_lazy('my things')
+            verbose_name = _('my thing')
+            verbose_name_plural = _('my things')
 
 Model methods ``short_description`` attribute values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -416,20 +419,36 @@ result is included in a string. For example::
 
     from django.utils.translation import string_concat
     ...
-    name = ugettext_lazy(u'John Lennon')
-    instrument = ugettext_lazy(u'guitar')
+    name = ugettext_lazy('John Lennon')
+    instrument = ugettext_lazy('guitar')
     result = string_concat(name, ': ', instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to
 strings when ``result`` itself is used in a string (usually at template
 rendering time).
 
+Other uses of lazy in delayed translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For any other case where you would like to delay the translation, but have to
+pass the translatable string as argument to another function, you can wrap
+this function inside a lazy call yourself. For example::
+
+    from django.utils import six  # Python 3 compatibility
+    from django.utils.functional import lazy
+    from django.utils.safestring import mark_safe
+    from django.utils.translation import ugettext_lazy as _
+
+    mark_safe_lazy = lazy(mark_safe, six.text_type)
+
+And then later::
+
+    lazy_string = mark_safe_lazy(_("<p>My <strong>string!</strong></p>"))
+
 Localized names of languages
 ----------------------------
 
 .. function:: get_language_info
-
-.. versionadded:: 1.3
 
 The ``get_language_info()`` function provides detailed information about
 languages::
@@ -456,6 +475,9 @@ Internationalization: in template code
 Translations in :doc:`Django templates </topics/templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
+As with all template tags, this tag needs to be loaded in all templates which
+use translations, even those templates that extend from other templates which
+have already loaded the ``i18n`` tag.
 
 .. templatetag:: trans
 
@@ -525,9 +547,6 @@ using the ``context`` keyword:
 ``blocktrans`` template tag
 ---------------------------
 
-.. versionchanged:: 1.3
-   New keyword argument format.
-
 Contrarily to the :ttag:`trans` tag, the ``blocktrans`` tag allows you to mark
 complex sentences consisting of literals and variable content for translation
 by making use of placeholders::
@@ -596,7 +615,7 @@ apply.
 Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
 be retrieved (and stored) beforehand::
 
-    {% url path.to.view arg arg2 as the_url %}
+    {% url 'path.to.view' arg arg2 as the_url %}
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
@@ -653,8 +672,6 @@ string, so they don't need to be aware of translations.
     parsing code knows how to split up the arguments. For example, a German
     translator might translate the string ``"yes,no"`` as ``"ja,nein"``
     (keeping the comma intact).
-
-.. versionadded:: 1.3
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
@@ -777,10 +794,6 @@ directories listed in :setting:`LOCALE_PATHS` have the highest precedence with
 the ones appearing first having higher precedence than the ones appearing
 later.
 
-.. versionchanged:: 1.3
-    Directories listed in :setting:`LOCALE_PATHS` weren't included in the
-    lookup algorithm until version 1.3.
-
 Using the JavaScript translation catalog
 ----------------------------------------
 
@@ -790,7 +803,7 @@ To use the catalog, just pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
-    <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the standard
@@ -890,7 +903,7 @@ prepend the current active language code to all url patterns defined within
 
     urlpatterns += i18n_patterns('',
         url(r'^about/$', 'about.view', name='about'),
-        url(r'^news/$', include(news_patterns, namespace='news')),
+        url(r'^news/', include(news_patterns, namespace='news')),
     )
 
 
@@ -945,7 +958,7 @@ URL patterns can also be marked translatable using the
 
     urlpatterns += i18n_patterns('',
         url(_(r'^about/$'), 'about.view', name='about'),
-        url(_(r'^news/$'), include(news_patterns, namespace='news')),
+        url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
 
@@ -992,7 +1005,7 @@ template tag. It enables the given language in the enclosed template section:
     {% trans "View this category in:" %}
     {% for lang_code, lang_name in languages %}
         {% language lang_code %}
-        <a href="{% url category slug=category.slug %}">{{ lang_name }}</a>
+        <a href="{% url 'category' slug=category.slug %}">{{ lang_name }}</a>
         {% endlanguage %}
     {% endfor %}
 
@@ -1038,8 +1051,6 @@ Django comes with a tool, :djadmin:`django-admin.py makemessages
     The ``makemessages`` command (and ``compilemessages`` discussed later) use
     commands from the GNU gettext toolset: ``xgettext``, ``msgfmt``,
     ``msgmerge`` and ``msguniq``.
-
-    .. versionchanged:: 1.2
 
     The minimum version of the ``gettext`` utilities supported is 0.15.
 
@@ -1243,11 +1254,22 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
+Make sure that the following item is in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
+
+    'django.core.context_processors.i18n'
+
 Activate this view by adding the following line to your URLconf::
 
     (r'^i18n/', include('django.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
+
+.. warning::
+
+    Make sure that you don't include the above URL within
+    :func:`~django.conf.urls.i18n.i18n_patterns` - it needs to be
+    language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view
@@ -1268,7 +1290,7 @@ Here's example HTML template code:
 
 .. code-block:: html+django
 
-    <form action="/i18n/setlang/" method="post">
+    <form action="{% url 'set_language' %}" method="post">
     {% csrf_token %}
     <input name="next" type="hidden" value="{{ redirect_to }}" />
     <select name="language">

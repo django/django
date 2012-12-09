@@ -1,3 +1,7 @@
+try:
+    from urllib.parse import urlencode
+except ImportError:     # Python 2
+    from urllib import urlencode
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -8,7 +12,6 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import Context, Template
 from django.utils.decorators import method_decorator
-
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -58,7 +61,6 @@ def raw_post_view(request):
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
     if request.GET:
-        from urllib import urlencode
         query = '?' + urlencode(request.GET, True)
     else:
         query = ''

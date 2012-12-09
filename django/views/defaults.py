@@ -1,6 +1,6 @@
 from django import http
 from django.template import (Context, RequestContext,
-                             loader, TemplateDoesNotExist)
+                             loader, Template, TemplateDoesNotExist)
 from django.views.decorators.csrf import requires_csrf_token
 
 
@@ -12,13 +12,18 @@ def page_not_found(request, template_name='404.html'):
     """
     Default 404 handler.
 
-    Templates: `404.html`
+    Templates: :template:`404.html`
     Context:
         request_path
             The path of the requested URL (e.g., '/app/pages/bad_page/')
     """
-    t = loader.get_template(template_name) # You need to create a 404.html template.
-    return http.HttpResponseNotFound(t.render(RequestContext(request, {'request_path': request.path})))
+    try:
+        template = loader.get_template(template_name)
+    except TemplateDoesNotExist:
+        template = Template(
+            '<h1>Not Found</h1>'
+            '<p>The requested URL {{ request_path }} was not found on this server.</p>')
+    return http.HttpResponseNotFound(template.render(RequestContext(request, {'request_path': request.path})))
 
 
 @requires_csrf_token
@@ -26,11 +31,14 @@ def server_error(request, template_name='500.html'):
     """
     500 error handler.
 
-    Templates: `500.html`
+    Templates: :template:`500.html`
     Context: None
     """
-    t = loader.get_template(template_name) # You need to create a 500.html template.
-    return http.HttpResponseServerError(t.render(Context({})))
+    try:
+        template = loader.get_template(template_name)
+    except TemplateDoesNotExist:
+        return http.HttpResponseServerError('<h1>Server Error (500)</h1>')
+    return http.HttpResponseServerError(template.render(Context({})))
 
 
 # This can be called when CsrfViewMiddleware.process_view has not run,
@@ -41,7 +49,7 @@ def permission_denied(request, template_name='403.html'):
     """
     Permission denied (403) handler.
 
-    Templates: `403.html`
+    Templates: :template:`403.html`
     Context: None
 
     If the template does not exist, an Http403 response containing the text

@@ -11,12 +11,6 @@ Django includes a simple, yet customizable comments framework. The built-in
 comments framework can be used to attach comments to any model, so you can use
 it for comments on blog entries, photos, book chapters, or anything else.
 
-.. note::
-
-    If you used to use Django's older (undocumented) comments framework, you'll
-    need to upgrade. See the :doc:`upgrade guide </ref/contrib/comments/upgrade>`
-    for instructions.
-
 Quick start guide
 =================
 
@@ -130,8 +124,6 @@ details.
 Linking to comments
 -------------------
 
-.. versionadded:: 1.2
-
 To provide a permalink to a specific comment, use :ttag:`get_comment_permalink`::
 
     {% get_comment_permalink comment_obj [format_string] %}
@@ -160,10 +152,12 @@ For example::
 
 .. warning::
 
-    There's a known bug in Safari/Webkit which causes the named anchor to be
+    There's a `known bug`_ in Safari/Webkit which causes the named anchor to be
     forgotten following a redirect. The practical impact for comments is that
     the Safari/webkit browsers will arrive at the correct page but will not
     scroll to the named anchor.
+
+.. _`known bug`: https://bugs.webkit.org/show_bug.cgi?id=24175
 
 .. templatetag:: get_comment_count
 
@@ -209,7 +203,7 @@ default version of which is included with Django.
 Rendering a custom comment form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want more control over the look and feel of the comment form, you use use
+If you want more control over the look and feel of the comment form, you may use
 :ttag:`get_comment_form` to get a :doc:`form object </topics/forms/index>` that
 you can use in the template::
 
@@ -252,7 +246,57 @@ Redirecting after the comment post
 To specify the URL you want to redirect to after the comment has been posted,
 you can include a hidden form input called ``next`` in your comment form. For example::
 
-    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
+    <input type="hidden" name="next" value="{% url 'my_comment_was_posted' %}" />
+
+Providing a comment form for authenticated users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a user is already authenticated, it makes little sense to display the name,
+email, and URL fields, since these can already be retrieved from their login
+data and profile. In addition, some sites will only accept comments from
+authenticated users.
+
+To provide a comment form for authenticated users, you can manually provide the
+additional fields expected by the Django comments framework. For example,
+assuming comments are attached to the model "object"::
+
+    {% if user.is_authenticated %}
+        {% get_comment_form for object as form %}
+        <form action="{% comment_form_target %}" method="POST">
+        {% csrf_token %}
+        {{ form.comment }}
+        {{ form.honeypot }}
+        {{ form.content_type }}
+        {{ form.object_pk }}
+        {{ form.timestamp }}
+        {{ form.security_hash }}
+        <input type="hidden" name="next" value="{% url 'object_detail_view' object.id %}" />
+        <input type="submit" value="Add comment" id="id_submit" />
+        </form>
+    {% else %}
+        <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+    {% endif %}
+
+The honeypot, content_type, object_pk, timestamp, and security_hash fields are
+fields that would have been created automatically if you had simply used
+``{{ form }}`` in your template, and are referred to in `Notes on the comment
+form`_ below.
+
+Note that we do not need to specify the user to be associated with comments
+submitted by authenticated users. This is possible because the :doc:`Built-in
+Comment Models</ref/contrib/comments/models>` that come with Django associate
+comments with authenticated users by default.
+
+In this example, the honeypot field will still be visible to the user; you'll
+need to hide that field in your CSS::
+
+    #id_honeypot {
+        display: none;
+    }
+
+If you want to accept either anonymous or authenticated comments, replace the
+contents of the "else" clause above with a standard comment form and the right
+thing will happen whether a user is logged in or not.
 
 .. _notes-on-the-comment-form:
 
@@ -300,7 +344,6 @@ More information
    models
    settings
    signals
-   upgrade
    custom
    forms
    moderation

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import http
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
@@ -12,11 +14,11 @@ def shortcut(request, content_type_id, object_id):
     try:
         content_type = ContentType.objects.get(pk=content_type_id)
         if not content_type.model_class():
-            raise http.Http404(_(u"Content type %(ct_id)s object has no associated model") %
+            raise http.Http404(_("Content type %(ct_id)s object has no associated model") %
                                {'ct_id': content_type_id})
         obj = content_type.get_object_for_this_type(pk=object_id)
     except (ObjectDoesNotExist, ValueError):
-        raise http.Http404(_(u"Content type %(ct_id)s object %(obj_id)s doesn't exist") %
+        raise http.Http404(_("Content type %(ct_id)s object %(obj_id)s doesn't exist") %
                            {'ct_id': content_type_id, 'obj_id': object_id})
 
     try:

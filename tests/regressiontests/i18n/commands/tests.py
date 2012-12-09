@@ -2,13 +2,15 @@ import os
 import re
 from subprocess import Popen, PIPE
 
+from django.utils import six
+
 can_run_extraction_tests = False
 can_run_compilation_tests = False
 
 def find_command(cmd, path=None, pathext=None):
     if path is None:
         path = os.environ.get('PATH', []).split(os.pathsep)
-    if isinstance(path, basestring):
+    if isinstance(path, six.string_types):
         path = [path]
     # check if there are funny path extensions for executables, e.g. Windows
     if pathext is None:

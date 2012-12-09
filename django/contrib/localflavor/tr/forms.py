@@ -2,7 +2,7 @@
 TR-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -10,7 +10,7 @@ from django.contrib.localflavor.tr.tr_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select, CharField
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -18,7 +18,7 @@ phone_digits_re = re.compile(r'^(\+90|0)? ?(([1-9]\d{2})|\([1-9]\d{2}\)) ?([2-9]
 
 class TRPostalCodeField(RegexField):
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXX.'),
+        'invalid': _('Enter a postal code in the format XXXXX.'),
     }
 
     def __init__(self, max_length=5, min_length=5, *args, **kwargs):
@@ -28,7 +28,7 @@ class TRPostalCodeField(RegexField):
     def clean(self, value):
         value = super(TRPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if len(value) != 5:
             raise ValidationError(self.error_messages['invalid'])
         province_code = int(value[:2])
@@ -39,17 +39,17 @@ class TRPostalCodeField(RegexField):
 
 class TRPhoneNumberField(CharField):
     default_error_messages = {
-        'invalid': _(u'Phone numbers must be in 0XXX XXX XXXX format.'),
+        'invalid': _('Phone numbers must be in 0XXX XXX XXXX format.'),
     }
 
     def clean(self, value):
         super(TRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
-        value = re.sub('(\(|\)|\s+)', '', smart_unicode(value))
+            return ''
+        value = re.sub('(\(|\)|\s+)', '', smart_text(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s%s' % (m.group(2), m.group(4))
+            return '%s%s' % (m.group(2), m.group(4))
         raise ValidationError(self.error_messages['invalid'])
 
 class TRIdentificationNumberField(Field):
@@ -66,24 +66,24 @@ class TRIdentificationNumberField(Field):
           sum(1st to 10th) % 10 = 11th digit
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid Turkish Identification number.'),
-        'not_11': _(u'Turkish Identification number must be 11 digits.'),
+        'invalid': _('Enter a valid Turkish Identification number.'),
+        'not_11': _('Turkish Identification number must be 11 digits.'),
     }
 
     def clean(self, value):
         super(TRIdentificationNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if len(value) != 11:
             raise ValidationError(self.error_messages['not_11'])
         if not re.match(r'^\d{11}$', value):
             raise ValidationError(self.error_messages['invalid'])
         if int(value[0]) == 0:
             raise ValidationError(self.error_messages['invalid'])
-        chksum = (sum([int(value[i]) for i in xrange(0,9,2)])*7-
-                          sum([int(value[i]) for i in xrange(1,9,2)])) % 10
+        chksum = (sum([int(value[i]) for i in range(0, 9, 2)]) * 7 -
+                          sum([int(value[i]) for i in range(1, 9, 2)])) % 10
         if chksum != int(value[9]) or \
-           (sum([int(value[i]) for i in xrange(10)]) % 10) != int(value[10]):
+           (sum([int(value[i]) for i in range(10)]) % 10) != int(value[10]):
             raise ValidationError(self.error_messages['invalid'])
         return value
 

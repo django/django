@@ -32,8 +32,8 @@ Refactored ``django.contrib.comments``
     carried out a major rewrite and refactoring of Django's bundled
     comment system, greatly increasing its flexibility and
     customizability. :doc:`Full documentation
-    </ref/contrib/comments/index>` is available, as well as :doc:`an
-    upgrade guide </ref/contrib/comments/upgrade>` if you were using
+    </ref/contrib/comments/index>` is available, as well as an
+    upgrade guide if you were using
     the previous incarnation of the comments application..
 
 Refactored documentation
@@ -46,7 +46,7 @@ Refactored documentation
     documentation files bundled with Django.
 
 .. _Sphinx: http://sphinx.pocoo.org/
-.. _online: http://docs.djangoproject.com/en/dev/
+.. _online: https://docs.djangoproject.com/
 
 Along with these new features, the Django team has also been hard at
 work polishing Django's codebase for the final 1.0 release; this beta
@@ -69,7 +69,7 @@ the remaining features to be implemented for Django 1.0, and on the
 bugs that need to be resolved before the final release. As of this
 beta release, Django is in its final "feature freeze" for 1.0; feature
 requests will be deferred to later releases, and the development
-effort will be focused solely on bug-fixing and stability. Django is
+effort will be focused solely on bugfixing and stability. Django is
 also now in a "string freeze"; translatable strings (labels, error
 messages, etc.) in Django's codebase will not be changed prior to the
 release, in order to allow our translators to produce the final 1.0

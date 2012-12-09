@@ -3,7 +3,7 @@
 """
 Chinese-specific form helpers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -81,7 +81,7 @@ class CNPostCodeField(RegexField):
     Valid code is XXXXXX where X is digit.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a post code in the format XXXXXX.'),
+        'invalid': _('Enter a post code in the format XXXXXX.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -102,10 +102,10 @@ class CNIDCardField(CharField):
     The checksum algorithm is described in GB11643-1999.
     """
     default_error_messages = {
-        'invalid': _(u'ID Card Number consists of 15 or 18 digits.'),
-        'checksum': _(u'Invalid ID Card Number: Wrong checksum'),
-        'birthday': _(u'Invalid ID Card Number: Wrong birthdate'),
-        'location': _(u'Invalid ID Card Number: Wrong location code'),
+        'invalid': _('ID Card Number consists of 15 or 18 digits.'),
+        'checksum': _('Invalid ID Card Number: Wrong checksum'),
+        'birthday': _('Invalid ID Card Number: Wrong birthdate'),
+        'location': _('Invalid ID Card Number: Wrong location code'),
     }
 
     def __init__(self, max_length=18, min_length=15, *args, **kwargs):
@@ -119,7 +119,7 @@ class CNIDCardField(CharField):
         # Check the length of the ID card number.
         super(CNIDCardField, self).clean(value)
         if not value:
-            return u""
+            return ""
         # Check whether this ID card number has valid format
         if not re.match(ID_CARD_RE, value):
             raise ValidationError(self.error_messages['invalid'])
@@ -133,7 +133,7 @@ class CNIDCardField(CharField):
         value = value.upper()
         if not self.has_valid_checksum(value):
             raise ValidationError(self.error_messages['checksum'])
-        return u'%s' % value
+        return '%s' % value
 
     def has_valid_birthday(self, value):
         """
@@ -190,7 +190,7 @@ class CNPhoneNumberField(RegexField):
         010-55555555-35
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid phone number.'),
+        'invalid': _('Enter a valid phone number.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -207,7 +207,7 @@ class CNCellNumberField(RegexField):
     The length of the cell number should be 11.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid cell number.'),
+        'invalid': _('Enter a valid cell number.'),
     }
 
     def __init__(self, *args, **kwargs):

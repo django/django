@@ -1,38 +1,46 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class MyFileField(models.FileField):
     pass
 
+@python_2_unicode_compatible
 class Member(models.Model):
     name = models.CharField(max_length=100)
     birthdate = models.DateTimeField(blank=True, null=True)
     gender = models.CharField(max_length=1, blank=True, choices=[('M','Male'), ('F', 'Female')])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Band(models.Model):
     name = models.CharField(max_length=100)
+    style = models.CharField(max_length=20)
     members = models.ManyToManyField(Member)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Album(models.Model):
     band = models.ForeignKey(Band)
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')
     backside_art = MyFileField(upload_to='albums_back', null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class HiddenInventoryManager(models.Manager):
     def get_query_set(self):
         return super(HiddenInventoryManager, self).get_query_set().filter(hidden=False)
 
+@python_2_unicode_compatible
 class Inventory(models.Model):
    barcode = models.PositiveIntegerField(unique=True)
    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
@@ -43,7 +51,7 @@ class Inventory(models.Model):
    default_manager = models.Manager()
    objects = HiddenInventoryManager()
 
-   def __unicode__(self):
+   def __str__(self):
       return self.name
 
 class Event(models.Model):
@@ -54,13 +62,14 @@ class Event(models.Model):
     link = models.URLField(blank=True)
     min_age = models.IntegerField(blank=True, null=True)
 
+@python_2_unicode_compatible
 class Car(models.Model):
     owner = models.ForeignKey(User)
     make = models.CharField(max_length=30)
     model = models.CharField(max_length=30)
 
-    def __unicode__(self):
-        return u"%s %s" % (self.make, self.model)
+    def __str__(self):
+        return "%s %s" % (self.make, self.model)
 
 class CarTire(models.Model):
     """
@@ -101,19 +110,21 @@ class Advisor(models.Model):
     companies = models.ManyToManyField(Company)
 
 
+@python_2_unicode_compatible
 class Student(models.Model):
     name = models.CharField(max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
         ordering = ('name',)
 
+@python_2_unicode_compatible
 class School(models.Model):
     name = models.CharField(max_length=255)
     students = models.ManyToManyField(Student, related_name='current_schools')
     alumni = models.ManyToManyField(Student, related_name='previous_schools')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

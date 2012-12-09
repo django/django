@@ -20,7 +20,7 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core import mail
@@ -37,12 +37,12 @@ class ClientTest(TestCase):
         "GET a view"
         # The data is ignored, but let's check it doesn't crash the system
         # anyway.
-        data = {'var': u'\xf2'}
+        data = {'var': '\xf2'}
         response = self.client.get('/test_client/get_view/', data)
 
         # Check some response details
         self.assertContains(response, 'This is a test')
-        self.assertEqual(response.context['var'], u'\xf2')
+        self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.templates[0].name, 'GET Template')
 
     def test_get_post_view(self):
@@ -91,7 +91,7 @@ class ClientTest(TestCase):
                                     content_type="text/xml")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name, "Book template")
-        self.assertEqual(response.content, "Blink - Malcolm Gladwell")
+        self.assertEqual(response.content, b"Blink - Malcolm Gladwell")
 
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
@@ -215,7 +215,7 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+        self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
 
     def test_valid_form_with_template(self):
         "POST valid data to a form using multiple templates"
@@ -263,7 +263,7 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, 'base.html')
         self.assertTemplateNotUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+        self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
 
     def test_unknown_page(self):
         "GET an invalid URL"

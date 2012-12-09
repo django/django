@@ -132,6 +132,41 @@ Write your own :doc:`custom SQL to retrieve data or populate models
 </topics/db/sql>`. Use ``django.db.connection.queries`` to find out what Django
 is writing for you and start from there.
 
+Retrieve individual objects using a unique, indexed column
+==========================================================
+
+There are two reasons to use a column with
+:attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Field.db_index` when using
+:meth:`~django.db.models.query.QuerySet.get` to retrieve individual objects.
+First, the query will be quicker because of the underlying database index.
+Also, the query could run much slower if multiple objects match the lookup;
+having a unique constraint on the column guarantees this will never happen.
+
+So using the :ref:`example Weblog models <queryset-model-example>`::
+
+  >>> entry = Entry.objects.get(id=10)
+
+will be quicker than:
+
+  >>> entry = Entry.object.get(headline="News Item Title")
+
+because ``id`` is indexed by the database and is guaranteed to be unique.
+
+Doing the following is potentially quite slow:
+
+  >>> entry = Entry.objects.get(headline__startswith="News")
+
+First of all, `headline` is not indexed, which will make the underlying
+database fetch slower.
+
+Second, the lookup doesn't guarantee that only one object will be returned.
+If the query matches more than one object, it will retrieve and transfer all of
+them from the database. This penalty could be substantial if hundreds or
+thousands of records are returned. The penalty will be compounded if the
+database lives on a separate server, where network overhead and latency also
+play a factor.
+
 Retrieve everything at once if you know you will need it
 ========================================================
 
@@ -230,7 +265,7 @@ It is optimal because:
 #. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable
    for later use, allowing its cache to be re-used.
 
-#. The line ``{% if emails %}`` causes ``QuerySet.__nonzero__()`` to be called,
+#. The line ``{% if emails %}`` causes ``QuerySet.__bool__()`` to be called,
    which causes the ``user.emails.all()`` query to be run on the database, and
    at the least the first line to be turned into an ORM object. If there aren't
    any results, it will return False, otherwise True.

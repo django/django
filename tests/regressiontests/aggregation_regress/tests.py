@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import pickle
@@ -8,6 +8,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.utils import six
 
 from .models import Author, Book, Publisher, Clues, Entries, HardbackBook
 
@@ -16,7 +17,7 @@ class AggregationTests(TestCase):
     fixtures = ["aggregation_regress.json"]
 
     def assertObjectAttrs(self, obj, **kwargs):
-        for attr, value in kwargs.iteritems():
+        for attr, value in six.iteritems(kwargs):
             self.assertEqual(getattr(obj, attr), value)
 
     def test_aggregates_in_where_clause(self):
@@ -119,7 +120,7 @@ class AggregationTests(TestCase):
         self.assertObjectAttrs(obj,
             contact_id=3,
             id=2,
-            isbn=u'067232959',
+            isbn='067232959',
             mean_auth_age=45.0,
             name='Sams Teach Yourself Django in 24 Hours',
             pages=528,
@@ -136,9 +137,9 @@ class AggregationTests(TestCase):
         self.assertObjectAttrs(obj,
             contact_id=3,
             id=2,
-            isbn=u'067232959',
+            isbn='067232959',
             mean_auth_age=45.0,
-            name=u'Sams Teach Yourself Django in 24 Hours',
+            name='Sams Teach Yourself Django in 24 Hours',
             pages=528,
             price=Decimal("23.09"),
             pubdate=datetime.date(2008, 3, 3),
@@ -156,9 +157,9 @@ class AggregationTests(TestCase):
         self.assertEqual(obj, {
             "contact_id": 3,
             "id": 2,
-            "isbn": u"067232959",
+            "isbn": "067232959",
             "mean_auth_age": 45.0,
-            "name": u"Sams Teach Yourself Django in 24 Hours",
+            "name": "Sams Teach Yourself Django in 24 Hours",
             "pages": 528,
             "price": Decimal("23.09"),
             "pubdate": datetime.date(2008, 3, 3),
@@ -175,9 +176,9 @@ class AggregationTests(TestCase):
         self.assertEqual(obj, {
             'contact_id': 3,
             'id': 2,
-            'isbn': u'067232959',
+            'isbn': '067232959',
             'mean_auth_age': 45.0,
-            'name': u'Sams Teach Yourself Django in 24 Hours',
+            'name': 'Sams Teach Yourself Django in 24 Hours',
             'pages': 528,
             'price': Decimal("23.09"),
             'pubdate': datetime.date(2008, 3, 3),
@@ -189,13 +190,13 @@ class AggregationTests(TestCase):
         # unless it is explicitly named
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name').get(pk=1)
         self.assertEqual(obj, {
-            "name": u'The Definitive Guide to Django: Web Development Done Right',
+            "name": 'The Definitive Guide to Django: Web Development Done Right',
         })
 
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).values('name','mean_auth_age').get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
-            'name': u'The Definitive Guide to Django: Web Development Done Right',
+            'name': 'The Definitive Guide to Django: Web Development Done Right',
         })
 
         # If an annotation isn't included in the values, it can still be used
@@ -203,7 +204,7 @@ class AggregationTests(TestCase):
         qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
         self.assertQuerysetEqual(
             qs, [
-                {"name": u'Python Web Development with Django'}
+                {"name": 'Python Web Development with Django'}
             ],
             lambda b: b,
         )
@@ -213,7 +214,7 @@ class AggregationTests(TestCase):
         obj = Book.objects.values('name').annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page' : 'price / pages'}).get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
-            'name': u'The Definitive Guide to Django: Web Development Done Right',
+            'name': 'The Definitive Guide to Django: Web Development Done Right',
         })
 
         # Check that all of the objects are getting counted (allow_nulls) and
@@ -298,8 +299,8 @@ class AggregationTests(TestCase):
         self.assertEqual(obj, {
             'contact_id': 8,
             'id': 5,
-            'isbn': u'013790395',
-            'name': u'Artificial Intelligence: A Modern Approach',
+            'isbn': '013790395',
+            'name': 'Artificial Intelligence: A Modern Approach',
             'num_authors': 2,
             'pages': 1132,
             'price': Decimal("82.8"),
@@ -338,8 +339,8 @@ class AggregationTests(TestCase):
         qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
         self.assertQuerysetEqual(
             qs, [
-                {'num_books': 1, 'name': u'Morgan Kaufmann', 'num_awards': 9},
-                {'num_books': 2, 'name': u'Prentice Hall', 'num_awards': 7}
+                {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
+                {'num_books': 2, 'name': 'Prentice Hall', 'num_awards': 7}
             ],
             lambda p: p,
         )
@@ -347,9 +348,9 @@ class AggregationTests(TestCase):
         qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
         self.assertQuerysetEqual(
             qs, [
-                {'num_books': 2, 'name': u'Apress', 'num_awards': 3},
-                {'num_books': 0, 'name': u"Jonno's House of Books", 'num_awards': 0},
-                {'num_books': 1, 'name': u'Sams', 'num_awards': 1}
+                {'num_books': 2, 'name': 'Apress', 'num_awards': 3},
+                {'num_books': 0, 'name': "Jonno's House of Books", 'num_awards': 0},
+                {'num_books': 1, 'name': 'Sams', 'num_awards': 1}
             ],
             lambda p: p,
         )
@@ -358,8 +359,8 @@ class AggregationTests(TestCase):
         qs = Publisher.objects.annotate(num_books=Count('book')).filter(num_awards__gt=2*F('num_books')).order_by('name').values('name','num_books','num_awards')
         self.assertQuerysetEqual(
             qs, [
-                {'num_books': 1, 'name': u'Morgan Kaufmann', 'num_awards': 9},
-                {'num_books': 2, 'name': u'Prentice Hall', 'num_awards': 7}
+                {'num_books': 1, 'name': 'Morgan Kaufmann', 'num_awards': 9},
+                {'num_books': 2, 'name': 'Prentice Hall', 'num_awards': 7}
             ],
             lambda p: p,
         )
@@ -367,9 +368,9 @@ class AggregationTests(TestCase):
         qs = Publisher.objects.annotate(num_books=Count('book')).exclude(num_books__lt=F('num_awards')/2).order_by('name').values('name','num_books','num_awards')
         self.assertQuerysetEqual(
             qs, [
-                {'num_books': 2, 'name': u'Apress', 'num_awards': 3},
-                {'num_books': 0, 'name': u"Jonno's House of Books", 'num_awards': 0},
-                {'num_books': 1, 'name': u'Sams', 'num_awards': 1}
+                {'num_books': 2, 'name': 'Apress', 'num_awards': 3},
+                {'num_books': 0, 'name': "Jonno's House of Books", 'num_awards': 0},
+                {'num_books': 1, 'name': 'Sams', 'num_awards': 1}
             ],
             lambda p: p,
         )
@@ -399,7 +400,7 @@ class AggregationTests(TestCase):
         qs = Publisher.objects.filter(pk=5).annotate(num_authors=Count('book__authors'), avg_authors=Avg('book__authors'), max_authors=Max('book__authors'), max_price=Max('book__price'), max_rating=Max('book__rating')).values()
         self.assertQuerysetEqual(
             qs, [
-                {'max_authors': None, 'name': u"Jonno's House of Books", 'num_awards': 0, 'max_price': None, 'num_authors': 0, 'max_rating': None, 'id': 5, 'avg_authors': None}
+                {'max_authors': None, 'name': "Jonno's House of Books", 'num_awards': 0, 'max_price': None, 'num_authors': 0, 'max_rating': None, 'id': 5, 'avg_authors': None}
             ],
             lambda p: p
         )
@@ -424,10 +425,10 @@ class AggregationTests(TestCase):
         qs = Book.objects.filter(rating__lt=4.5).select_related().annotate(Avg('authors__age'))
         self.assertQuerysetEqual(
             qs, [
-                (u'Artificial Intelligence: A Modern Approach', 51.5, u'Prentice Hall', u'Peter Norvig'),
-                (u'Practical Django Projects', 29.0, u'Apress', u'James Bennett'),
-                (u'Python Web Development with Django', Approximate(30.333, places=2), u'Prentice Hall', u'Jeffrey Forcier'),
-                (u'Sams Teach Yourself Django in 24 Hours', 45.0, u'Sams', u'Brad Dayley')
+                ('Artificial Intelligence: A Modern Approach', 51.5, 'Prentice Hall', 'Peter Norvig'),
+                ('Practical Django Projects', 29.0, 'Apress', 'James Bennett'),
+                ('Python Web Development with Django', Approximate(30.333, places=2), 'Prentice Hall', 'Jeffrey Forcier'),
+                ('Sams Teach Yourself Django in 24 Hours', 45.0, 'Sams', 'Brad Dayley')
             ],
             lambda b: (b.name, b.authors__age__avg, b.publisher.name, b.contact.name)
         )
@@ -469,7 +470,7 @@ class AggregationTests(TestCase):
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
         qs = Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by()
-        grouping, gb_params = qs.query.get_compiler(qs.db).get_grouping()
+        grouping, gb_params = qs.query.get_compiler(qs.db).get_grouping([])
         self.assertEqual(len(grouping), 1)
 
     def test_duplicate_alias(self):
@@ -491,19 +492,19 @@ class AggregationTests(TestCase):
         # But age isn't included in the ValuesQuerySet, so it is.
         results = Author.objects.values('name').annotate(age=Count('book_contact_set')).order_by('name')
         self.assertEqual(len(results), 9)
-        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['name'], 'Adrian Holovaty')
         self.assertEqual(results[0]['age'], 1)
 
         # Same problem, but aggregating over m2m fields
         results = Author.objects.values('name').annotate(age=Avg('friends__age')).order_by('name')
         self.assertEqual(len(results), 9)
-        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['name'], 'Adrian Holovaty')
         self.assertEqual(results[0]['age'], 32.0)
 
         # Same problem, but colliding with an m2m field
         results = Author.objects.values('name').annotate(friends=Count('friends')).order_by('name')
         self.assertEqual(len(results), 9)
-        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['name'], 'Adrian Holovaty')
         self.assertEqual(results[0]['friends'], 2)
 
     def test_reverse_relation_name_conflict(self):
@@ -531,12 +532,12 @@ class AggregationTests(TestCase):
         books.aggregate(Avg("authors__age"))
         self.assertQuerysetEqual(
             books.all(), [
-                u'Artificial Intelligence: A Modern Approach',
-                u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp',
-                u'Practical Django Projects',
-                u'Python Web Development with Django',
-                u'Sams Teach Yourself Django in 24 Hours',
-                u'The Definitive Guide to Django: Web Development Done Right'
+                'Artificial Intelligence: A Modern Approach',
+                'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp',
+                'Practical Django Projects',
+                'Python Web Development with Django',
+                'Sams Teach Yourself Django in 24 Hours',
+                'The Definitive Guide to Django: Web Development Done Right'
             ],
             lambda b: b.name
         )
@@ -632,8 +633,8 @@ class AggregationTests(TestCase):
         qs = HardbackBook.objects.annotate(n_authors=Count('book_ptr__authors')).values('name', 'n_authors')
         self.assertQuerysetEqual(
             qs, [
-                {'n_authors': 2, 'name': u'Artificial Intelligence: A Modern Approach'},
-                {'n_authors': 1, 'name': u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}
+                {'n_authors': 2, 'name': 'Artificial Intelligence: A Modern Approach'},
+                {'n_authors': 1, 'name': 'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}
             ],
             lambda h: h
         )
@@ -641,8 +642,8 @@ class AggregationTests(TestCase):
         qs = HardbackBook.objects.annotate(n_authors=Count('authors')).values('name', 'n_authors')
         self.assertQuerysetEqual(
             qs, [
-                {'n_authors': 2, 'name': u'Artificial Intelligence: A Modern Approach'},
-                {'n_authors': 1, 'name': u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}
+                {'n_authors': 2, 'name': 'Artificial Intelligence: A Modern Approach'},
+                {'n_authors': 1, 'name': 'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp'}
             ],
             lambda h: h,
         )
@@ -864,4 +865,116 @@ class AggregationTests(TestCase):
             qs,
             ['Peter Norvig'],
             lambda b: b.name
+        )
+
+    def test_type_conversion(self):
+        # The database backend convert_values function should not try to covert
+        # CharFields to float. Refs #13844.
+        from django.db.models import CharField
+        from django.db import connection
+        testData = 'not_a_float_value'
+        testField = CharField()
+        self.assertEqual(
+            connection.ops.convert_values(testData, testField),
+            testData
+        )
+
+    def test_annotate_joins(self):
+        """
+        Test that the base table's join isn't promoted to LOUTER. This could
+        cause the query generation to fail if there is an exclude() for fk-field
+        in the query, too. Refs #19087.
+        """
+        qs = Book.objects.annotate(n=Count('pk'))
+        self.assertIs(qs.query.alias_map['aggregation_regress_book'].join_type, None)
+        # Check that the query executes without problems.
+        self.assertEqual(len(qs.exclude(publisher=-1)), 6)
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns(self):
+        # Regression test for #17144
+
+        results = Author.objects.annotate(num_contacts=Count('book_contact_set'))
+
+        # There should only be one GROUP BY clause, for the `id` column.
+        # `name` and `age` should not be grouped on.
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'age' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(a.name, a.num_contacts) for a in results.order_by('name')],
+            [
+                ('Adrian Holovaty', 1),
+                ('Brad Dayley', 1),
+                ('Jacob Kaplan-Moss', 0),
+                ('James Bennett', 1),
+                ('Jeffrey Forcier', 1),
+                ('Paul Bissex', 0),
+                ('Peter Norvig', 2),
+                ('Stuart Russell', 0),
+                ('Wesley J. Chun', 0),
+            ]
+        )
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns_only(self):
+        # Works with only() too.
+        results = Author.objects.only('id', 'name').annotate(num_contacts=Count('book_contact_set'))
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'age' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(a.name, a.num_contacts) for a in results.order_by('name')],
+            [
+                ('Adrian Holovaty', 1),
+                ('Brad Dayley', 1),
+                ('Jacob Kaplan-Moss', 0),
+                ('James Bennett', 1),
+                ('Jeffrey Forcier', 1),
+                ('Paul Bissex', 0),
+                ('Peter Norvig', 2),
+                ('Stuart Russell', 0),
+                ('Wesley J. Chun', 0),
+            ]
+        )
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns_select_related(self):
+        # And select_related()
+        results = Book.objects.select_related('contact').annotate(
+            num_authors=Count('authors'))
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'contact' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_book', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(b.name, b.num_authors) for b in results.order_by('name')],
+            [
+                ('Artificial Intelligence: A Modern Approach', 2),
+                ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                ('Practical Django Projects', 1),
+                ('Python Web Development with Django', 3),
+                ('Sams Teach Yourself Django in 24 Hours', 1),
+                ('The Definitive Guide to Django: Web Development Done Right', 2)
+            ]
         )

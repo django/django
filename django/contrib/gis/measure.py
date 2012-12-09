@@ -30,7 +30,7 @@
 Distance and Area objects to allow for sensible and convienient calculation
 and conversions.
 
-Authors: Robert Coup, Justin Bronn
+Authors: Robert Coup, Justin Bronn, Riccardo Di Virgilio
 
 Inspired by GeoPy (http://exogen.case.edu/projects/geopy/)
 and Geoff Biggs' PhD work on dimensioned units for robotics.
@@ -38,14 +38,147 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
 
+from django.utils.functional import total_ordering
+from django.utils import six
+
+NUMERIC_TYPES = six.integer_types + (float, Decimal)
+AREA_PREFIX = "sq_"
+
+def pretty_name(obj):
+    return obj.__name__ if obj.__class__ == type else obj.__class__.__name__
+
+
+@total_ordering
 class MeasureBase(object):
+    STANDARD_UNIT = None
+    ALIAS  = {}
+    UNITS  = {}
+    LALIAS = {}
+
+    def __init__(self, default_unit=None, **kwargs):
+        value, self._default_unit = self.default_units(kwargs)
+        setattr(self, self.STANDARD_UNIT, value)
+        if default_unit and isinstance(default_unit, six.string_types):
+            self._default_unit = default_unit
+
+    def _get_standard(self):
+        return getattr(self, self.STANDARD_UNIT)
+
+    def _set_standard(self, value):
+        setattr(self, self.STANDARD_UNIT, value)
+
+    standard = property(_get_standard, _set_standard)
+
+    def __getattr__(self, name):
+        if name in self.UNITS:
+            return self.standard / self.UNITS[name]
+        else:
+            raise AttributeError('Unknown unit type: %s' % name)
+
+    def __repr__(self):
+        return '%s(%s=%s)' % (pretty_name(self), self._default_unit,
+            getattr(self, self._default_unit))
+
+    def __str__(self):
+        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
+
+    # **** Comparison methods ****
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.standard == other.standard
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.standard < other.standard
+        else:
+            return NotImplemented
+
+    # **** Operators methods ****
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard + other.standard)})
+        else:
+            raise TypeError('%(class)s must be added with %(class)s' % {"class":pretty_name(self)})
+
+    def __iadd__(self, other):
+        if isinstance(other, self.__class__):
+            self.standard += other.standard
+            return self
+        else:
+            raise TypeError('%(class)s must be added with %(class)s' % {"class":pretty_name(self)})
+
+    def __sub__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard - other.standard)})
+        else:
+            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class":pretty_name(self)})
+
+    def __isub__(self, other):
+        if isinstance(other, self.__class__):
+            self.standard -= other.standard
+            return self
+        else:
+            raise TypeError('%(class)s must be subtracted from %(class)s' % {"class":pretty_name(self)})
+
+    def __mul__(self, other):
+        if isinstance(other, NUMERIC_TYPES):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard * other)})
+        else:
+            raise TypeError('%(class)s must be multiplied with number' % {"class":pretty_name(self)})
+
+    def __imul__(self, other):
+        if isinstance(other, NUMERIC_TYPES):
+            self.standard *= float(other)
+            return self
+        else:
+            raise TypeError('%(class)s must be multiplied with number' % {"class":pretty_name(self)})
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __truediv__(self, other):
+        if isinstance(other, self.__class__):
+            return self.standard / other.standard
+        if isinstance(other, NUMERIC_TYPES):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard / other)})
+        else:
+            raise TypeError('%(class)s must be divided with number or %(class)s' % {"class":pretty_name(self)})
+
+    def __div__(self, other):   # Python 2 compatibility
+        return type(self).__truediv__(self, other)
+
+    def __itruediv__(self, other):
+        if isinstance(other, NUMERIC_TYPES):
+            self.standard /= float(other)
+            return self
+        else:
+            raise TypeError('%(class)s must be divided with number' % {"class":pretty_name(self)})
+
+    def __idiv__(self, other):  # Python 2 compatibility
+        return type(self).__itruediv__(self, other)
+
+    def __bool__(self):
+        return bool(self.standard)
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
+
     def default_units(self, kwargs):
         """
         Return the unit value and the default units specified
         from the given keyword arguments dictionary.
         """
         val = 0.0
-        for unit, value in kwargs.iteritems():
+        default_unit = self.STANDARD_UNIT
+        for unit, value in six.iteritems(kwargs):
             if not isinstance(value, float): value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
@@ -85,6 +218,7 @@ class MeasureBase(object):
             raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
 
 class Distance(MeasureBase):
+    STANDARD_UNIT = "m"
     UNITS = {
         'chain' : 20.1168,
         'chain_benoit' : 20.116782,
@@ -160,176 +294,36 @@ class Distance(MeasureBase):
         }
     LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
 
-    def __init__(self, default_unit=None, **kwargs):
-        # The base unit is in meters.
-        self.m, self._default_unit = self.default_units(kwargs)
-        if default_unit and isinstance(default_unit, str):
-            self._default_unit = default_unit
-
-    def __getattr__(self, name):
-        if name in self.UNITS:
-            return self.m / self.UNITS[name]
-        else:
-            raise AttributeError('Unknown unit type: %s' % name)
-
-    def __repr__(self):
-        return 'Distance(%s=%s)' % (self._default_unit, getattr(self, self._default_unit))
-
-    def __str__(self):
-        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
-
-    def __cmp__(self, other):
-        if isinstance(other, Distance):
-            return cmp(self.m, other.m)
-        else:
-            return NotImplemented
-
-    def __add__(self, other):
-        if isinstance(other, Distance):
-            return Distance(default_unit=self._default_unit, m=(self.m + other.m))
-        else:
-            raise TypeError('Distance must be added with Distance')
-
-    def __iadd__(self, other):
-        if isinstance(other, Distance):
-            self.m += other.m
-            return self
-        else:
-            raise TypeError('Distance must be added with Distance')
-
-    def __sub__(self, other):
-        if isinstance(other, Distance):
-            return Distance(default_unit=self._default_unit, m=(self.m - other.m))
-        else:
-            raise TypeError('Distance must be subtracted from Distance')
-
-    def __isub__(self, other):
-        if isinstance(other, Distance):
-            self.m -= other.m
-            return self
-        else:
-            raise TypeError('Distance must be subtracted from Distance')
-
     def __mul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            return Distance(default_unit=self._default_unit, m=(self.m * float(other)))
-        elif isinstance(other, Distance):
-            return Area(default_unit='sq_' + self._default_unit, sq_m=(self.m * other.m))
+        if isinstance(other, self.__class__):
+            return Area(default_unit=AREA_PREFIX + self._default_unit,
+                **{AREA_PREFIX + self.STANDARD_UNIT: (self.standard * other.standard)})
+        elif isinstance(other, NUMERIC_TYPES):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard * other)})
         else:
-            raise TypeError('Distance must be multiplied with number or Distance')
+            raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
+                "distance" : pretty_name(self.__class__),
+                })
 
-    def __imul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            self.m *= float(other)
-            return self
-        else:
-            raise TypeError('Distance must be multiplied with number')
-
-    def __rmul__(self, other):
-        return self * other
-
-    def __div__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            return Distance(default_unit=self._default_unit, m=(self.m / float(other)))
-        else:
-            raise TypeError('Distance must be divided with number')
-
-    def __idiv__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            self.m /= float(other)
-            return self
-        else:
-            raise TypeError('Distance must be divided with number')
-
-    def __nonzero__(self):
-        return bool(self.m)
 
 class Area(MeasureBase):
+    STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = dict([('sq_%s' % k, v ** 2) for k, v in Distance.UNITS.items()])
-    ALIAS = dict([(k, 'sq_%s' % v) for k, v in Distance.ALIAS.items()])
+    UNITS = dict([('%s%s' % (AREA_PREFIX, k), v ** 2) for k, v in Distance.UNITS.items()])
+    ALIAS = dict([(k, '%s%s' % (AREA_PREFIX, v)) for k, v in Distance.ALIAS.items()])
     LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
 
-    def __init__(self, default_unit=None, **kwargs):
-        self.sq_m, self._default_unit = self.default_units(kwargs)
-        if default_unit and isinstance(default_unit, str):
-            self._default_unit = default_unit
-
-    def __getattr__(self, name):
-        if name in self.UNITS:
-            return self.sq_m / self.UNITS[name]
+    def __truediv__(self, other):
+        if isinstance(other, NUMERIC_TYPES):
+            return self.__class__(default_unit=self._default_unit,
+                **{self.STANDARD_UNIT: (self.standard / other)})
         else:
-            raise AttributeError('Unknown unit type: ' + name)
+            raise TypeError('%(class)s must be divided by a number' % {"class":pretty_name(self)})
 
-    def __repr__(self):
-        return 'Area(%s=%s)' % (self._default_unit, getattr(self, self._default_unit))
+    def __div__(self, other):  # Python 2 compatibility
+        return type(self).__truediv__(self, other)
 
-    def __str__(self):
-        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
-
-    def __cmp__(self, other):
-        if isinstance(other, Area):
-            return cmp(self.sq_m, other.sq_m)
-        else:
-            return NotImplemented
-
-    def __add__(self, other):
-        if isinstance(other, Area):
-            return Area(default_unit=self._default_unit, sq_m=(self.sq_m + other.sq_m))
-        else:
-            raise TypeError('Area must be added with Area')
-
-    def __iadd__(self, other):
-        if isinstance(other, Area):
-            self.sq_m += other.sq_m
-            return self
-        else:
-            raise TypeError('Area must be added with Area')
-
-    def __sub__(self, other):
-        if isinstance(other, Area):
-            return Area(default_unit=self._default_unit, sq_m=(self.sq_m - other.sq_m))
-        else:
-            raise TypeError('Area must be subtracted from Area')
-
-    def __isub__(self, other):
-        if isinstance(other, Area):
-            self.sq_m -= other.sq_m
-            return self
-        else:
-            raise TypeError('Area must be subtracted from Area')
-
-    def __mul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            return Area(default_unit=self._default_unit, sq_m=(self.sq_m * float(other)))
-        else:
-            raise TypeError('Area must be multiplied with number')
-
-    def __imul__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            self.sq_m *= float(other)
-            return self
-        else:
-            raise TypeError('Area must be multiplied with number')
-
-    def __rmul__(self, other):
-        return self * other
-
-    def __div__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            return Area(default_unit=self._default_unit, sq_m=(self.sq_m / float(other)))
-        else:
-            raise TypeError('Area must be divided with number')
-
-    def __idiv__(self, other):
-        if isinstance(other, (int, float, long, Decimal)):
-            self.sq_m /= float(other)
-            return self
-        else:
-            raise TypeError('Area must be divided with number')
-
-    def __nonzero__(self):
-        return bool(self.sq_m)
 
 # Shortcuts
 D = Distance

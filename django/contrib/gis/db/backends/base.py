@@ -4,6 +4,8 @@ Base/mixin classes for the spatial backend database operations and the
 """
 import re
 from django.contrib.gis import gdal
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 class BaseSpatialOperations(object):
     """
@@ -30,8 +32,9 @@ class BaseSpatialOperations(object):
     # How the geometry column should be selected.
     select = None
 
-    # Does the spatial database have a geography type?
+    # Does the spatial database have a geometry or geography type?
     geography = False
+    geometry = False
 
     area = False
     centroid = False
@@ -88,8 +91,6 @@ class BaseSpatialOperations(object):
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
-        if isinstance(name, unicode):
-            name = name.encode('ascii')
         return "'%s'" % name
 
     # GeometryField operations
@@ -116,6 +117,16 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError
 
+    def get_expression_column(self, evaluator):
+        """
+        Helper method to return the quoted column string from the evaluator
+        for its expression.
+        """
+        for expr, col_tup in evaluator.cols:
+            if expr is evaluator.expression:
+                return '%s.%s' % tuple(map(self.quote_name, col_tup))
+        raise Exception("Could not find the column for the expression.")
+
     # Spatial SQL Construction
     def spatial_aggregate_sql(self, agg):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
@@ -130,6 +141,7 @@ class BaseSpatialOperations(object):
     def spatial_ref_sys(self):
         raise NotImplementedError
 
+@python_2_unicode_compatible
 class SpatialRefSysMixin(object):
     """
     The SpatialRefSysMixin is a class used by the database-dependent
@@ -324,12 +336,12 @@ class SpatialRefSysMixin(object):
                 radius, flattening = sphere_params
             return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns the string representation.  If GDAL is installed,
         it will be 'pretty' OGC WKT.
         """
         try:
-            return unicode(self.srs)
+            return six.text_type(self.srs)
         except:
-            return unicode(self.wkt)
+            return six.text_type(self.wkt)

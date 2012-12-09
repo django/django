@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from optparse import make_option
 
 from django.core.management.base import NoArgsCommand
@@ -16,4 +18,4 @@ class Command(NoArgsCommand):
     output_transaction = True
 
     def handle_noargs(self, **options):
-        return u'\n'.join(sql_flush(self.style, connections[options.get('database')], only_django=True)).encode('utf-8')
+        return '\n'.join(sql_flush(self.style, connections[options.get('database')], only_django=True))

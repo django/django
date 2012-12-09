@@ -1,9 +1,12 @@
 import os
+import pkgutil
 from threading import local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.utils._os import upath
+from django.utils import six
 
 
 DEFAULT_DB_ALIAS = 'default'
@@ -25,29 +28,20 @@ def load_backend(backend_name):
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.
-        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
+        backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
         try:
-            available_backends = [f for f in os.listdir(backend_dir)
-                    if os.path.isdir(os.path.join(backend_dir, f))
-                    and not f.startswith('.')]
+            builtin_backends = [
+                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+                if ispkg and name != 'dummy']
         except EnvironmentError:
-            available_backends = []
-        full_notation = backend_name.startswith('django.db.backends.')
-        if full_notation:
-            backend_name = backend_name[19:] # See #15621.
-        if backend_name not in available_backends:
-            backend_reprs = map(repr, sorted(available_backends))
+            builtin_backends = []
+        if backend_name not in ['django.db.backends.%s' % b for b in
+                                builtin_backends]:
+            backend_reprs = map(repr, sorted(builtin_backends))
             error_msg = ("%r isn't an available database backend.\n"
-                         "Try using django.db.backends.XXX, where XXX "
+                         "Try using 'django.db.backends.XXX', where XXX "
                          "is one of:\n    %s\nError was: %s" %
                          (backend_name, ", ".join(backend_reprs), e_user))
-            raise ImproperlyConfigured(error_msg)
-        elif not full_notation:
-            # user tried to use the old notation for the database backend
-            error_msg = ("%r isn't an available database backend.\n"
-                         "Try using django.db.backends.%s instead.\n"
-                         "Error was: %s" %
-                         (backend_name, backend_name, e_user))
             raise ImproperlyConfigured(error_msg)
         else:
             # If there's some other error, this must be an error in Django
@@ -60,7 +54,14 @@ class ConnectionDoesNotExist(Exception):
 
 class ConnectionHandler(object):
     def __init__(self, databases):
-        self.databases = databases
+        if not databases:
+            self.databases = {
+                DEFAULT_DB_ALIAS: {
+                    'ENGINE': 'django.db.backends.dummy',
+                },
+            }
+        else:
+            self.databases = databases
         self._connections = local()
 
     def ensure_defaults(self, alias):
@@ -108,7 +109,7 @@ class ConnectionRouter(object):
     def __init__(self, routers):
         self.routers = []
         for r in routers:
-            if isinstance(r, basestring):
+            if isinstance(r, six.string_types):
                 try:
                     module_name, klass_name = r.rsplit('.', 1)
                     module = import_module(module_name)

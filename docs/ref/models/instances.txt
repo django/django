@@ -25,18 +25,51 @@ The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
 that, you need to :meth:`~Model.save()`.
 
+.. note::
+
+    You may be tempted to customize the model by overriding the ``__init__``
+    method. If you do so, however, take care not to change the calling
+    signature as any change may prevent the model instance from being saved.
+    Rather than overriding ``__init__``, try using one of these approaches:
+
+    1. Add a classmethod on the model class::
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            @classmethod
+            def create(cls, title):
+                book = cls(title=title)
+                # do something with the book
+                return book
+
+        book = Book.create("Pride and Prejudice")
+
+    2. Add a method on a custom manager (usually preferred)::
+
+        class BookManager(models.Manager):
+            def create_book(self, title):
+                book = self.create(title=title)
+                # do something with the book
+                return book
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            objects = BookManager()
+
+        book = Book.objects.create_book("Pride and Prejudice")
+
 .. _validating-objects:
 
 Validating objects
 ==================
 
-.. versionadded:: 1.2
-
 There are three steps involved in validating a model:
 
-1. Validate the model fields
-2. Validate the model as a whole
-3. Validate the field uniqueness
+1. Validate the model fields - :meth:`Model.clean_fields()`
+2. Validate the model as a whole - :meth:`Model.clean()`
+3. Validate the field uniqueness - :meth:`Model.validate_unique()`
 
 All three steps are performed when you call a model's
 :meth:`~Model.full_clean()` method.
@@ -64,17 +97,20 @@ not be corrected by the user.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
 your model's :meth:`~Model.save()` method, nor as a result of
-:class:`~django.forms.ModelForm` validation. You'll need to call it manually
-when you want to run one-step model validation for your own manually created
-models.
+:class:`~django.forms.ModelForm` validation. In the case of
+:class:`~django.forms.ModelForm` validation, :meth:`Model.clean_fields()`,
+:meth:`Model.clean()`, and :meth:`Model.validate_unique()` are all called
+individually.
 
-Example::
+You'll need to call ``full_clean`` manually when you want to run one-step model
+validation for your own manually created models. For example::
 
     try:
         article.full_clean()
     except ValidationError as e:
         # Do something based on the errors contained in e.message_dict.
         # Display them to a user, or handle them programatically.
+        pass
 
 The first step ``full_clean()`` performs is to clean each individual field.
 
@@ -102,7 +138,7 @@ access to more than a single field::
             raise ValidationError('Draft entries may not have a publication date.')
         # Set the pub_date for published items if it hasn't been set already.
         if self.status == 'published' and self.pub_date is None:
-            self.pub_date = datetime.datetime.now()
+            self.pub_date = datetime.date.today()
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
@@ -136,9 +172,6 @@ Saving objects
 To save an object back to the database, call ``save()``:
 
 .. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
@@ -345,7 +378,7 @@ If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
 This may be desirable if you want to update just one or a few fields on
 an object. There will be a slight performance benefit from preventing
-all of the model fields from being updated in the database. For example:
+all of the model fields from being updated in the database. For example::
 
     product.name = 'Name changed again'
     product.save(update_fields=['name'])
@@ -356,13 +389,17 @@ perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
 
+When saving a model fetched through deferred model loading
+(:meth:`~django.db.models.query.QuerySet.only()` or
+:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+from the DB will get updated. In effect there is an automatic
+``update_fields`` in this case. If you assign or change any deferred field
+value, the field will be added to the updated fields.
+
 Deleting objects
 ================
 
 .. method:: Model.delete([using=DEFAULT_DB_ALIAS])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 Issues a SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
@@ -426,9 +463,9 @@ using ``__str__()`` like this::
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            # Note use of django.utils.encoding.smart_str() here because
+            # Note use of django.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
-            return smart_str('%s %s' % (self.first_name, self.last_name))
+            return force_bytes('%s %s' % (self.first_name, self.last_name))
 
 ``get_absolute_url``
 --------------------
@@ -445,9 +482,13 @@ For example::
         return "/people/%i/" % self.id
 
 (Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`permalink() decorator <permalink>`,
-documented below, is usually the best approach and you should read that section
-before diving into code implementation.)
+write this kind of method. The :func:`~django.core.urlresolvers.reverse`
+function is usually the best approach.)
+
+For example::
+
+    def get_absolute_url(self):
+        return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -460,12 +501,16 @@ defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
-hard-coding your objects' URLs. For example, this template code is bad::
+hard-coding your objects' URLs. For example, this template code is bad:
+
+.. code-block:: html+django
 
     <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-This template code is much better::
+This template code is much better:
+
+.. code-block:: html+django
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
@@ -488,11 +533,19 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The way we wrote ``get_absolute_url()`` above is a slightly violation of the
-DRY principle: the URL for this object is defined both in the URLconf file and
-in the model.
+.. warning::
 
-You can decouple your models from the URLconf using the ``permalink`` decorator:
+    The ``permalink`` decorator is no longer recommended. You should use
+    :func:`~django.core.urlresolvers.reverse` in the body of your
+    ``get_absolute_url`` method instead.
+
+In early versions of Django, there wasn't an easy way to use URLs defined in
+URLconf file inside :meth:`~django.db.models.Model.get_absolute_url`. That
+meant you would need to define the URL both in URLConf and
+:meth:`~django.db.models.Model.get_absolute_url`. The ``permalink`` decorator
+was added to overcome this DRY principle violation. However, since the
+introduction of :func:`~django.core.urlresolvers.reverse` there is no
+reason to use ``permalink`` any more.
 
 .. function:: permalink()
 
@@ -501,14 +554,16 @@ pattern name) and a list of position or keyword arguments and uses the URLconf
 patterns to construct the correct, full URL. It returns a string for the
 correct URL, with all parameters substituted in the correct positions.
 
-The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url` template tag and a high-level wrapper for the :func:`django.core.urlresolvers.reverse()` function.
+The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
+template tag and a high-level wrapper for the
+:func:`~django.core.urlresolvers.reverse` function.
 
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-...your model could have a :meth:`~django.db.models.Model.get_absolute_url()`
+...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
 method that looked like this::
 
     from django.db import models
@@ -572,25 +627,29 @@ might have some of the following methods:
 
 For every field that has :attr:`~django.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
-the field. This method returns the "human-readable" value of the field. For
-example, in the following model::
+the field. This method returns the "human-readable" value of the field.
 
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-    )
+For example::
+
+    from django.db import models
+
     class Person(models.Model):
-        name = models.CharField(max_length=20)
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+        SHIRT_SIZES = (
+            (u'S', u'Small'),
+            (u'M', u'Medium'),
+            (u'L', u'Large'),
+        )
+        name = models.CharField(max_length=60)
+        shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
 
-...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
+::
 
-    >>> p = Person(name='John', gender='M')
+    >>> p = Person(name="Fred Flintstone", shirt_size="L")
     >>> p.save()
-    >>> p.gender
-    'M'
-    >>> p.get_gender_display()
-    'Male'
+    >>> p.shirt_size
+    u'L'
+    >>> p.get_shirt_size_display()
+    u'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
@@ -608,4 +667,3 @@ described in :ref:`Field lookups <field-lookups>`.
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
 duplicated. That also means you cannot use those methods on unsaved objects.
-

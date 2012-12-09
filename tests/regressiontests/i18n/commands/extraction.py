@@ -1,12 +1,15 @@
 # -*- encoding: utf-8 -*-
+from __future__ import unicode_literals
 
 import os
 import re
 import shutil
-from StringIO import StringIO
 
 from django.core import management
 from django.test import TestCase
+from django.utils.encoding import force_text
+from django.utils._os import upath
+from django.utils.six import StringIO
 
 
 LOCALE='de'
@@ -17,7 +20,7 @@ class ExtractorTests(TestCase):
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(__file__))
+        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -55,7 +58,7 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
             self.assertTrue('This comment should not be extracted' not in po_contents)
             # Comments in templates
@@ -83,7 +86,7 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertMsgId('Literal with a percent symbol at the end %%', po_contents)
             self.assertMsgId('Literal with a percent %% symbol in the middle', po_contents)
             self.assertMsgId('Completed 50%% of all the tasks', po_contents)
@@ -99,7 +102,7 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
             self.assertMsgId('I think that 100%% is more that 50%% of %(obj)s.', po_contents)
             self.assertMsgId("Blocktrans extraction shouldn't double escape this: %%, a=%(a)s", po_contents)
@@ -117,6 +120,14 @@ class BasicExtractorTests(ExtractorTests):
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
 
+    def test_extraction_warning(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./code.sample', './code_sample.py')
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        os.remove('./code_sample.py')
+        self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
+
     def test_template_message_context_extractor(self):
         """
         Ensure that message contexts are correctly extracted for the
@@ -127,7 +138,7 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             # {% trans %}
             self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
             self.assertTrue("Translatable literal #7a" in po_contents)
@@ -147,6 +158,21 @@ class BasicExtractorTests(ExtractorTests):
             self.assertTrue("Translatable literal #8c-plural" in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
             self.assertTrue("Translatable literal #8d" in po_contents)
+
+    def test_context_in_single_quotes(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            # {% trans %}
+            self.assertTrue('msgctxt "Context wrapped in double quotes"' in po_contents)
+            self.assertTrue('msgctxt "Context wrapped in single quotes"' in po_contents)
+
+            # {% blocktrans %}
+            self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
+            self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+
 
 class JavascriptExtractorTests(ExtractorTests):
 
@@ -193,7 +219,7 @@ class SymlinkExtractorTests(ExtractorTests):
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(__file__))
+        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def tearDown(self):
@@ -215,7 +241,7 @@ class SymlinkExtractorTests(ExtractorTests):
             management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
             with open(self.PO_FILE, 'r') as fp:
-                po_contents = fp.read()
+                po_contents = force_text(fp.read())
                 self.assertMsgId('This literal should be included.', po_contents)
                 self.assertTrue('templates_symlinked/test.html' in po_contents)
 
@@ -227,7 +253,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
 
 
@@ -238,7 +264,7 @@ class NoWrapExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertMsgId('This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option.', po_contents)
 
     def test_no_wrap_disabled(self):
@@ -246,7 +272,7 @@ class NoWrapExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
 
 
@@ -257,7 +283,7 @@ class NoLocationExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertFalse('#: templates/test.html:55' in po_contents)
 
     def test_no_location_disabled(self):
@@ -265,5 +291,5 @@ class NoLocationExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
+            po_contents = force_text(fp.read())
             self.assertTrue('#: templates/test.html:55' in po_contents)

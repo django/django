@@ -18,7 +18,7 @@ Fixes and improvements in Django 1.0.1
 
 Django 1.0.1 contains over two hundred fixes to the original Django
 1.0 codebase; full details of every fix are available in `the
-Subversion log of the 1.0.X branch`_, but here are some of the
+history of the 1.0.X branch`_, but here are some of the
 highlights:
 
 * Several fixes in ``django.contrib.comments``, pertaining to RSS
@@ -61,4 +61,4 @@ highlights:
   documentation, including both corrections to existing documents and
   expanded and new documentation.
 
-.. _the Subversion log of the 1.0.X branch: https://code.djangoproject.com/log/django/branches/releases/1.0.X
+.. _the history of the 1.0.X branch: https://github.com/django/django/commits/stable/1.0.x

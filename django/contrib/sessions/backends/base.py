@@ -1,10 +1,12 @@
+from __future__ import unicode_literals
+
 import base64
-import time
 from datetime import datetime, timedelta
 try:
-    import cPickle as pickle
+    from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
+import string
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -12,6 +14,11 @@ from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
+from django.utils.encoding import force_bytes
+
+# session_key should not be case sensitive because some backends can store it
+# on case insensitive file systems.
+VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 
 class CreateError(Exception):
     """
@@ -78,15 +85,15 @@ class SessionBase(object):
         "Returns the given session dictionary pickled and encoded as a string."
         pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
         hash = self._hash(pickled)
-        return base64.encodestring(hash + ":" + pickled)
+        return base64.b64encode(hash.encode() + b":" + pickled).decode('ascii')
 
     def decode(self, session_data):
-        encoded_data = base64.decodestring(session_data)
+        encoded_data = base64.b64decode(force_bytes(session_data))
         try:
             # could produce ValueError if there is no ':'
-            hash, pickled = encoded_data.split(':', 1)
+            hash, pickled = encoded_data.split(b':', 1)
             expected_hash = self._hash(pickled)
-            if not constant_time_compare(hash, expected_hash):
+            if not constant_time_compare(hash.decode(), expected_hash):
                 raise SuspiciousOperation("Session data corrupted")
             else:
                 return pickle.loads(pickled)
@@ -130,12 +137,8 @@ class SessionBase(object):
 
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
-        # Todo: move to 0-9a-z charset in 1.5
-        hex_chars = '1234567890abcdef'
-        # session_key should not be case sensitive because some backends
-        # can store it on case insensitive file systems.
         while True:
-            session_key = get_random_string(32, hex_chars)
+            session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
                 break
         return session_key
@@ -167,24 +170,52 @@ class SessionBase(object):
 
     _session = property(_get_session)
 
-    def get_expiry_age(self):
-        """Get the number of seconds until the session expires."""
-        expiry = self.get('_session_expiry')
+    def get_expiry_age(self, **kwargs):
+        """Get the number of seconds until the session expires.
+
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
+        """
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Make the difference between "expiry=None passed in kwargs" and
+        # "expiry not passed in kwargs", in order to guarantee not to trigger
+        # self.load() when expiry is provided.
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
+            expiry = self.get('_session_expiry')
+
         if not expiry:   # Checks both None and 0 cases
             return settings.SESSION_COOKIE_AGE
         if not isinstance(expiry, datetime):
             return expiry
-        delta = expiry - timezone.now()
+        delta = expiry - modification
         return delta.days * 86400 + delta.seconds
 
-    def get_expiry_date(self):
-        """Get session the expiry date (as a datetime object)."""
-        expiry = self.get('_session_expiry')
+    def get_expiry_date(self, **kwargs):
+        """Get session the expiry date (as a datetime object).
+
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
+        """
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Same comment as in get_expiry_age
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
+            expiry = self.get('_session_expiry')
+
         if isinstance(expiry, datetime):
             return expiry
         if not expiry:   # Checks both None and 0 cases
             expiry = settings.SESSION_COOKIE_AGE
-        return timezone.now() + timedelta(seconds=expiry)
+        return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):
         """
@@ -276,5 +307,16 @@ class SessionBase(object):
     def load(self):
         """
         Loads the session data and returns a dictionary.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def clear_expired(cls):
+        """
+        Remove expired sessions from the session store.
+
+        If this operation isn't possible on a given backend, it should raise
+        NotImplementedError. If it isn't necessary, because the backend has
+        a built-in expiration mechanism, it should be a no-op.
         """
         raise NotImplementedError

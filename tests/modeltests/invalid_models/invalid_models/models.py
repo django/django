@@ -5,6 +5,8 @@
 This example exists purely to point out errors in models.
 """
 
+from __future__ import unicode_literals
+
 from django.db import connection, models
 
 
@@ -19,10 +21,11 @@ class FieldErrors(models.Model):
     decimalfield5 = models.DecimalField(max_digits=10, decimal_places=10)
     filefield = models.FileField()
     choices = models.CharField(max_length=10, choices='bad')
-    choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
+    choices2 = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
     index = models.CharField(max_length=10, db_index='bad')
     field_ = models.CharField(max_length=10)
     nullbool = models.BooleanField(null=True)
+
 
 class Target(models.Model):
     tgt_safe = models.CharField(max_length=10)
@@ -31,11 +34,13 @@ class Target(models.Model):
 
     clash1_set = models.CharField(max_length=10)
 
+
 class Clash1(models.Model):
     src_safe = models.CharField(max_length=10)
 
     foreign = models.ForeignKey(Target)
     m2m = models.ManyToManyField(Target)
+
 
 class Clash2(models.Model):
     src_safe = models.CharField(max_length=10)
@@ -46,6 +51,7 @@ class Clash2(models.Model):
     m2m_1 = models.ManyToManyField(Target, related_name='id')
     m2m_2 = models.ManyToManyField(Target, related_name='src_safe')
 
+
 class Target2(models.Model):
     clash3 = models.CharField(max_length=10)
     foreign_tgt = models.ForeignKey(Target)
@@ -53,6 +59,7 @@ class Target2(models.Model):
 
     m2m_tgt = models.ManyToManyField(Target)
     clashm2m_set = models.ManyToManyField(Target)
+
 
 class Clash3(models.Model):
     src_safe = models.CharField(max_length=10)
@@ -63,11 +70,14 @@ class Clash3(models.Model):
     m2m_1 = models.ManyToManyField(Target2, related_name='foreign_tgt')
     m2m_2 = models.ManyToManyField(Target2, related_name='m2m_tgt')
 
+
 class ClashForeign(models.Model):
     foreign = models.ForeignKey(Target2)
 
+
 class ClashM2M(models.Model):
     m2m = models.ManyToManyField(Target2)
+
 
 class SelfClashForeign(models.Model):
     src_safe = models.CharField(max_length=10)
@@ -76,6 +86,7 @@ class SelfClashForeign(models.Model):
     selfclashforeign_set = models.ForeignKey("SelfClashForeign")
     foreign_1 = models.ForeignKey("SelfClashForeign", related_name='id')
     foreign_2 = models.ForeignKey("SelfClashForeign", related_name='src_safe')
+
 
 class ValidM2M(models.Model):
     src_safe = models.CharField(max_length=10)
@@ -92,6 +103,7 @@ class ValidM2M(models.Model):
     m2m_3 = models.ManyToManyField('self')
     m2m_4 = models.ManyToManyField('self')
 
+
 class SelfClashM2M(models.Model):
     src_safe = models.CharField(max_length=10)
     selfclashm2m = models.CharField(max_length=10)
@@ -106,26 +118,32 @@ class SelfClashM2M(models.Model):
     m2m_3 = models.ManyToManyField('self', symmetrical=False)
     m2m_4 = models.ManyToManyField('self', symmetrical=False)
 
+
 class Model(models.Model):
     "But it's valid to call a model Model."
-    year = models.PositiveIntegerField() #1960
-    make = models.CharField(max_length=10) #Aston Martin
-    name = models.CharField(max_length=10) #DB 4 GT
+    year = models.PositiveIntegerField()  # 1960
+    make = models.CharField(max_length=10)  # Aston Martin
+    name = models.CharField(max_length=10)  # DB 4 GT
+
 
 class Car(models.Model):
     colour = models.CharField(max_length=5)
     model = models.ForeignKey(Model)
 
+
 class MissingRelations(models.Model):
     rel1 = models.ForeignKey("Rel1")
     rel2 = models.ManyToManyField("Rel2")
+
 
 class MissingManualM2MModel(models.Model):
     name = models.CharField(max_length=5)
     missing_m2m = models.ManyToManyField(Model, through="MissingM2MModel")
 
+
 class Person(models.Model):
     name = models.CharField(max_length=5)
+
 
 class Group(models.Model):
     name = models.CharField(max_length=5)
@@ -133,37 +151,45 @@ class Group(models.Model):
     secondary = models.ManyToManyField(Person, through="Membership", related_name="secondary")
     tertiary = models.ManyToManyField(Person, through="RelationshipDoubleFK", related_name="tertiary")
 
+
 class GroupTwo(models.Model):
     name = models.CharField(max_length=5)
     primary = models.ManyToManyField(Person, through="Membership")
     secondary = models.ManyToManyField(Group, through="MembershipMissingFK")
+
 
 class Membership(models.Model):
     person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
     not_default_or_null = models.CharField(max_length=5)
 
+
 class MembershipMissingFK(models.Model):
     person = models.ForeignKey(Person)
+
 
 class PersonSelfRefM2M(models.Model):
     name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="Relationship")
     too_many_friends = models.ManyToManyField('self', through="RelationshipTripleFK")
 
+
 class PersonSelfRefM2MExplicit(models.Model):
     name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="ExplicitRelationship", symmetrical=True)
+
 
 class Relationship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set")
     second = models.ForeignKey(PersonSelfRefM2M, related_name="rel_to_set")
     date_added = models.DateTimeField()
 
+
 class ExplicitRelationship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2MExplicit, related_name="rel_from_set")
     second = models.ForeignKey(PersonSelfRefM2MExplicit, related_name="rel_to_set")
     date_added = models.DateTimeField()
+
 
 class RelationshipTripleFK(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set_2")
@@ -171,67 +197,83 @@ class RelationshipTripleFK(models.Model):
     third = models.ForeignKey(PersonSelfRefM2M, related_name="too_many_by_far")
     date_added = models.DateTimeField()
 
+
 class RelationshipDoubleFK(models.Model):
     first = models.ForeignKey(Person, related_name="first_related_name")
     second = models.ForeignKey(Person, related_name="second_related_name")
     third = models.ForeignKey(Group, related_name="rel_to_set")
     date_added = models.DateTimeField()
 
+
 class AbstractModel(models.Model):
     name = models.CharField(max_length=10)
+
     class Meta:
         abstract = True
+
 
 class AbstractRelationModel(models.Model):
     fk1 = models.ForeignKey('AbstractModel')
     fk2 = models.ManyToManyField('AbstractModel')
 
+
 class UniqueM2M(models.Model):
     """ Model to test for unique ManyToManyFields, which are invalid. """
     unique_people = models.ManyToManyField(Person, unique=True)
+
 
 class NonUniqueFKTarget1(models.Model):
     """ Model to test for non-unique FK target in yet-to-be-defined model: expect an error """
     tgt = models.ForeignKey('FKTarget', to_field='bad')
 
+
 class UniqueFKTarget1(models.Model):
     """ Model to test for unique FK target in yet-to-be-defined model: expect no error """
     tgt = models.ForeignKey('FKTarget', to_field='good')
+
 
 class FKTarget(models.Model):
     bad = models.IntegerField()
     good = models.IntegerField(unique=True)
 
+
 class NonUniqueFKTarget2(models.Model):
     """ Model to test for non-unique FK target in previously seen model: expect an error """
     tgt = models.ForeignKey(FKTarget, to_field='bad')
+
 
 class UniqueFKTarget2(models.Model):
     """ Model to test for unique FK target in previously seen model: expect no error """
     tgt = models.ForeignKey(FKTarget, to_field='good')
 
+
 class NonExistingOrderingWithSingleUnderscore(models.Model):
     class Meta:
         ordering = ("does_not_exist",)
 
+
 class InvalidSetNull(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_NULL)
+
 
 class InvalidSetDefault(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
 
+
 class UnicodeForeignKeys(models.Model):
     """Foreign keys which can translate to ascii should be OK, but fail if
     they're not."""
-    good = models.ForeignKey(u'FKTarget')
-    also_good = models.ManyToManyField(u'FKTarget', related_name='unicode2')
+    good = models.ForeignKey('FKTarget')
+    also_good = models.ManyToManyField('FKTarget', related_name='unicode2')
 
     # In Python 3 this should become legal, but currently causes unicode errors
     # when adding the errors in core/management/validation.py
-    #bad = models.ForeignKey(u'★')
+    #bad = models.ForeignKey('★')
+
 
 class PrimaryKeyNull(models.Model):
     my_pk_field = models.IntegerField(primary_key=True, null=True)
+
 
 class OrderByPKModel(models.Model):
     """
@@ -242,6 +284,84 @@ class OrderByPKModel(models.Model):
 
     class Meta:
         ordering = ('pk',)
+
+
+class SwappableModel(models.Model):
+    """A model that can be, but isn't swapped out.
+
+    References to this model *shoudln't* raise any validation error.
+    """
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        swappable = 'TEST_SWAPPABLE_MODEL'
+
+
+class SwappedModel(models.Model):
+    """A model that is swapped out.
+
+    References to this model *should* raise a validation error.
+    Requires TEST_SWAPPED_MODEL to be defined in the test environment;
+    this is guaranteed by the test runner using @override_settings.
+
+    The foreign keys and m2m relations on this model *shouldn't*
+    install related accessors, so there shouldn't be clashes with
+    the equivalent names on the replacement.
+    """
+    name = models.CharField(max_length=100)
+
+    foreign = models.ForeignKey(Target, related_name='swappable_fk_set')
+    m2m = models.ManyToManyField(Target, related_name='swappable_m2m_set')
+
+    class Meta:
+        swappable = 'TEST_SWAPPED_MODEL'
+
+
+class ReplacementModel(models.Model):
+    """A replacement model for swapping purposes."""
+    name = models.CharField(max_length=100)
+
+    foreign = models.ForeignKey(Target, related_name='swappable_fk_set')
+    m2m = models.ManyToManyField(Target, related_name='swappable_m2m_set')
+
+
+class BadSwappableValue(models.Model):
+    """A model that can be swapped out; during testing, the swappable
+    value is not of the format app.model
+    """
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        swappable = 'TEST_SWAPPED_MODEL_BAD_VALUE'
+
+
+class BadSwappableModel(models.Model):
+    """A model that can be swapped out; during testing, the swappable
+    value references an unknown model.
+    """
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
+
+
+class HardReferenceModel(models.Model):
+    fk_1 = models.ForeignKey(SwappableModel, related_name='fk_hardref1')
+    fk_2 = models.ForeignKey('invalid_models.SwappableModel', related_name='fk_hardref2')
+    fk_3 = models.ForeignKey(SwappedModel, related_name='fk_hardref3')
+    fk_4 = models.ForeignKey('invalid_models.SwappedModel', related_name='fk_hardref4')
+    m2m_1 = models.ManyToManyField(SwappableModel, related_name='m2m_hardref1')
+    m2m_2 = models.ManyToManyField('invalid_models.SwappableModel', related_name='m2m_hardref2')
+    m2m_3 = models.ManyToManyField(SwappedModel, related_name='m2m_hardref3')
+    m2m_4 = models.ManyToManyField('invalid_models.SwappedModel', related_name='m2m_hardref4')
+
+
+class BadIndexTogether1(models.Model):
+    class Meta:
+        index_together = [
+            ["field_that_does_not_exist"],
+        ]
+
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
@@ -351,6 +471,13 @@ invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have 
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
+invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
+invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
+invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
 """
 
 if not connection.features.interprets_empty_strings_as_nulls:

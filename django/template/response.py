@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader, Context, RequestContext
+from django.utils import six
 
 
 class ContentNotRenderedError(Exception):
@@ -9,8 +10,8 @@ class ContentNotRenderedError(Exception):
 class SimpleTemplateResponse(HttpResponse):
     rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
 
-    def __init__(self, template, context=None, mimetype=None, status=None,
-            content_type=None):
+    def __init__(self, template, context=None, content_type=None, status=None,
+            mimetype=None):
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
         # API. To avoid the name collision, we use tricky-to-debug problems
@@ -22,8 +23,8 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', mimetype, status,
-                                                     content_type)
+        super(SimpleTemplateResponse, self).__init__('', content_type, status,
+                                                     mimetype)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -39,7 +40,7 @@ class SimpleTemplateResponse(HttpResponse):
         rendered, and that the pickled state only includes rendered
         data, not the data used to construct the response.
         """
-        obj_dict = self.__dict__.copy()
+        obj_dict = super(SimpleTemplateResponse, self).__getstate__()
         if not self._is_rendered:
             raise ContentNotRenderedError('The response content must be '
                                           'rendered before it can be pickled.')
@@ -53,7 +54,7 @@ class SimpleTemplateResponse(HttpResponse):
         "Accepts a template object, path-to-template or list of paths"
         if isinstance(template, (list, tuple)):
             return loader.select_template(template)
-        elif isinstance(template, basestring):
+        elif isinstance(template, six.string_types):
             return loader.get_template(template)
         else:
             return template
@@ -101,7 +102,7 @@ class SimpleTemplateResponse(HttpResponse):
         """
         retval = self
         if not self._is_rendered:
-            self._set_content(self.rendered_content)
+            self.content = self.rendered_content
             for post_callback in self._post_render_callbacks:
                 newretval = post_callback(retval)
                 if newretval is not None:
@@ -118,27 +119,27 @@ class SimpleTemplateResponse(HttpResponse):
                                           'rendered before it can be iterated over.')
         return super(SimpleTemplateResponse, self).__iter__()
 
-    def _get_content(self):
+    @property
+    def content(self):
         if not self._is_rendered:
             raise ContentNotRenderedError('The response content must be '
                                           'rendered before it can be accessed.')
-        return super(SimpleTemplateResponse, self)._get_content()
+        return super(SimpleTemplateResponse, self).content
 
-    def _set_content(self, value):
+    @content.setter
+    def content(self, value):
         """Sets the content for the response
         """
-        super(SimpleTemplateResponse, self)._set_content(value)
+        HttpResponse.content.fset(self, value)
         self._is_rendered = True
-
-    content = property(_get_content, _set_content)
 
 
 class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + \
         ['_request', '_current_app']
 
-    def __init__(self, request, template, context=None, mimetype=None,
-            status=None, content_type=None, current_app=None):
+    def __init__(self, request, template, context=None, content_type=None,
+            status=None, mimetype=None, current_app=None):
         # self.request gets over-written by django.test.client.Client - and
         # unlike context_data and template_name the _request should not
         # be considered part of the public API.
@@ -147,7 +148,7 @@ class TemplateResponse(SimpleTemplateResponse):
         # having to avoid needing to create the RequestContext directly
         self._current_app = current_app
         super(TemplateResponse, self).__init__(
-            template, context, mimetype, status, content_type)
+            template, context, content_type, status, mimetype)
 
     def resolve_context(self, context):
         """Convert context data into a full RequestContext object

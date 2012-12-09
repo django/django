@@ -96,6 +96,9 @@ cleanup
 Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
 
+.. versionchanged:: 1.5
+    :djadmin:`cleanup` is deprecated. Use :djadmin:`clearsessions` instead.
+
 compilemessages
 ---------------
 
@@ -109,7 +112,7 @@ If not provided, all locales are processed.
 
 Example usage::
 
-    django-admin.py compilemessages --locale=br_PT
+    django-admin.py compilemessages --locale=pt_BR
 
 createcachetable
 ----------------
@@ -118,8 +121,6 @@ createcachetable
 
 Creates a cache table named ``tablename`` for use with the database cache
 backend. See :doc:`/topics/cache` for more information.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which the cachetable will be installed.
@@ -141,8 +142,6 @@ This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
 the right place. There's no way to specify the location of the program
 manually.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which to open a shell.
@@ -180,8 +179,6 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
-.. versionadded:: 1.3
-
 The :djadminopt:`--all` option may be provided to specify that
 ``dumpdata`` should use Django's base manager, dumping records which
 might otherwise be filtered or modified by a custom manager.
@@ -199,27 +196,15 @@ easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
-applications from being dumped.
-
-.. versionadded:: 1.3
-
-The :djadminopt:`--exclude` option may also be provided to prevent specific
-models (specified as in the form of ``appname.ModelName``) from being dumped.
-
-In addition to specifying application names, you can provide a list of
-individual models, in the form of ``appname.Model``. If you specify a model
-name to ``dumpdata``, the dumped output will be restricted to that model,
-rather than the entire application. You can also mix application names and
-model names.
-
-.. versionadded:: 1.2
+applications or models (specified as in the form of ``appname.ModelName``) from
+being dumped. If you specify a model name to ``dumpdata``, the dumped output
+will be restricted to that model, rather than the entire application. You can
+also mix application names and model names.
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
 
 .. django-admin-option:: --natural
-
-.. versionadded:: 1.2
 
 Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
 any foreign key and many-to-many relationship with a model that provides
@@ -232,18 +217,24 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after syncdb was
-executed. This means that all data will be removed from the database, any
+Returns the database to the state it was in immediately after :djadmin:`syncdb`
+was executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
+
+--no-initial-data
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.5
+
+Use ``--no-initial-data`` to avoid loading the initial_data fixture.
+
 
 inspectdb
 ---------
@@ -288,8 +279,6 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
 
@@ -300,10 +289,13 @@ loaddata <fixture fixture ...>
 
 Searches for and loads the contents of the named fixture into the database.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
+
+.. versionadded:: 1.5
+
+The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
+may have been removed from models since the fixture was originally generated.
 
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
@@ -432,7 +424,7 @@ Use the :djadminopt:`--locale` option to specify the locale to process.
 
 Example usage::
 
-    django-admin.py makemessages --locale=br_PT
+    django-admin.py makemessages --locale=pt_BR
 
 .. django-admin-option:: --domain
 
@@ -443,8 +435,6 @@ Currently supported:
 * ``djangojs`` for ``*.js`` files
 
 .. django-admin-option:: --symlinks
-
-.. versionadded:: 1.2
 
 Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
 looking for new translation strings.
@@ -470,8 +460,6 @@ Use the ``--no-default-ignore`` option to disable the default values of
 :djadminopt:`--ignore`.
 
 .. django-admin-option:: --no-wrap
-
-.. versionadded:: 1.3
 
 Use the ``--no-wrap`` option to disable breaking long message lines into
 several lines in language files.
@@ -648,18 +636,14 @@ machines on your network. To make your development server viewable to other
 machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
 ``0.0.0.0`` or ``::`` (with IPv6 enabled).
 
-.. versionchanged:: 1.3
-
 You can provide an IPv6 address surrounded by brackets
 (e.g. ``[200a::1]:8000``). This will automatically enable IPv6 support.
 
 A hostname containing ASCII-only characters can also be used.
 
-.. versionchanged:: 1.3
-
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overriden
-with an own :djadmin:`runserver<staticfiles-runserver>` command.
+with its own :ref:`runserver<staticfiles-runserver>` command.
 
 .. django-admin-option:: --noreload
 
@@ -676,12 +660,11 @@ Example usage::
 
 .. versionadded:: 1.4
 
+Since version 1.4, the development server is multithreaded by default.
 Use the ``--nothreading`` option to disable the use of threading in the
 development server.
 
 .. django-admin-option:: --ipv6, -6
-
-.. versionadded:: 1.3
 
 Use the ``--ipv6`` (or shorter ``-6``) option to tell Django to use IPv6 for
 the development server. This changes the default IP address from
@@ -750,6 +733,24 @@ use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
 
+.. versionchanged:: 1.5
+
+If you would like to specify either IPython or bpython as your interpreter if
+you have both installed you can specify an alternative interpreter interface
+with the ``-i`` or ``--interface`` options like so:
+
+IPython::
+
+    django-admin.py shell -i ipython
+    django-admin.py shell --interface ipython
+
+
+bpython::
+
+    django-admin.py shell -i bpython
+    django-admin.py shell --interface bpython
+
+
 .. _IPython: http://ipython.scipy.org/
 .. _bpython: http://bpython-interpreter.org/
 
@@ -759,8 +760,6 @@ sql <appname appname ...>
 .. django-admin:: sql
 
 Prints the CREATE TABLE SQL statements for the given app name(s).
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -775,8 +774,6 @@ Prints the CREATE TABLE and initial-data SQL statements for the given app name(s
 Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -786,8 +783,6 @@ sqlclear <appname appname ...>
 .. django-admin:: sqlclear
 
 Prints the DROP TABLE SQL statements for the given app name(s).
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -813,8 +808,6 @@ table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -826,8 +819,6 @@ sqlflush
 Prints the SQL statements that would be executed for the :djadmin:`flush`
 command.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -837,8 +828,6 @@ sqlindexes <appname appname ...>
 .. django-admin:: sqlindexes
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -855,8 +844,6 @@ number for automatically incremented fields.
 
 Use this command to generate SQL which will fix cases where a sequence is out
 of sync with its automatically incremented field data.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -892,14 +879,19 @@ either the path to a directory with the app template file, or a path to a
 compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
 containing the app template files.
 
-Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
-archives with the app template files, downloading and extracting them on the
-fly.
-
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
 
     django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
+
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the app template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
 
 .. versionadded:: 1.4
 
@@ -909,7 +901,8 @@ through the template engine: the files whose extensions match the
 with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
-- Any option passed to the startapp command
+- Any option passed to the startapp command (among the command's supported
+  options)
 - ``app_name`` -- the app name as passed to the command
 - ``app_directory`` -- the full path of the newly created app
 
@@ -966,6 +959,15 @@ when creating the ``myproject`` project::
 
     django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
 
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the project template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
+
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
 ``--extension`` option (``py`` by default) and the files whose names are passed
@@ -1019,10 +1021,15 @@ data files.
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database to
 synchronize.
+
+--no-initial-data
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.5
+
+Use ``--no-initial-data`` to avoid loading the initial_data fixture.
 
 test <app or test identifier>
 -----------------------------
@@ -1032,7 +1039,6 @@ test <app or test identifier>
 Runs tests for all installed models. See :doc:`/topics/testing` for more
 information.
 
-.. versionadded:: 1.2
 .. django-admin-option:: --failfast
 
 The ``--failfast`` option can be used to stop running tests and report the
@@ -1111,8 +1117,6 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
 
-.. versionadded:: 1.3
-
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
@@ -1139,8 +1143,6 @@ changepassword
 ~~~~~~~~~~~~~~
 
 .. django-admin:: changepassword
-
-.. versionadded:: 1.2
 
 This command is only available if Django's :doc:`authentication system
 </topics/auth>` (``django.contrib.auth``) is installed.
@@ -1201,6 +1203,16 @@ This command is only available if :doc:`GeoDjango </ref/contrib/gis/index>`
 
 Please refer to its :djadmin:`description <ogrinspect>` in the GeoDjango
 documentation.
+
+``django.contrib.sessions``
+---------------------------
+
+clearsessions
+~~~~~~~~~~~~~~~
+
+.. django-admin:: clearsessions
+
+Can be run as a cron job or directly to clean out expired sessions.
 
 ``django.contrib.sitemaps``
 ---------------------------
@@ -1301,8 +1313,6 @@ The following options are not available on every command, but they are common
 to a number of commands.
 
 .. django-admin-option:: --database
-
-.. versionadded:: 1.2
 
 Used to specify the database on which a command will operate. If not
 specified, this option will default to an alias of ``default``.
@@ -1473,3 +1483,12 @@ Examples::
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+
+Output redirection
+==================
+
+Note that you can redirect standard output and error streams as all commands
+support the ``stdout`` and ``stderr`` options. For example, you could write::
+
+    with open('/tmp/command_output') as f:
+        management.call_command('dumpdata', stdout=f)

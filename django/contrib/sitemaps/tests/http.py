@@ -1,71 +1,89 @@
+from __future__ import unicode_literals
+
+import os
 from datetime import date
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 from django.utils.unittest import skipUnless
 from django.utils.formats import localize
+from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 
 from .base import SitemapTestsBase
+
 
 class HTTPSitemapTests(SitemapTestsBase):
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
         response = self.client.get('/simple/index.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
-""" % self.base_url)
+""" % self.base_url
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
+    @override_settings(
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+    )
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
         response = self.client.get('/simple/custom-index.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
-""" % self.base_url)
+""" % self.base_url
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
 
     def test_simple_sitemap_section(self):
         "A simple sitemap section can be rendered"
         response = self.client.get('/simple/sitemap-simple.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today()))
+""" % (self.base_url, date.today())
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
         response = self.client.get('/simple/sitemap.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today()))
+""" % (self.base_url, date.today())
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
+    @override_settings(
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+    )
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
         response = self.client.get('/simple/custom-sitemap.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today()))
+""" % (self.base_url, date.today())
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
+    @override_settings(USE_L10N=True)
     def test_localized_priority(self):
         "The priority value should not be localized (Refs #14164)"
-        # Localization should be active
-        settings.USE_L10N = True
         activate('fr')
-        self.assertEqual(u'0,3', localize(0.3))
+        self.assertEqual('0,3', localize(0.3))
 
         # Retrieve the sitemap. Check that priorities
         # haven't been rendered in localized format
@@ -79,11 +97,12 @@ class HTTPSitemapTests(SitemapTestsBase):
         # installed doesn't raise an exception
         Site._meta.installed = False
         response = self.client.get('/simple/sitemap.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % date.today())
+""" % date.today()
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS,
                 "django.contrib.sites app not installed.")
@@ -120,8 +139,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         Check that a cached sitemap index can be rendered (#2713).
         """
         response = self.client.get('/cached/index.xml')
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
-""" % self.base_url)
+""" % self.base_url
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)

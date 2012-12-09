@@ -38,6 +38,8 @@ in a form suitable for easy inclusion on your Web page.
     whichever toolkit suits your requirements. Django is able to integrate
     with any JavaScript toolkit.
 
+.. _media-as-a-static-definition:
+
 Media as a static definition
 ----------------------------
 
@@ -65,9 +67,9 @@ through this property::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
 Here's a list of all possible ``Media`` options. There are no required options.
 
@@ -78,10 +80,8 @@ A dictionary describing the CSS files required for various forms of output
 media.
 
 The values in the dictionary should be a tuple/list of file names. See
-`the section on media paths`_ for details of how to specify paths to media
-files.
-
-.. _the section on media paths: `Paths in media definitions`_
+:ref:`the section on media paths <form-media-paths>` for details of how to
+specify paths to media files.
 
 The keys in the dictionary are the output media types. These are the same
 types accepted by CSS files in media declarations: 'all', 'aural', 'braille',
@@ -110,15 +110,15 @@ requirements::
 
 If this last CSS definition were to be rendered, it would become the following HTML::
 
-    <link href="http://media.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
-    <link href="http://media.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
-    <link href="http://media.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
+    <link href="http://static.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
+    <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
 
 ``js``
 ~~~~~~
 
-A tuple describing the required JavaScript files. See
-`the section on media paths`_ for details of how to specify paths to media
+A tuple describing the required JavaScript files. See :ref:`the section on
+media paths <form-media-paths>` for details of how to specify paths to media
 files.
 
 ``extend``
@@ -140,11 +140,11 @@ basic Calendar widget from the example above::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 The FancyCalendar widget inherits all the media from it's parent widget. If
 you don't want media to be inherited in this way, add an ``extend=False``
@@ -160,14 +160,14 @@ declaration to the media declaration::
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you require even more control over media inheritance, define your media
-using a `dynamic property`_. Dynamic properties give you complete control over
-which media files are inherited, and which are not.
+using a :ref:`dynamic property <dynamic-property>`. Dynamic properties give
+you complete control over which media files are inherited, and which are not.
 
-.. _dynamic property: `Media as a dynamic property`_
+.. _dynamic-property:
 
 Media as a dynamic property
 ---------------------------
@@ -195,12 +195,10 @@ return values for dynamic media properties.
 Paths in media definitions
 --------------------------
 
-.. versionchanged:: 1.3
-
 Paths used to specify media can be either relative or absolute. If a path
-starts with '/', 'http://' or 'https://', it will be interpreted as an absolute
-path, and left as-is. All other paths will be prepended with the value of
-the appropriate prefix.
+starts with ``/``, ``http://`` or ``https://``, it will be interpreted as an
+absolute path, and left as-is. All other paths will be prepended with the value
+of the appropriate prefix.
 
 As part of the introduction of the
 :doc:`staticfiles app </ref/contrib/staticfiles>` two new settings were added
@@ -253,12 +251,12 @@ to filter out a medium of interest. For example::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
     >>> print(w.media)['css']
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
 
 When you use the subscript operator, the value that is returned is a new
 Media object -- but one that only contains the media of interest.
@@ -283,10 +281,10 @@ the resulting Media object contains the union of the media from both files::
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
     >>> print(w1.media + w2.media)
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 Media on Forms
 --------------
@@ -306,10 +304,10 @@ of adding the media definitions for all widgets that are part of the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 If you want to associate additional media with a form -- for example, CSS for form
 layout -- simply add a media declaration to the form::
@@ -325,8 +323,8 @@ layout -- simply add a media declaration to the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <link href="http://media.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
-    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
-    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://static.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://static.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>

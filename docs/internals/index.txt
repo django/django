@@ -18,6 +18,7 @@ the hood".
 
    contributing/index
    committers
+   security
    release-process
    deprecation
-   svn
+   git

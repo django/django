@@ -33,11 +33,15 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
 
+from django.utils import six
+from django.utils.encoding import force_bytes
+
+
 #### Spatial Reference class. ####
 class SpatialReference(GDALBase):
     """
     A wrapper for the OGRSpatialReference object.  According to the GDAL Web site,
-    the SpatialReference object "provide[s] services to represent coordinate 
+    the SpatialReference object "provide[s] services to represent coordinate
     systems (projections and datums) and to transform between them."
     """
 
@@ -45,16 +49,15 @@ class SpatialReference(GDALBase):
     def __init__(self, srs_input=''):
         """
         Creates a GDAL OSR Spatial Reference object from the given input.
-        The input may be string of OGC Well Known Text (WKT), an integer 
-        EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand 
+        The input may be string of OGC Well Known Text (WKT), an integer
+        EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        buf = c_char_p('')
         srs_type = 'user'
 
-        if isinstance(srs_input, basestring):
+        if isinstance(srs_input, six.string_types):
             # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, unicode):
+            if isinstance(srs_input, six.text_type):
                 srs_input = srs_input.encode('ascii')
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
@@ -63,7 +66,7 @@ class SpatialReference(GDALBase):
                 srs_input = 'EPSG:%d' % srid
             except ValueError:
                 pass
-        elif isinstance(srs_input, (int, long)):
+        elif isinstance(srs_input, six.integer_types):
             # EPSG integer code was input.
             srs_type = 'epsg'
         elif isinstance(srs_input, self.ptr_type):
@@ -77,6 +80,7 @@ class SpatialReference(GDALBase):
             srs = srs_input
         else:
             # Creating a new SRS pointer, using the string buffer.
+            buf = c_char_p(b'')
             srs = capi.new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
@@ -97,8 +101,8 @@ class SpatialReference(GDALBase):
 
     def __getitem__(self, target):
         """
-        Returns the value of the given string attribute node, None if the node 
-        doesn't exist.  Can also take a tuple as a parameter, (target, child), 
+        Returns the value of the given string attribute node, None if the node
+        doesn't exist.  Can also take a tuple as a parameter, (target, child),
         where child is the index of the attribute in the WKT.  For example:
 
         >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
@@ -133,17 +137,17 @@ class SpatialReference(GDALBase):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, basestring) or not isinstance(index, int):
+        if not isinstance(target, six.string_types) or not isinstance(index, int):
             raise TypeError
-        return capi.get_attr_value(self.ptr, target, index)
+        return capi.get_attr_value(self.ptr, force_bytes(target), index)
 
     def auth_name(self, target):
         "Returns the authority name for the given string target node."
-        return capi.get_auth_name(self.ptr, target)
-    
+        return capi.get_auth_name(self.ptr, force_bytes(target))
+
     def auth_code(self, target):
         "Returns the authority code for the given string target node."
-        return capi.get_auth_code(self.ptr, target)
+        return capi.get_auth_code(self.ptr, force_bytes(target))
 
     def clone(self):
         "Returns a clone of this SpatialReference object."
@@ -167,7 +171,7 @@ class SpatialReference(GDALBase):
     def validate(self):
         "Checks to see if the given spatial reference is valid."
         capi.srs_validate(self.ptr)
-    
+
     #### Name & SRID properties ####
     @property
     def name(self):
@@ -184,7 +188,7 @@ class SpatialReference(GDALBase):
             return int(self.attr_value('AUTHORITY', 1))
         except (TypeError, ValueError):
             return None
-        
+
     #### Unit Properties ####
     @property
     def linear_name(self):
@@ -213,16 +217,18 @@ class SpatialReference(GDALBase):
     @property
     def units(self):
         """
-        Returns a 2-tuple of the units value and the units name, 
+        Returns a 2-tuple of the units value and the units name,
         and will automatically determines whether to return the linear
         or angular units.
         """
+        units, name = None, None
         if self.projected or self.local:
-            return capi.linear_units(self.ptr, byref(c_char_p()))
+            units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         elif self.geographic:
-            return capi.angular_units(self.ptr, byref(c_char_p()))
-        else:
-            return (None, None)
+            units, name = capi.angular_units(self.ptr, byref(c_char_p()))
+        if name is not None:
+            name.decode()
+        return (units, name)
 
     #### Spheroid/Ellipsoid Properties ####
     @property
@@ -252,7 +258,7 @@ class SpatialReference(GDALBase):
     @property
     def geographic(self):
         """
-        Returns True if this SpatialReference is geographic 
+        Returns True if this SpatialReference is geographic
          (root node is GEOGCS).
         """
         return bool(capi.isgeographic(self.ptr))
@@ -265,7 +271,7 @@ class SpatialReference(GDALBase):
     @property
     def projected(self):
         """
-        Returns True if this SpatialReference is a projected coordinate system 
+        Returns True if this SpatialReference is a projected coordinate system
          (root node is PROJCS).
         """
         return bool(capi.isprojected(self.ptr))
@@ -281,7 +287,7 @@ class SpatialReference(GDALBase):
 
     def import_user_input(self, user_input):
         "Imports the Spatial Reference from the given user input string."
-        capi.from_user_input(self.ptr, user_input)
+        capi.from_user_input(self.ptr, force_bytes(user_input))
 
     def import_wkt(self, wkt):
         "Imports the Spatial Reference from OGC WKT (string)"

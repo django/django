@@ -1,0 +1,238 @@
+==========
+Base views
+==========
+
+The following three classes provide much of the functionality needed to create
+Django views. You may think of them as *parent* views, which can be used by
+themselves or inherited from. They may not provide all the capabilities
+required for projects, in which case there are Mixins and Generic class-based
+views.
+
+Many of Django's built-in class-based views inherit from other class-based
+views or various mixins. Because this inheritence chain is very important, the
+ancestor classes are  documented under the section title of **Ancestors (MRO)**.
+MRO is an acronym for Method Resolution Order.
+
+View
+----
+
+.. class:: django.views.generic.base.View
+
+    The master class-based base view. All other class-based views inherit from
+    this base class.
+
+    **Method Flowchart**
+
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`options()`
+
+    **Example views.py**::
+
+        from django.http import HttpResponse
+        from django.views.generic import View
+
+        class MyView(View):
+
+            def get(self, request, *args, **kwargs):
+                return HttpResponse('Hello, World!')
+
+    **Example urls.py**::
+
+        from django.conf.urls import patterns, url
+
+        from myapp.views import MyView
+
+        urlpatterns = patterns('',
+            url(r'^mine/$', MyView.as_view(), name='my-view'),
+        )
+
+    **Attributes**
+
+    .. attribute:: http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+
+        The default list of HTTP method names that this view will accept.
+
+    **Methods**
+
+    .. classmethod:: as_view(**initkwargs)
+
+        Returns a callable view that takes a request and returns a response::
+
+            response = MyView.as_view()(request)
+
+    .. method:: dispatch(request, *args, **kwargs)
+
+        The ``view`` part of the view -- the method that accepts a ``request``
+        argument plus arguments, and returns a HTTP response.
+
+        The default implementation will inspect the HTTP method and attempt to
+        delegate to a method that matches the HTTP method; a ``GET`` will be
+        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
+        and so on.
+
+        By default, a ``HEAD`` request will be delegated to :meth:`~View.get()`.
+        If you need to handle ``HEAD`` requests in a different way than ``GET``,
+        you can override the :meth:`~View.head()` method. See
+        :ref:`supporting-other-http-methods` for an example.
+
+        The default implementation also sets ``request``, ``args`` and
+        ``kwargs`` as instance variables, so any method on the view can know
+        the full details of the request that was made to invoke the view.
+
+    .. method:: http_method_not_allowed(request, *args, **kwargs)
+
+        If the view was called with a HTTP method it doesn't support, this
+        method is called instead.
+
+        The default implementation returns ``HttpResponseNotAllowed`` with a
+        list of allowed methods in plain text.
+
+    .. method:: options(request, *args, **kwargs)
+
+        Handles responding to requests for the OPTIONS HTTP verb.  Returns a
+        list of the allowed HTTP method names for the view.
+
+TemplateView
+------------
+
+.. class:: django.views.generic.base.TemplateView
+
+    Renders a given template, passing it a ``{{ params }}`` template variable,
+    which is a dictionary of the parameters captured in the URL.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.base.TemplateView`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`get_context_data()`
+
+    **Example views.py**::
+
+        from django.views.generic.base import TemplateView
+
+        from articles.models import Article
+
+        class HomePageView(TemplateView):
+
+            template_name = "home.html"
+
+            def get_context_data(self, **kwargs):
+                context = super(HomePageView, self).get_context_data(**kwargs)
+                context['latest_articles'] = Article.objects.all()[:5]
+                return context
+
+    **Example urls.py**::
+
+        from django.conf.urls import patterns, url
+
+        from myapp.views import HomePageView
+
+        urlpatterns = patterns('',
+            url(r'^$', HomePageView.as_view(), name='home'),
+        )
+
+    **Context**
+
+    * ``params``: The dictionary of keyword arguments captured from the URL
+      pattern that served the view.
+
+RedirectView
+------------
+
+.. class:: django.views.generic.base.RedirectView
+
+    Redirects to a given URL.
+
+    The given URL may contain dictionary-style string formatting, which will be
+    interpolated against the parameters captured in the URL. Because keyword
+    interpolation is *always* done (even if no arguments are passed in), any
+    ``"%"`` characters in the URL must be written as ``"%%"`` so that Python
+    will convert them to a single percent sign on output.
+
+    If the given URL is ``None``, Django will return an ``HttpResponseGone``
+    (410).
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following view:
+
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`get_redirect_url()`
+
+    **Example views.py**::
+
+        from django.shortcuts import get_object_or_404
+        from django.views.generic.base import RedirectView
+
+        from articles.models import Article
+
+        class ArticleCounterRedirectView(RedirectView):
+
+            permanent = False
+            query_string = True
+
+            def get_redirect_url(self, pk):
+                article = get_object_or_404(Article, pk=pk)
+                article.update_counter()
+                return reverse('product_detail', args=(pk,))
+
+    **Example urls.py**::
+
+        from django.conf.urls import patterns, url
+        from django.views.generic.base import RedirectView
+
+        from article.views import ArticleCounterRedirectView
+
+        urlpatterns = patterns('',
+
+            url(r'r^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
+        )
+
+    **Attributes**
+
+    .. attribute:: url
+
+        The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
+        HTTP error.
+
+    .. attribute:: permanent
+
+        Whether the redirect should be permanent. The only difference here is
+        the HTTP status code returned. If ``True``, then the redirect will use
+        status code 301. If ``False``, then the redirect will use status code
+        302. By default, ``permanent`` is ``True``.
+
+    .. attribute:: query_string
+
+        Whether to pass along the GET query string to the new location. If
+        ``True``, then the query string is appended to the URL. If ``False``,
+        then the query string is discarded. By default, ``query_string`` is
+        ``False``.
+
+    **Methods**
+
+    .. method:: get_redirect_url(**kwargs)
+
+        Constructs the target URL for redirection.
+
+        The default implementation uses :attr:`~RedirectView.url` as a starting
+        string, performs expansion of ``%`` parameters in that string, as well
+        as the appending of query string if requested by
+        :attr:`~RedirectView.query_string`. Subclasses may implement any
+        behavior they wish, as long as the method returns a redirect-ready URL
+        string.

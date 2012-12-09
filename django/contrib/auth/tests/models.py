@@ -1,45 +1,40 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import (Group, User, SiteProfileNotAvailable,
+    UserManager)
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.contrib.auth.models import (Group, User,
-    SiteProfileNotAvailable, UserManager)
+from django.utils import six
 
 
-@override_settings(USE_TZ=False)
+@skipIfCustomUser
+@override_settings(USE_TZ=False, AUTH_PROFILE_MODULE='')
 class ProfileTestCase(TestCase):
-    fixtures = ['authtestdata.json']
-
-    def setUp(self):
-        """Backs up the AUTH_PROFILE_MODULE"""
-        self.old_AUTH_PROFILE_MODULE = getattr(settings,
-                                               'AUTH_PROFILE_MODULE', None)
-
-    def tearDown(self):
-        """Restores the AUTH_PROFILE_MODULE -- if it was not set it is deleted,
-        otherwise the old value is restored"""
-        if self.old_AUTH_PROFILE_MODULE is None and \
-                hasattr(settings, 'AUTH_PROFILE_MODULE'):
-            del settings.AUTH_PROFILE_MODULE
-
-        if self.old_AUTH_PROFILE_MODULE is not None:
-            settings.AUTH_PROFILE_MODULE = self.old_AUTH_PROFILE_MODULE
 
     def test_site_profile_not_available(self):
+        user = User.objects.create(username='testclient')
+
         # calling get_profile without AUTH_PROFILE_MODULE set
-        if hasattr(settings, 'AUTH_PROFILE_MODULE'):
-            del settings.AUTH_PROFILE_MODULE
-        user = User.objects.get(username='testclient')
-        self.assertRaises(SiteProfileNotAvailable, user.get_profile)
+        del settings.AUTH_PROFILE_MODULE
+        with six.assertRaisesRegex(self, SiteProfileNotAvailable,
+                "You need to set AUTH_PROFILE_MODULE in your project"):
+            user.get_profile()
 
         # Bad syntax in AUTH_PROFILE_MODULE:
         settings.AUTH_PROFILE_MODULE = 'foobar'
-        self.assertRaises(SiteProfileNotAvailable, user.get_profile)
+        with six.assertRaisesRegex(self, SiteProfileNotAvailable,
+                "app_label and model_name should be separated by a dot"):
+            user.get_profile()
 
         # module that doesn't exist
         settings.AUTH_PROFILE_MODULE = 'foo.bar'
-        self.assertRaises(SiteProfileNotAvailable, user.get_profile)
+        with six.assertRaisesRegex(self, SiteProfileNotAvailable,
+                "Unable to load the profile model"):
+            user.get_profile()
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class NaturalKeysTestCase(TestCase):
     fixtures = ['authtestdata.json']
@@ -54,6 +49,7 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(Group.objects.get_by_natural_key('users'), users_group)
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
     fixtures = ['regular.json']
@@ -64,6 +60,7 @@ class LoadDataWithoutNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
+@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithNaturalKeysTestCase(TestCase):
     fixtures = ['natural.json']
@@ -74,6 +71,7 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
+@skipIfCustomUser
 class UserManagerTestCase(TestCase):
 
     def test_create_user(self):
@@ -101,3 +99,36 @@ class UserManagerTestCase(TestCase):
         self.assertRaisesMessage(ValueError,
                                  'The given username must be set',
                                   User.objects.create_user, username='')
+
+
+class IsActiveTestCase(TestCase):
+    """
+    Tests the behavior of the guaranteed is_active attribute
+    """
+
+    @skipIfCustomUser
+    def test_builtin_user_isactive(self):
+        user = User.objects.create(username='foo', email='foo@bar.com')
+        # is_active is true by default
+        self.assertEqual(user.is_active, True)
+        user.is_active = False
+        user.save()
+        user_fetched = User.objects.get(pk=user.pk)
+        # the is_active flag is saved
+        self.assertFalse(user_fetched.is_active)
+
+    @override_settings(AUTH_USER_MODEL='auth.IsActiveTestUser1')
+    def test_is_active_field_default(self):
+        """
+        tests that the default value for is_active is provided
+        """
+        UserModel = get_user_model()
+        user = UserModel(username='foo')
+        self.assertEqual(user.is_active, True)
+        # you can set the attribute - but it will not save
+        user.is_active = False
+        # there should be no problem saving - but the attribute is not saved
+        user.save()
+        user_fetched = UserModel.objects.get(pk=user.pk)
+        # the attribute is always true for newly retrieved instance
+        self.assertEqual(user_fetched.is_active, True)

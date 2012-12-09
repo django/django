@@ -3,6 +3,7 @@ import operator
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.template.loader import get_template
+from django.utils import six
 
 register = template.Library()
 
@@ -56,22 +57,22 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 @register.simple_tag
 def simple_unlimited_args(one, two='hi', *args):
     """Expected simple_unlimited_args __doc__"""
-    return "simple_unlimited_args - Expected result: %s" % (', '.join([unicode(arg) for arg in [one, two] + list(args)]))
+    return "simple_unlimited_args - Expected result: %s" % (', '.join([six.text_type(arg) for arg in [one, two] + list(args)]))
 simple_unlimited_args.anything = "Expected simple_unlimited_args __dict__"
 
 @register.simple_tag
 def simple_only_unlimited_args(*args):
     """Expected simple_only_unlimited_args __doc__"""
-    return "simple_only_unlimited_args - Expected result: %s" % ', '.join([unicode(arg) for arg in args])
+    return "simple_only_unlimited_args - Expected result: %s" % ', '.join([six.text_type(arg) for arg in args])
 simple_only_unlimited_args.anything = "Expected simple_only_unlimited_args __dict__"
 
 @register.simple_tag
 def simple_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join([unicode(arg) for arg in [one, two] + list(args)]),
+        ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])
         )
 simple_unlimited_args_kwargs.anything = "Expected simple_unlimited_args_kwargs __dict__"
@@ -183,25 +184,25 @@ inclusion_one_default_from_template.anything = "Expected inclusion_one_default_f
 @register.inclusion_tag('inclusion.html')
 def inclusion_unlimited_args(one, two='hi', *args):
     """Expected inclusion_unlimited_args __doc__"""
-    return {"result": "inclusion_unlimited_args - Expected result: %s" % (', '.join([unicode(arg) for arg in [one, two] + list(args)]))}
+    return {"result": "inclusion_unlimited_args - Expected result: %s" % (', '.join([six.text_type(arg) for arg in [one, two] + list(args)]))}
 inclusion_unlimited_args.anything = "Expected inclusion_unlimited_args __dict__"
 
 @register.inclusion_tag(get_template('inclusion.html'))
 def inclusion_unlimited_args_from_template(one, two='hi', *args):
     """Expected inclusion_unlimited_args_from_template __doc__"""
-    return {"result": "inclusion_unlimited_args_from_template - Expected result: %s" % (', '.join([unicode(arg) for arg in [one, two] + list(args)]))}
+    return {"result": "inclusion_unlimited_args_from_template - Expected result: %s" % (', '.join([six.text_type(arg) for arg in [one, two] + list(args)]))}
 inclusion_unlimited_args_from_template.anything = "Expected inclusion_unlimited_args_from_template __dict__"
 
 @register.inclusion_tag('inclusion.html')
 def inclusion_only_unlimited_args(*args):
     """Expected inclusion_only_unlimited_args __doc__"""
-    return {"result": "inclusion_only_unlimited_args - Expected result: %s" % (', '.join([unicode(arg) for arg in args]))}
+    return {"result": "inclusion_only_unlimited_args - Expected result: %s" % (', '.join([six.text_type(arg) for arg in args]))}
 inclusion_only_unlimited_args.anything = "Expected inclusion_only_unlimited_args __dict__"
 
 @register.inclusion_tag(get_template('inclusion.html'))
 def inclusion_only_unlimited_args_from_template(*args):
     """Expected inclusion_only_unlimited_args_from_template __doc__"""
-    return {"result": "inclusion_only_unlimited_args_from_template - Expected result: %s" % (', '.join([unicode(arg) for arg in args]))}
+    return {"result": "inclusion_only_unlimited_args_from_template - Expected result: %s" % (', '.join([six.text_type(arg) for arg in args]))}
 inclusion_only_unlimited_args_from_template.anything = "Expected inclusion_only_unlimited_args_from_template __dict__"
 
 @register.inclusion_tag('test_incl_tag_current_app.html', takes_context=True)
@@ -220,9 +221,9 @@ inclusion_tag_use_l10n.anything = "Expected inclusion_tag_use_l10n __dict__"
 def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected inclusion_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join([unicode(arg) for arg in [one, two] + list(args)]),
+        ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])
         )}
 inclusion_unlimited_args_kwargs.anything = "Expected inclusion_unlimited_args_kwargs __dict__"
@@ -278,22 +279,22 @@ assignment_one_default.anything = "Expected assignment_one_default __dict__"
 @register.assignment_tag
 def assignment_unlimited_args(one, two='hi', *args):
     """Expected assignment_unlimited_args __doc__"""
-    return "assignment_unlimited_args - Expected result: %s" % (', '.join([unicode(arg) for arg in [one, two] + list(args)]))
+    return "assignment_unlimited_args - Expected result: %s" % (', '.join([six.text_type(arg) for arg in [one, two] + list(args)]))
 assignment_unlimited_args.anything = "Expected assignment_unlimited_args __dict__"
 
 @register.assignment_tag
 def assignment_only_unlimited_args(*args):
     """Expected assignment_only_unlimited_args __doc__"""
-    return "assignment_only_unlimited_args - Expected result: %s" % ', '.join([unicode(arg) for arg in args])
+    return "assignment_only_unlimited_args - Expected result: %s" % ', '.join([six.text_type(arg) for arg in args])
 assignment_only_unlimited_args.anything = "Expected assignment_only_unlimited_args __dict__"
 
 @register.assignment_tag
 def assignment_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected assignment_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.iteritems(), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
     return "assignment_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join([unicode(arg) for arg in [one, two] + list(args)]),
+        ', '.join([six.text_type(arg) for arg in [one, two] + list(args)]),
         ', '.join(['%s=%s' % (k, v) for (k, v) in sorted_kwarg])
         )
 assignment_unlimited_args_kwargs.anything = "Expected assignment_unlimited_args_kwargs __dict__"

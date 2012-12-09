@@ -25,12 +25,10 @@ exception or returns the clean value::
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
     u'foo@example.com'
-    >>> f.clean(u'foo@example.com')
-    u'foo@example.com'
     >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'Enter a valid e-mail address.']
+    ValidationError: [u'Enter a valid email address.']
 
 Core field arguments
 --------------------
@@ -256,8 +254,6 @@ error message keys it uses.
 ``validators``
 ~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
-
 .. attribute:: Field.validators
 
 The ``validators`` argument lets you provide a list of validation functions
@@ -267,8 +263,6 @@ See the :doc:`validators documentation </ref/validators>` for more information.
 
 ``localize``
 ~~~~~~~~~~~~
-
-.. versionadded:: 1.2
 
 .. attribute:: Field.localize
 
@@ -404,11 +398,23 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+        '%Y-%m-%d',       # '2006-10-25'
+        '%m/%d/%Y',       # '10/25/2006'
+        '%m/%d/%y',       # '10/25/06'
+
+    Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
+    following will also be included in the default input formats::
+
+        '%b %d %Y',       # 'Oct 25 2006'
+        '%b %d, %Y',      # 'Oct 25, 2006'
+        '%d %b %Y',       # '25 Oct 2006'
+        '%d %b, %Y',      # '25 Oct, 2006'
+        '%B %d %Y',       # 'October 25 2006'
+        '%B %d, %Y',      # 'October 25, 2006'
+        '%d %B %Y',       # '25 October 2006'
+        '%d %B, %Y',      # '25 October, 2006'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -440,6 +446,8 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -491,11 +499,6 @@ For each field, we describe the default widget used if you don't specify
     Has two optional arguments for validation, ``max_length`` and ``min_length``.
     If provided, these arguments ensure that the string is at most or at least the
     given length.
-
-.. versionchanged:: 1.2
-   The EmailField previously did not recognize email addresses as valid that
-   contained an IDN (Internationalized Domain Name; a domain containing
-   unicode characters) domain part. This has now been corrected.
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -602,7 +605,11 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ImageField requires that the `Python Imaging Library`_ is installed.
+    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
+    is installed and supports the image formats you use. If you encounter a
+    ``corrupt image`` error when you upload an image, it usually means PIL
+    doesn't understand its format. To fix this, install the appropriate
+    library and reinstall PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
@@ -676,7 +683,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: unpack_ipv4
 
-        Unpacks IPv4 mapped addresses like ``::ffff::192.0.2.1``.
+        Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
         If this option is enabled that address would be unpacked to
         ``192.0.2.1``. Default is disabled. Can only be used
         when ``protocol`` is set to ``'both'``.
@@ -700,8 +707,6 @@ For each field, we describe the default widget used if you don't specify
 
 ``TypedMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 .. class:: TypedMultipleChoiceField(**kwargs)
 
@@ -815,11 +820,6 @@ For each field, we describe the default widget used if you don't specify
 
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
 
-.. versionchanged:: 1.2
-   The URLField previously did not recognize URLs as valid that contained an IDN
-   (Internationalized Domain Name; a domain name containing unicode characters)
-   domain name. This has now been corrected.
-
 
 Slightly complex built-in ``Field`` classes
 -------------------------------------------
@@ -854,7 +854,7 @@ Slightly complex built-in ``Field`` classes
 ``MultiValueField``
 ~~~~~~~~~~~~~~~~~~~
 
-.. class:: MultiValueField(**kwargs)
+.. class:: MultiValueField(fields=(), **kwargs)
 
     * Default widget: ``TextInput``
     * Empty value: ``''`` (an empty string)
@@ -863,22 +863,39 @@ Slightly complex built-in ``Field`` classes
       as an argument to the ``MultiValueField``.
     * Error message keys: ``required``, ``invalid``
 
-    This abstract field (must be subclassed) aggregates the logic of multiple
-    fields. Subclasses should not have to implement clean(). Instead, they must
-    implement compress(), which takes a list of valid values and returns a
-    "compressed" version of those values -- a single value.  For example,
-    :class:`SplitDateTimeField` is a subclass which combines a time field and
-    a date field into a datetime object.
+    Aggregates the logic of multiple fields that together produce a single
+    value.
+
+    This field is abstract and must be subclassed. In contrast with the
+    single-value fields, subclasses of :class:`MultiValueField` must not
+    implement :meth:`~django.forms.Field.clean` but instead - implement
+    :meth:`~MultiValueField.compress`.
 
     Takes one extra required argument:
 
     .. attribute:: fields
 
-        A list of fields which are cleaned into a single field. Each value in
-        ``clean`` is cleaned by the corresponding field in ``fields`` -- the first
-        value is cleaned by the first field, the second value is cleaned by
-        the second field, etc.  Once all fields are cleaned, the list of clean
-        values is "compressed" into a single value.
+        A tuple of fields whose values are cleaned and subsequently combined
+        into a single value.  Each value of the field is cleaned by the
+        corresponding field in ``fields`` -- the first value is cleaned by the
+        first field, the second value is cleaned by the second field, etc.
+        Once all fields are cleaned, the list of clean values is combined into
+        a single value by :meth:`~MultiValueField.compress`.
+
+    .. attribute:: MultiValueField.widget
+
+        Must be a subclass of :class:`django.forms.MultiWidget`.
+        Default value is :class:`~django.forms.widgets.TextInput`, which
+        probably is not very useful in this case.
+
+    .. method:: compress(data_list)
+
+        Takes a list of valid values and returns  a "compressed" version of
+        those values -- in a single value. For example,
+        :class:`SplitDateTimeField` is a subclass which combines a time field
+        and a date field into a ``datetime`` object.
+
+        This method must be implemented in the subclasses.
 
 ``SplitDateTimeField``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -984,12 +1001,16 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: ``SelectMultiple``
-    * Empty value: ``[]`` (an empty list)
-    * Normalizes to: A list of model instances.
+    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
+
+    .. versionchanged:: 1.5
+        The empty and normalized values were changed to be consistently
+        ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
 
     Allows the selection of one or more model objects, suitable for
     representing a many-to-many relation. As with :class:`ModelChoiceField`,

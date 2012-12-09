@@ -2,11 +2,13 @@
 XML serializer.
 """
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from xml.dom import pulldom
 
 class Serializer(base.Serializer):
@@ -44,11 +46,11 @@ class Serializer(base.Serializer):
         self.indent(1)
         obj_pk = obj._get_pk_val()
         if obj_pk is None:
-            attrs = {"model": smart_unicode(obj._meta),}
+            attrs = {"model": smart_text(obj._meta),}
         else:
             attrs = {
-                "pk": smart_unicode(obj._get_pk_val()),
-                "model": smart_unicode(obj._meta),
+                "pk": smart_text(obj._get_pk_val()),
+                "model": smart_text(obj._meta),
             }
 
         self.xml.startElement("object", attrs)
@@ -94,10 +96,10 @@ class Serializer(base.Serializer):
                 # Iterable natural keys are rolled out as subelements
                 for key_value in related:
                     self.xml.startElement("natural", {})
-                    self.xml.characters(smart_unicode(key_value))
+                    self.xml.characters(smart_text(key_value))
                     self.xml.endElement("natural")
             else:
-                self.xml.characters(smart_unicode(related_att))
+                self.xml.characters(smart_text(related_att))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
@@ -118,13 +120,13 @@ class Serializer(base.Serializer):
                     self.xml.startElement("object", {})
                     for key_value in natural:
                         self.xml.startElement("natural", {})
-                        self.xml.characters(smart_unicode(key_value))
+                        self.xml.characters(smart_text(key_value))
                         self.xml.endElement("natural")
                     self.xml.endElement("object")
             else:
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={
-                        'pk' : smart_unicode(value._get_pk_val())
+                        'pk' : smart_text(value._get_pk_val())
                     })
             for relobj in getattr(obj, field.name).iterator():
                 handle_m2m(relobj)
@@ -139,7 +141,7 @@ class Serializer(base.Serializer):
         self.xml.startElement("field", {
             "name" : field.name,
             "rel"  : field.rel.__class__.__name__,
-            "to"   : smart_unicode(field.rel.to._meta),
+            "to"   : smart_text(field.rel.to._meta),
         })
 
 class Deserializer(base.Deserializer):
@@ -152,7 +154,7 @@ class Deserializer(base.Deserializer):
         self.event_stream = pulldom.parse(self.stream)
         self.db = options.pop('using', DEFAULT_DB_ALIAS)
 
-    def next(self):
+    def __next__(self):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
                 self.event_stream.expandNode(node)
@@ -289,4 +291,4 @@ def getInnerText(node):
             inner_text.extend(getInnerText(child))
         else:
            pass
-    return u"".join(inner_text)
+    return "".join(inner_text)

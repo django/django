@@ -9,6 +9,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.utils import DatabaseError
+from django.utils import six
 
 class SpatiaLiteOperator(SpatialOperation):
     "For SpatiaLite operators (e.g. `&&`, `~`)."
@@ -42,7 +43,7 @@ class SpatiaLiteRelate(SpatiaLiteFunctionParam):
         super(SpatiaLiteRelate, self).__init__('Relate')
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int, long)
+dtypes = (Decimal, Distance, float) + six.integer_types
 def get_dist_ops(operator):
     "Returns operations for regular distances; spherical distances are not currently supported."
     return (SpatiaLiteDistance(operator),)
@@ -89,7 +90,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         'overlaps' : SpatiaLiteFunction('Overlaps'),
         'contains' : SpatiaLiteFunction('Contains'),
         'intersects' : SpatiaLiteFunction('Intersects'),
-        'relate' : (SpatiaLiteRelate, basestring),
+        'relate' : (SpatiaLiteRelate, six.string_types),
         # Returns true if B's bounding box completely contains A's bounding box.
         'contained' : SpatiaLiteFunction('MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
@@ -112,6 +113,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     def __init__(self, connection):
         super(DatabaseOperations, self).__init__(connection)
 
+        # Creating the GIS terms dictionary.
+        gis_terms = ['isnull']
+        gis_terms += self.geometry_functions.keys()
+        self.gis_terms = dict([(term, None) for term in gis_terms])
+
+    def confirm_spatial_components_versions(self):
         # Determine the version of the SpatiaLite library.
         try:
             vtup = self.spatialite_version_tuple()
@@ -128,11 +135,6 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                                        'SQL loaded on this database?' %
                                        (self.connection.settings_dict['NAME'], msg))
 
-        # Creating the GIS terms dictionary.
-        gis_terms = ['isnull']
-        gis_terms += self.geometry_functions.keys()
-        self.gis_terms = dict([(term, None) for term in gis_terms])
-
         if version >= (2, 4, 0):
             # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both
             # RC2 (shipped in popular Debian/Ubuntu packages) and RC4
@@ -144,6 +146,8 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             except DatabaseError:
                 # we are using < 2.4.0-RC4
                 pass
+        if version >= (3, 0, 0):
+            self.geojson = 'AsGeoJSON'
 
     def check_aggregate_support(self, aggregate):
         """
@@ -206,7 +210,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s'
             # No geometry value used for F expression, substitue in
             # the column name instead.
-            return placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            return placeholder % self.get_expression_column(value)
         else:
             if transform_value(value, f.srid):
                 # Adding Transform() to the SQL placeholder.

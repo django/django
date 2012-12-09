@@ -53,15 +53,20 @@ comment
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 
+Sample usage::
+
+    <p>Rendered text with {{ pub_date|date:"c" }}</p>
+    {% comment %}
+        <p>Commented out text with {{ create_date|date:"c" }}</p>
+    {% endcomment %}
+
 .. templatetag:: csrf_token
 
 csrf_token
 ^^^^^^^^^^
 
-In the Django 1.1.X series, this is a no-op tag that returns an empty string
-for future compatibility purposes.  In Django 1.2 and later, it is used for
-CSRF protection, as described in the documentation for :doc:`Cross Site Request
-Forgeries </ref/contrib/csrf>`.
+This tag is used for CSRF protection, as described in the documentation for
+:doc:`Cross Site Request Forgeries </ref/contrib/csrf>`.
 
 .. templatetag:: cycle
 
@@ -157,8 +162,6 @@ looks like::
 In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
-
-.. versionadded:: 1.3
 
 By default, when you use the ``as`` keyword with the cycle tag, the
 usage of ``{% cycle %}`` that declares the cycle will itself output
@@ -410,8 +413,6 @@ variables or to negate a given variable::
         There are some athletes and absolutely no coaches.
     {% endif %}
 
-.. versionchanged:: 1.2
-
 Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 ``and`` having higher precedence than ``or`` e.g.::
 
@@ -423,11 +424,8 @@ will be interpreted like:
 
     if (athlete_list and coach_list) or cheerleader_list
 
-Use of actual brackets in the :ttag:`if` tag is invalid syntax.  If you need
+Use of actual parentheses in the :ttag:`if` tag is invalid syntax.  If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
-
-.. versionadded:: 1.2
-
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
 ``<=``, ``>=`` and ``in`` which work as follows:
@@ -620,7 +618,7 @@ Output the contents of the block if the two arguments equal each other.
 
 Example::
 
-    {% ifequal user.id comment.user_id %}
+    {% ifequal user.pk comment.user_id %}
         ...
     {% endifequal %}
 
@@ -637,9 +635,8 @@ You cannot check for equality with Python objects such as ``True`` or
 ``False``.  If you need to test if something is true or false, use the
 :ttag:`if` tag instead.
 
-.. versionadded:: 1.2
-   An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
-   ``==`` operator.
+An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
+``==`` operator.
 
 .. templatetag:: ifnotequal
 
@@ -649,9 +646,8 @@ ifnotequal
 Just like :ttag:`ifequal`, except it tests that the two arguments are not
 equal.
 
-.. versionadded:: 1.2
-   An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
-   the ``!=`` operator.
+An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
+the ``!=`` operator.
 
 .. templatetag:: include
 
@@ -685,9 +681,6 @@ including it. This example produces the output ``"Hello, John"``:
 
     {{ greeting }}, {{ person|default:"friend" }}!
 
-.. versionchanged:: 1.3
-   Additional context and exclusive context.
-
 You can pass additional context to the template using keyword arguments::
 
     {% include "name_snippet.html" with person="Jane" greeting="Hello" %}
@@ -718,8 +711,6 @@ registered in ``somelibrary`` and ``otherlibrary`` located in package
 ``package``::
 
     {% load somelibrary package.otherlibrary %}
-
-.. versionchanged:: 1.3
 
 You can also selectively load individual filters or tags from a library, using
 the ``from`` argument. In this example, the template tags/filters named ``foo``
@@ -771,48 +762,41 @@ regroup
 
 Regroups a list of alike objects by a common attribute.
 
-This complex tag is best illustrated by use of an example: say that ``people``
-is a list of people represented by dictionaries with ``first_name``,
-``last_name``, and ``gender`` keys:
+This complex tag is best illustrated by way of an example: say that "places" is a list of cities represented by dictionaries containing ``"name"``, ``"population"``, and ``"country"`` keys:
 
 .. code-block:: python
 
-    people = [
-        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
-        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
-        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
-        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
-        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+    cities = [
+        {'name': 'Mumbai', 'population': '19,000,000', 'country': 'India'},
+        {'name': 'Calcutta', 'population': '15,000,000', 'country': 'India'},
+        {'name': 'New York', 'population': '20,000,000', 'country': 'USA'},
+        {'name': 'Chicago', 'population': '7,000,000', 'country': 'USA'},
+        {'name': 'Tokyo', 'population': '33,000,000', 'country': 'Japan'},
     ]
 
-...and you'd like to display a hierarchical list that is ordered by gender,
-like this:
+...and you'd like to display a hierarchical list that is ordered by country, like this:
 
-* Male:
+* India
+    * Mumbai: 19,000,000
+    * Calcutta: 15,000,000
+* USA
+    * New York: 20,000,000
+    * Chicago: 7,000,000
+* Japan
+    * Tokyo: 33,000,000
 
-  * George Bush
-  * Bill Clinton
 
-* Female:
-
-  * Margaret Thatcher
-  * Condoleezza Rice
-
-* Unknown:
-
-  * Pat Smith
-
-You can use the ``{% regroup %}`` tag to group the list of people by gender.
+You can use the ``{% regroup %}`` tag to group the list of cities by country.
 The following snippet of template code would accomplish this::
 
-    {% regroup people by gender as gender_list %}
+    {% regroup cities by country as country_list %}
 
     <ul>
-    {% for gender in gender_list %}
-        <li>{{ gender.grouper }}
+    {% for country in country_list %}
+        <li>{{ country.grouper }}
         <ul>
-            {% for item in gender.list %}
-            <li>{{ item.first_name }} {{ item.last_name }}</li>
+            {% for item in country.list %}
+              <li>{{ item.name }}: {{ item.population }}</li>
             {% endfor %}
         </ul>
         </li>
@@ -821,56 +805,45 @@ The following snippet of template code would accomplish this::
 
 Let's walk through this example. ``{% regroup %}`` takes three arguments: the
 list you want to regroup, the attribute to group by, and the name of the
-resulting list. Here, we're regrouping the ``people`` list by the ``gender``
-attribute and calling the result ``gender_list``.
+resulting list. Here, we're regrouping the ``cities`` list by the ``country``
+attribute and calling the result ``country_list``.
 
-``{% regroup %}`` produces a list (in this case, ``gender_list``) of
+``{% regroup %}`` produces a list (in this case, ``country_list``) of
 **group objects**. Each group object has two attributes:
 
-* ``grouper`` -- the item that was grouped by (e.g., the string "Male" or
-  "Female").
-* ``list`` -- a list of all items in this group (e.g., a list of all people
-  with gender='Male').
+* ``grouper`` -- the item that was grouped by (e.g., the string "India" or
+  "Japan").
+* ``list`` -- a list of all items in this group (e.g., a list of all cities
+  with country='India').
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
-the fact that the ``people`` list was ordered by ``gender`` in the first place.
-If the ``people`` list did *not* order its members by ``gender``, the
-regrouping would naively display more than one group for a single gender. For
-example, say the ``people`` list was set to this (note that the males are not
+the fact that the ``cities`` list was ordered by ``country`` in the first place.
+If the ``cities`` list did *not* order its members by ``country``, the
+regrouping would naively display more than one group for a single country. For
+example, say the ``cities`` list was set to this (note that the countries are not
 grouped together):
 
 .. code-block:: python
 
-    people = [
-        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
-        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
-        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
-        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
-        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+    cities = [
+        {'name': 'Mumbai', 'population': '19,000,000', 'country': 'India'},
+        {'name': 'New York', 'population': '20,000,000', 'country': 'USA'},
+        {'name': 'Calcutta', 'population': '15,000,000', 'country': 'India'},
+        {'name': 'Chicago', 'population': '7,000,000', 'country': 'USA'},
+        {'name': 'Tokyo', 'population': '33,000,000', 'country': 'Japan'},
     ]
 
-With this input for ``people``, the example ``{% regroup %}`` template code
+With this input for ``cities``, the example ``{% regroup %}`` template code
 above would result in the following output:
 
-* Male:
-
-  * Bill Clinton
-
-* Unknown:
-
-  * Pat Smith
-
-* Female:
-
-  * Margaret Thatcher
-
-* Male:
-
-  * George Bush
-
-* Female:
-
-  * Condoleezza Rice
+* India
+    * Mumbai: 19,000,000
+* USA
+    * New York: 20,000,000
+* India
+    * Calcutta: 15,000,000
+* Japan
+    * Tokyo: 33,000,000
 
 The easiest solution to this gotcha is to make sure in your view code that the
 data is ordered according to how you want to display it.
@@ -878,27 +851,26 @@ data is ordered according to how you want to display it.
 Another solution is to sort the data in the template using the
 :tfilter:`dictsort` filter, if your data is in a list of dictionaries::
 
-    {% regroup people|dictsort:"gender" by gender as gender_list %}
-
+    {% regroup cities|dictsort:"country" by country as country_list %}
 
 Grouping on other properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Any valid template lookup is a legal grouping attribute for the regroup
 tag, including methods, attributes, dictionary keys and list items. For
-example, if the "gender" field is a foreign key to a class with
+example, if the "country" field is a foreign key to a class with
 an attribute "description," you could use::
 
-    {% regroup people by gender.description as gender_list %}
+    {% regroup cities by country.description as country_list %}
 
-Or, if ``gender`` is a field with ``choices``, it will have a
+Or, if ``country`` is a field with ``choices``, it will have a
 :meth:`^django.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key::
 
-    {% regroup people by get_gender_display as gender_list %}
+    {% regroup cities by get_country_display as country_list %}
 
-``{{ gender.grouper }}`` will now display the value fields from the
+``{{ country.grouper }}`` will now display the value fields from the
 ``choices`` set rather than the keys.
 
 .. templatetag:: spaceless
@@ -982,6 +954,10 @@ Argument            Outputs
 ``closecomment``    ``#}``
 ==================  =======
 
+Sample usage::
+
+    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+
 .. templatetag:: url
 
 url
@@ -1032,7 +1008,7 @@ refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`^django.core.urlresolvers.NoReverseMatch` exception raised, which will
+:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
 cause your site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
@@ -1059,6 +1035,39 @@ This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
 
+.. warning::
+
+    Don't forget to put quotes around the function path or pattern name!
+
+    .. versionchanged:: 1.5
+        The first parameter used not to be quoted, which was inconsistent with
+        other template tags. Since Django 1.5, it is evaluated according to
+        the usual rules: it can be a quoted string or a variable that will be
+        looked up in the context.
+
+.. templatetag:: verbatim
+
+verbatim
+^^^^^^^^
+
+.. versionadded:: 1.5
+
+Stops the template engine from rendering the contents of this block tag.
+
+A common use is to allow a Javascript template layer that collides with
+Django's syntax. For example::
+
+    {% verbatim %}
+        {{if dying}}Still alive.{{/if}}
+    {% endverbatim %}
+
+You can also designate a specific closing tag, allowing the use of
+``{% endverbatim %}`` as part of the unrendered contents::
+
+    {% verbatim myblock %}
+        Avoid template rendering via the {% verbatim %}{% endverbatim %} block.
+    {% endverbatim myblock %}
+
 .. templatetag:: widthratio
 
 widthratio
@@ -1069,7 +1078,8 @@ value to a maximum value, and then applies that ratio to a constant.
 
 For example::
 
-    <img src="bar.gif" height="10" width="{% widthratio this_value max_value 100 %}" />
+    <img src="bar.png" alt="Bar"
+         height="10" width="{% widthratio this_value max_value 100 %}" />
 
 Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in the
 above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
@@ -1079,9 +1089,6 @@ which is rounded up to 88).
 
 with
 ^^^^
-
-.. versionchanged:: 1.3
-   New keyword argument format and multiple variable assignments.
 
 Caches a complex variable under a simpler name. This is useful when accessing
 an "expensive" method (e.g., one that hits the database) multiple times.
@@ -1121,9 +1128,6 @@ For example::
     {{ value|add:"2" }}
 
 If ``value`` is ``4``, then the output will be ``6``.
-
-.. versionchanged:: 1.2
-   The following behavior didn't exist in previous Django versions.
 
 This filter will first try to coerce both values to integers. If this fails,
 it'll attempt to add the values together anyway. This will work on some data
@@ -1191,7 +1195,7 @@ Removes all values of arg from the given string.
 
 For example::
 
-    {{ value|cut:" "}}
+    {{ value|cut:" " }}
 
 If ``value`` is ``"String with spaces"``, the output will be
 ``"Stringwithspaces"``.
@@ -1243,7 +1247,8 @@ G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
 h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
 H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
 i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Not implemented.
+I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
 j                 Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
 l                 Day of the week, textual, long.           ``'Friday'``
@@ -1268,7 +1273,7 @@ S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, 
                   month, 2 characters.
 t                 Number of days in the given month.        ``28`` to ``31``
 T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-u                 Microseconds.                             ``0`` to ``999999``
+u                 Microseconds.                             ``000000`` to ``999999``
 U                 Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
@@ -1283,10 +1288,6 @@ Z                 Time zone offset in seconds. The          ``-43200`` to ``4320
                   always negative, and for those east of
                   UTC is always positive.
 ================  ========================================  =====================
-
-.. versionadded:: 1.2
-
-The ``c`` and ``u`` format specification characters were added in Django 1.2.
 
 .. versionadded:: 1.4
 
@@ -1320,9 +1321,6 @@ When used without a format string::
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
 used, without applying any localization.
-
-.. versionchanged:: 1.2
-    Predefined formats can now be influenced by the current locale.
 
 .. templatefilter:: default
 
@@ -1432,6 +1430,12 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
+For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
+
+    {% autoescape off %}
+        {{ title|escape }}
+    {% endautoescape %}
+
 .. templatefilter:: escapejs
 
 escapejs
@@ -1461,6 +1465,14 @@ For example::
     {{ value|filesizeformat }}
 
 If ``value`` is 123456789, the output would be ``117.7 MB``.
+
+.. admonition:: File sizes and SI units
+
+    Strictly speaking, ``filesizeformat`` does not conform to the International
+    System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
+    are calculated in powers of 1024 (which is the case here). Instead, Django
+    uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
+    are more commonly used.
 
 .. templatefilter:: first
 
@@ -1528,6 +1540,17 @@ that many decimal places. For example:
 ``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
 ============  =============================  ==========
 
+Particularly useful is passing 0 (zero) as the argument which will round the
+float to the nearest integer.
+
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"0" }}``   ``34``
+``34.00000``  ``{{ value|floatformat:"0" }}``   ``34``
+``39.56000``  ``{{ value|floatformat:"0" }}``   ``40``
+============  ================================  ==========
+
 If the argument passed to ``floatformat`` is negative, it will round a number
 to that many decimal places -- but only if there's a decimal part to be
 displayed. For example:
@@ -1553,6 +1576,13 @@ details). This filter is applied *immediately* and returns a new, escaped
 string. This is useful in the rare cases where you need multiple escaping or
 want to apply other filters to the escaped results. Normally, you want to use
 the :tfilter:`escape` filter.
+
+For example, if you want to catch the ``<p>`` HTML elements created by
+the :tfilter:`linebreaks` filter::
+
+    {% autoescape off %}
+        {{ body|linebreaks|force_escape }}
+    {% endautoescape %}
 
 .. templatefilter:: get_digit
 
@@ -1923,9 +1953,9 @@ for documentation of Python string formatting
 
 For example::
 
-    {{ value|stringformat:"s" }}
+    {{ value|stringformat:"E" }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is a slug"``.
+If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 .. templatefilter:: striptags
 
@@ -1980,9 +2010,6 @@ When used without a format string::
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
 used, without applying any localization.
 
-.. versionchanged:: 1.2
-    Predefined formats can now be influenced by the current locale.
-
 .. templatefilter:: timesince
 
 timesince
@@ -1994,7 +2021,9 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
-then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
+then the following would return "8 hours"::
+
+    {{ blog_date|timesince:comment_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -2013,7 +2042,9 @@ given date or datetime. For example, if today is 1 June 2006 and
 
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
-2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+2006, then the following will return "1 week"::
+
+    {{ conference_date|timeuntil:from_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -2142,8 +2173,6 @@ For example::
 
 If ``value`` is ``"http://www.example.org/foo?a=b&c=d"``, the output will be
 ``"http%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
-
-.. versionadded:: 1.3
 
 An optional argument containing the characters which should not be escaped can
 be provided.
@@ -2361,7 +2390,7 @@ using :class:`~django.template.RequestContext` or not.
 .. code-block:: html+django
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template:
@@ -2370,6 +2399,17 @@ It is also able to consume standard context variables, e.g. assuming a
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+
+If you'd like to retrieve a static URL without displaying it, you can use a
+slightly different call::
+
+.. versionadded:: 1.5
+
+.. code-block:: html+django
+
+    {% load static %}
+    {% static "images/hi.jpg" as myphoto %}
+    <img src="{{ myphoto }}"></img>
 
 .. note::
 
@@ -2380,7 +2420,7 @@ It is also able to consume standard context variables, e.g. assuming a
     :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
 
         {% load static from staticfiles %}
-        <img src="{% static "images/hi.jpg" %}" />
+        <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 .. templatetag:: get_static_prefix
 
@@ -2395,7 +2435,7 @@ into the template, you can use the :ttag:`get_static_prefix` template tag
 instead::
 
     {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" />
+    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
@@ -2403,8 +2443,8 @@ the value multiple times::
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
 
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!" />
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!" />
 
 .. templatetag:: get_media_prefix
 

@@ -3,6 +3,8 @@ from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
 from django.contrib.gis.geos.linestring import LinearRing
 from django.contrib.gis.geos import prototypes as capi
+from django.utils import six
+from django.utils.six.moves import xrange
 
 class Polygon(GEOSGeometry):
     _minlength = 1
@@ -55,8 +57,11 @@ class Polygon(GEOSGeometry):
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return GEOSGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
-                x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
+        for z in bbox:
+            if not isinstance(z, six.integer_types + (float,)):
+                return GEOSGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %
+                                    (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+        return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
 
     ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):

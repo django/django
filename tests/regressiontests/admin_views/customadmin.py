@@ -16,7 +16,7 @@ class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm
     login_template = 'custom_admin/login.html'
     logout_template = 'custom_admin/logout.html'
-    index_template = 'custom_admin/index.html'
+    index_template = ['custom_admin/index.html'] # a list, to test fix for #18697
     password_change_template = 'custom_admin/password_change_form.html'
     password_change_done_template = 'custom_admin/password_change_done.html'
 
@@ -40,6 +40,10 @@ class UserLimitedAdmin(UserAdmin):
         return qs.filter(is_superuser=False)
 
 
+class CustomPwdTemplateUserAdmin(UserAdmin):
+    change_user_password_template = ['admin/auth/user/change_password.html'] # a list, to test fix for #18697
+
+
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
@@ -48,3 +52,8 @@ site.register(models.Thing, base_admin.ThingAdmin)
 site.register(models.Fabric, base_admin.FabricAdmin)
 site.register(models.ChapterXtra1, base_admin.ChapterXtra1Admin)
 site.register(User, UserLimitedAdmin)
+site.register(models.UndeletableObject, base_admin.UndeletableObjectAdmin)
+site.register(models.Simple, base_admin.AttributeErrorRaisingAdmin)
+
+simple_site = Admin2(name='admin4')
+simple_site.register(User, CustomPwdTemplateUserAdmin)

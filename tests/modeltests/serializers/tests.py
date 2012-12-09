@@ -1,15 +1,16 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
 from xml.dom import minidom
-from StringIO import StringIO
 
 from django.conf import settings
 from django.core import serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
+from django.utils import six
+from django.utils.six import StringIO
 from django.utils import unittest
 
 from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
@@ -162,8 +163,8 @@ class SerializersTestBase(object):
 
     def test_serialize_unicode(self):
         """Tests that unicode makes the roundtrip intact"""
-        actor_name = u"Za\u017c\u00f3\u0142\u0107"
-        movie_title = u'G\u0119\u015bl\u0105 ja\u017a\u0144'
+        actor_name = "Za\u017c\u00f3\u0142\u0107"
+        movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
         ac = Actor(name=actor_name)
         mv = Movie(title=movie_title, actor=ac)
         ac.save()
@@ -295,7 +296,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return unicode(value)
+        return six.text_type(value)
 
     @staticmethod
     def _validate_output(serial_str):
@@ -461,7 +462,7 @@ else:
                     # yaml.safe_load will return non-string objects for some
                     # of the fields we are interested in, this ensures that
                     # everything comes back as a string
-                    if isinstance(field_value, basestring):
+                    if isinstance(field_value, six.string_types):
                         ret_list.append(field_value)
                     else:
                         ret_list.append(str(field_value))

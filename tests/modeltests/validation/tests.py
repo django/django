@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -55,7 +55,7 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_url_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'Enter a valid value.'])
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['Enter a valid value.'])
 
     def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
@@ -79,7 +79,7 @@ class ModelFormsTests(TestCase):
             'pub_date': '2010-1-10 14:49:00'
         }
         form = ArticleForm(data)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors), [])
         article = form.save(commit=False)
         article.author = self.author
         article.save()
@@ -95,7 +95,7 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), [])
+        self.assertEqual(list(form.errors), [])
         self.assertNotEqual(form.instance.pub_date, None)
         article = form.save()
 
@@ -108,7 +108,7 @@ class ModelFormsTests(TestCase):
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(form.errors.keys(), ['pub_date'])
+        self.assertEqual(list(form.errors), ['pub_date'])
 
 
 class GenericIPAddressFieldTests(ValidationTestCase):

@@ -75,6 +75,29 @@ using a Python built-in ``file`` object::
 Now you can use any of the documented attributes and methods
 of the :class:`~django.core.files.File` class.
 
+Be aware that files created in this way are not automatically closed.
+The following approach may be used to close files automatically::
+
+    >>> from django.core.files import File
+
+    # Create a Python file object using open() and the with statement
+    >>> with open('/tmp/hello.world', 'w') as f:
+    >>>     myfile = File(f)
+    >>>     for line in myfile:
+    >>>         print line
+    >>> myfile.closed
+    True
+    >>> f.closed
+    True
+
+Closing files is especially important when accessing file fields in a loop
+over a large number of objects:: If files are not manually closed after
+accessing them, the risk of running out of file descriptors may arise. This
+may lead to the following error:
+
+    IOError: [Errno 24] Too many open files
+
+
 File storage
 ============
 
@@ -115,6 +138,8 @@ useful -- you can use the global default storage system::
     False
 
 See :doc:`/ref/files/storage` for the file storage API.
+
+.. _builtin-fs-storage:
 
 The built-in filesystem storage class
 -------------------------------------

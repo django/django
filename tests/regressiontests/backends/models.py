@@ -1,22 +1,27 @@
+from __future__ import unicode_literals
+
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, connection
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s ** 2 == %s" % (self.root, self.square)
 
 
+@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
 
-    def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
 
 class SchoolClass(models.Model):
@@ -53,18 +58,20 @@ class Post(models.Model):
         db_table = 'CaseSensitive_Post'
 
 
+@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
-    def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+    def __str__(self):
+        return "%s %s" % (self.first_name, self.last_name)
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline

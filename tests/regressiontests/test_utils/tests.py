@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.utils import six
 from django.utils.unittest import skip
 
 from .models import Person
@@ -136,15 +137,15 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
@@ -449,6 +450,46 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
+class XMLEqualTests(TestCase):
+    def test_simple_equal(self):
+        xml1 = "<elem attr1='a' attr2='b' />"
+        xml2 = "<elem attr1='a' attr2='b' />"
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_equal_unordered(self):
+        xml1 = "<elem attr1='a' attr2='b' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_equal_raise(self):
+        xml1 = "<elem attr1='a' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+        with self.assertRaises(AssertionError):
+            self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_not_equal(self):
+        xml1 = "<elem attr1='a' attr2='c' />"
+        xml2 = "<elem attr1='a' attr2='b' />"
+        self.assertXMLNotEqual(xml1, xml2)
+
+    def test_simple_not_equal_raise(self):
+        xml1 = "<elem attr1='a' attr2='b' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+        with self.assertRaises(AssertionError):
+            self.assertXMLNotEqual(xml1, xml2)
+
+    def test_parsing_errors(self):
+        xml_unvalid = "<elem attr1='a attr2='b' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+        with self.assertRaises(AssertionError):
+            self.assertXMLNotEqual(xml_unvalid, xml2)
+
+    def test_comment_root(self):
+        xml1 = "<?xml version='1.0'?><!-- comment1 --><elem attr1='a' attr2='b' />"
+        xml2 = "<?xml version='1.0'?><!-- comment2 --><elem attr2='b' attr1='a' />"
+        self.assertXMLEqual(xml1, xml2)
+
+
 class SkippingExtraTests(TestCase):
     fixtures = ['should_not_be_loaded.json']
 
@@ -475,16 +516,16 @@ class AssertRaisesMsgTest(SimpleTestCase):
 class AssertFieldOutputTests(SimpleTestCase):
 
     def test_assert_field_output(self):
-        error_invalid = [u'Enter a valid e-mail address.']
+        error_invalid = ['Enter a valid email address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + [u'Another error']})
+        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
         self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Come on, gimme some well formatted data, dude.']})
+        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']})
 
     def test_custom_required_message(self):
         class MyCustomField(IntegerField):
             default_error_messages = {
-                'required': u'This is really required.',
+                'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
@@ -493,13 +534,7 @@ __test__ = {"API_TEST": r"""
 # Standard doctests do fairly
 >>> import json
 >>> from django.utils.xmlutils import SimplerXMLGenerator
->>> from StringIO import StringIO
-
->>> def produce_long():
-...     return 42L
-
->>> def produce_int():
-...     return 42
+>>> from django.utils.six import StringIO
 
 >>> def produce_json():
 ...     return json.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
@@ -529,14 +564,6 @@ __test__ = {"API_TEST": r"""
 ...     xml.endElement("bar")
 ...     return stream.getvalue()
 
-# Long values are normalized and are comparable to normal integers ...
->>> produce_long()
-42
-
-# ... and vice versa
->>> produce_int()
-42L
-
 # JSON output is normalized for field order, so it doesn't matter
 # which order json dictionary attributes are listed in output
 >>> produce_json()
@@ -560,3 +587,21 @@ __test__ = {"API_TEST": r"""
 '<foo bbb="2.0" aaa="1.0">Hello</foo><bar ddd="4.0" ccc="3.0"></bar>'
 
 """}
+
+if not six.PY3:
+    __test__["API_TEST"] += """
+>>> def produce_long():
+...     return 42L
+
+>>> def produce_int():
+...     return 42
+
+# Long values are normalized and are comparable to normal integers ...
+>>> produce_long()
+42
+
+# ... and vice versa
+>>> produce_int()
+42L
+
+"""

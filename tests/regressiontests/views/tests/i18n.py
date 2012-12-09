@@ -5,9 +5,18 @@ import gettext
 from os import path
 
 from django.conf import settings
-from django.test import TestCase
-from django.utils.translation import override, activate, get_language
+from django.core.urlresolvers import reverse
+from django.test import LiveServerTestCase, TestCase
+from django.test.utils import override_settings
+from django.utils import six, unittest
+from django.utils._os import upath
+from django.utils.translation import override
 from django.utils.text import javascript_quote
+
+try:
+    from selenium.webdriver.firefox import webdriver as firefox
+except ImportError:
+    firefox = None
 
 from ..urls import locale_dir
 
@@ -23,22 +32,26 @@ class I18NTests(TestCase):
             self.assertRedirects(response, 'http://testserver/views/')
             self.assertEqual(self.client.session['django_language'], lang_code)
 
+    def test_setlang_reversal(self):
+        self.assertEqual(reverse('set_language'), '/views/i18n/setlang/')
+
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
-        saved_lang = get_language()
         for lang_code in ['es', 'fr', 'ru']:
-            activate(lang_code)
-            catalog = gettext.translation('djangojs', locale_dir, [lang_code])
-            trans_txt = catalog.ugettext('this is to be translated')
-            response = self.client.get('/views/jsi18n/')
-            # in response content must to be a line like that:
-            # catalog['this is to be translated'] = 'same_that_trans_txt'
-            # javascript_quote is used to be able to check unicode strings
-            self.assertContains(response, javascript_quote(trans_txt), 1)
-            if lang_code == 'fr':
-                # Message with context (msgctxt)
-                self.assertContains(response, "['month name\x04May'] = 'mai';", 1)
-        activate(saved_lang)
+            with override(lang_code):
+                catalog = gettext.translation('djangojs', locale_dir, [lang_code])
+                if six.PY3:
+                    trans_txt = catalog.gettext('this is to be translated')
+                else:
+                    trans_txt = catalog.ugettext('this is to be translated')
+                response = self.client.get('/views/jsi18n/')
+                # in response content must to be a line like that:
+                # catalog['this is to be translated'] = 'same_that_trans_txt'
+                # javascript_quote is used to be able to check unicode strings
+                self.assertContains(response, javascript_quote(trans_txt), 1)
+                if lang_code == 'fr':
+                    # Message with context (msgctxt)
+                    self.assertContains(response, "['month name\x04May'] = 'mai';", 1)
 
 
 class JsI18NTests(TestCase):
@@ -140,9 +153,49 @@ class JsI18NTestsMultiPackage(TestCase):
     def testI18NWithLocalePaths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (
             path.join(path.dirname(
-                path.dirname(path.abspath(__file__))), 'app3', 'locale'),)
+                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/views/jsi18n/')
                 self.assertContains(response,
                     javascript_quote('este texto de app3 debe ser traducido'))
+
+
+@unittest.skipUnless(firefox, 'Selenium not installed')
+class JavascriptI18nTests(LiveServerTestCase):
+    urls = 'regressiontests.views.urls'
+
+    @classmethod
+    def setUpClass(cls):
+        cls.selenium = firefox.WebDriver()
+        super(JavascriptI18nTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super(JavascriptI18nTests, cls).tearDownClass()
+
+    @override_settings(LANGUAGE_CODE='de')
+    def test_javascript_gettext(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+
+            elem = self.selenium.find_element_by_id("gettext")
+            self.assertEqual(elem.text, "Entfernen")
+            elem = self.selenium.find_element_by_id("ngettext_sing")
+            self.assertEqual(elem.text, "1 Element")
+            elem = self.selenium.find_element_by_id("ngettext_plur")
+            self.assertEqual(elem.text, "455 Elemente")
+            elem = self.selenium.find_element_by_id("pgettext")
+            self.assertEqual(elem.text, "Kann")
+            elem = self.selenium.find_element_by_id("npgettext_sing")
+            self.assertEqual(elem.text, "1 Resultat")
+            elem = self.selenium.find_element_by_id("npgettext_plur")
+            self.assertEqual(elem.text, "455 Resultate")
+
+    def test_escaping(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            response = self.client.get('%s%s' % (self.live_server_url, '/jsi18n_admin/'))
+            self.assertContains(response, '\\x04')

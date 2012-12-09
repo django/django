@@ -8,7 +8,6 @@ This class sets up a model for each model field type
 from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
@@ -58,9 +57,6 @@ class GenericIPAddressData(models.Model):
 class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
-class PhoneData(models.Model):
-    data = PhoneNumberField(null=True)
-
 class PositiveIntegerData(models.Model):
     data = models.PositiveIntegerField(null=True)
 
@@ -78,9 +74,6 @@ class TextData(models.Model):
 
 class TimeData(models.Model):
     data = models.TimeField(null=True)
-
-class USStateData(models.Model):
-    data = USStateField(null=True)
 
 class Tag(models.Model):
     """A tag on an item."""
@@ -212,9 +205,6 @@ class GenericIPAddressPKData(models.Model):
 # class NullBooleanPKData(models.Model):
 #     data = models.NullBooleanField(primary_key=True)
 
-class PhonePKData(models.Model):
-    data = PhoneNumberField(primary_key=True)
-
 class PositiveIntegerPKData(models.Model):
     data = models.PositiveIntegerField(primary_key=True)
 
@@ -232,9 +222,6 @@ class SmallPKData(models.Model):
 
 # class TimePKData(models.Model):
 #    data = models.TimeField(primary_key=True)
-
-class USStatePKData(models.Model):
-    data = USStateField(primary_key=True)
 
 class ComplexModel(models.Model):
     field1 = models.CharField(max_length=10)

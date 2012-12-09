@@ -1,5 +1,9 @@
-from django.db import models
+from __future__ import unicode_literals
 
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
+@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -8,19 +12,21 @@ class Tag(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity)
 
+@python_2_unicode_compatible
 class Staff(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -28,12 +34,13 @@ class Staff(models.Model):
     tags = models.ManyToManyField(Tag, through='StaffTag')
     coworkers = models.ManyToManyField('self')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class StaffTag(models.Model):
     staff = models.ForeignKey(Staff)
     tag = models.ForeignKey(Tag)
 
-    def __unicode__(self):
-        return u"%s -> %s" % (self.tag, self.staff)
+    def __str__(self):
+        return "%s -> %s" % (self.tag, self.staff)

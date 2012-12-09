@@ -3,125 +3,137 @@ Management utility to create superusers.
 """
 
 import getpass
-import re
 import sys
 from optparse import make_option
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
-from django.utils.translation import ugettext as _
-
-RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
-
-EMAIL_RE = re.compile(
-    r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
-    r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
-
-
-def is_valid_email(value):
-    if not EMAIL_RE.search(value):
-        raise exceptions.ValidationError(_('Enter a valid e-mail address.'))
+from django.utils.six.moves import input
+from django.utils.text import capfirst
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--username', dest='username', default=None,
-            help='Specifies the username for the superuser.'),
-        make_option('--email', dest='email', default=None,
-            help='Specifies the email address for the superuser.'),
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help=('Tells Django to NOT prompt the user for input of any kind. '
-                  'You must use --username and --email with --noinput, and '
-                  'superusers created with --noinput will not be able to log '
-                  'in until they\'re given a valid password.')),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
-    )
+
+    def __init__(self, *args, **kwargs):
+        # Options are defined in an __init__ method to support swapping out
+        # custom user models in tests.
+        super(Command, self).__init__(*args, **kwargs)
+        self.UserModel = get_user_model()
+        self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
+
+        self.option_list = BaseCommand.option_list + (
+            make_option('--%s' % self.UserModel.USERNAME_FIELD, dest=self.UserModel.USERNAME_FIELD, default=None,
+                help='Specifies the login for the superuser.'),
+            make_option('--noinput', action='store_false', dest='interactive', default=True,
+                help=('Tells Django to NOT prompt the user for input of any kind. '
+                    'You must use --%s with --noinput, along with an option for '
+                    'any other required field. Superusers created with --noinput will '
+                    ' not be able to log in until they\'re given a valid password.' %
+                    self.UserModel.USERNAME_FIELD)),
+            make_option('--database', action='store', dest='database',
+                default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
+        ) + tuple(
+            make_option('--%s' % field, dest=field, default=None,
+                help='Specifies the %s for the superuser.' % field)
+            for field in self.UserModel.REQUIRED_FIELDS
+        )
+
+    option_list = BaseCommand.option_list
     help = 'Used to create a superuser.'
 
     def handle(self, *args, **options):
-        username = options.get('username', None)
-        email = options.get('email', None)
+        username = options.get(self.UserModel.USERNAME_FIELD, None)
         interactive = options.get('interactive')
         verbosity = int(options.get('verbosity', 1))
         database = options.get('database')
 
-        # Do quick and dirty validation if --noinput
-        if not interactive:
-            if not username or not email:
-                raise CommandError("You must use --username and --email with --noinput.")
-            if not RE_VALID_USERNAME.match(username):
-                raise CommandError("Invalid username. Use only letters, digits, and underscores")
-            try:
-                is_valid_email(email)
-            except exceptions.ValidationError:
-                raise CommandError("Invalid email address.")
-
         # If not provided, create the user with an unusable password
         password = None
+        user_data = {}
 
-        # Prompt for username/email/password. Enclose this whole thing in a
-        # try/except to trap for a keyboard interrupt and exit gracefully.
-        if interactive:
+        # Do quick and dirty validation if --noinput
+        if not interactive:
+            try:
+                if not username:
+                    raise CommandError("You must use --%s with --noinput." %
+                            self.UserModel.USERNAME_FIELD)
+                username = self.username_field.clean(username, None)
+
+                for field_name in self.UserModel.REQUIRED_FIELDS:
+                    if options.get(field_name):
+                        field = self.UserModel._meta.get_field(field_name)
+                        user_data[field_name] = field.clean(options[field_name], None)
+                    else:
+                        raise CommandError("You must use --%s with --noinput." % field_name)
+            except exceptions.ValidationError as e:
+                raise CommandError('; '.join(e.messages))
+
+        else:
+            # Prompt for username/password, and any other required fields.
+            # Enclose this whole thing in a try/except to trap for a
+            # keyboard interrupt and exit gracefully.
             default_username = get_default_username()
             try:
 
                 # Get a username
-                while 1:
+                while username is None:
                     if not username:
-                        input_msg = 'Username'
+                        input_msg = capfirst(self.username_field.verbose_name)
                         if default_username:
-                            input_msg += ' (leave blank to use %r)' % default_username
-                        username = raw_input(input_msg + ': ')
-                    if default_username and username == '':
-                        username = default_username
-                    if not RE_VALID_USERNAME.match(username):
-                        sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
+                            input_msg += " (leave blank to use '%s')" % default_username
+                        raw_value = input(input_msg + ': ')
+
+                    if default_username and raw_value == '':
+                        raw_value = default_username
+                    try:
+                        username = self.username_field.clean(raw_value, None)
+                    except exceptions.ValidationError as e:
+                        self.stderr.write("Error: %s" % '; '.join(e.messages))
                         username = None
                         continue
                     try:
-                        User.objects.using(database).get(username=username)
-                    except User.DoesNotExist:
-                        break
+                        self.UserModel.objects.db_manager(database).get_by_natural_key(username)
+                    except self.UserModel.DoesNotExist:
+                        pass
                     else:
-                        sys.stderr.write("Error: That username is already taken.\n")
+                        self.stderr.write("Error: That %s is already taken." %
+                                self.username_field.verbose_name)
                         username = None
 
-                # Get an email
-                while 1:
-                    if not email:
-                        email = raw_input('E-mail address: ')
-                    try:
-                        is_valid_email(email)
-                    except exceptions.ValidationError:
-                        sys.stderr.write("Error: That e-mail address is invalid.\n")
-                        email = None
-                    else:
-                        break
+                for field_name in self.UserModel.REQUIRED_FIELDS:
+                    field = self.UserModel._meta.get_field(field_name)
+                    user_data[field_name] = options.get(field_name)
+                    while user_data[field_name] is None:
+                        raw_value = input(capfirst(field.verbose_name + ': '))
+                        try:
+                            user_data[field_name] = field.clean(raw_value, None)
+                        except exceptions.ValidationError as e:
+                            self.stderr.write("Error: %s" % '; '.join(e.messages))
+                            user_data[field_name] = None
 
                 # Get a password
-                while 1:
+                while password is None:
                     if not password:
                         password = getpass.getpass()
                         password2 = getpass.getpass('Password (again): ')
                         if password != password2:
-                            sys.stderr.write("Error: Your passwords didn't match.\n")
+                            self.stderr.write("Error: Your passwords didn't match.")
                             password = None
                             continue
                     if password.strip() == '':
-                        sys.stderr.write("Error: Blank passwords aren't allowed.\n")
+                        self.stderr.write("Error: Blank passwords aren't allowed.")
                         password = None
                         continue
-                    break
+
             except KeyboardInterrupt:
-                sys.stderr.write("\nOperation cancelled.\n")
+                self.stderr.write("\nOperation cancelled.")
                 sys.exit(1)
 
-        User.objects.db_manager(database).create_superuser(username, email, password)
+        user_data[self.UserModel.USERNAME_FIELD] = username
+        user_data['password'] = password
+        self.UserModel.objects.db_manager(database).create_superuser(**user_data)
         if verbosity >= 1:
-          self.stdout.write("Superuser created successfully.\n")
-
+            self.stdout.write("Superuser created successfully.")

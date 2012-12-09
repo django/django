@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import tempfile
 import os
@@ -27,11 +27,14 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated)
+    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice)
 
 
 def callable_year(dt_value):
-    return dt_value.year
+    try:
+        return dt_value.year
+    except AttributeError:
+        return None
 callable_year.admin_order_field = 'date'
 
 
@@ -127,7 +130,7 @@ class CustomArticleAdmin(admin.ModelAdmin):
 
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ('color__warm', 'color__value')
+    list_filter = ('color__warm', 'color__value', 'pub_date',)
 
 
 class InquisitionAdmin(admin.ModelAdmin):
@@ -171,12 +174,12 @@ class PersonAdmin(admin.ModelAdmin):
 
 class FooAccount(Account):
     """A service-specific account of type Foo."""
-    servicename = u'foo'
+    servicename = 'foo'
 
 
 class BarAccount(Account):
     """A service-specific account of type Bar."""
-    servicename = u'bar'
+    servicename = 'bar'
 
 
 class FooAccountAdmin(admin.StackedInline):
@@ -343,7 +346,10 @@ class LinkInline(admin.TabularInline):
     model = Link
     extra = 1
 
-    readonly_fields = ("posted",)
+    readonly_fields = ("posted", "multiline")
+
+    def multiline(self, instance):
+        return "InlineMultiline\ntest\nstring"
 
 
 class SubPostInline(admin.TabularInline):
@@ -385,7 +391,10 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
-    readonly_fields = ('posted', 'awesomeness_level', 'coolness', 'value', lambda obj: "foo")
+    readonly_fields = (
+        'posted', 'awesomeness_level', 'coolness', 'value', 'multiline',
+        lambda obj: "foo"
+    )
 
     inlines = [
         LinkInline
@@ -399,6 +408,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def value(self, instance):
         return 1000
+
+    def multiline(self, instance):
+        return "Multiline\ntest\nstring"
+
     value.short_description = 'Value in $US'
 
 
@@ -569,6 +582,47 @@ class UnorderedObjectAdmin(admin.ModelAdmin):
     list_per_page = 2
 
 
+class UndeletableObjectAdmin(admin.ModelAdmin):
+    def change_view(self, *args, **kwargs):
+        kwargs['extra_context'] = {'show_delete': False}
+        return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
+
+
+def callable_on_unknown(obj):
+    return obj.unknown
+
+
+class AttributeErrorRaisingAdmin(admin.ModelAdmin):
+    list_display = [callable_on_unknown, ]
+
+class MessageTestingAdmin(admin.ModelAdmin):
+    actions = ["message_debug", "message_info", "message_success",
+               "message_warning", "message_error", "message_extra_tags"]
+
+    def message_debug(self, request, selected):
+        self.message_user(request, "Test debug", level="debug")
+
+    def message_info(self, request, selected):
+        self.message_user(request, "Test info", level="info")
+
+    def message_success(self, request, selected):
+        self.message_user(request, "Test success", level="success")
+
+    def message_warning(self, request, selected):
+        self.message_user(request, "Test warning", level="warning")
+
+    def message_error(self, request, selected):
+        self.message_user(request, "Test error", level="error")
+
+    def message_extra_tags(self, request, selected):
+        self.message_user(request, "Test tags", extra_tags="extra_tag")
+
+
+class ChoiceList(admin.ModelAdmin):
+    list_display = ['choice']
+    readonly_fields = ['choice']
+    fields = ['choice']
+
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -616,6 +670,7 @@ site.register(OtherStory, OtherStoryAdmin)
 site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
+site.register(UndeletableObject, UndeletableObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -624,7 +679,7 @@ site.register(UnorderedObject, UnorderedObjectAdmin)
 #     related OneToOne object registered in admin
 #     related OneToOne object not registered in admin
 # when deleting Book so as exercise all four troublesome (w.r.t escaping
-# and calling force_unicode to avoid problems on Python 2.3) paths through
+# and calling force_text to avoid problems on Python 2.3) paths through
 # contrib.admin.util's get_deleted_objects function.
 site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
@@ -642,6 +697,9 @@ site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
 site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
+site.register(Simple, AttributeErrorRaisingAdmin)
+site.register(UserMessenger, MessageTestingAdmin)
+site.register(Choice, ChoiceList)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

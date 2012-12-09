@@ -1,10 +1,13 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
+import copy
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.core.exceptions import FieldError
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
+from django.db.models.loading import cache
 from django.test import TestCase
 
 
@@ -12,6 +15,7 @@ from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
     Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement)
+
 
 class ProxyModelTests(TestCase):
     def test_same_manager_queries(self):
@@ -91,7 +95,7 @@ class ProxyModelTests(TestCase):
         )
         self.assertRaises(Person.MultipleObjectsReturned,
             MyPersonProxy.objects.get,
-            id__lt=max_id+1
+            id__lt=max_id + 1
         )
         self.assertRaises(Person.DoesNotExist,
             StatusPerson.objects.get,
@@ -104,7 +108,7 @@ class ProxyModelTests(TestCase):
 
         self.assertRaises(Person.MultipleObjectsReturned,
             StatusPerson.objects.get,
-            id__lt=max_id+1
+            id__lt=max_id + 1
         )
 
     def test_abc(self):
@@ -138,9 +142,39 @@ class ProxyModelTests(TestCase):
         def build_new_fields():
             class NoNewFields(Person):
                 newfield = models.BooleanField()
+
                 class Meta:
                     proxy = True
         self.assertRaises(FieldError, build_new_fields)
+
+    def test_swappable(self):
+        try:
+            # This test adds dummy applications to the app cache. These
+            # need to be removed in order to prevent bad interactions
+            # with the flush operation in other tests.
+            old_app_models = copy.deepcopy(cache.app_models)
+            old_app_store = copy.deepcopy(cache.app_store)
+
+            settings.TEST_SWAPPABLE_MODEL = 'proxy_models.AlternateModel'
+
+            class SwappableModel(models.Model):
+
+                class Meta:
+                    swappable = 'TEST_SWAPPABLE_MODEL'
+
+            class AlternateModel(models.Model):
+                pass
+
+            # You can't proxy a swapped model
+            with self.assertRaises(TypeError):
+                class ProxyModel(SwappableModel):
+
+                    class Meta:
+                        proxy = True
+        finally:
+            del settings.TEST_SWAPPABLE_MODEL
+            cache.app_models = old_app_models
+            cache.app_store = old_app_store
 
     def test_myperson_manager(self):
         Person.objects.create(name="fred")
@@ -195,7 +229,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h3, sender=Person)
         signals.post_save.connect(h4, sender=Person)
 
-        dino = MyPerson.objects.create(name=u"dino")
+        dino = MyPerson.objects.create(name="dino")
         self.assertEqual(output, [
             'MyPerson pre save',
             'MyPerson post save'
@@ -209,7 +243,7 @@ class ProxyModelTests(TestCase):
         signals.pre_save.connect(h5, sender=MyPersonProxy)
         signals.post_save.connect(h6, sender=MyPersonProxy)
 
-        dino = MyPersonProxy.objects.create(name=u"pebbles")
+        dino = MyPersonProxy.objects.create(name="pebbles")
 
         self.assertEqual(output, [
             'MyPersonProxy pre save',

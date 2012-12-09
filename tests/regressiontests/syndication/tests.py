@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from xml.dom import minidom
 
@@ -199,7 +199,7 @@ class SyndicationFeedTest(FeedTestCase):
             link = item.getElementsByTagName('link')[0]
             if link.firstChild.wholeText == 'http://example.com/blog/4/':
                 title = item.getElementsByTagName('title')[0]
-                self.assertEqual(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
+                self.assertEqual(title.firstChild.wholeText, 'A &amp; B &lt; C &gt; D')
 
     def test_naive_datetime_conversion(self):
         """
@@ -225,6 +225,14 @@ class SyndicationFeedTest(FeedTestCase):
         doc = minidom.parseString(response.content)
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
         self.assertEqual(updated[-6:], '+00:42')
+
+    def test_feed_last_modified_time(self):
+        response = self.client.get('/syndication/naive-dates/')
+        self.assertEqual(response['Last-Modified'], 'Thu, 03 Jan 2008 19:30:00 GMT')
+
+        # No last-modified when feed has no item_pubdate
+        response = self.client.get('/syndication/no_pubdate/')
+        self.assertFalse(response.has_header('Last-Modified'))
 
     def test_feed_url(self):
         """

@@ -6,6 +6,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import empty, memoize, LazyObject
 from django.utils.importlib import import_module
 from django.utils._os import safe_join
+from django.utils import six
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
@@ -132,7 +133,7 @@ class AppDirectoriesFinder(BaseFinder):
         """
         List all files in all app storages.
         """
-        for storage in self.storages.itervalues():
+        for storage in six.itervalues(self.storages):
             if storage.exists(''):  # check if storage location exists
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage

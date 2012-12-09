@@ -6,6 +6,7 @@ from zipimport import zipimporter
 from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.utils._os import upath
 
 
 class DefaultLoader(unittest.TestCase):
@@ -50,7 +51,7 @@ class DefaultLoader(unittest.TestCase):
 class EggLoader(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path[:]
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
     def tearDown(self):
         sys.path = self.old_path
@@ -109,7 +110,12 @@ class ProxyFinder(object):
     def find_module(self, fullname, path=None):
         tail = fullname.rsplit('.', 1)[-1]
         try:
-            self._cache[fullname] = imp.find_module(tail, path)
+            fd, fn, info = imp.find_module(tail, path)
+            if fullname in self._cache:
+                old_fd = self._cache[fullname][0]
+                if old_fd:
+                    old_fd.close()
+            self._cache[fullname] = (fd, fn, info)
         except ImportError:
             return None
         else:
@@ -119,7 +125,11 @@ class ProxyFinder(object):
         if fullname in sys.modules:
             return sys.modules[fullname]
         fd, fn, info = self._cache[fullname]
-        return imp.load_module(fullname, fd, fn, info)
+        try:
+            return imp.load_module(fullname, fd, fn, info)
+        finally:
+            if fd:
+                fd.close()
 
 class TestFinder(object):
     def __init__(self, *args, **kwargs):

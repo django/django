@@ -6,10 +6,14 @@ and returns a dictionary to add to the context.
 These are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
 RequestContext.
 """
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.middleware.csrf import get_token
+from django.utils import six
+from django.utils.encoding import smart_text
 from django.utils.functional import lazy
+
 
 def csrf(request):
     """
@@ -24,8 +28,8 @@ def csrf(request):
             # instead of returning an empty dict.
             return 'NOTPROVIDED'
         else:
-            return token
-    _get_val = lazy(_get_val, str)
+            return smart_text(token)
+    _get_val = lazy(_get_val, six.text_type)
 
     return {'csrf_token': _get_val() }
 

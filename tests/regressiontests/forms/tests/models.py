@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 
@@ -8,14 +8,20 @@ from django.db import models
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
+from django.utils import six
 
 from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
-    BoundaryModel, Defaults)
+    BoundaryModel, Defaults, OptionalMultiChoiceModel)
 
 
 class ChoiceFieldForm(ModelForm):
     class Meta:
         model = ChoiceFieldModel
+
+
+class OptionalMultiChoiceModelForm(ModelForm):
+    class Meta:
+        model = OptionalMultiChoiceModel
 
 
 class FileForm(Form):
@@ -33,6 +39,21 @@ class TestTicket12510(TestCase):
             field = ModelChoiceField(Group.objects.order_by('-name'))
             self.assertEqual('a', field.clean(self.groups[0].pk).name)
 
+
+class TestTicket14567(TestCase):
+    """
+    Check that the return values of ModelMultipleChoiceFields are QuerySets
+    """
+    def test_empty_queryset_return(self):
+        "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
+        form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': ['1']})
+        self.assertTrue(form.is_valid())
+        # Check that the empty value is a QuerySet
+        self.assertTrue(isinstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet))
+        # While we're at it, test whether a QuerySet is returned if there *is* a value.
+        self.assertTrue(isinstance(form.cleaned_data['multi_choice'], models.query.QuerySet))
+
+
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
         "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
@@ -40,7 +61,7 @@ class ModelFormCallableModelDefault(TestCase):
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
-        self.assertEqual(choices[0], (option.pk, unicode(option)))
+        self.assertEqual(choices[0], (option.pk, six.text_type(option)))
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
@@ -102,15 +123,14 @@ class ModelFormCallableModelDefault(TestCase):
 <input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
 
 
-
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
         # FileModel with unicode filename and data #########################
-        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह')}, auto_id=False)
+        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))}, auto_id=False)
         self.assertTrue(f.is_valid())
         self.assertTrue('file1' in f.cleaned_data)
         m = FileModel.objects.create(file=f.cleaned_data['file1'])
-        self.assertEqual(m.file.name, u'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
+        self.assertEqual(m.file.name, 'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
         m.delete()
 
     def test_boundary_conditions(self):
@@ -134,7 +154,7 @@ class FormsModelTestCase(TestCase):
             class Meta:
                 model = Defaults
 
-        self.assertEqual(DefaultsForm().fields['name'].initial, u'class default value')
+        self.assertEqual(DefaultsForm().fields['name'].initial, 'class default value')
         self.assertEqual(DefaultsForm().fields['def_date'].initial, datetime.date(1980, 1, 1))
         self.assertEqual(DefaultsForm().fields['value'].initial, 42)
         r1 = DefaultsForm()['callable_default'].as_widget()
@@ -143,9 +163,9 @@ class FormsModelTestCase(TestCase):
 
         # In a ModelForm that is passed an instance, the initial values come from the
         # instance's values, not the model's defaults.
-        foo_instance = Defaults(name=u'instance value', def_date=datetime.date(1969, 4, 4), value=12)
+        foo_instance = Defaults(name='instance value', def_date=datetime.date(1969, 4, 4), value=12)
         instance_form = DefaultsForm(instance=foo_instance)
-        self.assertEqual(instance_form.initial['name'], u'instance value')
+        self.assertEqual(instance_form.initial['name'], 'instance value')
         self.assertEqual(instance_form.initial['def_date'], datetime.date(1969, 4, 4))
         self.assertEqual(instance_form.initial['value'], 12)
 
@@ -158,11 +178,11 @@ class FormsModelTestCase(TestCase):
                 model = Defaults
                 exclude = ['name', 'callable_default']
 
-        f = ExcludingForm({'name': u'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
+        f = ExcludingForm({'name': 'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['name'], u'Hello')
+        self.assertEqual(f.cleaned_data['name'], 'Hello')
         obj = f.save()
-        self.assertEqual(obj.name, u'class default value')
+        self.assertEqual(obj.name, 'class default value')
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
@@ -177,7 +197,7 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertRaises(ValueError, ModelFormMetaclass, 'Form', (ModelForm,), {'Meta': Meta})
+        self.assertRaises(ValueError, ModelFormMetaclass, str('Form'), (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass
@@ -195,4 +215,4 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))
+        self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))

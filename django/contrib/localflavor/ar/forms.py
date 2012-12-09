@@ -3,7 +3,7 @@
 AR-specific Form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.ar.ar_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
@@ -24,7 +24,9 @@ class ARPostalCodeField(RegexField):
     """
     A field that accepts a 'classic' NNNN Postal Code or a CPA.
 
-    See http://www.correoargentino.com.ar/consulta_cpa/home.php
+    See:
+        http://www.correoargentino.com.ar/cpa/que_es
+        http://www.correoargentino.com.ar/cpa/como_escribirlo
     """
     default_error_messages = {
         'invalid': _("Enter a postal code in the format NNNN or ANNNNAAA."),
@@ -37,11 +39,11 @@ class ARPostalCodeField(RegexField):
     def clean(self, value):
         value = super(ARPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if len(value) not in (4, 8):
             raise ValidationError(self.error_messages['invalid'])
         if len(value) == 8:
-            return u'%s%s%s' % (value[0].upper(), value[1:5], value[5:].upper())
+            return '%s%s%s' % (value[0].upper(), value[1:5], value[5:].upper())
         return value
 
 class ARDNIField(CharField):
@@ -63,7 +65,7 @@ class ARDNIField(CharField):
         """
         value = super(ARDNIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             value = value.replace('.', '')
         if not value.isdigit():
@@ -81,6 +83,7 @@ class ARCUITField(RegexField):
     default_error_messages = {
         'invalid': _('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
         'checksum': _("Invalid CUIT."),
+        'legal_type': _('Invalid legal type. Type must be 27, 20, 23 or 30.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -94,8 +97,10 @@ class ARCUITField(RegexField):
         """
         value = super(ARCUITField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value, cd = self._canon(value)
+        if not value[:2] in ['27', '20', '23', '30']:
+            raise ValidationError(self.error_messages['legal_type'])
         if self._calc_cd(value) != cd:
             raise ValidationError(self.error_messages['checksum'])
         return self._format(value, cd)
@@ -105,13 +110,19 @@ class ARCUITField(RegexField):
         return cuit[:-1], cuit[-1]
 
     def _calc_cd(self, cuit):
+        # Calculation code based on:
+        # http://es.wikipedia.org/wiki/C%C3%B3digo_%C3%9Anico_de_Identificaci%C3%B3n_Tributaria
         mults = (5, 4, 3, 2, 7, 6, 5, 4, 3, 2)
         tmp = sum([m * int(cuit[idx]) for idx, m in enumerate(mults)])
-        return str(11 - tmp % 11)
+        result = 11 - (tmp % 11)
+        if result == 11:
+            result = 0
+        elif result == 10:
+            result = 9
+        return str(result)
 
     def _format(self, cuit, check_digit=None):
-        if check_digit == None:
+        if check_digit is None:
             check_digit = cuit[-1]
             cuit = cuit[:-1]
-        return u'%s-%s-%s' % (cuit[:2], cuit[2:], check_digit)
-
+        return '%s-%s-%s' % (cuit[:2], cuit[2:], check_digit)

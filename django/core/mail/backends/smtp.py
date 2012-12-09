@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.core.mail.message import sanitize_address
+from django.utils.encoding import force_bytes
 
 
 class EmailBackend(BaseEmailBackend):
@@ -80,8 +81,7 @@ class EmailBackend(BaseEmailBackend):
         """
         if not email_messages:
             return
-        self._lock.acquire()
-        try:
+        with self._lock:
             new_conn_created = self.open()
             if not self.connection:
                 # We failed silently on open().
@@ -94,8 +94,6 @@ class EmailBackend(BaseEmailBackend):
                     num_sent += 1
             if new_conn_created:
                 self.close()
-        finally:
-            self._lock.release()
         return num_sent
 
     def _send(self, email_message):
@@ -105,9 +103,11 @@ class EmailBackend(BaseEmailBackend):
         from_email = sanitize_address(email_message.from_email, email_message.encoding)
         recipients = [sanitize_address(addr, email_message.encoding)
                       for addr in email_message.recipients()]
+        message = email_message.message()
+        charset = message.get_charset().get_output_charset() if message.get_charset() else 'utf-8'
         try:
             self.connection.sendmail(from_email, recipients,
-                    email_message.message().as_string())
+                    force_bytes(message.as_string(), charset))
         except:
             if not self.fail_silently:
                 raise

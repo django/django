@@ -16,7 +16,8 @@ passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects.
+:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+module.
 
 HttpRequest objects
 ===================
@@ -28,7 +29,8 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes except ``session`` should be considered read-only.
+All attributes should be considered read-only, unless stated otherwise below.
+``session`` is a notable exception.
 
 .. attribute:: HttpRequest.body
 
@@ -40,8 +42,6 @@ All attributes except ``session`` should be considered read-only.
     The raw HTTP request body as a byte string. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
-
-    .. versionadded:: 1.3
 
     You can also read from an HttpRequest using a file-like interface. See
     :meth:`HttpRequest.read()`.
@@ -92,8 +92,14 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.POST
 
-    A dictionary-like object containing all given HTTP POST parameters. See the
-    :class:`QueryDict` documentation below.
+    A dictionary-like object containing all given HTTP POST parameters,
+    providing that the request contains form data. See the
+    :class:`QueryDict` documentation below. If you need to access raw or
+    non-form data posted in the request, access this through the
+    :attr:`HttpRequest.body` attribute instead.
+
+    .. versionchanged:: 1.5
+        Before Django 1.5, HttpRequest.POST contained non-form data.
 
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
@@ -190,6 +196,17 @@ All attributes except ``session`` should be considered read-only.
     middleware class) sets it. When present, this will be used as the root
     URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
     setting. See :ref:`how-django-processes-a-request` for details.
+
+.. attribute:: HttpRequest.resolver_match
+
+    .. versionadded:: 1.5
+
+    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
+    the resolved url. This attribute is only set after url resolving took place,
+    which means it's available in all views but not in middleware methods which
+    are executed before url resolving takes place (like ``process_request``, you
+    can use ``process_view`` instead).
+
 
 Methods
 -------
@@ -303,8 +320,6 @@ Methods
 .. method:: HttpRequest.readlines()
 .. method:: HttpRequest.xreadlines()
 .. method:: HttpRequest.__iter__()
-
-    .. versionadded:: 1.3
 
     Methods implementing a file-like interface for reading from an
     HttpRequest instance. This makes it possible to consume an incoming
@@ -508,9 +523,6 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
-    .. versionchanged:: 1.3
-       The ``safe`` parameter was added.
-
     Optionally, urlencode can be passed characters which
     do not require encoding. For example::
 
@@ -554,13 +566,28 @@ file-like object::
 Passing iterators
 ~~~~~~~~~~~~~~~~~
 
-Finally, you can pass ``HttpResponse`` an iterator rather than passing it
-hard-coded strings. If you use this technique, follow these guidelines:
+Finally, you can pass ``HttpResponse`` an iterator rather than strings. If you
+use this technique, the iterator should return strings.
 
-* The iterator should return strings.
-* If an :class:`HttpResponse` has been initialized with an iterator as its
-  content, you can't use the :class:`HttpResponse` instance as a file-like
-  object. Doing so will raise ``Exception``.
+Passing an iterator as content to :class:`HttpResponse` creates a
+streaming response if (and only if) no middleware accesses the
+:attr:`HttpResponse.content` attribute before the response is returned.
+
+.. versionchanged:: 1.5
+
+This technique is fragile and was deprecated in Django 1.5. If you need the
+response to be streamed from the iterator to the client, you should use the
+:class:`StreamingHttpResponse` class instead.
+
+As of Django 1.7, when :class:`HttpResponse` is instantiated with an
+iterator, it will consume it immediately, store the response content as a
+string, and discard the iterator.
+
+.. versionchanged:: 1.5
+
+You can now use :class:`HttpResponse` as a file-like object even if it was
+instantiated with an iterator. Django will consume and save the content of
+the iterator on first access.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -585,7 +612,7 @@ To tell the browser to treat the response as a file attachment, use the
 this is how you might return a Microsoft Excel spreadsheet::
 
     >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
-    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+    >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -602,14 +629,20 @@ Attributes
 
     The `HTTP Status code`_ for the response.
 
+.. attribute:: HttpResponse.streaming
+
+    This is always ``False``.
+
+    This attribute exists so middleware can treat streaming responses
+    differently from regular responses.
+
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200)
 
-    Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The :setting:`DEFAULT_CONTENT_TYPE` is
-    ``'text/html'``.
+    Instantiates an ``HttpResponse`` object with the given page content and
+    content type.
 
     ``content`` should be an iterator or a string. If it's an
     iterator, it should return strings, and those strings will be
@@ -617,15 +650,15 @@ Methods
     an iterator or a string, it will be converted to a string when
     accessed.
 
+    ``content_type`` is the MIME type optionally completed by a character set
+    encoding and is used to fill the HTTP ``Content-Type`` header. If not
+    specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
+    :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
+
+    Historically, this parameter was called ``mimetype`` (now deprecated).
+
     ``status`` is the `HTTP Status code`_ for the response.
 
-    ``content_type`` is an alias for ``mimetype``. Historically, this parameter
-    was only called ``mimetype``, but since this is actually the value included
-    in the HTTP ``Content-Type`` header, it can also include the character set
-    encoding, which makes it more than just a MIME type specification.
-    If ``mimetype`` is specified (not ``None``), that value is used.
-    Otherwise, ``content_type`` is used. If neither is given, the
-    :setting:`DEFAULT_CONTENT_TYPE` setting is used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -646,17 +679,7 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
-
-    .. versionchanged:: 1.3
-
-    The possibility of specifying a ``datetime.datetime`` object in
-    ``expires``, and the auto-calculation of ``max_age`` in such case
-    was added. The ``httponly`` argument was also added.
-
-    .. versionchanged:: 1.4
-
-    The default value for httponly was changed from ``False`` to ``True``.
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
     Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
     object in the Python standard library.
@@ -683,7 +706,7 @@ Methods
       risk of client side script accessing the protected cookie
       data.
 
-    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
@@ -731,10 +754,11 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseRedirect
 
-    The constructor takes a single argument -- the path to redirect to. This
-    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or
-    an absolute path with no domain (e.g. ``'/search/'``). Note that this
-    returns an HTTP status code 302.
+    The first argument to the constructor is required -- the path to redirect
+    to. This can be a fully qualified URL
+    (e.g. ``'http://www.yahoo.com/search/'``) or an absolute path with no
+    domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
+    constructor arguments. Note that this returns an HTTP status code 302.
 
 .. class:: HttpResponsePermanentRedirect
 
@@ -743,8 +767,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseNotModified
 
-    The constructor doesn't take any arguments. Use this to designate that a
-    page hasn't been modified since the user's last request (status code 304).
+    The constructor doesn't take any arguments and no content should be added
+    to this response. Use this to designate that a page hasn't been modified
+    since the user's last request (status code 304).
 
 .. class:: HttpResponseBadRequest
 
@@ -760,8 +785,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 .. class:: HttpResponseNotAllowed
 
-    Like :class:`HttpResponse`, but uses a 405 status code. Takes a single,
-    required argument: a list of permitted methods (e.g. ``['GET', 'POST']``).
+    Like :class:`HttpResponse`, but uses a 405 status code. The first argument
+    to the constructor is required: a list of permitted methods (e.g.
+    ``['GET', 'POST']``).
 
 .. class:: HttpResponseGone
 
@@ -777,3 +803,60 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+StreamingHttpResponse objects
+=============================
+
+.. versionadded:: 1.5
+
+.. class:: StreamingHttpResponse
+
+The :class:`StreamingHttpResponse` class is used to stream a response from
+Django to the browser. You might want to do this if generating the response
+takes too long or uses too much memory. For instance, it's useful for
+generating large CSV files.
+
+.. admonition:: Performance considerations
+
+    Django is designed for short-lived requests. Streaming responses will tie
+    a worker process and keep a database connection idle in transaction for
+    the entire duration of the response. This may result in poor performance.
+
+    Generally speaking, you should perform expensive tasks outside of the
+    request-response cycle, rather than resorting to a streamed response.
+
+The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
+because it features a slightly different API. However, it is almost identical,
+with the following notable differences:
+
+* It should be given an iterator that yields strings as content.
+
+* You cannot access its content, except by iterating the response object
+  itself. This should only occur when the response is returned to the client.
+
+* It has no ``content`` attribute. Instead, it has a
+  :attr:`~StreamingHttpResponse.streaming_content` attribute.
+
+* You cannot use the file-like object ``tell()`` or ``write()`` methods.
+  Doing so will raise an exception.
+
+:class:`StreamingHttpResponse` should only be used in situations where it is
+absolutely required that the whole content isn't iterated before transferring
+the data to the client. Because the content can't be accessed, many
+middlewares can't function normally. For example the ``ETag`` and ``Content-
+Length`` headers can't be generated for streaming responses.
+
+Attributes
+----------
+
+.. attribute:: StreamingHttpResponse.streaming_content
+
+    An iterator of strings representing the content.
+
+.. attribute:: HttpResponse.status_code
+
+    The `HTTP Status code`_ for the response.
+
+.. attribute:: HttpResponse.streaming
+
+    This is always ``True``.

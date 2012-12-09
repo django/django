@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import pickle
 import time
@@ -9,6 +11,7 @@ from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test.utils import override_settings
+from django.utils._os import upath
 
 def test_processor(request):
     return {'processors': 'yes'}
@@ -29,16 +32,16 @@ class SimpleTemplateResponseTest(TestCase):
     def test_template_resolving(self):
         response = SimpleTemplateResponse('first/test.html')
         response.render()
-        self.assertEqual('First template\n', response.content)
+        self.assertEqual(response.content, b'First template\n')
 
         templates = ['foo.html', 'second/test.html', 'first/test.html']
         response = SimpleTemplateResponse(templates)
         response.render()
-        self.assertEqual('Second template\n', response.content)
+        self.assertEqual(response.content, b'Second template\n')
 
         response = self._response()
         response.render()
-        self.assertEqual(response.content, 'foo')
+        self.assertEqual(response.content, b'foo')
 
     def test_explicit_baking(self):
         # explicit baking
@@ -50,17 +53,17 @@ class SimpleTemplateResponseTest(TestCase):
     def test_render(self):
         # response is not re-rendered without the render call
         response = self._response().render()
-        self.assertEqual(response.content, 'foo')
+        self.assertEqual(response.content, b'foo')
 
         # rebaking doesn't change the rendered content
         response.template_name = Template('bar{{ baz }}')
         response.render()
-        self.assertEqual(response.content, 'foo')
+        self.assertEqual(response.content, b'foo')
 
         # but rendered content can be overridden by manually
         # setting content
         response.content = 'bar'
-        self.assertEqual(response.content, 'bar')
+        self.assertEqual(response.content, b'bar')
 
     def test_iteration_unrendered(self):
         # unrendered response raises an exception on iteration
@@ -77,7 +80,7 @@ class SimpleTemplateResponseTest(TestCase):
         # iteration works for rendered responses
         response = self._response().render()
         res = [x for x in response]
-        self.assertEqual(res, ['foo'])
+        self.assertEqual(res, [b'foo'])
 
     def test_content_access_unrendered(self):
         # unrendered response raises an exception when content is accessed
@@ -89,7 +92,7 @@ class SimpleTemplateResponseTest(TestCase):
     def test_content_access_rendered(self):
         # rendered response content can be accessed
         response = self._response().render()
-        self.assertEqual(response.content, 'foo')
+        self.assertEqual(response.content, b'foo')
 
     def test_set_content(self):
         # content can be overriden
@@ -97,23 +100,23 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertFalse(response.is_rendered)
         response.content = 'spam'
         self.assertTrue(response.is_rendered)
-        self.assertEqual(response.content, 'spam')
+        self.assertEqual(response.content, b'spam')
         response.content = 'baz'
-        self.assertEqual(response.content, 'baz')
+        self.assertEqual(response.content, b'baz')
 
     def test_dict_context(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   {'foo': 'bar'})
         self.assertEqual(response.context_data, {'foo': 'bar'})
         response.render()
-        self.assertEqual(response.content, 'bar')
+        self.assertEqual(response.content, b'bar')
 
     def test_context_instance(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'}))
         self.assertEqual(response.context_data.__class__, Context)
         response.render()
-        self.assertEqual(response.content, 'bar')
+        self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
         response = self._response(content_type = 'application/json', status=504)
@@ -140,7 +143,7 @@ class SimpleTemplateResponseTest(TestCase):
 
         # When the content is rendered, all the callbacks are invoked, too.
         response.render()
-        self.assertEqual('First template\n', response.content)
+        self.assertEqual(response.content, b'First template\n')
         self.assertEqual(post, ['post1','post2'])
 
 
@@ -187,9 +190,24 @@ class SimpleTemplateResponseTest(TestCase):
         unpickled_response = pickle.loads(pickled_response)
         repickled_response = pickle.dumps(unpickled_response)
 
+    def test_pickling_cookie(self):
+        response = SimpleTemplateResponse('first/test.html', {
+                'value': 123,
+                'fn': datetime.now,
+            })
+
+        response.cookies['key'] = 'value'
+
+        response.render()
+        pickled_response = pickle.dumps(response, pickle.HIGHEST_PROTOCOL)
+        unpickled_response = pickle.loads(pickled_response)
+
+        self.assertEqual(unpickled_response.cookies['key'].value, 'value')
+
+
 @override_settings(
     TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__),'templates')),
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
 )
 class TemplateResponseTest(TestCase):
 
@@ -202,17 +220,17 @@ class TemplateResponseTest(TestCase):
 
     def test_render(self):
         response = self._response('{{ foo }}{{ processors }}').render()
-        self.assertEqual(response.content, 'yes')
+        self.assertEqual(response.content, b'yes')
 
     def test_render_with_requestcontext(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   {'foo': 'bar'}).render()
-        self.assertEqual(response.content, 'baryes')
+        self.assertEqual(response.content, b'baryes')
 
     def test_render_with_context(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'})).render()
-        self.assertEqual(response.content, 'bar')
+        self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
         response = self._response(content_type = 'application/json',

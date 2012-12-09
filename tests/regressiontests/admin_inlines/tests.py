@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
@@ -8,10 +8,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 # local test models
-from .admin import InnerInline
+from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
-    ProfileCollection)
+    ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
+    Title)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -67,7 +68,7 @@ class TestInline(TestCase):
             'shoppingweakness_set-TOTAL_FORMS': 1,
             'shoppingweakness_set-INITIAL_FORMS': 0,
             'shoppingweakness_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'person': person.id,
             'max_weight': 0,
             'shoppingweakness_set-0-item': item.id,
@@ -85,7 +86,7 @@ class TestInline(TestCase):
             'title_set-TOTAL_FORMS': 1,
             'title_set-INITIAL_FORMS': 0,
             'title_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'title_set-0-title1': 'a title',
             'title_set-0-title2': 'a different title',
         }
@@ -146,6 +147,33 @@ class TestInline(TestCase):
         self.assertContains(response,
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
                 'name="-2-0-name" maxlength="100" />', html=True)
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_localize_pk_shortcut(self):
+        """
+        Ensure that the "View on Site" link is correct for locales that use
+        thousand separators
+        """
+        holder = Holder.objects.create(pk=123456789, dummy=42)
+        inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly='')
+        response = self.client.get('/admin/admin_inlines/holder/%i/' % holder.id)
+        inner_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(inner).pk, inner.pk)
+        self.assertContains(response, inner_shortcut)
+
+    def test_custom_pk_shortcut(self):
+        """
+        Ensure that the "View on Site" link is correct for models with a
+        custom primary key field. Bug #18433.
+        """
+        parent = ParentModelWithCustomPk.objects.create(my_own_pk="foo", name="Foo")
+        child1 = ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
+        child2 = ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
+        response = self.client.get('/admin/admin_inlines/parentmodelwithcustompk/foo/')
+        child1_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child1).pk, child1.pk)
+        child2_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child2).pk, child2.pk)
+        self.assertContains(response, child1_shortcut)
+        self.assertContains(response, child2_shortcut)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineMedia(TestCase):
@@ -235,8 +263,8 @@ class TestInlinePermissions(TestCase):
         permission = Permission.objects.get(codename='change_holder2', content_type=self.holder_ct)
         self.user.user_permissions.add(permission)
 
-        author = Author.objects.create(pk=1, name=u'The Author')
-        book = author.books.create(name=u'The inline Book')
+        author = Author.objects.create(pk=1, name='The Author')
+        book = author.books.create(name='The inline Book')
         self.author_change_url = '/admin/admin_inlines/author/%i/' % author.id
         # Get the ID of the automatically created intermediate model for thw Author-Book m2m
         author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)
@@ -393,6 +421,47 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     fixtures = ['admin-views-users.xml']
     urls = "regressiontests.admin_inlines.urls"
 
+    def test_add_stackeds(self):
+        """
+        Ensure that the "Add another XXX" link correctly adds items to the
+        stacked formset.
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+
+        self.assertEqual(rows_length(), 4)
+
+    def test_delete_stackeds(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/holder4/add/'))
+
+        inline_id = '#inner4stacked_set-group'
+        rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
+            '%s .dynamic-inner4stacked_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 Stacked')
+        add_button.click()
+        add_button.click()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+        for delete_link in self.selenium.find_elements_by_css_selector(
+                '%s .inline-deletelink' % inline_id):
+            delete_link.click()
+        self.assertEqual(rows_length(), 3)
+
     def test_add_inlines(self):
         """
         Ensure that the "Add another XXX" link correctly adds items to the
@@ -500,6 +569,21 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
+
+    def test_alternating_rows(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin/admin_inlines/profilecollection/add/'))
+
+        # Add a few inlines
+        self.selenium.find_element_by_link_text('Add another Profile').click()
+        self.selenium.find_element_by_link_text('Add another Profile').click()
+
+        row_selector = 'form#profilecollection_form tr.dynamic-profile_set'
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            "%s.row1" % row_selector)), 2, msg="Expect two row1 styled rows")
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            "%s.row2" % row_selector)), 1, msg="Expect one row2 styled row")
 
 
 class SeleniumChromeTests(SeleniumFirefoxTests):

@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import mimetypes
 import os
 import random
+import sys
 import time
 from email import charset as Charset, encoders as Encoders
 from email.generator import Generator
@@ -9,11 +12,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import formatdate, getaddresses, formataddr, parseaddr
-from io import BytesIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -76,38 +79,43 @@ ADDRESS_HEADERS = set([
 def forbid_multi_line_headers(name, val, encoding):
     """Forbids multi-line headers, to prevent header injection."""
     encoding = encoding or settings.DEFAULT_CHARSET
-    val = force_unicode(val)
+    val = force_text(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
     try:
-        val = val.encode('ascii')
+        val.encode('ascii')
     except UnicodeEncodeError:
         if name.lower() in ADDRESS_HEADERS:
             val = ', '.join(sanitize_address(addr, encoding)
                 for addr in getaddresses((val,)))
         else:
-            val = str(Header(val, encoding))
+            val = Header(val, encoding).encode()
     else:
         if name.lower() == 'subject':
-            val = Header(val)
-    return name, val
+            val = Header(val).encode()
+    return str(name), val
 
 
 def sanitize_address(addr, encoding):
-    if isinstance(addr, basestring):
-        addr = parseaddr(force_unicode(addr))
+    if isinstance(addr, six.string_types):
+        addr = parseaddr(force_text(addr))
     nm, addr = addr
-    nm = str(Header(nm, encoding))
+    # This try-except clause is needed on Python 3 < 3.2.4
+    # http://bugs.python.org/issue14291
     try:
-        addr = addr.encode('ascii')
+        nm = Header(nm, encoding).encode()
+    except UnicodeEncodeError:
+        nm = Header(nm, 'utf-8').encode()
+    try:
+        addr.encode('ascii')
     except UnicodeEncodeError:  # IDN
-        if u'@' in addr:
-            localpart, domain = addr.split(u'@', 1)
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
             localpart = str(Header(localpart, encoding))
-            domain = domain.encode('idna')
+            domain = domain.encode('idna').decode('ascii')
             addr = '@'.join([localpart, domain])
         else:
-            addr = str(Header(addr, encoding))
+            addr = Header(addr, encoding).encode()
     return formataddr((nm, addr))
 
 
@@ -129,8 +137,11 @@ class SafeMIMEText(MIMEText):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = BytesIO()
+        fp = six.StringIO()
         g = Generator(fp, mangle_from_ = False)
+        if sys.version_info < (2, 6, 6) and isinstance(self._payload, six.text_type):
+            # Workaround for http://bugs.python.org/issue1368247
+            self._payload = self._payload.encode(self._charset.output_charset)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 
@@ -153,7 +164,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = BytesIO()
+        fp = six.StringIO()
         g = Generator(fp, mangle_from_ = False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
@@ -178,17 +189,17 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            assert not isinstance(to, basestring), '"to" argument must be a list or tuple'
+            assert not isinstance(to, six.string_types), '"to" argument must be a list or tuple'
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            assert not isinstance(cc, basestring), '"cc" argument must be a list or tuple'
+            assert not isinstance(cc, six.string_types), '"cc" argument must be a list or tuple'
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
+            assert not isinstance(bcc, six.string_types), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
         else:
             self.bcc = []
@@ -207,8 +218,7 @@ class EmailMessage(object):
 
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(smart_str(self.body, encoding),
-                           self.content_subtype, encoding)
+        msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
@@ -290,7 +300,7 @@ class EmailMessage(object):
         basetype, subtype = mimetype.split('/', 1)
         if basetype == 'text':
             encoding = self.encoding or settings.DEFAULT_CHARSET
-            attachment = SafeMIMEText(smart_str(content, encoding), subtype, encoding)
+            attachment = SafeMIMEText(content, subtype, encoding)
         else:
             # Encode non-text attachments with base64.
             attachment = MIMEBase(basetype, subtype)
@@ -310,9 +320,11 @@ class EmailMessage(object):
         attachment = self._create_mime_attachment(content, mimetype)
         if filename:
             try:
-                filename = filename.encode('ascii')
+                filename.encode('ascii')
             except UnicodeEncodeError:
-                filename = ('utf-8', '', filename.encode('utf-8'))
+                if not six.PY3:
+                    filename = filename.encode('utf-8')
+                filename = ('utf-8', '', filename)
             attachment.add_header('Content-Disposition', 'attachment',
                                   filename=filename)
         return attachment

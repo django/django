@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import,unicode_literals
 
 import datetime
 from operator import attrgetter
@@ -10,7 +10,10 @@ from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count
 from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
+from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import str_prefix
 from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
@@ -19,7 +22,8 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
-    SpecialCategory, OneToOneCategory, NullableName, ProxyCategory)
+    SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
+    SingleObject, RelatedObject, ModelA, ModelD)
 
 
 class BaseQuerysetTest(TestCase):
@@ -465,7 +469,7 @@ class Queries1Tests(BaseQuerysetTest):
         # ordering columns.
         self.assertValueQuerysetEqual(
             Note.objects.values('misc').distinct().order_by('note', '-misc'),
-            [{'misc': u'foo'}, {'misc': u'bar'}, {'misc': u'foo'}]
+            [{'misc': 'foo'}, {'misc': 'bar'}, {'misc': 'foo'}]
         )
 
     def test_ticket4358(self):
@@ -505,7 +509,7 @@ class Queries1Tests(BaseQuerysetTest):
         # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
         # using constants here and not a real concern.
         d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
-        self.assertEqual(d, {'a': u'one', 'b': u'two'})
+        self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
         l = Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).order_by('-count')
@@ -581,7 +585,7 @@ class Queries1Tests(BaseQuerysetTest):
         # works.
         self.assertValueQuerysetEqual(
             Item.objects.values('note__note').order_by('queries_note.note', 'id'),
-            [{'note__note': u'n2'}, {'note__note': u'n3'}, {'note__note': u'n3'}, {'note__note': u'n3'}]
+            [{'note__note': 'n2'}, {'note__note': 'n3'}, {'note__note': 'n3'}, {'note__note': 'n3'}]
         )
 
     def test_ticket7096(self):
@@ -802,7 +806,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
         qs.query.bump_prefix()
         first = qs[0]
-        self.assertEqual(list(qs), range(first, first+5))
+        self.assertEqual(list(qs), list(range(first, first+5)))
 
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable
@@ -842,6 +846,39 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
         )
         Tag._meta.ordering = original_ordering
+
+    def test_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(tags__name='t4'),
+            [repr(i) for i in Item.objects.filter(~Q(tags__name='t4'))])
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name='t4')|Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|Q(tags__name='t3')))])
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name='t4')|~Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|~Q(tags__name='t3')))])
+
+    def test_nested_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(~Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name='t4'))])
+
+    def test_double_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name='t4'))])
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~Q(~Q(tags__name='t4')))])
+
+    @unittest.expectedFailure
+    def test_exclude_in(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name__in=['t4', 't3'])),
+            [repr(i) for i in Item.objects.filter(~Q(tags__name__in=['t4', 't3']))])
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name__in=['t4', 't3'])),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name__in=['t4', 't3']))])
 
 class Queries2Tests(TestCase):
     def setUp(self):
@@ -1009,6 +1046,18 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(q1, ["<Item: i1>"])
         self.assertEqual(str(q1.query), str(q2.query))
 
+    def test_combine_join_reuse(self):
+        # Test that we correctly recreate joins having identical connections
+        # in the rhs query, in case the query is ORed together. Related to
+        # ticket #18748
+        Report.objects.create(name='r4', creator=self.a1)
+        q1 = Author.objects.filter(report__name='r5')
+        q2 = Author.objects.filter(report__name='r4').filter(report__name='r1')
+        combined = q1|q2
+        self.assertEquals(str(combined.query).count('JOIN'), 2)
+        self.assertEquals(len(combined), 1)
+        self.assertEquals(combined[0].name, 'a1')
+
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
         # tricky in MySQL. This exercises that case.
@@ -1017,15 +1066,15 @@ class Queries4Tests(BaseQuerysetTest):
 
         # A values() or values_list() query across joined models must use outer
         # joins appropriately.
-        # Note: In Oracle, we expect a null CharField to return u'' instead of
+        # Note: In Oracle, we expect a null CharField to return '' instead of
         # None.
         if connection.features.interprets_empty_strings_as_nulls:
-            expected_null_charfield_repr = u''
+            expected_null_charfield_repr = ''
         else:
             expected_null_charfield_repr = None
         self.assertValueQuerysetEqual(
             Report.objects.values_list("creator__extra__info", flat=True).order_by("name"),
-            [u'e1', u'e2', expected_null_charfield_repr],
+            ['e1', 'e2', expected_null_charfield_repr],
         )
 
         # Similarly for select_related(), joins beyond an initial nullable join
@@ -1046,7 +1095,7 @@ class Queries4Tests(BaseQuerysetTest):
         m2 = Member.objects.create(name="m2", details=d2)
         Child.objects.create(person=m2, parent=m1)
         obj = m1.children.select_related("person__details")[0]
-        self.assertEqual(obj.person.details.data, u'd2')
+        self.assertEqual(obj.person.details.data, 'd2')
 
     def test_order_by_resetting(self):
         # Calling order_by() with no parameters removes any existing ordering on the
@@ -1235,8 +1284,8 @@ class Queries5Tests(TestCase):
         # them in a values() query.
         dicts = qs.values('id', 'rank').order_by('id')
         self.assertEqual(
-            [d.items()[1] for d in dicts],
-            [('rank', 2), ('rank', 1), ('rank', 3)]
+            [d['rank'] for d in dicts],
+            [2, 1, 3]
         )
 
     def test_ticket7256(self):
@@ -1281,8 +1330,21 @@ class Queries5Tests(TestCase):
         )
 
     def test_ticket5261(self):
+        # Test different empty excludes.
         self.assertQuerysetEqual(
             Note.objects.exclude(Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.filter(~Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.filter(~Q()|~Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.exclude(~Q()&~Q()),
             ['<Note: n1>', '<Note: n2>']
         )
 
@@ -1321,10 +1383,31 @@ class NullableRelOrderingTests(TestCase):
     def test_ticket10028(self):
         # Ordering by model related to nullable relations(!) should use outer
         # joins, so that all results are included.
-        _ = Plaything.objects.create(name="p1")
+        Plaything.objects.create(name="p1")
         self.assertQuerysetEqual(
             Plaything.objects.all(),
             ['<Plaything: p1>']
+        )
+
+    def test_join_already_in_query(self):
+        # Ordering by model related to nullable relations should not change
+        # the join type of already existing joins.
+        Plaything.objects.create(name="p1")
+        s = SingleObject.objects.create(name='s')
+        r = RelatedObject.objects.create(single=s)
+        Plaything.objects.create(name="p2", others=r)
+        qs = Plaything.objects.all().filter(others__isnull=False).order_by('pk')
+        self.assertTrue('INNER' in str(qs.query))
+        qs = qs.order_by('others__single__name')
+        # The ordering by others__single__pk will add one new join (to single)
+        # and that join must be LEFT join. The already existing join to related
+        # objects must be kept INNER. So, we have both a INNER and a LEFT join
+        # in the query.
+        self.assertTrue('LEFT' in str(qs.query))
+        self.assertTrue('INNER' in str(qs.query))
+        self.assertQuerysetEqual(
+            qs,
+            ['<Plaything: p2>']
         )
 
 
@@ -1475,12 +1558,12 @@ class RawQueriesTests(TestCase):
         query = "SELECT * FROM queries_note WHERE note = %s"
         params = ['n1']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1'>")
+        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1'>"))
 
         query = "SELECT * FROM queries_note WHERE note = %s and misc = %s"
         params = ['n1', 'foo']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>")
+        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>"))
 
 
 class GeneratorExpressionTests(TestCase):
@@ -1606,10 +1689,7 @@ class CloneTests(TestCase):
         list(n_list)
         # Use the note queryset in a query, and evalute
         # that query in a way that involves cloning.
-        try:
-            self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
-        except:
-            self.fail('Query should be clonable')
+        self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
 
 
 class EmptyQuerySetTests(TestCase):
@@ -1629,6 +1709,13 @@ class EmptyQuerySetTests(TestCase):
             Number.objects.filter(pk__in=Number.objects.none().values_list("pk")),
             []
         )
+
+    def test_ticket_19151(self):
+        # #19151 -- Calling .values() or .values_list() on an EmptyQuerySet
+        # should return EmptyQuerySet and not cause an error.
+        q = EmptyQuerySet()
+        self.assertQuerysetEqual(q.values(), [])
+        self.assertQuerysetEqual(q.values_list(), [])
 
 
 class ValuesQuerysetTests(BaseQuerysetTest):
@@ -1808,8 +1895,7 @@ class ConditionalTests(BaseQuerysetTest):
         # Test that the "in" lookup works with lists of 1000 items or more.
         Number.objects.all().delete()
         numbers = range(2500)
-        for num in numbers:
-            _ = Number.objects.create(num=num)
+        Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
             Number.objects.filter(num__in=numbers[:1000]).count(),
             1000
@@ -1964,3 +2050,97 @@ class ProxyQueryCleanupTest(TestCase):
         self.assertEqual(qs.count(), 1)
         str(qs.query)
         self.assertEqual(qs.count(), 1)
+
+class WhereNodeTest(TestCase):
+    class DummyNode(object):
+        def as_sql(self, qn, connection):
+            return 'dummy', []
+
+    def test_empty_full_handling_conjunction(self):
+        qn = connection.ops.quote_name
+        w = WhereNode(children=[EverythingNode()])
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[NothingNode()])
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w = WhereNode(children=[EverythingNode(), EverythingNode()])
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[EverythingNode(), self.DummyNode()])
+        self.assertEqual(w.as_sql(qn, connection), ('dummy', []))
+        w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
+        self.assertEqual(w.as_sql(qn, connection), ('(dummy AND dummy)', []))
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy AND dummy)', []))
+        w = WhereNode(children=[NothingNode(), self.DummyNode()])
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+
+    def test_empty_full_handling_disjunction(self):
+        qn = connection.ops.quote_name
+        w = WhereNode(children=[EverythingNode()], connector='OR')
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[NothingNode()], connector='OR')
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w = WhereNode(children=[EverythingNode(), EverythingNode()], connector='OR')
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[EverythingNode(), self.DummyNode()], connector='OR')
+        self.assertEqual(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
+        self.assertEqual(w.as_sql(qn, connection), ('(dummy OR dummy)', []))
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy OR dummy)', []))
+        w = WhereNode(children=[NothingNode(), self.DummyNode()], connector='OR')
+        self.assertEqual(w.as_sql(qn, connection), ('dummy', []))
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), ('NOT (dummy)', []))
+
+    def test_empty_nodes(self):
+        qn = connection.ops.quote_name
+        empty_w = WhereNode()
+        w = WhereNode(children=[empty_w, empty_w])
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
+        w.connector = 'OR'
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
+        w.negate()
+        self.assertEqual(w.as_sql(qn, connection), (None, []))
+        w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+
+class NullJoinPromotionOrTest(TestCase):
+    def setUp(self):
+        d = ModelD.objects.create(name='foo')
+        ModelA.objects.create(name='bar', d=d)
+
+    def test_ticket_17886(self):
+        # The first Q-object is generating the match, the rest of the filters
+        # should not remove the match even if they do not match anything. The
+        # problem here was that b__name generates a LOUTER JOIN, then
+        # b__c__name generates join to c, which the ORM tried to promote but
+        # failed as that join isn't nullable.
+        q_obj =  (
+            Q(d__name='foo')|
+            Q(b__name='foo')|
+            Q(b__c__name='foo')
+        )
+        qset = ModelA.objects.filter(q_obj)
+        self.assertEqual(len(qset), 1)
+        # We generate one INNER JOIN to D. The join is direct and not nullable
+        # so we can use INNER JOIN for it. However, we can NOT use INNER JOIN
+        # for the b->c join, as a->b is nullable.
+        self.assertEqual(str(qset.query).count('INNER JOIN'), 1)

@@ -4,6 +4,7 @@ from django.conf.urls import patterns, url
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
+from . import models
 from . import views
 
 
@@ -52,6 +53,12 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view()),
     (r'^detail/author/invalid/qs/$',
         views.AuthorDetail.as_view(queryset=None)),
+    (r'^detail/nonmodel/1/$',
+        views.NonModelDetail.as_view()),
+
+    # FormView
+    (r'^contact/$',
+        views.ContactView.as_view()),
 
     # Create/UpdateView
     (r'^edit/artists/create/$',
@@ -108,6 +115,10 @@ urlpatterns = patterns('',
         views.BookArchive.as_view(queryset=None)),
     (r'^dates/books/paginated/$',
         views.BookArchive.as_view(paginate_by=10)),
+    (r'^dates/books/reverse/$',
+        views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+    (r'^dates/books/by_month/$',
+        views.BookArchive.as_view(date_list_period='month')),
     (r'^dates/booksignings/$',
         views.BookSigningArchive.as_view()),
 
@@ -126,8 +137,12 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(paginate_by=30)),
     (r'^list/authors/paginated/(?P<page>\d+)/$',
         views.AuthorList.as_view(paginate_by=30)),
+    (r'^list/authors/paginated-orphaned/$',
+        views.AuthorList.as_view(paginate_by=30, paginate_orphans=2)),
     (r'^list/authors/notempty/$',
         views.AuthorList.as_view(allow_empty=False)),
+    (r'^list/authors/notempty/paginated/$',
+        views.AuthorList.as_view(allow_empty=False, paginate_by=2)),
     (r'^list/authors/template_name/$',
         views.AuthorList.as_view(template_name='generic_views/list.html')),
     (r'^list/authors/template_name_suffix/$',
@@ -140,6 +155,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(queryset=None)),
     (r'^list/authors/paginated/custom_class/$',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
+    (r'^list/authors/paginated/custom_page_kwarg/$',
+        views.AuthorList.as_view(paginate_by=30, page_kwarg='pagina')),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
 
@@ -158,6 +175,8 @@ urlpatterns = patterns('',
         views.BookYearArchive.as_view(make_object_list=True, paginate_by=30)),
     (r'^dates/books/no_year/$',
         views.BookYearArchive.as_view()),
+    (r'^dates/books/(?P<year>\d{4})/reverse/$',
+        views.BookYearArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
     (r'^dates/booksignings/(?P<year>\d{4})/$',
         views.BookSigningYearArchive.as_view()),
 
@@ -202,6 +221,8 @@ urlpatterns = patterns('',
         views.BookDayArchive.as_view(allow_empty=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/allow_future/$',
         views.BookDayArchive.as_view(allow_future=True)),
+    (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/allow_empty_and_future/$',
+        views.BookDayArchive.as_view(allow_empty=True, allow_future=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/paginated/$',
         views.BookDayArchive.as_view(paginate_by=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/no_day/$',

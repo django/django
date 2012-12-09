@@ -1,14 +1,17 @@
+from __future__ import unicode_literals
+
 import datetime
 import decimal
 import hashlib
+import logging
 from time import time
 
 from django.conf import settings
-from django.utils.log import getLogger
+from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
 
-logger = getLogger('django.db.backends')
+logger = logging.getLogger('django.db.backends')
 
 
 class CursorWrapper(object):
@@ -21,11 +24,9 @@ class CursorWrapper(object):
             self.db.set_dirty()
 
     def __getattr__(self, attr):
-        self.set_dirty()
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+        if attr in ('execute', 'executemany', 'callproc'):
+            self.set_dirty()
+        return getattr(self.cursor, attr)
 
     def __iter__(self):
         return iter(self.cursor)
@@ -135,7 +136,7 @@ def truncate_name(name, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return name
 
-    hsh = hashlib.md5(name).hexdigest()[:hash_len]
+    hsh = hashlib.md5(force_bytes(name)).hexdigest()[:hash_len]
     return '%s%s' % (name[:length-hash_len], hsh)
 
 def format_number(value, max_digits, decimal_places):
@@ -146,6 +147,6 @@ def format_number(value, max_digits, decimal_places):
     if isinstance(value, decimal.Decimal):
         context = decimal.getcontext().copy()
         context.prec = max_digits
-        return u'%s' % str(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
+        return '%s' % str(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
     else:
-        return u"%.*f" % (decimal_places, value)
+        return "%.*f" % (decimal_places, value)

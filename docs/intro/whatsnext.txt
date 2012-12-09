@@ -67,8 +67,7 @@ different needs:
   whathaveyou.
 
 * Finally, there's some "specialized" documentation not usually relevant to
-  most developers. This includes the :doc:`release notes </releases/index>`,
-  :doc:`documentation of obsolete features </obsolete/index>`,
+  most developers. This includes the :doc:`release notes </releases/index>` and
   :doc:`internals documentation </internals/index>` for those who want to add
   code to Django itself, and a :doc:`few other things that simply don't fit
   elsewhere </misc/index>`.
@@ -108,7 +107,7 @@ On the Web
 ----------
 
 The most recent version of the Django documentation lives at
-http://docs.djangoproject.com/en/dev/. These HTML pages are generated
+https://docs.djangoproject.com/en/dev/. These HTML pages are generated
 automatically from the text files in source control. That means they reflect the
 "latest and greatest" in Django -- they include the very latest corrections and
 additions, and they discuss the latest Django features, which may only be
@@ -124,7 +123,7 @@ rather than asking broad tech-support questions. If you need help with your
 particular Django setup, try the `django-users mailing list`_ or the `#django
 IRC channel`_ instead.
 
-.. _ticket system: https://code.djangoproject.com/simpleticket?component=Documentation
+.. _ticket system: https://code.djangoproject.com/newticket?component=Documentation
 .. _django-users mailing list: http://groups.google.com/group/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 
@@ -191,6 +190,8 @@ You can get a local copy of the HTML documentation following a few easy steps:
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
 
+.. _differences-between-doc-versions:
+
 Differences between versions
 ============================
 
@@ -215,15 +216,13 @@ We follow this policy:
   "New in version X.Y", being X.Y the next release version (hence, the one
   being developed).
 
-* Documentation for a particular Django release is frozen once the version
-  has been released officially. It remains a snapshot of the docs as of the
-  moment of the release. We will make exceptions to this rule in
-  the case of retroactive security updates or other such retroactive
-  changes. Once documentation is frozen, we add a note to the top of each
-  frozen document that says "These docs are frozen for Django version XXX"
-  and links to the current version of that document.
+* Documentation fixes and improvements may be backported to the last release
+  branch, at the discretion of the committer, however, once a version of
+  Django is :ref:`no longer supported<backwards-compatibility-policy>`, that
+  version of the docs won't get any further updates.
 
 * The `main documentation Web page`_ includes links to documentation for
-  all previous versions.
+  all previous versions. Be sure you are using the version of the docs
+  corresponding to the version of Django you are using!
 
-.. _main documentation Web page: http://docs.djangoproject.com/en/dev/
+.. _main documentation Web page: https://docs.djangoproject.com/en/dev/

@@ -2,34 +2,35 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+import random
 import re
-import StringIO
+import string
 import tempfile
 import time
 import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
+from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import router
-from django.http import HttpResponse, HttpRequest, QueryDict
+from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
+    QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import (get_warnings_state, restore_warnings_state,
-    override_settings)
+from django.test.utils import override_settings, six
 from django.utils import timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
@@ -140,10 +141,10 @@ class DummyCacheTests(unittest.TestCase):
     def test_unicode(self):
         "Unicode values are ignored by the dummy cache"
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii2': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii2': {'x' : 1 }
             }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -256,6 +257,7 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('answer'), 42)
         self.assertEqual(self.cache.incr('answer', 10), 52)
         self.assertEqual(self.cache.get('answer'), 52)
+        self.assertEqual(self.cache.incr('answer', -10), 42)
         self.assertRaises(ValueError, self.cache.incr, 'does_not_exist')
 
     def test_decr(self):
@@ -265,7 +267,12 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('answer'), 42)
         self.assertEqual(self.cache.decr('answer', 10), 32)
         self.assertEqual(self.cache.get('answer'), 32)
+        self.assertEqual(self.cache.decr('answer', -10), 42)
         self.assertRaises(ValueError, self.cache.decr, 'does_not_exist')
+
+    def test_close(self):
+        self.assertTrue(hasattr(self.cache, 'close'))
+        self.cache.close()
 
     def test_data_types(self):
         # Many different data types can be cached
@@ -338,10 +345,10 @@ class BaseCacheTests(object):
     def test_unicode(self):
         # Unicode values can be cached
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii2': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii2': {'x' : 1 }
             }
         # Test `set`
         for (key, value) in stuff.items():
@@ -365,25 +372,25 @@ class BaseCacheTests(object):
         # Binary strings should be cacheable
         from zlib import compress, decompress
         value = 'value_to_be_compressed'
-        compressed_value = compress(value)
+        compressed_value = compress(value.encode())
 
         # Test set
         self.cache.set('binary1', compressed_value)
         compressed_result = self.cache.get('binary1')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
         # Test add
         self.cache.add('binary1-add', compressed_value)
         compressed_result = self.cache.get('binary1-add')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
         # Test set_many
         self.cache.set_many({'binary1-set_many': compressed_value})
         compressed_result = self.cache.get('binary1-set_many')
         self.assertEqual(compressed_value, compressed_result)
-        self.assertEqual(value, decompress(compressed_result))
+        self.assertEqual(value, decompress(compressed_result).decode())
 
     def test_set_many(self):
         # Multiple keys can be set using set_many
@@ -775,13 +782,13 @@ class BaseCacheTests(object):
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
         update_middleware.process_response(request, get_cache_data)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
 def custom_key_func(key, key_prefix, version):
@@ -820,9 +827,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
-        err = StringIO.StringIO()
-        management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False, stderr=err)
-        self.assertTrue("Cache table 'test cache table' could not be created" in err.getvalue())
+        with six.assertRaisesRegex(self, management.CommandError,
+                "Cache table 'test cache table' could not be created"):
+            management.call_command(
+               'createcachetable',
+                self._table_name,
+                verbosity=0,
+                interactive=False
+            )
 
 
 @override_settings(USE_TZ=True)
@@ -928,21 +940,24 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
-# need to contain a cache backend setting that points at
+# need to contain at least one cache backend setting that points at
 # your memcache server.
 @unittest.skipUnless(
-    settings.CACHES[DEFAULT_CACHE_ALIAS]['BACKEND'].startswith('django.core.cache.backends.memcached.'),
+    any(cache['BACKEND'].startswith('django.core.cache.backends.memcached.')
+        for cache in settings.CACHES.values()),
     "memcached not available")
 class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
-    backend_name = 'django.core.cache.backends.memcached.MemcachedCache'
 
     def setUp(self):
-        name = settings.CACHES[DEFAULT_CACHE_ALIAS]['LOCATION']
-        self.cache = get_cache(self.backend_name, LOCATION=name)
-        self.prefix_cache = get_cache(self.backend_name, LOCATION=name, KEY_PREFIX='cacheprefix')
-        self.v2_cache = get_cache(self.backend_name, LOCATION=name, VERSION=2)
-        self.custom_key_cache = get_cache(self.backend_name, LOCATION=name, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=name, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        for cache_key, cache in settings.CACHES.items():
+            if cache['BACKEND'].startswith('django.core.cache.backends.memcached.'):
+                break
+        random_prefix = ''.join(random.choice(string.ascii_letters) for x in range(10))
+        self.cache = get_cache(cache_key)
+        self.prefix_cache = get_cache(cache_key, KEY_PREFIX=random_prefix)
+        self.v2_cache = get_cache(cache_key, VERSION=2)
+        self.custom_key_cache = get_cache(cache_key, KEY_FUNCTION=custom_key_func)
+        self.custom_key_cache2 = get_cache(cache_key, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
@@ -984,7 +999,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """Test that keys are hashed into subdirectories correctly"""
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = hashlib.md5(key.encode()).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 
@@ -994,7 +1009,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = hashlib.md5(key.encode()).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 
@@ -1218,7 +1233,7 @@ class CacheHEADTest(TestCase):
         request = self._get_request('HEAD')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(test_content, get_cache_data.content)
+        self.assertEqual(test_content.encode(), get_cache_data.content)
 
     def test_head_with_cached_get(self):
         test_content = 'test content'
@@ -1229,7 +1244,7 @@ class CacheHEADTest(TestCase):
         request = self._get_request('HEAD')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(test_content, get_cache_data.content)
+        self.assertEqual(test_content.encode(), get_cache_data.content)
 
 
 @override_settings(
@@ -1303,8 +1318,8 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
-        tz = force_unicode(timezone.get_current_timezone_name(), errors='ignore')
-        tz = tz.encode('ascii', 'ignore').replace(' ', '_')
+        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertIn(tz, key, "Cache keys should include the time zone name when time zones are active")
@@ -1315,8 +1330,8 @@ class CacheI18nTest(TestCase):
     def test_cache_key_no_i18n (self):
         request = self._get_request()
         lang = translation.get_language()
-        tz = force_unicode(timezone.get_current_timezone_name(), errors='ignore')
-        tz = tz.encode('ascii', 'ignore').replace(' ', '_')
+        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
@@ -1333,12 +1348,12 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         response = HttpResponse()
         with timezone.override(CustomTzName()):
-            CustomTzName.name = 'Hora estándar de Argentina'    # UTF-8 string
+            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8') # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
 
-            CustomTzName.name = u'Hora estándar de Argentina'    # unicode
+            CustomTzName.name = 'Hora estándar de Argentina'    # unicode
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
@@ -1369,7 +1384,7 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # cache must return content
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
         request = self._get_request_cache(query_string='foo=bar&somethingelse=true')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
@@ -1384,7 +1399,7 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # Check that we can recover the cache
         self.assertNotEqual(get_cache_data, None)
-        self.assertEqual(get_cache_data.content, en_message)
+        self.assertEqual(get_cache_data.content, en_message.encode())
         # Check that we use etags
         self.assertTrue(get_cache_data.has_header('ETag'))
         # Check that we can disable etags
@@ -1400,13 +1415,36 @@ class CacheI18nTest(TestCase):
         translation.activate('en')
         # retrieve the content from cache
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data.content, en_message)
+        self.assertEqual(get_cache_data.content, en_message.encode())
         # change again the language
         translation.activate('es')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data.content, es_message)
+        self.assertEqual(get_cache_data.content, es_message.encode())
         # reset the language
         translation.deactivate()
+
+    @override_settings(
+            CACHE_MIDDLEWARE_KEY_PREFIX="test",
+            CACHE_MIDDLEWARE_SECONDS=60,
+            USE_ETAGS=True,
+    )
+    def test_middleware_with_streaming_response(self):
+        # cache with non empty request.GET
+        request = self._get_request_cache(query_string='foo=baz&other=true')
+
+        # first access, cache must return None
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data, None)
+
+        # pass streaming response through UpdateCacheMiddleware.
+        content = 'Check for cache with QUERY_STRING and streaming content'
+        response = StreamingHttpResponse(content)
+        UpdateCacheMiddleware().process_response(request, response)
+
+        # second access, cache must still return None, because we can't cache
+        # streaming response.
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data, None)
 
 
 @override_settings(
@@ -1509,8 +1547,8 @@ class CacheMiddlewareTest(TestCase):
 
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
-        self.assertNotEquals(result, None)
-        self.assertEqual(result.content, 'Hello World 1')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.content, b'Hello World 1')
 
         # The same request through a different middleware won't hit
         result = prefix_middleware.process_request(request)
@@ -1518,8 +1556,8 @@ class CacheMiddlewareTest(TestCase):
 
         # The same request with a timeout _will_ hit
         result = timeout_middleware.process_request(request)
-        self.assertNotEquals(result, None)
-        self.assertEqual(result.content, 'Hello World 1')
+        self.assertNotEqual(result, None)
+        self.assertEqual(result.content, b'Hello World 1')
 
     @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
     def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
@@ -1588,43 +1626,43 @@ class CacheMiddlewareTest(TestCase):
 
         # Request the view once
         response = default_view(request, '1')
-        self.assertEqual(response.content, 'Hello World 1')
+        self.assertEqual(response.content, b'Hello World 1')
 
         # Request again -- hit the cache
         response = default_view(request, '2')
-        self.assertEqual(response.content, 'Hello World 1')
+        self.assertEqual(response.content, b'Hello World 1')
 
         # Requesting the same view with the explicit cache should yield the same result
         response = explicit_default_view(request, '3')
-        self.assertEqual(response.content, 'Hello World 1')
+        self.assertEqual(response.content, b'Hello World 1')
 
         # Requesting with a prefix will hit a different cache key
         response = explicit_default_with_prefix_view(request, '4')
-        self.assertEqual(response.content, 'Hello World 4')
+        self.assertEqual(response.content, b'Hello World 4')
 
         # Hitting the same view again gives a cache hit
         response = explicit_default_with_prefix_view(request, '5')
-        self.assertEqual(response.content, 'Hello World 4')
+        self.assertEqual(response.content, b'Hello World 4')
 
         # And going back to the implicit cache will hit the same cache
         response = default_with_prefix_view(request, '6')
-        self.assertEqual(response.content, 'Hello World 4')
+        self.assertEqual(response.content, b'Hello World 4')
 
         # Requesting from an alternate cache won't hit cache
         response = other_view(request, '7')
-        self.assertEqual(response.content, 'Hello World 7')
+        self.assertEqual(response.content, b'Hello World 7')
 
         # But a repeated hit will hit cache
         response = other_view(request, '8')
-        self.assertEqual(response.content, 'Hello World 7')
+        self.assertEqual(response.content, b'Hello World 7')
 
         # And prefixing the alternate cache yields yet another cache entry
         response = other_with_prefix_view(request, '9')
-        self.assertEqual(response.content, 'Hello World 9')
+        self.assertEqual(response.content, b'Hello World 9')
 
         # Request from the alternate cache with a new prefix and a custom timeout
         response = other_with_timeout_view(request, '10')
-        self.assertEqual(response.content, 'Hello World 10')
+        self.assertEqual(response.content, b'Hello World 10')
 
         # But if we wait a couple of seconds...
         time.sleep(2)
@@ -1632,38 +1670,38 @@ class CacheMiddlewareTest(TestCase):
         # ... the default cache will still hit
         cache = get_cache('default')
         response = default_view(request, '11')
-        self.assertEqual(response.content, 'Hello World 1')
+        self.assertEqual(response.content, b'Hello World 1')
 
         # ... the default cache with a prefix will still hit
         response = default_with_prefix_view(request, '12')
-        self.assertEqual(response.content, 'Hello World 4')
+        self.assertEqual(response.content, b'Hello World 4')
 
         # ... the explicit default cache will still hit
         response = explicit_default_view(request, '13')
-        self.assertEqual(response.content, 'Hello World 1')
+        self.assertEqual(response.content, b'Hello World 1')
 
         # ... the explicit default cache with a prefix will still hit
         response = explicit_default_with_prefix_view(request, '14')
-        self.assertEqual(response.content, 'Hello World 4')
+        self.assertEqual(response.content, b'Hello World 4')
 
         # .. but a rapidly expiring cache won't hit
         response = other_view(request, '15')
-        self.assertEqual(response.content, 'Hello World 15')
+        self.assertEqual(response.content, b'Hello World 15')
 
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
-        self.assertEqual(response.content, 'Hello World 16')
+        self.assertEqual(response.content, b'Hello World 16')
 
         # ... but a view with a custom timeout will still hit
         response = other_with_timeout_view(request, '17')
-        self.assertEqual(response.content, 'Hello World 10')
+        self.assertEqual(response.content, b'Hello World 10')
 
         # And if we wait a few more seconds
         time.sleep(2)
 
-        # the custom timeouot cache will miss
+        # the custom timeout cache will miss
         response = other_with_timeout_view(request, '18')
-        self.assertEqual(response.content, 'Hello World 18')
+        self.assertEqual(response.content, b'Hello World 18')
 
 
 @override_settings(

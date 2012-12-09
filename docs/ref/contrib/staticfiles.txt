@@ -5,8 +5,6 @@ The staticfiles app
 .. module:: django.contrib.staticfiles
    :synopsis: An app for handling static files.
 
-.. versionadded:: 1.3
-
 ``django.contrib.staticfiles`` collects static files from each of your
 applications (and any other places you specify) into a single location that
 can easily be served in production.
@@ -380,12 +378,23 @@ full URL for the given relative path, e.g.:
 .. code-block:: html+django
 
     {% load static from staticfiles %}
-    <img src="{% static "css/base.css" %}" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 The previous example is equal to calling the ``url`` method of an instance of
-:setting:`STATICFILES_STORAGE` with ``"css/base.css"``. This is especially
+:setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
 useful when using a non-local storage backend to deploy files as documented
 in :ref:`staticfiles-from-cdn`.
+
+.. versionadded:: 1.5
+
+If you'd like to retrieve a static URL without displaying it, you can use a
+slightly different call:
+
+.. code-block:: html+django
+
+    {% load static from staticfiles %}
+    {% static "images/hi.jpg" as myphoto %}
+    <img src="{{ myphoto }}" alt="Hi!" />
 
 Other Helpers
 =============

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 from django.utils.crypto import salted_hmac, constant_time_compare
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.text import get_text_list
 from django.utils import timezone
 from django.utils.translation import ungettext, ugettext, ugettext_lazy as _
@@ -133,7 +133,7 @@ class CommentDetailsForm(CommentSecurityForm):
         """
         return dict(
             content_type = ContentType.objects.get_for_model(self.target_object),
-            object_pk    = force_unicode(self.target_object._get_pk_val()),
+            object_pk    = force_text(self.target_object._get_pk_val()),
             user_name    = self.cleaned_data["name"],
             user_email   = self.cleaned_data["email"],
             user_url     = self.cleaned_data["url"],

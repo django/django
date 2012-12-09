@@ -1,14 +1,16 @@
 import hashlib
+import logging
 import re
 
 from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
+from django.utils import six
 from django.core import urlresolvers
-from django.utils.log import getLogger
 
-logger = getLogger('django.request')
+
+logger = logging.getLogger('django.request')
 
 
 class CommonMiddleware(object):
@@ -86,7 +88,17 @@ class CommonMiddleware(object):
         else:
             newurl = urlquote(new_url[1])
         if request.META.get('QUERY_STRING', ''):
-            newurl += '?' + request.META['QUERY_STRING']
+            if six.PY3:
+                newurl += '?' + request.META['QUERY_STRING']
+            else:
+                # `query_string` is a bytestring. Appending it to the unicode
+                # string `newurl` will fail if it isn't ASCII-only. This isn't
+                # allowed; only broken software generates such query strings.
+                # Better drop the invalid query string than crash (#15152).
+                try:
+                    newurl += '?' + request.META['QUERY_STRING'].decode()
+                except UnicodeDecodeError:
+                    pass
         return http.HttpResponsePermanentRedirect(newurl)
 
     def process_response(self, request, response):
@@ -112,14 +124,18 @@ class CommonMiddleware(object):
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
+            elif response.streaming:
+                etag = None
             else:
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
-                cookies = response.cookies
-                response = http.HttpResponseNotModified()
-                response.cookies = cookies
-            else:
-                response['ETag'] = etag
+            if etag is not None:
+                if (200 <= response.status_code < 300
+                    and request.META.get('HTTP_IF_NONE_MATCH') == etag):
+                    cookies = response.cookies
+                    response = http.HttpResponseNotModified()
+                    response.cookies = cookies
+                else:
+                    response['ETag'] = etag
 
         return response
 

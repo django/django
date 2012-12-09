@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+import codecs
 import os
 import re
 
@@ -5,6 +8,8 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models
 from django.db.models import get_models
+from django.utils._os import upath
+
 
 def sql_create(app, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
@@ -13,9 +18,8 @@ def sql_create(app, style, connection):
         # This must be the "dummy" database backend, which means the user
         # hasn't set ENGINE for the database.
         raise CommandError("Django doesn't know which syntax to use for your SQL statements,\n" +
-            "because you haven't specified the ENGINE setting for the database.\n" +
-            "Edit your settings file and change DATBASES['default']['ENGINE'] to something like\n" +
-            "'django.db.backends.postgresql' or 'django.db.backends.mysql'.")
+            "because you haven't properly specified the ENGINE setting for the database.\n" +
+            "see: https://docs.djangoproject.com/en/dev/ref/settings/#databases")
 
     # Get installed models, so we generate REFERENCES right.
     # We trim models from the current app so that the sqlreset command does not
@@ -52,6 +56,7 @@ def sql_create(app, style, connection):
 
     return final_output
 
+
 def sql_delete(app, style, connection):
     "Returns a list of the DROP TABLE SQL statements for the given app."
 
@@ -80,7 +85,7 @@ def sql_delete(app, style, connection):
             opts = model._meta
             for f in opts.local_fields:
                 if f.rel and f.rel.to not in to_delete:
-                    references_to_delete.setdefault(f.rel.to, []).append( (model, f) )
+                    references_to_delete.setdefault(f.rel.to, []).append((model, f))
 
             to_delete.add(model)
 
@@ -94,9 +99,10 @@ def sql_delete(app, style, connection):
         cursor.close()
         connection.close()
 
-    return output[::-1] # Reverse it, to deal with table dependencies.
+    return output[::-1]  # Reverse it, to deal with table dependencies.
 
-def sql_flush(style, connection, only_django=False):
+
+def sql_flush(style, connection, only_django=False, reset_sequences=True):
     """
     Returns a list of the SQL statements used to flush the database.
 
@@ -107,10 +113,10 @@ def sql_flush(style, connection, only_django=False):
         tables = connection.introspection.django_table_names(only_existing=True)
     else:
         tables = connection.introspection.table_names()
-    statements = connection.ops.sql_flush(
-        style, tables, connection.introspection.sequence_list()
-    )
+    seqs = connection.introspection.sequence_list() if reset_sequences else ()
+    statements = connection.ops.sql_flush(style, tables, seqs)
     return statements
+
 
 def sql_custom(app, style, connection):
     "Returns a list of the custom table modifying SQL statements for the given app."
@@ -123,6 +129,7 @@ def sql_custom(app, style, connection):
 
     return output
 
+
 def sql_indexes(app, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
@@ -130,13 +137,30 @@ def sql_indexes(app, style, connection):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
+
 def sql_all(app, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
 
+
+def _split_statements(content):
+    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+    statements = []
+    statement = []
+    for line in content.split("\n"):
+        cleaned_line = comment_re.sub(r"\1", line).strip()
+        if not cleaned_line:
+            continue
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
+    return statements
+
+
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(models.get_app(model._meta.app_label).__file__)), 'sql'))
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
@@ -147,23 +171,16 @@ def custom_sql_for_model(model, style, connection):
         for f in post_sql_fields:
             output.extend(f.post_create_sql(style, model._meta.db_table))
 
-    # Some backends can't execute more than one SQL statement at a time,
-    # so split into separate statements.
-    statements = re.compile(r";[ \t]*$", re.M)
-
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
     sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            with open(sql_file, 'U') as fp:
-                for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
-                    # Remove any comments from the file
-                    statement = re.sub(ur"--.*([\n\Z]|$)", "", statement)
-                    if statement.strip():
-                        output.append(statement + u";")
-
+            with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
+                # Some backends can't execute more than one SQL statement at a time,
+                # so split into separate statements.
+                output.extend(_split_statements(fp.read()))
     return output
 
 

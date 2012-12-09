@@ -1,7 +1,8 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.forms.models import inlineformset_factory
 from django.test import TestCase
+from django.utils import six
 
 from .models import Poet, Poem, School, Parent, Child
 
@@ -13,13 +14,13 @@ class DeletionTests(TestCase):
         poet = Poet.objects.create(name='test')
         poem = poet.poem_set.create(name='test poem')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'1',
-            'poem_set-MAX_NUM_FORMS': u'0',
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
             'poem_set-0-id': str(poem.pk),
             'poem_set-0-poet': str(poet.pk),
-            'poem_set-0-name': u'test',
-            'poem_set-0-DELETE': u'on',
+            'poem_set-0-name': 'test',
+            'poem_set-0-DELETE': 'on',
         }
         formset = PoemFormSet(data, instance=poet)
         formset.save()
@@ -34,12 +35,12 @@ class DeletionTests(TestCase):
         PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
         poet = Poet.objects.create(name='test')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'0',
-            'poem_set-MAX_NUM_FORMS': u'0',
-            'poem_set-0-id': u'',
-            'poem_set-0-poem': u'1',
-            'poem_set-0-name': u'x' * 1000,
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': '',
+            'poem_set-0-poem': '1',
+            'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
@@ -63,12 +64,12 @@ class DeletionTests(TestCase):
         poet = Poet.objects.create(name='test')
         poem = poet.poem_set.create(name='test poem')
         data = {
-            'poem_set-TOTAL_FORMS': u'1',
-            'poem_set-INITIAL_FORMS': u'1',
-            'poem_set-MAX_NUM_FORMS': u'0',
-            'poem_set-0-id': unicode(poem.id),
-            'poem_set-0-poem': unicode(poem.id),
-            'poem_set-0-name': u'x' * 1000,
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': six.text_type(poem.id),
+            'poem_set-0-poem': six.text_type(poem.id),
+            'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
@@ -90,14 +91,14 @@ class DeletionTests(TestCase):
         """
         # exclude some required field from the forms
         ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
-        school = School.objects.create(name=u'test')
-        mother = Parent.objects.create(name=u'mother')
-        father = Parent.objects.create(name=u'father')
+        school = School.objects.create(name='test')
+        mother = Parent.objects.create(name='mother')
+        father = Parent.objects.create(name='father')
         data = {
-            'child_set-TOTAL_FORMS': u'1',
-            'child_set-INITIAL_FORMS': u'0',
-            'child_set-MAX_NUM_FORMS': u'0',
-            'child_set-0-name': u'child',
+            'child_set-TOTAL_FORMS': '1',
+            'child_set-INITIAL_FORMS': '0',
+            'child_set-MAX_NUM_FORMS': '0',
+            'child_set-0-name': 'child',
         }
         formset = ChildFormSet(data, instance=school)
         self.assertEqual(formset.is_valid(), True)
@@ -122,7 +123,7 @@ class InlineFormsetFactoryTest(TestCase):
         Child has two ForeignKeys to Parent, so if we don't specify which one
         to use for the inline formset, we should get an exception.
         """
-        self.assertRaisesRegexp(Exception,
+        six.assertRaisesRegex(self, Exception,
             "<class 'regressiontests.inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child
         )
@@ -142,7 +143,7 @@ class InlineFormsetFactoryTest(TestCase):
         If the field specified in fk_name is not a ForeignKey, we should get an
         exception.
         """
-        self.assertRaisesRegexp(Exception,
+        six.assertRaisesRegex(self, Exception,
             "<class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'",
             inlineformset_factory, Parent, Child, fk_name='test'
         )

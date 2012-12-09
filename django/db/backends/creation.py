@@ -1,8 +1,11 @@
+import hashlib
 import sys
 import time
 
 from django.conf import settings
 from django.db.utils import load_backend
+from django.utils.encoding import force_bytes
+from django.utils.six.moves import input
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -26,7 +29,10 @@ class BaseDatabaseCreation(object):
         Generates a 32-bit digest of a set of arguments that can be used to
         shorten identifying names.
         """
-        return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
+        h = hashlib.md5()
+        for arg in args:
+            h.update(force_bytes(arg))
+        return h.hexdigest()[:8]
 
     def sql_create_model(self, model, style, known_models=set()):
         """
@@ -34,7 +40,7 @@ class BaseDatabaseCreation(object):
             (list_of_sql, pending_references_dict)
         """
         opts = model._meta
-        if not opts.managed or opts.proxy:
+        if not opts.managed or opts.proxy or opts.swapped:
             return [], {}
         final_output = []
         table_output = []
@@ -86,9 +92,9 @@ class BaseDatabaseCreation(object):
 
         full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' +
                           style.SQL_TABLE(qn(opts.db_table)) + ' (']
-        for i, line in enumerate(table_output): # Combine and add commas.
+        for i, line in enumerate(table_output):  # Combine and add commas.
             full_statement.append(
-                '    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
+                '    %s%s' % (line, i < len(table_output) - 1 and ',' or ''))
         full_statement.append(')')
         if opts.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(
@@ -137,11 +143,11 @@ class BaseDatabaseCreation(object):
         """
         from django.db.backends.util import truncate_name
 
-        if not model._meta.managed or model._meta.proxy:
+        opts = model._meta
+        if not opts.managed or opts.proxy or opts.swapped:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
-        opts = model._meta
         if model in pending_references:
             for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
@@ -166,46 +172,59 @@ class BaseDatabaseCreation(object):
         """
         Returns the CREATE INDEX SQL statements for a single model.
         """
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for f in model._meta.local_fields:
             output.extend(self.sql_indexes_for_field(model, f, style))
+        for fs in model._meta.index_together:
+            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            output.extend(self.sql_indexes_for_fields(model, fields, style))
         return output
 
     def sql_indexes_for_field(self, model, f, style):
         """
         Return the CREATE INDEX SQL statements for a single model field.
         """
+        if f.db_index and not f.unique:
+            return self.sql_indexes_for_fields(model, [f], style)
+        else:
+            return []
+
+    def sql_indexes_for_fields(self, model, fields, style):
         from django.db.backends.util import truncate_name
 
-        if f.db_index and not f.unique:
-            qn = self.connection.ops.quote_name
-            tablespace = f.db_tablespace or model._meta.db_tablespace
-            if tablespace:
-                tablespace_sql = self.connection.ops.tablespace_sql(tablespace)
-                if tablespace_sql:
-                    tablespace_sql = ' ' + tablespace_sql
-            else:
-                tablespace_sql = ''
-            i_name = '%s_%s' % (model._meta.db_table, self._digest(f.column))
-            output = [style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                style.SQL_TABLE(qn(truncate_name(
-                    i_name, self.connection.ops.max_name_length()))) + ' ' +
-                style.SQL_KEYWORD('ON') + ' ' +
-                style.SQL_TABLE(qn(model._meta.db_table)) + ' ' +
-                "(%s)" % style.SQL_FIELD(qn(f.column)) +
-                "%s;" % tablespace_sql]
+        if len(fields) == 1 and fields[0].db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
+        elif model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
         else:
-            output = []
-        return output
+            tablespace_sql = ""
+        if tablespace_sql:
+            tablespace_sql = " " + tablespace_sql
+
+        field_names = []
+        qn = self.connection.ops.quote_name
+        for f in fields:
+            field_names.append(style.SQL_FIELD(qn(f.column)))
+
+        index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
+
+        return [
+            style.SQL_KEYWORD("CREATE INDEX") + " " +
+            style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + " " +
+            style.SQL_KEYWORD("ON") + " " +
+            style.SQL_TABLE(qn(model._meta.db_table)) + " " +
+            "(%s)" % style.SQL_FIELD(", ".join(field_names)) +
+            "%s;" % tablespace_sql,
+        ]
 
     def sql_destroy_model(self, model, references_to_delete, style):
         """
         Return the DROP TABLE and restraint dropping statements for a single
         model.
         """
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         # Drop the table now
         qn = self.connection.ops.quote_name
@@ -222,7 +241,7 @@ class BaseDatabaseCreation(object):
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
         from django.db.backends.util import truncate_name
-        if not model._meta.managed or model._meta.proxy:
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         qn = self.connection.ops.quote_name
@@ -262,10 +281,8 @@ class BaseDatabaseCreation(object):
         self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
+        settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
-
-        # Confirm the feature set of the test database
-        self.connection.features.confirm()
 
         # Report syncdb messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
@@ -333,7 +350,7 @@ class BaseDatabaseCreation(object):
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
             if not autoclobber:
-                confirm = raw_input(
+                confirm = input(
                     "Type 'yes' if you would like to try deleting the test "
                     "database '%s', or 'no' to cancel: " % test_database_name)
             if autoclobber or confirm == 'yes':

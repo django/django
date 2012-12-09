@@ -2,13 +2,19 @@ import os
 from django.core.management.base import NoArgsCommand
 from optparse import make_option
 
+
 class Command(NoArgsCommand):
+    shells = ['ipython', 'bpython']
+
     option_list = NoArgsCommand.option_list + (
         make_option('--plain', action='store_true', dest='plain',
-            help='Tells Django to use plain Python, not IPython.'),
+            help='Tells Django to use plain Python, not IPython or bpython.'),
+        make_option('-i', '--interface', action='store', type='choice', choices=shells,
+                    dest='interface',
+            help='Specify an interactive interpreter interface. Available options: "ipython" and "bpython"'),
+
     )
-    help = "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
-    shells = ['ipython', 'bpython']
+    help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_model_validation = False
 
     def ipython(self):
@@ -31,8 +37,10 @@ class Command(NoArgsCommand):
         import bpython
         bpython.embed()
 
-    def run_shell(self):
-        for shell in self.shells:
+    def run_shell(self, shell=None):
+        available_shells = [shell] if shell else self.shells
+
+        for shell in available_shells:
             try:
                 return getattr(self, shell)()
             except ImportError:
@@ -46,19 +54,21 @@ class Command(NoArgsCommand):
         get_models()
 
         use_plain = options.get('plain', False)
+        interface = options.get('interface', None)
 
         try:
             if use_plain:
                 # Don't bother loading IPython, because the user wants plain Python.
                 raise ImportError
-            self.run_shell()
+
+            self.run_shell(shell=interface)
         except ImportError:
             import code
             # Set up a dictionary to serve as the environment for the shell, so
             # that tab completion works on objects that are imported at runtime.
             # See ticket 5082.
             imported_objects = {}
-            try: # Try activating rlcompleter, because it's handy.
+            try:  # Try activating rlcompleter, because it's handy.
                 import readline
             except ImportError:
                 pass
@@ -70,14 +80,14 @@ class Command(NoArgsCommand):
                 readline.parse_and_bind("tab:complete")
 
             # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
-            # conventions and get $PYTHONSTARTUP first then import user.
+            # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
             if not use_plain:
-                pythonrc = os.environ.get("PYTHONSTARTUP")
-                if pythonrc and os.path.isfile(pythonrc):
-                    try:
-                        execfile(pythonrc)
-                    except NameError:
-                        pass
-                # This will import .pythonrc.py as a side-effect
-                import user
+                for pythonrc in (os.environ.get("PYTHONSTARTUP"),
+                                 os.path.expanduser('~/.pythonrc.py')):
+                    if pythonrc and os.path.isfile(pythonrc):
+                        try:
+                            with open(pythonrc) as handle:
+                                exec(compile(handle.read(), pythonrc, 'exec'))
+                        except NameError:
+                            pass
             code.interact(local=imported_objects)

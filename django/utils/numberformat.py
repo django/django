@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.utils.safestring import mark_safe
+from django.utils import six
 
 
 def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
@@ -18,14 +19,12 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     use_grouping = use_grouping and grouping > 0
     # Make the common case fast
     if isinstance(number, int) and not use_grouping and not decimal_pos:
-        return mark_safe(unicode(number))
+        return mark_safe(six.text_type(number))
     # sign
-    if float(number) < 0:
-        sign = '-'
-    else:
-        sign = ''
-    str_number = unicode(number)
+    sign = ''
+    str_number = six.text_type(number)
     if str_number[0] == '-':
+        sign = '-'
         str_number = str_number[1:]
     # decimal part
     if '.' in str_number:
@@ -47,4 +46,3 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
             int_part_gd += digit
         int_part = int_part_gd[::-1]
     return sign + int_part + dec_part
-

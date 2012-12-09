@@ -57,7 +57,7 @@ there.
 In fact, new documentation is one of our favorite features of Django 1.0, so we
 might as well start there. First, there's a new documentation site:
 
-* http://docs.djangoproject.com/
+* https://docs.djangoproject.com/
 
 The documentation has been greatly improved, cleaned up, and generally made
 awesome. There's now dedicated search, indexes, and more.
@@ -194,8 +194,8 @@ Refactored ``django.contrib.comments``
 As part of a Google Summer of Code project, Thejaswi Puthraya carried out a
 major rewrite and refactoring of Django's bundled comment system, greatly
 increasing its flexibility and customizability. :doc:`Full documentation
-</ref/contrib/comments/index>` is available, as well as :doc:`an upgrade guide
-</ref/contrib/comments/upgrade>` if you were using the previous incarnation of
+</ref/contrib/comments/index>` is available, as well as an upgrade guide
+if you were using the previous incarnation of
 the comments application.
 
 Removal of deprecated features

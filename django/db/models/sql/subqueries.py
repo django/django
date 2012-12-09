@@ -3,13 +3,17 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db import connections
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
+from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -42,6 +46,43 @@ class DeleteQuery(Query):
             where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
+
+    def delete_qs(self, query, using):
+        """
+        Delete the queryset in one SQL query (if possible). For simple queries
+        this is done by copying the query.query.where to self.query, for
+        complex queries by using subquery.
+        """
+        innerq = query.query
+        # Make sure the inner query has at least one table in use.
+        innerq.get_initial_alias()
+        # The same for our new query.
+        self.get_initial_alias()
+        innerq_used_tables = [t for t in innerq.tables
+                              if innerq.alias_refcount[t]]
+        if ((not innerq_used_tables or innerq_used_tables == self.tables)
+            and not len(innerq.having)):
+            # There is only the base table in use in the query, and there are
+            # no aggregate filtering going on.
+            self.where = innerq.where
+        else:
+            pk = query.model._meta.pk
+            if not connections[using].features.update_can_self_select:
+                # We can't do the delete using subquery.
+                values = list(query.values_list('pk', flat=True))
+                if not values:
+                    return
+                self.delete_batch(values, using)
+                return
+            else:
+                innerq.clear_select_clause()
+                innerq.select = [SelectInfo((self.get_initial_alias(), pk.column), None)]
+                values = innerq
+            where = self.where_class()
+            where.add((Constraint(None, pk.column, pk), 'in', values), AND)
+            self.where = where
+        self.get_compiler(using).execute_sql(None)
+
 
 class UpdateQuery(Query):
     """
@@ -86,7 +127,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in values.iteritems():
+        for name, val in six.iteritems(values):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
@@ -103,7 +144,7 @@ class UpdateQuery(Query):
         saving models.
         """
         # Check that no Promise object passes to the query. Refs #10498.
-        values_seq = [(value[0], value[1], force_unicode(value[2]))
+        values_seq = [(value[0], value[1], force_text(value[2]))
                       if isinstance(value[2], Promise) else value
                       for value in values_seq]
         self.values.extend(values_seq)
@@ -128,7 +169,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.iteritems():
+        for model, values in six.iteritems(self.related_updates):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -169,7 +210,7 @@ class InsertQuery(Query):
             for obj in objs:
                 value = getattr(obj, field.attname)
                 if isinstance(value, Promise):
-                    setattr(obj, field.attname, force_unicode(value))
+                    setattr(obj, field.attname, force_text(value))
         self.objs = objs
         self.raw = raw
 
@@ -202,10 +243,8 @@ class DateQuery(Query):
                 % field.name
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
-        self.select = [select]
-        self.select_fields = [None]
-        self.select_related = False # See #7097.
-        self.set_extra_mask([])
+        self.clear_select_clause()
+        self.select = [SelectInfo(select, None)]
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

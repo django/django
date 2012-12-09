@@ -14,11 +14,15 @@
 
 {% if app_list %}
     {% for app in app_list %}
-        <div class="module">
-        <table summary="{% blocktrans with name=app.name %}Models available in the {{ name }} application.{% endblocktrans %}">
-        <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with name=app.name %}{{ name }}{% endblocktrans %}</a></caption>
+        <div class="app-{{ app.app_label }} module">
+        <table>
+        <caption>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">
+                {% blocktrans with name=app.name %}{{ name }}{% endblocktrans %}
+            </a>
+        </caption>
         {% for model in app.models %}
-            <tr>
+            <tr class="model-{{ model.object_name|lower }}">
             {% if model.admin_url %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
             {% else %}

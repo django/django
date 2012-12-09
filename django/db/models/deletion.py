@@ -4,6 +4,7 @@ from operator import attrgetter
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
 from django.utils.datastructures import SortedDict
+from django.utils import six
 
 
 class ProtectedError(IntegrityError):
@@ -76,6 +77,9 @@ class Collector(object):
         self.data = {}
         self.batches = {} # {model: {field: set([instances])}}
         self.field_updates = {} # {model: {(field, value): set([instances])}}
+        # fast_deletes is a list of queryset-likes that can be deleted without
+        # fetching the objects into memory.
+        self.fast_deletes = [] 
 
         # Tracks deletion-order dependency for databases without transactions
         # or ability to defer constraint checks. Only concrete model classes
@@ -130,6 +134,43 @@ class Collector(object):
             model, {}).setdefault(
             (field, value), set()).update(objs)
 
+    def can_fast_delete(self, objs, from_field=None):
+        """
+        Determines if the objects in the given queryset-like can be
+        fast-deleted. This can be done if there are no cascades, no
+        parents and no signal listeners for the object class.
+
+        The 'from_field' tells where we are coming from - we need this to
+        determine if the objects are in fact to be deleted. Allows also
+        skipping parent -> child -> parent chain preventing fast delete of
+        the child.
+        """
+        if from_field and from_field.rel.on_delete is not CASCADE:
+            return False
+        if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
+            return False
+        model = objs.model
+        if (signals.pre_delete.has_listeners(model)
+                or signals.post_delete.has_listeners(model)
+                or signals.m2m_changed.has_listeners(model)):
+            return False
+        # The use of from_field comes from the need to avoid cascade back to
+        # parent when parent delete is cascading to child.
+        opts = model._meta
+        if any(link != from_field for link in opts.concrete_model._meta.parents.values()):
+            return False
+        # Foreign keys pointing to this model, both from m2m and other
+        # models.
+        for related in opts.get_all_related_objects(
+            include_hidden=True, include_proxy_eq=True):
+            if related.field.rel.on_delete is not DO_NOTHING:
+                return False
+        # GFK deletes
+        for relation in opts.many_to_many:
+            if not relation.rel.through:
+                return False
+        return True
+
     def collect(self, objs, source=None, nullable=False, collect_related=True,
         source_attr=None, reverse_dependency=False):
         """
@@ -147,6 +188,9 @@ class Collector(object):
         models, the one case in which the cascade follows the forwards
         direction of an FK rather than the reverse direction.)
         """
+        if self.can_fast_delete(objs):
+            self.fast_deletes.append(objs)
+            return
         new_objs = self.add(objs, source, nullable,
                             reverse_dependency=reverse_dependency)
         if not new_objs:
@@ -157,8 +201,12 @@ class Collector(object):
         # Recursively collect concrete model's parent models, but not their
         # related objects. These will be found by meta.get_all_related_objects()
         concrete_model = model._meta.concrete_model
-        for ptr in concrete_model._meta.parents.itervalues():
+        for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
+                # FIXME: This seems to be buggy and execute a query for each
+                # parent object fetch. We have the parent data in the obj,
+                # but we don't have a nice way to turn that data into parent
+                # object instance.
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
                              source_attr=ptr.rel.related_name,
@@ -169,12 +217,12 @@ class Collector(object):
             for related in model._meta.get_all_related_objects(
                     include_hidden=True, include_proxy_eq=True):
                 field = related.field
-                if related.model._meta.auto_created:
-                    self.add_batch(related.model, field, new_objs)
-                else:
-                    sub_objs = self.related_objects(related, new_objs)
-                    if not sub_objs:
-                        continue
+                if field.rel.on_delete == DO_NOTHING:
+                    continue
+                sub_objs = self.related_objects(related, new_objs)
+                if self.can_fast_delete(sub_objs, from_field=field):
+                    self.fast_deletes.append(sub_objs)
+                elif sub_objs:
                     field.rel.on_delete(self, field, sub_objs, self.using)
 
             # TODO This entire block is only needed as a special case to
@@ -199,14 +247,14 @@ class Collector(object):
         )
 
     def instances_with_model(self):
-        for model, instances in self.data.iteritems():
+        for model, instances in six.iteritems(self.data):
             for obj in instances:
                 yield model, obj
 
     def sort(self):
         sorted_models = []
         concrete_models = set()
-        models = self.data.keys()
+        models = list(self.data)
         while len(sorted_models) < len(models):
             found = False
             for model in models:
@@ -240,25 +288,29 @@ class Collector(object):
                     sender=model, instance=obj, using=self.using
                 )
 
+        # fast deletes
+        for qs in self.fast_deletes:
+            qs._raw_delete(using=self.using)
+
         # update fields
-        for model, instances_for_fieldvalues in self.field_updates.iteritems():
+        for model, instances_for_fieldvalues in six.iteritems(self.field_updates):
             query = sql.UpdateQuery(model)
-            for (field, value), instances in instances_for_fieldvalues.iteritems():
+            for (field, value), instances in six.iteritems(instances_for_fieldvalues):
                 query.update_batch([obj.pk for obj in instances],
                                    {field.name: value}, self.using)
 
         # reverse instance collections
-        for instances in self.data.itervalues():
+        for instances in six.itervalues(self.data):
             instances.reverse()
 
         # delete batches
-        for model, batches in self.batches.iteritems():
+        for model, batches in six.iteritems(self.batches):
             query = sql.DeleteQuery(model)
-            for field, instances in batches.iteritems():
+            for field, instances in six.iteritems(batches):
                 query.delete_batch([obj.pk for obj in instances], self.using, field)
 
         # delete instances
-        for model, instances in self.data.iteritems():
+        for model, instances in six.iteritems(self.data):
             query = sql.DeleteQuery(model)
             pk_list = [obj.pk for obj in instances]
             query.delete_batch(pk_list, self.using)
@@ -271,10 +323,10 @@ class Collector(object):
                 )
 
         # update collected instances
-        for model, instances_for_fieldvalues in self.field_updates.iteritems():
-            for (field, value), instances in instances_for_fieldvalues.iteritems():
+        for model, instances_for_fieldvalues in six.iteritems(self.field_updates):
+            for (field, value), instances in six.iteritems(instances_for_fieldvalues):
                 for obj in instances:
                     setattr(obj, field.attname, value)
-        for model, instances in self.data.iteritems():
+        for model, instances in six.iteritems(self.data):
             for instance in instances:
                 setattr(instance, model._meta.pk.attname, None)

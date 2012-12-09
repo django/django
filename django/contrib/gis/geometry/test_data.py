@@ -2,18 +2,19 @@
 This module has the mock object definitions used to hold reference geometry
 for the GEOS and GDAL tests.
 """
-import gzip
 import json
 import os
 
 from django.contrib import gis
+from django.utils import six
+from django.utils._os import upath
 
 
 # This global used to store reference geometry data.
 GEOMETRIES = None
 
 # Path where reference test data is located.
-TEST_DATA = os.path.join(os.path.dirname(gis.__file__), 'tests', 'data')
+TEST_DATA = os.path.join(os.path.dirname(upath(gis.__file__)), 'tests', 'data')
 
 
 def tuplize(seq):
@@ -25,7 +26,7 @@ def tuplize(seq):
 
 def strconvert(d):
     "Converts all keys in dictionary to str type."
-    return dict([(str(k), v) for k, v in d.iteritems()])
+    return dict([(str(k), v) for k, v in six.iteritems(d)])
 
 
 def get_ds_file(name, ext):
@@ -99,7 +100,7 @@ class TestDataMixin(object):
         global GEOMETRIES
         if GEOMETRIES is None:
             # Load up the test geometry data from fixture into global.
-            gzf = gzip.GzipFile(os.path.join(TEST_DATA, 'geometries.json.gz'))
-            geometries = json.loads(gzf.read())
+            with open(os.path.join(TEST_DATA, 'geometries.json')) as f:
+                geometries = json.load(f)
             GEOMETRIES = TestGeomSet(**strconvert(geometries))
         return GEOMETRIES

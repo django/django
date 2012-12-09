@@ -212,8 +212,6 @@ __ http://www.gdal.org/ogr/ogr_formats.html
 
    .. attribute:: spatial_filter
 
-   .. versionadded:: 1.2
-
    Property that may be used to retrieve or set a spatial filter for this
    layer.  A spatial filter can only be set with an :class:`OGRGeometry`
    instance, a 4-tuple extent, or ``None``.  When set with something 
@@ -449,7 +447,7 @@ systems and coordinate transformation::
 
    This object is a wrapper for the `OGR Geometry`__ class.
    These objects are instantiated directly from the given ``geom_input`` 
-   parameter, which may be a string containing WKT or HEX, a ``buffer``
+   parameter, which may be a string containing WKT, HEX, GeoJSON, a ``buffer``
    containing WKB data, or an :class:`OGRGeomType` object. These objects
    are also returned from the :class:`Feature.geom` attribute, when 
    reading vector data from :class:`Layer` (which is in turn a part of
@@ -490,14 +488,8 @@ systems and coordinate transformation::
 
    .. attribute:: coord_dim
 
-   .. versionchanged:: 1.2
-
    Returns or sets the coordinate dimension of this geometry.  For
    example, the value would be 2 for two-dimensional geometries.
-
-   .. note::
-
-      Setting this property is only available in versions 1.2 and above.
 
    .. attribute:: geom_count
 
@@ -618,8 +610,6 @@ systems and coordinate transformation::
    Returns a string representation of this geometry in WKT format.
 
    .. attribute:: ewkt
-
-   .. versionadded:: 1.2
 
    Returns the EWKT representation of this geometry.
 

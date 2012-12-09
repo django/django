@@ -5,10 +5,13 @@ from threading import local
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 
+from django.utils import six
+from django.utils.encoding import force_str
+
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, basestring):
+        if isinstance(server, six.string_types):
             self._servers = server.split(';')
         else:
             self._servers = server
@@ -48,6 +51,10 @@ class BaseMemcachedCache(BaseCache):
             timeout += int(time.time())
         return int(timeout)
 
+    def make_key(self, key, version=None):
+        # Python 2 memcache requires the key to be a byte string.
+        return force_str(super(BaseMemcachedCache, self).make_key(key, version))
+
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version)
         return self._cache.add(key, value, self._get_memcache_timeout(timeout))
@@ -83,6 +90,9 @@ class BaseMemcachedCache(BaseCache):
 
     def incr(self, key, delta=1, version=None):
         key = self.make_key(key, version=version)
+        # memcached doesn't support a negative delta
+        if delta < 0:
+            return self._cache.decr(key, -delta)
         try:
             val = self._cache.incr(key, delta)
 
@@ -98,6 +108,9 @@ class BaseMemcachedCache(BaseCache):
 
     def decr(self, key, delta=1, version=None):
         key = self.make_key(key, version=version)
+        # memcached doesn't support a negative delta
+        if delta < 0:
+            return self._cache.incr(key, -delta)
         try:
             val = self._cache.decr(key, delta)
 
@@ -134,7 +147,7 @@ class CacheClass(BaseMemcachedCache):
         )
         try:
             import memcache
-        except:
+        except ImportError:
             raise InvalidCacheBackendError(
                 "Memcached cache backend requires either the 'memcache' or 'cmemcache' library"
                 )

@@ -1,4 +1,8 @@
 *.egg-info
 *.pot
 *.py[co]
+MANIFEST
+dist/
 docs/_build/
+tests/coverage_html/
+tests/.coverage

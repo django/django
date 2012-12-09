@@ -4,9 +4,11 @@ is generated for the table on various manage.py operations.
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 #  All of these models are created in the database by Django.
 
+@python_2_unicode_compatible
 class A01(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
@@ -14,9 +16,10 @@ class A01(models.Model):
     class Meta:
         db_table = 'a01'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
+@python_2_unicode_compatible
 class B01(models.Model):
     fk_a = models.ForeignKey(A01)
     f_a = models.CharField(max_length=10, db_index=True)
@@ -27,9 +30,10 @@ class B01(models.Model):
         # 'managed' is True by default. This tests we can set it explicitly.
         managed = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
+@python_2_unicode_compatible
 class C01(models.Model):
     mm_a = models.ManyToManyField(A01, db_table='d01')
     f_a = models.CharField(max_length=10, db_index=True)
@@ -38,13 +42,14 @@ class C01(models.Model):
     class Meta:
         db_table = 'c01'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
 # All of these models use the same tables as the previous set (they are shadows
 # of possibly a subset of the columns). There should be no creation errors,
 # since we have told Django they aren't managed by Django.
 
+@python_2_unicode_compatible
 class A02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
 
@@ -52,9 +57,10 @@ class A02(models.Model):
         db_table = 'a01'
         managed = False
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
+@python_2_unicode_compatible
 class B02(models.Model):
     class Meta:
         db_table = 'b01'
@@ -64,11 +70,12 @@ class B02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
 # To re-use the many-to-many intermediate table, we need to manually set up
 # things up.
+@python_2_unicode_compatible
 class C02(models.Model):
     mm_a = models.ManyToManyField(A02, through="Intermediate")
     f_a = models.CharField(max_length=10, db_index=True)
@@ -78,7 +85,7 @@ class C02(models.Model):
         db_table = 'c01'
         managed = False
 
-    def __unicode__(self):
+    def __str__(self):
         return self.f_a
 
 class Intermediate(models.Model):

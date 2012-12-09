@@ -4,12 +4,16 @@ Multi-part parsing for file uploads.
 Exposes one class, ``MultiPartParser``, which feeds chunks of uploaded data to
 file upload handlers for processing.
 """
+from __future__ import unicode_literals
 
+import base64
 import cgi
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
+from django.utils import six
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
@@ -59,16 +63,15 @@ class MultiPartParser(object):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
         # Parse the header to get the boundary to split the parts.
-        ctypes, opts = parse_header(content_type)
+        ctypes, opts = parse_header(content_type.encode('ascii'))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
 
-
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH',0)))
+            content_length = int(META.get('HTTP_CONTENT_LENGTH', META.get('CONTENT_LENGTH', 0)))
         except (ValueError, TypeError):
             content_length = 0
 
@@ -76,6 +79,8 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
+        if isinstance(boundary, six.text_type):
+            boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data
 
@@ -105,7 +110,7 @@ class MultiPartParser(object):
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict(MultiValueDict(), encoding=self._encoding), MultiValueDict()
+            return QueryDict('', encoding=self._encoding), MultiValueDict()
 
         # See if the handler will want to take care of the parsing.
         # This allows overriding everything if somebody wants it.
@@ -147,7 +152,7 @@ class MultiPartParser(object):
                 transfer_encoding = meta_data.get('content-transfer-encoding')
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
-                field_name = force_unicode(field_name, encoding, errors='replace')
+                field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
                     # This is a post field, we can just set it in the post
@@ -161,18 +166,18 @@ class MultiPartParser(object):
                         data = field_stream.read()
 
                     self._post.appendlist(field_name,
-                                          force_unicode(data, encoding, errors='replace'))
+                                          force_text(data, encoding, errors='replace'))
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if not file_name:
                         continue
-                    file_name = force_unicode(file_name, encoding, errors='replace')
+                    file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
                     content_type = meta_data.get('content-type', ('',))[0].strip()
                     try:
-                        charset = meta_data.get('content-type', (0,{}))[1].get('charset', None)
+                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
                     except:
                         charset = None
 
@@ -194,8 +199,14 @@ class MultiPartParser(object):
                         for chunk in field_stream:
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
+                                # We should always read base64 streams by multiple of 4
+                                over_bytes = len(chunk) % 4
+                                if over_bytes:
+                                    over_chunk = field_stream.read(4 - over_bytes)
+                                    chunk += over_chunk
+
                                 try:
-                                    chunk = str(chunk).decode('base64')
+                                    chunk = base64.b64decode(chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     raise MultiPartParserError("Could not decode base64 data: %r" % e)
@@ -241,7 +252,7 @@ class MultiPartParser(object):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_unicode(old_field_name,
+                self._files.appendlist(force_text(old_field_name,
                                                      self._encoding,
                                                      errors='replace'),
                                        file_obj)
@@ -251,7 +262,7 @@ class MultiPartParser(object):
         """Cleanup filename from Internet Explorer full paths."""
         return filename and filename[filename.rfind("\\")+1:].strip()
 
-class LazyStream(object):
+class LazyStream(six.Iterator):
     """
     The LazyStream wrapper allows one to get and "unget" bytes from a stream.
 
@@ -268,7 +279,7 @@ class LazyStream(object):
         """
         self._producer = producer
         self._empty = False
-        self._leftover = ''
+        self._leftover = b''
         self.length = length
         self.position = 0
         self._remaining = length
@@ -282,7 +293,7 @@ class LazyStream(object):
             remaining = (size is not None and [size] or [self._remaining])[0]
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
-                yield ''.join(self)
+                yield b''.join(self)
                 return
 
             # otherwise do some bookkeeping to return exactly enough
@@ -298,10 +309,10 @@ class LazyStream(object):
                 remaining -= len(emitting)
                 yield emitting
 
-        out = ''.join(parts())
+        out = b''.join(parts())
         return out
 
-    def next(self):
+    def __next__(self):
         """
         Used when the exact number of bytes to read is unimportant.
 
@@ -311,7 +322,7 @@ class LazyStream(object):
         """
         if self._leftover:
             output = self._leftover
-            self._leftover = ''
+            self._leftover = b''
         else:
             output = next(self._producer)
             self._unget_history = []
@@ -341,7 +352,7 @@ class LazyStream(object):
             return
         self._update_unget_history(len(bytes))
         self.position -= len(bytes)
-        self._leftover = ''.join([bytes, self._leftover])
+        self._leftover = b''.join([bytes, self._leftover])
 
     def _update_unget_history(self, num_bytes):
         """
@@ -362,7 +373,7 @@ class LazyStream(object):
                 " if there is none, report this to the Django developers."
             )
 
-class ChunkIter(object):
+class ChunkIter(six.Iterator):
     """
     An iterable that will yield chunks of data. Given a file-like object as the
     constructor, this object will yield chunks of read operations from that
@@ -372,7 +383,7 @@ class ChunkIter(object):
         self.flo = flo
         self.chunk_size = chunk_size
 
-    def next(self):
+    def __next__(self):
         try:
             data = self.flo.read(self.chunk_size)
         except InputStreamExhausted:
@@ -385,7 +396,7 @@ class ChunkIter(object):
     def __iter__(self):
         return self
 
-class InterBoundaryIter(object):
+class InterBoundaryIter(six.Iterator):
     """
     A Producer that will iterate over boundaries.
     """
@@ -396,13 +407,13 @@ class InterBoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
             raise StopIteration()
 
-class BoundaryIter(object):
+class BoundaryIter(six.Iterator):
     """
     A Producer that is sensitive to boundaries.
 
@@ -437,7 +448,7 @@ class BoundaryIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._done:
             raise StopIteration()
 
@@ -459,7 +470,7 @@ class BoundaryIter(object):
         if not chunks:
             raise StopIteration()
 
-        chunk = ''.join(chunks)
+        chunk = b''.join(chunks)
         boundary = self._find_boundary(chunk, len(chunk) < self._rollback)
 
         if boundary:
@@ -495,9 +506,11 @@ class BoundaryIter(object):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            if data[max(0,end-1)] == '\n':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\n':
                 end -= 1
-            if data[max(0,end-1)] == '\r':
+            last = max(0, end-1)
+            if data[last:last+1] == b'\r':
                 end -= 1
             return end, next
 
@@ -531,7 +544,7 @@ def parse_boundary_stream(stream, max_header_size):
     # 'find' returns the top of these four bytes, so we'll
     # need to munch them later to prevent them from polluting
     # the payload.
-    header_end = chunk.find('\r\n\r\n')
+    header_end = chunk.find(b'\r\n\r\n')
 
     def _parse_header(line):
         main_value_pair, params = parse_header(line)
@@ -557,7 +570,7 @@ def parse_boundary_stream(stream, max_header_size):
     outdict = {}
 
     # Eliminate blank lines
-    for line in header.split('\r\n'):
+    for line in header.split(b'\r\n'):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
@@ -580,7 +593,7 @@ def parse_boundary_stream(stream, max_header_size):
 class Parser(object):
     def __init__(self, stream, boundary):
         self._stream = stream
-        self._separator = '--' + boundary
+        self._separator = b'--' + boundary
 
     def __iter__(self):
         boundarystream = InterBoundaryIter(self._stream, self._separator)
@@ -589,28 +602,31 @@ class Parser(object):
             yield parse_boundary_stream(sub_stream, 1024)
 
 def parse_header(line):
-    """ Parse the header into a key-value. """
-    plist = _parse_header_params(';' + line)
-    key = plist.pop(0).lower()
+    """ Parse the header into a key-value.
+        Input (line): bytes, output: unicode for key/name, bytes for value which
+        will be decoded later
+    """
+    plist = _parse_header_params(b';' + line)
+    key = plist.pop(0).lower().decode('ascii')
     pdict = {}
     for p in plist:
-        i = p.find('=')
+        i = p.find(b'=')
         if i >= 0:
-            name = p[:i].strip().lower()
+            name = p[:i].strip().lower().decode('ascii')
             value = p[i+1:].strip()
-            if len(value) >= 2 and value[0] == value[-1] == '"':
+            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
-                value = value.replace('\\\\', '\\').replace('\\"', '"')
+                value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
             pdict[name] = value
     return key, pdict
 
 def _parse_header_params(s):
     plist = []
-    while s[:1] == ';':
+    while s[:1] == b';':
         s = s[1:]
-        end = s.find(';')
-        while end > 0 and s.count('"', 0, end) % 2:
-            end = s.find(';', end + 1)
+        end = s.find(b';')
+        while end > 0 and s.count(b'"', 0, end) % 2:
+            end = s.find(b';', end + 1)
         if end < 0:
             end = len(s)
         f = s[:end]

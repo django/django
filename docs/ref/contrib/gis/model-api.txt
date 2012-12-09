@@ -142,7 +142,7 @@ __ http://en.wikipedia.org/wiki/Geodesy
 __ http://en.wikipedia.org/wiki/Great_circle
 __ http://www.spatialreference.org/ref/epsg/2796/
 __ http://spatialreference.org/
-__ http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
+__ http://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
 
 ``spatial_index``
 -----------------
@@ -163,8 +163,6 @@ field.
 ``dim``
 -------
 
-.. versionadded:: 1.2
-
 .. attribute:: GeometryField.dim
 
 This option may be used for customizing the coordinate dimension of the
@@ -179,8 +177,6 @@ three-dimensonal support.
 
 ``geography``
 -------------
-
-.. versionadded:: 1.2
 
 .. attribute:: GeometryField.geography
 
@@ -256,7 +252,7 @@ for example::
     qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
 
 .. rubric:: Footnotes
-.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999).
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnharvard] Harvard Graduate School of Design, `An Overview of Geodesy and Geographic Referencing Systems <http://www.gsd.harvard.edu/gis/manual/projections/fundamentals/>`_.  This is an excellent resource for an overview of principles relating to geographic and Cartesian coordinate systems.

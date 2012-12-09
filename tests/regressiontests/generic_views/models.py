@@ -1,6 +1,9 @@
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Artist(models.Model):
     name = models.CharField(max_length=100)
 
@@ -9,13 +12,13 @@ class Artist(models.Model):
         verbose_name = 'professional artist'
         verbose_name_plural = 'professional artists'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('artist_detail', (), {'pk': self.id})
+        return reverse('artist_detail', kwargs={'pk': self.id})
 
+@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -23,9 +26,10 @@ class Author(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=300)
     slug = models.SlugField()
@@ -36,7 +40,7 @@ class Book(models.Model):
     class Meta:
         ordering = ['-pubdate']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Page(models.Model):

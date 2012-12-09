@@ -18,6 +18,23 @@ Documentation changes generally come in two forms:
 This section explains how writers can craft their documentation changes
 in the most useful and least error-prone ways.
 
+Getting the raw documentation
+-----------------------------
+
+Though Django's documentation is intended to be read as HTML at
+https://docs.djangoproject.com/, we edit it as a collection of text files for
+maximum flexibility. These files live in the top-level ``docs/`` directory of a
+Django release.
+
+If you'd like to start contributing to our docs, get the development version of
+Django from the source code repository
+(see :ref:`installing-development-version`). The development version has the
+latest-and-greatest documentation, just as it has latest-and-greatest code.
+We also backport documentation fixes and improvements, at the discretion of the
+committer, to the last release branch. That's because it's highly advantageous
+to have the docs for the last release be up-to-date and correct (see
+:ref:`differences-between-doc-versions`).
+
 Getting started with Sphinx
 ---------------------------
 

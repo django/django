@@ -1,11 +1,15 @@
 from django.db import connections
 from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
 
+from django.contrib.gis import memoryview
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
+
+from django.utils import six
+
 
 class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."
@@ -22,7 +26,7 @@ class GeoQuerySet(QuerySet):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (kwargs.keys(),))
+                    % (list(kwargs),))
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=GeoValuesListQuerySet, setup=True, flat=flat,
@@ -142,13 +146,14 @@ class GeoQuerySet(QuerySet):
         """
         backend = connections[self.db].ops
         if not backend.geojson:
-            raise NotImplementedError('Only PostGIS 1.3.4+ supports GeoJSON serialization.')
+            raise NotImplementedError('Only PostGIS 1.3.4+ and SpatiaLite 3.0+ '
+                                      'support GeoJSON serialization.')
 
-        if not isinstance(precision, (int, long)):
+        if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')
 
         # Setting the options flag -- which depends on which version of
-        # PostGIS we're using.
+        # PostGIS we're using. SpatiaLite only uses the first group of options.
         if backend.spatial_version >= (1, 4, 0):
             options = 0
             if crs and bbox: options = 3
@@ -173,7 +178,7 @@ class GeoQuerySet(QuerySet):
         The `precision` keyword may be used to custom the number of
         _characters_ used in the output GeoHash, the default is 20.
         """
-        s = {'desc' : 'GeoHash', 
+        s = {'desc' : 'GeoHash',
              'procedure_args': {'precision': precision},
              'procedure_fmt': '%(geo_col)s,%(precision)s',
              }
@@ -190,9 +195,9 @@ class GeoQuerySet(QuerySet):
             # PostGIS AsGML() aggregate function parameter order depends on the
             # version -- uggh.
             if backend.spatial_version > (1, 3, 1):
-                procedure_fmt = '%(version)s,%(geo_col)s,%(precision)s'
+                s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             else:
-                procedure_fmt = '%(geo_col)s,%(precision)s,%(version)s'
+                s['procedure_fmt'] = '%(geo_col)s,%(precision)s,%(version)s'
             s['procedure_args'] = {'precision' : precision, 'version' : version}
 
         return self._spatial_attribute('gml', s, **kwargs)
@@ -309,7 +314,7 @@ class GeoQuerySet(QuerySet):
           - 2 arguments: X and Y sizes to snap the grid to.
           - 4 arguments: X, Y sizes and the X, Y origins.
         """
-        if False in [isinstance(arg, (float, int, long)) for arg in args]:
+        if False in [isinstance(arg, (float,) + six.integer_types) for arg in args]:
             raise TypeError('Size argument(s) for the grid must be a float or integer values.')
 
         nargs = len(args)
@@ -349,7 +354,7 @@ class GeoQuerySet(QuerySet):
                         digits used in output (defaults to 8).
         """
         relative = int(bool(relative))
-        if not isinstance(precision, (int, long)):
+        if not isinstance(precision, six.integer_types):
             raise TypeError('SVG precision keyword argument must be an integer.')
         s = {'desc' : 'SVG',
              'procedure_fmt' : '%(geo_col)s,%(rel)s,%(precision)s',
@@ -390,7 +395,7 @@ class GeoQuerySet(QuerySet):
         Transforms the given geometry field to the given SRID.  If no SRID is
         provided, the transformation will default to using 4326 (WGS84).
         """
-        if not isinstance(srid, (int, long)):
+        if not isinstance(srid, six.integer_types):
             raise TypeError('An integer SRID must be provided.')
         field_name = kwargs.get('field_name', None)
         tmp, geo_field = self._spatial_setup('transform', field_name=field_name)
@@ -528,12 +533,12 @@ class GeoQuerySet(QuerySet):
         if settings.get('setup', True):
             default_args, geo_field = self._spatial_setup(att, desc=settings['desc'], field_name=field_name,
                                                           geo_field_type=settings.get('geo_field_type', None))
-            for k, v in default_args.iteritems(): settings['procedure_args'].setdefault(k, v)
+            for k, v in six.iteritems(default_args): settings['procedure_args'].setdefault(k, v)
         else:
             geo_field = settings['geo_field']
 
         # The attribute to attach to the model.
-        if not isinstance(model_att, basestring): model_att = att
+        if not isinstance(model_att, six.string_types): model_att = att
 
         # Special handling for any argument that is a geometry.
         for name in settings['geom_args']:
@@ -673,7 +678,7 @@ class GeoQuerySet(QuerySet):
                     if not backend.geography:
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
-                        if not str(Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
+                        if not str(Geometry(memoryview(params[0].ewkb)).geom_type) == 'Point':
                             raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
@@ -755,8 +760,10 @@ class GeoQuerySet(QuerySet):
             self.query.add_select_related([field_name])
             compiler = self.query.get_compiler(self.db)
             compiler.pre_sql_setup()
-            rel_table, rel_col = self.query.related_select_cols[self.query.related_select_fields.index(geo_field)]
-            return compiler._field_column(geo_field, rel_table)
+            for (rel_table, rel_col), field in self.query.related_select_cols:
+                if field == geo_field:
+                    return compiler._field_column(geo_field, rel_table)
+            raise ValueError("%r not in self.query.related_select_cols" % geo_field)
         elif not geo_field in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.

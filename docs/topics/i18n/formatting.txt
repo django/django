@@ -4,8 +4,6 @@
 Format localization
 ===================
 
-.. versionadded:: 1.2
-
 Overview
 ========
 
@@ -23,7 +21,10 @@ necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 
     The default :file:`settings.py` file created by :djadmin:`django-admin.py
     startproject <startproject>` includes :setting:`USE_L10N = True <USE_L10N>`
-    for convenience.
+    for convenience.  Note, however, that to enable number formatting with
+    thousand separators it is necessary to set :setting:`USE_THOUSAND_SEPARATOR
+    = True <USE_THOUSAND_SEPARATOR>` in your settings file. Alternatively, you
+    could use :tfilter:`intcomma` to format numbers in your template.
 
 .. note::
 
@@ -79,8 +80,6 @@ Template tags
 localize
 ~~~~~~~~
 
-.. versionadded:: 1.3
-
 Enables or disables localization of template variables in the
 contained block.
 
@@ -115,8 +114,6 @@ Template filters
 localize
 ~~~~~~~~
 
-.. versionadded:: 1.3
-
 Forces localization of a single value.
 
 For example::
@@ -134,8 +131,6 @@ tag.
 
 unlocalize
 ~~~~~~~~~~
-
-.. versionadded:: 1.3
 
 Forces a single value to be printed without localization.
 

@@ -4,19 +4,22 @@ Cross Site Request Forgery Middleware.
 This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
+from __future__ import unicode_literals
 
 import hashlib
+import logging
 import re
 import random
 
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
+from django.utils.encoding import force_text
 from django.utils.http import same_origin
-from django.utils.log import getLogger
 from django.utils.crypto import constant_time_compare, get_random_string
 
-logger = getLogger('django.request')
+
+logger = logging.getLogger('django.request')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
@@ -51,11 +54,10 @@ def get_token(request):
 
 
 def _sanitize_token(token):
-    # Allow only alphanum, and ensure we return a 'str' for the sake
-    # of the post processing middleware.
+    # Allow only alphanum
     if len(token) > CSRF_KEY_LENGTH:
         return _get_new_csrf_key()
-    token = re.sub('[^a-zA-Z0-9]+', '', str(token.decode('ascii', 'ignore')))
+    token = re.sub('[^a-zA-Z0-9]+', '', force_text(token))
     if token == "":
         # In case the cookie has been truncated to nothing at some point.
         return _get_new_csrf_key()
@@ -104,7 +106,7 @@ class CsrfViewMiddleware(object):
         if getattr(callback, 'csrf_exempt', False):
             return None
 
-        # Assume that anything not defined as 'safe' by RC2616 needs protection
+        # Assume that anything not defined as 'safe' by RFC2616 needs protection
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
             if getattr(request, '_dont_enforce_csrf_checks', False):
                 # Mechanism to turn off CSRF checks for test suite.

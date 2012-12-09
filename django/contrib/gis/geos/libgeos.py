@@ -6,18 +6,23 @@
  This module also houses GEOS Pointer utilities, including
  get_pointer_arr(), and GEOM_PTR.
 """
+import logging
 import os
 import re
-import sys
 from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
 from ctypes.util import find_library
+
 from django.contrib.gis.geos.error import GEOSException
+from django.core.exceptions import ImproperlyConfigured
+
+logger = logging.getLogger('django.contrib.gis')
 
 # Custom library path set?
 try:
     from django.conf import settings
     lib_path = settings.GEOS_LIBRARY_PATH
-except (AttributeError, EnvironmentError, ImportError):
+except (AttributeError, EnvironmentError,
+        ImportError, ImproperlyConfigured):
     lib_path = None
 
 # Setting the appropriate names for the GEOS-C library.
@@ -56,21 +61,23 @@ lgeos = CDLL(lib_path)
 # Supposed to mimic the GEOS message handler (C below):
 #  typedef void (*GEOSMessageHandler)(const char *fmt, ...);
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
-def notice_h(fmt, lst, output_h=sys.stdout):
+def notice_h(fmt, lst):
+    fmt, lst = fmt.decode(), lst.decode()
     try:
         warn_msg = fmt % lst
     except:
         warn_msg = fmt
-    output_h.write('GEOS_NOTICE: %s\n' % warn_msg)
+    logger.warn('GEOS_NOTICE: %s\n' % warn_msg)
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
-def error_h(fmt, lst, output_h=sys.stderr):
+def error_h(fmt, lst):
+    fmt, lst = fmt.decode(), lst.decode()
     try:
         err_msg = fmt % lst
     except:
         err_msg = fmt
-    output_h.write('GEOS_ERROR: %s\n' % err_msg)
+    logger.error('GEOS_ERROR: %s\n' % err_msg)
 error_h = ERRORFUNC(error_h)
 
 #### GEOS Geometry C data structures, and utility functions. ####
@@ -110,7 +117,7 @@ def geos_version_info():
     is a release candidate (and what number release candidate), and the C API
     version.
     """
-    ver = geos_version()
+    ver = geos_version().decode()
     m = version_regex.match(ver)
     if not m: raise GEOSException('Could not parse version info string "%s"' % ver)
     return dict((key, m.group(key)) for key in ('version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor'))

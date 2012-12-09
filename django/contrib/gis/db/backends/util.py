@@ -3,18 +3,6 @@ A collection of utility routines and classes used by the spatial
 backends.
 """
 
-def gqn(val):
-    """
-    The geographic quote name function; used for quoting tables and
-    geometries (they use single rather than the double quotes of the
-    backend quotename function).
-    """
-    if isinstance(val, basestring):
-        if isinstance(val, unicode): val = val.encode('ascii')
-        return "'%s'" % val
-    else:
-        return str(val)
-
 class SpatialOperation(object):
     """
     Base class for generating spatial SQL.

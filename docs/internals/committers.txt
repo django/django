@@ -77,15 +77,13 @@ record of being helpful on the mailing lists, and a proven desire to dedicate
 serious time to Django. In return, they've been granted the coveted commit bit,
 and have free rein to hack on all parts of Django.
 
-`Malcolm Tredinnick`_
+Malcolm Tredinnick
     Malcolm originally wanted to be a mathematician, somehow ended up a software
     developer. He's contributed to many Open Source projects, has served on the
     board of the GNOME foundation, and will kick your ass at chess.
 
     When he's not busy being an International Man of Mystery, Malcolm lives in
     Sydney, Australia.
-
-.. _malcolm tredinnick: http://www.pointy-stick.com/
 
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
@@ -146,9 +144,10 @@ Joseph Kocherhans
 
     Brian lives in Denver, Colorado, USA.
 
-.. _brian rosner: http://oebfare.com/
+.. _brian rosner: http://brosner.com/
 .. _eldarion: http://eldarion.com/
 .. _django dose: http://djangodose.com/
+.. _pinax: http://pinaxproject.com/
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
@@ -162,7 +161,7 @@ Joseph Kocherhans
 
     Gary lives in Austin, Texas, USA.
 
-.. _Gary Wilson: http://gdub.wordpress.com/
+.. _Gary Wilson: http://thegarywilson.com/
 .. _The University of Texas: http://www.utexas.edu/
 
 Justin Bronn
@@ -174,7 +173,7 @@ Justin Bronn
     implementing GeoDjango, Justin obtained a deep knowledge of Django's
     internals including the ORM, the admin, and Oracle support.
 
-    Justin lives in Houston, Texas.
+    Justin lives in San Francisco, CA.
 
 .. _GeoDjango: http://geodjango.org/
 
@@ -191,14 +190,19 @@ Karen Tracey
 `Jannis Leidel`_
     Jannis graduated in media design from `Bauhaus-University Weimar`_,
     is the author of a number of pluggable Django apps and likes to
-    contribute to Open Source projects like Pinax_. He currently works as
-    a freelance Web developer and designer.
+    contribute to Open Source projects like virtualenv_ and pip_.
+
+    He has worked on Django's auth, admin and staticfiles apps as well as
+    the form, core, internationalization and test systems. He currently works
+    as the lead engineer at Gidsy_.
 
     Jannis lives in Berlin, Germany.
 
 .. _Jannis Leidel: http://jezdez.com/
 .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-.. _pinax: http://pinaxproject.com/
+.. _virtualenv: http://www.virtualenv.org/
+.. _pip: http://www.pip-installer.org/
+.. _Gidsy: http://gidsy.com/
 
 `James Tauber`_
     James is the lead developer of Pinax_ and the CEO and founder of
@@ -214,15 +218,15 @@ Karen Tracey
 .. _James Tauber: http://jtauber.com/
 
 `Alex Gaynor`_
-    Alex is a student at Rensselaer Polytechnic Institute, and is also an
-    independent contractor.  He found Django in 2007 and has been addicted ever
-    since he found out you don't need to write out your forms by hand.  He has
-    a small obsession with compilers.  He's contributed to the ORM, forms,
-    admin, and other components of Django.
+    Alex is a software engineer working at Rdio_. He found Django in 2007 and
+    has been addicted ever since he found out you don't need to write out your
+    forms by hand. He has a small obsession with compilers.  He's contributed
+    to the ORM, forms, admin, and other components of Django.
 
-    Alex lives in Chicago, IL, but spends most of his time in Troy, NY.
+    Alex lives in San Francisco, CA, USA.
 
 .. _Alex Gaynor: http://alexgaynor.net
+.. _Rdio: http://rdio.com
 
 `Andrew Godwin`_
     Andrew is a freelance Python developer and tinkerer, and has been
@@ -355,6 +359,66 @@ Honza Král
 .. _Claude Paroz: http://www.2xlibre.net
 .. _l10n.gnome.org: http://l10n.gnome.org
 
+Anssi Kääriäinen
+    Anssi works as a developer at Finnish National Institute for Health and
+    Welfare. He is also a computer science student at Aalto University. In his
+    work he uses Django for developing internal business applications and sees
+    Django as a great match for that use case.
+
+    Anssi is interested in developing the object relational mapper (ORM) and
+    all related features. He's also a fan of benckmarking and he tries keep
+    Django as fast as possible.
+
+Florian Apolloner
+    Florian is currently studying Physics at the `Graz University of Technology`_.
+    Soon after he started using Django he joined the `Ubuntuusers webteam`_ to
+    work on *Inyoka*, the software powering the whole Ubuntusers site.
+
+    For the time beeing he lives in Graz, Austria (not Australia ;)).
+
+.. _Graz University of Technology: http://tugraz.at/
+.. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
+
+Jeremy Dunck
+    Jeremy was rescued from corporate IT drudgery by Free Software and, in part, 
+    Django.  Many of Jeremy's interests center around access to information.
+
+    Jeremy was the lead developer of Pegasus News, one of the first uses of 
+    Django outside World Online, and has since joined Votizen, a startup intent 
+    on reducing the influence of money in politics.
+
+    He serves as DSF Secretary, organizes and helps organize sprints, cares 
+    about the health and equity of the Django community.  He has gone an 
+    embarrassingly long time without a working blog.
+    
+    Jeremy lives in Mountain View, CA, USA.
+
+`Bryan Veloso`_
+    Bryan found Django 0.96 through a fellow designer who was evangelizing
+    its use. It was his first foray outside of the land that was PHP-based
+    templating. Although he has only ever used Django for personal projects,
+    it is the very reason he considers himself a designer/developer
+    hybrid and is working to further design within the Django community.
+
+    Bryan works as a designer at GitHub by day, and masquerades as a `vlogger`_
+    and `shoutcaster`_ in the after-hours. Bryan lives in Los Angeles, CA, USA.
+
+.. _bryan veloso: http://avalonstar.com/
+.. _vlogger: http://youtube.com/bryanveloso/
+.. _shoutcaster: http://twitch.tv/vlogalonstar/
+
+`Preston Holmes`_
+    Preston is a recovering neuroscientist who originally discovered Django as
+    part of a sweeping move to Python from a grab bag of half a dozen
+    languages. He was drawn to Django's balance of practical batteries included
+    philosophy, care and thought in code design, and strong open source
+    community. In addition to his current job in private progressive education,
+    Preston contributes some developer time to local non-profits.
+
+    Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
+
+.. _Preston Holmes: http://www.ptone.com/
+
 Specialists
 -----------
 
@@ -378,16 +442,6 @@ Ian Kelly
 
 Matt Boersma
     Matt is also responsible for Django's Oracle support.
-
-Jeremy Dunck
-    Jeremy is the lead developer of Pegasus News, a personalized local site based
-    in Dallas, Texas. An early contributor to Greasemonkey and Django, he sees
-    technology as a tool for communication and access to knowledge.
-
-    Jeremy helped kick off GeoDjango development, and is mostly responsible for
-    the serious speed improvements that signals received in Django 1.0.
-
-    Jeremy lives in Dallas, Texas, USA.
 
 `Simon Meers`_
     Simon discovered Django 0.96 during his Computer Science PhD research and

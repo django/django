@@ -1,7 +1,9 @@
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class AbstractArticle(models.Model):
     title = models.CharField(max_length=50)
 
@@ -11,7 +13,7 @@ class AbstractArticle(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 class SyndicatedArticle(AbstractArticle):

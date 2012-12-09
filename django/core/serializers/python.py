@@ -3,11 +3,14 @@ A Python "serializer". Doesn't do much serializing per se -- just converts to
 and from basic Python data types (lists, dicts, strings, etc.). Useful as a basis for
 other serializers.
 """
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
-from django.utils.encoding import smart_unicode, is_protected_type
+from django.utils.encoding import smart_text, is_protected_type
+from django.utils import six
+
 
 class Serializer(base.Serializer):
     """
@@ -27,12 +30,15 @@ class Serializer(base.Serializer):
         self._current = {}
 
     def end_object(self, obj):
-        self.objects.append({
-            "model"  : smart_unicode(obj._meta),
-            "pk"     : smart_unicode(obj._get_pk_val(), strings_only=True),
-            "fields" : self._current
-        })
+        self.objects.append(self.get_dump_object(obj))
         self._current = None
+
+    def get_dump_object(self, obj):
+        return {
+            "pk": smart_text(obj._get_pk_val(), strings_only=True),
+            "model": smart_text(obj._meta),
+            "fields": self._current
+        }
 
     def handle_field(self, obj, field):
         value = field._get_val_from_obj(obj)
@@ -60,12 +66,13 @@ class Serializer(base.Serializer):
             if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
                 m2m_value = lambda value: value.natural_key()
             else:
-                m2m_value = lambda value: smart_unicode(value._get_pk_val(), strings_only=True)
+                m2m_value = lambda value: smart_text(value._get_pk_val(), strings_only=True)
             self._current[field.name] = [m2m_value(related)
                                for related in getattr(obj, field.name).iterator()]
 
     def getvalue(self):
         return self.objects
+
 
 def Deserializer(object_list, **options):
     """
@@ -75,17 +82,25 @@ def Deserializer(object_list, **options):
     stream or a string) to the constructor
     """
     db = options.pop('using', DEFAULT_DB_ALIAS)
+    ignore = options.pop('ignorenonexistent', False)
+
     models.get_apps()
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.attname : Model._meta.pk.to_python(d["pk"])}
+        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d["pk"])}
         m2m_data = {}
+        model_fields = Model._meta.get_all_field_names()
 
         # Handle each field
-        for (field_name, field_value) in d["fields"].iteritems():
+        for (field_name, field_value) in six.iteritems(d["fields"]):
+
+            if ignore and field_name not in model_fields:
+                # skip fields no longer on model
+                continue
+
             if isinstance(field_value, str):
-                field_value = smart_unicode(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
+                field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
 
             field = Model._meta.get_field(field_name)
 
@@ -93,19 +108,19 @@ def Deserializer(object_list, **options):
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
-                        if hasattr(value, '__iter__'):
+                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
                             return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
-                            return smart_unicode(field.rel.to._meta.pk.to_python(value))
+                            return smart_text(field.rel.to._meta.pk.to_python(value))
                 else:
-                    m2m_convert = lambda v: smart_unicode(field.rel.to._meta.pk.to_python(v))
+                    m2m_convert = lambda v: smart_text(field.rel.to._meta.pk.to_python(v))
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                        if hasattr(field_value, '__iter__'):
+                        if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
                             obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
                             value = getattr(obj, field.rel.field_name)
                             # If this is a natural foreign key to an object that
@@ -135,5 +150,5 @@ def _get_model(model_identifier):
     except TypeError:
         Model = None
     if Model is None:
-        raise base.DeserializationError(u"Invalid model identifier: '%s'" % model_identifier)
+        raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
     return Model

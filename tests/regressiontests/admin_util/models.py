@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Article(models.Model):
@@ -17,12 +19,13 @@ class Article(models.Model):
         return "nothing"
     test_from_model_with_override.short_description = "not What you Expect"
 
+@python_2_unicode_compatible
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey('self', null=True)
 
-    def __unicode__(self):
-        return unicode(self.num)
+    def __str__(self):
+        return six.text_type(self.num)
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)
@@ -36,3 +39,6 @@ class Guest(models.Model):
 
     class Meta:
         verbose_name = "awesome guest"
+
+class EventGuide(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)

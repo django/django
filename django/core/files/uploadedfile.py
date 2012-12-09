@@ -8,7 +8,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import File
 from django.core.files import temp as tempfile
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_str
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
@@ -30,8 +30,8 @@ class UploadedFile(File):
         self.charset = charset
 
     def __repr__(self):
-        return "<%s: %s (%s)>" % (
-            self.__class__.__name__, smart_str(self.name), self.content_type)
+        return force_str("<%s: %s (%s)>" % (
+            self.__class__.__name__, self.name, self.content_type))
 
     def _get_name(self):
         return self._name

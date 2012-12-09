@@ -16,6 +16,7 @@ from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.util import SpatialFunction
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
+from django.utils import six
 
 class SDOOperation(SpatialFunction):
     "Base class for SDO* Oracle operations."
@@ -65,7 +66,7 @@ class SDORelate(SpatialFunction):
         super(SDORelate, self).__init__(self.relate_func, mask=mask)
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int, long)
+dtypes = (Decimal, Distance, float) + six.integer_types
 
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
@@ -120,14 +121,14 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         'exact' : SDOOperation('SDO_EQUAL'),
         'overlaps' : SDOOperation('SDO_OVERLAPS'),
         'same_as' : SDOOperation('SDO_EQUAL'),
-        'relate' : (SDORelate, basestring), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        'relate' : (SDORelate, six.string_types), # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches' : SDOOperation('SDO_TOUCH'),
         'within' : SDOOperation('SDO_INSIDE'),
         }
     geometry_functions.update(distance_functions)
 
     gis_terms = ['isnull']
-    gis_terms += geometry_functions.keys()
+    gis_terms += list(geometry_functions)
     gis_terms = dict([(term, None) for term in gis_terms])
 
     truncate_params = {'relate' : None}
@@ -212,7 +213,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s'
             # No geometry value used for F expression, substitue in
             # the column name instead.
-            return placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            return placeholder % self.get_expression_column(value)
         else:
             if transform_value(value, f.srid):
                 return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
@@ -287,3 +288,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
         return SpatialRefSys
+    
+    def modify_insert_params(self, placeholders, params):
+        """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
+        backend due to #10888
+        """
+        # This code doesn't work for bulk insert cases.
+        assert len(placeholders) == 1
+        return [[param for pholder,param
+                 in six.moves.zip(placeholders[0], params[0]) if pholder != 'NULL'], ]

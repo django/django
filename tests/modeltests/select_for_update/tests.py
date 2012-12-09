@@ -36,6 +36,8 @@ class SelectForUpdateTests(TransactionTestCase):
         # issuing a SELECT ... FOR UPDATE will block.
         new_connections = ConnectionHandler(settings.DATABASES)
         self.new_connection = new_connections[DEFAULT_DB_ALIAS]
+        self.new_connection.enter_transaction_management()
+        self.new_connection.managed(True)
 
         # We need to set settings.DEBUG to True so we can capture
         # the output SQL to examine.
@@ -48,6 +50,7 @@ class SelectForUpdateTests(TransactionTestCase):
             # this in the course of their run.
             transaction.managed(False)
             transaction.leave_transaction_management()
+            self.new_connection.leave_transaction_management()
         except transaction.TransactionManagementError:
             pass
         self.new_connection.close()
@@ -66,7 +69,7 @@ class SelectForUpdateTests(TransactionTestCase):
             'for_update': self.new_connection.ops.for_update_sql(),
             }
         self.cursor.execute(sql, ())
-        result = self.cursor.fetchone()
+        self.cursor.fetchone()
 
     def end_blocking_transaction(self):
         # Roll back the blocking transaction.
@@ -203,7 +206,7 @@ class SelectForUpdateTests(TransactionTestCase):
             sanity_count += 1
             time.sleep(1)
         if sanity_count >= 10:
-            raise ValueError, 'Thread did not run and block'
+            raise ValueError('Thread did not run and block')
 
         # Check the person hasn't been updated. Since this isn't
         # using FOR UPDATE, it won't block.

@@ -1,15 +1,19 @@
 """Translation helper functions."""
+from __future__ import unicode_literals
 
 import locale
 import os
 import re
 import sys
 import gettext as gettext_module
-from io import BytesIO
 from threading import local
 
 from django.utils.importlib import import_module
+from django.utils.encoding import force_str, force_text
+from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
+from django.utils import six
+from django.utils.six import StringIO
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -25,11 +29,12 @@ _default = None
 _accepted = {}
 
 # magic gettext number to separate context from message
-CONTEXT_SEPARATOR = u"\x04"
+CONTEXT_SEPARATOR = "\x04"
 
-# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
+# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
+# and RFC 3066, section 2.1
 accept_language_re = re.compile(r'''
-        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)         # "en", "en-au", "x-y-z", "*"
+        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)      # "en", "en-au", "x-y-z", "es-419", "*"
         (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
@@ -105,7 +110,7 @@ def translation(language):
 
     from django.conf import settings
 
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
 
     def _fetch(lang, fallback=None):
 
@@ -147,7 +152,7 @@ def translation(language):
 
         for appname in reversed(settings.INSTALLED_APPS):
             app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
@@ -242,7 +247,8 @@ def do_translate(message, translation_function):
     """
     global _default
 
-    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
+    # str() is allowing a bytestring message to remain bytestring on Python 2
+    eol_message = message.replace(str('\r\n'), str('\n')).replace(str('\r'), str('\n'))
     t = getattr(_active, "value", None)
     if t is not None:
         result = getattr(t, translation_function)(eol_message)
@@ -256,14 +262,22 @@ def do_translate(message, translation_function):
     return result
 
 def gettext(message):
+    """
+    Returns a string of the translation of the message.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
+    """
     return do_translate(message, 'gettext')
 
-def ugettext(message):
-    return do_translate(message, 'ugettext')
+if six.PY3:
+    ugettext = gettext
+else:
+    def ugettext(message):
+        return do_translate(message, 'ugettext')
 
 def pgettext(context, message):
-    result = do_translate(
-        u"%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+    msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
+    result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -291,25 +305,31 @@ def do_ntranslate(singular, plural, number, translation_function):
 
 def ngettext(singular, plural, number):
     """
-    Returns a UTF-8 bytestring of the translation of either the singular or
-    plural, based on the number.
+    Returns a string of the translation of either the singular or plural,
+    based on the number.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 
-def ungettext(singular, plural, number):
-    """
-    Returns a unicode strings of the translation of either the singular or
-    plural, based on the number.
-    """
-    return do_ntranslate(singular, plural, number, 'ungettext')
+if six.PY3:
+    ungettext = ngettext
+else:
+    def ungettext(singular, plural, number):
+        """
+        Returns a unicode strings of the translation of either the singular or
+        plural, based on the number.
+        """
+        return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = do_ntranslate(u"%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                           u"%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
-                           number, 'ungettext')
+    msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                      "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                      number)
+    result = ungettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = do_ntranslate(singular, plural, number, 'ungettext')
+        result = ungettext(singular, plural, number)
     return result
 
 def all_locale_paths():
@@ -318,7 +338,7 @@ def all_locale_paths():
     """
     from django.conf import settings
     globalpath = os.path.join(
-        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 def check_for_language(lang_code):
@@ -422,8 +442,8 @@ def blankout(src, char):
     return dot_re.sub(char, src)
 
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?\s*""")
-block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?(?:\s+|$)""")
+inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
@@ -436,9 +456,11 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
+    from django.conf import settings
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
-    out = BytesIO()
+    src = force_text(src, settings.FILE_CHARSET)
+    out = StringIO()
     message_context = None
     intrans = False
     inplural = False
@@ -449,16 +471,16 @@ def templatize(src, origin=None):
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
-                content = b''.join(comment)
+                content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
                     if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
                     if translators_comment_start is not None and lineno >= translators_comment_start:
-                        out.write(b' # %s' % line)
+                        out.write(' # %s' % line)
                     else:
-                        out.write(b' #\n')
+                        out.write(' #\n')
                 incomment = False
                 comment = []
             else:
@@ -470,18 +492,18 @@ def templatize(src, origin=None):
                 if endbmatch:
                     if inplural:
                         if message_context:
-                            out.write(b' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
                         else:
-                            out.write(b' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
+                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
                         if message_context:
-                            out.write(b' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
                         else:
-                            out.write(b' gettext(%r) ' % ''.join(singular))
+                            out.write(' gettext(%r) ' % ''.join(singular))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None
@@ -527,10 +549,10 @@ def templatize(src, origin=None):
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
                             message_context = message_context.strip("'")
-                        out.write(b' pgettext(%r, %r) ' % (message_context, g))
+                        out.write(' pgettext(%r, %r) ' % (message_context, g))
                         message_context = None
                     else:
-                        out.write(b' gettext(%r) ' % g)
+                        out.write(' gettext(%r) ' % g)
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
@@ -548,7 +570,7 @@ def templatize(src, origin=None):
                     plural = []
                 elif cmatches:
                     for cmatch in cmatches:
-                        out.write(b' _(%s) ' % cmatch)
+                        out.write(' _(%s) ' % cmatch)
                 elif t.contents == 'comment':
                     incomment = True
                 else:
@@ -557,17 +579,17 @@ def templatize(src, origin=None):
                 parts = t.contents.split('|')
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(b' _(%s) ' % cmatch.group(1))
+                    out.write(' _(%s) ' % cmatch.group(1))
                 for p in parts[1:]:
                     if p.find(':_(') >= 0:
-                        out.write(b' %s ' % p.split(':',1)[1])
+                        out.write(' %s ' % p.split(':',1)[1])
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(b' # %s' % t.contents)
+                out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
-    return out.getvalue()
+    return force_str(out.getvalue())
 
 def parse_accept_lang_header(lang_string):
     """

@@ -35,19 +35,9 @@ display two blank forms::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-.. versionchanged:: 1.3
-
-Prior to Django 1.3, formset instances were not iterable. To render
-the formset you iterated over the ``forms`` attribute::
-
-    >>> formset = ArticleFormSet()
-    >>> for form in formset.forms:
-    ...     print(form.as_table())
-
-Iterating over ``formset.forms`` will render the forms in the order
-they were created. The default formset iterator also renders the forms
-in this order, but you can change this order by providing an alternate
-implementation for the :meth:`__iter__()` method.
+Iterating over the ``formset`` will render the forms in the order they were
+created. You can change this order by providing an alternate implementation for
+the :meth:`__iter__()` method.
 
 Formsets can also be indexed into, which returns the corresponding form. If you
 override ``__iter__``, you will need to also override ``__getitem__`` to have
@@ -102,15 +92,12 @@ limit the maximum number of empty forms the formset will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-.. versionchanged:: 1.2
-
 If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
 A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed. Please note that the default value of ``max_num`` was changed
-from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
+forms displayed.
 
 Formset validation
 ------------------
@@ -151,6 +138,8 @@ provide an invalid article::
 As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
+
+.. versionadded:: 1.4
 
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
@@ -207,8 +196,6 @@ the management data by rendering ``{{ my_formset.management_form }}``
 pre-filled, and is also used to determine how many forms are required. You
 will probably never need to override either of these methods, so please be
 sure you understand what they do before doing so.
-
-.. versionadded:: 1.2
 
 ``empty_form``
 ~~~~~~~~~~~~~~

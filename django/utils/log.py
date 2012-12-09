@@ -3,7 +3,9 @@ import traceback
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail import get_connection
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
+
 
 # Make sure a NullHandler is available
 # This was added in Python 2.7/3.2
@@ -23,12 +25,49 @@ except ImportError:
 
 getLogger = logging.getLogger
 
-# Ensure the creation of the Django logger
-# with a null handler. This ensures we don't get any
-# 'No handlers could be found for logger "django"' messages
-logger = getLogger('django')
-if not logger.handlers:
-    logger.addHandler(NullHandler())
+# Default logging for Django. This sends an email to the site admins on every
+# HTTP 500 error. Depending on DEBUG, all other log records are either sent to
+# the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
+DEFAULT_LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        'null': {
+            'class': 'django.utils.log.NullHandler',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'py.warnings': {
+            'handlers': ['console'],
+        },
+    }
+}
 
 
 class AdminEmailHandler(logging.Handler):
@@ -38,9 +77,10 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(self, include_html=False):
+    def __init__(self, include_html=False, email_backend=None):
         logging.Handler.__init__(self)
         self.include_html = include_html
+        self.email_backend = email_backend
 
     def emit(self, record):
         try:
@@ -72,7 +112,12 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
-        mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+        mail.mail_admins(subject, message, fail_silently=True,
+                         html_message=html_message,
+                         connection=self.connection())
+
+    def connection(self):
+        return get_connection(backend=self.email_backend)
 
     def format_subject(self, subject):
         """
@@ -103,3 +148,8 @@ class CallbackFilter(logging.Filter):
 class RequireDebugFalse(logging.Filter):
     def filter(self, record):
         return not settings.DEBUG
+
+
+class RequireDebugTrue(logging.Filter):
+    def filter(self, record):
+       return settings.DEBUG

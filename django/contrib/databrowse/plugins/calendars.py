@@ -1,11 +1,13 @@
+from __future__ import unicode_literals
+
 from django import http
 from django.db import models
 from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
+from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode
-from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
 from django.views.generic import dates
 from django.utils import datetime_safe
 
@@ -61,19 +63,20 @@ class CalendarPlugin(DatabrowsePlugin):
     def model_index_html(self, request, model, site):
         fields = self.field_dict(model)
         if not fields:
-            return u''
-        return mark_safe(u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
-            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
+            return ''
+        return format_html('<p class="filter"><strong>View calendar by:</strong> {0}</p>',
+                           format_html_join(', ', '<a href="calendars/{0}/">{1}</a>',
+                                            ((f.name, force_text(capfirst(f.verbose_name))) for f in fields.values())))
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
             d = easy_instance_field.raw_value
-            return [mark_safe(u'%s%s/%s/%s/%s/%s/' % (
+            return ['%s%s/%s/%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 str(d.year),
                 datetime_safe.new_date(d).strftime('%b').lower(),
-                d.day))]
+                d.day)]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site
@@ -93,7 +96,7 @@ class CalendarPlugin(DatabrowsePlugin):
 
     def homepage_view(self, request):
         easy_model = EasyModel(self.site, self.model)
-        field_list = self.fields.values()
+        field_list = list(self.fields.values())
         field_list.sort(key=lambda k:k.verbose_name)
         return render_to_response('databrowse/calendar_homepage.html', {
                 'root_url': self.site.root_url,

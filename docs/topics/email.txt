@@ -119,8 +119,6 @@ The "From:" header of the email will be the value of the
 
 This method exists for convenience and readability.
 
-.. versionchanged:: 1.3
-
 If ``html_message`` is provided, the resulting email will be a
 :mimetype:`multipart/alternative` email with ``message`` as the
 :mimetype:`text/plain` content type and ``html_message`` as the
@@ -192,7 +190,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
             # to get proper validation errors.
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _Header injection: http://www.nyphp.org/phundamentals/email_header_injection.php
+.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection
 
 .. _emailmessage-and-smtpconnection:
 
@@ -235,9 +233,6 @@ The :class:`~django.core.mail.EmailMessage` class is initialized with the
 following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
-
-.. versionchanged:: 1.3
-   The ``cc`` argument was added.
 
 * ``subject``: The subject line of the email.
 
@@ -364,8 +359,6 @@ subtype. For example::
 
 Email backends
 ==============
-
-.. versionadded:: 1.2
 
 The actual sending of an email is handled by the email backend.
 

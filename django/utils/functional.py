@@ -3,6 +3,7 @@ import operator
 from functools import wraps, update_wrapper
 import sys
 
+from django.utils import six
 
 # You can't trivially replace this `functools.partial` because this binds to
 # classes and returns bound instances, whereas functools.partial (on CPython)
@@ -58,6 +59,7 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
 
+    @total_ordering
     class __proxy__(Promise):
         """
         Encapsulate a function call and act as a proxy for methods that are
@@ -91,13 +93,19 @@ def lazy(func, *resultclasses):
                         if hasattr(cls, k):
                             continue
                         setattr(cls, k, meth)
-            cls._delegate_str = str in resultclasses
-            cls._delegate_unicode = unicode in resultclasses
-            assert not (cls._delegate_str and cls._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
-            if cls._delegate_unicode:
-                cls.__unicode__ = cls.__unicode_cast
-            elif cls._delegate_str:
-                cls.__str__ = cls.__str_cast
+            cls._delegate_bytes = bytes in resultclasses
+            cls._delegate_text = six.text_type in resultclasses
+            assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
+            if cls._delegate_text:
+                if six.PY3:
+                    cls.__str__ = cls.__text_cast
+                else:
+                    cls.__unicode__ = cls.__text_cast
+            elif cls._delegate_bytes:
+                if six.PY3:
+                    cls.__bytes__ = cls.__bytes_cast
+                else:
+                    cls.__str__ = cls.__bytes_cast
         __prepare_class__ = classmethod(__prepare_class__)
 
         def __promise__(cls, klass, funcname, method):
@@ -118,29 +126,37 @@ def lazy(func, *resultclasses):
             return __wrapper__
         __promise__ = classmethod(__promise__)
 
-        def __unicode_cast(self):
+        def __text_cast(self):
             return func(*self.__args, **self.__kw)
 
-        def __str_cast(self):
-            return str(func(*self.__args, **self.__kw))
+        def __bytes_cast(self):
+            return bytes(func(*self.__args, **self.__kw))
 
-        def __cmp__(self, rhs):
-            if self._delegate_str:
-                s = str(func(*self.__args, **self.__kw))
-            elif self._delegate_unicode:
-                s = unicode(func(*self.__args, **self.__kw))
+        def __cast(self):
+            if self._delegate_bytes:
+                return self.__bytes_cast()
+            elif self._delegate_text:
+                return self.__text_cast()
             else:
-                s = func(*self.__args, **self.__kw)
-            if isinstance(rhs, Promise):
-                return -cmp(rhs, s)
-            else:
-                return cmp(s, rhs)
+                return func(*self.__args, **self.__kw)
+
+        def __eq__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() == other
+
+        def __lt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() < other
+
+        __hash__ = object.__hash__
 
         def __mod__(self, rhs):
-            if self._delegate_str:
-                return str(self) % rhs
-            elif self._delegate_unicode:
-                return unicode(self) % rhs
+            if self._delegate_bytes and not six.PY3:
+                return bytes(self) % rhs
+            elif self._delegate_text:
+                return six.text_type(self) % rhs
             else:
                 raise AssertionError('__mod__ not supported for non-string types')
 
@@ -170,7 +186,7 @@ def allow_lazy(func, *resultclasses):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for arg in list(args) + kwargs.values():
+        for arg in list(args) + list(six.itervalues(kwargs)):
             if isinstance(arg, Promise):
                 break
         else:
@@ -222,9 +238,11 @@ class LazyObject(object):
         raise NotImplementedError
 
     # introspection support:
-    __members__ = property(lambda self: self.__dir__())
     __dir__ = new_method_proxy(dir)
 
+
+# Workaround for http://bugs.python.org/issue12370
+_super = super
 
 class SimpleLazyObject(LazyObject):
     """
@@ -243,13 +261,17 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        super(SimpleLazyObject, self).__init__()
+        _super(SimpleLazyObject, self).__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()
 
-    __str__ = new_method_proxy(str)
-    __unicode__ = new_method_proxy(unicode)
+    if six.PY3:
+        __bytes__ = new_method_proxy(bytes)
+        __str__ = new_method_proxy(str)
+    else:
+        __str__ = new_method_proxy(str)
+        __unicode__ = new_method_proxy(unicode)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -271,12 +293,23 @@ class SimpleLazyObject(LazyObject):
             self._setup()
         return self._wrapped.__dict__
 
+    # Python 3.3 will call __reduce__ when pickling; these methods are needed
+    # to serialize and deserialize correctly. They are not called in earlier
+    # versions of Python.
+    @classmethod
+    def __newobj__(cls, *args):
+        return cls.__new__(cls, *args)
+
+    def __reduce__(self):
+        return (self.__newobj__, (self.__class__,), self.__getstate__())
+
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
     __hash__ = new_method_proxy(hash)
-    __nonzero__ = new_method_proxy(bool)
+    __bool__ = new_method_proxy(bool)       # Python 3
+    __nonzero__ = __bool__                  # Python 2
 
 
 class lazy_property(property):
@@ -304,8 +337,8 @@ def partition(predicate, values):
     Splits the values into two sets, based on the return value of the function
     (True/False). e.g.:
 
-        >>> partition(lambda: x > 3, range(5))
-        [1, 2, 3], [4]
+        >>> partition(lambda x: x > 3, range(5))
+        [0, 1, 2, 3], [4]
     """
     results = ([], [])
     for item in values:

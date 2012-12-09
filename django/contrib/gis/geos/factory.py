@@ -1,4 +1,8 @@
+from django.contrib.gis import memoryview
 from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
+
+from django.utils import six
+
 
 def fromfile(file_h):
     """
@@ -6,17 +10,25 @@ def fromfile(file_h):
     WKT, or HEX.
     """
     # If given a file name, get a real handle.
-    if isinstance(file_h, basestring): 
+    if isinstance(file_h, six.string_types):
         with open(file_h, 'rb') as file_h:
             buf = file_h.read()
     else:
         buf = file_h.read()
 
-    # If we get WKB need to wrap in buffer(), so run through regexes.
-    if wkt_regex.match(buf) or hex_regex.match(buf):
-        return GEOSGeometry(buf)
+    # If we get WKB need to wrap in memoryview(), so run through regexes.
+    if isinstance(buf, bytes):
+        try:
+            decoded = buf.decode()
+            if wkt_regex.match(decoded) or hex_regex.match(decoded):
+                return GEOSGeometry(decoded)
+        except UnicodeDecodeError:
+            pass
     else:
-        return GEOSGeometry(buffer(buf))
+        return GEOSGeometry(buf)
+
+    return GEOSGeometry(memoryview(buf))
+
 
 def fromstr(string, **kwargs):
     "Given a string value, returns a GEOSGeometry object."

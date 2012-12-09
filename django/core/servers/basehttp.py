@@ -7,13 +7,17 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
+from __future__ import unicode_literals
+
 import os
 import socket
 import sys
 import traceback
-import urllib
-import urlparse
-from SocketServer import ThreadingMixIn
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
+from django.utils.six.moves import socketserver
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -68,12 +72,12 @@ class WSGIServerException(Exception):
 
 
 class ServerHandler(simple_server.ServerHandler, object):
-    error_status = "500 INTERNAL SERVER ERROR"
+    error_status = str("500 INTERNAL SERVER ERROR")
 
     def write(self, data):
-        """'write()' callable as specified by PEP 333"""
+        """'write()' callable as specified by PEP 3333"""
 
-        assert isinstance(data, str), "write() argument must be string"
+        assert isinstance(data, bytes), "write() argument must be bytestring"
 
         if not self.status:
             raise AssertionError("write() before start_response()")
@@ -127,45 +131,16 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings
-        self.admin_static_prefix = urlparse.urljoin(settings.STATIC_URL, 'admin/')
+        self.admin_static_prefix = urljoin(settings.STATIC_URL, 'admin/')
         # We set self.path to avoid crashes in log_message() on unsupported
         # requests (like "OPTIONS").
         self.path = ''
         self.style = color_style()
         super(WSGIRequestHandler, self).__init__(*args, **kwargs)
 
-    def get_environ(self):
-        env = self.server.base_environ.copy()
-        env['SERVER_PROTOCOL'] = self.request_version
-        env['REQUEST_METHOD'] = self.command
-        if '?' in self.path:
-            path,query = self.path.split('?',1)
-        else:
-            path,query = self.path,''
-
-        env['PATH_INFO'] = urllib.unquote(path)
-        env['QUERY_STRING'] = query
-        env['REMOTE_ADDR'] = self.client_address[0]
-
-        if self.headers.typeheader is None:
-            env['CONTENT_TYPE'] = self.headers.type
-        else:
-            env['CONTENT_TYPE'] = self.headers.typeheader
-
-        length = self.headers.getheader('content-length')
-        if length:
-            env['CONTENT_LENGTH'] = length
-
-        for h in self.headers.headers:
-            k,v = h.split(':',1)
-            k=k.replace('-','_').upper(); v=v.strip()
-            if k in env:
-                continue                    # skip content length, type,etc.
-            if 'HTTP_'+k in env:
-                env['HTTP_'+k] += ','+v     # comma-separate multiple headers
-            else:
-                env['HTTP_'+k] = v
-        return env
+    def address_string(self):
+        # Short-circuit parent method to not call socket.getfqdn
+        return self.client_address[0]
 
     def log_message(self, format, *args):
         # Don't bother logging requests for admin images or the favicon.
@@ -199,7 +174,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type('WSGIServer', (ThreadingMixIn, WSGIServer), {})
+        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
     else:
         httpd_cls = WSGIServer
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*
+from __future__ import unicode_literals
 
 REGION_CHOICES = (
     ('ABR', 'Abruzzo'),
@@ -19,6 +20,6 @@ REGION_CHOICES = (
     ('TOS', 'Toscana'),
     ('TAA', 'Trentino-Alto Adige'),
     ('UMB', 'Umbria'),
-    ('VAO', u'Valle d’Aosta'),
+    ('VAO', 'Valle d’Aosta'),
     ('VEN', 'Veneto'),
 )

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.admindocs import views
 from django.db.models import fields as builtin_fields
@@ -20,17 +20,17 @@ class TestFieldType(unittest.TestCase):
     def test_builtin_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(builtin_fields.BooleanField()),
-            _(u'Boolean (Either True or False)')
+            _('Boolean (Either True or False)')
         )
 
     def test_custom_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(fields.CustomField()),
-            _(u'A custom field type')
+            'A custom field type'
         )
         self.assertEqual(
             views.get_readable_field_data_type(fields.DescriptionLackingField()),
-            _(u'Field of type: %(field_type)s') % {
+            _('Field of type: %(field_type)s') % {
                 'field_type': 'DescriptionLackingField'
             }
         )

@@ -1,6 +1,7 @@
 import os
 import sys
 from django.db.backends.creation import BaseDatabaseCreation
+from django.utils.six.moves import input
 
 class DatabaseCreation(BaseDatabaseCreation):
     # SQLite doesn't actually support most of these types, but it "does the right
@@ -53,13 +54,13 @@ class DatabaseCreation(BaseDatabaseCreation):
                 print("Destroying old test database '%s'..." % self.connection.alias)
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
-                    confirm = raw_input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
+                    confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
                 if autoclobber or confirm == 'yes':
-                  try:
-                      os.remove(test_database_name)
-                  except Exception as e:
-                      sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
-                      sys.exit(2)
+                    try:
+                        os.remove(test_database_name)
+                    except Exception as e:
+                        sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                        sys.exit(2)
                 else:
                     print("Tests cancelled.")
                     sys.exit(1)

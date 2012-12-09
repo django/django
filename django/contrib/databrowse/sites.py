@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import http
 from django.db import models
 from django.contrib.databrowse.datastructures import EasyModel
@@ -61,7 +63,7 @@ class ModelDatabrowse(object):
 
     def main_view(self, request):
         easy_model = EasyModel(self.site, self.model)
-        html_snippets = mark_safe(u'\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()]))
+        html_snippets = mark_safe('\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()]))
         return render_to_response('databrowse/model_detail.html', {
             'model': easy_model,
             'root_url': self.site.root_url,

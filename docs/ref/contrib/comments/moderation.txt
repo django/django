@@ -32,11 +32,11 @@ A simple example is the best illustration of this. Suppose we have the
 following model, which would represent entries in a Weblog::
 
     from django.db import models
-    
+
     class Entry(models.Model):
         title = models.CharField(maxlength=250)
         body = models.TextField()
-        pub_date = models.DateTimeField()
+        pub_date = models.DateField()
         enable_comments = models.BooleanField()
 
 Now, suppose that we want the following steps to be applied whenever a
@@ -55,11 +55,11 @@ Accomplishing this is fairly straightforward and requires very little
 code::
 
     from django.contrib.comments.moderation import CommentModerator, moderator
-    
+
     class EntryModerator(CommentModerator):
         email_notification = True
         enable_field = 'enable_comments'
-    
+
     moderator.register(Entry, EntryModerator)
 
 The :class:`CommentModerator` class pre-defines a number of useful moderation
@@ -135,10 +135,6 @@ Built-in moderation options
 Simply subclassing :class:`CommentModerator` and changing the values of these
 options will automatically enable the various moderation methods for any
 models registered using the subclass.
-
-.. versionchanged:: 1.3
-
-``moderate_after`` and ``close_after`` now accept 0 as a valid value.
 
 Adding custom moderation methods
 --------------------------------

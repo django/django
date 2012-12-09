@@ -86,8 +86,8 @@ the message itself. Here's what the :file:`forms.py` might look like::
     section :ref:`Handling files <wizard-files>` below to learn more about
     what to do.
 
-Creating a ``WizardView`` class
--------------------------------
+Creating a ``WizardView`` subclass
+----------------------------------
 
 The next step is to create a
 :class:`django.contrib.formtools.wizard.views.WizardView` subclass. You can
@@ -155,7 +155,8 @@ or the
 :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
 method, which are documented in the
 :class:`~django.views.generic.base.TemplateResponseMixin` documentation.  The
-latter one allows you to use a different template for each form.
+latter one allows you to use a different template for each form (:ref:`see the
+example below <wizard-template-for-each-form>`).
 
 This template expects a ``wizard`` object that has various items attached to
 it:
@@ -186,6 +187,7 @@ Here's a full example template:
 .. code-block:: html+django
 
     {% extends "base.html" %}
+    {% load i18n %}
 
     {% block head %}
     {{ wizard.form.media }}
@@ -224,7 +226,7 @@ Hooking the wizard into a URLconf
 ---------------------------------
 
 Finally, we need to specify which forms to use in the wizard, and then
-deploy the new :class:`WizardView` object at an URL in the ``urls.py``. The
+deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
 wizard's :meth:`as_view` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 
@@ -236,6 +238,65 @@ wizard's :meth:`as_view` method takes a list of your
     urlpatterns = patterns('',
         (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
     )
+
+.. _wizard-template-for-each-form:
+
+Using a different template for each form
+----------------------------------------
+
+As mentioned above, you may specify a different template for each form.
+Consider an example using a form wizard to implement a multi-step checkout
+process for an online store. In the first step, the user specifies a billing
+and shipping address. In the second step, the user chooses payment type. If
+they chose to pay by credit card, they will enter credit card information in
+the next step. In the final step, they will confirm the purchase.
+
+Here's what the view code might look like::
+
+    from django.http import HttpResponseRedirect
+    from django.contrib.formtools.wizard.views import SessionWizardView
+
+    FORMS = [("address", myapp.forms.AddressForm),
+             ("paytype", myapp.forms.PaymentChoiceForm),
+             ("cc", myapp.forms.CreditCardForm),
+             ("confirmation", myapp.forms.OrderForm)]
+
+    TEMPLATES = {"address": "checkout/billingaddress.html",
+                 "paytype": "checkout/paymentmethod.html",
+                 "cc": "checkout/creditcard.html",
+                 "confirmation": "checkout/confirmation.html"}
+
+    def pay_by_credit_card(wizard):
+        """Return true if user opts to pay by credit card"""
+        # Get cleaned data from payment step
+        cleaned_data = wizard.get_cleaned_data_for_step('paytype') or {'method': 'none'}
+        # Return true if the user selected credit card
+        return cleaned_data['method'] == 'cc'
+
+
+    class OrderWizard(SessionWizardView):
+        def get_template_names(self):
+            return [TEMPLATES[self.steps.current]]
+
+        def done(self, form_list, **kwargs):
+            do_something_with_the_form_data(form_list)
+            return HttpResponseRedirect('/page-to-redirect-to-when-done/')
+            ...
+
+The ``urls.py`` file would contain something like::
+
+    urlpatterns = patterns('',
+        (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
+    )
+
+Note that the ``OrderWizard`` object is initialized with a list of pairs.
+The first element in the pair is a string that corresponds to the name of the
+step and the second is the form class.
+
+In this example, the
+:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+method returns a list containing a single template, which is selected based on
+the name of the current step.
 
 .. _wizardview-advanced-methods:
 
@@ -432,6 +493,21 @@ Advanced ``WizardView`` methods
             context = self.get_context_data(form=form, **kwargs)
             return self.render_to_response(context)
 
+.. method:: WizardView.get_cleaned_data_for_step(step)
+
+    This method returns the cleaned data for a given ``step``. Before returning
+    the cleaned data, the stored values are revalidated through the form. If
+    the data doesn't validate, ``None`` will be returned.
+
+.. method:: WizardView.get_all_cleaned_data()
+
+    This method returns a merged dictionary of all form steps' ``cleaned_data``
+    dictionaries. If a step contains a ``FormSet``, the key will be prefixed
+    with ``formset-`` and contain a list of the formset's ``cleaned_data``
+    dictionaries. Note that if two or more steps have a field with the same
+    name, the value for that field from the latest step will overwrite the
+    value from any earlier steps.
+
 Providing initial data for the forms
 ====================================
 
@@ -472,6 +548,16 @@ you have to add a :attr:`file_storage` to your :class:`WizardView` subclass.
 This storage will temporarily store the uploaded files for the wizard. The
 :attr:`file_storage` attribute should be a
 :class:`~django.core.files.storage.Storage` subclass.
+
+Django provides a built-in storage class (see :ref:`the built-in filesystem
+storage class <builtin-fs-storage>`)::
+
+    from django.conf import settings
+    from django.core.files.storage import FileSystemStorage
+
+    class CustomWizardView(WizardView):
+        ...
+        file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
 
 .. warning::
 
@@ -527,7 +613,7 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import pattern
+    from django.conf.urls import patterns
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
@@ -553,17 +639,19 @@ How to work with ModelForm and ModelFormSet
 WizardView supports :doc:`ModelForms </topics/forms/modelforms>` and
 :ref:`ModelFormSets <model-formsets>`. Additionally to
 :attr:`~WizardView.initial_dict`, the :meth:`~WizardView.as_view` method takes
-an ``instance_dict`` argument that should contain instances of ``ModelForm`` and
-``ModelFormSet``.  Similarly to :attr:`~WizardView.initial_dict`, these
-dictionary key values should be equal to the step number in the form list.
+an ``instance_dict`` argument that should contain model instances for steps
+based on ``ModelForm`` and querysets for steps based on ``ModelFormSet``.
 
 Usage of ``NamedUrlWizardView``
 ===============================
 
 .. class:: NamedUrlWizardView
 
-There is a :class:`WizardView` subclass which adds named-urls support to the wizard.
-By doing this, you can have single urls for every step.
+There is a :class:`WizardView` subclass which adds named-urls support to the
+wizard. By doing this, you can have single urls for every step. You can also
+use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
+classes which preselect the backend used for storing information (server-side
+sessions and browser cookies respectively).
 
 To use the named urls, you have to change the ``urls.py``.
 

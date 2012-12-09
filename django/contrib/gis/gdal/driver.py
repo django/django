@@ -1,8 +1,11 @@
-# prerequisites imports 
+# prerequisites imports
 from ctypes import c_void_p
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException
 from django.contrib.gis.gdal.prototypes import ds as capi
+
+from django.utils import six
+from django.utils.encoding import force_bytes
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -18,11 +21,11 @@ class Driver(GDALBase):
               'tiger' : 'TIGER',
               'tiger/line' : 'TIGER',
               }
-                
+
     def __init__(self, dr_input):
         "Initializes an OGR driver on either a string or integer input."
 
-        if isinstance(dr_input, basestring):
+        if isinstance(dr_input, six.string_types):
             # If a string name of the driver was passed in
             self._register()
 
@@ -34,7 +37,7 @@ class Driver(GDALBase):
                 name = dr_input
 
             # Attempting to get the OGR driver by the string name.
-            dr = capi.get_driver_by_name(name)
+            dr = capi.get_driver_by_name(force_bytes(name))
         elif isinstance(dr_input, int):
             self._register()
             dr = capi.get_driver(dr_input)
@@ -57,7 +60,7 @@ class Driver(GDALBase):
         # Only register all if the driver count is 0 (or else all drivers
         # will be registered over and over again)
         if not self.driver_count: capi.register_all()
-                    
+
     # Driver properties
     @property
     def driver_count(self):

@@ -8,7 +8,10 @@ import shutil
 import stat
 import sys
 import tempfile
-import urllib
+try:
+    from urllib.request import urlretrieve
+except ImportError:     # Python 2
+    from urllib import urlretrieve
 
 from optparse import make_option
 from os import path
@@ -16,7 +19,6 @@ from os import path
 import django
 from django.template import Template, Context
 from django.utils import archive
-from django.utils.encoding import smart_str
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.commands.makemessages import handle_extensions
@@ -113,7 +115,7 @@ class TemplateCommand(BaseCommand):
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
-        }))
+        }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
         from django.conf import settings
@@ -134,7 +136,7 @@ class TemplateCommand(BaseCommand):
                     os.mkdir(target_dir)
 
             for dirname in dirs[:]:
-                if dirname.startswith('.'):
+                if dirname.startswith('.') or dirname == '__pycache__':
                     dirs.remove(dirname)
 
             for filename in files:
@@ -152,12 +154,14 @@ class TemplateCommand(BaseCommand):
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
-                with open(old_path, 'r') as template_file:
+                with open(old_path, 'rb') as template_file:
                     content = template_file.read()
                 if filename.endswith(extensions) or filename in extra_files:
+                    content = content.decode('utf-8')
                     template = Template(content)
                     content = template.render(context)
-                with open(new_path, 'w') as new_file:
+                    content = content.encode('utf-8')
+                with open(new_path, 'wb') as new_file:
                     new_file.write(content)
 
                 if self.verbosity >= 2:
@@ -166,11 +170,10 @@ class TemplateCommand(BaseCommand):
                     shutil.copymode(old_path, new_path)
                     self.make_writeable(new_path)
                 except OSError:
-                    notice = self.style.NOTICE(
+                    self.stderr.write(
                         "Notice: Couldn't set permission bits on %s. You're "
                         "probably using an uncommon filesystem setup. No "
-                        "problem.\n" % new_path)
-                    sys.stderr.write(smart_str(notice))
+                        "problem." % new_path, self.style.NOTICE)
 
         if self.paths_to_remove:
             if self.verbosity >= 2:
@@ -229,8 +232,7 @@ class TemplateCommand(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Downloading %s\n" % display_url)
         try:
-            the_path, info = urllib.urlretrieve(url,
-                                                path.join(tempdir, filename))
+            the_path, info = urlretrieve(url, path.join(tempdir, filename))
         except IOError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))

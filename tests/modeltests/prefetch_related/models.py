@@ -1,16 +1,18 @@
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 ## Basic tests
 
+@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
     first_book = models.ForeignKey('Book', related_name='first_time_authors')
     favorite_authors = models.ManyToManyField(
         'self', through='FavoriteAuthors', symmetrical=False, related_name='favors_me')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -30,6 +32,7 @@ class FavoriteAuthors(models.Model):
          ordering = ['id']
 
 
+@python_2_unicode_compatible
 class AuthorAddress(models.Model):
     author = models.ForeignKey(Author, to_field='name', related_name='addresses')
     address = models.TextField()
@@ -37,15 +40,16 @@ class AuthorAddress(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.address
 
 
+@python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name='books')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -58,16 +62,20 @@ class BookWithYear(Book):
         AuthorWithAge, related_name='books_with_year')
 
 
+@python_2_unicode_compatible
 class Reader(models.Model):
     name = models.CharField(max_length=50)
     books_read = models.ManyToManyField(Book, related_name='read_by')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['id']
 
+class BookReview(models.Model):
+    book = models.ForeignKey(BookWithYear)
+    notes = models.TextField(null=True, blank=True)
 
 ## Models for default manager tests
 
@@ -83,13 +91,14 @@ class TeacherManager(models.Manager):
         return super(TeacherManager, self).get_query_set().prefetch_related('qualifications')
 
 
+@python_2_unicode_compatible
 class Teacher(models.Model):
     name = models.CharField(max_length=50)
     qualifications = models.ManyToManyField(Qualification)
 
     objects = TeacherManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
 
     class Meta:
@@ -106,6 +115,7 @@ class Department(models.Model):
 
 ## GenericRelation/GenericForeignKey tests
 
+@python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, related_name="taggeditem_set2")
@@ -115,14 +125,22 @@ class TaggedItem(models.Model):
                                       related_name='taggeditem_set3')
     created_by_fkey = models.PositiveIntegerField(null=True)
     created_by = generic.GenericForeignKey('created_by_ct', 'created_by_fkey',)
+    favorite_ct = models.ForeignKey(ContentType, null=True,
+                                    related_name='taggeditem_set4')
+    favorite_fkey = models.CharField(max_length=64, null=True)
+    favorite = generic.GenericForeignKey('favorite_ct', 'favorite_fkey')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.tag
 
 
 class Bookmark(models.Model):
     url = models.URLField()
-    tags = generic.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem, related_name='bookmarks')
+    favorite_tags = generic.GenericRelation(TaggedItem,
+                                    content_type_field='favorite_ct',
+                                    object_id_field='favorite_fkey',
+                                    related_name='favorite_bookmarks')
 
 
 class Comment(models.Model):
@@ -166,12 +184,13 @@ class Person(models.Model):
 
 ## Models for nullable FK tests
 
+@python_2_unicode_compatible
 class Employee(models.Model):
     name = models.CharField(max_length=50)
     boss = models.ForeignKey('self', null=True,
                              related_name='serfs')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:

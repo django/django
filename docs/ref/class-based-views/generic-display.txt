@@ -1,0 +1,147 @@
+=====================
+Generic display views
+=====================
+
+The two following generic class-based views are designed to display data. On
+many projects they are typically the most commonly used views.
+
+DetailView
+----------
+
+.. class:: django.views.generic.detail.DetailView
+
+    While this view is executing, ``self.object`` will contain the object that
+    the view is operating upon.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`get_template_names()`
+    4. :meth:`get_slug_field()`
+    5. :meth:`get_queryset()`
+    6. :meth:`get_object()`
+    7. :meth:`get_context_object_name()`
+    8. :meth:`get_context_data()`
+    9. :meth:`get()`
+    10. :meth:`render_to_response()`
+
+    **Example views.py**::
+
+        from django.views.generic.detail import DetailView
+        from django.utils import timezone
+
+        from articles.models import Article
+
+        class ArticleDetailView(DetailView):
+
+            model = Article
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticleDetailView, self).get_context_data(**kwargs)
+                context['now'] = timezone.now()
+                return context
+
+    **Example urls.py**::
+
+        from django.conf.urls import patterns, url
+
+        from article.views import ArticleDetailView
+
+        urlpatterns = patterns('',
+            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
+        )
+
+ListView
+--------
+
+.. class:: django.views.generic.list.ListView
+
+    A page representing a list of objects.
+
+    While this view is executing, ``self.object_list`` will contain the list of
+    objects (usually, but not necessarily a queryset) that the view is
+    operating upon.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.list.ListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.list.BaseListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. :meth:`dispatch()`
+    2. :meth:`http_method_not_allowed()`
+    3. :meth:`get_template_names()`
+    4. :meth:`get_queryset()`
+    5. :meth:`get_objects()`
+    6. :meth:`get_context_data()`
+    7. :meth:`get()`
+    8. :meth:`render_to_response()`
+
+
+    **Example views.py**::
+
+        from django.views.generic.list import ListView
+        from django.utils import timezone
+
+        from articles.models import Article
+
+        class ArticleListView(ListView):
+
+            model = Article
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticleListView, self).get_context_data(**kwargs)
+                context['now'] = timezone.now()
+                return context
+
+    **Example urls.py**::
+
+        from django.conf.urls import patterns, url
+
+        from article.views import ArticleListView
+
+        urlpatterns = patterns('',
+            url(r'^$', ArticleListView.as_view(), name='article-list'),
+        )
+
+.. class:: django.views.generic.list.BaseListView
+
+    A base view for displaying a list of objects. It is not intended to be used
+    directly, but rather as a parent class of the
+    :class:`django.views.generic.list.ListView` or other views representing
+    lists of objects.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Methods**
+
+    .. method:: get(request, *args, **kwargs)
+
+        Adds :attr:`object_list` to the context. If
+        :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty`
+        is True then display an empty list. If
+        :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` is
+        False then raise a 404 error.

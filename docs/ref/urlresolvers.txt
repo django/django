@@ -1,0 +1,194 @@
+==============================================
+``django.core.urlresolvers`` utility functions
+==============================================
+
+.. module:: django.core.urlresolvers
+
+reverse()
+---------
+
+If you need to use something similar to the :ttag:`url` template tag in
+your code, Django provides the following function:
+
+.. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+
+``viewname`` is either the function name (either a function reference, or the
+string version of the name, if you used that form in ``urlpatterns``) or the
+:ref:`URL pattern name <naming-url-patterns>`.  Normally, you won't need to
+worry about the ``urlconf`` parameter and will only pass in the positional and
+keyword arguments to use in the URL matching. For example::
+
+    from django.core.urlresolvers import reverse
+
+    def myview(request):
+        return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+
+The ``reverse()`` function can reverse a large variety of regular expression
+patterns for URLs, but not every possible one. The main restriction at the
+moment is that the pattern cannot contain alternative choices using the
+vertical bar (``"|"``) character. You can quite happily use such patterns for
+matching against incoming URLs and sending them off to views, but you cannot
+reverse such patterns.
+
+The ``current_app`` argument allows you to provide a hint to the resolver
+indicating the application to which the currently executing view belongs.
+This ``current_app`` argument is used as a hint to resolve application
+namespaces into URLs on specific application instances, according to the
+:ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
+
+You can use ``kwargs`` instead of ``args``. For example::
+
+    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+    '/admin/auth/'
+
+``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
+
+.. admonition:: Make sure your views are all correct.
+
+    As part of working out which URL names map to which patterns, the
+    ``reverse()`` function has to import all of your URLconf files and examine
+    the name of each view. This involves importing each view function. If
+    there are *any* errors whilst importing any of your view functions, it
+    will cause ``reverse()`` to raise an error, even if that view function is
+    not the one you are trying to reverse.
+
+    Make sure that any views you reference in your URLconf files exist and can
+    be imported correctly. Do not include lines that reference views you
+    haven't written yet, because those views will not be importable.
+
+.. note::
+
+    The string returned by ``reverse()`` is already
+    :ref:`urlquoted <uri-and-iri-handling>`. For example::
+
+        >>> reverse('cities', args=[u'Orléans'])
+        '.../Orl%C3%A9ans/'
+
+    Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
+    ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
+    results.
+
+reverse_lazy()
+--------------
+
+.. versionadded:: 1.4
+
+A lazily evaluated version of `reverse()`_.
+
+.. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+
+It is useful for when you need to use a URL reversal before your project's
+URLConf is loaded. Some common cases where this function is necessary are:
+
+* providing a reversed URL as the ``url`` attribute of a generic class-based
+  view.
+
+* providing a reversed URL to a decorator (such as the ``login_url`` argument
+  for the :func:`django.contrib.auth.decorators.permission_required`
+  decorator).
+
+* providing a reversed URL as a default value for a parameter in a function's
+  signature.
+
+resolve()
+---------
+
+The ``resolve()`` function can be used for resolving URL paths to the
+corresponding view functions. It has the following signature:
+
+.. function:: resolve(path, urlconf=None)
+
+``path`` is the URL path you want to resolve. As with
+:func:`~django.core.urlresolvers.reverse`, you don't need to
+worry about the ``urlconf`` parameter. The function returns a
+:class:`ResolverMatch` object that allows you
+to access various meta-data about the resolved URL.
+
+If the URL does not resolve, the function raises an
+:class:`~django.http.Http404` exception.
+
+.. class:: ResolverMatch
+
+    .. attribute:: ResolverMatch.func
+
+        The view function that would be used to serve the URL
+
+    .. attribute:: ResolverMatch.args
+
+        The arguments that would be passed to the view function, as
+        parsed from the URL.
+
+    .. attribute:: ResolverMatch.kwargs
+
+        The keyword arguments that would be passed to the view
+        function, as parsed from the URL.
+
+    .. attribute:: ResolverMatch.url_name
+
+        The name of the URL pattern that matches the URL.
+
+    .. attribute:: ResolverMatch.app_name
+
+        The application namespace for the URL pattern that matches the
+        URL.
+
+    .. attribute:: ResolverMatch.namespace
+
+        The instance namespace for the URL pattern that matches the
+        URL.
+
+    .. attribute:: ResolverMatch.namespaces
+
+        The list of individual namespace components in the full
+        instance namespace for the URL pattern that matches the URL.
+        i.e., if the namespace is ``foo:bar``, then namespaces will be
+        ``['foo', 'bar']``.
+
+A :class:`ResolverMatch` object can then be interrogated to provide
+information about the URL pattern that matches a URL::
+
+    # Resolve a URL
+    match = resolve('/some/path/')
+    # Print the URL pattern that matches the URL
+    print(match.url_name)
+
+A :class:`ResolverMatch` object can also be assigned to a triple::
+
+    func, args, kwargs = resolve('/some/path/')
+
+One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
+whether a view would raise a ``Http404`` error before redirecting to it::
+
+    from urlparse import urlparse
+    from django.core.urlresolvers import resolve
+    from django.http import HttpResponseRedirect, Http404
+
+    def myview(request):
+        next = request.META.get('HTTP_REFERER', None) or '/'
+        response = HttpResponseRedirect(next)
+
+        # modify the request and response as required, e.g. change locale
+        # and set corresponding locale cookie
+
+        view, args, kwargs = resolve(urlparse(next)[2])
+        kwargs['request'] = request
+        try:
+            view(*args, **kwargs)
+        except Http404:
+            return HttpResponseRedirect('/')
+        return response
+
+get_script_prefix()
+-------------------
+
+.. function:: get_script_prefix()
+
+Normally, you should always use :func:`~django.core.urlresolvers.reverse` to
+define URLs within your application. However, if your application constructs
+part of the URL hierarchy itself, you may occasionally need to generate URLs.
+In that case, you need to be able to find the base URL of the Django project
+within its Web server (normally, :func:`~django.core.urlresolvers.reverse`
+takes care of this for you). In that case, you can call
+``get_script_prefix()``, which will return the script prefix portion of the URL
+for your Django project. If your Django project is at the root of its web
+server, this is always ``"/"``.

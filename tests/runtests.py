@@ -7,6 +7,8 @@ import tempfile
 import warnings
 
 from django import contrib
+from django.utils._os import upath
+from django.utils import six
 
 # databrowse is deprecated, but we still want to run its tests
 warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
@@ -18,8 +20,8 @@ REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
-RUNTESTS_DIR = os.path.dirname(__file__)
-CONTRIB_DIR = os.path.dirname(contrib.__file__)
+RUNTESTS_DIR = os.path.dirname(upath(__file__))
+CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
@@ -91,7 +93,7 @@ def setup(verbosity, test_labels):
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
-    settings.LOGIN_URL = '/accounts/login/'
+    settings.LOGIN_URL = 'django.contrib.auth.views.login'
     settings.MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -142,7 +144,7 @@ def teardown(state):
     # so that it will successfully remove temp trees containing
     # non-ASCII filenames on Windows. (We're assuming the temp dir
     # name itself does not contain non-ASCII characters.)
-    shutil.rmtree(unicode(TEMP_DIR))
+    shutil.rmtree(six.text_type(TEMP_DIR))
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
@@ -191,7 +193,7 @@ def bisect_tests(bisection_label, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, __file__, '--settings=%s' % options.settings]
+        sys.executable, upath(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -252,7 +254,7 @@ def paired_tests(paired_test, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, __file__, '--settings=%s' % options.settings]
+        sys.executable, upath(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -276,7 +278,7 @@ if __name__ == "__main__":
     usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
     parser.add_option(
-        '-v','--verbosity', action='store', dest='verbosity', default='1',
+        '-v', '--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2', '3'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all '
              'output')

@@ -24,3 +24,14 @@ oracle  = _default_db == 'oracle'
 postgis = _default_db == 'postgis'
 mysql   = _default_db == 'mysql'
 spatialite = _default_db == 'spatialite'
+
+HAS_SPATIALREFSYS = True
+if oracle and 'gis' in settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']:
+    from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
+elif postgis:
+    from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
+elif spatialite:
+    from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
+else:
+    HAS_SPATIALREFSYS = False
+    SpatialRefSys = None

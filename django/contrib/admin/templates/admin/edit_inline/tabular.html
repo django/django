@@ -27,7 +27,7 @@
         <td class="original">
           {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
-          {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
+          {% if inline_admin_form.show_url %}<a href="{% url 'admin:view_on_site' inline_admin_form.original_content_type_id inline_admin_form.original.pk %}">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
           {% if inline_admin_form.has_auto_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
           {{ inline_admin_form.fk_field.field }}
@@ -46,7 +46,7 @@
             {% for field in line %}
               <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
               {% if field.is_readonly %}
-                  <p>{{ field.contents }}</p>
+                  <p>{{ field.contents|linebreaksbr }}</p>
               {% else %}
                   {{ field.field.errors.as_ul }}
                   {{ field.field }}
@@ -67,64 +67,13 @@
 </div>
 
 <script type="text/javascript">
+
 (function($) {
-    $(document).ready(function($) {
-        var rows = "#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr";
-        var alternatingRows = function(row) {
-            $(rows).not(".add-row").removeClass("row1 row2")
-                .filter(":even").addClass("row1").end()
-                .filter(rows + ":odd").addClass("row2");
-        }
-        var reinitDateTimeShortCuts = function() {
-            // Reinitialize the calendar and clock widgets by force
-            if (typeof DateTimeShortcuts != "undefined") {
-                $(".datetimeshortcuts").remove();
-                DateTimeShortcuts.init();
-            }
-        }
-        var updateSelectFilter = function() {
-            // If any SelectFilter widgets are a part of the new form,
-            // instantiate a new SelectFilter instance for it.
-            if (typeof SelectFilter != "undefined"){
-                $(".selectfilter").each(function(index, value){
-                  var namearr = value.name.split('-');
-                  SelectFilter.init(value.id, namearr[namearr.length-1], false, "{% static "admin/" %}");
-                });
-                $(".selectfilterstacked").each(function(index, value){
-                  var namearr = value.name.split('-');
-                  SelectFilter.init(value.id, namearr[namearr.length-1], true, "{% static "admin/" %}");
-                });
-            }
-        }
-        var initPrepopulatedFields = function(row) {
-            row.find('.prepopulated_field').each(function() {
-                var field = $(this);
-                var input = field.find('input, select, textarea');
-                var dependency_list = input.data('dependency_list') || [];
-                var dependencies = [];
-                $.each(dependency_list, function(i, field_name) {
-                  dependencies.push('#' + row.find('.field-' + field_name).find('input, select, textarea').attr('id'));
-                });
-                if (dependencies.length) {
-                    input.prepopulate(dependencies, input.attr('maxlength'));
-                }
-            });
-        }
-        $(rows).formset({
-            prefix: "{{ inline_admin_formset.formset.prefix }}",
-            addText: "{% blocktrans with verbose_name=inline_admin_formset.opts.verbose_name|title %}Add another {{ verbose_name }}{% endblocktrans %}",
-            formCssClass: "dynamic-{{ inline_admin_formset.formset.prefix }}",
-            deleteCssClass: "inline-deletelink",
-            deleteText: "{% trans "Remove" %}",
-            emptyCssClass: "empty-form",
-            removed: alternatingRows,
-            added: (function(row) {
-                initPrepopulatedFields(row);
-                reinitDateTimeShortCuts();
-                updateSelectFilter();
-                alternatingRows(row);
-            })
-        });
-    });
+  $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr").tabularFormset({
+    prefix: "{{ inline_admin_formset.formset.prefix }}",
+    adminStaticPrefix: '{% static "admin/" %}',
+    addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
+    deleteText: "{% trans 'Remove' %}"
+  });
 })(django.jQuery);
 </script>

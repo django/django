@@ -1,7 +1,11 @@
+from __future__ import unicode_literals
+
 import os
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils._os import upath
 
 
 class Person(models.Model):
@@ -13,23 +17,25 @@ class Triple(models.Model):
     right = models.IntegerField()
 
     class Meta:
-        unique_together = (('left', 'middle'), (u'middle', u'right'))
+        unique_together = (('left', 'middle'), ('middle', 'right'))
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(__file__), match=".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
 
+@python_2_unicode_compatible
 class Publication(models.Model):
     title = models.CharField(max_length=30)
     date_published = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     publications = models.ManyToManyField(Publication)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
 class CustomFileField(models.FileField):

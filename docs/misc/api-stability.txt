@@ -54,7 +54,7 @@ of 1.0. This includes these APIs:
 - :doc:`HTTP request/response handling </topics/http/index>`, including file
   uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
 
-- :doc:`Generic views </topics/class-based-views>`.
+- :doc:`Generic views </topics/class-based-views/index>`.
 
 - :doc:`Internationalization </topics/i18n/index>`.
 
@@ -154,8 +154,6 @@ Certain APIs are explicitly marked as "internal" in a couple of ways:
 
 Local flavors
 -------------
-
-.. versionchanged:: 1.3
 
 :mod:`django.contrib.localflavor` contains assorted pieces of code
 that are useful for particular countries or cultures. This data is

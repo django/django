@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 
 from django.utils import feedgenerator, tzinfo, unittest
@@ -13,7 +15,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         self.assertEqual(
             feedgenerator.get_tag_uri('http://example.org/foo/bar#headline', datetime.date(2004, 10, 25)),
-            u'tag:example.org,2004-10-25:/foo/bar/headline')
+            'tag:example.org,2004-10-25:/foo/bar/headline')
 
     def test_get_tag_uri_with_port(self):
         """
@@ -22,7 +24,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         self.assertEqual(
             feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
-            u'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
+            'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
 
     def test_rfc2822_date(self):
         """
@@ -102,10 +104,14 @@ class FeedgeneratorTest(unittest.TestCase):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')
         self.assertEqual(feed.feed['feed_url'], None)
         feed_content = feed.writeString('utf-8')
-        self.assertNotIn('<atom:link href=', feed_content)
+        self.assertNotIn('<atom:link', feed_content)
+        self.assertNotIn('href="/feed/"', feed_content)
+        self.assertNotIn('rel="self"', feed_content)
 
     def test_feed_with_feed_url_gets_rendered_with_atom_link(self):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr', feed_url='/feed/')
         self.assertEqual(feed.feed['feed_url'], '/feed/')
         feed_content = feed.writeString('utf-8')
-        self.assertIn('<atom:link href="/feed/" rel="self"></atom:link>', feed_content)
+        self.assertIn('<atom:link', feed_content)
+        self.assertIn('href="/feed/"', feed_content)
+        self.assertIn('rel="self"', feed_content)

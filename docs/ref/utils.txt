@@ -112,9 +112,13 @@ to distinguish caches by the ``Accept-language`` header.
 
     .. method:: insert(index, key, value)
 
+        .. deprecated:: 1.5
+
         Inserts the key, value pair before the item with the given index.
 
     .. method:: value_for_index(index)
+
+        .. deprecated:: 1.5
 
         Returns the value of the item at the given zero-based index.
 
@@ -166,6 +170,37 @@ The functions defined in this module share the following properties:
     ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
     instance.
 
+``django.utils.decorators``
+===========================
+
+.. module:: django.utils.decorators
+    :synopsis: Functions that help with creating decorators for views.
+
+.. function:: method_decorator(decorator)
+
+    Converts a function decorator into a method decorator. See :ref:`decorating
+    class based views<decorating-class-based-views>` for example usage.
+
+.. function:: decorator_from_middleware(middleware_class)
+
+    Given a middleware class, returns a view decorator. This lets you use
+    middleware functionality on a per-view basis. The middleware is created
+    with no params passed.
+
+.. function:: decorator_from_middleware_with_args(middleware_class)
+
+    Like ``decorator_from_middleware``, but returns a function
+    that accepts the arguments to be passed to the middleware_class.
+    For example, the :func:`~django.views.decorators.cache.cache_page`
+    decorator is created from the
+    :class:`~django.middleware.cache.CacheMiddleware` like this::
+
+         cache_page = decorator_from_middleware_with_args(CacheMiddleware)
+
+         @cache_page(3600)
+         def my_view(request):
+             pass
+
 ``django.utils.encoding``
 =========================
 
@@ -174,39 +209,90 @@ The functions defined in this module share the following properties:
 
 .. class:: StrAndUnicode
 
-    A class whose ``__str__`` returns its ``__unicode__`` as a UTF-8
-    bytestring. Useful as a mix-in.
+    A class that derives ``__str__`` from ``__unicode__``.
 
-.. function:: smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+    On Python 2, ``__str__`` returns the output of ``__unicode__`` encoded as
+    a UTF-8 bytestring. On Python 3, ``__str__`` returns the output of
+    ``__unicode__``.
 
-    Returns a ``unicode`` object representing ``s``. Treats bytestrings using
-    the 'encoding' codec.
+    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
+    you can inherit this mix-in and just define ``__unicode__``.
+
+.. function:: python_2_unicode_compatible
+
+    A decorator that defines ``__unicode__`` and ``__str__`` methods under
+    Python 2. Under Python 3 it does nothing.
+
+    To support Python 2 and 3 with a single code base, define a ``__str__``
+    method returning text and apply this decorator to the class.
+
+.. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    .. versionadded:: 1.5
+
+    Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
+    ``str`` on Python 3. Treats bytestrings using the ``encoding`` codec.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
+
+.. function:: smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    Historical name of :func:`smart_text`. Only available under Python 2.
 
 .. function:: is_protected_type(obj)
 
     Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
-    ``force_unicode(strings_only=True)``.
+    ``force_text(strings_only=True)``.
 
-.. function:: force_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+.. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Similar to ``smart_unicode``, except that lazy instances are resolved to
+    .. versionadded:: 1.5
+
+    Similar to ``smart_text``, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-.. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
+.. function:: force_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    Historical name of :func:`force_text`. Only available under Python 2.
+
+.. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    .. versionadded:: 1.5
 
     Returns a bytestring version of ``s``, encoded as specified in
     ``encoding``.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
+
+.. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    .. versionadded:: 1.5
+
+    Similar to ``smart_bytes``, except that lazy instances are resolved to
+    bytestrings, rather than kept as lazy objects.
+
+    If ``strings_only`` is ``True``, don't convert (some) non-string-like
+    objects.
+
+.. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    Alias of :func:`smart_bytes` on Python 2 and :func:`smart_text` on Python
+    3. This function returns a :class:`str` or a lazy string.
+
+    For instance, this is  suitable for writing to :attr:`sys.stdout` on
+    Python 2 and 3.
+
+.. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
+
+    Alias of :func:`force_bytes` on Python 2 and :func:`force_text` on Python
+    3. This function always returns a :class:`str`.
 
 .. function:: iri_to_uri(iri)
 
@@ -246,13 +332,13 @@ For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
 For definitions of the different versions of RSS, see:
-http://diveintomark.org/archives/2004/02/04/incompatible-rss
+http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
 
 SyndicationFeed
 ---------------
@@ -330,7 +416,7 @@ Rss201rev2Feed
 
 .. class:: Rss201rev2Feed(RssFeed)
 
-    Spec: http://blogs.law.harvard.edu/tech/rss
+    Spec: http://cyber.law.harvard.edu/rss/rss.html
 
 RssUserland091Feed
 ------------------
@@ -387,6 +473,94 @@ Atom1Feed
     input is a proper string, then add support for lazy translation objects at the
     end.
 
+``django.utils.html``
+=====================
+
+.. module:: django.utils.html
+   :synopsis: HTML helper functions
+
+Usually you should build up HTML using Django's templates to make use of its
+autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
+where appropriate. This module provides some additional low level utilitiesfor
+escaping HTML.
+
+.. function:: escape(text)
+
+    Returns the given text with ampersands, quotes and angle brackets encoded
+    for use in HTML. The input is first passed through
+    :func:`~django.utils.encoding.force_text` and the output has
+    :func:`~django.utils.safestring.mark_safe` applied.
+
+.. function:: conditional_escape(text)
+
+    Similar to ``escape()``, except that it doesn't operate on pre-escaped strings,
+    so it will not double escape.
+
+.. function:: format_html(format_string, *args, **kwargs)
+
+    This is similar to `str.format`_, except that it is appropriate for
+    building up HTML fragments. All args and kwargs are passed through
+    :func:`conditional_escape` before being passed to ``str.format``.
+
+    For the case of building up small HTML fragments, this function is to be
+    preferred over string interpolation using ``%`` or ``str.format`` directly,
+    because it applies escaping to all arguments - just like the Template system
+    applies escaping by default.
+
+    So, instead of writing:
+
+    .. code-block:: python
+
+        mark_safe(u"%s <b>%s</b> %s" % (some_html,
+                                        escape(some_text),
+                                        escape(some_other_text),
+                                        ))
+
+    you should instead use:
+
+    .. code-block:: python
+
+        format_html(u"%{0} <b>{1}</b> {2}",
+                    mark_safe(some_html), some_text, some_other_text)
+
+    This has the advantage that you don't need to apply :func:`escape` to each
+    argument and risk a bug and an XSS vulnerability if you forget one.
+
+    Note that although this function uses ``str.format`` to do the
+    interpolation, some of the formatting options provided by `str.format`_
+    (e.g. number formatting) will not work, since all arguments are passed
+    through :func:`conditional_escape` which (ultimately) calls
+    :func:`~django.utils.encoding.force_text` on the values.
+
+.. function:: strip_tags(value)
+
+    Removes anything that looks like an html tag from the string, that is
+    anything contained within ``<>``.
+
+    For example::
+
+        strip_tags(value)
+
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"Joel is a slug"``.
+
+.. function:: remove_tags(value, tags)
+
+    Removes a list of [X]HTML tag names from the output.
+
+    For example::
+
+        remove_tags(value, ["b", "span"])
+
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"Joel <button>is</button> a slug"``.
+
+    Note that this filter is case-sensitive.
+
+    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
+    return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
+.. _str.format: http://docs.python.org/library/stdtypes.html#str.format
 
 ``django.utils.http``
 =====================
@@ -439,11 +613,13 @@ Atom1Feed
 
 .. function:: base36_to_int(s)
 
-    Converts a base 36 string to an integer.
+    Converts a base 36 string to an integer. On Python 2 the output is
+    guaranteed to be an :class:`int` and not a :class:`long`.
 
 .. function:: int_to_base36(i)
 
-    Converts a positive integer less than sys.maxint to a base 36 string.
+    Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
+    smaller than :attr:`sys.maxint`.
 
 ``django.utils.safestring``
 ===========================
@@ -457,15 +633,29 @@ string" means that the producer of the string has already turned characters
 that should not be interpreted by the HTML engine (e.g. '<') into the
 appropriate entities.
 
+.. class:: SafeBytes
+
+    .. versionadded:: 1.5
+
+    A :class:`bytes` subclass that has been specifically marked as "safe"
+    (requires no further escaping) for HTML output purposes.
+
 .. class:: SafeString
 
-    A string subclass that has been specifically marked as "safe" (requires no
-    further escaping) for HTML output purposes.
+    A :class:`str` subclass that has been specifically marked as "safe"
+    (requires no further escaping) for HTML output purposes. This is
+    :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
+
+.. class:: SafeText
+
+    .. versionadded:: 1.5
+
+    A :class:`str` (in Python 3) or :class:`unicode` (in Python 2) subclass
+    that has been specifically marked as "safe" for HTML output purposes.
 
 .. class:: SafeUnicode
 
-    A unicode subclass that has been specifically marked as "safe" for HTML
-    output purposes.
+    Historical name of :class:`SafeText`. Only available under Python 2.
 
 .. function:: mark_safe(s)
 
@@ -481,6 +671,24 @@ appropriate entities.
 
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
+
+``django.utils.text``
+=====================
+
+.. module:: django.utils.text
+    :synopsis: Text manipulation.
+
+.. function:: slugify
+
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and trailing
+    whitespace.
+
+    For example::
+
+        slugify(value)
+
+    If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 
 ``django.utils.translation``
 ============================

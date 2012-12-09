@@ -1,5 +1,5 @@
 # encoding: utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -10,7 +10,7 @@ from django.contrib.admin import widgets
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import DateField
+from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 from django.utils import translation
@@ -112,6 +112,23 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Event, 'start_date', forms.TextInput,
                              formfield_overrides={DateField: {'widget': forms.TextInput}})
 
+    def testFormfieldOverridesWidgetInstances(self):
+        """
+        Test that widget instances in formfield_overrides are not shared between
+        different fields. (#19423)
+        """
+        class BandAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {'widget': forms.TextInput(attrs={'size':'10'})}
+            }
+        ma = BandAdmin(models.Band, admin.site)
+        f1 = ma.formfield_for_dbfield(models.Band._meta.get_field('name'), request=None)
+        f2 = ma.formfield_for_dbfield(models.Band._meta.get_field('style'), request=None)
+        self.assertNotEqual(f1.widget, f2.widget)
+        self.assertEqual(f1.widget.attrs['maxlength'], '100')
+        self.assertEqual(f2.widget.attrs['maxlength'], '20')
+        self.assertEqual(f2.widget.attrs['size'], '10')
+
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
 
@@ -169,7 +186,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": u'%s' % pk,
+            "band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -266,6 +283,37 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
                 )
 
 
+class AdminURLWidgetTest(DjangoTestCase):
+    def test_render(self):
+        w = widgets.AdminURLFieldWidget()
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', '')),
+            '<input class="vURLField" name="test" type="text" />'
+        )
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example.com')),
+            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com" /></p>'
+        )
+
+    def test_render_idn(self):
+        w = widgets.AdminURLFieldWidget()
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example-äüö.com')),
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com" /></p>'
+        )
+
+    def test_render_quoting(self):
+        w = widgets.AdminURLFieldWidget()
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example.com/<sometag>some text</sometag>')),
+            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com/<sometag>some text</sometag>" /></p>'
+        )
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')),
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
+        )
+
+
 class AdminFileWidgetTest(DjangoTestCase):
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -280,7 +328,7 @@ class AdminFileWidgetTest(DjangoTestCase):
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', SimpleUploadedFile('test', 'content'))),
+            conditional_escape(w.render('test', SimpleUploadedFile('test', b'content'))),
             '<input type="file" name="test" />',
         )
 
@@ -379,10 +427,10 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         self.assertEqual(w._has_changed(None, None), False)
         self.assertEqual(w._has_changed([], None), False)
-        self.assertEqual(w._has_changed(None, [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'2']), False)
-        self.assertEqual(w._has_changed([1, 2], [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'3']), True)
+        self.assertEqual(w._has_changed(None, ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '2']), False)
+        self.assertEqual(w._has_changed([1, 2], ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '3']), True)
 
     def test_m2m_related_model_not_in_admin(self):
         # M2M relationship with model not registered with admin site. Raw ID

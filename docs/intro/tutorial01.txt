@@ -13,9 +13,19 @@ It'll consist of two parts:
 * An admin site that lets you add, change and delete polls.
 
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
-tell Django is installed by running the Python interactive interpreter and
-typing ``import django``. If that command runs successfully, with no errors,
-Django is installed.
+tell Django is installed and which version by running the following command:
+
+.. code-block:: bash
+
+    python -c "import django; print(django.get_version())"
+
+You should see either the version of your Django installation or an error
+telling "No module named django". Check also that the version number matches
+the version of this tutorial. If they don't match, you can refer to the
+tutorial for your version of Django or update Django to the newest version.
+
+See :doc:`How to install Django </topics/install>` for advice on how to remove
+older versions of Django and install a newer one.
 
 .. admonition:: Where to get help:
 
@@ -42,7 +52,8 @@ code, then run the following command:
 
    django-admin.py startproject mysite
 
-This will create a ``mysite`` directory in your current directory.
+This will create a ``mysite`` directory in your current directory. If it didn't
+work, see :doc:`Troubleshooting </faq/troubleshooting>`.
 
 .. admonition:: Script name may differ in distribution packages
 
@@ -67,13 +78,6 @@ This will create a ``mysite`` directory in your current directory.
     components. In particular, this means you should avoid using names like
     ``django`` (which will conflict with Django itself) or ``test`` (which
     conflicts with a built-in Python package).
-
-:doc:`django-admin.py </ref/django-admin>` should be on your system path if you
-installed Django via ``python setup.py``. If it's not on your path, you can find
-it in ``site-packages/django/bin``, where ``site-packages`` is a directory
-within your Python installation. Consider symlinking to :doc:`django-admin.py
-</ref/django-admin>` from some place on your path, such as
-:file:`/usr/local/bin`.
 
 .. admonition:: Where should this code live?
 
@@ -339,9 +343,10 @@ The first step in writing a database Web app in Django is to define your models
    the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
    place and automatically derive things from it.
 
-In our simple poll app, we'll create two models: polls and choices. A poll has
-a question and a publication date. A choice has two fields: the text of the
-choice and a vote tally. Each choice is associated with a poll.
+In our simple poll app, we'll create two models: ``Poll`` and ``Choice``.
+A ``Poll`` has a question and a publication date. A ``Choice`` has two fields:
+the text of the choice and a vote tally. Each ``Choice`` is associated with a
+``Poll``.
 
 These concepts are represented by simple Python classes. Edit the
 :file:`polls/models.py` file so it looks like this::
@@ -354,7 +359,7 @@ These concepts are represented by simple Python classes. Edit the
 
     class Choice(models.Model):
         poll = models.ForeignKey(Poll)
-        choice = models.CharField(max_length=200)
+        choice_text = models.CharField(max_length=200)
         votes = models.IntegerField()
 
 The code is straightforward. Each model is represented by a class that
@@ -384,8 +389,8 @@ Some :class:`~django.db.models.Field` classes have required elements.
 schema, but in validation, as we'll soon see.
 
 Finally, note a relationship is defined, using
-:class:`~django.db.models.ForeignKey`. That tells Django each Choice is related
-to a single Poll. Django supports all the common database relationships:
+:class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is related
+to a single ``Poll``. Django supports all the common database relationships:
 many-to-ones, many-to-manys and one-to-ones.
 
 .. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
@@ -397,7 +402,7 @@ That small bit of model code gives Django a lot of information. With it, Django
 is able to:
 
 * Create a database schema (``CREATE TABLE`` statements) for this app.
-* Create a Python database-access API for accessing Poll and Choice objects.
+* Create a Python database-access API for accessing ``Poll`` and ``Choice`` objects.
 
 But first we need to tell our project that the ``polls`` app is installed.
 
@@ -446,7 +451,7 @@ statements for the polls app):
     CREATE TABLE "polls_choice" (
         "id" serial NOT NULL PRIMARY KEY,
         "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id") DEFERRABLE INITIALLY DEFERRED,
-        "choice" varchar(200) NOT NULL,
+        "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
     COMMIT;
@@ -597,7 +602,7 @@ of this object. Let's fix that by editing the polls model (in the
     class Choice(models.Model):
         # ...
         def __unicode__(self):
-            return self.choice
+            return self.choice_text
 
 It's important to add :meth:`~django.db.models.Model.__unicode__` methods to
 your models, not only for your own sanity when dealing with the interactive
@@ -661,6 +666,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Poll.objects.get(pub_date__year=2012)
     <Poll: What's up?>
 
+    # Request an ID that doesn't exist, this will raise an exception.
     >>> Poll.objects.get(id=2)
     Traceback (most recent call last):
         ...
@@ -678,7 +684,7 @@ Save these changes and start a new Python interactive shell by running
     True
 
     # Give the Poll a couple of Choices. The create call constructs a new
-    # choice object, does the INSERT statement, adds the choice to the set
+    # Choice object, does the INSERT statement, adds the choice to the set
     # of available choices and returns the new Choice object. Django creates
     # a set to hold the "other side" of a ForeignKey relation
     # (e.g. a poll's choices) which can be accessed via the API.
@@ -689,11 +695,11 @@ Save these changes and start a new Python interactive shell by running
     []
 
     # Create three choices.
-    >>> p.choice_set.create(choice='Not much', votes=0)
+    >>> p.choice_set.create(choice_text='Not much', votes=0)
     <Choice: Not much>
-    >>> p.choice_set.create(choice='The sky', votes=0)
+    >>> p.choice_set.create(choice_text='The sky', votes=0)
     <Choice: The sky>
-    >>> c = p.choice_set.create(choice='Just hacking again', votes=0)
+    >>> c = p.choice_set.create(choice_text='Just hacking again', votes=0)
 
     # Choice objects have API access to their related Poll objects.
     >>> c.poll
@@ -713,7 +719,7 @@ Save these changes and start a new Python interactive shell by running
     [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
     # Let's delete one of the choices. Use delete() for that.
-    >>> c = p.choice_set.filter(choice__startswith='Just hacking')
+    >>> c = p.choice_set.filter(choice_text__startswith='Just hacking')
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects

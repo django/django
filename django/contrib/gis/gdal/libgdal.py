@@ -1,45 +1,54 @@
+from __future__ import unicode_literals
+
+import logging
 import os
 import re
-from ctypes import c_char_p, CDLL
+from ctypes import c_char_p, c_int, CDLL, CFUNCTYPE
 from ctypes.util import find_library
+
 from django.contrib.gis.gdal.error import OGRException
+from django.core.exceptions import ImproperlyConfigured
+
+logger = logging.getLogger('django.contrib.gis')
 
 # Custom library path set?
 try:
     from django.conf import settings
     lib_path = settings.GDAL_LIBRARY_PATH
-except (AttributeError, EnvironmentError, ImportError):
+except (AttributeError, EnvironmentError,
+        ImportError, ImproperlyConfigured):
     lib_path = None
 
 if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared libraries
-    lib_names = ['gdal18', 'gdal17', 'gdal16', 'gdal15']
+    lib_names = ['gdal19', 'gdal18', 'gdal17', 'gdal16', 'gdal15']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal1.8.0', 'gdal1.7.0', 'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
+    lib_names = ['gdal', 'GDAL', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0',
+        'gdal1.6.0', 'gdal1.5.0']
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 
-# Using the ctypes `find_library` utility  to find the 
+# Using the ctypes `find_library` utility  to find the
 # path to the GDAL library from the list of library names.
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
         if not lib_path is None: break
-        
+
 if lib_path is None:
     raise OGRException('Could not find the GDAL library (tried "%s"). '
-                       'Try setting GDAL_LIBRARY_PATH in your settings.' % 
+                       'Try setting GDAL_LIBRARY_PATH in your settings.' %
                        '", "'.join(lib_names))
 
 # This loads the GDAL/OGR C library
 lgdal = CDLL(lib_path)
 
-# On Windows, the GDAL binaries have some OSR routines exported with 
-# STDCALL, while others are not.  Thus, the library will also need to 
-# be loaded up as WinDLL for said OSR functions that require the 
+# On Windows, the GDAL binaries have some OSR routines exported with
+# STDCALL, while others are not.  Thus, the library will also need to
+# be loaded up as WinDLL for said OSR functions that require the
 # different calling convention.
 if os.name == 'nt':
     from ctypes import WinDLL
@@ -64,28 +73,15 @@ _version_info.restype = c_char_p
 
 def gdal_version():
     "Returns only the GDAL version number information."
-    return _version_info('RELEASE_NAME')
+    return _version_info(b'RELEASE_NAME')
 
-def gdal_full_version(): 
+def gdal_full_version():
     "Returns the full GDAL version information."
     return _version_info('')
 
-def gdal_release_date(date=False): 
-    """
-    Returns the release date in a string format, e.g, "2007/06/27".
-    If the date keyword argument is set to True, a Python datetime object
-    will be returned instead.
-    """
-    from datetime import date as date_type
-    rel = _version_info('RELEASE_DATE')
-    yy, mm, dd = map(int, (rel[0:4], rel[4:6], rel[6:8]))
-    d = date_type(yy, mm, dd)
-    if date: return d
-    else: return d.strftime('%Y/%m/%d')
-
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 def gdal_version_info():
-    ver = gdal_version()
+    ver = gdal_version().decode()
     m = version_regex.match(ver)
     if not m: raise OGRException('Could not parse GDAL version string "%s"' % ver)
     return dict([(key, m.group(key)) for key in ('major', 'minor', 'subminor')])
@@ -97,9 +93,17 @@ GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
 GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
 del _verinfo
 
-# GeoJSON support is available only in GDAL 1.5+.
-if GDAL_VERSION >= (1, 5):
-    GEOJSON = True
-else:
-    GEOJSON = False
+# Set library error handling so as errors are logged
+CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
+def err_handler(error_class, error_number, message):
+    logger.error('GDAL_ERROR %d: %s' % (error_number, message))
+err_handler = CPLErrorHandler(err_handler)
 
+def function(name, args, restype):
+    func = std_call(name)
+    func.argtypes = args
+    func.restype = restype
+    return func
+
+set_error_handler = function('CPLSetErrorHandler', [CPLErrorHandler], CPLErrorHandler)
+set_error_handler(err_handler)

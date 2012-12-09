@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.utils.unittest import skipUnless
 
@@ -17,15 +19,15 @@ class FlatpagesSitemapTests(SitemapTestsBase):
         from django.contrib.flatpages.models import FlatPage
 
         public = FlatPage.objects.create(
-            url=u'/public/',
-            title=u'Public Page',
+            url='/public/',
+            title='Public Page',
             enable_comments=True,
             registration_required=False,
         )
         public.sites.add(settings.SITE_ID)
         private = FlatPage.objects.create(
-            url=u'/private/',
-            title=u'Private Page',
+            url='/private/',
+            title='Private Page',
             enable_comments=True,
             registration_required=True
         )

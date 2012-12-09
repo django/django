@@ -83,9 +83,10 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.get_latest_by
 
-    The name of a :class:`DateField` or :class:`DateTimeField` in the model.
-    This specifies the default field to use in your model :class:`Manager`'s
-    :class:`~QuerySet.latest` method.
+    The name of an orderable field in the model, typically a :class:`DateField`,
+    :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
+    field to use in your model :class:`Manager`'s :class:`~QuerySet.latest`
+    method.
 
     Example::
 
@@ -244,12 +245,12 @@ Django quotes column and table names behind the scenes.
 
         unique_together = (("driver", "restaurant"),)
 
-    This is a list of lists of fields that must be unique when considered together.
+    This is a tuple of tuples that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
-    For convenience, unique_together can be a single list when dealing with a single
+    For convenience, unique_together can be a single tuple when dealing with a single
     set of fields::
 
         unique_together = ("driver", "restaurant")
@@ -259,6 +260,21 @@ Django quotes column and table names behind the scenes.
     need to validate uniqueness related to a
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
+
+``index_together``
+
+.. attribute:: Options.index_together
+
+    .. versionadded:: 1.5
+
+    Sets of field names that, taken together, are indexed::
+
+        index_together = [
+            ["pub_date", "deadline"],
+        ]
+
+    This list of fields will be indexed together (i.e. the appropriate
+    ``CREATE INDEX`` statement will be issued.)
 
 ``verbose_name``
 ----------------

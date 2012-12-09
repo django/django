@@ -9,7 +9,7 @@ from django.db.models.loading import cache
 from django.test import TestCase
 
 from .models import (ResolveThis, Item, RelatedItem, Child, Leaf, Proxy,
-    SimpleItem, Feature)
+    SimpleItem, Feature, ItemAndSimpleItem, OneToOneItem, SpecialFeature)
 
 
 class DeferRegressionTest(TestCase):
@@ -109,11 +109,14 @@ class DeferRegressionTest(TestCase):
                 Child,
                 Feature,
                 Item,
+                ItemAndSimpleItem,
                 Leaf,
+                OneToOneItem,
                 Proxy,
                 RelatedItem,
                 ResolveThis,
                 SimpleItem,
+                SpecialFeature,
             ]
         )
 
@@ -125,12 +128,16 @@ class DeferRegressionTest(TestCase):
                 ),
             )
         )
+        # FIXME: This is dependent on the order in which tests are run --
+        # this test case has to be the first, otherwise a LOT more classes
+        # appear.
         self.assertEqual(
             klasses, [
                 "Child",
                 "Child_Deferred_value",
                 "Feature",
                 "Item",
+                "ItemAndSimpleItem",
                 "Item_Deferred_name",
                 "Item_Deferred_name_other_value_text",
                 "Item_Deferred_name_other_value_value",
@@ -139,14 +146,16 @@ class DeferRegressionTest(TestCase):
                 "Leaf",
                 "Leaf_Deferred_child_id_second_child_id_value",
                 "Leaf_Deferred_name_value",
-                "Leaf_Deferred_second_child_value",
+                "Leaf_Deferred_second_child_id_value",
                 "Leaf_Deferred_value",
+                "OneToOneItem",
                 "Proxy",
                 "RelatedItem",
                 "RelatedItem_Deferred_",
                 "RelatedItem_Deferred_item_id",
                 "ResolveThis",
                 "SimpleItem",
+                "SpecialFeature",
             ]
         )
 
@@ -174,3 +183,66 @@ class DeferRegressionTest(TestCase):
         qs = ResolveThis.objects.defer('num')
         self.assertEqual(1, qs.count())
         self.assertEqual('Foobar', qs[0].name)
+
+    def test_reverse_one_to_one_relations(self):
+        # Refs #14694. Test reverse relations which are known unique (reverse
+        # side has o2ofield or unique FK) - the o2o case
+        item = Item.objects.create(name="first", value=42)
+        o2o = OneToOneItem.objects.create(item=item, name="second")
+        self.assertEqual(len(Item.objects.defer('one_to_one_item__name')), 1)
+        self.assertEqual(len(Item.objects.select_related('one_to_one_item')), 1)
+        self.assertEqual(len(Item.objects.select_related(
+            'one_to_one_item').defer('one_to_one_item__name')), 1)
+        self.assertEqual(len(Item.objects.select_related('one_to_one_item').defer('value')), 1)
+        # Make sure that `only()` doesn't break when we pass in a unique relation,
+        # rather than a field on the relation.
+        self.assertEqual(len(Item.objects.only('one_to_one_item')), 1)
+        with self.assertNumQueries(1):
+            i = Item.objects.select_related('one_to_one_item')[0]
+            self.assertEqual(i.one_to_one_item.pk, o2o.pk)
+            self.assertEqual(i.one_to_one_item.name, "second")
+        with self.assertNumQueries(1):
+            i = Item.objects.select_related('one_to_one_item').defer(
+                'value', 'one_to_one_item__name')[0]
+            self.assertEqual(i.one_to_one_item.pk, o2o.pk)
+            self.assertEqual(i.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.one_to_one_item.name, "second")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.value, 42)
+
+    def test_defer_with_select_related(self):
+        item1 = Item.objects.create(name="first", value=47)
+        item2 = Item.objects.create(name="second", value=42)
+        simple = SimpleItem.objects.create(name="simple", value="23")
+        related = ItemAndSimpleItem.objects.create(item=item1, simple=simple)
+
+        obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
+        self.assertEqual(obj.item, item1)
+        self.assertEqual(obj.item_id, item1.id)
+
+        obj.item = item2
+        obj.save()
+
+        obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
+        self.assertEqual(obj.item, item2)
+        self.assertEqual(obj.item_id, item2.id)
+
+    def test_only_with_select_related(self):
+        # Test for #17485.
+        item = SimpleItem.objects.create(name='first', value=47)
+        feature = Feature.objects.create(item=item)
+        SpecialFeature.objects.create(feature=feature)
+
+        qs = Feature.objects.only('item__name').select_related('item')
+        self.assertEqual(len(qs), 1)
+
+        qs = SpecialFeature.objects.only('feature__item__name').select_related('feature__item')
+        self.assertEqual(len(qs), 1)
+
+    def test_deferred_class_factory(self):
+        from django.db.models.query_utils import deferred_class_factory
+        new_class = deferred_class_factory(Item,
+            ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))
+        self.assertEqual(new_class.__name__,
+            'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')

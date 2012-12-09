@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 
-from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils import six
 from django.utils import translation
-from django.utils.encoding import force_unicode, smart_unicode
+from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 
 from .error_messages import AssertFormErrorsMixin
 
@@ -366,7 +366,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         # Invalid dates shouldn't be allowed
         c = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
         self.assertFalse(c.is_valid())
-        self.assertEqual(c.errors, {'mydate': [u'Enter a valid date.']})
+        self.assertEqual(c.errors, {'mydate': ['Enter a valid date.']})
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
@@ -395,7 +395,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
-                return u'\n'.join(rendered_widgets)
+                return '\n'.join(rendered_widgets)
 
         w = ComplexMultiWidget()
         self.assertHTMLEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
@@ -422,11 +422,11 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
                 return None
 
         f = ComplexField(widget=w)
-        self.assertEqual(f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']]), u'some text,JP,2007-04-25 06:24:00')
-        self.assertFormErrors([u'Select a valid choice. X is not one of the available choices.'], f.clean, ['some text',['X'], ['2007-04-25','6:24:00']])
+        self.assertEqual(f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']]), 'some text,JP,2007-04-25 06:24:00')
+        self.assertFormErrors(['Select a valid choice. X is not one of the available choices.'], f.clean, ['some text',['X'], ['2007-04-25','6:24:00']])
 
         # If insufficient data is provided, None is substituted
-        self.assertFormErrors([u'This field is required.'], f.clean, ['some text',['JP']])
+        self.assertFormErrors(['This field is required.'], f.clean, ['some text',['JP']])
 
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
@@ -451,26 +451,26 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 </select>
 <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>""")
 
-        self.assertEqual(f.cleaned_data['field1'], u'some text,JP,2007-04-25 06:24:00')
+        self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
 
     def test_ipaddress(self):
         f = IPAddressField()
-        self.assertFormErrors([u'This field is required.'], f.clean, '')
-        self.assertFormErrors([u'This field is required.'], f.clean, None)
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertFormErrors(['This field is required.'], f.clean, '')
+        self.assertFormErrors(['This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
         f = IPAddressField(required=False)
-        self.assertEqual(f.clean(''), u'')
-        self.assertEqual(f.clean(None), u'')
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
 
     def test_generic_ipaddress_invalid_arguments(self):
         self.assertRaises(ValueError, GenericIPAddressField, protocol="hamster")
@@ -480,93 +480,103 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         # The edge cases of the IPv6 validation code are not deeply tested
         # here, they are covered in the tests for django.utils.ipv6
         f = GenericIPAddressField()
-        self.assertFormErrors([u'This field is required.'], f.clean, '')
-        self.assertFormErrors([u'This field is required.'], f.clean, None)
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
-        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
-        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+        self.assertFormErrors(['This field is required.'], f.clean, '')
+        self.assertFormErrors(['This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), '2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_as_ipv4_only(self):
         f = GenericIPAddressField(protocol="IPv4")
-        self.assertFormErrors([u'This field is required.'], f.clean, '')
-        self.assertFormErrors([u'This field is required.'], f.clean, None)
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'fe80::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['This field is required.'], f.clean, '')
+        self.assertFormErrors(['This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, 'fe80::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv4 address.'], f.clean, '2a02::223:6cff:fe8a:2e8a')
 
     def test_generic_ipaddress_as_ipv6_only(self):
         f = GenericIPAddressField(protocol="IPv6")
-        self.assertFormErrors([u'This field is required.'], f.clean, '')
-        self.assertFormErrors([u'This field is required.'], f.clean, None)
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '256.125.1.5')
-        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
-        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1:2')
+        self.assertFormErrors(['This field is required.'], f.clean, '')
+        self.assertFormErrors(['This field is required.'], f.clean, None)
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), '2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_as_generic_not_required(self):
         f = GenericIPAddressField(required=False)
-        self.assertEqual(f.clean(''), u'')
-        self.assertEqual(f.clean(None), u'')
-        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
-        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
-        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), '2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_normalization(self):
         # Test the normalising code
         f = GenericIPAddressField()
-        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), u'::ffff:10.10.10.10')
-        self.assertEqual(f.clean('::ffff:10.10.10.10'), u'::ffff:10.10.10.10')
-        self.assertEqual(f.clean('2001:000:a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
-        self.assertEqual(f.clean('2001::a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
+        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean('::ffff:10.10.10.10'), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean('2001:000:a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
+        self.assertEqual(f.clean('2001::a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
 
         f = GenericIPAddressField(unpack_ipv4=True)
-        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), u'10.10.10.10')
+        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), '10.10.10.10')
 
-    def test_smart_unicode(self):
+    def test_smart_text(self):
         class Test:
-            def __str__(self):
-               return 'ŠĐĆŽćžšđ'
+            if six.PY3:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'
+            else:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'.encode('utf-8')
 
         class TestU:
-            def __str__(self):
-               return 'Foo'
-            def __unicode__(self):
-               return u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+            if six.PY3:
+                def __str__(self):
+                    return 'ŠĐĆŽćžšđ'
+                def __bytes__(self):
+                    return b'Foo'
+            else:
+                def __str__(self):
+                    return b'Foo'
+                def __unicode__(self):
+                    return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 
-        self.assertEqual(smart_unicode(Test()), u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(TestU()), u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_unicode(1), u'1')
-        self.assertEqual(smart_unicode('foo'), u'foo')
+        self.assertEqual(smart_text(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_text(1), '1')
+        self.assertEqual(smart_text('foo'), 'foo')
 
     def test_accessing_clean(self):
         class UserForm(Form):
@@ -583,16 +593,17 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         f = UserForm({'username': 'SirRobin', 'password': 'blue'})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['username'], u'sirrobin')
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
 
     def test_overriding_errorlist(self):
+        @python_2_unicode_compatible
         class DivErrorList(ErrorList):
-            def __unicode__(self):
+            def __str__(self):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return u''
-                return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % force_unicode(e) for e in self])
+                if not self: return ''
+                return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % force_text(e) for e in self])
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)
@@ -602,7 +613,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         data = dict(email='invalid')
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
         self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
-<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" /></p>""")
@@ -631,17 +642,14 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFalse(b.has_changed())
 
 
-
+@override_settings(USE_L10N=True)
 class FormsExtraL10NTestCase(TestCase):
     def setUp(self):
         super(FormsExtraL10NTestCase, self).setUp()
-        self.old_use_l10n = getattr(settings, 'USE_L10N', False)
-        settings.USE_L10N = True
         translation.activate('nl')
 
     def tearDown(self):
         translation.deactivate()
-        settings.USE_L10N = self.old_use_l10n
         super(FormsExtraL10NTestCase, self).tearDown()
 
     def test_l10n(self):
@@ -774,7 +782,7 @@ class FormsExtraL10NTestCase(TestCase):
         a = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
-        self.assertEqual(a.errors, {'mydate': [u'Geef een geldige datum op.']})
+        self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
 
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown

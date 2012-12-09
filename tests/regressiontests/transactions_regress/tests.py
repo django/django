@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, transaction
+from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
-from django.utils.unittest import skipIf
+from django.utils.unittest import skipIf, skipUnless
 
 from .models import Mod, M2mA, M2mB
 
@@ -25,17 +24,15 @@ class TestTransactionClosing(TransactionTestCase):
         def raw_sql():
             "Write a record using raw sql under a commit_on_success decorator"
             cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (17,18)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (18)")
 
         raw_sql()
         # Rollback so that if the decorator didn't commit, the record is unwritten
         transaction.rollback()
-        try:
-            # Check that the record is in the DB
-            obj = Mod.objects.get(pk=17)
-            self.assertEqual(obj.fld, 18)
-        except Mod.DoesNotExist:
-            self.fail("transaction with raw sql not committed")
+        self.assertEqual(Mod.objects.count(), 1)
+        # Check that the record is in the DB
+        obj = Mod.objects.all()[0]
+        self.assertEqual(obj.fld, 18)
 
     def test_commit_manually_enforced(self):
         """
@@ -116,19 +113,16 @@ class TestTransactionClosing(TransactionTestCase):
             be committed.
             """
             cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
             transaction.rollback()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
 
         reuse_cursor_ref()
         # Rollback so that if the decorator didn't commit, the record is unwritten
         transaction.rollback()
-        try:
-            # Check that the record is in the DB
-            obj = Mod.objects.get(pk=1)
-            self.assertEqual(obj.fld, 2)
-        except Mod.DoesNotExist:
-            self.fail("After ending a transaction, cursor use no longer sets dirty")
+        self.assertEqual(Mod.objects.count(), 1)
+        obj = Mod.objects.all()[0]
+        self.assertEqual(obj.fld, 2)
 
     def test_failing_query_transaction_closed(self):
         """
@@ -146,26 +140,19 @@ class TestTransactionClosing(TransactionTestCase):
             "Create a user in a transaction"
             user = User.objects.create_user(username='system', password='iamr00t', email='root@SITENAME.com')
             # Redundant, just makes sure the user id was read back from DB
-            Mod.objects.create(fld=user.id)
+            Mod.objects.create(fld=user.pk)
 
         # Create a user
         create_system_user()
 
-        try:
-            # The second call to create_system_user should fail for violating a unique constraint
-            # (it's trying to re-create the same user)
+        with self.assertRaises(DatabaseError):
+            # The second call to create_system_user should fail for violating
+            # a unique constraint (it's trying to re-create the same user)
             create_system_user()
-        except:
-            pass
-        else:
-            raise ImproperlyConfigured('Unique constraint not enforced on django.contrib.auth.models.User')
 
-        try:
-            # Try to read the database. If the last transaction was indeed closed,
-            # this should cause no problems
-            _ = User.objects.all()[0]
-        except:
-            self.fail("A transaction consisting of a failed operation was not closed.")
+        # Try to read the database. If the last transaction was indeed closed,
+        # this should cause no problems
+        User.objects.all()[0]
 
     @override_settings(DEBUG=True)
     def test_failing_query_transaction_closed_debug(self):
@@ -173,6 +160,59 @@ class TestTransactionClosing(TransactionTestCase):
         Regression for #6669. Same test as above, with DEBUG=True.
         """
         self.test_failing_query_transaction_closed()
+
+
+@skipUnless(connection.vendor == 'postgresql',
+            "This test only valid for PostgreSQL")
+class TestPostgresAutocommit(TransactionTestCase):
+    """
+    Tests to make sure psycopg2's autocommit mode is restored after entering
+    and leaving transaction management. Refs #16047.
+    """
+    def setUp(self):
+        from psycopg2.extensions import (ISOLATION_LEVEL_AUTOCOMMIT,
+                                         ISOLATION_LEVEL_READ_COMMITTED)
+        self._autocommit = ISOLATION_LEVEL_AUTOCOMMIT
+        self._read_committed = ISOLATION_LEVEL_READ_COMMITTED
+
+        # We want a clean backend with autocommit = True, so
+        # first we need to do a bit of work to have that.
+        self._old_backend = connections[DEFAULT_DB_ALIAS]
+        settings = self._old_backend.settings_dict.copy()
+        opts = settings['OPTIONS'].copy()
+        opts['autocommit'] = True
+        settings['OPTIONS'] = opts
+        new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
+        connections[DEFAULT_DB_ALIAS] = new_backend
+
+    def tearDown(self):
+        connections[DEFAULT_DB_ALIAS] = self._old_backend
+
+    def test_initial_autocommit_state(self):
+        self.assertTrue(connection.features.uses_autocommit)
+        self.assertEqual(connection.isolation_level, self._autocommit)
+
+    def test_transaction_management(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._autocommit)
+
+    def test_transaction_stacking(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.enter_transaction_management()
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._read_committed)
+
+        transaction.leave_transaction_management()
+        self.assertEqual(connection.isolation_level, self._autocommit)
 
 
 class TestManyToManyAddTransaction(TransactionTestCase):
@@ -208,7 +248,7 @@ class SavepointTest(TransactionTestCase):
         work()
 
     @skipIf(connection.vendor == 'mysql' and \
-            connection.features._mysql_storage_engine() == 'MyISAM',
+            connection.features._mysql_storage_engine == 'MyISAM',
             "MyISAM MySQL storage engine doesn't support savepoints")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_rollback(self):

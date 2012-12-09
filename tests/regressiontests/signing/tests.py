@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
+
 import time
 
 from django.core import signing
 from django.test import TestCase
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_str
+from django.utils import six
 
 
 class TestSigner(TestCase):
@@ -12,14 +15,14 @@ class TestSigner(TestCase):
         signer = signing.Signer('predictable-secret')
         signer2 = signing.Signer('predictable-secret2')
         for s in (
-            'hello',
-            '3098247:529:087:',
-            u'\u2019'.encode('utf-8'),
+            b'hello',
+            b'3098247:529:087:',
+            '\u2019'.encode('utf-8'),
         ):
             self.assertEqual(
                 signer.signature(s),
                 signing.base64_hmac(signer.salt + 'signer', s,
-                    'predictable-secret')
+                    'predictable-secret').decode()
             )
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
@@ -29,7 +32,8 @@ class TestSigner(TestCase):
         self.assertEqual(
             signer.signature('hello'),
                 signing.base64_hmac('extra-salt' + 'signer',
-                'hello', 'predictable-secret'))
+                'hello', 'predictable-secret').decode()
+            )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
             signing.Signer('predictable-secret', salt='two').signature('hello'))
@@ -37,17 +41,20 @@ class TestSigner(TestCase):
     def test_sign_unsign(self):
         "sign/unsign should be reversible"
         signer = signing.Signer('predictable-secret')
-        examples = (
+        examples = [
             'q;wjmbk;wkmb',
             '3098247529087',
             '3098247:529:087:',
             'jkw osanteuh ,rcuh nthu aou oauh ,ud du',
-            u'\u2019',
-        )
+            '\u2019',
+        ]
+        if not six.PY3:
+            examples.append(b'a byte string')
         for example in examples:
-            self.assertNotEqual(
-                force_unicode(example), force_unicode(signer.sign(example)))
-            self.assertEqual(example, signer.unsign(signer.sign(example)))
+            signed = signer.sign(example)
+            self.assertIsInstance(signed, str)
+            self.assertNotEqual(force_str(example), signed)
+            self.assertEqual(example, signer.unsign(signed))
 
     def unsign_detects_tampering(self):
         "unsign should raise an exception if the value has been tampered with"
@@ -67,15 +74,18 @@ class TestSigner(TestCase):
 
     def test_dumps_loads(self):
         "dumps and loads be reversible for any JSON serializable object"
-        objects = (
+        objects = [
             ['a', 'list'],
-            'a string',
-            u'a unicode string \u2019',
+            'a unicode string \u2019',
             {'a': 'dictionary'},
-        )
+        ]
+        if not six.PY3:
+            objects.append(b'a byte string')
         for o in objects:
             self.assertNotEqual(o, signing.dumps(o))
             self.assertEqual(o, signing.loads(signing.dumps(o)))
+            self.assertNotEqual(o, signing.dumps(o, compress=True))
+            self.assertEqual(o, signing.loads(signing.dumps(o, compress=True)))
 
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"
@@ -98,7 +108,7 @@ class TestSigner(TestCase):
 class TestTimestampSigner(TestCase):
 
     def test_timestamp_signer(self):
-        value = u'hello'
+        value = 'hello'
         _time = time.time
         time.time = lambda: 123456789
         try:

@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.test import TestCase
-from django.utils import unittest
-from django.utils.http import parse_etags, quote_etag, parse_http_date
 
 
 FULL_RESPONSE = 'Test conditional get response'
@@ -20,7 +20,7 @@ class ConditionalGet(TestCase):
 
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, FULL_RESPONSE)
+        self.assertEqual(response.content, FULL_RESPONSE.encode())
         if check_last_modified:
             self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
         if check_etag:
@@ -28,7 +28,7 @@ class ConditionalGet(TestCase):
 
     def assertNotModified(self, response):
         self.assertEqual(response.status_code, 304)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def testWithoutConditions(self):
         response = self.client.get('/condition/')
@@ -63,10 +63,10 @@ class ConditionalGet(TestCase):
 
     def testIfMatch(self):
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
-        response = self.client.put('/condition/etag/', {'data': ''})
+        response = self.client.put('/condition/etag/')
         self.assertEqual(response.status_code, 200)
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
-        response = self.client.put('/condition/etag/', {'data': ''})
+        response = self.client.put('/condition/etag/')
         self.assertEqual(response.status_code, 412)
 
     def testBothHeaders(self):
@@ -127,30 +127,3 @@ class ConditionalGet(TestCase):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = r'"\"'
         response = self.client.get('/condition/etag/')
         self.assertFullResponse(response, check_last_modified=False)
-
-
-class ETagProcessing(unittest.TestCase):
-    def testParsing(self):
-        etags = parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
-        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
-
-    def testQuoting(self):
-        quoted_etag = quote_etag(r'e\t"ag')
-        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
-
-
-class HttpDateProcessing(unittest.TestCase):
-    def testParsingRfc1123(self):
-        parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))
-
-    def testParsingRfc850(self):
-        parsed = parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))
-
-    def testParsingAsctime(self):
-        parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
-        self.assertEqual(datetime.utcfromtimestamp(parsed),
-                         datetime(1994, 11, 06, 8, 49, 37))

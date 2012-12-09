@@ -8,7 +8,7 @@ __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'DEFAULT_DB_ALIAS')
 
 
-if DEFAULT_DB_ALIAS not in settings.DATABASES:
+if settings.DATABASES and DEFAULT_DB_ALIAS not in settings.DATABASES:
     raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
 
 connections = ConnectionHandler(settings.DATABASES)

@@ -1,18 +1,26 @@
+# -*- encoding: utf-8 -*-
 """
 Tests for django.core.servers.
 """
+from __future__ import unicode_literals
+
 import os
-import urllib2
+try:
+    from urllib.request import urlopen, HTTPError
+except ImportError:     # Python 2
+    from urllib2 import urlopen, HTTPError
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
 from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
+from django.utils.http import urlencode
+from django.utils._os import upath
 
 from .models import Person
 
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
@@ -39,7 +47,7 @@ class LiveServerBase(LiveServerTestCase):
         super(LiveServerBase, cls).tearDownClass()
 
     def urlopen(self, url):
-        return urllib2.urlopen(self.live_server_url + url)
+        return urlopen(self.live_server_url + url)
 
 
 class LiveServerAddress(LiveServerBase):
@@ -102,7 +110,7 @@ class LiveServerViews(LiveServerBase):
         """
         try:
             self.urlopen('/')
-        except urllib2.HTTPError as err:
+        except HTTPError as err:
             self.assertEqual(err.code, 404, 'Expected 404 response')
         else:
             self.fail('Expected 404 response')
@@ -113,7 +121,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/example_view/')
-        self.assertEqual(f.read(), 'example view')
+        self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
         """
@@ -121,7 +129,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/static/example_static_file.txt')
-        self.assertEqual(f.read(), 'example static file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_media_files(self):
         """
@@ -129,7 +137,11 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/media/example_media_file.txt')
-        self.assertEqual(f.read(), 'example media file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
+
+    def test_environ(self):
+        f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
+        self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
 class LiveServerDatabase(LiveServerBase):
@@ -141,7 +153,7 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/model_view/')
-        self.assertEqual(f.read().splitlines(), ['jane', 'robert'])
+        self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """

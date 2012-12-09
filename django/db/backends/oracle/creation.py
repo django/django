@@ -1,6 +1,7 @@
 import sys
 import time
 from django.db.backends.creation import BaseDatabaseCreation
+from django.utils.six.moves import input
 
 TEST_DATABASE_PREFIX = 'test_'
 PASSWORD = 'Im_a_lumberjack'
@@ -65,7 +66,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception as e:
                 sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
-                    confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
+                    confirm = input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -87,7 +88,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception as e:
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
-                    confirm = raw_input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_USER)
+                    confirm = input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_USER)
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -103,10 +104,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
 
-        self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
-        self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
-        self.connection.settings_dict['TEST_USER'] = self.connection.settings_dict['USER'] = TEST_USER
-        self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
+        from django.db import settings
+        real_settings = settings.DATABASES[self.connection.alias]
+        real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
+        real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
+        real_settings['TEST_USER'] = real_settings['USER'] = self.connection.settings_dict['TEST_USER'] = self.connection.settings_dict['USER'] = TEST_USER
+        real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
 
         return self.connection.settings_dict['NAME']
 

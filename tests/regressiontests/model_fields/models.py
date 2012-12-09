@@ -66,8 +66,40 @@ class BooleanModel(models.Model):
     bfield = models.BooleanField()
     string = models.CharField(max_length=10, default='abc')
 
+class FksToBooleans(models.Model):
+    """Model wih FKs to models with {Null,}BooleanField's, #15040"""
+    bf = models.ForeignKey(BooleanModel)
+    nbf = models.ForeignKey(NullBooleanModel)
+
 class RenamedField(models.Model):
     modelname = models.IntegerField(name="fieldname", choices=((1,'One'),))
+
+class VerboseNameField(models.Model):
+    id = models.AutoField("verbose pk", primary_key=True)
+    field1 = models.BigIntegerField("verbose field1")
+    field2 = models.BooleanField("verbose field2")
+    field3 = models.CharField("verbose field3", max_length=10)
+    field4 = models.CommaSeparatedIntegerField("verbose field4", max_length=99)
+    field5 = models.DateField("verbose field5")
+    field6 = models.DateTimeField("verbose field6")
+    field7 = models.DecimalField("verbose field7", max_digits=6, decimal_places=1)
+    field8 = models.EmailField("verbose field8")
+    field9 = models.FileField("verbose field9", upload_to="unused")
+    field10 = models.FilePathField("verbose field10")
+    field11 = models.FloatField("verbose field11")
+    # Don't want to depend on PIL in this test
+    #field_image = models.ImageField("verbose field")
+    field12 = models.IntegerField("verbose field12")
+    field13 = models.IPAddressField("verbose field13")
+    field14 = models.GenericIPAddressField("verbose field14", protocol="ipv4")
+    field15 = models.NullBooleanField("verbose field15")
+    field16 = models.PositiveIntegerField("verbose field16")
+    field17 = models.PositiveSmallIntegerField("verbose field17")
+    field18 = models.SlugField("verbose field18")
+    field19 = models.SmallIntegerField("verbose field19")
+    field20 = models.TextField("verbose field20")
+    field21 = models.TimeField("verbose field21")
+    field22 = models.URLField("verbose field22")
 
 # This model isn't used in any test, just here to ensure it validates successfully.
 # See ticket #16570.

@@ -2,15 +2,69 @@ import os
 
 from django.conf import global_settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
-from django.template import context
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils._os import upath
 
 
+class MockUser(object):
+    def has_module_perms(self, perm):
+        if perm == 'mockapp':
+            return True
+        return False
+
+    def has_perm(self, perm):
+        if perm == 'mockapp.someperm':
+            return True
+        return False
+
+
+class PermWrapperTests(TestCase):
+    """
+    Test some details of the PermWrapper implementation.
+    """
+    class EQLimiterObject(object):
+        """
+        This object makes sure __eq__ will not be called endlessly.
+        """
+        def __init__(self):
+            self.eq_calls = 0
+
+        def __eq__(self, other):
+            if self.eq_calls > 0:
+                return True
+            self.eq_calls += 1
+            return False
+
+    def test_permwrapper_in(self):
+        """
+        Test that 'something' in PermWrapper works as expected.
+        """
+        perms = PermWrapper(MockUser())
+        # Works for modules and full permissions.
+        self.assertTrue('mockapp' in perms)
+        self.assertFalse('nonexisting' in perms)
+        self.assertTrue('mockapp.someperm' in perms)
+        self.assertFalse('mockapp.nonexisting' in perms)
+
+    def test_permlookupdict_in(self):
+        """
+        No endless loops if accessed with 'in' - refs #18979.
+        """
+        pldict = PermLookupDict(MockUser(), 'mockapp')
+        with self.assertRaises(TypeError):
+            self.EQLimiterObject() in pldict
+
+
+@skipIfCustomUser
 @override_settings(
     TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(__file__), 'templates'),
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
         ),
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -47,9 +101,28 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "Session accessed")
 
     def test_perms_attrs(self):
-        self.client.login(username='super', password='secret')
+        u = User.objects.create_user(username='normal', password='secret')
+        u.user_permissions.add(
+            Permission.objects.get(
+                content_type=ContentType.objects.get_for_model(Permission),
+                codename='add_permission'))
+        self.client.login(username='normal', password='secret')
         response = self.client.get('/auth_processor_perms/')
         self.assertContains(response, "Has auth permissions")
+        self.assertContains(response, "Has auth.add_permission permissions")
+        self.assertNotContains(response, "nonexisting")
+    
+    def test_perm_in_perms_attrs(self):
+        u = User.objects.create_user(username='normal', password='secret')
+        u.user_permissions.add(
+            Permission.objects.get(
+                content_type=ContentType.objects.get_for_model(Permission),
+                codename='add_permission'))
+        self.client.login(username='normal', password='secret')
+        response = self.client.get('/auth_processor_perm_in_perms/')
+        self.assertContains(response, "Has auth permissions")
+        self.assertContains(response, "Has auth.add_permission permissions")
+        self.assertNotContains(response, "nonexisting")
 
     def test_message_attrs(self):
         self.client.login(username='super', password='secret')

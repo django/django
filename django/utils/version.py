@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 import os
 import subprocess
@@ -28,7 +30,7 @@ def get_version(version=None):
         mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
         sub = mapping[version[3]] + str(version[4])
 
-    return main + sub
+    return str(main + sub)
 
 def get_git_changeset():
     """Returns a numeric identifier of the latest git changeset.
@@ -38,10 +40,10 @@ def get_git_changeset():
     so it's sufficient for generating the development version numbers.
     """
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    git_show = subprocess.Popen('git show --pretty=format:%ct --quiet HEAD',
+    git_log = subprocess.Popen('git log --pretty=format:%ct --quiet -1 HEAD',
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             shell=True, cwd=repo_dir, universal_newlines=True)
-    timestamp = git_show.communicate()[0].partition('\n')[0]
+    timestamp = git_log.communicate()[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
     except ValueError:

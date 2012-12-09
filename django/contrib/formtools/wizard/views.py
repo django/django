@@ -7,6 +7,7 @@ from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
+from django.utils import six
 
 from django.contrib.formtools.wizard.storage import get_storage
 from django.contrib.formtools.wizard.storage.exceptions import NoFileStorageConfigured
@@ -43,7 +44,7 @@ class StepsHelper(object):
     @property
     def all(self):
         "Returns the names of all steps/forms."
-        return self._wizard.get_form_list().keys()
+        return list(self._wizard.get_form_list())
 
     @property
     def count(self):
@@ -133,8 +134,9 @@ class WizardView(TemplateView):
           The key should be equal to the `step_name` in the `form_list` (or
           the str of the zero based counter - if no step_names added in the
           `form_list`)
-        * `instance_dict` - contains a dictionary of instance objects. This
-          is only used when `ModelForm`s are used. The key should be equal to
+        * `instance_dict` - contains a dictionary whose values are model
+          instances if the step is based on a ``ModelForm`` and querysets if
+          the step is based on a ``ModelFormSet``. The key should be equal to
           the `step_name` in the `form_list`. Same rules as for `initial_dict`
           apply.
         * `condition_dict` - contains a dictionary of boolean values or
@@ -156,23 +158,25 @@ class WizardView(TemplateView):
             if isinstance(form, (list, tuple)):
                 # if the element is a tuple, add the tuple to the new created
                 # sorted dictionary.
-                init_form_list[unicode(form[0])] = form[1]
+                init_form_list[six.text_type(form[0])] = form[1]
             else:
                 # if not, add the form with a zero based counter as unicode
-                init_form_list[unicode(i)] = form
+                init_form_list[six.text_type(i)] = form
 
         # walk through the new created list of forms
-        for form in init_form_list.itervalues():
+        for form in six.itervalues(init_form_list):
             if issubclass(form, formsets.BaseFormSet):
                 # if the element is based on BaseFormSet (FormSet/ModelFormSet)
                 # we need to override the form variable.
                 form = form.form
             # check if any form contains a FileField, if yes, we need a
             # file_storage added to the wizardview (by subclassing).
-            for field in form.base_fields.itervalues():
+            for field in six.itervalues(form.base_fields):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
-                    raise NoFileStorageConfigured
+                    raise NoFileStorageConfigured(
+                            "You need to define 'file_storage' in your "
+                            "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = init_form_list
@@ -194,7 +198,7 @@ class WizardView(TemplateView):
         could use data from other (maybe previous forms).
         """
         form_list = SortedDict()
-        for form_key, form_class in self.form_list.iteritems():
+        for form_key, form_class in six.iteritems(self.form_list):
             # try to fetch the value from condition list, by default, the form
             # gets passed to the new list.
             condition = self.condition_dict.get(form_key, True)
@@ -434,8 +438,8 @@ class WizardView(TemplateView):
     def get_all_cleaned_data(self):
         """
         Returns a merged dictionary of all step cleaned_data dictionaries.
-        If a step contains a `FormSet`, the key will be prefixed with formset
-        and contain a list of the formset cleaned_data dictionaries.
+        If a step contains a `FormSet`, the key will be prefixed with
+        'formset-' and contain a list of the formset cleaned_data dictionaries.
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
@@ -456,8 +460,8 @@ class WizardView(TemplateView):
     def get_cleaned_data_for_step(self, step):
         """
         Returns the cleaned data for a given `step`. Before returning the
-        cleaned data, the stored values are being revalidated through the
-        form. If the data doesn't validate, None will be returned.
+        cleaned data, the stored values are revalidated through the form.
+        If the data doesn't validate, None will be returned.
         """
         if step in self.form_list:
             form_obj = self.get_form(step=step,
@@ -526,7 +530,7 @@ class WizardView(TemplateView):
                         context.update({'another_var': True})
                     return context
         """
-        context = super(WizardView, self).get_context_data(**kwargs)
+        context = super(WizardView, self).get_context_data(form=form, **kwargs)
         context.update(self.storage.extra_data)
         context['wizard'] = {
             'form': form,

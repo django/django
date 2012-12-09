@@ -1,13 +1,16 @@
+from __future__ import unicode_literals
+
 import codecs
 import os
 import sys
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
+from django.utils._os import npath
 
 def has_bom(fn):
-    with open(fn, 'r') as f:
+    with open(fn, 'rb') as f:
         sample = f.read(4)
-    return sample[:3] == '\xef\xbb\xbf' or \
+    return sample[:3] == b'\xef\xbb\xbf' or \
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
 
@@ -39,8 +42,8 @@ def compile_messages(stderr, locale=None):
                     # command, so that we can take advantage of shell quoting, to
                     # quote any malicious characters/escaping.
                     # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    os.environ['djangocompilemo'] = pf + '.mo'
-                    os.environ['djangocompilepo'] = pf + '.po'
+                    os.environ['djangocompilemo'] = npath(pf + '.mo')
+                    os.environ['djangocompilepo'] = npath(pf + '.po')
                     if sys.platform == 'win32': # Different shell-variable syntax
                         cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
                     else:

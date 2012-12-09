@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+
+import codecs
+import logging
 import sys
 from io import BytesIO
 from threading import Lock
@@ -7,10 +11,9 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, iri_to_uri
-from django.utils.log import getLogger
+from django.utils.encoding import force_str, force_text, iri_to_uri
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 # See http://www.iana.org/assignments/http-status-codes
@@ -78,14 +81,14 @@ class LimitedStream(object):
     def __init__(self, stream, limit, buf_size=64 * 1024 * 1024):
         self.stream = stream
         self.remaining = limit
-        self.buffer = ''
+        self.buffer = b''
         self.buf_size = buf_size
 
     def _read_limited(self, size=None):
         if size is None or size > self.remaining:
             size = self.remaining
         if size == 0:
-            return ''
+            return b''
         result = self.stream.read(size)
         self.remaining -= len(result)
         return result
@@ -93,17 +96,17 @@ class LimitedStream(object):
     def read(self, size=None):
         if size is None:
             result = self.buffer + self._read_limited()
-            self.buffer = ''
+            self.buffer = b''
         elif size < len(self.buffer):
             result = self.buffer[:size]
             self.buffer = self.buffer[size:]
         else: # size >= len(self.buffer)
             result = self.buffer + self._read_limited(size - len(self.buffer))
-            self.buffer = ''
+            self.buffer = b''
         return result
 
     def readline(self, size=None):
-        while '\n' not in self.buffer and \
+        while b'\n' not in self.buffer and \
               (size is None or len(self.buffer) < size):
             if size:
                 # since size is not None here, len(self.buffer) < size
@@ -125,7 +128,7 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_unicode(environ.get('PATH_INFO', u'/'))
+        path_info = force_text(environ.get('PATH_INFO', '/'))
         if not path_info or path_info == script_name:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -134,7 +137,7 @@ class WSGIRequest(http.HttpRequest):
             #
             # (The comparison of path_info to script_name is to work around an
             # apparent bug in flup 1.0.1. See Django ticket #8490).
-            path_info = u'/'
+            path_info = '/'
         self.environ = environ
         self.path_info = path_info
         self.path = '%s%s' % (script_name, path_info)
@@ -142,6 +145,14 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
+        _, content_params = self._parse_content_type(self.META.get('CONTENT_TYPE', ''))
+        if 'charset' in content_params:
+            try:
+                codecs.lookup(content_params['charset'])
+            except LookupError:
+                pass
+            else:
+                self.encoding = content_params['charset']
         self._post_parse_error = False
         try:
             content_length = int(self.environ.get('CONTENT_LENGTH'))
@@ -150,13 +161,23 @@ class WSGIRequest(http.HttpRequest):
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
 
-    def get_full_path(self):
-        # RFC 3986 requires query string arguments to be in the ASCII range.
-        # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.environ.get('QUERY_STRING', ''))) or '')
-
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
+
+    def _parse_content_type(self, ctype):
+        """
+        Media Types parsing according to RFC 2616, section 3.7.
+
+        Returns the data type and parameters. For example:
+        Input: "text/plain; charset=iso-8859-1"
+        Output: ('text/plain', {'charset': 'iso-8859-1'})
+        """
+        content_type, _, params = ctype.partition(';')
+        content_params = {}
+        for parameter in params.split(';'):
+            k, _, v = parameter.strip().partition('=')
+            content_params[k] = v
+        return content_type, content_params
 
     def _get_request(self):
         if not hasattr(self, '_request'):
@@ -208,8 +229,7 @@ class WSGIHandler(base.BaseHandler):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
-            self.initLock.acquire()
-            try:
+            with self.initLock:
                 try:
                     # Check that middleware is still uninitialised.
                     if self._request_middleware is None:
@@ -218,24 +238,21 @@ class WSGIHandler(base.BaseHandler):
                     # Unload whatever middleware we got
                     self._request_middleware = None
                     raise
-            finally:
-                self.initLock.release()
 
         set_script_prefix(base.get_script_name(environ))
         signals.request_started.send(sender=self.__class__)
         try:
-            try:
-                request = self.request_class(environ)
-            except UnicodeDecodeError:
-                logger.warning('Bad Request (UnicodeDecodeError)',
-                    exc_info=sys.exc_info(),
-                    extra={
-                        'status_code': 400,
-                    }
-                )
-                response = http.HttpResponseBadRequest()
-            else:
-                response = self.get_response(request)
+            request = self.request_class(environ)
+        except UnicodeDecodeError:
+            logger.warning('Bad Request (UnicodeDecodeError)',
+                exc_info=sys.exc_info(),
+                extra={
+                    'status_code': 400,
+                }
+            )
+            response = http.HttpResponseBadRequest()
+        else:
+            response = self.get_response(request)
         finally:
             signals.request_finished.send(sender=self.__class__)
 
@@ -246,6 +263,6 @@ class WSGIHandler(base.BaseHandler):
         status = '%s %s' % (response.status_code, status_text)
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
-            response_headers.append(('Set-Cookie', str(c.output(header=''))))
-        start_response(status, response_headers)
+            response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
+        start_response(force_str(status), response_headers)
         return response

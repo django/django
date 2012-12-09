@@ -12,11 +12,7 @@ GeoDjango Database API
 Spatial Backends
 ================
 
-.. versionadded:: 1.2
-
-In Django 1.2, support for :doc:`multiple databases </topics/db/multi-db>` was
-introduced.  In order to support multiple databases, GeoDjango has segregated
-its functionality into full-fledged spatial database backends:
+GeoDjango currently provides the following spatial database backends:
 
 * :mod:`django.contrib.gis.db.backends.postgis`
 * :mod:`django.contrib.gis.db.backends.mysql`
@@ -286,7 +282,7 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.extent3d`          X
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
-:meth:`GeoQuerySet.geojson`           X
+:meth:`GeoQuerySet.geojson`           X                X
 :meth:`GeoQuerySet.gml`               X        X       X
 :meth:`GeoQuerySet.intersection`      X        X       X
 :meth:`GeoQuerySet.kml`               X                X

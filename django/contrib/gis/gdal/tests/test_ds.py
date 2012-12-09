@@ -4,12 +4,13 @@ from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRExcept
 from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
 
+
 # List of acceptable data sources.
 ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
                   fields={'dbl' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
                   extent=(-1.35011,0.166623,-0.524093,0.824508), # Got extent from QGIS
                   srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-                  field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : range(1, 6), 'str' : [str(i) for i in range(1, 6)]},
+                  field_values={'dbl' : [float(i) for i in range(1, 6)], 'int' : list(range(1, 6)), 'str' : [str(i) for i in range(1, 6)]},
                   fids=range(5)),
            TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
                   fields={'POINT_X' : OFTString, 'POINT_Y' : OFTString, 'NUM' : OFTString}, # VRT uses CSV, which all types are OFTString.
@@ -59,7 +60,6 @@ class DataSourceTest(unittest.TestCase):
 
     def test03a_layers(self):
         "Testing Data Source Layers."
-        print("\nBEGIN - expecting out of range feature id error; safe to ignore.\n")
         for source in ds_list:
             ds = DataSource(source.ds)
 
@@ -108,7 +108,6 @@ class DataSourceTest(unittest.TestCase):
                         # the feature values here while in this loop.
                         for fld_name in fld_names:
                             self.assertEqual(source.field_values[fld_name][i], feat.get(fld_name))
-        print("\nEND - expecting out of range feature id error; safe to ignore.")
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."
@@ -126,7 +125,9 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(control_vals, test_vals)
 
     def test03c_layer_references(self):
-        "Test to make sure Layer access is still available without the DataSource."
+        """
+        Ensure OGR objects keep references to the objects they belong to.
+        """
         source = ds_list[0]
 
         # See ticket #9448.
@@ -141,6 +142,9 @@ class DataSourceTest(unittest.TestCase):
         lyr = get_layer()
         self.assertEqual(source.nfeat, len(lyr))
         self.assertEqual(source.gtype, lyr.geom_type.num)
+
+        # Same issue for Feature/Field objects, see #18640
+        self.assertEqual(str(lyr[0]['str']), "1")
 
     def test04_features(self):
         "Testing Data Source Features."
@@ -163,7 +167,8 @@ class DataSourceTest(unittest.TestCase):
                         self.assertEqual(True, isinstance(feat[k], v))
 
                     # Testing Feature.__iter__
-                    for fld in feat: self.assertEqual(True, fld.name in source.fields.keys())
+                    for fld in feat:
+                        self.assertEqual(True, fld.name in source.fields.keys())
 
     def test05_geometries(self):
         "Testing Geometries from Data Source Features."
@@ -181,7 +186,11 @@ class DataSourceTest(unittest.TestCase):
 
                     # Making sure the SpatialReference is as expected.
                     if hasattr(source, 'srs_wkt'):
-                        self.assertEqual(source.srs_wkt, g.srs.wkt)
+                        self.assertEqual(
+                            source.srs_wkt,
+                            # Depending on lib versions, WGS_84 might be WGS_1984
+                            g.srs.wkt.replace('SPHEROID["WGS_84"', 'SPHEROID["WGS_1984"')
+                        )
 
     def test06_spatial_filter(self):
         "Testing the Layer.spatial_filter property."
@@ -196,7 +205,7 @@ class DataSourceTest(unittest.TestCase):
 
         # Setting the spatial filter with a tuple/list with the extent of
         # a buffer centering around Pueblo.
-        self.assertRaises(ValueError, lyr._set_spatial_filter, range(5))
+        self.assertRaises(ValueError, lyr._set_spatial_filter, list(range(5)))
         filter_extent = (-105.609252, 37.255001, -103.609252, 39.255001)
         lyr.spatial_filter = (-105.609252, 37.255001, -103.609252, 39.255001)
         self.assertEqual(OGRGeometry.from_bbox(filter_extent), lyr.spatial_filter)

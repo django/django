@@ -1,6 +1,10 @@
+from __future__ import unicode_literals
+
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class R(models.Model):
     is_default = models.BooleanField(default=False)
 
@@ -91,7 +95,7 @@ class MRNull(models.Model):
 
 
 class Avatar(models.Model):
-    pass
+    desc = models.TextField(null=True)
 
 
 class User(models.Model):
@@ -104,3 +108,21 @@ class HiddenUser(models.Model):
 
 class HiddenUserProfile(models.Model):
     user = models.ForeignKey(HiddenUser)
+
+class M2MTo(models.Model):
+    pass
+
+class M2MFrom(models.Model):
+    m2m = models.ManyToManyField(M2MTo)
+
+class Parent(models.Model):
+    pass
+
+class Child(Parent):
+    pass
+
+class Base(models.Model):
+    pass
+
+class RelToBase(models.Model):
+    base = models.ForeignKey(Base, on_delete=models.DO_NOTHING)

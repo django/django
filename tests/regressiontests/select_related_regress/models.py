@@ -1,33 +1,40 @@
+from __future__ import unicode_literals
+
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Building(models.Model):
     name = models.CharField(max_length=10)
 
-    def __unicode__(self):
-        return u"Building: %s" % self.name
+    def __str__(self):
+        return "Building: %s" % self.name
 
+@python_2_unicode_compatible
 class Device(models.Model):
     building = models.ForeignKey('Building')
     name = models.CharField(max_length=10)
 
-    def __unicode__(self):
-        return u"device '%s' in building %s" % (self.name, self.building)
+    def __str__(self):
+        return "device '%s' in building %s" % (self.name, self.building)
 
+@python_2_unicode_compatible
 class Port(models.Model):
     device = models.ForeignKey('Device')
     port_number = models.CharField(max_length=10)
 
-    def __unicode__(self):
-        return u"%s/%s" % (self.device.name, self.port_number)
+    def __str__(self):
+        return "%s/%s" % (self.device.name, self.port_number)
 
+@python_2_unicode_compatible
 class Connection(models.Model):
     start = models.ForeignKey(Port, related_name='connection_start',
             unique=True)
     end = models.ForeignKey(Port, related_name='connection_end', unique=True)
 
-    def __unicode__(self):
-        return u"%s to %s" % (self.start, self.end)
+    def __str__(self):
+        return "%s to %s" % (self.start, self.end)
 
 # Another non-tree hierarchy that exercises code paths similar to the above
 # example, but in a slightly different configuration.
@@ -70,18 +77,20 @@ class SpecialClient(Client):
     value = models.IntegerField()
 
 # Some model inheritance exercises
+@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=10)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Child(Parent):
     value = models.IntegerField()
 
+@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=10)
     child = models.ForeignKey(Child, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

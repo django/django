@@ -3,12 +3,14 @@ Tests of ModelAdmin validation logic.
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Album(models.Model):
     title = models.CharField(max_length=150)
 
 
+@python_2_unicode_compatible
 class Song(models.Model):
     title = models.CharField(max_length=150)
     album = models.ForeignKey(Album)
@@ -17,7 +19,7 @@ class Song(models.Model):
     class Meta:
         ordering = ('title',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def readonly_method_on_model(self):

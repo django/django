@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from datetime import datetime, date
 import os
 import time
@@ -58,57 +60,62 @@ class DateFormatTests(unittest.TestCase):
 
     def test_epoch(self):
         udt = datetime(1970, 1, 1, tzinfo=utc)
-        self.assertEqual(format(udt, 'U'), u'0')
+        self.assertEqual(format(udt, 'U'), '0')
 
     def test_empty_format(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
 
-        self.assertEqual(dateformat.format(my_birthday, ''), u'')
+        self.assertEqual(dateformat.format(my_birthday, ''), '')
 
     def test_am_pm(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
 
-        self.assertEqual(dateformat.format(my_birthday, 'a'), u'p.m.')
+        self.assertEqual(dateformat.format(my_birthday, 'a'), 'p.m.')
+
+    def test_microsecond(self):
+        # Regression test for #18951
+        dt = datetime(2009, 5, 16, microsecond=123)
+        self.assertEqual(dateformat.format(dt, 'u'), '000123')
 
     def test_date_formats(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
         timestamp = datetime(2008, 5, 19, 11, 45, 23, 123456)
 
-        self.assertEqual(dateformat.format(my_birthday, 'A'), u'PM')
-        self.assertEqual(dateformat.format(timestamp, 'c'), u'2008-05-19T11:45:23.123456')
-        self.assertEqual(dateformat.format(my_birthday, 'd'), u'08')
-        self.assertEqual(dateformat.format(my_birthday, 'j'), u'8')
-        self.assertEqual(dateformat.format(my_birthday, 'l'), u'Sunday')
-        self.assertEqual(dateformat.format(my_birthday, 'L'), u'False')
-        self.assertEqual(dateformat.format(my_birthday, 'm'), u'07')
-        self.assertEqual(dateformat.format(my_birthday, 'M'), u'Jul')
-        self.assertEqual(dateformat.format(my_birthday, 'b'), u'jul')
-        self.assertEqual(dateformat.format(my_birthday, 'n'), u'7')
-        self.assertEqual(dateformat.format(my_birthday, 'N'), u'July')
+        self.assertEqual(dateformat.format(my_birthday, 'A'), 'PM')
+        self.assertEqual(dateformat.format(timestamp, 'c'), '2008-05-19T11:45:23.123456')
+        self.assertEqual(dateformat.format(my_birthday, 'd'), '08')
+        self.assertEqual(dateformat.format(my_birthday, 'j'), '8')
+        self.assertEqual(dateformat.format(my_birthday, 'l'), 'Sunday')
+        self.assertEqual(dateformat.format(my_birthday, 'L'), 'False')
+        self.assertEqual(dateformat.format(my_birthday, 'm'), '07')
+        self.assertEqual(dateformat.format(my_birthday, 'M'), 'Jul')
+        self.assertEqual(dateformat.format(my_birthday, 'b'), 'jul')
+        self.assertEqual(dateformat.format(my_birthday, 'n'), '7')
+        self.assertEqual(dateformat.format(my_birthday, 'N'), 'July')
 
     def test_time_formats(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
 
-        self.assertEqual(dateformat.format(my_birthday, 'P'), u'10 p.m.')
-        self.assertEqual(dateformat.format(my_birthday, 's'), u'00')
-        self.assertEqual(dateformat.format(my_birthday, 'S'), u'th')
-        self.assertEqual(dateformat.format(my_birthday, 't'), u'31')
-        self.assertEqual(dateformat.format(my_birthday, 'w'), u'0')
-        self.assertEqual(dateformat.format(my_birthday, 'W'), u'27')
-        self.assertEqual(dateformat.format(my_birthday, 'y'), u'79')
-        self.assertEqual(dateformat.format(my_birthday, 'Y'), u'1979')
-        self.assertEqual(dateformat.format(my_birthday, 'z'), u'189')
+        self.assertEqual(dateformat.format(my_birthday, 'P'), '10 p.m.')
+        self.assertEqual(dateformat.format(my_birthday, 's'), '00')
+        self.assertEqual(dateformat.format(my_birthday, 'S'), 'th')
+        self.assertEqual(dateformat.format(my_birthday, 't'), '31')
+        self.assertEqual(dateformat.format(my_birthday, 'w'), '0')
+        self.assertEqual(dateformat.format(my_birthday, 'W'), '27')
+        self.assertEqual(dateformat.format(my_birthday, 'y'), '79')
+        self.assertEqual(dateformat.format(my_birthday, 'Y'), '1979')
+        self.assertEqual(dateformat.format(my_birthday, 'z'), '189')
 
     def test_dateformat(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
 
-        self.assertEqual(dateformat.format(my_birthday, r'Y z \C\E\T'), u'1979 189 CET')
+        self.assertEqual(dateformat.format(my_birthday, r'Y z \C\E\T'), '1979 189 CET')
 
-        self.assertEqual(dateformat.format(my_birthday, r'jS \o\f F'), u'8th of July')
+        self.assertEqual(dateformat.format(my_birthday, r'jS \o\f F'), '8th of July')
 
     def test_futuredates(self):
         the_future = datetime(2100, 10, 25, 0, 00)
-        self.assertEqual(dateformat.format(the_future, r'Y'), u'2100')
+        self.assertEqual(dateformat.format(the_future, r'Y'), '2100')
 
     def test_timezones(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
@@ -117,19 +124,19 @@ class DateFormatTests(unittest.TestCase):
         timestamp = datetime(2008, 5, 19, 11, 45, 23, 123456)
 
         if self.tz_tests:
-            self.assertEqual(dateformat.format(my_birthday, 'O'), u'+0100')
-            self.assertEqual(dateformat.format(my_birthday, 'r'), u'Sun, 8 Jul 1979 22:00:00 +0100')
-            self.assertEqual(dateformat.format(my_birthday, 'T'), u'CET')
-            self.assertEqual(dateformat.format(my_birthday, 'U'), u'300315600')
-            self.assertEqual(dateformat.format(timestamp, 'u'), u'123456')
-            self.assertEqual(dateformat.format(my_birthday, 'Z'), u'3600')
-            self.assertEqual(dateformat.format(summertime, 'I'), u'1')
-            self.assertEqual(dateformat.format(summertime, 'O'), u'+0200')
-            self.assertEqual(dateformat.format(wintertime, 'I'), u'0')
-            self.assertEqual(dateformat.format(wintertime, 'O'), u'+0100')
+            self.assertEqual(dateformat.format(my_birthday, 'O'), '+0100')
+            self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 8 Jul 1979 22:00:00 +0100')
+            self.assertEqual(dateformat.format(my_birthday, 'T'), 'CET')
+            self.assertEqual(dateformat.format(my_birthday, 'U'), '300315600')
+            self.assertEqual(dateformat.format(timestamp, 'u'), '123456')
+            self.assertEqual(dateformat.format(my_birthday, 'Z'), '3600')
+            self.assertEqual(dateformat.format(summertime, 'I'), '1')
+            self.assertEqual(dateformat.format(summertime, 'O'), '+0200')
+            self.assertEqual(dateformat.format(wintertime, 'I'), '0')
+            self.assertEqual(dateformat.format(wintertime, 'O'), '+0100')
 
         # Ticket #16924 -- We don't need timezone support to test this
         # 3h30m to the west of UTC
         tz = FixedOffset(-3*60 - 30)
         dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
-        self.assertEqual(dateformat.format(dt, 'O'), u'-0330')
+        self.assertEqual(dateformat.format(dt, 'O'), '-0330')

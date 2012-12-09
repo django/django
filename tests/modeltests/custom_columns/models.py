@@ -15,25 +15,30 @@ from the default generated name, use the ``db_table`` parameter on the
 
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Author(models.Model):
     first_name = models.CharField(max_length=30, db_column='firstname')
     last_name = models.CharField(max_length=30, db_column='last')
 
-    def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
     class Meta:
         db_table = 'my_author_table'
         ordering = ('last_name','first_name')
 
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.headline
 
     class Meta:

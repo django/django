@@ -2,9 +2,10 @@ from __future__ import absolute_import
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
+from django.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet)
+    SelfReferChildSibling, Worksheet, RegressionModelSplit)
 
 
 class M2MRegressionTests(TestCase):
@@ -35,7 +36,7 @@ class M2MRegressionTests(TestCase):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
 
-        self.assertRaisesRegexp(FieldError,
+        six.assertRaisesRegex(self, FieldError,
             "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )
@@ -70,7 +71,7 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create(name='t2')
 
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1,t2]
+        c1.tags = [t1, t2]
         c1 = TagCollection.objects.get(name='c1')
 
         self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"])
@@ -89,3 +90,9 @@ class M2MRegressionTests(TestCase):
         # Get same manager for different instances
         self.assertTrue(e1.topics.__class__ is e2.topics.__class__)
         self.assertTrue(t1.entry_set.__class__ is t2.entry_set.__class__)
+
+    def test_m2m_abstract_split(self):
+        # Regression for #19236 - an abstract class with a 'split' method
+        # causes a TypeError in add_lazy_relation
+        m1 = RegressionModelSplit(name='1')
+        m1.save()

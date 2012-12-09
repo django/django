@@ -8,8 +8,7 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.db import connection
-from django.test import simple, TransactionTestCase
+from django.test import simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
@@ -205,28 +204,6 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         self.assertOutput(out, 'bar:foo:31337')
 
 
-class Ticket16885RegressionTests(unittest.TestCase):
-    def test_ticket_16885(self):
-        """Features are also confirmed on mirrored databases."""
-        old_db_connections = db.connections
-        try:
-            db.connections = db.ConnectionHandler({
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                },
-                'slave': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'TEST_MIRROR': 'default',
-                },
-            })
-            slave = db.connections['slave']
-            self.assertEqual(slave.features.supports_transactions, None)
-            DjangoTestSuiteRunner(verbosity=0).setup_databases()
-            self.assertNotEqual(slave.features.supports_transactions, None)
-        finally:
-            db.connections = old_db_connections
-
-
 class Ticket17477RegressionTests(AdminScriptTestCase):
     def setUp(self):
         self.write_settings('settings.py')
@@ -274,11 +251,10 @@ class Sqlite3InMemoryTestDbs(unittest.TestCase):
                     },
                 })
                 other = db.connections['other']
-                self.assertIsNone(other.features.supports_transactions)
                 DjangoTestSuiteRunner(verbosity=0).setup_databases()
                 msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
                 # Transaction support should be properly initialised for the 'other' DB
-                self.assertIsNotNone(other.features.supports_transactions, msg)
+                self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions
                 self.assertTrue(connections_support_transactions(), msg)
             finally:
@@ -291,16 +267,15 @@ class AutoIncrementResetTest(TransactionTestCase):
     and check that both times they get "1" as their PK value. That is, we test
     that AutoField values start from 1 for each transactional test case.
     """
-    @unittest.skipIf(connection.vendor == 'oracle',
-                     "Oracle's auto-increment fields are not reset between "
-                     "tests")
+
+    reset_sequences = True
+
+    @skipUnlessDBFeature('supports_sequence_reset')
     def test_autoincrement_reset1(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)
 
-    @unittest.skipIf(connection.vendor == 'oracle',
-                     "Oracle's auto-increment fields are not reset between "
-                     "tests")
+    @skipUnlessDBFeature('supports_sequence_reset')
     def test_autoincrement_reset2(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)

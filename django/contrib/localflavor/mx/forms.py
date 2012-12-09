@@ -2,10 +2,12 @@
 """
 Mexican-specific form helpers.
 """
+from __future__ import unicode_literals
 import re
 
 from django.forms import ValidationError
 from django.forms.fields import Select, RegexField
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import EMPTY_VALUES
 from django.contrib.localflavor.mx.mx_states import STATE_CHOICES
@@ -19,12 +21,12 @@ document described in the next link:
 """
 
 RFC_INCONVENIENT_WORDS = [
-    u'BUEI', u'BUEY', u'CACA', u'CACO', u'CAGA', u'CAGO', u'CAKA', u'CAKO',
-    u'COGE', u'COJA', u'COJE', u'COJI', u'COJO', u'CULO', u'FETO', u'GUEY',
-    u'JOTO', u'KACA', u'KACO', u'KAGA', u'KAGO', u'KOGE', u'KOJO', u'KAKA',
-    u'KULO', u'MAME', u'MAMO', u'MEAR', u'MEAS', u'MEON', u'MION', u'MOCO',
-    u'MULA', u'PEDA', u'PEDO', u'PENE', u'PUTA', u'PUTO', u'QULO', u'RATA',
-    u'RUIN',
+    'BUEI', 'BUEY', 'CACA', 'CACO', 'CAGA', 'CAGO', 'CAKA', 'CAKO',
+    'COGE', 'COJA', 'COJE', 'COJI', 'COJO', 'CULO', 'FETO', 'GUEY',
+    'JOTO', 'KACA', 'KACO', 'KAGA', 'KAGO', 'KOGE', 'KOJO', 'KAKA',
+    'KULO', 'MAME', 'MAMO', 'MEAR', 'MEAS', 'MEON', 'MION', 'MOCO',
+    'MULA', 'PEDA', 'PEDO', 'PENE', 'PUTA', 'PUTO', 'QULO', 'RATA',
+    'RUIN',
 ]
 
 """
@@ -33,17 +35,17 @@ document described in the next link:
     http://portal.veracruz.gob.mx/pls/portal/url/ITEM/444112558A57C6E0E040A8C02E00695C
 """
 CURP_INCONVENIENT_WORDS = [
-   u'BACA', u'BAKA', u'BUEI', u'BUEY', u'CACA', u'CACO', u'CAGA', u'CAGO',
-   u'CAKA', u'CAKO', u'COGE', u'COGI', u'COJA', u'COJE', u'COJI', u'COJO',
-   u'COLA', u'CULO', u'FALO', u'FETO', u'GETA', u'GUEI', u'GUEY', u'JETA',
-   u'JOTO', u'KACA', u'KACO', u'KAGA', u'KAGO', u'KAKA', u'KAKO', u'KOGE',
-   u'KOGI', u'KOJA', u'KOJE', u'KOJI', u'KOJO', u'KOLA', u'KULO', u'LILO',
-   u'LOCA', u'LOCO', u'LOKA', u'LOKO', u'MAME', u'MAMO', u'MEAR', u'MEAS',
-   u'MEON', u'MIAR', u'MION', u'MOCO', u'MOKO', u'MULA', u'MULO', u'NACA',
-   u'NACO', u'PEDA', u'PEDO', u'PENE', u'PIPI', u'PITO', u'POPO', u'PUTA',
-   u'PUTO', u'QULO', u'RATA', u'ROBA', u'ROBE', u'ROBO', u'RUIN', u'SENO',
-   u'TETA', u'VACA', u'VAGA', u'VAGO', u'VAKA', u'VUEI', u'VUEY', u'WUEI',
-   u'WUEY',
+   'BACA', 'BAKA', 'BUEI', 'BUEY', 'CACA', 'CACO', 'CAGA', 'CAGO',
+   'CAKA', 'CAKO', 'COGE', 'COGI', 'COJA', 'COJE', 'COJI', 'COJO',
+   'COLA', 'CULO', 'FALO', 'FETO', 'GETA', 'GUEI', 'GUEY', 'JETA',
+   'JOTO', 'KACA', 'KACO', 'KAGA', 'KAGO', 'KAKA', 'KAKO', 'KOGE',
+   'KOGI', 'KOJA', 'KOJE', 'KOJI', 'KOJO', 'KOLA', 'KULO', 'LILO',
+   'LOCA', 'LOCO', 'LOKA', 'LOKO', 'MAME', 'MAMO', 'MEAR', 'MEAS',
+   'MEON', 'MIAR', 'MION', 'MOCO', 'MOKO', 'MULA', 'MULO', 'NACA',
+   'NACO', 'PEDA', 'PEDO', 'PENE', 'PIPI', 'PITO', 'POPO', 'PUTA',
+   'PUTO', 'QULO', 'RATA', 'ROBA', 'ROBE', 'ROBO', 'RUIN', 'SENO',
+   'TETA', 'VACA', 'VAGA', 'VAGO', 'VAKA', 'VUEI', 'VUEY', 'WUEI',
+   'WUEY',
 ]
 
 class MXStateSelect(Select):
@@ -62,11 +64,11 @@ class MXZipCodeField(RegexField):
         http://en.wikipedia.org/wiki/List_of_postal_codes_in_Mexico
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid zip code in the format XXXXX.'),
+        'invalid': _('Enter a valid zip code in the format XXXXX.'),
     }
 
     def __init__(self, *args, **kwargs):
-        zip_code_re = ur'^(0[1-9]|[1][0-6]|[2-9]\d)(\d{3})$'
+        zip_code_re = r'^(0[1-9]|[1][0-6]|[2-9]\d)(\d{3})$'
         super(MXZipCodeField, self).__init__(zip_code_re, *args, **kwargs)
 
 
@@ -110,7 +112,7 @@ class MXRFCField(RegexField):
     }
 
     def __init__(self, min_length=9, max_length=13, *args, **kwargs):
-        rfc_re = re.compile(ur'^([A-Z&Ññ]{3}|[A-Z][AEIOU][A-Z]{2})%s([A-Z0-9]{2}[0-9A])?$' % DATE_RE,
+        rfc_re = re.compile(r'^([A-Z&Ññ]{3}|[A-Z][AEIOU][A-Z]{2})%s([A-Z0-9]{2}[0-9A])?$' % DATE_RE,
                             re.IGNORECASE)
         super(MXRFCField, self).__init__(rfc_re, min_length=min_length,
                                          max_length=max_length, *args, **kwargs)
@@ -118,7 +120,7 @@ class MXRFCField(RegexField):
     def clean(self, value):
         value = super(MXRFCField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = value.upper()
         if self._has_homoclave(value):
             if not value[-1] == self._checksum(value[:-1]):
@@ -133,7 +135,7 @@ class MXRFCField(RegexField):
         since the current algorithm to calculate it had not been created for
         the first RFCs ever in Mexico.
         """
-        rfc_without_homoclave_re = re.compile(ur'^[A-Z&Ññ]{3,4}%s$' % DATE_RE,
+        rfc_without_homoclave_re = re.compile(r'^[A-Z&Ññ]{3,4}%s$' % DATE_RE,
                                               re.IGNORECASE)
         return not rfc_without_homoclave_re.match(rfc)
 
@@ -142,19 +144,19 @@ class MXRFCField(RegexField):
         More info about this procedure:
             www.sisi.org.mx/jspsi/documentos/2005/seguimiento/06101/0610100162005_065.doc
         """
-        chars = u'0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ-Ñ'
+        chars = '0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ-Ñ'
         if len(rfc) == 11:
             rfc = '-' + rfc
 
-        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(xrange(14)), rfc))
+        sum_ = sum(i * chars.index(c) for i, c in zip(reversed(range(14)), rfc))
         checksum = 11 - sum_ % 11
 
         if checksum == 10:
-            return u'A'
+            return 'A'
         elif checksum == 11:
-            return u'0'
+            return '0'
 
-        return unicode(checksum)
+        return six.text_type(checksum)
 
     def _has_inconvenient_word(self, rfc):
         first_four = rfc[:4]
@@ -187,13 +189,13 @@ class MXCURPField(RegexField):
     """
     default_error_messages = {
         'invalid': _('Enter a valid CURP.'),
-        'invalid_checksum': _(u'Invalid checksum for CURP.'),
+        'invalid_checksum': _('Invalid checksum for CURP.'),
     }
 
     def __init__(self, min_length=18, max_length=18, *args, **kwargs):
         states_re = r'(AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)'
         consonants_re = r'[B-DF-HJ-NP-TV-Z]'
-        curp_re = (ur'^[A-Z][AEIOU][A-Z]{2}%s[HM]%s%s{3}[0-9A-Z]\d$' %
+        curp_re = (r'^[A-Z][AEIOU][A-Z]{2}%s[HM]%s%s{3}[0-9A-Z]\d$' %
                    (DATE_RE, states_re, consonants_re))
         curp_re = re.compile(curp_re, re.IGNORECASE)
         super(MXCURPField, self).__init__(curp_re, min_length=min_length,
@@ -202,7 +204,7 @@ class MXCURPField(RegexField):
     def clean(self, value):
         value = super(MXCURPField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = value.upper()
         if value[-1] != self._checksum(value[:-1]):
             raise ValidationError(self.default_error_messages['invalid_checksum'])
@@ -211,14 +213,14 @@ class MXCURPField(RegexField):
         return value
 
     def _checksum(self, value):
-        chars = u'0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ'
+        chars = '0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ'
 
-        s = sum(i * chars.index(c) for i, c in zip(reversed(xrange(19)), value))
+        s = sum(i * chars.index(c) for i, c in zip(reversed(range(19)), value))
         checksum = 10 - s % 10
 
         if checksum == 10:
-            return u'0'
-        return unicode(checksum)
+            return '0'
+        return six.text_type(checksum)
 
     def _has_inconvenient_word(self, curp):
         first_four = curp[:4]

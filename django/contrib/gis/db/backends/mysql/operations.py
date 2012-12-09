@@ -3,6 +3,8 @@ from django.db.backends.mysql.base import DatabaseOperations
 from django.contrib.gis.db.backends.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 
+from django.utils import six
+
 class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
     compiler_module = 'django.contrib.gis.db.backends.mysql.compiler'
@@ -30,7 +32,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         'within' : 'MBRWithin',
         }
 
-    gis_terms = dict([(term, None) for term in geometry_functions.keys() + ['isnull']])
+    gis_terms = dict([(term, None) for term in list(geometry_functions) + ['isnull']])
 
     def geo_db_type(self, f):
         return f.geom_type
@@ -42,7 +44,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         modify the placeholder based on the contents of the given value.
         """
         if hasattr(value, 'expression'):
-            placeholder = '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
+            placeholder = self.get_expression_column(value)
         else:
             placeholder = '%s(%%s)' % self.from_text
         return placeholder

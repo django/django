@@ -1,11 +1,15 @@
-import urllib
+from __future__ import unicode_literals
+import re
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
+from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
-from django.utils.encoding import smart_str
+from django.utils.http import urlquote
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -15,6 +19,7 @@ from django.contrib.auth.hashers import (
     check_password, make_password, is_password_usable, UNUSABLE_PASSWORD)
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def update_last_login(sender, user, **kwargs):
@@ -23,7 +28,7 @@ def update_last_login(sender, user, **kwargs):
     the user logging in.
     """
     user.last_login = timezone.now()
-    user.save()
+    user.save(update_fields=['last_login'])
 user_logged_in.connect(update_last_login)
 
 
@@ -40,6 +45,7 @@ class PermissionManager(models.Manager):
         )
 
 
+@python_2_unicode_compatible
 class Permission(models.Model):
     """
     The permissions system provides a way to assign permissions to specific
@@ -75,11 +81,11 @@ class Permission(models.Model):
         ordering = ('content_type__app_label', 'content_type__model',
                     'codename')
 
-    def __unicode__(self):
-        return u"%s | %s | %s" % (
-            unicode(self.content_type.app_label),
-            unicode(self.content_type),
-            unicode(self.name))
+    def __str__(self):
+        return "%s | %s | %s" % (
+            six.text_type(self.content_type.app_label),
+            six.text_type(self.content_type),
+            six.text_type(self.name))
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -93,6 +99,8 @@ class GroupManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
+
+@python_2_unicode_compatible
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -120,14 +128,14 @@ class Group(models.Model):
         verbose_name = _('group')
         verbose_name_plural = _('groups')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def natural_key(self):
         return (self.name,)
 
 
-class UserManager(models.Manager):
+class BaseUserManager(models.Manager):
 
     @classmethod
     def normalize_email(cls, email):
@@ -144,30 +152,6 @@ class UserManager(models.Manager):
             email = '@'.join([email_name, domain_part.lower()])
         return email
 
-    def create_user(self, username, email=None, password=None):
-        """
-        Creates and saves a User with the given username, email and password.
-        """
-        now = timezone.now()
-        if not username:
-            raise ValueError('The given username must be set')
-        email = UserManager.normalize_email(email)
-        user = self.model(username=username, email=email,
-                          is_staff=False, is_active=True, is_superuser=False,
-                          last_login=now, date_joined=now)
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, username, email, password):
-        u = self.create_user(username, email, password)
-        u.is_staff = True
-        u.is_active = True
-        u.is_superuser = True
-        u.save(using=self._db)
-        return u
-
     def make_random_password(self, length=10,
                              allowed_chars='abcdefghjkmnpqrstuvwxyz'
                                            'ABCDEFGHJKLMNPQRSTUVWXYZ'
@@ -181,7 +165,34 @@ class UserManager(models.Manager):
         return get_random_string(length, allowed_chars)
 
     def get_by_natural_key(self, username):
-        return self.get(username=username)
+        return self.get(**{self.model.USERNAME_FIELD: username})
+
+
+class UserManager(BaseUserManager):
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        """
+        Creates and saves a User with the given username, email and password.
+        """
+        now = timezone.now()
+        if not username:
+            raise ValueError('The given username must be set')
+        email = UserManager.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_staff=False, is_active=True, is_superuser=False,
+                          last_login=now, date_joined=now, **extra_fields)
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email, password, **extra_fields):
+        u = self.create_user(username, email, password, **extra_fields)
+        u.is_staff = True
+        u.is_active = True
+        u.is_superuser = True
+        u.save(using=self._db)
+        return u
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -197,8 +208,6 @@ def _user_get_all_permissions(user, obj):
 
 
 def _user_has_perm(user, perm, obj):
-    anon = user.is_anonymous()
-    active = user.is_active
     for backend in auth.get_backends():
         if hasattr(backend, "has_perm"):
             if obj is not None:
@@ -211,8 +220,6 @@ def _user_has_perm(user, perm, obj):
 
 
 def _user_has_module_perms(user, app_label):
-    anon = user.is_anonymous()
-    active = user.is_active
     for backend in auth.get_backends():
         if hasattr(backend, "has_module_perms"):
             if backend.has_module_perms(user, app_label):
@@ -220,52 +227,27 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
-class User(models.Model):
-    """
-    Users within the Django authentication system are represented by this
-    model.
-
-    Username and password are required. Other fields are optional.
-    """
-    username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'))
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    email = models.EmailField(_('e-mail address'), blank=True)
+@python_2_unicode_compatible
+class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-        help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
-    is_superuser = models.BooleanField(_('superuser status'), default=False,
-        help_text=_('Designates that this user has all permissions without '
-                    'explicitly assigning them.'))
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    groups = models.ManyToManyField(Group, verbose_name=_('groups'),
-        blank=True, help_text=_('The groups this user belongs to. A user will '
-                                'get all permissions granted to each of '
-                                'his/her group.'))
-    user_permissions = models.ManyToManyField(Permission,
-        verbose_name=_('user permissions'), blank=True,
-        help_text='Specific permissions for this user.')
-    objects = UserManager()
+
+    is_active = True
+
+    REQUIRED_FIELDS = []
 
     class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
+        abstract = True
 
-    def __unicode__(self):
-        return self.username
+    def get_username(self):
+        "Return the identifying username for this User"
+        return getattr(self, self.USERNAME_FIELD)
+
+    def __str__(self):
+        return self.get_username()
 
     def natural_key(self):
-        return (self.username,)
-
-    def get_absolute_url(self):
-        return "/users/%s/" % urllib.quote(smart_str(self.username))
+        return (self.get_username(),)
 
     def is_anonymous(self):
         """
@@ -281,13 +263,6 @@ class User(models.Model):
         """
         return True
 
-    def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = u'%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
-
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
 
@@ -298,7 +273,7 @@ class User(models.Model):
         """
         def setter(raw_password):
             self.set_password(raw_password)
-            self.save()
+            self.save(update_fields=["password"])
         return check_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
@@ -307,6 +282,71 @@ class User(models.Model):
 
     def has_usable_password(self):
         return is_password_usable(self.password)
+
+    def get_full_name(self):
+        raise NotImplementedError()
+
+    def get_short_name(self):
+        raise NotImplementedError()
+
+
+class AbstractUser(AbstractBaseUser):
+    """
+    An abstract base class implementing a fully featured User model with
+    admin-compliant permissions.
+
+    Username, password and email are required. Other fields are optional.
+    """
+    username = models.CharField(_('username'), max_length=30, unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
+                    '@/./+/-/_ characters'),
+        validators=[
+            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+        ])
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
+    is_superuser = models.BooleanField(_('superuser status'), default=False,
+        help_text=_('Designates that this user has all permissions without '
+                    'explicitly assigning them.'))
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    groups = models.ManyToManyField(Group, verbose_name=_('groups'),
+        blank=True, help_text=_('The groups this user belongs to. A user will '
+                                'get all permissions granted to each of '
+                                'his/her group.'))
+    user_permissions = models.ManyToManyField(Permission,
+        verbose_name=_('user permissions'), blank=True,
+        help_text='Specific permissions for this user.')
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+        abstract = True
+
+    def get_absolute_url(self):
+        return "/users/%s/" % urlquote(self.username)
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        "Returns the short name for the user."
+        return self.first_name
 
     def get_group_permissions(self, obj=None):
         """
@@ -376,6 +416,8 @@ class User(models.Model):
         Returns site-specific profile for this user. Raises
         SiteProfileNotAvailable if this site does not allow profiles.
         """
+        warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
+            PendingDeprecationWarning)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
@@ -402,6 +444,18 @@ class User(models.Model):
         return self._profile_cache
 
 
+class User(AbstractUser):
+    """
+    Users within the Django authentication system are represented by this
+    model.
+
+    Username, password and email are required. Other fields are optional.
+    """
+    class Meta:
+        swappable = 'AUTH_USER_MODEL'
+
+
+@python_2_unicode_compatible
 class AnonymousUser(object):
     id = None
     pk = None
@@ -415,11 +469,8 @@ class AnonymousUser(object):
     def __init__(self):
         pass
 
-    def __unicode__(self):
-        return 'AnonymousUser'
-
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return 'AnonymousUser'
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
@@ -428,7 +479,7 @@ class AnonymousUser(object):
         return not self.__eq__(other)
 
     def __hash__(self):
-        return 1 # instances always return the same hash value
+        return 1  # instances always return the same hash value
 
     def save(self):
         raise NotImplementedError

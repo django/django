@@ -1,9 +1,11 @@
+from __future__ import unicode_literals
 import re
 
 from django.template import (Node, Variable, TemplateSyntaxError,
     TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
 from django.template.base import _render_value_in_context
 from django.template.defaulttags import token_kwargs
+from django.utils import six
 from django.utils import translation
 
 
@@ -75,8 +77,8 @@ class TranslateNode(Node):
         self.asvar = asvar
         self.message_context = message_context
         self.filter_expression = filter_expression
-        if isinstance(self.filter_expression.var, basestring):
-            self.filter_expression.var = Variable(u"'%s'" %
+        if isinstance(self.filter_expression.var, six.string_types):
+            self.filter_expression.var = Variable("'%s'" %
                                                   self.filter_expression.var)
 
     def render(self, context):
@@ -108,13 +110,13 @@ class BlockTranslateNode(Node):
         vars = []
         for token in tokens:
             if token.token_type == TOKEN_TEXT:
-                result.append(token.contents)
+                result.append(token.contents.replace('%', '%%'))
             elif token.token_type == TOKEN_VAR:
-                result.append(u'%%(%s)s' % token.contents)
+                result.append('%%(%s)s' % token.contents)
                 vars.append(token.contents)
         return ''.join(result), vars
 
-    def render(self, context):
+    def render(self, context, nested=False):
         if self.message_context:
             message_context = self.message_context.resolve(context)
         else:
@@ -126,13 +128,10 @@ class BlockTranslateNode(Node):
         # the end of function
         context.update(tmp_context)
         singular, vars = self.render_token_list(self.singular)
-        # Escape all isolated '%'
-        singular = re.sub(u'%(?!\()', u'%%', singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
             plural, plural_vars = self.render_token_list(self.plural)
-            plural = re.sub(u'%(?!\()', u'%%', plural)
             if message_context:
                 result = translation.npgettext(message_context, singular,
                                                plural, count)
@@ -148,9 +147,13 @@ class BlockTranslateNode(Node):
         context.pop()
         try:
             result = result % data
-        except KeyError:
+        except (KeyError, ValueError):
+            if nested:
+                # Either string is malformed, or it's a bug
+                raise TemplateSyntaxError("'blocktrans' is unable to format "
+                    "string returned by gettext: %r using %r" % (result, data))
             with translation.override(None):
-                result = self.render(context)
+                result = self.render(context, nested=True)
         return result
 
 
@@ -423,7 +426,7 @@ def do_block_translate(parser, token):
         options[option] = value
 
     if 'count' in options:
-        countervar, counter = options['count'].items()[0]
+        countervar, counter = list(six.iteritems(options['count']))[0]
     else:
         countervar, counter = None, None
     if 'context' in options:

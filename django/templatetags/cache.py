@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 import hashlib
 from django.template import Library, Node, TemplateSyntaxError, Variable, VariableDoesNotExist
 from django.template import resolve_variable
 from django.core.cache import cache
+from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
 
 register = Library()
@@ -22,8 +25,9 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
-        # Build a unicode key for this fragment and all vary-on's.
-        args = hashlib.md5(u':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on]))
+        # Build a key for this fragment and all vary-on's.
+        key = ':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on])
+        args = hashlib.md5(force_bytes(key))
         cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
         value = cache.get(cache_key)
         if value is None:
@@ -57,5 +61,5 @@ def do_cache(parser, token):
     parser.delete_first_token()
     tokens = token.contents.split()
     if len(tokens) < 3:
-        raise TemplateSyntaxError(u"'%r' tag requires at least 2 arguments." % tokens[0])
+        raise TemplateSyntaxError("'%r' tag requires at least 2 arguments." % tokens[0])
     return CacheNode(nodelist, tokens[1], tokens[2], tokens[3:])

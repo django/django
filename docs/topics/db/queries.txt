@@ -35,8 +35,8 @@ models, which comprise a Weblog application:
         blog = models.ForeignKey(Blog)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
-        pub_date = models.DateTimeField()
-        mod_date = models.DateTimeField()
+        pub_date = models.DateField()
+        mod_date = models.DateField()
         authors = models.ManyToManyField(Author)
         n_comments = models.IntegerField()
         n_pingbacks = models.IntegerField()
@@ -233,16 +233,16 @@ refinements together. For example::
     >>> Entry.objects.filter(
     ...     headline__startswith='What'
     ... ).exclude(
-    ...     pub_date__gte=datetime.now()
+    ...     pub_date__gte=datetime.date.today()
     ... ).filter(
-    ...     pub_date__gte=datetime(2005, 1, 1)
+    ...     pub_date__gte=datetime(2005, 1, 30)
     ... )
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
 in the database, adds a filter, then an exclusion, then another filter. The
 final result is a :class:`~django.db.models.query.QuerySet` containing all
 entries with a headline that starts with "What", that were published between
-January 1, 2005, and the current day.
+January 30, 2005, and the current day.
 
 .. _filtered-querysets-are-unique:
 
@@ -258,8 +258,8 @@ stored, used and reused.
 Example::
 
     >> q1 = Entry.objects.filter(headline__startswith="What")
-    >> q2 = q1.exclude(pub_date__gte=datetime.now())
-    >> q3 = q1.filter(pub_date__gte=datetime.now())
+    >> q2 = q1.exclude(pub_date__gte=datetime.date.today())
+    >> q3 = q1.filter(pub_date__gte=datetime.date.today())
 
 These three ``QuerySets`` are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
@@ -282,7 +282,7 @@ actually run the query until the :class:`~django.db.models.query.QuerySet` is
 *evaluated*. Take a look at this example::
 
     >>> q = Entry.objects.filter(headline__startswith="What")
-    >>> q = q.filter(pub_date__lte=datetime.now())
+    >>> q = q.filter(pub_date__lte=datetime.date.today())
     >>> q = q.exclude(body_text__icontains="food")
     >>> print(q)
 
@@ -417,7 +417,7 @@ translates (roughly) into the following SQL::
     There's one exception though, in case of a
     :class:`~django.db.models.ForeignKey` you can specify the field
     name suffixed with ``_id``. In this case, the value parameter is expected
-    to contain the raw value of the foreign model's primary key. For example::
+    to contain the raw value of the foreign model's primary key. For example:
 
         >>> Entry.objects.filter(blog_id__exact=4)
 
@@ -575,12 +575,17 @@ To select all blogs that contain an entry with *"Lennon"* in the headline
     Blog.objects.filter(entry__headline__contains='Lennon').filter(
             entry__pub_date__year=2008)
 
-In this second example, the first filter restricted the queryset to all those
-blogs linked to that particular type of entry. The second filter restricted
-the set of blogs *further* to those that are also linked to the second type of
-entry. The entries select by the second filter may or may not be the same as
-the entries in the first filter. We are filtering the ``Blog`` items with each
-filter statement, not the ``Entry`` items.
+Suppose there is only one blog that had both entries containing *"Lennon"* and
+entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
+The first query would not return any blogs, but the second query would return
+that one blog.
+
+In the second example, the first filter restricts the queryset to all those
+blogs linked to entries with *"Lennon"* in the headline. The second filter
+restricts the set of blogs *further* to those that are also linked to entries
+that were published in 2008. The entries selected by the second filter may or
+may not be the same as the entries in the first filter. We are filtering the
+``Blog`` items with each filter statement, not the ``Entry`` items.
 
 All of this behavior also applies to
 :meth:`~django.db.models.query.QuerySet.exclude`: all the conditions in a
@@ -633,14 +638,24 @@ issue the query::
 
     >>> Entry.objects.filter(authors__name=F('blog__name'))
 
-.. versionadded:: 1.3
-
 For date and date/time fields, you can add or subtract a
 :class:`~datetime.timedelta` object. The following would return all entries
 that were modified more than 3 days after they were published::
 
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
+
+.. versionadded:: 1.5
+    ``.bitand()`` and ``.bitor()``
+
+The ``F()`` objects now support bitwise operations by ``.bitand()`` and
+``.bitor()``, for example::
+
+    >>> F('somefield').bitand(16)
+
+.. versionchanged:: 1.5
+    The previously undocumented operators ``&`` and ``|`` no longer produce
+    bitwise operations, use ``.bitand()`` and ``.bitor()`` instead.
 
 The pk lookup shortcut
 ----------------------
@@ -876,10 +891,9 @@ it. For example::
     # This will delete the Blog and all of its Entry objects.
     b.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 Note that :meth:`~django.db.models.query.QuerySet.delete` is the only
 :class:`~django.db.models.query.QuerySet` method that is not exposed on a
@@ -900,10 +914,10 @@ possible to easily create new instance with all fields' values copied. In the
 simplest case, you can just set ``pk`` to ``None``. Using our blog example::
 
     blog = Blog(name='My blog', tagline='Blogging is easy')
-    blog.save() # post.pk == 1
+    blog.save() # blog.pk == 1
 
     blog.pk = None
-    blog.save() # post.pk == 2
+    blog.save() # blog.pk == 2
 
 Things get more complicated if you use inheritance. Consider a subclass of
 ``Blog``::
@@ -911,7 +925,7 @@ Things get more complicated if you use inheritance. Consider a subclass of
     class ThemeBlog(Blog):
         theme = models.CharField(max_length=200)
 
-    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme = 'python')
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
     django_blog.save() # django_blog.pk == 3
 
 Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
@@ -953,7 +967,8 @@ new value to be the new model instance you want to point to. For example::
     >>> Entry.objects.all().update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
-affected by the query. The only restriction on the
+matched by the query (which may not be equal to the number of rows updated if
+some rows already have the new value). The only restriction on the
 :class:`~django.db.models.query.QuerySet` that is updated is that it can only
 access one database table, the model's main table. You can filter based on
 related fields, but you can only update columns in the model's main
@@ -968,11 +983,12 @@ Be aware that the ``update()`` method is converted directly to an SQL
 statement. It is a bulk operation for direct updates. It doesn't run any
 :meth:`~django.db.models.Model.save` methods on your models, or emit the
 ``pre_save`` or ``post_save`` signals (which are a consequence of calling
-:meth:`~django.db.models.Model.save`). If you want to save every item in a
-:class:`~django.db.models.query.QuerySet` and make sure that the
-:meth:`~django.db.models.Model.save` method is called on each instance, you
-don't need any special function to handle that. Just loop over them and call
-:meth:`~django.db.models.Model.save`::
+:meth:`~django.db.models.Model.save`), or honor the
+:attr:`~django.db.models.DateField.auto_now` field option.
+If you want to save every item in a :class:`~django.db.models.query.QuerySet`
+and make sure that the :meth:`~django.db.models.Model.save` method is called on
+each instance, you don't need any special function to handle that. Just loop
+over them and call :meth:`~django.db.models.Model.save`::
 
     for item in my_queryset:
         item.save()

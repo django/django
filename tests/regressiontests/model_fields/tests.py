@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from decimal import Decimal
@@ -8,17 +8,17 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields.files import FieldFile
+from django.utils import six
 from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, Document, RenamedField)
+    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField,
+    FksToBooleans)
 
-# If PIL available, do these tests.
-if Image:
-    from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-        TwoImageFieldTests, ImageFieldNoDimensionsTests,
-        ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-        ImageFieldUsingFileTests)
+from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+    TwoImageFieldTests, ImageFieldNoDimensionsTests,
+    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
+    ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
@@ -65,6 +65,14 @@ class BasicFieldTests(test.TestCase):
         self.assertTrue(hasattr(instance, 'get_fieldname_display'))
         self.assertFalse(hasattr(instance, 'get_modelname_display'))
 
+    def test_field_verbose_name(self):
+        m = VerboseNameField
+        for i in range(1, 23):
+            self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
+                    'verbose field%d' % i)
+
+        self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
+
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
         f = models.DecimalField(max_digits=4, decimal_places=2)
@@ -78,8 +86,8 @@ class DecimalFieldTests(test.TestCase):
 
     def test_format(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), u'2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), u'2.6')
+        self.assertEqual(f._format(f.to_python(2)), '2.0')
+        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
         self.assertEqual(f._format(None), None)
 
     def test_get_db_prep_lookup(self):
@@ -92,7 +100,7 @@ class DecimalFieldTests(test.TestCase):
         We should be able to filter decimal fields using strings (#8023)
         """
         Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
-        self.assertEqual(list(Foo.objects.filter(d=u'1.23')), [])
+        self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
         """
@@ -168,7 +176,7 @@ class BooleanFieldTests(unittest.TestCase):
         Test that BooleanField with choices and defaults doesn't generate a
         formfield with the blank option (#9640, #10549).
         """
-        choices = [(1, u'Si'), (2, 'No')]
+        choices = [(1, 'Si'), (2, 'No')]
         f = models.BooleanField(choices=choices, default=1, null=True)
         self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
 
@@ -208,8 +216,45 @@ class BooleanFieldTests(unittest.TestCase):
         # Verify that when an extra clause exists, the boolean
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(
-            select={'string_length': 'LENGTH(string)'})[0]
+            select={'string_col': 'string'})[0]
         self.assertFalse(isinstance(b5.pk, bool))
+
+    def test_select_related(self):
+        """
+        Test type of boolean fields when retrieved via select_related() (MySQL,
+        #15040)
+        """
+        bmt = BooleanModel.objects.create(bfield=True)
+        bmf = BooleanModel.objects.create(bfield=False)
+        nbmt = NullBooleanModel.objects.create(nbfield=True)
+        nbmf = NullBooleanModel.objects.create(nbfield=False)
+
+        m1 = FksToBooleans.objects.create(bf=bmt, nbf=nbmt)
+        m2 = FksToBooleans.objects.create(bf=bmf, nbf=nbmf)
+
+        # Test select_related('fk_field_name')
+        ma = FksToBooleans.objects.select_related('bf').get(pk=m1.id)
+        # verify types -- should't be 0/1
+        self.assertIsInstance(ma.bf.bfield, bool)
+        self.assertIsInstance(ma.nbf.nbfield, bool)
+        # verify values
+        self.assertEqual(ma.bf.bfield, True)
+        self.assertEqual(ma.nbf.nbfield, True)
+
+        # Test select_related()
+        mb = FksToBooleans.objects.select_related().get(pk=m1.id)
+        mc = FksToBooleans.objects.select_related().get(pk=m2.id)
+        # verify types -- shouldn't be 0/1
+        self.assertIsInstance(mb.bf.bfield, bool)
+        self.assertIsInstance(mb.nbf.nbfield, bool)
+        self.assertIsInstance(mc.bf.bfield, bool)
+        self.assertIsInstance(mc.nbf.nbfield, bool)
+        # verify values
+        self.assertEqual(mb.bf.bfield, True)
+        self.assertEqual(mb.nbf.nbfield, True)
+        self.assertEqual(mc.bf.bfield, False)
+        self.assertEqual(mc.nbf.nbfield, False)
+
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
@@ -275,6 +320,10 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, None, None)
         self.assertRaises(ValidationError, f.clean, '', None)
 
+    def test_integerfield_validates_zero_against_choices(self):
+        f = models.IntegerField(choices=((1, 1),))
+        self.assertRaises(ValidationError, f.clean, '0', None)
+
     def test_charfield_raises_error_on_empty_input(self):
         f = models.CharField(null=False)
         self.assertRaises(ValidationError, f.clean, None, None)
@@ -305,11 +354,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')

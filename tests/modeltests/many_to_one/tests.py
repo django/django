@@ -3,8 +3,9 @@ from __future__ import absolute_import
 from copy import deepcopy
 from datetime import datetime
 
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, FieldError
 from django.test import TestCase
+from django.utils import six
 from django.utils.translation import ugettext_lazy
 
 from .models import Article, Reporter
@@ -69,7 +70,7 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
         # Adding an object of the wrong type raises TypeError.
-        with self.assertRaisesRegexp(TypeError, "'Article' instance expected, got <Reporter.*"):
+        with six.assertRaisesRegex(self, TypeError, "'Article' instance expected, got <Reporter.*"):
             self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
@@ -177,7 +178,7 @@ class ManyToOneTests(TestCase):
         # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__first_name__exact='John'
-                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % u'Smith']),
+                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith']),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -300,7 +301,7 @@ class ManyToOneTests(TestCase):
         # It's possible to use values() calls across many-to-one relations.
         # (Note, too, that we clear the ordering here so as not to drag the
         # 'headline' field into the columns being used to determine uniqueness)
-        d = {'reporter__first_name': u'John', 'reporter__last_name': u'Smith'}
+        d = {'reporter__first_name': 'John', 'reporter__last_name': 'Smith'}
         self.assertEqual([d],
             list(Article.objects.filter(reporter=self.r).distinct().order_by()
                  .values('reporter__first_name', 'reporter__last_name')))
@@ -418,9 +419,21 @@ class ManyToOneTests(TestCase):
         reporter = Reporter.objects.create(first_name='John',
                                            last_name='Smith',
                                            email='john.smith@example.com')
-        lazy = ugettext_lazy(u'test')
+        lazy = ugettext_lazy('test')
         reporter.article_set.create(headline=lazy,
                                     pub_date=datetime(2011, 6, 10))
-        notlazy = unicode(lazy)
+        notlazy = six.text_type(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)
+
+    def test_values_list_exception(self):
+        expected_message = "Cannot resolve keyword 'notafield' into field. Choices are: %s"
+
+        self.assertRaisesMessage(FieldError,
+                                 expected_message % ', '.join(Reporter._meta.get_all_field_names()),
+                                 Article.objects.values_list,
+                                 'reporter__notafield')
+        self.assertRaisesMessage(FieldError,
+                                 expected_message % ', '.join(['EXTRA',] + Article._meta.get_all_field_names()),
+                                 Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
+                                 'notafield')

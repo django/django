@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.core.validators import EMPTY_VALUES
@@ -13,8 +13,9 @@ from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property)
-from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.encoding import smart_text, force_text
 from django.utils.datastructures import SortedDict
+from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -125,7 +126,7 @@ def model_to_dict(instance, fields=None, exclude=None):
                 data[f.name] = []
             else:
                 # MultipleChoiceWidget needs a list of pks, not object instances.
-                data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
+                data[f.name] = list(f.value_from_object(instance).values_list('pk', flat=True))
         else:
             data[f.name] = f.value_from_object(instance)
     return data
@@ -205,7 +206,7 @@ class ModelFormMetaclass(type):
             fields = fields_for_model(opts.model, opts.fields,
                                       opts.exclude, opts.widgets, formfield_callback)
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in fields.iteritems() if not v]
+            none_model_fields = [k for k, v in six.iteritems(fields) if not v]
             missing_fields = set(none_model_fields) - \
                              set(declared_fields.keys())
             if missing_fields:
@@ -365,8 +366,8 @@ class BaseModelForm(BaseForm):
 
     save.alters_data = True
 
-class ModelForm(BaseModelForm):
-    __metaclass__ = ModelFormMetaclass
+class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
+    pass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       formfield_callback=None,  widgets=None):
@@ -388,10 +389,10 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     parent = (object,)
     if hasattr(form, 'Meta'):
         parent = (form.Meta, object)
-    Meta = type('Meta', parent, attrs)
+    Meta = type(str('Meta'), parent, attrs)
 
     # Give this new form class a reasonable name.
-    class_name = model.__name__ + 'Form'
+    class_name = model.__name__ + str('Form')
 
     # Class attributes for the new form class.
     form_class_attrs = {
@@ -399,12 +400,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
         'formfield_callback': formfield_callback
     }
 
-    form_metaclass = ModelFormMetaclass
-
-    if issubclass(form, BaseModelForm) and hasattr(form, '__metaclass__'):
-        form_metaclass = form.__metaclass__
-
-    return form_metaclass(class_name, (form,), form_class_attrs)
+    # Instatiate type(form) in order to use the same metaclass as form.
+    return type(form)(class_name, (form,), form_class_attrs)
 
 
 # ModelFormSets ##############################################################
@@ -504,7 +501,7 @@ class BaseModelFormSet(BaseFormSet):
         all_unique_checks = set()
         all_date_checks = set()
         for form in self.forms:
-            if not hasattr(form, 'cleaned_data'):
+            if not form.is_valid():
                 continue
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
@@ -516,21 +513,21 @@ class BaseModelFormSet(BaseFormSet):
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
             for form in self.forms:
-                # if the form doesn't have cleaned_data then we ignore it,
-                # it's already invalid
-                if not hasattr(form, "cleaned_data"):
+                if not form.is_valid():
                     continue
                 # get data for each field of each of unique_check
                 row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
                 if row_data and not None in row_data:
-                    # if we've aready seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_unique_error_message(unique_check))
                         form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
-                        del form.cleaned_data
-                        break
+                        # remove the data from the cleaned_data dict since it was invalid
+                        for field in unique_check:
+                            if field in form.cleaned_data:
+                                del form.cleaned_data[field]
                     # mark the data as seen
                     seen_data.add(row_data)
         # iterate over each of the date checks now
@@ -538,9 +535,7 @@ class BaseModelFormSet(BaseFormSet):
             seen_data = set()
             uclass, lookup, field, unique_for = date_check
             for form in self.forms:
-                # if the form doesn't have cleaned_data then we ignore it,
-                # it's already invalid
-                if not hasattr(self, 'cleaned_data'):
+                if not form.is_valid():
                     continue
                 # see if we have data for both fields
                 if (form.cleaned_data and form.cleaned_data[field] is not None
@@ -554,14 +549,15 @@ class BaseModelFormSet(BaseFormSet):
                     else:
                         date_data = (getattr(form.cleaned_data[unique_for], lookup),)
                     data = (form.cleaned_data[field],) + date_data
-                    # if we've aready seen it then we have a uniqueness failure
+                    # if we've already seen it then we have a uniqueness failure
                     if data in seen_data:
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_date_error_message(date_check))
                         form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
-                        del form.cleaned_data
-                        break
+                        # remove the data from the cleaned_data dict since it was invalid
+                        del form.cleaned_data[field]
+                    # mark the data as seen
                     seen_data.add(data)
         if errors:
             raise ValidationError(errors)
@@ -574,7 +570,7 @@ class BaseModelFormSet(BaseFormSet):
         else:
             return ugettext("Please correct the duplicate data for %(field)s, "
                 "which must be unique.") % {
-                    "field": get_text_list(unique_check, unicode(_("and"))),
+                    "field": get_text_list(unique_check, six.text_type(_("and"))),
                 }
 
     def get_date_error_message(self, date_check):
@@ -582,7 +578,7 @@ class BaseModelFormSet(BaseFormSet):
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
             'field_name': date_check[2],
             'date_field': date_check[3],
-            'lookup': unicode(date_check[1]),
+            'lookup': six.text_type(date_check[1]),
         }
 
     def get_form_error(self):
@@ -595,6 +591,10 @@ class BaseModelFormSet(BaseFormSet):
             return []
 
         saved_instances = []
+        try:
+            forms_to_delete = self.deleted_forms
+        except AttributeError:
+            forms_to_delete = []
         for form in self.initial_forms:
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
@@ -605,7 +605,7 @@ class BaseModelFormSet(BaseFormSet):
             pk_value = getattr(pk_value, 'pk', pk_value)
 
             obj = self._existing_object(pk_value)
-            if self.can_delete and self._should_delete_form(form):
+            if form in forms_to_delete:
                 self.deleted_objects.append(obj)
                 obj.delete()
                 continue
@@ -712,7 +712,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             # Remove the foreign key from the form's data
             form.data[form.add_prefix(self.fk.name)] = None
 
-        # Set the fk value here so that the form can do it's validation.
+        # Set the fk value here so that the form can do its validation.
         setattr(form.instance, self.fk.get_attname(), self.instance.pk)
         return form
 
@@ -846,7 +846,7 @@ class InlineForeignKeyField(Field):
     given parent instance in an inline.
     """
     default_error_messages = {
-        'invalid_choice': _(u'The inline foreign key did not match the parent instance primary key.'),
+        'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
     }
 
     def __init__(self, parent_instance, *args, **kwargs):
@@ -873,7 +873,7 @@ class InlineForeignKeyField(Field):
             orig = getattr(self.parent_instance, self.to_field)
         else:
             orig = self.parent_instance.pk
-        if force_unicode(value) != force_unicode(orig):
+        if force_text(value) != force_text(orig):
             raise ValidationError(self.error_messages['invalid_choice'])
         return self.parent_instance
 
@@ -884,7 +884,7 @@ class ModelChoiceIterator(object):
 
     def __iter__(self):
         if self.field.empty_label is not None:
-            yield (u"", self.field.empty_label)
+            yield ("", self.field.empty_label)
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
@@ -907,11 +907,11 @@ class ModelChoiceField(ChoiceField):
     # This class is a subclass of ChoiceField for purity, but it doesn't
     # actually use any of ChoiceField's implementation.
     default_error_messages = {
-        'invalid_choice': _(u'Select a valid choice. That choice is not one of'
-                            u' the available choices.'),
+        'invalid_choice': _('Select a valid choice. That choice is not one of'
+                            ' the available choices.'),
     }
 
-    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+    def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
                  help_text=None, to_field_name=None, *args, **kwargs):
         if required and (initial is not None):
@@ -951,7 +951,7 @@ class ModelChoiceField(ChoiceField):
         generate the labels for the choices presented by this object. Subclasses
         can override this method to customize the display of the choices.
         """
-        return smart_unicode(obj)
+        return smart_text(obj)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
@@ -996,10 +996,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget = SelectMultiple
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
-        'list': _(u'Enter a list of values.'),
-        'invalid_choice': _(u'Select a valid choice. %s is not one of the'
-                            u' available choices.'),
-        'invalid_pk_value': _(u'"%s" is not a valid value for a primary key.')
+        'list': _('Enter a list of values.'),
+        'invalid_choice': _('Select a valid choice. %s is not one of the'
+                            ' available choices.'),
+        'invalid_pk_value': _('"%s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,
@@ -1013,7 +1013,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages['required'])
         elif not self.required and not value:
-            return []
+            return self.queryset.none()
         if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['list'])
         key = self.to_field_name or 'pk'
@@ -1023,9 +1023,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
             except ValueError:
                 raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = set([force_unicode(getattr(o, key)) for o in qs])
+        pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
-            if force_unicode(val) not in pks:
+            if force_text(val) not in pks:
                 raise ValidationError(self.error_messages['invalid_choice'] % val)
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
@@ -1033,6 +1033,6 @@ class ModelMultipleChoiceField(ModelChoiceField):
         return qs
 
     def prepare_value(self, value):
-        if hasattr(value, '__iter__'):
+        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
