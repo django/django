@@ -78,8 +78,9 @@ work, see :doc:`Troubleshooting </faq/troubleshooting>`.
    on Windows, you may get an ImportError when you try to run
    ``django-admin.py startproject``. This is because Windows does not run the
    Python interpreter from your virtual environment unless you invoke it
-   directly. Instead, prefix all commands that use .py files with ``python``,
-   like so: ``python django-admin.py startproject mysite``.
+   directly. Instead, prefix all commands that use .py files with ``python`` and
+   use the full path to the file, like so:
+   ``python C:\pythonXY\Scripts\django-admin.py startproject mysite``.
 
 .. _virtualenv: http://www.virtualenv.org/
 
