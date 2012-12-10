@@ -1262,7 +1262,12 @@ def url(parser, token):
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
                                   " (path to a view)" % bits[0])
-    viewname = parser.compile_filter(bits[1])
+    try:
+        viewname = parser.compile_filter(bits[1])
+    except TemplateSyntaxError as exc:
+        exc.args = (exc.args[0] + ". "
+                "The syntax of 'url' changed in Django 1.5, see the docs."),
+        raise
     args = []
     kwargs = {}
     asvar = None
