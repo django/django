@@ -119,7 +119,7 @@ class Query(object):
         self.filter_is_sticky = False
         self.included_inherited_models = {}
 
-        # SQL-related attributes  
+        # SQL-related attributes
         # Select and related select clauses as SelectInfo instances.
         # The select is used for cases where we want to set up the select
         # clause to contain other than default fields (values(), annotate(),
