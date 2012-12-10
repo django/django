@@ -38,7 +38,7 @@ class FlagViewTests(CommentTestCase):
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.post("/flag/%d/" % pk, {'next': "/go/here/"})
         self.assertEqual(response["Location"],
-            "http://testserver/go/here/?c=1")
+            "http://testserver/go/here/?c=%d" % pk)
 
     def testFlagPostUnsafeNext(self):
         """
@@ -135,7 +135,7 @@ class DeleteViewTests(CommentTestCase):
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.post("/delete/%d/" % pk, {'next': "/go/here/"})
         self.assertEqual(response["Location"],
-            "http://testserver/go/here/?c=1")
+            "http://testserver/go/here/?c=%d" % pk)
 
     def testDeletePostUnsafeNext(self):
         """
@@ -209,7 +209,7 @@ class ApproveViewTests(CommentTestCase):
         response = self.client.post("/approve/%d/" % c1.pk,
             {'next': "/go/here/"})
         self.assertEqual(response["Location"],
-            "http://testserver/go/here/?c=1")
+            "http://testserver/go/here/?c=%d" % c1.pk)
 
     def testApprovePostUnsafeNext(self):
         """
