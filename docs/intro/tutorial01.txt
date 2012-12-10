@@ -62,6 +62,16 @@ work, see :doc:`Troubleshooting </faq/troubleshooting>`.
    ``django-admin``. You may continue through this documentation by omitting
    ``.py`` from each command.
 
+.. admonition:: Mac OS X permissions
+
+   If you're using Mac OS X, you may see the message "permission denied" when
+   you try to run ``django-admin.py startproject``. This is because, on
+   Unix-based systems like OS X, a file must be marked as "executable" before it
+   can be run as a program. To do this, open Terminal.app and navigate (using
+   the ``cd`` command) to the directory where :doc:`django-admin.py
+   </ref/django-admin>` is installed, then run the command
+   ``sudo chmod +x django-admin.py``.
+
 .. note::
 
     You'll need to avoid naming projects after built-in Python or Django
