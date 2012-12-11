@@ -91,7 +91,7 @@ class Converter(object):
             return r
 
 
-def _intword(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter):
+def _intword(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter, **kwargs):
     try:
         value = int(value)
     except (TypeError, ValueError):
@@ -110,7 +110,7 @@ def _intword(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=C
         else:
             template = float_formatted
         return template % {'value': value}
-    intword_converters = converter(precision, word_abr_symbol)#.intword_converters
+    intword_converters = converter(precision, word_abr_symbol, **kwargs)#.intword_converters
     for exponent, converters in intword_converters:
         large_number = 10 ** exponent
         if value < large_number * 1000:
@@ -118,8 +118,8 @@ def _intword(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=C
             return _check_for_i18n(new_value, *converters(new_value))
     return value
 
-def intword_internal(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter):
-    return _intword(value, precision, word_abr_symbol, max_num, converter)
+def intword_internal(value, precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter, **kwargs):
+    return _intword(value, precision, word_abr_symbol, max_num, converter, **kwargs)
 
 @register.filter(is_safe=False)
 def intword(value, precision=1):
