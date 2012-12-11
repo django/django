@@ -431,10 +431,12 @@ MySQL will connect via a Unix socket to the specified socket. For example::
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
 
-If you're using PostgreSQL, an empty string means to use a Unix domain socket
-for the connection, rather than a network connection to localhost. If you
-explicitly need to use a TCP/IP connection on the local machine with
-PostgreSQL, specify ``localhost`` here.
+If you're using PostgreSQL, by default (empty :setting:`HOST`), the connection
+to the database is done through UNIX domain sockets ('local' lines in
+``pg_hba.conf``). If you want to connect through TCP sockets, set
+:setting:`HOST` to 'localhost' or '127.0.0.1' ('host' lines in ``pg_hba.conf``).
+On Windows, you should always define :setting:`HOST`, as UNIX domain sockets
+are not available.
 
 .. setting:: NAME
 

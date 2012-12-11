@@ -220,8 +220,8 @@ your database connection settings.
   SQLite).
 
 * :setting:`HOST` -- The host your database is on. Leave this as
-  an empty string if your database server is on the same physical
-  machine (not used for SQLite).
+  an empty string (or possibly ``127.0.0.1``) if your database server is on the
+  same physical machine (not used for SQLite). See :setting:`HOST` for details.
 
 If you're new to databases, we recommend simply using SQLite by setting
 :setting:`ENGINE` to ``'django.db.backends.sqlite3'`` and :setting:`NAME` to
