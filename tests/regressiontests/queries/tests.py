@@ -1028,12 +1028,12 @@ class Queries4Tests(BaseQuerysetTest):
     def test_ticket14876(self):
         q1 = Report.objects.filter(Q(creator__isnull=True) | Q(creator__extra__info='e1'))
         q2 = Report.objects.filter(Q(creator__isnull=True)) | Report.objects.filter(Q(creator__extra__info='e1'))
-        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"])
+        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"], ordered=False)
         self.assertEqual(str(q1.query), str(q2.query))
 
         q1 = Report.objects.filter(Q(creator__extra__info='e1') | Q(creator__isnull=True))
         q2 = Report.objects.filter(Q(creator__extra__info='e1')) | Report.objects.filter(Q(creator__isnull=True))
-        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"])
+        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"], ordered=False)
         self.assertEqual(str(q1.query), str(q2.query))
 
         q1 = Item.objects.filter(Q(creator=self.a1) | Q(creator__report__name='r1')).order_by()
