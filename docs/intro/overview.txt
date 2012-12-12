@@ -166,7 +166,7 @@ Design your URLs
 
 A clean, elegant URL scheme is an important detail in a high-quality Web
 application. Django encourages beautiful URL design and doesn't put any cruft
-in URLs, like ``.php`` or ``.asp``.
+in URLs, like ``.py``.
 
 To design URLs for an app, you create a Python module called a :doc:`URLconf
 </topics/http/urls>`. A table of contents for your app, it contains a simple mapping
@@ -257,8 +257,7 @@ lookup and function calls.
 Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
 character). This is called a template filter, and it's a way to filter the value
 of a variable. In this case, the date filter formats a Python datetime object in
-the given format (as found in PHP's date function; yes, there is one good idea
-in PHP).
+the given format (as found in PHP's date function).
 
 You can chain together as many filters as you'd like. You can write custom
 filters. You can write custom template tags, which run custom Python code behind

@@ -624,8 +624,10 @@ Technical details
 Session IDs in URLs
 ===================
 
-The Django sessions framework is entirely, and solely, cookie-based. It does
-not fall back to putting session IDs in URLs as a last resort, as PHP does.
-This is an intentional design decision. Not only does that behavior make URLs
-ugly, it makes your site vulnerable to session-ID theft via the "Referer"
-header.
+The Django sessions framework is entirely, and solely, cookie-based. It is
+unable to fall back to putting session IDs in URLs as a last resort, as PHP
+does. This is an intentional design decision. Not only does that behavior
+make URLs ugly, it makes your site vulnerable to session-ID theft via the
+"Referer" header. This decision does mean that cookies are required in order
+to use Django sessions, however in modern web development this is rarely a
+problem.
