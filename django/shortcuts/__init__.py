@@ -7,6 +7,7 @@ for convenience's sake.
 from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
@@ -72,13 +73,19 @@ def _get_queryset(klass):
     """
     Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
     get_object_or_404 and get_list_or_404 more DRY.
+
+    If klass is not a Model, Manager, or QuerySet raises a ValueError
+    to inform user.
     """
     if isinstance(klass, QuerySet):
         return klass
     elif isinstance(klass, Manager):
         manager = klass
-    else:
+    elif isinstance(klass, ModelBase):
         manager = klass._default_manager
+    else:
+        raise ValueError("object is of type '%s', but must be a Django Model, "
+                         "Manager, or QuerySet" % klass.__class__.__name__)
     return manager.all()
 
 def get_object_or_404(klass, *args, **kwargs):
