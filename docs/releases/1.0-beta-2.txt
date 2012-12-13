@@ -46,7 +46,7 @@ Refactored documentation
     documentation files bundled with Django.
 
 .. _Sphinx: http://sphinx.pocoo.org/
-.. _online: http://docs.djangoproject.com/en/dev/
+.. _online: https://docs.djangoproject.com/
 
 Along with these new features, the Django team has also been hard at
 work polishing Django's codebase for the final 1.0 release; this beta

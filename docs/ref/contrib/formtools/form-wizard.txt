@@ -155,7 +155,8 @@ or the
 :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
 method, which are documented in the
 :class:`~django.views.generic.base.TemplateResponseMixin` documentation.  The
-latter one allows you to use a different template for each form.
+latter one allows you to use a different template for each form (:ref:`see the
+example below <wizard-template-for-each-form>`).
 
 This template expects a ``wizard`` object that has various items attached to
 it:
@@ -186,6 +187,7 @@ Here's a full example template:
 .. code-block:: html+django
 
     {% extends "base.html" %}
+    {% load i18n %}
 
     {% block head %}
     {{ wizard.form.media }}
@@ -236,6 +238,65 @@ wizard's :meth:`as_view` method takes a list of your
     urlpatterns = patterns('',
         (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
     )
+
+.. _wizard-template-for-each-form:
+
+Using a different template for each form
+----------------------------------------
+
+As mentioned above, you may specify a different template for each form.
+Consider an example using a form wizard to implement a multi-step checkout
+process for an online store. In the first step, the user specifies a billing
+and shipping address. In the second step, the user chooses payment type. If
+they chose to pay by credit card, they will enter credit card information in
+the next step. In the final step, they will confirm the purchase.
+
+Here's what the view code might look like::
+
+    from django.http import HttpResponseRedirect
+    from django.contrib.formtools.wizard.views import SessionWizardView
+
+    FORMS = [("address", myapp.forms.AddressForm),
+             ("paytype", myapp.forms.PaymentChoiceForm),
+             ("cc", myapp.forms.CreditCardForm),
+             ("confirmation", myapp.forms.OrderForm)]
+
+    TEMPLATES = {"address": "checkout/billingaddress.html",
+                 "paytype": "checkout/paymentmethod.html",
+                 "cc": "checkout/creditcard.html",
+                 "confirmation": "checkout/confirmation.html"}
+
+    def pay_by_credit_card(wizard):
+        """Return true if user opts to pay by credit card"""
+        # Get cleaned data from payment step
+        cleaned_data = wizard.get_cleaned_data_for_step('paytype') or {'method': 'none'}
+        # Return true if the user selected credit card
+        return cleaned_data['method'] == 'cc'
+
+
+    class OrderWizard(SessionWizardView):
+        def get_template_names(self):
+            return [TEMPLATES[self.steps.current]]
+
+        def done(self, form_list, **kwargs):
+            do_something_with_the_form_data(form_list)
+            return HttpResponseRedirect('/page-to-redirect-to-when-done/')
+            ...
+
+The ``urls.py`` file would contain something like::
+
+    urlpatterns = patterns('',
+        (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
+    )
+
+Note that the ``OrderWizard`` object is initialized with a list of pairs.
+The first element in the pair is a string that corresponds to the name of the
+step and the second is the form class.
+
+In this example, the
+:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+method returns a list containing a single template, which is selected based on
+the name of the current step.
 
 .. _wizardview-advanced-methods:
 
@@ -527,7 +588,7 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import pattern
+    from django.conf.urls import patterns
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition

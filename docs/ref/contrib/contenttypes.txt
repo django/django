@@ -187,6 +187,14 @@ The ``ContentTypeManager``
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
 
+    .. method:: get_for_id(id)
+
+        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
+        Since this method uses the same shared cache as
+        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
+        it's preferred to use this method over the usual
+        ``ContentType.objects.get(pk=id)``
+
     .. method:: get_for_model(model)
 
         Takes either a model class or an instance of a model, and returns the

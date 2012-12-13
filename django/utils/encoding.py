@@ -183,3 +183,15 @@ try:
     codecs.lookup(DEFAULT_LOCALE_ENCODING)
 except:
     DEFAULT_LOCALE_ENCODING = 'ascii'
+
+# Forwards compatibility with Django 1.5
+
+def python_2_unicode_compatible(klass):
+    # Always use the Python 2 branch of the decorator here in Django 1.4
+    klass.__unicode__ = klass.__str__
+    klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+    return klass
+
+smart_text = smart_unicode
+force_text = force_unicode
+smart_bytes = smart_str

@@ -494,6 +494,13 @@ file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
+Caches are not cleared after each test, and running "manage.py test fooapp" can
+insert data from the tests into the cache of a live system if you run your
+tests in production because, unlike databases, a separate "test cache" is not
+used. This behavior `may change`_ in the future.
+
+.. _may change: https://code.djangoproject.com/ticket/11505
+
 Understanding the test output
 -----------------------------
 
@@ -552,6 +559,51 @@ Note that the return code for the test-runner script is 1 for any number of
 failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
+
+Speeding up the tests
+---------------------
+
+In recent versions of Django, the default password hasher is rather slow by
+design. If during your tests you are authenticating many users, you may want
+to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
+to a faster hashing algorithm::
+
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    )
+
+Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
+algorithm used in fixtures, if any.
+
+.. _topics-testing-code-coverage:
+
+Integration with coverage.py
+----------------------------
+
+Code coverage describes how much source code has been tested. It shows which
+parts of your code are being exercised by tests and which are not. It's an
+important part of testing applications, so it's strongly recommended to check
+the coverage of your tests.
+
+Django can be easily integrated with `coverage.py`_, a tool for measuring code
+coverage of Python programs. First, `install coverage.py`_. Next, run the
+following from your project folder containing ``manage.py``::
+
+   coverage run --source='.' manage.py test myapp
+
+This runs your tests and collects coverage data of the executed files in your
+project. You can see a report of this data by typing following command::
+
+   coverage report
+
+Note that some Django code was executed while running tests, but it is not
+listed here because of the ``source`` flag passed to the previous command.
+
+For more options like annotated HTML listings detailing missed lines, see the
+`coverage.py`_ docs.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
+.. _install coverage.py: http://pypi.python.org/pypi/coverage
 
 Testing tools
 =============
@@ -1915,8 +1967,8 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
         @classmethod
         def tearDownClass(cls):
-            super(MySeleniumTests, cls).tearDownClass()
             cls.selenium.quit()
+            super(MySeleniumTests, cls).tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
@@ -1940,7 +1992,7 @@ out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: http://pypi.python.org/pypi/selenium
-.. _full reference: http://readthedocs.org/docs/selenium-python/en/latest/api.html
+.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
 
 .. note::

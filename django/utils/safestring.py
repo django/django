@@ -117,3 +117,9 @@ def mark_for_escaping(s):
         return EscapeUnicode(s)
     return EscapeString(str(s))
 
+# Forwards compatibility with Django 1.5
+
+EscapeBytes = EscapeString
+EscapeText = EscapeUnicode
+SafeBytes = SafeString
+SafeText = SafeUnicode

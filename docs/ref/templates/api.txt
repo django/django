@@ -122,6 +122,10 @@ dot in a variable name, it tries the following lookups, in this order:
 * Attribute lookup. Example: ``foo.bar``
 * List-index lookup. Example: ``foo[bar]``
 
+Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
+interpreted as a literal string and not using the value of the variable "bar",
+if one exists in the template context.
+
 The template system uses the first lookup type that works. It's short-circuit
 logic. Here are a few examples::
 
@@ -418,6 +422,10 @@ optional, third positional argument, ``processors``. In this example, the
             return render_to_response('my_template.html',
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
+
+    Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
+    the same as a call to :func:`~django.shortcuts.render_to_response()` with a
+    context_instance argument that forces the use of a ``RequestContext``.
 
 Here's what each of the default processors does:
 
@@ -792,7 +800,7 @@ Using an alternative template language
 The Django ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that
 implement this API we can use third party template systems like `Jinja2
-<http://jinja.pocoo.org/2/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
+<http://jinja.pocoo.org/docs/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
 allows us to use third-party template libraries without giving up useful Django
 features like the Django ``Context`` object and handy shortcuts like
 :func:`~django.shortcuts.render_to_response()`.

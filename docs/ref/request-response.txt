@@ -16,7 +16,8 @@ passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects.
+:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+module.
 
 HttpRequest objects
 ===================
@@ -28,7 +29,8 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes except ``session`` should be considered read-only.
+All attributes should be considered read-only, unless stated otherwise below.
+``session`` is a notable exception.
 
 .. attribute:: HttpRequest.body
 
@@ -587,7 +589,7 @@ To tell the browser to treat the response as a file attachment, use the
 this is how you might return a Microsoft Excel spreadsheet::
 
     >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
-    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+    >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -648,7 +650,7 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
     .. versionchanged:: 1.3
 
@@ -685,7 +687,7 @@ Methods
       risk of client side script accessing the protected cookie
       data.
 
-    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 

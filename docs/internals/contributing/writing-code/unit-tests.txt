@@ -161,9 +161,29 @@ associated tests will be skipped.
 .. _Textile: http://pypi.python.org/pypi/textile
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
-.. _memcached: http://www.danga.com/memcached/
+.. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: http://pypi.python.org/pypi/selenium
+
+Code coverage
+~~~~~~~~~~~~~
+
+Contributors are encouraged to run coverage on the test suite to identify areas
+that need additional tests. The coverage tool installation and use is described
+in :ref:`testing code coverage<topics-testing-code-coverage>`.
+
+To run coverage on the Django test suite using the standard test settings::
+
+    coverage run ./runtests.py --settings=test_sqlite
+
+After running coverage, generate the html report by running::
+
+    coverage html
+
+When running coverage for the Django tests, the included ``.coveragerc``
+settings file  defines ``coverage_html`` as the output directory for the report
+and also excludes several directories not relevant to the results
+(test code or external code included in Django).
 
 .. _contrib-apps:
 

@@ -70,7 +70,7 @@ server platforms. See the `server-arrangements wiki page`_ for specific
 installation instructions for each platform.
 
 .. _Apache: http://httpd.apache.org/
-.. _nginx: http://nginx.net/
+.. _nginx: http://nginx.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 
@@ -82,7 +82,14 @@ Get your database running
 If you plan to use Django's database API functionality, you'll need to make
 sure a database server is running. Django supports many different database
 servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
-SQLite_ (although SQLite doesn't require a separate server to be running).
+SQLite_.
+
+If you are developing a simple project or something you don't plan to deploy
+in a production environment, SQLite is generally the simplest option as it
+doesn't require running a separate server. However, SQLite has many differences
+from other databases, so if you are working on something substantial, it's
+recommended to develop with the same database as you plan on using in
+production.
 
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:

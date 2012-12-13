@@ -1401,8 +1401,8 @@ MEDIA_ROOT
 
 Default: ``''`` (Empty string)
 
-Absolute path to the directory that holds media for this installation, used
-for :doc:`managing stored files </topics/files>`.
+Absolute filesystem path to the directory that will hold :doc:`user-uploaded
+files </topics/files>`.
 
 Example: ``"/home/media/media.lawrence.com/"``
 
@@ -1724,7 +1724,7 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
-.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. versionchanged:: 1.4
     The default value of the setting was changed from ``False`` to ``True``.

@@ -93,8 +93,8 @@ GZip middleware
 Compresses content for browsers that understand GZip compression (all modern
 browsers).
 
-It is suggested to place this first in the middleware list, so that the
-compression of the response content is the last thing that happens.
+This middleware should be placed before any other middleware that need to
+read or write the response body so that compression happens afterward.
 
 It will NOT compress content if any of the following are true:
 
@@ -206,9 +206,9 @@ Transaction middleware
 
 .. class:: TransactionMiddleware
 
-Binds commit and rollback to the request/response phase. If a view function
-runs successfully, a commit is done. If it fails with an exception, a rollback
-is done.
+Binds commit and rollback of the default database to the request/response
+phase. If a view function runs successfully, a commit is done. If it fails with
+an exception, a rollback is done.
 
 The order of this middleware in the stack is important: middleware modules
 running outside of it run with commit-on-save - the default Django behavior.

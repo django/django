@@ -568,8 +568,6 @@ subclass::
 
 .. attribute:: ModelAdmin.list_filter
 
-    .. versionchanged:: 1.4
-
     Set ``list_filter`` to activate filters in the right sidebar of the change
     list page of the admin, as illustrated in the following screenshot:
 
@@ -592,6 +590,8 @@ subclass::
 
           class PersonAdmin(UserAdmin):
               list_filter = ('company__name',)
+
+    .. versionadded:: 1.4
 
     * a class inheriting from :mod:`django.contrib.admin.SimpleListFilter`,
       which you need to provide the ``title`` and ``parameter_name``
@@ -677,6 +677,8 @@ subclass::
                       if qs.filter(birthday__gte=date(1990, 1, 1),
                                     birthday__lte=date(1999, 12, 31)).exists():
                           yield ('90s', _('in the nineties'))
+
+    .. versionadded:: 1.4
 
     * a tuple, where the first element is a field name and the second
       element is a class inheriting from
@@ -1281,11 +1283,11 @@ provided some extra mapping data that would not otherwise be available::
             # ...
             pass
 
-        def change_view(self, request, object_id, extra_context=None):
+        def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
             return super(MyModelAdmin, self).change_view(request, object_id,
-                extra_context=extra_context)
+                form_url, extra_context=extra_context)
 
 .. versionadded:: 1.4
 

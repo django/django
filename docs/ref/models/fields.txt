@@ -71,8 +71,8 @@ If ``True``, the field is allowed to be blank. Default is ``False``.
 
 Note that this is different than :attr:`~Field.null`. :attr:`~Field.null` is
 purely database-related, whereas :attr:`~Field.blank` is validation-related. If
-a field has ``blank=True``, validation on Django's admin site will allow entry
-of an empty value. If a field has ``blank=False``, the field will be required.
+a field has ``blank=True``, form validation will allow entry of an empty value.
+If a field has ``blank=False``, the field will be required.
 
 .. _field-choices:
 
@@ -82,12 +82,11 @@ of an empty value. If a field has ``blank=False``, the field will be required.
 .. attribute:: Field.choices
 
 An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-field.
+field. If this is given, the default form widget will be a select box with
+these choices instead of the standard text field.
 
-If this is given, Django's admin will use a select box instead of the standard
-text field and will limit choices to the choices given.
-
-A choices list looks like this::
+The first element in each tuple is the actual value to be stored, and the
+second element is the human-readable name. For example::
 
     YEAR_IN_SCHOOL_CHOICES = (
         ('FR', 'Freshman'),
@@ -198,13 +197,21 @@ support tablespaces for indexes, this option is ignored.
 The default value for the field. This can be a value or a callable object. If
 callable it will be called every time a new object is created.
 
+The default cannot be a mutable object (model instance, list, set, etc.), as a
+reference to the same instance of that object would be used as the default
+value in all new model instances. Instead, wrap the desired default in a
+callable.  For example, if you had a custom ``JSONField`` and wanted to specify
+a dictionary as the default, use a ``lambda`` as follows::
+
+    contact_info = JSONField("ContactInfo", default=lambda:{"email": "to1@example.com"})
+
 ``editable``
 ------------
 
 .. attribute:: Field.editable
 
-If ``False``, the field will not be editable in the admin or via forms
-automatically generated from the model class. Default is ``True``.
+If ``False``, the field will not be displayed in the admin or any other
+:class:`~django.forms.ModelForm`. Default is ``True``.
 
 ``error_messages``
 ------------------
@@ -226,11 +233,11 @@ the `Field types`_ section below.
 
 .. attribute:: Field.help_text
 
-Extra "help" text to be displayed under the field on the object's admin form.
-It's useful for documentation even if your object doesn't have an admin form.
+Extra "help" text to be displayed with the form widget. It's useful for
+documentation even if your field isn't used on a form.
 
-Note that this value is *not* HTML-escaped when it's displayed in the admin
-interface. This lets you include HTML in :attr:`~Field.help_text` if you so
+Note that this value is *not* HTML-escaped in automatically-generated
+forms. This lets you include HTML in :attr:`~Field.help_text` if you so
 desire. For example::
 
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
@@ -261,7 +268,7 @@ Only one primary key is allowed on an object.
 
 If ``True``, this field must be unique throughout the table.
 
-This is enforced at the database level and at the Django admin-form level. If
+This is enforced at the database level and by model validation. If
 you try to save a model with a duplicate value in a :attr:`~Field.unique`
 field, a :exc:`django.db.IntegrityError` will be raised by the model's
 :meth:`~django.db.models.Model.save` method.
@@ -281,7 +288,7 @@ For example, if you have a field ``title`` that has
 ``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
 records with the same ``title`` and ``pub_date``.
 
-This is enforced at the Django admin-form level but not at the database level.
+This is enforced by model validation but not at the database level.
 
 ``unique_for_month``
 --------------------
@@ -343,7 +350,7 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 
 A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
-admin represents this as an ``<input type="text">`` (a single-line input).
+default form widget for this field is a :class:`~django.forms.TextInput`.
 
 
 ``BooleanField``
@@ -353,7 +360,8 @@ admin represents this as an ``<input type="text">`` (a single-line input).
 
 A true/false field.
 
-The admin represents this as a checkbox.
+The default form widget for this field is a
+:class:`~django.forms.CheckboxInput`.
 
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
@@ -372,7 +380,7 @@ A string field, for small- to large-sized strings.
 
 For large amounts of text, use :class:`~django.db.models.TextField`.
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 :class:`CharField` has one extra required argument:
 
@@ -425,9 +433,10 @@ optional arguments:
     for creation of timestamps. Note that the current date is *always* used;
     it's not just a default value that you can override.
 
-The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar, and a shortcut for "Today". Includes an additional ``invalid_date``
-error message key.
+The default form widget for this field is a
+:class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
+and a shortcut for "Today". Includes an additional ``invalid_date`` error
+message key.
 
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
@@ -442,8 +451,9 @@ error message key.
 A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
-The admin represents this as two ``<input type="text">`` fields, with
-JavaScript shortcuts.
+The default form widget for this field is a single
+:class:`~django.forms.TextInput`. The admin uses two separate
+:class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
 ----------------
@@ -472,7 +482,7 @@ decimal places::
 
     models.DecimalField(..., max_digits=19, decimal_places=10)
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 .. note::
 
@@ -541,8 +551,8 @@ Also has one optional argument:
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
 
-The admin represents this field as an ``<input type="file">`` (a file-upload
-widget).
+The default form widget for this field is a
+:class:`~django.forms.widgets.FileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
@@ -662,6 +672,11 @@ the field. Note: This method will close the file if it happens to be open when
 The optional ``save`` argument controls whether or not the instance is saved
 after the file has been deleted. Defaults to ``True``.
 
+Note that when a model is deleted, related files are not deleted. If you need
+to cleanup orphaned files, you'll need to handle it yourself (for instance,
+with a custom management command that can be run manually or scheduled to run
+periodically via e.g. cron).
+
 ``FilePathField``
 -----------------
 
@@ -710,7 +725,7 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 A floating-point number represented in Python by a ``float`` instance.
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 .. _floatfield_vs_decimalfield:
 
@@ -761,16 +776,16 @@ length using the :attr:`~CharField.max_length` argument.
 
 .. class:: IntegerField([**options])
 
-An integer. The admin represents this as an ``<input type="text">`` (a
-single-line input).
+An integer. The default form widget for this field is a
+:class:`~django.forms.TextInput`.
 
 ``IPAddressField``
 ------------------
 
 .. class:: IPAddressField([**options])
 
-An IP address, in string format (e.g. "192.0.2.30"). The admin represents this
-as an ``<input type="text">`` (a single-line input).
+An IP address, in string format (e.g. "192.0.2.30"). The default form widget
+for this field is a :class:`~django.forms.TextInput`.
 
 ``GenericIPAddressField``
 -------------------------
@@ -780,8 +795,8 @@ as an ``<input type="text">`` (a single-line input).
 .. versionadded:: 1.4
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
-``2a02:42fe::4``). The admin represents this as an ``<input type="text">``
-(a single-line input).
+``2a02:42fe::4``). The default form widget for this field is a
+:class:`~django.forms.TextInput`.
 
 The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
 including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -808,8 +823,8 @@ are converted to lowercase.
 .. class:: NullBooleanField([**options])
 
 Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
-this instead of a :class:`BooleanField` with ``null=True``. The admin represents
-this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
+this instead of a :class:`BooleanField` with ``null=True``. The default form
+widget for this field is a :class:`~django.forms.NullBooleanSelect`.
 
 ``PositiveIntegerField``
 ------------------------
@@ -860,8 +875,8 @@ Like an :class:`IntegerField`, but only allows values under a certain
 
 .. class:: TextField([**options])
 
-A large text field. The admin represents this as a ``<textarea>`` (a multi-line
-input).
+A large text field. The default form widget for this field is a
+:class:`~django.forms.Textarea`.
 
 .. admonition:: MySQL users
 
@@ -878,8 +893,8 @@ input).
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The admin represents this as an ``<input type="text">`` with some JavaScript
-shortcuts.
+The default form widget for this field is a :class:`~django.forms.TextInput`.
+The admin adds some JavaScript shortcuts.
 
 ``URLField``
 ------------
@@ -902,7 +917,7 @@ A :class:`CharField` for a URL. Has one extra optional argument:
     validating a URL being served by the same server will hang. This should not
     be a problem for multithreaded servers.
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length`argument. If you don't specify
@@ -978,9 +993,9 @@ define the details of how the relation works.
 .. attribute:: ForeignKey.limit_choices_to
 
     A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
-    that limit the available admin choices for this object. Use this with
-    functions from the Python ``datetime`` module to limit choices of objects by
-    date. For example::
+    that limit the available admin or ModelForm choices for this object. Use
+    this with functions from the Python ``datetime`` module to limit choices of
+    objects by date. For example::
 
         limit_choices_to = {'pub_date__lte': datetime.now}
 
@@ -1002,9 +1017,10 @@ define the details of how the relation works.
     <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django didn't create a backwards relation, set ``related_name``
-    to ``'+'``. For example, this will ensure that the ``User`` model won't get a
-    backwards relation to this model::
+    If you'd prefer Django not to create a backwards relation, set
+    ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
+    ensure that the ``User`` model won't have a backwards relation to this
+    model::
 
         user = models.ForeignKey(User, related_name='+')
 
@@ -1071,6 +1087,9 @@ the model is related. This works exactly the same as it does for
 :class:`ForeignKey`, including all the options regarding :ref:`recursive
 <recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
 
+Related objects can be added, removed, or created with the field's
+:class:`~django.db.models.fields.related.RelatedManager`.
+
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1095,6 +1114,13 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.related_name
 
     Same as :attr:`ForeignKey.related_name`.
+
+    If you have more than one ``ManyToManyField`` pointing to the same model
+    and want to suppress the backwards relations, set each ``related_name``
+    to a unique value ending with ``'+'``::
+
+        users = models.ManyToManyField(User, related_name='u+')
+        referents = models.ManyToManyField(User, related_name='ref+')
 
 .. attribute:: ManyToManyField.limit_choices_to
 

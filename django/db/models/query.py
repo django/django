@@ -377,7 +377,7 @@ class QuerySet(object):
         obj.save(force_insert=True, using=self.db)
         return obj
 
-    def bulk_create(self, objs):
+    def bulk_create(self, objs, batch_size=None):
         """
         Inserts each of the instances into the database. This does *not* call
         save() on each of the instances, does not send any pre/post save
@@ -390,8 +390,10 @@ class QuerySet(object):
         # this could be implemented if you didn't have an autoincrement pk,
         # and 2) you could do it by doing O(n) normal inserts into the parent
         # tables to get the primary keys back, and then doing a single bulk
-        # insert into the childmost table. We're punting on these for now
-        # because they are relatively rare cases.
+        # insert into the childmost table. Some databases might allow doing
+        # this by using RETURNING clause for the insert query. We're punting
+        # on these for now because they are relatively rare cases.
+        assert batch_size is None or batch_size > 0
         if self.model._meta.parents:
             raise ValueError("Can't bulk create an inherited model")
         if not objs:
@@ -407,13 +409,14 @@ class QuerySet(object):
         try:
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
-                self.model._base_manager._insert(objs, fields=fields, using=self.db)
+                self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
                 if objs_with_pk:
-                    self.model._base_manager._insert(objs_with_pk, fields=fields, using=self.db)
+                    self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
-                    self.model._base_manager._insert(objs_without_pk, fields=[f for f in fields if not isinstance(f, AutoField)], using=self.db)
+                    fields= [f for f in fields if not isinstance(f, AutoField)]
+                    self._batched_insert(objs_without_pk, fields, batch_size)
             if forced_managed:
                 transaction.commit(using=self.db)
             else:
@@ -849,6 +852,20 @@ class QuerySet(object):
     ###################
     # PRIVATE METHODS #
     ###################
+    def _batched_insert(self, objs, fields, batch_size):
+        """
+        A little helper method for bulk_insert to insert the bulk one batch
+        at a time. Inserts recursively a batch from the front of the bulk and
+        then _batched_insert() the remaining objects again.
+        """
+        if not objs:
+            return
+        ops = connections[self.db].ops
+        batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
+        for batch in [objs[i:i+batch_size]
+                      for i in range(0, len(objs), batch_size)]:
+            self.model._base_manager._insert(batch, fields=fields,
+                                             using=self.db)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:

@@ -149,6 +149,21 @@ class BasicExtractorTests(ExtractorTests):
             self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
             self.assertTrue("Translatable literal #8d" in po_contents)
 
+    def test_context_in_single_quotes(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+            # {% trans %}
+            self.assertTrue('msgctxt "Context wrapped in double quotes"' in po_contents)
+            self.assertTrue('msgctxt "Context wrapped in single quotes"' in po_contents)
+
+            # {% blocktrans %}
+            self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
+            self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+
+
 class JavascriptExtractorTests(ExtractorTests):
 
     PO_FILE='locale/%s/LC_MESSAGES/djangojs.po' % LOCALE

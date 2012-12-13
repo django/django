@@ -527,7 +527,7 @@ registered with any ``Admin`` instance::
     admin.site.register(Author, MultiDBModelAdmin)
     admin.site.register(Publisher, PublisherAdmin)
 
-    othersite = admin.Site('othersite')
+    othersite = admin.AdminSite('othersite')
     othersite.register(Publisher, MultiDBModelAdmin)
 
 This example sets up two admin sites. On the first site, the

@@ -516,7 +516,10 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
-.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+.. versionchanged:: 1.4
+    The default value of the setting was changed from ``False`` to ``True``.
+
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 SESSION_COOKIE_NAME
 -------------------

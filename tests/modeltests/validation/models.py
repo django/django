@@ -88,6 +88,8 @@ class GenericIPAddressTestModel(models.Model):
     generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)
     v4_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv4")
     v6_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv6")
+    ip_verbose_name = models.GenericIPAddressField("IP Address Verbose",
+            blank=True, null=True)
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)

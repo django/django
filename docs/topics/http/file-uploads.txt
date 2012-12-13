@@ -179,6 +179,52 @@ Three settings control Django's file upload behavior:
     Which means "try to upload to memory first, then fall back to temporary
     files."
 
+Handling uploaded files with a model
+------------------------------------
+
+If you're saving a file on a :class:`~django.db.models.Model` with a
+:class:`~django.db.models.FileField`, using a :class:`~django.forms.ModelForm`
+makes this process much easier. The file object will be saved to the location
+specified by the :attr:`~django.db.models.FileField.upload_to` argument of the
+corresponding :class:`~django.db.models.FileField` when calling
+``form.save()``::
+
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render
+    from .forms import ModelFormWithFileField
+
+    def upload_file(request):
+        if request.method == 'POST':
+            form = ModelFormWithFileField(request.POST, request.FILES)
+            if form.is_valid():
+                # file is saved
+                form.save()
+                return HttpResponseRedirect('/success/url/')
+        else:
+            form = ModelFormWithFileField()
+        return render('upload.html', {'form': form})
+
+If you are constructing an object manually, you can simply assign the file
+object from :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file
+field in the model::
+
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render
+    from .forms import UploadFileForm
+    from .models import ModelWithFileField
+
+    def upload_file(request):
+        if request.method == 'POST':
+            form = UploadFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                instance = ModelWithFileField(file_field=request.FILES['file'])
+                instance.save()
+                return HttpResponseRedirect('/success/url/')
+        else:
+            form = UploadFileForm()
+        return render('upload.html', {'form': form})
+
+
 ``UploadedFile`` objects
 ========================
 

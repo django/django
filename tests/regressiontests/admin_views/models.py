@@ -113,6 +113,7 @@ class Color2(Color):
 class Thing(models.Model):
     title = models.CharField(max_length=20)
     color = models.ForeignKey(Color, limit_choices_to={'warm': True})
+    pub_date = models.DateField(blank=True, null=True)
     def __unicode__(self):
         return self.title
 

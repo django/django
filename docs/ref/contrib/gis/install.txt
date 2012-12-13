@@ -102,7 +102,7 @@ Program                   Description                           Required        
 
 .. _PROJ.4: http://trac.osgeo.org/proj/
 __ http://postgis.refractions.net/
-__ http://www.gaia-gis.it/spatialite/index.html
+__ http://www.gaia-gis.it/gaia-sins/
 
 .. _build_from_source:
 
@@ -191,6 +191,8 @@ GEOS C library.  For example:
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
 
+See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-logfile>`.
+
 .. _proj4:
 
 PROJ.4
@@ -233,7 +235,7 @@ installed prior to building PostGIS.
     The `psycopg2`_ module is required for use as the database adaptor
     when using GeoDjango with PostGIS.
 
-.. _psycopg2: http://initd.org/projects/psycopg2
+.. _psycopg2: http://initd.org/psycopg/
 
 First download the source archive, and extract::
 
@@ -376,7 +378,7 @@ SpatiaLite.
 After installation is complete, don't forget to read the post-installation
 docs on :ref:`create_spatialite_db`.
 
-__ http://www.gaia-gis.it/spatialite/index.html
+__ http://www.gaia-gis.it/gaia-sins/
 
 .. _sqlite:
 
@@ -457,7 +459,7 @@ Finally, do the same for the SpatiaLite tools::
 
         $ ./configure --target=macosx
 
-__ http://www.gaia-gis.it/spatialite/sources.html
+__ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _pysqlite2:
 
@@ -666,7 +668,7 @@ community!  You can:
   and specify the component as "GIS".
 
 __ http://groups.google.com/group/geodjango
-__ https://code.djangoproject.com/simpleticket
+__ https://code.djangoproject.com/newticket
 
 .. _libsettings:
 
@@ -905,7 +907,7 @@ add the following to your ``settings.py``:
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
-__ http://www.gaia-gis.it/spatialite/binaries.html
+__ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
 
 .. _fink:
 
@@ -1316,8 +1318,8 @@ may be executed from the SQL Shell as the ``postgres`` user::
 .. rubric:: Footnotes
 .. [#] The datum shifting files are needed for converting data to and from
        certain projections.
-       For example, the PROJ.4 string for the `Google projection (900913)
-       <http://spatialreference.org/ref/epsg/900913/proj4>`_ requires the
+       For example, the PROJ.4 string for the `Google projection (900913 or 3857)
+       <http://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
        ``null`` grid file only included in the extra datum shifting files.
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.

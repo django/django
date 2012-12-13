@@ -2,10 +2,56 @@ import os
 
 from django.conf import global_settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
 from django.template import context
 from django.test import TestCase
 from django.test.utils import override_settings
+
+
+class MockUser(object):
+    def has_module_perm(self, perm):
+        if perm == 'mockapp.someapp':
+            return True
+        return False
+
+    def has_perm(self, perm):
+        if perm == 'someperm':
+            return True
+        return False
+
+
+class PermWrapperTests(TestCase):
+    """
+    Test some details of the PermWrapper implementation.
+    """
+    class EQLimiterObject(object):
+        """
+        This object makes sure __eq__ will not be called endlessly.
+        """
+        def __init__(self):
+            self.eq_calls = 0
+
+        def __eq__(self, other):
+            if self.eq_calls > 0:
+                return True
+            self.eq_calls += 1
+            return False
+
+    def test_permwrapper_in(self):
+        """
+        Test that 'something' in PermWrapper doesn't end up in endless loop.
+        """
+        perms = PermWrapper(MockUser())
+        def raises():
+            self.EQLimiterObject() in perms
+        self.assertRaises(raises, TypeError)
+
+    def test_permlookupdict_in(self):
+        pldict = PermLookupDict(MockUser(), 'mockapp')
+        def raises():
+            self.EQLimiterObject() in pldict
+        self.assertRaises(raises, TypeError)
 
 
 class AuthContextProcessorTests(TestCase):

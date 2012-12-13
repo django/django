@@ -218,10 +218,11 @@ handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
 
-Logging is configured immediately after settings have been loaded.
-Since the loading of settings is one of the first things that Django
-does, you can be certain that loggers are always ready for use in your
-project code.
+Logging is configured as soon as settings have been loaded
+(either manually using :func:`~django.conf.settings.configure` or when at least
+one setting is accessed). Since the loading of settings is one of the first
+things that Django does, you can be certain that loggers are always ready for
+use in your project code.
 
 .. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -514,6 +515,35 @@ logging module.
    argument, the record to be logged), and calls it for each record that passes
    through the filter. Handling of that record will not proceed if the callback
    returns False.
+
+   For instance, to filter out :class:`~django.http.UnreadablePostError`
+   (raised when a user cancels an upload) from the admin emails, you would
+   create a filter function::
+
+    from django.http import UnreadablePostError
+
+    def skip_unreadable_post(record):
+        if record.exc_info:
+            exc_type, exc_value = record.exc_info[:2]
+            if isinstance(exc_value, UnreadablePostError):
+                return False
+        return True
+
+   and then add it to your logging config::
+
+        'filters': {
+            'skip_unreadable_posts': {
+                '()': 'django.utils.log.CallbackFilter',
+                'callback': skip_unreadable_post,
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['skip_unreadable_posts'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            }
+        },
 
 .. class:: RequireDebugFalse()
 

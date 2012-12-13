@@ -31,7 +31,7 @@ attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
 aggregate with a database backend that falls within the affected release range.
 
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
-.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+.. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
 
 Optimizing PostgreSQL's configuration
 -------------------------------------
@@ -56,10 +56,10 @@ will do some additional queries to set these parameters.
 Transaction handling
 ---------------------
 
-:doc:`By default </topics/db/transactions>`, Django starts a transaction when a
-database connection is first used and commits the result at the end of the
-request/response handling. The PostgreSQL backends normally operate the same
-as any other Django backend in this respect.
+:doc:`By default </topics/db/transactions>`, Django runs with an open
+transaction which it commits automatically when any built-in, data-altering
+model function is called. The PostgreSQL backends normally operate the same as
+any other Django backend in this respect.
 
 .. _postgresql-autocommit-mode:
 
@@ -164,6 +164,16 @@ full-text indexing and searching.
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
 choice at this point.
+
+If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
+tables, ensure that your tables are using the same storage engine (i.e. MyISAM
+vs. InnoDB). Specifically, if tables that have a ``ForeignKey`` between them
+use different storage engines, you may see an error like the following when
+running ``syncdb``::
+
+    _mysql_exceptions.OperationalError: (
+        1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
+    )
 
 .. versionchanged:: 1.4
 

@@ -97,12 +97,28 @@ Use a dot (``.``) to access attributes of a variable.
     * Method call
     * List-index lookup
 
+    This can cause some unexpected behavior with objects that override
+    dictionary lookup. For example, consider the following code snippet that
+    attempts to loop over a ``collections.defaultdict``::
+
+        {% for k, v in defaultdict.iteritems %}
+            Do something with k and v here...
+        {% endfor %}
+
+    Because dictionary lookup happens first, that behavior kicks in and provides
+    a default value instead of using the intended ``.iteritems()``
+    method. In this case, consider converting to a dictionary first.
+
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
 
 If you use a variable that doesn't exist, the template system will insert
 the value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set
 to ``''`` (the empty string) by default.
+
+Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
+interpreted as a literal string and not using the value of the variable "bar",
+if one exists in the template context.
 
 Filters
 =======

@@ -11,6 +11,16 @@ A widget is Django's representation of a HTML input element. The widget
 handles the rendering of the HTML, and the extraction of data from a GET/POST
 dictionary that corresponds to the widget.
 
+.. tip::
+
+    Widgets should not be confused with the :doc:`form fields </ref/forms/fields>`.
+    Form fields deal with the logic of input validation and are used directly
+    in templates. Widgets deal with rendering of HTML form input elements on
+    the web page and extraction of raw submitted data. However, widgets do
+    need to be :ref:`assigned <widget-to-field>` to form fields.
+
+.. _widget-to-field:
+
 Specifying widgets
 ------------------
 
@@ -75,7 +85,7 @@ changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
 example::
 
     >>> from django import forms
-    >>> CHOICES = (('1', 'First',), ('2', 'Second',)))
+    >>> CHOICES = (('1', 'First',), ('2', 'Second',))
     >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
     >>> choice_field.choices
     [('1', 'First'), ('2', 'Second')]
@@ -95,15 +105,23 @@ choices are inherent to the model and not just the representational widget.
 Customizing widget instances
 ----------------------------
 
-When Django renders a widget as HTML, it only renders the bare minimum
-HTML - Django doesn't add a class definition, or any other widget-specific
-attributes. This means that all :class:`TextInput` widgets will appear the same
-on your Web page.
+When Django renders a widget as HTML, it only renders very minimal markup -
+Django doesn't add class names, or any other widget-specific attributes. This
+means, for example, that all :class:`TextInput` widgets will appear the same
+on your Web pages.
 
-If you want to make one widget look different to another, you need to
-specify additional attributes for each widget. When you specify a
-widget, you can provide a list of attributes that will be added to the
-rendered HTML for the widget.
+There are two ways to customize widgets: :ref:`per widget instance
+<styling-widget-instances>` and :ref:`per widget class <styling-widget-classes>`.
+
+.. _styling-widget-instances:
+
+Styling widget instances
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to make one widget instance look different from another, you will
+need to specify additional attributes at the time when the widget object is
+instantiated and assigned to a form field (and perhaps add some rules to your
+CSS files).
 
 For example, take the following simple form::
 
@@ -127,9 +145,7 @@ provided for each widget will be rendered exactly the same::
 On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. To do this, you use the
-:attr:`Widget.attrs` argument when creating the widget:
-
-For example::
+:attr:`Widget.attrs` argument when creating the widget::
 
     class CommentForm(forms.Form):
         name = forms.CharField(
@@ -146,30 +162,115 @@ Django will then include the extra attributes in the rendered output:
     <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
 
-.. _built-in widgets:
+.. _styling-widget-classes:
 
-Built-in widgets
-----------------
+Styling widget classes
+^^^^^^^^^^^^^^^^^^^^^^
 
-Django provides a representation of all the basic HTML widgets, plus some
-commonly used groups of widgets:
+With widgets, it is possible to add media (``css`` and ``javascript``)
+and more deeply customize their appearance and behavior.
 
-``Widget``
-~~~~~~~~~~
+In a nutshell, you will need to subclass the widget and either
+:ref:`define a class "Media" <media-as-a-static-definition>` as a member of the
+subclass, or :ref:`create a property "media" <dynamic-property>`, returning an
+instance of that class.
 
-.. class:: Widget
+These methods involve somewhat advanced Python programming and are described in
+detail in the :doc:`Form Media </topics/forms/media>` topic guide.
 
-    This abstract class cannot be rendered, but provides the basic attribute :attr:`~Widget.attrs`.
+.. _base-widget-classes:
+
+Base Widget classes
+-------------------
+
+Base widget classes :class:`Widget` and :class:`MultiWidget` are subclassed by
+all the :ref:`built-in widgets <built-in widgets>` and may serve as a
+foundation for custom widgets.
+
+.. class:: Widget(attrs=None)
+
+    This abstract class cannot be rendered, but provides the basic attribute
+    :attr:`~Widget.attrs`.  You may also implement or override the
+    :meth:`~Widget.render()` method on custom widgets.
 
     .. attribute:: Widget.attrs
 
-        A dictionary containing HTML attributes to be set on the rendered widget.
+        A dictionary containing HTML attributes to be set on the rendered
+        widget.
 
         .. code-block:: python
 
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
             u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
+
+    .. method:: render(name, value, attrs=None)
+
+        Returns HTML for the widget, as a Unicode string. This method must be
+        implemented by the subclass, otherwise ``NotImplementedError`` will be
+        raised.
+
+        The 'value' given is not guaranteed to be valid input, therefore
+        subclass implementations should program defensively.
+
+.. class:: MultiWidget(widgets, attrs=None)
+
+    A widget that is composed of multiple widgets.
+    :class:`~django.forms.widgets.MultiWidget` works hand in hand with the
+    :class:`~django.forms.MultiValueField`.
+
+    .. method:: render(name, value, attrs=None)
+
+        Argument `value` is handled differently in this method from the
+        subclasses of :class:`~Widget`.
+
+        If `value` is a list, output of :meth:`~MultiWidget.render` will be a
+        concatenation of rendered child widgets. If `value` is not a list, it
+        will be first processed by the method :meth:`~MultiWidget.decompress()`
+        to create the list and then processed as above.
+
+        Unlike in the single value widgets, method :meth:`~MultiWidget.render`
+        need not be implemented in the subclasses.
+
+    .. method:: decompress(value)
+
+        Returns a list of "decompressed" values for the given value of the
+        multi-value field that makes use of the widget. The input value can be
+        assumed as valid, but not necessarily non-empty.
+
+        This method **must be implemented** by the subclass, and since the
+        value may be empty, the implementation must be defensive.
+
+        The rationale behind "decompression" is that it is necessary to "split"
+        the combined value of the form field into the values of the individual
+        field encapsulated within the multi-value field (e.g. when displaying
+        the partially or fully filled-out form).
+
+        .. tip::
+
+            Note that :class:`~django.forms.MultiValueField` has a
+            complementary method :meth:`~django.forms.MultiValueField.compress`
+            with the opposite responsibility - to combine cleaned values of
+            all member fields into one.
+
+
+.. _built-in widgets:
+
+Built-in widgets
+----------------
+
+Django provides a representation of all the basic HTML widgets, plus some
+commonly used groups of widgets in the ``django.forms.widgets`` module,
+including :ref:`the input of text <text-widgets>`, :ref:`various checkboxes
+and selectors <selector-widgets>`, :ref:`uploading files <file-upload-widgets>`,
+and :ref:`handling of multi-valued input <composite-widgets>`.
+
+.. _text-widgets:
+
+Widgets handling input of text
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 ``TextInput``
 ~~~~~~~~~~~~~
@@ -204,39 +305,8 @@ commonly used groups of widgets:
 
     Hidden input: ``<input type='hidden' ...>``
 
-``MultipleHiddenInput``
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. class:: MultipleHiddenInput
-
-    Multiple ``<input type='hidden' ...>`` widgets.
-
-    A widget that handles multiple hidden widgets for fields that have a list
-    of values.
-
-    .. attribute:: MultipleHiddenInput.choices
-
-        This attribute is optional when the field does not have a
-        :attr:`~Field.choices` attribute. If it does, it will override anything
-        you set here when the attribute is updated on the :class:`Field`.
-
-``FileInput``
-~~~~~~~~~~~~~
-
-.. class:: FileInput
-
-    File upload input: ``<input type='file' ...>``
-
-``ClearableFileInput``
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. class:: ClearableFileInput
-
-    .. versionadded:: 1.3
-
-    File upload input: ``<input type='file' ...>``, with an additional checkbox
-    input to clear the field's value, if the field is not required and has
-    initial data.
+    Note that there also is a :class:`MultipleHiddenInput` widget that
+    encapsulates a set of hidden input elements.
 
 ``DateInput``
 ~~~~~~~~~~~~~
@@ -295,6 +365,11 @@ commonly used groups of widgets:
 .. class:: Textarea
 
     Text area: ``<textarea>...</textarea>``
+
+.. _selector-widgets:
+
+Selector and checkbox widgets
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``CheckboxInput``
 ~~~~~~~~~~~~~~~~~
@@ -434,6 +509,50 @@ commonly used groups of widgets:
           <li><input type='checkbox' ...></li>
           ...
         </ul>
+
+.. _file-upload-widgets:
+
+File upload widgets
+^^^^^^^^^^^^^^^^^^^
+
+``FileInput``
+~~~~~~~~~~~~~
+
+.. class:: FileInput
+
+    File upload input: ``<input type='file' ...>``
+
+``ClearableFileInput``
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ClearableFileInput
+
+    .. versionadded:: 1.3
+
+    File upload input: ``<input type='file' ...>``, with an additional checkbox
+    input to clear the field's value, if the field is not required and has
+    initial data.
+
+.. _composite-widgets:
+
+Composite widgets
+^^^^^^^^^^^^^^^^^
+
+``MultipleHiddenInput``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: MultipleHiddenInput
+
+    Multiple ``<input type='hidden' ...>`` widgets.
+
+    A widget that handles multiple hidden widgets for fields that have a list
+    of values.
+
+    .. attribute:: MultipleHiddenInput.choices
+
+        This attribute is optional when the field does not have a
+        :attr:`~Field.choices` attribute. If it does, it will override anything
+        you set here when the attribute is updated on the :class:`Field`.
 
 ``MultiWidget``
 ~~~~~~~~~~~~~~~

@@ -52,7 +52,7 @@ Here's a "Hello World" example::
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
         response = HttpResponse(mimetype='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+        response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
 
         # Create the PDF object, using the response object as its "file."
         p = canvas.Canvas(response)
@@ -87,7 +87,7 @@ mention:
   the PDF using whatever program/plugin they've been configured to use for
   PDFs. Here's what that code would look like::
 
-      response['Content-Disposition'] = 'filename=somefilename.pdf'
+      response['Content-Disposition'] = 'filename="somefilename.pdf"'
 
 * Hooking into the ReportLab API is easy: Just pass ``response`` as the
   first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
@@ -119,7 +119,7 @@ Here's the above "Hello World" example rewritten to use :mod:`cStringIO`::
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
         response = HttpResponse(mimetype='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+        response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
 
         buffer = StringIO()
 

@@ -166,6 +166,37 @@ The functions defined in this module share the following properties:
     ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
     instance.
 
+``django.utils.decorators``
+===========================
+
+.. module:: django.utils.decorators
+    :synopsis: Functions that help with creating decorators for views.
+
+.. function:: method_decorator(decorator)
+
+    Converts a function decorator into a method decorator. See :ref:`decorating
+    class based views<decorating-class-based-views>` for example usage.
+
+.. function:: decorator_from_middleware(middleware_class)
+
+    Given a middleware class, returns a view decorator. This lets you use
+    middleware functionality on a per-view basis. The middleware is created
+    with no params passed.
+
+.. function:: decorator_from_middleware_with_args(middleware_class)
+
+    Like ``decorator_from_middleware``, but returns a function
+    that accepts the arguments to be passed to the middleware_class.
+    For example, the :func:`~django.views.decorators.cache.cache_page`
+    decorator is created from the
+    :class:`~django.middleware.cache.CacheMiddleware` like this::
+
+         cache_page = decorator_from_middleware_with_args(CacheMiddleware)
+
+         @cache_page(3600)
+         def my_view(request):
+             pass
+
 ``django.utils.encoding``
 =========================
 
@@ -247,13 +278,13 @@ For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
 For definitions of the different versions of RSS, see:
-http://diveintomark.org/archives/2004/02/04/incompatible-rss
+http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
 
 SyndicationFeed
 ---------------
@@ -331,7 +362,7 @@ Rss201rev2Feed
 
 .. class:: Rss201rev2Feed(RssFeed)
 
-    Spec: http://blogs.law.harvard.edu/tech/rss
+    Spec: http://cyber.law.harvard.edu/rss/rss.html
 
 RssUserland091Feed
 ------------------

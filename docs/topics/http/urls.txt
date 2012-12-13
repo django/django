@@ -55,7 +55,8 @@ algorithm the system follows to determine which Python code to execute:
    one that matches the requested URL.
 
 4. Once one of the regexes matches, Django imports and calls the given
-   view, which is a simple Python function. The view gets passed an
+   view, which is a simple Python function (or a :doc:`class based view
+   </topics/class-based-views>`). The view gets passed an
    :class:`~django.http.HttpRequest` as its first argument and any values
    captured in the regex as remaining arguments.
 
@@ -672,6 +673,15 @@ The style you use is up to you.
 
 Note that if you use this technique -- passing objects rather than strings --
 the view prefix (as explained in "The view prefix" above) will have no effect.
+
+Note that :doc:`class based views</topics/class-based-views>` must be
+imported::
+
+    from mysite.views import ClassBasedView
+
+    urlpatterns = patterns('',
+        (r'^myview/$', ClassBasedView.as_view()),
+    )
 
 .. _naming-url-patterns:
 

@@ -404,11 +404,21 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+        '%Y-%m-%d',       # '2006-10-25'
+        '%m/%d/%Y',       # '10/25/2006'
+        '%m/%d/%y',       # '10/25/06'
+
+    Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
+    following will also be included in the default input formats::
+
+        '%b %d %Y',       # 'Oct 25 2006'
+        '%b %d, %Y',      # 'Oct 25, 2006'
+        '%d %b %Y',       # '25 Oct 2006'
+        '%d %b, %Y',      # '25 Oct, 2006'
+        '%B %d %Y',       # 'October 25 2006'
+        '%B %d, %Y',      # 'October 25, 2006'
+        '%d %B %Y',       # '25 October 2006'
+        '%d %B, %Y',      # '25 October, 2006'
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -851,7 +861,7 @@ Slightly complex built-in ``Field`` classes
 ``MultiValueField``
 ~~~~~~~~~~~~~~~~~~~
 
-.. class:: MultiValueField(**kwargs)
+.. class:: MultiValueField(fields=(), **kwargs)
 
     * Default widget: ``TextInput``
     * Empty value: ``''`` (an empty string)
@@ -860,22 +870,39 @@ Slightly complex built-in ``Field`` classes
       as an argument to the ``MultiValueField``.
     * Error message keys: ``required``, ``invalid``
 
-    This abstract field (must be subclassed) aggregates the logic of multiple
-    fields. Subclasses should not have to implement clean(). Instead, they must
-    implement compress(), which takes a list of valid values and returns a
-    "compressed" version of those values -- a single value.  For example,
-    :class:`SplitDateTimeField` is a subclass which combines a time field and
-    a date field into a datetime object.
+    Aggregates the logic of multiple fields that together produce a single
+    value.
+
+    This field is abstract and must be subclassed. In contrast with the
+    single-value fields, subclasses of :class:`MultiValueField` must not
+    implement :meth:`~django.forms.Field.clean` but instead - implement
+    :meth:`~MultiValueField.compress`.
 
     Takes one extra required argument:
 
     .. attribute:: fields
 
-        A list of fields which are cleaned into a single field. Each value in
-        ``clean`` is cleaned by the corresponding field in ``fields`` -- the first
-        value is cleaned by the first field, the second value is cleaned by
-        the second field, etc.  Once all fields are cleaned, the list of clean
-        values is "compressed" into a single value.
+        A tuple of fields whose values are cleaned and subsequently combined
+        into a single value.  Each value of the field is cleaned by the
+        corresponding field in ``fields`` -- the first value is cleaned by the
+        first field, the second value is cleaned by the second field, etc.
+        Once all fields are cleaned, the list of clean values is combined into
+        a single value by :meth:`~MultiValueField.compress`.
+
+    .. attribute:: MultiValueField.widget
+
+        Must be a subclass of :class:`django.forms.MultiWidget`.
+        Default value is :class:`~django.forms.widgets.TextInput`, which
+        probably is not very useful in this case.
+
+    .. method:: compress(data_list)
+
+        Takes a list of valid values and returns  a "compressed" version of
+        those values -- in a single value. For example,
+        :class:`SplitDateTimeField` is a subclass which combines a time field
+        and a date field into a ``datetime`` object.
+
+        This method must be implemented in the subclasses.
 
 ``SplitDateTimeField``
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -101,12 +101,13 @@ Fields
 
         This doesn't necessarily control whether or not the user can log in.
         Authentication backends aren't required to check for the ``is_active``
-        flag, so if you want to reject a login based on ``is_active`` being
-        ``False``, it's up to you to check that in your own login view.
-        However, the :class:`~django.contrib.auth.forms.AuthenticationForm`
-        used by the :func:`~django.contrib.auth.views.login` view *does*
-        perform this check, as do the permission-checking methods such as
-        :meth:`~models.User.has_perm` and the authentication in the Django
+        flag, and the default backends do not. If you want to reject a login
+        based on ``is_active`` being ``False``, it's up to you to check that in
+        your own login view or a custom authentication backend. However, the
+        :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+        :func:`~django.contrib.auth.views.login` view (which is the default)
+        *does* perform this check, as do the permission-checking methods such
+        as :meth:`~models.User.has_perm` and the authentication in the Django
         admin. All of those functions/methods will return ``False`` for
         inactive users.
 
@@ -663,6 +664,36 @@ the handler, if ``created`` is ``True``, create the associated user profile::
 .. seealso:: :doc:`/topics/signals` for more information on Django's signal
     dispatcher.
 
+Adding UserProfile fields to the admin
+--------------------------------------
+
+To add the UserProfile fields to the user page in the admin, define an
+:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+add it to a ``UserAdmin`` class which is registered with the
+:class:`~django.contrib.auth.models.User` class::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from my_user_profile_app.models import UserProfile
+
+    # Define an inline admin descriptor for UserProfile model
+    # which acts a bit like a singleton
+    class UserProfileInline(admin.StackedInline):
+        model = UserProfile
+        can_delete = False
+        verbose_name_plural = 'profile'
+
+    # Define a new User admin
+    class UserAdmin(UserAdmin):
+        inlines = (UserProfileInline, )
+
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
+
 Authentication in Web requests
 ==============================
 
@@ -1188,24 +1219,25 @@ includes a few other useful built-in views located in
       :file:`registration/password_reset_form.html` if not supplied.
 
     * ``email_template_name``: The full name of a template to use for
-      generating the email with the new password. Defaults to
+      generating the email with the reset password link. Defaults to
       :file:`registration/password_reset_email.html` if not supplied.
 
     * ``subject_template_name``: The full name of a template to use for
-      the subject of the email with the new password. Defaults
+      the subject of the email with the reset password link. Defaults
       to :file:`registration/password_reset_subject.txt` if not supplied.
 
       .. versionadded:: 1.4
 
-    * ``password_reset_form``: Form that will be used to set the password.
-      Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
+    * ``password_reset_form``: Form that will be used to get the email of
+      the user to reset the password for. Defaults to
+      :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
-    * ``token_generator``: Instance of the class to check the password. This
-      will default to ``default_token_generator``, it's an instance of
+    * ``token_generator``: Instance of the class to check the one time link.
+      This will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
     * ``post_reset_redirect``: The URL to redirect to after a successful
-      password change.
+      password reset request.
 
     * ``from_email``: A valid email address. By default Django uses
       the :setting:`DEFAULT_FROM_EMAIL`.
@@ -1236,7 +1268,7 @@ includes a few other useful built-in views located in
 
     * ``uid``: The user's id encoded in base 36.
 
-    * ``token``: Token to check that the password is valid.
+    * ``token``: Token to check that the reset link is valid.
 
     Sample ``registration/password_reset_email.html`` (email body template):
 
@@ -1467,12 +1499,13 @@ The permission_required decorator
 
 .. currentmodule:: django.contrib.auth
 
-Limiting access to generic views
---------------------------------
+Applying permissions to generic views
+-------------------------------------
 
-To limit access to a :doc:`class-based generic view </ref/class-based-views>`,
-decorate the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
-method on the class. See :ref:`decorating-class-based-views` for details.
+To apply a permission to a :doc:`class-based generic view
+</ref/class-based-views>`, decorate the :meth:`View.dispatch
+<django.views.generic.base.View.dispatch>` method on the class. See
+:ref:`decorating-class-based-views` for details.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1508,12 +1541,13 @@ The Django admin site uses permissions as follows:
 * Access to delete an object is limited to users with the "delete"
   permission for that type of object.
 
-Permissions are set globally per type of object, not per specific object
-instance. For example, it's possible to say "Mary may change news stories," but
-it's not currently possible to say "Mary may change news stories, but only the
-ones she created herself" or "Mary may only change news stories that have a
-certain status, publication date or ID." The latter functionality is something
-Django developers are currently discussing.
+Permissions can be set not only per type of object, but also per specific
+object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
+:meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
+by the :class:`~django.contrib.admin.ModelAdmin` class, it is possible to
+customize permissions for different object instances of the same type.
 
 Default permissions
 -------------------
@@ -1779,7 +1813,11 @@ By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
     ('django.contrib.auth.backends.ModelBackend',)
 
-That's the basic authentication scheme that checks the Django users database.
+That's the basic authentication backend that checks the Django users database
+and queries the builtin permissions. It does not provide protection against
+brute force attacks via any rate limiting mechanism. You may either implement
+your own rate limiting mechanism in a custom auth backend, or use the
+mechanisms provided by most Web servers.
 
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
@@ -1799,8 +1837,9 @@ processing at the first positive match.
 Writing an authentication backend
 ---------------------------------
 
-An authentication backend is a class that implements two methods:
-``get_user(user_id)`` and ``authenticate(**credentials)``.
+An authentication backend is a class that implements two required methods:
+``get_user(user_id)`` and ``authenticate(**credentials)``, as well as a set of
+optional permission related :ref:`authorization methods <authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever -- and returns a ``User`` object.
@@ -1871,6 +1910,8 @@ object the first time a user authenticates::
             except User.DoesNotExist:
                 return None
 
+.. _authorization_methods:
+
 Handling authorization in custom backends
 -----------------------------------------
 
@@ -1901,13 +1942,16 @@ fairly simply::
                 return False
 
 This gives full permissions to the user granted access in the above example.
-Notice that the backend auth functions all take the user object as an argument,
-and they also accept the same arguments given to the associated
-:class:`django.contrib.auth.models.User` functions.
+Notice that in addition to the same arguments given to the associated
+:class:`django.contrib.auth.models.User` functions, the backend auth functions
+all take the user object, which may be an anonymous user, as an argument.
 
-A full authorization implementation can be found in
-`django/contrib/auth/backends.py`_, which is the default backend and queries
-the ``auth_permission`` table most of the time.
+A full authorization implementation can be found in the ``ModelBackend`` class
+in `django/contrib/auth/backends.py`_, which is the default backend and queries
+the ``auth_permission`` table most of the time. If you wish to provide
+custom behavior for only part of the backend API, you can take advantage of
+Python inheritence and subclass ``ModelBackend`` instead of implementing the
+complete API in a custom backend.
 
 .. _django/contrib/auth/backends.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
 
@@ -1925,25 +1969,27 @@ authorize anonymous users to browse most of the site, and many allow anonymous
 posting of comments etc.
 
 Django's permission framework does not have a place to store permissions for
-anonymous users. However, it has a foundation that allows custom authentication
-backends to specify authorization for anonymous users. This is especially useful
-for the authors of re-usable apps, who can delegate all questions of authorization
-to the auth backend, rather than needing settings, for example, to control
-anonymous access.
+anonymous users. However, the user object passed to an authentication backend
+may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
+the backend to specify custom authorization behavior for anonymous users. This
+is especially useful for the authors of re-usable apps, who can delegate all
+questions of authorization to the auth backend, rather than needing settings,
+for example, to control anonymous access.
 
+.. _inactive_auth:
 
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.3
+.. versionchanged:: 1.3
 
 An inactive user is a one that is authenticated but has its attribute
 ``is_active`` set to ``False``. However this does not mean they are not
 authorized to do anything. For example they are allowed to activate their
 account.
 
-The support for anonymous users in the permission system allows for
-anonymous users to have permissions to do something while inactive
+The support for anonymous users in the permission system allows for a scenario
+where anonymous users have permissions to do something while inactive
 authenticated users do not.
 
 To enable this on your own backend, you must set the class attribute
@@ -1958,9 +2004,11 @@ passed to the authorization methods.
 
 
 Handling object permissions
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django's permission framework has a foundation for object permissions, though
 there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
-the check performed).
+the check performed). An authentication backend will receive the keyword
+parameters ``obj`` and ``user_obj`` for each object related authorization
+method and can return the object level permission as appropriate.

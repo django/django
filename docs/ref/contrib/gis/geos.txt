@@ -75,6 +75,17 @@ return a :class:`GEOSGeometry` object from an input string or a file::
     >>> pnt = fromfile('/path/to/pnt.wkt')
     >>> pnt = fromfile(open('/path/to/pnt.wkt'))
 
+.. _geos-exceptions-in-logfile:
+
+.. admonition:: My logs are filled with GEOS-related errors
+
+    You find many ``TypeError`` or ``AttributeError`` exceptions filling your
+    Web server's log files. This generally means that you are creating GEOS
+    objects at the top level of some of your Python modules. Then, due to a race
+    condition in the garbage collector, your module is garbage collected before
+    the GEOS object. To prevent this, create :class:`GEOSGeometry` objects
+    inside the local scope of your functions/methods.
+
 Geometries are Pythonic
 -----------------------
 :class:`GEOSGeometry` objects are 'Pythonic', in other words components may
@@ -328,7 +339,7 @@ and Z values that are a part of this geometry.
 
 Returns the Well-Known Text of the geometry (an OGC standard).
 
-__ http://code.google.com/apis/kml/documentation/
+__ https://developers.google.com/kml/documentation/
 
 Spatial Predicate Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -896,7 +907,7 @@ Returns the WKT of the given geometry. Example::
 
 
 .. rubric:: Footnotes
-.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/docs/ch04.html#id2591381>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
 
 Settings
