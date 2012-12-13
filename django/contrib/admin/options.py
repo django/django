@@ -408,8 +408,6 @@ class ModelAdmin(BaseModelAdmin):
             js.append('actions%s.js' % extra)
         if self.prepopulated_fields:
             js.extend(['urlify.js', 'prepopulate%s.js' % extra])
-        if self.opts.get_ordered_objects():
-            js.extend(['getElementsBySelector.js', 'dom-drag.js' , 'admin/ordering.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_model_perms(self, request):
@@ -764,7 +762,6 @@ class ModelAdmin(BaseModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         opts = self.model._meta
         app_label = opts.app_label
-        ordered_objects = opts.get_ordered_objects()
         context.update({
             'add': add,
             'change': change,
@@ -773,7 +770,6 @@ class ModelAdmin(BaseModelAdmin):
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
-            'ordered_objects': ordered_objects,
             'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
