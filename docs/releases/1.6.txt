@@ -53,6 +53,12 @@ UTC. This limitation was lifted in Django 1.6. Use :meth:`QuerySet.datetimes()
 <django.db.models.query.QuerySet.datetimes>` to perform time zone aware
 aggregation on a :class:`~django.db.models.DateTimeField`.
 
+``BinaryField`` model field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new :class:`django.db.models.BinaryField` model field allows to store raw
+binary data in the database.
+
 Minor features
 ~~~~~~~~~~~~~~
 

@@ -347,6 +347,22 @@ A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
 default form widget for this field is a :class:`~django.forms.TextInput`.
 
+``BinaryField``
+-------------------
+
+.. class:: BinaryField([**options])
+
+.. versionadded:: 1.6
+
+A field to store raw binary data. It only supports ``bytes`` assignment. Be
+aware that this field has limited functionality. For example, it is not possible
+to filter a queryset on a ``BinaryField`` value.
+
+.. admonition:: Abusing ``BinaryField``
+
+    Although you might think about storing files in the database, consider that
+    it is bad design in 99% of the cases. This field is *not* a replacement for
+    proper :ref.`static files <static-files> handling.
 
 ``BooleanField``
 ----------------

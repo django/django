@@ -17,6 +17,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     data_types = {
         'AutoField':                    'NUMBER(11)',
+        'BinaryField':                  'BLOB',
         'BooleanField':                 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
         'CharField':                    'NVARCHAR2(%(max_length)s)',
         'CommaSeparatedIntegerField':   'VARCHAR2(%(max_length)s)',

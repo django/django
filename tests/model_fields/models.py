@@ -106,6 +106,10 @@ class VerboseNameField(models.Model):
 class DecimalLessThanOne(models.Model):
     d = models.DecimalField(max_digits=3, decimal_places=3)
 
+class DataModel(models.Model):
+    short_data = models.BinaryField(max_length=10, default=b'\x08')
+    data = models.BinaryField()
+
 ###############################################################################
 # FileField
 
