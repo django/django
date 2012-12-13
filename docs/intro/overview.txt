@@ -257,8 +257,7 @@ lookup and function calls.
 Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
 character). This is called a template filter, and it's a way to filter the value
 of a variable. In this case, the date filter formats a Python datetime object in
-the given format (as found in PHP's date function; yes, there is one good idea
-in PHP).
+the given format (as found in PHP's date function).
 
 You can chain together as many filters as you'd like. You can write custom
 filters. You can write custom template tags, which run custom Python code behind
