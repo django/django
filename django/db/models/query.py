@@ -190,7 +190,7 @@ class QuerySet(object):
                         # Some people insist on passing in strings here.
                         bound = int(k.stop)
                     else:
-                        bound = None
+                        bound = len(self)
                 else:
                     bound = k + 1
                 if len(self._result_cache) < bound:
