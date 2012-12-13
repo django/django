@@ -394,10 +394,14 @@ if PY3:
     _iterlists = "lists"
     _assertRaisesRegex = "assertRaisesRegex"
     _assertRegex = "assertRegex"
+    memoryview = memoryview
 else:
     _iterlists = "iterlists"
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
+    # memoryview and buffer are not stricly equivalent, but should be fine for
+    # django core usage (mainly BinaryField)
+    memoryview = buffer
 
 
 def iterlists(d):
