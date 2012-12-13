@@ -6,7 +6,7 @@ A clean, elegant URL scheme is an important detail in a high-quality Web
 application. Django lets you design URLs however you want, with no framework
 limitations.
 
-There's no ``.php`` or ``.cgi`` required, and certainly none of that
+There's no ``.py`` required, and certainly none of that
 ``0,2097,1-1-1928,00`` nonsense.
 
 See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
