@@ -16,9 +16,9 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 .. admonition:: Philosophy
 
     If you have a background in programming, or if you're used to languages
-    like PHP which mix programming code directly into HTML, you'll want to
-    bear in mind that the Django template system is not simply Python embedded
-    into HTML. This is by design: the template system is meant to express
+    which mix programming code directly into HTML, you'll want to bear in
+    mind that the Django template system is not simply Python embedded into
+    HTML. This is by design: the template system is meant to express
     presentation, not program logic.
 
     The Django template system provides tags which function similarly to some
