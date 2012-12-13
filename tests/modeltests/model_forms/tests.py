@@ -1044,9 +1044,12 @@ class OldFormForXTests(TestCase):
         self.assertQuerysetEqual(f.clean([c1.id]), ["Entertainment"])
         self.assertQuerysetEqual(f.clean([c2.id]), ["It's a test"])
         self.assertQuerysetEqual(f.clean([str(c1.id)]), ["Entertainment"])
-        self.assertQuerysetEqual(f.clean([str(c1.id), str(c2.id)]), ["Entertainment", "It's a test"])
-        self.assertQuerysetEqual(f.clean([c1.id, str(c2.id)]), ["Entertainment", "It's a test"])
-        self.assertQuerysetEqual(f.clean((c1.id, str(c2.id))), ["Entertainment", "It's a test"])
+        self.assertQuerysetEqual(f.clean([str(c1.id), str(c2.id)]), ["Entertainment", "It's a test"],
+                                 ordered=False)
+        self.assertQuerysetEqual(f.clean([c1.id, str(c2.id)]), ["Entertainment", "It's a test"],
+                                 ordered=False)
+        self.assertQuerysetEqual(f.clean((c1.id, str(c2.id))), ["Entertainment", "It's a test"],
+                                 ordered=False)
         with self.assertRaises(ValidationError):
             f.clean(['100'])
         with self.assertRaises(ValidationError):

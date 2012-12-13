@@ -841,11 +841,14 @@ class Queries1Tests(BaseQuerysetTest):
         """
         original_ordering = Tag._meta.ordering
         Tag._meta.ordering = None
-        self.assertQuerysetEqual(
-            Tag.objects.all(),
-            ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
-        )
-        Tag._meta.ordering = original_ordering
+        try:
+            self.assertQuerysetEqual(
+                Tag.objects.all(),
+                ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
+                ordered=False
+            )
+        finally:
+            Tag._meta.ordering = original_ordering
 
     def test_exclude(self):
         self.assertQuerysetEqual(
@@ -925,15 +928,18 @@ class Queries2Tests(TestCase):
         self.assertQuerysetEqual(Number.objects.filter(num__gt=12.1), [])
         self.assertQuerysetEqual(
             Number.objects.filter(num__lt=12),
-            ['<Number: 4>', '<Number: 8>']
+            ['<Number: 4>', '<Number: 8>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lt=12.0),
-            ['<Number: 4>', '<Number: 8>']
+            ['<Number: 4>', '<Number: 8>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lt=12.1),
-            ['<Number: 4>', '<Number: 8>', '<Number: 12>']
+            ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__gte=11.9),
@@ -951,23 +957,28 @@ class Queries2Tests(TestCase):
         self.assertQuerysetEqual(Number.objects.filter(num__gte=12.9), [])
         self.assertQuerysetEqual(
             Number.objects.filter(num__lte=11.9),
-            ['<Number: 4>', '<Number: 8>']
+            ['<Number: 4>', '<Number: 8>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lte=12),
-            ['<Number: 4>', '<Number: 8>', '<Number: 12>']
+            ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lte=12.0),
-            ['<Number: 4>', '<Number: 8>', '<Number: 12>']
+            ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lte=12.1),
-            ['<Number: 4>', '<Number: 8>', '<Number: 12>']
+            ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
+            ordered=False
         )
         self.assertQuerysetEqual(
             Number.objects.filter(num__lte=12.9),
-            ['<Number: 4>', '<Number: 8>', '<Number: 12>']
+            ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
+            ordered=False
         )
 
     def test_ticket7411(self):

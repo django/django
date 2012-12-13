@@ -74,7 +74,7 @@ class M2MRegressionTests(TestCase):
         c1.tags = [t1, t2]
         c1 = TagCollection.objects.get(name='c1')
 
-        self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"])
+        self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"], ordered=False)
         self.assertQuerysetEqual(t1.tag_collections.all(), ["<TagCollection: c1>"])
 
     def test_manager_class_caching(self):

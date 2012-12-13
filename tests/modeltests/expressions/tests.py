@@ -158,6 +158,7 @@ class ExpressionsTests(TestCase):
                 "Max Mustermann",
             ],
             lambda c: six.text_type(c.point_of_contact),
+            ordered=False
         )
 
         c = Company.objects.all()[0]
@@ -170,7 +171,8 @@ class ExpressionsTests(TestCase):
                 "Foobar Ltd.",
                 "Test GmbH",
             ],
-            lambda c: c.name
+            lambda c: c.name,
+            ordered=False
         )
 
         Company.objects.exclude(

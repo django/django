@@ -1770,6 +1770,11 @@ your test suite.
 	via an explicit ``order_by()`` call on the queryset prior to
 	comparison.
 
+    .. versionchanged:: 1.6
+        The method now checks for undefined order and raises ``ValueError``
+        if undefined order is spotted. The ordering is seen as undefined if
+        the given ``qs`` isn't ordered and the comparison is against more
+        than one ordered values.
 
 .. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
 

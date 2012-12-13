@@ -96,8 +96,8 @@ class FixtureLoadingTests(TestCase):
         management.call_command('loaddata', 'fixture6.json', verbosity=0, commit=False)
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
-            '<Tag: <Article: Copyright is fine the way it is> tagged "law">'
-        ])
+            '<Tag: <Article: Copyright is fine the way it is> tagged "law">',
+        ], ordered=False)
 
         # Load fixture 7, XML file with dynamic ContentType fields. Testing ManyToOne.
         management.call_command('loaddata', 'fixture7.xml', verbosity=0, commit=False)
@@ -105,8 +105,8 @@ class FixtureLoadingTests(TestCase):
             '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
             '<Tag: <Article: Copyright is fine the way it is> tagged "legal">',
             '<Tag: <Article: Django conquers world!> tagged "django">',
-            '<Tag: <Article: Django conquers world!> tagged "world domination">'
-        ])
+            '<Tag: <Article: Django conquers world!> tagged "world domination">',
+        ], ordered=False)
 
         # Load fixture 8, JSON file with dynamic Permission fields. Testing ManyToMany.
         management.call_command('loaddata', 'fixture8.json', verbosity=0, commit=False)
@@ -114,7 +114,7 @@ class FixtureLoadingTests(TestCase):
             '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user>',
             '<Visa: Prince >'
-        ])
+        ], ordered=False)
 
         # Load fixture 9, XML file with dynamic Permission fields. Testing ManyToMany.
         management.call_command('loaddata', 'fixture9.xml', verbosity=0, commit=False)
@@ -122,7 +122,7 @@ class FixtureLoadingTests(TestCase):
             '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user, Can delete user>',
             '<Visa: Artist formerly known as "Prince" Can change user>'
-        ])
+        ], ordered=False)
 
         self.assertQuerysetEqual(Book.objects.all(), [
             '<Book: Achieving self-awareness of Python programs>',
@@ -280,7 +280,7 @@ class FixtureLoadingTests(TestCase):
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Time to reform copyright> tagged "copyright">',
             '<Tag: <Article: Time to reform copyright> tagged "law">'
-        ])
+        ], ordered=False)
 
         # Dump the current contents of the database as a JSON fixture
         self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 1, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": 3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django Reinhardt"}}, {"pk": 2, "model": "fixtures.person", "fields": {"name": "Stephane Grappelli"}}, {"pk": 3, "model": "fixtures.person", "fields": {"name": "Prince"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]', natural_keys=True)

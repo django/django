@@ -767,6 +767,12 @@ class TransactionTestCase(SimpleTestCase):
         items = six.moves.map(transform, qs)
         if not ordered:
             return self.assertEqual(set(items), set(values))
+        values = list(values)
+        # For example qs.iterator() could be passed as qs, but it does not
+        # have 'ordered' attribute.
+        if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
+            raise ValueError("Trying to compare non-ordered queryset "
+                             "against more than one ordered values")
         return self.assertEqual(list(items), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):

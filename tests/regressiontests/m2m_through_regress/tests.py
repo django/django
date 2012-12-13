@@ -28,7 +28,8 @@ class M2MThroughTestCase(TestCase):
             bob.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
-            ]
+            ],
+            ordered=False
         )
 
         self.assertQuerysetEqual(
@@ -51,7 +52,8 @@ class M2MThroughTestCase(TestCase):
             frank.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
-            ]
+            ],
+            ordered=False
         )
 
         self.assertQuerysetEqual(
@@ -190,7 +192,8 @@ class ToFieldThroughTests(TestCase):
         self.driver.car_set._add_items('driver', 'car', car2)
         self.assertQuerysetEqual(
             self.driver.car_set.all(),
-            ["<Car: Toyota>", "<Car: Honda>"]
+            ["<Car: Toyota>", "<Car: Honda>"],
+            ordered=False
         )
 
     def test_add_null_reverse(self):

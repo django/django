@@ -28,7 +28,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David"
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is friends with Bill?
         self.assertQuerysetEqual(
@@ -43,7 +44,8 @@ class RecursiveM2MTests(TestCase):
                 "Anne",
                 "David"
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is friends with David?
         self.assertQuerysetEqual(
@@ -51,7 +53,8 @@ class RecursiveM2MTests(TestCase):
                 "Anne",
                 "Chuck",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Bill is already friends with Anne - add Anne again, but in the
         # reverse direction
@@ -64,7 +67,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is friends with Bill?
         self.assertQuerysetEqual(
@@ -81,7 +85,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is friends with Bill?
         self.assertQuerysetEqual(
@@ -125,7 +130,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is stalking Anne?
         self.assertQuerysetEqual(
@@ -172,7 +178,8 @@ class RecursiveM2MTests(TestCase):
                 "Anne",
                 "Chuck",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Bill is already being stalked by Anne - add Anne again, but in the
         # reverse direction
@@ -184,7 +191,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is stalking Anne?
         self.assertQuerysetEqual(
@@ -215,7 +223,8 @@ class RecursiveM2MTests(TestCase):
                 "Chuck",
                 "David",
             ],
-            attrgetter("name")
+            attrgetter("name"),
+            ordered=False
         )
         # Who is stalking Anne?
         self.assertQuerysetEqual(
