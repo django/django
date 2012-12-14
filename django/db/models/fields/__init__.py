@@ -6,6 +6,7 @@ import datetime
 import decimal
 import math
 import warnings
+from base64 import b64decode, b64encode
 from itertools import tee
 
 from django.db import connection
@@ -19,7 +20,7 @@ from django.utils.functional import curry, total_ordering
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 
@@ -1317,4 +1318,14 @@ class BinaryField(Field):
             ).get_db_prep_value(value, connection, prepared)
         if value is not None:
             return connection.Database.Binary(value)
+        return value
+
+    def value_to_string(self, obj):
+        """Binary data is serialized as base64"""
+        return b64encode(force_bytes(self._get_val_from_obj(obj))).decode('ascii')
+
+    def to_python(self, value):
+        # If it's a string, it should be base64-encoded data
+        if isinstance(value, six.text_type):
+            return six.memoryview(b64decode(force_bytes(value)))
         return value

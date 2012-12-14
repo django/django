@@ -24,10 +24,11 @@ from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.functional import curry
 from django.utils.unittest import skipUnless
 
-from .models import (BooleanData, CharData, DateData, DateTimeData, EmailData,
+from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
     GenericIPAddressData, NullBooleanData, PositiveIntegerData,
     PositiveSmallIntegerData, SlugData, SmallData, TextData, TimeData,
@@ -116,10 +117,17 @@ def inherited_create(pk, klass, data):
 # test data objects of various kinds
 def data_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
-    testcase.assertEqual(data, instance.data,
-         "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
-            pk, data, type(data), instance.data, type(instance.data))
-    )
+    if klass == BinaryData and data is not None:
+        testcase.assertEqual(bytes(data), bytes(instance.data),
+             "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
+                pk, repr(bytes(data)), type(data), repr(bytes(instance.data)),
+                type(instance.data))
+        )
+    else:
+        testcase.assertEqual(data, instance.data,
+             "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (
+                pk, data, type(data), instance, type(instance.data))
+        )
 
 def generic_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
@@ -175,8 +183,10 @@ inherited_obj = (inherited_create, inherited_compare)
 
 test_data = [
     # Format: (data type, PK value, Model Class, data)
-    (data_obj, 1, BooleanData, True),
-    (data_obj, 2, BooleanData, False),
+    (data_obj, 1, BinaryData, six.memoryview(b"\x05\xFD\x00")),
+    (data_obj, 2, BinaryData, None),
+    (data_obj, 5, BooleanData, True),
+    (data_obj, 6, BooleanData, False),
     (data_obj, 10, CharData, "Test Char Data"),
     (data_obj, 11, CharData, ""),
     (data_obj, 12, CharData, "None"),

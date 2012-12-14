@@ -142,6 +142,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    if isinstance(s, six.memoryview):
+        s = bytes(s)
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
