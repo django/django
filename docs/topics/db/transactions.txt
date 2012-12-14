@@ -208,11 +208,13 @@ This applies to all database operations, not just write operations. Even
 if your transaction only reads from the database, the transaction must
 be committed or rolled back before you complete a request.
 
+.. _deactivate-transaction-management:
+
 How to globally deactivate transaction management
 =================================================
 
 Control freaks can totally disable all transaction management by setting
-``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in the Django settings file.
+:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file.
 
 If you do this, Django won't provide any automatic transaction management
 whatsoever. Middleware will no longer implicitly commit transactions, and
