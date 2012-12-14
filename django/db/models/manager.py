@@ -16,7 +16,7 @@ def ensure_default_manager(sender, **kwargs):
     if cls._meta.abstract:
         setattr(cls, 'objects', AbstractManagerDescriptor(cls))
         return
-    elif cls._meta.swapped:
+    elif cls._meta.is_swapped:
         setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
@@ -64,10 +64,10 @@ class Manager(object):
         # Only contribute the manager if the model is concrete
         if model._meta.abstract:
             setattr(model, name, AbstractManagerDescriptor(model))
-        elif model._meta.swapped:
+        elif model._meta.is_swapped:
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
-        # if not model._meta.abstract and not model._meta.swapped:
+        # if not model._meta.abstract and not model._meta.is_swapped:
             setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
@@ -252,8 +252,8 @@ class SwappedManagerDescriptor(object):
         self.model = model
 
     def __get__(self, instance, type=None):
-        raise AttributeError("Manager isn't available; %s has been swapped for '%s'" % (
-            self.model._meta.object_name, self.model._meta.swapped
+        raise AttributeError("Manager isn't available; %s has been swapped for '%s.%s'" % (
+            self.model._meta.object_name, self.model._meta.swapped_app_label, self.model._meta.swapped_object_name
         ))
 
 

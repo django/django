@@ -1015,7 +1015,7 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if not model._meta.managed:
                     continue
-                if model._meta.swapped:
+                if model._meta.is_swapped:
                     continue
                 if not router.allow_syncdb(self.connection.alias, model):
                     continue

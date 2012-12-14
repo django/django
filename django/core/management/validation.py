@@ -39,14 +39,9 @@ def get_validation_errors(outfile, app=None):
         opts = cls._meta
 
         # Check swappable attribute.
-        if opts.swapped:
-            try:
-                app_label, model_name = opts.swapped.split('.')
-            except ValueError:
-                e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
-                continue
-            if not models.get_model(app_label, model_name):
-                e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
+        if opts.is_swapped:
+            if not models.get_model(opts.app_label, opts.object_name):
+                e.add(opts, "Model has been swapped out for '%s.%s' which has not been installed or is abstract." % (opts.app_label,opts.object_name) )
             # No need to perform any other validation checks on a swapped model.
             continue
 
@@ -140,7 +135,7 @@ def get_validation_errors(outfile, app=None):
                 if f.rel.to not in models.get_models():
                     # If the related model is swapped, provide a hint;
                     # otherwise, the model just hasn't been installed.
-                    if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                    if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.is_swapped:
                         e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
                     else:
                         e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
@@ -187,7 +182,7 @@ def get_validation_errors(outfile, app=None):
             if f.rel.to not in models.get_models():
                 # If the related model is swapped, provide a hint;
                 # otherwise, the model just hasn't been installed.
-                if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.is_swapped:
                     e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
                 else:
                     e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
