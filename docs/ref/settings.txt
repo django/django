@@ -2069,6 +2069,16 @@ to ensure your processes are running in the correct environment.
 
 .. _pytz: http://pytz.sourceforge.net/
 
+.. setting:: TRANSACTIONS_MANAGED
+
+TRANSACTIONS_MANAGED
+--------------------
+
+Default: ``False``
+
+Set this to ``True`` if you want to :ref:`disable Django's transaction
+management <deactivate-transaction-management>` and implement your own.
+
 .. setting:: USE_ETAGS
 
 USE_ETAGS

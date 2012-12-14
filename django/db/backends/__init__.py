@@ -181,8 +181,6 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
-        # Note that this setting isn't documented, and is only used here, and
-        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
