@@ -5,9 +5,9 @@ import sys
 
 from django.utils import six
 
-# You can't trivially replace this `functools.partial` because this binds to
-# classes and returns bound instances, whereas functools.partial (on CPython)
-# is a type and its instances don't bind.
+# You can't trivially replace this with `functools.partial` because this binds
+# to classes and returns bound instances, whereas functools.partial (on
+# CPython) is a type and its instances don't bind.
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
@@ -33,8 +33,8 @@ def memoize(func, cache, num_args):
 
 class cached_property(object):
     """
-    Decorator that creates converts a method with a single
-    self argument into a property cached on the instance.
+    Decorator that converts a method with a single self argument into a
+    property cached on the instance.
     """
     def __init__(self, func):
         self.func = func
