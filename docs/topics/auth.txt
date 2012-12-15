@@ -2136,6 +2136,76 @@ override any of the definitions that refer to fields on
 :class:`~django.contrib.auth.models.AbstractUser` that aren't on your
 custom User class.
 
+Custom users and permissions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make it easy to include Django's permission framework into your own User
+class, Django provides :class:`~django.contrib.auth.model.PermissionsMixin`.
+This is an abstract model you can include in the class heirarchy for your User
+model, giving you all the methods and database fields necessary to support
+Django's permission model.
+
+:class:`~django.contrib.auth.model.PermissionsMixin` provides the following
+methods and attributes:
+
+.. class:: models.PermissionsMixin
+
+    .. attribute:: models.PermissionsMixin.is_superuser
+
+        Boolean. Designates that this user has all permissions without
+        explicitly assigning them.
+
+    .. method:: models.PermissionsMixin.get_group_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, through his/her
+        groups.
+
+        If ``obj`` is passed in, only returns the group permissions for
+        this specific object.
+
+    .. method:: models.PermissionsMixin.get_all_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, both through
+        group and user permissions.
+
+        If ``obj`` is passed in, only returns the permissions for this
+        specific object.
+
+    .. method:: models.PermissionsMixin.has_perm(perm, obj=None)
+
+        Returns ``True`` if the user has the specified permission, where perm is
+        in the format ``"<app label>.<permission codename>"`` (see
+        `permissions`_). If the user is inactive, this method will
+        always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for a permission for
+        the model, but for this specific object.
+
+    .. method:: models.PermissionsMixin.has_perms(perm_list, obj=None)
+
+        Returns ``True`` if the user has each of the specified permissions,
+        where each perm is in the format
+        ``"<app label>.<permission codename>"``. If the user is inactive,
+        this method will always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for permissions for
+        the model, but for the specific object.
+
+    .. method:: models.PermissionsMixin.has_module_perms(package_name)
+
+        Returns ``True`` if the user has any permissions in the given package
+        (the Django app label). If the user is inactive, this method will
+        always return ``False``.
+
+.. admonition:: ModelBackend
+
+    If you don't include the
+    :class:`~django.contrib.auth.model.PermissionsMixin`, you must ensure you
+    don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
+    assumes that certain fields are available on your user model. If your User
+    model doesn't provide  those fields, you will receive database errors when
+    you check permissions.
+
 Custom users and Proxy models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

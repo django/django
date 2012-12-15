@@ -1,5 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, AbstractUser, UserManager
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+    AbstractUser,
+    UserManager,
+    PermissionsMixin
+)
 
 
 # The custom User uses email as the unique identifier, and requires
@@ -90,6 +96,40 @@ class ExtensionUser(AbstractUser):
         app_label = 'auth'
 
 
+# The CustomPermissionsUser users email as the identifier, but uses the normal
+# Django permissions model. This allows us to check that the PermissionsMixin
+# includes everything that is needed to interact with the ModelBackend.
+
+class CustomPermissionsUserManager(CustomUserManager):
+    def create_superuser(self, email, password, date_of_birth):
+        u = self.create_user(email, password=password, date_of_birth=date_of_birth)
+        u.is_superuser = True
+        u.save(using=self._db)
+        return u
+
+
+class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    date_of_birth = models.DateField()
+
+    objects = CustomPermissionsUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['date_of_birth']
+
+    class Meta:
+        app_label = 'auth'
+
+    def get_full_name(self):
+        return self.email
+
+    def get_short_name(self):
+        return self.email
+
+    def __unicode__(self):
+        return self.email
+
+
 class IsActiveTestUser1(AbstractBaseUser):
     """
     This test user class and derivatives test the default is_active behavior
@@ -104,4 +144,3 @@ class IsActiveTestUser1(AbstractBaseUser):
         app_label = 'auth'
 
     # the is_active attr is provided by AbstractBaseUser
-
