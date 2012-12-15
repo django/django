@@ -13,6 +13,7 @@ place: read this material to quickly get up and running.
    tutorial02
    tutorial03
    tutorial04
+   tutorial05
    reusable-apps
    whatsnext
    contributing
