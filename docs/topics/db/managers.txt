@@ -274,6 +274,21 @@ it into the inheritance hierarchy *after* the defaults::
         # Default manager is CustomManager, but OtherManager is
         # also available via the "extra_manager" attribute.
 
+Note that while you can *define* a custom manager on the abstract model, you
+can't *invoke* any methods using the abstract model. That is::
+
+    ClassA.objects.do_something()
+
+is legal, but::
+
+    AbstractBase.objects.do_something()
+
+will raise an exception. This is because managers are intended to encapsulate
+logic for managing collections of objects. Since you can't have a collection of
+abstract objects, it doesn't make sense to be managing them. If you have
+functionality that applies to the abstract model, you should put that functionality
+in a ``staticmethod`` or ``classmethod`` on the abstract model.
+
 Implementation concerns
 -----------------------
 
