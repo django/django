@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 from functools import update_wrapper, partial
 import warnings
 
@@ -1056,6 +1057,18 @@ class ModelAdmin(BaseModelAdmin):
                     continue
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
+                if isinstance(f, models.DateTimeField):
+                    for format in settings.DATETIME_INPUT_FORMATS:
+                        if "/" in format:
+                            # Don't deal with dates like %m/%d/%Y on the
+                            # querystrings
+                            continue
+                        try:
+                            initial[k] = datetime.strptime(initial[k],
+                                format.replace(" ", "T"))
+                            break
+                        except ValueError:
+                            continue
             form = ModelForm(initial=initial)
             prefixes = {}
             for FormSet, inline in zip(self.get_formsets(request), inline_instances):
