@@ -4,7 +4,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.custom_user import ExtensionUser
+from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.contrib.auth import authenticate
@@ -34,7 +34,7 @@ class BaseModelBackendTest(object):
         ContentType.objects.clear_cache()
 
     def test_has_perm(self):
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(user.has_perm('auth.test'), False)
         user.is_staff = True
         user.save()
@@ -53,14 +53,14 @@ class BaseModelBackendTest(object):
         self.assertEqual(user.has_perm('auth.test'), False)
 
     def test_custom_perms(self):
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
         user.save()
 
         # reloading user to purge the _perm_cache
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(user.get_all_permissions() == set(['auth.test']), True)
         self.assertEqual(user.get_group_permissions(), set([]))
         self.assertEqual(user.has_module_perms('Group'), False)
@@ -71,7 +71,7 @@ class BaseModelBackendTest(object):
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
         user.save()
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(user.get_all_permissions(), set(['auth.test2', 'auth.test', 'auth.test3']))
         self.assertEqual(user.has_perm('test'), False)
         self.assertEqual(user.has_perm('auth.test'), True)
@@ -81,7 +81,7 @@ class BaseModelBackendTest(object):
         group.permissions.add(perm)
         group.save()
         user.groups.add(group)
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         exp = set(['auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'])
         self.assertEqual(user.get_all_permissions(), exp)
         self.assertEqual(user.get_group_permissions(), set(['auth.test_group']))
@@ -93,7 +93,7 @@ class BaseModelBackendTest(object):
 
     def test_has_no_object_perm(self):
         """Regressiontest for #12462"""
-        user = self.UserModel.objects.get(username='test')
+        user = self.UserModel.objects.get(pk=self.user.pk)
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
@@ -106,7 +106,7 @@ class BaseModelBackendTest(object):
 
     def test_get_all_superuser_permissions(self):
         "A superuser has all permissions. Refs #14795"
-        user = self.UserModel.objects.get(username='test2')
+        user = self.UserModel.objects.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
 
 
@@ -118,12 +118,12 @@ class ModelBackendTest(BaseModelBackendTest, TestCase):
     UserModel = User
 
     def create_users(self):
-        User.objects.create_user(
+        self.user = User.objects.create_user(
             username='test',
             email='test@example.com',
             password='test',
         )
-        User.objects.create_superuser(
+        self.superuser = User.objects.create_superuser(
             username='test2',
             email='test2@example.com',
             password='test',
@@ -151,14 +151,39 @@ class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
     UserModel = ExtensionUser
 
     def create_users(self):
-        ExtensionUser.objects.create_user(
+        self.user = ExtensionUser.objects.create_user(
             username='test',
             email='test@example.com',
             password='test',
             date_of_birth=date(2006, 4, 25)
         )
-        ExtensionUser.objects.create_superuser(
+        self.superuser = ExtensionUser.objects.create_superuser(
             username='test2',
+            email='test2@example.com',
+            password='test',
+            date_of_birth=date(1976, 11, 8)
+        )
+
+
+@override_settings(AUTH_USER_MODEL='auth.CustomPermissionsUser')
+class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
+    """
+    Tests for the ModelBackend using the CustomPermissionsUser model.
+
+    As with the ExtensionUser test, this isn't a perfect test, because both
+    the User and CustomPermissionsUser are synchronized to the database,
+    which wouldn't ordinary happen in production.
+    """
+
+    UserModel = CustomPermissionsUser
+
+    def create_users(self):
+        self.user = CustomPermissionsUser.objects.create_user(
+            email='test@example.com',
+            password='test',
+            date_of_birth=date(2006, 4, 25)
+        )
+        self.superuser = CustomPermissionsUser.objects.create_superuser(
             email='test2@example.com',
             password='test',
             date_of_birth=date(1976, 11, 8)
