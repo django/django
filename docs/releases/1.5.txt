@@ -219,6 +219,15 @@ GeoDjango
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
 
+New tutorials
+~~~~~~~~~~~~~
+
+Additions to the docs include a revamped :doc:`Tutorial 3</intro/tutorial03>`
+and a new :doc:`tutorial on testing</intro/tutorial05>`. A new section,
+"Advanced Tutorials", offers :doc:`How to write reusable apps
+</intro/reusable-apps>` as well as a step-by-step guide for new contributors in
+:doc:`Writing your first patch for Django </intro/contributing>`.
+
 Minor features
 ~~~~~~~~~~~~~~
 
