@@ -341,6 +341,21 @@ Backwards incompatible changes in 1.5
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Managers on abstract models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Abstract models are able to define a custom manager, and that manager
+:ref:`will be inherited by any concrete models extending the abstract model
+<custom-managers-and-inheritance>`. However, if you try to use the abstract
+model to call a method on the manager, an exception will now be raised.
+Previously, the call would have been permitted, but would have failed as soon
+as any database operation was attempted (usually with a "table does not exist"
+error from the database).
+
+If you have functionality on a manager that you have been invoking using
+the abstract class, you should migrate that logic to a Python
+``staticmethod`` or ``classmethod`` on the abstract class.
+
 Context in year archive class-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
