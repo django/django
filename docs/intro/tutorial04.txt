@@ -275,13 +275,5 @@ Run the server, and use your new polling app based on generic views.
 For full details on generic views, see the :doc:`generic views documentation
 </topics/class-based-views/index>`.
 
-What's next?
-============
-
-The beginner tutorial ends here for the time being. In the meantime, you might
-want to check out some pointers on :doc:`where to go from here
-</intro/whatsnext>`.
-
-If you are familiar with Python packaging and interested in learning how to
-turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
-write reusable apps</intro/reusable-apps>`.
+When you're comfortable with forms and generic views, read :doc:`part 5 of this
+tutorial</intro/tutorial05>` to learn about testing our polls app.
