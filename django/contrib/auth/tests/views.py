@@ -248,7 +248,9 @@ class ChangePasswordTest(AuthViewsTestCase):
             'username': 'testclient',
             'password': password,
         })
-        self.assertContainsEscaped(response, AuthenticationForm.error_messages['invalid_login'])
+        self.assertContainsEscaped(response, AuthenticationForm.error_messages['invalid_login'] % {
+                'username': User._meta.get_field('username').verbose_name
+            })
 
     def logout(self):
         response = self.client.get('/logout/')

@@ -51,7 +51,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
-for a staff account. Note that both fields are case-sensitive."
+for a staff account. Note that both fields may be case-sensitive."
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
