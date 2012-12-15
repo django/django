@@ -148,8 +148,8 @@ class AuthenticationForm(forms.Form):
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
-        'invalid_login': _("Please enter a correct username and password. "
-                           "Note that both fields are case-sensitive."),
+        'invalid_login': _("Please enter a correct %(username)s and password. "
+                           "Note that both fields may be case-sensitive."),
         'no_cookies': _("Your Web browser doesn't appear to have cookies "
                         "enabled. Cookies are required for logging in."),
         'inactive': _("This account is inactive."),
@@ -168,8 +168,8 @@ class AuthenticationForm(forms.Form):
 
         # Set the label for the "username" field.
         UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.fields['username'].label = capfirst(username_field.verbose_name)
+        self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -180,7 +180,9 @@ class AuthenticationForm(forms.Form):
                                            password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login'])
+                    self.error_messages['invalid_login'] % {
+                        'username': self.username_field.verbose_name
+                    })
             elif not self.user_cache.is_active:
                 raise forms.ValidationError(self.error_messages['inactive'])
         self.check_for_test_cookie()
