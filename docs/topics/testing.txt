@@ -1186,10 +1186,13 @@ Normal Python unit test classes extend a base class of
 
 .. _testcase_hierarchy_diagram:
 
-.. figure:: _images/django_unittest_classes_hierarchy.png
+.. figure:: _images/django_unittest_classes_hierarchy.*
    :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
+   :width: 508
+   :height: 391
 
-   Hierarchy of Django unit testing classes
+Regardless of the version of Python you're using, if you've installed
+:mod:`unittest2`, :mod:`django.utils.unittest` will point to that library.
 
 TestCase
 ^^^^^^^^
