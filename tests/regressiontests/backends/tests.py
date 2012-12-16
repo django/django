@@ -565,6 +565,9 @@ class ThreadTests(TestCase):
             # connections[DEFAULT_DB_ALIAS] does.
             from django.db import connections
             connection = connections[DEFAULT_DB_ALIAS]
+            # Allow thread sharing so the connection can be closed by the
+            # main thread.
+            connection.allow_thread_sharing = True
             connection.cursor()
             connections_set.add(connection)
         for x in range(2):
@@ -579,7 +582,7 @@ class ThreadTests(TestCase):
         # connection opened in the main thread will automatically be closed on
         # teardown).
         for conn in connections_set:
-            if conn != connection:
+            if conn is not connection:
                 conn.close()
 
     def test_connections_thread_local(self):
@@ -606,7 +609,7 @@ class ThreadTests(TestCase):
         # connection opened in the main thread will automatically be closed on
         # teardown).
         for conn in connections_set:
-            if conn != connection:
+            if conn is not connection:
                 conn.close()
 
     def test_pass_connection_between_threads(self):
