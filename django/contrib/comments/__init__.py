@@ -20,9 +20,9 @@ def get_comment_app():
     # Try to import the package
     try:
         package = import_module(comments_app)
-    except ImportError:
+    except ImportError as e:
         raise ImproperlyConfigured("The COMMENTS_APP setting refers to "\
-                                   "a non-existing package.")
+                                   "a non-existing package. (%s)" % e)
 
     return package
 
