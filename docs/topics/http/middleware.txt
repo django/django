@@ -65,8 +65,8 @@ reverse order, from the bottom up. Three hooks are available:
 
 .. image:: _images/middleware.*
    :alt: middleware application order
-   :width: 480
-   :height: 408
+   :width: 481
+   :height: 409
 
 If you prefer, you can also think of it like an onion: each middleware class
 is a "layer" that wraps the view.
