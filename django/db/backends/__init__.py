@@ -883,16 +883,14 @@ class BaseDatabaseOperations(object):
         Coerce the value returned by the database backend into a consistent type
         that is compatible with the field type.
         """
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
+        if value is None:
             return value
-        elif internal_type == 'FloatField':
+        internal_type = field.get_internal_type()
+        if internal_type == 'FloatField':
             return float(value)
         elif (internal_type and (internal_type.endswith('IntegerField')
                                  or internal_type == 'AutoField')):
             return int(value)
-        elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
-            return value
         return value
 
     def check_aggregate_support(self, aggregate_func):
