@@ -216,7 +216,7 @@ def iri_to_uri(iri):
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
-    """Convert an file system path to a URI portion that is suitable for
+    """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
 
     We are assuming input is either UTF-8 or unicode already.
