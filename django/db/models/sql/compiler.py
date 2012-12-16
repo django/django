@@ -636,10 +636,10 @@ class SQLCompiler(object):
                         int_opts = int_model._meta
                         continue
                     lhs_col = int_opts.parents[int_model].column
+                    link_field = int_opts.get_ancestor_link(int_model)
                     int_opts = int_model._meta
                     alias = self.query.join((alias, int_opts.db_table, lhs_col,
-                            int_opts.pk.column),
-                            promote=promote)
+                            int_opts.pk.column), promote=promote, join_field=link_field)
                     alias_chain.append(alias)
             else:
                 alias = root_alias
@@ -685,10 +685,11 @@ class SQLCompiler(object):
                             int_opts = int_model._meta
                             continue
                         lhs_col = int_opts.parents[int_model].column
+                        link_field = int_opts.get_ancestor_link(int_model)
                         int_opts = int_model._meta
                         alias = self.query.join(
                             (alias, int_opts.db_table, lhs_col, int_opts.pk.column),
-                            promote=True
+                            promote=True, join_field=link_field
                         )
                         alias_chain.append(alias)
                 alias = self.query.join(
