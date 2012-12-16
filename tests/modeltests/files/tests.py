@@ -10,6 +10,7 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.test.utils import str_prefix
 from django.utils import unittest
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -114,7 +115,21 @@ class FileStorageTests(TestCase):
         s1.full_clean()
         with self.assertRaises(ValidationError):
             Storage(random=SimpleUploadedFile(13 * 'x', b"content")).full_clean()
+        #Check for i18n and pluralization: singular form
+        self.assertRaisesRegexp(ValidationError, str_prefix(r"^{'random': \[%(_)s'Filename is 1 character too long\.'\]}$"),
+                                Storage(random=SimpleUploadedFile(13 * 'x', b"content")).full_clean)
+        #and plural form
+        self.assertRaisesRegexp(ValidationError, str_prefix(r"^{'random': \[%(_)s'Filename is 2 characters too long\.'\]}$"),
+                                Storage(random=SimpleUploadedFile(14 * 'x', b"content")).full_clean)
 
+        # Check that subclass which overrides default_error_messages['max_length']
+        # with a string behave exactly the same as usual FileField
+        s1 = Storage(subclass=SimpleUploadedFile(12 * 'x', b"content"))
+        s1.full_clean()
+        with self.assertRaises(ValidationError):
+            Storage(subclass=SimpleUploadedFile(13 * 'x', b"content")).full_clean()
+        self.assertRaisesRegexp(ValidationError, str_prefix(r"^{'subclass': \[%(_)s'Filename is 1 character too long\.'\]}$"),
+                                Storage(subclass=SimpleUploadedFile(13 * 'x', b"content")).full_clean)
         # Ticket #18515: validation for an already saved file should not check
         # against a regenerated file name (and potentially raise a ValidationError
         # if max_length is exceeded
