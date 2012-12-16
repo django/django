@@ -305,6 +305,18 @@ The functions defined in this module share the following properties:
 
     Returns an ASCII string containing the encoded result.
 
+.. function:: filepath_to_uri(path)
+
+    Convert a file system path to a URI portion that is suitable for inclusion
+    in a URL. The path is assumed to be either UTF-8 or unicode.
+
+    This method will encode certain characters that would normally be
+    recognized as special characters for URIs.  Note that this method does not
+    encode the ' character, as it is a valid character within URIs. See
+    ``encodeURIComponent()`` JavaScript function for more details.
+
+    Returns an ASCII string containing the encoded result.
+
 ``django.utils.feedgenerator``
 ==============================
 
