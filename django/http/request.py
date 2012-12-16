@@ -25,7 +25,7 @@ from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
 
 RAISE_ERROR = object()
 absolute_http_url_re = re.compile(r"^https?://", re.I)
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
+host_validation_re = re.compile(r"^([a-z0-9.-_]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(IOError):
