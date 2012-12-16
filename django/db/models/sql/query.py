@@ -944,6 +944,7 @@ class Query(object):
         The 'join_field' is the field we are joining along (if any).
         """
         lhs, table, lhs_col, col = connection
+        assert lhs is None or join_field is not None
         existing = self.join_map.get(connection, ())
         if reuse is None:
             reuse = existing
@@ -1003,8 +1004,9 @@ class Query(object):
         for field, model in opts.get_fields_with_model():
             if model not in seen:
                 link_field = opts.get_ancestor_link(model)
-                seen[model] = self.join((root_alias, model._meta.db_table,
-                        link_field.column, model._meta.pk.column))
+                seen[model] = self.join(
+                    (root_alias, model._meta.db_table, link_field.column,
+                     model._meta.pk.column), join_field=link_field)
         self.included_inherited_models = seen
 
     def remove_inherited_models(self):
