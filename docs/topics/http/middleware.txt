@@ -63,7 +63,7 @@ reverse order, from the bottom up. Three hooks are available:
 * :meth:`process_template_response` (only for template responses)
 * :meth:`process_response`
 
-.. image:: _images/middleware.svg
+.. image:: _images/middleware.*
    :alt: middleware application order
    :width: 480
    :height: 408
