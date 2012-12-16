@@ -40,7 +40,7 @@ class BaseDatabaseCreation(object):
             (list_of_sql, pending_references_dict)
         """
         opts = model._meta
-        if not opts.managed or opts.proxy or opts.swapped:
+        if not opts.managed or opts.proxy or opts.is_swapped:
             return [], {}
         final_output = []
         table_output = []
@@ -144,7 +144,7 @@ class BaseDatabaseCreation(object):
         from django.db.backends.util import truncate_name
 
         opts = model._meta
-        if not opts.managed or opts.proxy or opts.swapped:
+        if not opts.managed or opts.proxy or opts.is_swapped:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
@@ -172,7 +172,7 @@ class BaseDatabaseCreation(object):
         """
         Returns the CREATE INDEX SQL statements for a single model.
         """
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
+        if not model._meta.managed or model._meta.proxy or model._meta.is_swapped:
             return []
         output = []
         for f in model._meta.local_fields:
@@ -224,7 +224,7 @@ class BaseDatabaseCreation(object):
         Return the DROP TABLE and restraint dropping statements for a single
         model.
         """
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
+        if not model._meta.managed or model._meta.proxy or model._meta.is_swapped:
             return []
         # Drop the table now
         qn = self.connection.ops.quote_name
@@ -241,7 +241,7 @@ class BaseDatabaseCreation(object):
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
         from django.db.backends.util import truncate_name
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
+        if not model._meta.managed or model._meta.proxy or model._meta.is_swapped:
             return []
         output = []
         qn = self.connection.ops.quote_name

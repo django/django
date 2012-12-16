@@ -1064,7 +1064,7 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
-        if not self.rel.is_hidden() and not related.model._meta.swapped:
+        if not self.rel.is_hidden() and not related.model._meta.is_swapped:
             setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
@@ -1279,7 +1279,7 @@ class ManyToManyField(RelatedField, Field):
         #  1) There is a manually specified intermediate, or
         #  2) The class owning the m2m field is abstract.
         #  3) The class owning the m2m field has been swapped out.
-        if not self.rel.through and not cls._meta.abstract and not cls._meta.swapped:
+        if not self.rel.through and not cls._meta.abstract and not cls._meta.is_swapped:
             self.rel.through = create_many_to_many_intermediary_model(self, cls)
 
         # Add the descriptor for the m2m relation
@@ -1304,7 +1304,7 @@ class ManyToManyField(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
-        if not self.rel.is_hidden() and not related.model._meta.swapped:
+        if not self.rel.is_hidden() and not related.model._meta.is_swapped:
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
 
         # Set up the accessors for the column names on the m2m table

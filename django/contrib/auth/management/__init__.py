@@ -155,7 +155,7 @@ def get_default_username(check_db=True):
     """
     # If the User model has been swapped out, we can't make any assumptions
     # about the default user name.
-    if auth_app.User._meta.swapped:
+    if auth_app.User._meta.is_swapped:
         return ''
 
     default_username = get_system_username()

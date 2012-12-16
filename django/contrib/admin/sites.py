@@ -84,7 +84,7 @@ class AdminSite(object):
 
             # Ignore the registration if the model has been
             # swapped out.
-            if not model._meta.swapped:
+            if not model._meta.is_swapped:
                 # If we got **options then dynamically construct a subclass of
                 # admin_class with those **options.
                 if options:

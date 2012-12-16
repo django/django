@@ -213,7 +213,7 @@ class AppCache(object):
                 model for model in app.values()
                 if ((not model._deferred or include_deferred) and
                     (not model._meta.auto_created or include_auto_created) and
-                    (not model._meta.swapped or include_swapped))
+                    (not model._meta.is_swapped or include_swapped))
             )
         self._get_models_cache[cache_key] = model_list
         return model_list
