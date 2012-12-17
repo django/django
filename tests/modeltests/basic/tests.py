@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import Field, FieldDoesNotExist
-from django.db.models.query import EmptyQuerySet
+from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -646,3 +646,43 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertTrue(isinstance(Article.objects.none(), EmptyQuerySet))
+
+    def test_emptyqs_values(self):
+        # test for #15959
+        Article.objects.create(headline='foo', pub_date=datetime.now())
+        with self.assertNumQueries(0):
+            qs = Article.objects.none().values_list('pk')
+            self.assertTrue(isinstance(qs, EmptyQuerySet))
+            self.assertTrue(isinstance(qs, ValuesListQuerySet))
+            self.assertEqual(len(qs), 0)
+
+    def test_emptyqs_customqs(self):
+        # A hacky test for custom QuerySet subclass - refs #17271
+        Article.objects.create(headline='foo', pub_date=datetime.now())
+        class CustomQuerySet(QuerySet):
+            def do_something(self):
+                return 'did something'
+
+        qs = Article.objects.all()
+        qs.__class__ = CustomQuerySet
+        qs = qs.none()
+        with self.assertNumQueries(0):
+            self.assertEqual(len(qs), 0)
+            self.assertTrue(isinstance(qs, EmptyQuerySet))
+            self.assertEqual(qs.do_something(), 'did something')
+
+    def test_emptyqs_values_order(self):
+        # Tests for ticket #17712
+        Article.objects.create(headline='foo', pub_date=datetime.now())
+        with self.assertNumQueries(0):
+            self.assertEqual(len(Article.objects.none().values_list('id').order_by('id')), 0)
+        with self.assertNumQueries(0):
+            self.assertEqual(len(Article.objects.none().filter(
+                id__in=Article.objects.values_list('id', flat=True))), 0)
+
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_emptyqs_distinct(self):
+        # Tests for #19426
+        Article.objects.create(headline='foo', pub_date=datetime.now())
+        with self.assertNumQueries(0):
+            self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)
