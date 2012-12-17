@@ -10,6 +10,7 @@ class Reporter(models.Model):
     last_name = models.CharField(max_length=30)
     email = models.EmailField()
     facebook_user_id = models.BigIntegerField(null=True)
+    raw_data = models.BinaryField(null=True)
 
     class Meta:
         unique_together = ('first_name', 'last_name')
