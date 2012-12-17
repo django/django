@@ -56,8 +56,13 @@ _error_files = []
 
 def code_changed():
     global _mtimes, _win
-    filenames = [getattr(m, "__file__", None) for m in sys.modules.values()]
-    for filename in filter(None, filenames) + _error_files:
+    filenames = []
+    for m in sys.modules.values():
+        try:
+            filenames.append(m.__file__)
+        except AttributeError:
+            pass
+    for filename in filenames + _error_files:
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if filename.endswith("$py.class"):
