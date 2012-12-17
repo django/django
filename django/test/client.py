@@ -245,7 +245,11 @@ class RequestFactory(object):
         # If there are parameters, add them
         if parsed[3]:
             path += str(";") + force_str(parsed[3])
-        return unquote(path)
+        path = unquote(path)
+        # WSGI requires latin-1 encoded strings. See get_path_info().
+        if six.PY3:
+            path = path.encode('utf-8').decode('iso-8859-1')
+        return path
 
     def get(self, path, data={}, **extra):
         "Construct a GET request."

@@ -5,10 +5,14 @@ import sys
 import types
 
 from django import http
+from django.conf import settings
+from django.core import exceptions
+from django.core import urlresolvers
 from django.core import signals
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 from django.utils import six
+from django.views import debug
 
 logger = logging.getLogger('django.request')
 
@@ -32,8 +36,6 @@ class BaseHandler(object):
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
-        from django.conf import settings
-        from django.core import exceptions
         self._view_middleware = []
         self._template_response_middleware = []
         self._response_middleware = []
@@ -75,9 +77,6 @@ class BaseHandler(object):
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
-        from django.core import exceptions, urlresolvers
-        from django.conf import settings
-
         try:
             # Setup default url resolver for this thread, this code is outside
             # the try/except so we don't get a spurious "unbound local
@@ -147,7 +146,6 @@ class BaseHandler(object):
                                 'request': request
                             })
                 if settings.DEBUG:
-                    from django.views import debug
                     response = debug.technical_404_response(request, e)
                 else:
                     try:
@@ -204,8 +202,6 @@ class BaseHandler(object):
         caused by anything, so assuming something like the database is always
         available would be an error.
         """
-        from django.conf import settings
-
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
@@ -218,7 +214,6 @@ class BaseHandler(object):
         )
 
         if settings.DEBUG:
-            from django.views import debug
             return debug.technical_500_response(request, *exc_info)
 
         # If Http500 handler is not installed, re-raise last exception
@@ -238,6 +233,20 @@ class BaseHandler(object):
             response = func(request, response)
         return response
 
+
+def get_path_info(environ):
+    """
+    Returns the HTTP request's PATH_INFO as a unicode string.
+    """
+    path_info = environ.get('PATH_INFO', str('/'))
+    # Under Python 3, strings in environ are decoded with ISO-8859-1;
+    # re-encode to recover the original bytestring provided by the webserver.
+    if six.PY3:
+        path_info = path_info.encode('iso-8859-1')
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return path_info.decode('utf-8')
+
+
 def get_script_name(environ):
     """
     Returns the equivalent of the HTTP request's SCRIPT_NAME environment
@@ -246,7 +255,6 @@ def get_script_name(environ):
     from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
     set (to anything).
     """
-    from django.conf import settings
     if settings.FORCE_SCRIPT_NAME is not None:
         return force_text(settings.FORCE_SCRIPT_NAME)
 
@@ -255,9 +263,14 @@ def get_script_name(environ):
     # rewrites. Unfortunately not every Web server (lighttpd!) passes this
     # information through all the time, so FORCE_SCRIPT_NAME, above, is still
     # needed.
-    script_url = environ.get('SCRIPT_URL', '')
-    if not script_url:
-        script_url = environ.get('REDIRECT_URL', '')
+    script_url = environ.get('SCRIPT_URL', environ.get('REDIRECT_URL', str('')))
     if script_url:
-        return force_text(script_url[:-len(environ.get('PATH_INFO', ''))])
-    return force_text(environ.get('SCRIPT_NAME', ''))
+        script_name = script_url[:-len(environ.get('PATH_INFO', str('')))]
+    else:
+        script_name = environ.get('SCRIPT_NAME', str(''))
+    # Under Python 3, strings in environ are decoded with ISO-8859-1;
+    # re-encode to recover the original bytestring provided by the webserver.
+    if six.PY3:
+        script_name = script_name.encode('iso-8859-1')
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return script_name.decode('utf-8')
