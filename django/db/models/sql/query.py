@@ -1004,11 +1004,39 @@ class Query(object):
 
         for field, model in opts.get_fields_with_model():
             if model not in seen:
-                link_field = opts.get_ancestor_link(model)
-                seen[model] = self.join(
-                    (root_alias, model._meta.db_table, link_field.column,
-                     model._meta.pk.column), join_field=link_field)
+                self.join_parent_model(opts, model, root_alias, seen)
         self.included_inherited_models = seen
+
+    def join_parent_model(self, opts, model, alias, seen):
+        """
+        Makes sure the given 'model' is joined in the query. If 'model' isn't
+        a parent of 'opts' or if it is None this method is a no-op.
+
+        The 'alias' is the root alias for starting the join, 'seen' is a dict
+        of model -> alias of existing joins.
+        """
+        if model in seen:
+            return seen[model]
+        int_opts = opts
+        chain = opts.get_base_chain(model)
+        if chain is None:
+            return alias
+        for int_model in chain:
+            if int_model in seen:
+                return seen[int_model]
+            # Proxy model have elements in base chain
+            # with no parents, assign the new options
+            # object and skip to the next base in that
+            # case
+            if not int_opts.parents[int_model]:
+                int_opts = int_model._meta
+                continue
+            link_field = int_opts.get_ancestor_link(int_model)
+            int_opts = int_model._meta
+            connection = (alias, int_opts.db_table, link_field.column, int_opts.pk.column)
+            alias = seen[int_model] = self.join(connection, nullable=False,
+                                                join_field=link_field)
+        return alias
 
     def remove_inherited_models(self):
         """
