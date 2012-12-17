@@ -11,6 +11,7 @@ from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
 from django.test.client import FakePayload
 from django.test.utils import override_settings, str_prefix
+from django.utils import six
 from django.utils import unittest
 from django.utils.http import cookie_date, urlencode
 from django.utils.timezone import utc
@@ -56,6 +57,16 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(build_request_repr(request), repr(request))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
+
+    def test_wsgirequest_path_info(self):
+        def wsgi_str(path_info):
+            path_info = path_info.encode('utf-8')           # Actual URL sent by the browser (bytestring)
+            if six.PY3:
+                path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
+            return path_info
+        # Regression for #19468
+        request = WSGIRequest({'PATH_INFO': wsgi_str("/سلام/"), 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        self.assertEqual(request.path, "/سلام/")
 
     def test_parse_cookie(self):
         self.assertEqual(parse_cookie('invalid@key=true'), {})
