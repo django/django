@@ -11,6 +11,7 @@ from django.db import connection
 from django.db.models import signals
 from django.db import models, router, DEFAULT_DB_ALIAS
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
+from django.db.models.related import PathInfo
 from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
@@ -159,6 +160,16 @@ class GenericRelation(RelatedField, Field):
         kwargs['editable'] = False
         kwargs['serialize'] = False
         Field.__init__(self, **kwargs)
+
+    def get_path_info(self):
+        from_field = self.model._meta.pk
+        opts = self.rel.to._meta
+        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        # Note that we are using different field for the join_field
+        # than from_field or to_field. This is a hack, but we need the
+        # GenericRelation to generate the extra SQL.
+        return ([PathInfo(from_field, target, self.model._meta, opts, self, True, False)],
+                opts, target, self)
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)

@@ -1,5 +1,14 @@
+from collections import namedtuple
+
 from django.utils.encoding import smart_text
 from django.db.models.fields import BLANK_CHOICE_DASH
+
+# PathInfo is used when converting lookups (fk__somecol). The contents
+# describe the relation in Model terms (model Options and Fields for both
+# sides of the relation. The join_field is the field backing the relation.
+PathInfo = namedtuple('PathInfo',
+                      'from_field to_field from_opts to_opts join_field '
+                      'm2m direct')
 
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
@@ -67,3 +76,6 @@ class RelatedObject(object):
 
     def get_cache_name(self):
         return "_%s_cache" % self.get_accessor_name()
+
+    def get_path_info(self):
+        return self.field.get_reverse_path_info()

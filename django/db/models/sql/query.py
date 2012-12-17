@@ -18,9 +18,10 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.loading import get_model
+from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
-        ORDER_PATTERN, JoinInfo, SelectInfo, PathInfo)
+        ORDER_PATTERN, JoinInfo, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
@@ -1294,7 +1295,6 @@ class Query(object):
         contain the same value as the final field).
         """
         path = []
-        multijoin_pos = None
         for pos, name in enumerate(names):
             if name == 'pk':
                 name = opts.pk.name
@@ -1328,92 +1328,19 @@ class Query(object):
                         target = final_field.rel.get_related_field()
                         opts = int_model._meta
                         path.append(PathInfo(final_field, target, final_field.model._meta,
-                                             opts, final_field))
-            # We have five different cases to solve: foreign keys, reverse
-            # foreign keys, m2m fields (also reverse) and non-relational
-            # fields. We are mostly just using the related field API to
-            # fetch the from and to fields. The m2m fields are handled as
-            # two foreign keys, first one reverse, the second one direct.
-            if direct and not field.rel and not m2m:
+                                             opts, final_field, False, True))
+            if hasattr(field, 'get_path_info'):
+                pathinfos, opts, target, final_field = field.get_path_info()
+                path.extend(pathinfos)
+            else:
                 # Local non-relational field.
                 final_field = target = field
                 break
-            elif direct and not m2m:
-                # Foreign Key
-                opts = field.rel.to._meta
-                target = field.rel.get_related_field()
-                final_field = field
-                from_opts = field.model._meta
-                path.append(PathInfo(field, target, from_opts, opts, field))
-            elif not direct and not m2m:
-                # Revere foreign key
-                final_field = to_field = field.field
-                opts = to_field.model._meta
-                from_field = to_field.rel.get_related_field()
-                from_opts = from_field.model._meta
-                path.append(
-                    PathInfo(from_field, to_field, from_opts, opts, to_field))
-                if from_field.model is to_field.model:
-                    # Recursive foreign key to self.
-                    target = opts.get_field_by_name(
-                        field.field.rel.field_name)[0]
-                else:
-                    target = opts.pk
-            elif direct and m2m:
-                if not field.rel.through:
-                    # Gotcha! This is just a fake m2m field - a generic relation
-                    # field).
-                    from_field = opts.pk
-                    opts = field.rel.to._meta
-                    target = opts.get_field_by_name(field.object_id_field_name)[0]
-                    final_field = field
-                    # Note that we are using different field for the join_field
-                    # than from_field or to_field. This is a hack, but we need the
-                    # GenericRelation to generate the extra SQL.
-                    path.append(PathInfo(from_field, target, field.model._meta, opts,
-                                         field))
-                else:
-                    # m2m field. We are travelling first to the m2m table along a
-                    # reverse relation, then from m2m table to the target table.
-                    from_field1 = opts.get_field_by_name(
-                        field.m2m_target_field_name())[0]
-                    opts = field.rel.through._meta
-                    to_field1 = opts.get_field_by_name(field.m2m_field_name())[0]
-                    path.append(
-                        PathInfo(from_field1, to_field1, from_field1.model._meta,
-                                 opts, to_field1))
-                    final_field = from_field2 = opts.get_field_by_name(
-                        field.m2m_reverse_field_name())[0]
-                    opts = field.rel.to._meta
-                    target = to_field2 = opts.get_field_by_name(
-                        field.m2m_reverse_target_field_name())[0]
-                    path.append(
-                        PathInfo(from_field2, to_field2, from_field2.model._meta,
-                                 opts, from_field2))
-            elif not direct and m2m:
-                # This one is just like above, except we are travelling the
-                # fields in opposite direction.
-                field = field.field
-                from_field1 = opts.get_field_by_name(
-                    field.m2m_reverse_target_field_name())[0]
-                int_opts = field.rel.through._meta
-                to_field1 = int_opts.get_field_by_name(
-                    field.m2m_reverse_field_name())[0]
-                path.append(
-                    PathInfo(from_field1, to_field1, from_field1.model._meta,
-                             int_opts, to_field1))
-                final_field = from_field2 = int_opts.get_field_by_name(
-                    field.m2m_field_name())[0]
-                opts = field.opts
-                target = to_field2 = opts.get_field_by_name(
-                    field.m2m_target_field_name())[0]
-                path.append(PathInfo(from_field2, to_field2, from_field2.model._meta,
-                                     opts, from_field2))
-
-            if m2m and multijoin_pos is None:
-                multijoin_pos = pos
-            if not direct and not path[-1].to_field.unique and multijoin_pos is None:
-                multijoin_pos = pos
+        multijoin_pos = None
+        for m2mpos, pathinfo in enumerate(path):
+            if pathinfo.m2m:
+                multijoin_pos = m2mpos
+                break
 
         if pos != len(names) - 1:
             if pos == len(names) - 2:
@@ -1463,16 +1390,15 @@ class Query(object):
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
         for pos, join in enumerate(path):
-            from_field, to_field, from_opts, opts, join_field = join
-            direct = join_field == from_field
-            if direct:
-                nullable = self.is_nullable(from_field)
+            opts = join.to_opts
+            if join.direct:
+                nullable = self.is_nullable(join.from_field)
             else:
                 nullable = True
-            connection = alias, opts.db_table, from_field.column, to_field.column
-            reuse = None if direct or to_field.unique else can_reuse
+            connection = alias, opts.db_table, join.from_field.column, join.to_field.column
+            reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse,
-                              nullable=nullable, join_field=join_field)
+                              nullable=nullable, join_field=join.join_field)
             joins.append(alias)
         return final_field, target, opts, joins, path
 
