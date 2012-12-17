@@ -1545,7 +1545,7 @@ class Query(object):
         alias, col = query.select[0].col
         query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
         # We need to trim the last part from the prefix.
-        trimmed_prefix = '__'.join(prefix.split(LOOKUP_SEP)[0:-1])
+        trimmed_prefix = LOOKUP_SEP.join(prefix.split(LOOKUP_SEP)[0:-1])
         if not trimmed_prefix:
             rel, _, direct, m2m = self.model._meta.get_field_by_name(prefix)
             if not m2m:
