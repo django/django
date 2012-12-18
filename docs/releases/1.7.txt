@@ -135,6 +135,10 @@ Minor features
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
 
+* In addition to the existing ``admin.site.register`` syntax, you can use the
+  new :func:`~django.contrib.admin.register` decorator to register a
+  :class:`~django.contrib.admin.ModelAdmin`.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

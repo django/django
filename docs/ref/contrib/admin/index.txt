@@ -101,6 +101,34 @@ Other topics
 
             admin.site.register(Author)
 
+The register decorator
+----------------------
+
+.. function:: register(*models, [site=django.admin.sites.site])
+
+    .. versionadded:: 1.7
+
+    There is also a decorator for registering your ``ModelAdmin`` classes::
+
+        from django.contrib import admin
+        from .models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+
+    It is given one or more model classes to register with the ``ModelAdmin``
+    and an optional keyword argument ``site`` if you are not using the default
+    ``AdminSite``::
+
+        from django.contrib import admin
+        from .models import Author, Reader, Editor
+        from myproject.admin_site import custom_admin_site
+
+        @admin.register(Author, Reader, Editor, site=custom_admin_site)
+        class PersonAdmin(admin.ModelAdmin):
+            pass
+
 ``ModelAdmin`` options
 ----------------------
 
