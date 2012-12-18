@@ -110,6 +110,12 @@ Methods
     :class:`~django.contrib.auth.models.User` objects have the following custom
     methods:
 
+    .. method:: models.User.get_username()
+
+        Returns the username for the user. Since the User model can be swapped
+        out, you should use  this method instead of referencing the username
+        attribute directly.
+
     .. method:: models.User.is_anonymous()
 
         Always returns ``False``. This is a way of differentiating
