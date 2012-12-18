@@ -15,7 +15,7 @@ The tests cover:
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications </topics/testing>`
+testing applications. See :doc:`Testing Django applications </topics/testing/index>`
 for an explanation of how to write new tests.
 
 .. _running-unit-tests:

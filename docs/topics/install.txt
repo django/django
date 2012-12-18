@@ -135,7 +135,7 @@ table once ``syncdb`` has created it. After creating a database user with these
 permissions, you'll specify the details in your project's settings file,
 see :setting:`DATABASES` for details.
 
-If you're using Django's :doc:`testing framework</topics/testing>` to test
+If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
