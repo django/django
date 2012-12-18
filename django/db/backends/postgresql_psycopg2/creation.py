@@ -41,7 +41,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         return ''
 
     def sql_indexes_for_field(self, model, f, style):
-        if f.db_index and not f.unique:
+        output = []
+        if f.db_index:
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -60,7 +61,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
                         "%s;" % tablespace_sql)
 
-            output = [get_index_sql('%s_%s' % (db_table, f.column))]
+            if not f.unique:
+                output = [get_index_sql('%s_%s' % (db_table, f.column))]
 
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
@@ -73,8 +75,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             elif db_type.startswith('text'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' text_pattern_ops'))
-        else:
-            output = []
         return output
 
     def set_autocommit(self):
