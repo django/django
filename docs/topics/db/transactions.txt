@@ -199,7 +199,8 @@ Requirements for transaction handling
 Django requires that every transaction that is opened is closed before
 the completion of a request. If you are using :func:`autocommit` (the
 default commit mode) or :func:`commit_on_success`, this will be done
-for you automatically. However, if you are manually managing
+for you automatically (with the exception of :ref:`executing custom SQL
+<executing-custom-sql>`). However, if you are manually managing
 transactions (using the :func:`commit_manually` decorator), you must
 ensure that the transaction is either committed or rolled back before
 a request is completed.
