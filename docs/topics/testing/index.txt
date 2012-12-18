@@ -268,24 +268,6 @@ be reported, and any test databases created by the run will not be destroyed.
     flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
 
-Running tests outside the test runner
--------------------------------------
-
-If you want to run tests outside of ``./manage.py test`` -- for example,
-from a shell prompt -- you will need to set up the test
-environment first. Django provides a convenience method to do this::
-
-    >>> from django.test.utils import setup_test_environment
-    >>> setup_test_environment()
-
-This convenience method sets up the test database, and puts other
-Django features into modes that allow for repeatable testing.
-
-The call to :meth:`~django.test.utils.setup_test_environment` is made
-automatically as part of the setup of ``./manage.py test``. You only
-need to manually invoke this method if you're not using running your
-tests via Django's test runner.
-
 The test database
 -----------------
 
@@ -536,36 +518,6 @@ to a faster hashing algorithm::
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
-
-.. _topics-testing-code-coverage:
-
-Integration with coverage.py
-----------------------------
-
-Code coverage describes how much source code has been tested. It shows which
-parts of your code are being exercised by tests and which are not. It's an
-important part of testing applications, so it's strongly recommended to check
-the coverage of your tests.
-
-Django can be easily integrated with `coverage.py`_, a tool for measuring code
-coverage of Python programs. First, `install coverage.py`_. Next, run the
-following from your project folder containing ``manage.py``::
-
-   coverage run --source='.' manage.py test myapp
-
-This runs your tests and collects coverage data of the executed files in your
-project. You can see a report of this data by typing following command::
-
-   coverage report
-
-Note that some Django code was executed while running tests, but it is not
-listed here because of the ``source`` flag passed to the previous command.
-
-For more options like annotated HTML listings detailing missed lines, see the
-`coverage.py`_ docs.
-
-.. _coverage.py: http://nedbatchelder.com/code/coverage/
-.. _install coverage.py: http://pypi.python.org/pypi/coverage
 
 Testing tools
 =============
@@ -2060,6 +2012,27 @@ out the `full reference`_ for more details.
     .. _Selenium FAQ: http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
     .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
+Advanced topics
+===============
+
+Running tests outside the test runner
+-------------------------------------
+
+If you want to run tests outside of ``./manage.py test`` -- for example,
+from a shell prompt -- you will need to set up the test
+environment first. Django provides a convenience method to do this::
+
+    >>> from django.test.utils import setup_test_environment
+    >>> setup_test_environment()
+
+This convenience method sets up the test database, and puts other
+Django features into modes that allow for repeatable testing.
+
+The call to :meth:`~django.test.utils.setup_test_environment` is made
+automatically as part of the setup of ``./manage.py test``. You only
+need to manually invoke this method if you're not using running your
+tests via Django's test runner.
+
 Using different testing frameworks
 ==================================
 
@@ -2284,3 +2257,34 @@ also provides some utilities that can be useful during testing.
 
     The ``verbosity`` argument has the same behavior as for
     :class:`~django.test.simple.DjangoTestSuiteRunner`.
+
+.. _topics-testing-code-coverage:
+
+Integration with coverage.py
+----------------------------
+
+Code coverage describes how much source code has been tested. It shows which
+parts of your code are being exercised by tests and which are not. It's an
+important part of testing applications, so it's strongly recommended to check
+the coverage of your tests.
+
+Django can be easily integrated with `coverage.py`_, a tool for measuring code
+coverage of Python programs. First, `install coverage.py`_. Next, run the
+following from your project folder containing ``manage.py``::
+
+   coverage run --source='.' manage.py test myapp
+
+This runs your tests and collects coverage data of the executed files in your
+project. You can see a report of this data by typing following command::
+
+   coverage report
+
+Note that some Django code was executed while running tests, but it is not
+listed here because of the ``source`` flag passed to the previous command.
+
+For more options like annotated HTML listings detailing missed lines, see the
+`coverage.py`_ docs.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
+.. _install coverage.py: http://pypi.python.org/pypi/coverage
+
