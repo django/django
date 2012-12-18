@@ -241,6 +241,40 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
 
 
 class SimpleTestCase(ut2.TestCase):
+    def __call__(self, result=None):
+        """
+        Wrapper around default __call__ method to perform common Django test
+        set up. This means that user-defined Test Cases aren't required to
+        include a call to super().setUp().
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = (getattr(self.__class__, "__unittest_skip__", False) or
+            getattr(testMethod, "__unittest_skip__", False))
+
+        if not skipped:
+            try:
+                self._pre_setup()
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except Exception:
+                result.addError(self, sys.exc_info())
+                return
+        super(SimpleTestCase, self).__call__(result)
+        if not skipped:
+            try:
+                self._post_teardown()
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except Exception:
+                result.addError(self, sys.exc_info())
+                return
+
+    def _pre_setup(self):
+        pass
+
+    def _post_teardown(self):
+        pass
+
     def save_warnings_state(self):
         """
         Saves the state of the warnings module
@@ -412,9 +446,19 @@ class TransactionTestCase(SimpleTestCase):
               ROOT_URLCONF with it.
             * Clearing the mail test outbox.
         """
+        self.client = self.client_class()
         self._fixture_setup()
         self._urlconf_setup()
         mail.outbox = []
+
+    def _databases_names(self, include_mirrors=True):
+        # If the test case has a multi_db=True flag, act on all databases,
+        # including mirrors or not. Otherwise, just on the default DB.
+        if getattr(self, 'multi_db', False):
+            return [alias for alias in connections
+                    if include_mirrors or not connections[alias].settings_dict['TEST_MIRROR']]
+        else:
+            return [DEFAULT_DB_ALIAS]
 
     def _reset_sequences(self, db_name):
         conn = connections[db_name]
@@ -433,10 +477,7 @@ class TransactionTestCase(SimpleTestCase):
                 transaction.commit_unless_managed(using=db_name)
 
     def _fixture_setup(self):
-        # If the test case has a multi_db=True flag, act on all databases.
-        # Otherwise, just on the default DB.
-        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-        for db_name in db_names:
+        for db_name in self._databases_names(include_mirrors=False):
             # Reset sequences
             if self.reset_sequences:
                 self._reset_sequences(db_name)
@@ -452,35 +493,6 @@ class TransactionTestCase(SimpleTestCase):
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
             clear_url_caches()
-
-    def __call__(self, result=None):
-        """
-        Wrapper around default __call__ method to perform common Django test
-        set up. This means that user-defined Test Cases aren't required to
-        include a call to super().setUp().
-        """
-        testMethod = getattr(self, self._testMethodName)
-        skipped = (getattr(self.__class__, "__unittest_skip__", False) or
-            getattr(testMethod, "__unittest_skip__", False))
-
-        if not skipped:
-            self.client = self.client_class()
-            try:
-                self._pre_setup()
-            except (KeyboardInterrupt, SystemExit):
-                raise
-            except Exception:
-                result.addError(self, sys.exc_info())
-                return
-        super(TransactionTestCase, self).__call__(result)
-        if not skipped:
-            try:
-                self._post_teardown()
-            except (KeyboardInterrupt, SystemExit):
-                raise
-            except Exception:
-                result.addError(self, sys.exc_info())
-                return
 
     def _post_teardown(self):
         """ Performs any post-test things. This includes:
@@ -502,10 +514,12 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        # If the test case has a multi_db=True flag, flush all databases.
-        # Otherwise, just flush default.
-        databases = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-        for db in databases:
+        # Roll back any pending transactions in order to avoid a deadlock
+        # during flush when TEST_MIRROR is used (#18984).
+        for conn in connections.all():
+            conn.rollback_unless_managed()
+
+        for db in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False, database=db,
                          skip_validation=True, reset_sequences=False)
 
@@ -753,6 +767,12 @@ class TransactionTestCase(SimpleTestCase):
         items = six.moves.map(transform, qs)
         if not ordered:
             return self.assertEqual(set(items), set(values))
+        values = list(values)
+        # For example qs.iterator() could be passed as qs, but it does not
+        # have 'ordered' attribute.
+        if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
+            raise ValueError("Trying to compare non-ordered queryset "
+                             "against more than one ordered values")
         return self.assertEqual(list(items), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
@@ -790,11 +810,7 @@ class TestCase(TransactionTestCase):
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
 
-        # If the test case has a multi_db=True flag, setup all databases.
-        # Otherwise, just use default.
-        db_names = connections if getattr(self, 'multi_db', False) else [DEFAULT_DB_ALIAS]
-
-        for db_name in db_names:
+        for db_name in self._databases_names():
             transaction.enter_transaction_management(using=db_name)
             transaction.managed(True, using=db_name)
         disable_transaction_methods()
@@ -802,7 +818,7 @@ class TestCase(TransactionTestCase):
         from django.contrib.sites.models import Site
         Site.objects.clear_cache()
 
-        for db in db_names:
+        for db in self._databases_names(include_mirrors=False):
             if hasattr(self, 'fixtures'):
                 call_command('loaddata', *self.fixtures,
                              **{
@@ -816,15 +832,8 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
-        # If the test case has a multi_db=True flag, teardown all databases.
-        # Otherwise, just teardown default.
-        if getattr(self, 'multi_db', False):
-            databases = connections
-        else:
-            databases = [DEFAULT_DB_ALIAS]
-
         restore_transaction_methods()
-        for db in databases:
+        for db in self._databases_names():
             transaction.rollback(using=db)
             transaction.leave_transaction_management(using=db)
 
@@ -1025,6 +1034,7 @@ class LiveServerThread(threading.Thread):
                         (self.host, port), QuietWSGIRequestHandler)
                 except WSGIServerException as e:
                     if (index + 1 < len(self.possible_ports) and
+                        hasattr(e.args[0], 'errno') and
                         e.args[0].errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
@@ -1077,7 +1087,7 @@ class LiveServerTestCase(TransactionTestCase):
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
-            if (conn.settings_dict['ENGINE'] == 'django.db.backends.sqlite3'
+            if (conn.settings_dict['ENGINE'].rsplit('.', 1)[-1] in ('sqlite3', 'spatialite')
                 and conn.settings_dict['NAME'] == ':memory:'):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
@@ -1129,7 +1139,7 @@ class LiveServerTestCase(TransactionTestCase):
 
         # Restore sqlite connections' non-sharability
         for conn in connections.all():
-            if (conn.settings_dict['ENGINE'] == 'django.db.backends.sqlite3'
+            if (conn.settings_dict['ENGINE'].rsplit('.', 1)[-1] in ('sqlite3', 'spatialite')
                 and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 

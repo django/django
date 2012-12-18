@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.utils import six
 from django.utils.unittest import skipIf
 
-from .models import Article, InternationalArticle
+from .models import Article, BrokenArticle, InternationalArticle
 
 
 class SimpleTests(TestCase):
@@ -20,6 +20,16 @@ class SimpleTests(TestCase):
         )
         self.assertEqual(str(a), str('Area man programs in Python'))
         self.assertEqual(repr(a), str('<Article: Area man programs in Python>'))
+
+    @skipIf(six.PY3, "tests Model's default __str__ method under Python 2")
+    def test_broken(self):
+        # Regression test for #19362.
+        a = BrokenArticle.objects.create(
+            headline='Girl wins €12.500 in lottery',
+            pub_date=datetime.datetime(2005, 7, 28)
+        )
+        self.assertRaisesRegexp(RuntimeError, "Did you apply "
+            "@python_2_unicode_compatible without defining __str__\?", str, a)
 
     def test_international(self):
         a = InternationalArticle.objects.create(

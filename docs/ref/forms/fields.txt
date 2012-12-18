@@ -683,7 +683,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: unpack_ipv4
 
-        Unpacks IPv4 mapped addresses like ``::ffff::192.0.2.1``.
+        Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
         If this option is enabled that address would be unpacked to
         ``192.0.2.1``. Default is disabled. Can only be used
         when ``protocol`` is set to ``'both'``.

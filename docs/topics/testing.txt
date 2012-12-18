@@ -379,6 +379,15 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 advanced settings.
 
+.. admonition:: Finding data from your production database when running tests?
+
+    If your code attempts to access the database when its modules are compiled,
+    this will occur *before* the test database is set up, with potentially
+    unexpected results. For example, if you have a database query in
+    module-level code and a real database exists, production data could pollute
+    your tests. *It is a bad idea to have such import-time database queries in
+    your code* anyway - rewrite your code so that it doesn't do this.
+
 .. _topics-testing-masterslave:
 
 Testing master/slave configurations
@@ -1177,10 +1186,13 @@ Normal Python unit test classes extend a base class of
 
 .. _testcase_hierarchy_diagram:
 
-.. figure:: _images/django_unittest_classes_hierarchy.png
+.. figure:: _images/django_unittest_classes_hierarchy.*
    :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
+   :width: 508
+   :height: 391
 
-   Hierarchy of Django unit testing classes
+Regardless of the version of Python you're using, if you've installed
+:mod:`unittest2`, :mod:`django.utils.unittest` will point to that library.
 
 TestCase
 ^^^^^^^^
@@ -1586,15 +1598,24 @@ The decorator can also be applied to test case classes::
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
 
-.. note::
+When overriding settings, make sure to handle the cases in which your app's
+code uses a cache or similar feature that retains state even if the
+setting is changed. Django provides the
+:data:`django.test.signals.setting_changed` signal that lets you register
+callbacks to clean up and otherwise reset state when settings are changed.
 
-    When overriding settings, make sure to handle the cases in which your app's
-    code uses a cache or similar feature that retains state even if the
-    setting is changed. Django provides the
-    :data:`django.test.signals.setting_changed` signal that lets you register
-    callbacks to clean up and otherwise reset state when settings are changed.
-    Note that this signal isn't currently used by Django itself, so changing
-    built-in settings may not yield the results you expect.
+Django itself uses this signal to reset various data:
+
+================================ ========================
+Overriden settings               Data reset
+================================ ========================
+USE_TZ, TIME_ZONE                Databases timezone
+TEMPLATE_CONTEXT_PROCESSORS      Context processors cache
+TEMPLATE_LOADERS                 Template loaders cache
+SERIALIZATION_MODULES            Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
+MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
+================================ ========================
 
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1752,6 +1773,11 @@ your test suite.
 	via an explicit ``order_by()`` call on the queryset prior to
 	comparison.
 
+    .. versionchanged:: 1.6
+        The method now checks for undefined order and raises ``ValueError``
+        if undefined order is spotted. The ordering is seen as undefined if
+        the given ``qs`` isn't ordered and the comparison is against more
+        than one ordered values.
 
 .. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
 
@@ -2075,6 +2101,7 @@ out the `full reference`_ for more details.
 
         def test_login(self):
             from selenium.webdriver.support.wait import WebDriverWait
+            timeout = 2
             ...
             self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
             # Wait until the response is received

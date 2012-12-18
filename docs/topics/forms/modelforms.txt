@@ -90,9 +90,6 @@ Model field                      Form field
 
 ``NullBooleanField``             ``CharField``
 
-``PhoneNumberField``             ``USPhoneNumberField``
-                                 (from ``django.contrib.localflavor.us``)
-
 ``PositiveIntegerField``         ``IntegerField``
 
 ``PositiveSmallIntegerField``    ``IntegerField``
@@ -192,6 +189,8 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
+.. _modelform-is-valid-and-errors:
+
 The ``is_valid()`` method and ``errors``
 ----------------------------------------
 
@@ -213,7 +212,9 @@ method. This method creates and saves a database object from the data
 bound to the form. A subclass of ``ModelForm`` can accept an existing
 model instance as the keyword argument ``instance``; if this is
 supplied, ``save()`` will update that instance. If it's not supplied,
-``save()`` will create a new instance of the specified model::
+``save()`` will create a new instance of the specified model:
+
+.. code-block:: python
 
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
@@ -232,8 +233,10 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     >>> f = ArticleForm(request.POST, instance=a)
     >>> f.save()
 
-Note that ``save()`` will raise a ``ValueError`` if the data in the form
-doesn't validate -- i.e., if form.errors evaluates to True.
+Note that if the form :ref:`hasn't been validated
+<modelform-is-valid-and-errors>`, calling ``save()`` will do so by checking
+``form.errors``. A ``ValueError`` will be raised if the data in the form
+doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with

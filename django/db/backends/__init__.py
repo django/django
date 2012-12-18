@@ -181,8 +181,6 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
-        # Note that this setting isn't documented, and is only used here, and
-        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
@@ -904,16 +902,14 @@ class BaseDatabaseOperations(object):
         Coerce the value returned by the database backend into a consistent type
         that is compatible with the field type.
         """
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
+        if value is None:
             return value
-        elif internal_type == 'FloatField':
+        internal_type = field.get_internal_type()
+        if internal_type == 'FloatField':
             return float(value)
         elif (internal_type and (internal_type.endswith('IntegerField')
                                  or internal_type == 'AutoField')):
             return int(value)
-        elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
-            return value
         return value
 
     def check_aggregate_support(self, aggregate_func):
@@ -935,6 +931,11 @@ class BaseDatabaseOperations(object):
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
 
+    def modify_insert_params(self, placeholders, params):
+        """Allow modification of insert parameters. Needed for Oracle Spatial
+        backend due to #10888.
+        """
+        return params
 
 class BaseDatabaseIntrospection(object):
     """

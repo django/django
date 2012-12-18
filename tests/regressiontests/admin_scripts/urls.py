@@ -1,7 +1,8 @@
 import os
 from django.conf.urls import patterns
+from django.utils._os import upath
 
-here = os.path.dirname(__file__)
+here = os.path.dirname(upath(__file__))
 
 urlpatterns = patterns('',
     (r'^custom_templates/(?P<path>.*)$', 'django.views.static.serve', {

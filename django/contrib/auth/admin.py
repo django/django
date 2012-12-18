@@ -133,7 +133,7 @@ class UserAdmin(admin.ModelAdmin):
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
-            'title': _('Change password: %s') % escape(user.username),
+            'title': _('Change password: %s') % escape(user.get_username()),
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
@@ -148,10 +148,10 @@ class UserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
         }
-        return TemplateResponse(request, [
+        return TemplateResponse(request,
             self.change_user_password_template or
-            'admin/auth/user/change_password.html'
-        ], context, current_app=self.admin_site.name)
+            'admin/auth/user/change_password.html',
+            context, current_app=self.admin_site.name)
 
     def response_add(self, request, obj, **kwargs):
         """

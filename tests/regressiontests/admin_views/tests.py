@@ -33,6 +33,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils._os import upath
 from django.utils import six
 from django.test.utils import override_settings
 
@@ -46,11 +47,11 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject)
+    Simple, UndeletableObject, Choice)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
-for a staff account. Note that both fields are case-sensitive."
+for a staff account. Note that both fields may be case-sensitive."
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -633,7 +634,7 @@ class AdminViewFormUrlTest(TestCase):
         Refs #17515.
         """
         template_dirs = settings.TEMPLATE_DIRS + (
-            os.path.join(os.path.dirname(__file__), 'templates'),)
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get("/test_admin/admin/admin_views/color2/")
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
@@ -770,7 +771,10 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.assertContains(response, 'Hello from a custom logout template')
 
     def testCustomAdminSiteIndexViewAndTemplate(self):
-        response = self.client.get('/test_admin/admin2/')
+        try:
+            response = self.client.get('/test_admin/admin2/')
+        except TypeError:
+            self.fail('AdminSite.index_template should accept a list of template paths')
         self.assertIsInstance(response, TemplateResponse)
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
@@ -791,6 +795,15 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.client.login(username='super', password='secret')
         response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
         self.assertEqual(response.content, b"Django is a magical pony!")
+
+    def test_pwd_change_custom_template(self):
+        self.client.login(username='super', password='secret')
+        su = User.objects.get(username='super')
+        try:
+            response = self.client.get('/test_admin/admin4/auth/user/%s/password/' % su.pk)
+        except TypeError:
+            self.fail('ModelAdmin.change_user_password_template should accept a list of template paths')
+        self.assertEqual(response.status_code, 200)
 
 
 def get_perm(Model, perm):
@@ -3149,6 +3162,11 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, "Very awesome.")
         self.assertContains(response, "Unkown coolness.")
         self.assertContains(response, "foo")
+
+        # Checks that multiline text in a readonly field gets <br /> tags
+        self.assertContains(response, "Multiline<br />test<br />string")
+        self.assertContains(response, "InlineMultiline<br />test<br />string")
+
         self.assertContains(response,
             formats.localize(datetime.date.today() - datetime.timedelta(days=7))
         )
@@ -3197,6 +3215,15 @@ class ReadonlyTest(TestCase):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
         self.assertEqual(response.status_code, 404)
+
+    def test_change_form_renders_correct_null_choice_value(self):
+        """
+        Regression test for #17911.
+        """
+        choice = Choice.objects.create(choice=None)
+        response = self.client.get('/test_admin/admin/admin_views/choice/%s/' % choice.pk)
+        self.assertContains(response, '<p>No opinion</p>', html=True)
+        self.assertNotContains(response, '<p>(None)</p>')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -3378,7 +3405,11 @@ class CSSTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_css_classes(self):
+    def test_field_prefix_css_classes(self):
+        """
+        Ensure that fields have a CSS class name with a 'field-' prefix.
+        Refs #16371.
+        """
         response = self.client.get('/test_admin/admin/admin_views/post/add/')
 
         # The main form
@@ -3394,6 +3425,23 @@ class CSSTest(TestCase):
         self.assertContains(response, '<td class="field-url">')
         self.assertContains(response, '<td class="field-posted">')
 
+    def test_index_css_classes(self):
+        """
+        Ensure that CSS class names are used for each app and model on the
+        admin index pages.
+        Refs #17050.
+        """
+        # General index page
+        response = self.client.get("/test_admin/admin/")
+        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<tr class="model-actor">')
+        self.assertContains(response, '<tr class="model-album">')
+
+        # App index page
+        response = self.client.get("/test_admin/admin/admin_views/")
+        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<tr class="model-actor">')
+        self.assertContains(response, '<tr class="model-album">')
 
 try:
     import docutils
@@ -3693,3 +3741,61 @@ class AdminViewLogoutTest(TestCase):
         self.assertEqual(response.template_name, 'admin/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminUserMessageTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def send_message(self, level):
+        """
+        Helper that sends a post to the dummy test methods and asserts that a
+        message with the level has appeared in the response.
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'message_%s' % level,
+            'index': 0,
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/usermessenger/',
+                                    action_data, follow=True)
+        self.assertContains(response,
+                            '<li class="%s">Test %s</li>' % (level, level),
+                            html=True)
+
+    @override_settings(MESSAGE_LEVEL=10)  # Set to DEBUG for this request
+    def test_message_debug(self):
+        self.send_message('debug')
+
+    def test_message_info(self):
+        self.send_message('info')
+
+    def test_message_success(self):
+        self.send_message('success')
+
+    def test_message_warning(self):
+        self.send_message('warning')
+
+    def test_message_error(self):
+        self.send_message('error')
+
+    def test_message_extra_tags(self):
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'message_extra_tags',
+            'index': 0,
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/usermessenger/',
+                                    action_data, follow=True)
+        self.assertContains(response,
+                            '<li class="extra_tag info">Test tags</li>',
+                            html=True)

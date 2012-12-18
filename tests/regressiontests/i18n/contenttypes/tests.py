@@ -6,6 +6,7 @@ import os
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils._os import upath
 from django.utils import six
 from django.utils import translation
 
@@ -13,7 +14,7 @@ from django.utils import translation
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=(
-        os.path.join(os.path.dirname(__file__), 'locale'),
+        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
     ),
     LANGUAGE_CODE='en',
     LANGUAGES=(

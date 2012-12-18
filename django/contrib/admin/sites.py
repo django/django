@@ -354,6 +354,7 @@ class AdminSite(object):
                     info = (app_label, model._meta.module_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
                         'perms': perms,
                     }
                     if perms.get('change', False):
@@ -371,6 +372,7 @@ class AdminSite(object):
                     else:
                         app_dict[app_label] = {
                             'name': app_label.title(),
+                            'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
@@ -389,9 +391,9 @@ class AdminSite(object):
             'app_list': app_list,
         }
         context.update(extra_context or {})
-        return TemplateResponse(request, [
-            self.index_template or 'admin/index.html',
-        ], context, current_app=self.name)
+        return TemplateResponse(request, self.index_template or
+                                'admin/index.html', context,
+                                current_app=self.name)
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
@@ -408,6 +410,7 @@ class AdminSite(object):
                         info = (app_label, model._meta.module_name)
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
+                            'object_name': model._meta.object_name,
                             'perms': perms,
                         }
                         if perms.get('change', False):
@@ -428,6 +431,7 @@ class AdminSite(object):
                             # information.
                             app_dict = {
                                 'name': app_label.title(),
+                                'app_label': app_label,
                                 'app_url': '',
                                 'has_module_perms': has_module_perms,
                                 'models': [model_dict],

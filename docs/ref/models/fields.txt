@@ -825,7 +825,7 @@ are converted to lowercase.
 
 .. attribute:: GenericIPAddressField.unpack_ipv4
 
-    Unpacks IPv4 mapped addresses like ``::ffff::192.0.2.1``.
+    Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
     If this option is enabled that address would be unpacked to
     ``192.0.2.1``. Default is disabled. Can only be used
     when ``protocol`` is set to ``'both'``.
@@ -921,6 +921,11 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length`argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
+
+.. versionadded:: 1.5
+
+The current value of the field will be displayed as a clickable link above the
+input widget.
 
 
 Relationship fields

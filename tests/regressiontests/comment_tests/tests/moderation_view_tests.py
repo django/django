@@ -4,7 +4,6 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
 
 from . import CommentTestCase
 
@@ -30,6 +29,30 @@ class FlagViewTests(CommentTestCase):
         self.assertEqual(c.flags.filter(flag=CommentFlag.SUGGEST_REMOVAL).count(), 1)
         return c
 
+    def testFlagPostNext(self):
+        """
+        POST the flag view, explicitly providing a next url.
+        """
+        comments = self.createSomeComments()
+        pk = comments[0].pk
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/flag/%d/" % pk, {'next': "/go/here/"})
+        self.assertEqual(response["Location"],
+            "http://testserver/go/here/?c=%d" % pk)
+
+    def testFlagPostUnsafeNext(self):
+        """
+        POSTing to the flag view with an unsafe next url will ignore the
+        provided url when redirecting.
+        """
+        comments = self.createSomeComments()
+        pk = comments[0].pk
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/flag/%d/" % pk,
+            {'next': "http://elsewhere/bad"})
+        self.assertEqual(response["Location"],
+            "http://testserver/flagged/?c=%d" % pk)
+
     def testFlagPostTwice(self):
         """Users don't get to flag comments more than once."""
         c = self.testFlagPost()
@@ -49,7 +72,7 @@ class FlagViewTests(CommentTestCase):
     def testFlaggedView(self):
         comments = self.createSomeComments()
         pk = comments[0].pk
-        response = self.client.get("/flagged/", data={"c":pk})
+        response = self.client.get("/flagged/", data={"c": pk})
         self.assertTemplateUsed(response, "comments/flagged.html")
 
     def testFlagSignals(self):
@@ -101,6 +124,33 @@ class DeleteViewTests(CommentTestCase):
         self.assertTrue(c.is_removed)
         self.assertEqual(c.flags.filter(flag=CommentFlag.MODERATOR_DELETION, user__username="normaluser").count(), 1)
 
+    def testDeletePostNext(self):
+        """
+        POSTing the delete view will redirect to an explicitly provided a next
+        url.
+        """
+        comments = self.createSomeComments()
+        pk = comments[0].pk
+        makeModerator("normaluser")
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/delete/%d/" % pk, {'next': "/go/here/"})
+        self.assertEqual(response["Location"],
+            "http://testserver/go/here/?c=%d" % pk)
+
+    def testDeletePostUnsafeNext(self):
+        """
+        POSTing to the delete view with an unsafe next url will ignore the
+        provided url when redirecting.
+        """
+        comments = self.createSomeComments()
+        pk = comments[0].pk
+        makeModerator("normaluser")
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/delete/%d/" % pk,
+            {'next': "http://elsewhere/bad"})
+        self.assertEqual(response["Location"],
+            "http://testserver/deleted/?c=%d" % pk)
+
     def testDeleteSignals(self):
         def receive(sender, **kwargs):
             received_signals.append(kwargs.get('signal'))
@@ -116,13 +166,13 @@ class DeleteViewTests(CommentTestCase):
     def testDeletedView(self):
         comments = self.createSomeComments()
         pk = comments[0].pk
-        response = self.client.get("/deleted/", data={"c":pk})
+        response = self.client.get("/deleted/", data={"c": pk})
         self.assertTemplateUsed(response, "comments/deleted.html")
 
 class ApproveViewTests(CommentTestCase):
 
     def testApprovePermissions(self):
-        """The delete view should only be accessible to 'moderators'"""
+        """The approve view should only be accessible to 'moderators'"""
         comments = self.createSomeComments()
         pk = comments[0].pk
         self.client.login(username="normaluser", password="normaluser")
@@ -134,7 +184,7 @@ class ApproveViewTests(CommentTestCase):
         self.assertEqual(response.status_code, 200)
 
     def testApprovePost(self):
-        """POSTing the delete view should mark the comment as removed"""
+        """POSTing the approve view should mark the comment as removed"""
         c1, c2, c3, c4 = self.createSomeComments()
         c1.is_public = False; c1.save()
 
@@ -145,6 +195,36 @@ class ApproveViewTests(CommentTestCase):
         c = Comment.objects.get(pk=c1.pk)
         self.assertTrue(c.is_public)
         self.assertEqual(c.flags.filter(flag=CommentFlag.MODERATOR_APPROVAL, user__username="normaluser").count(), 1)
+
+    def testApprovePostNext(self):
+        """
+        POSTing the approve view will redirect to an explicitly provided a next
+        url.
+        """
+        c1, c2, c3, c4 = self.createSomeComments()
+        c1.is_public = False; c1.save()
+
+        makeModerator("normaluser")
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/approve/%d/" % c1.pk,
+            {'next': "/go/here/"})
+        self.assertEqual(response["Location"],
+            "http://testserver/go/here/?c=%d" % c1.pk)
+
+    def testApprovePostUnsafeNext(self):
+        """
+        POSTing to the approve view with an unsafe next url will ignore the
+        provided url when redirecting.
+        """
+        c1, c2, c3, c4 = self.createSomeComments()
+        c1.is_public = False; c1.save()
+
+        makeModerator("normaluser")
+        self.client.login(username="normaluser", password="normaluser")
+        response = self.client.post("/approve/%d/" % c1.pk,
+            {'next': "http://elsewhere/bad"})
+        self.assertEqual(response["Location"],
+            "http://testserver/approved/?c=%d" % c1.pk)
 
     def testApproveSignals(self):
         def receive(sender, **kwargs):

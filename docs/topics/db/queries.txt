@@ -417,7 +417,7 @@ translates (roughly) into the following SQL::
     There's one exception though, in case of a
     :class:`~django.db.models.ForeignKey` you can specify the field
     name suffixed with ``_id``. In this case, the value parameter is expected
-    to contain the raw value of the foreign model's primary key. For example::
+    to contain the raw value of the foreign model's primary key. For example:
 
         >>> Entry.objects.filter(blog_id__exact=4)
 
@@ -575,12 +575,17 @@ To select all blogs that contain an entry with *"Lennon"* in the headline
     Blog.objects.filter(entry__headline__contains='Lennon').filter(
             entry__pub_date__year=2008)
 
-In this second example, the first filter restricted the queryset to all those
-blogs linked to that particular type of entry. The second filter restricted
-the set of blogs *further* to those that are also linked to the second type of
-entry. The entries select by the second filter may or may not be the same as
-the entries in the first filter. We are filtering the ``Blog`` items with each
-filter statement, not the ``Entry`` items.
+Suppose there is only one blog that had both entries containing *"Lennon"* and
+entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
+The first query would not return any blogs, but the second query would return
+that one blog.
+
+In the second example, the first filter restricts the queryset to all those
+blogs linked to entries with *"Lennon"* in the headline. The second filter
+restricts the set of blogs *further* to those that are also linked to entries
+that were published in 2008. The entries selected by the second filter may or
+may not be the same as the entries in the first filter. We are filtering the
+``Blog`` items with each filter statement, not the ``Entry`` items.
 
 All of this behavior also applies to
 :meth:`~django.db.models.query.QuerySet.exclude`: all the conditions in a
@@ -920,7 +925,7 @@ Things get more complicated if you use inheritance. Consider a subclass of
     class ThemeBlog(Blog):
         theme = models.CharField(max_length=200)
 
-    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme = 'python')
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
     django_blog.save() # django_blog.pk == 3
 
 Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::

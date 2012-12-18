@@ -69,7 +69,9 @@ class BaseFormSet(object):
     def __bool__(self):
         """All formsets have a management form which is not included in the length"""
         return True
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     @property
     def management_form(self):
@@ -265,7 +267,7 @@ class BaseFormSet(object):
 
     def is_valid(self):
         """
-        Returns True if form.errors is empty for every form in self.forms.
+        Returns True if every form in self.forms is valid.
         """
         if not self.is_bound:
             return False
@@ -280,8 +282,7 @@ class BaseFormSet(object):
                     # This form is going to be deleted so any of its errors
                     # should not cause the entire formset to be invalid.
                     continue
-            if bool(self.errors[i]):
-                forms_valid = False
+            forms_valid &= form.is_valid()
         return forms_valid and not bool(self.non_form_errors())
 
     def full_clean(self):

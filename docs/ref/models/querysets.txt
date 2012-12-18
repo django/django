@@ -676,21 +676,12 @@ Note that, by default, ``select_related()`` does not follow foreign keys that
 have ``null=True``.
 
 Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, in situations with deeply nested
-sets of relationships ``select_related()`` can sometimes end up following "too
-many" relations, and can generate queries so large that they end up being slow.
+app can avoid many database calls. However, there are times you are only
+interested in specific related models, or have deeply nested sets of
+relationships, and in these cases ``select_related()`` can be optimized by
+explicitly passing the related field names you are interested in. Only
+the specified relations will be followed.
 
-In these situations, you can use the ``depth`` argument to ``select_related()``
-to control how many "levels" of relations ``select_related()`` will actually
-follow::
-
-    b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
-
-Sometimes you only want to access specific models that are related to your root
-model, not all of the related models. In these cases, you can pass the related
-field names to ``select_related()`` and it will only follow those relations.
 You can even do this for models that are more than one relation away by
 separating the field names with double underscores, just as for filters. For
 example, if you have this model::
@@ -729,6 +720,17 @@ You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
+
+.. deprecated:: 1.5
+    The ``depth`` parameter to ``select_related()`` has been deprecated. You
+    should replace it with the use of the ``(*fields)`` listing specific
+    related fields instead as documented above.
+
+A depth limit of relationships to follow can also be specified::
+
+    b = Book.objects.select_related(depth=1).get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Requires a database call.
 
 A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
 direction if you are performing a depth-based ``select_related()`` call.
@@ -1319,10 +1321,12 @@ The above example can be rewritten using ``get_or_create()`` like so::
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
-found, ``get_or_create()`` returns a tuple of that object and ``False``. If an
-object is *not* found, ``get_or_create()`` will instantiate and save a new
-object, returning a tuple of the new object and ``True``. The new object will
-be created roughly according to this algorithm::
+found, ``get_or_create()`` returns a tuple of that object and ``False``. If
+multiple objects are found, ``get_or_create`` raises
+:exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
+found, ``get_or_create()`` will instantiate and save a new object, returning a
+tuple of the new object and ``True``. The new object will be created roughly
+according to this algorithm::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])

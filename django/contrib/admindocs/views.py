@@ -14,6 +14,7 @@ from django.core import urlresolvers
 from django.contrib.admindocs import utils
 from django.contrib.sites.models import Site
 from django.utils.importlib import import_module
+from django.utils._os import upath
 from django.utils import six
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
@@ -311,7 +312,7 @@ def load_all_installed_template_libraries():
         try:
             libraries = [
                 os.path.splitext(p)[0]
-                for p in os.listdir(os.path.dirname(mod.__file__))
+                for p in os.listdir(os.path.dirname(upath(mod.__file__)))
                 if p.endswith('.py') and p[0].isalpha()
             ]
         except OSError:

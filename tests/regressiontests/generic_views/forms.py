@@ -11,3 +11,8 @@ class AuthorForm(forms.ModelForm):
 
     class Meta:
         model = Author
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField()
+    message = forms.CharField(widget=forms.Textarea)

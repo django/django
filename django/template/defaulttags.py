@@ -398,10 +398,14 @@ class URLNode(Node):
 
         view_name = self.view_name.resolve(context)
 
+        if not view_name:
+            raise NoReverseMatch("'url' requires a non-empty first argument. "
+                "The syntax changed in Django 1.5, see the docs.")
+
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which cause return nothing.
+        # {% url ... as var %} construct in which case return nothing.
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
@@ -1258,7 +1262,12 @@ def url(parser, token):
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
                                   " (path to a view)" % bits[0])
-    viewname = parser.compile_filter(bits[1])
+    try:
+        viewname = parser.compile_filter(bits[1])
+    except TemplateSyntaxError as exc:
+        exc.args = (exc.args[0] + ". "
+                "The syntax of 'url' changed in Django 1.5, see the docs."),
+        raise
     args = []
     kwargs = {}
     asvar = None

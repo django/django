@@ -58,13 +58,15 @@ class ExtraRegressTests(TestCase):
                 ('First Revision', 'First Revision'),
                 ('Second Revision', 'First Revision'),
             ],
-            transform=lambda r: (r.title, r.base.title)
+            transform=lambda r: (r.title, r.base.title),
+            ordered=False
         )
 
         # Following queryset should return the most recent revision:
         self.assertQuerysetEqual(qs & qs2,
             [('Second Revision', 'First Revision')],
-            transform=lambda r: (r.title, r.base.title)
+            transform=lambda r: (r.title, r.base.title),
+            ordered=False
         )
 
     def test_extra_stay_tied(self):
@@ -342,5 +344,6 @@ class ExtraRegressTests(TestCase):
             TestObject.objects.extra(
                 where=["first = 'a' OR second = 'a'", "third = 'a'"],
             ),
-            ['<TestObject: TestObject: a,a,a>', '<TestObject: TestObject: b,a,a>']
+            ['<TestObject: TestObject: a,a,a>', '<TestObject: TestObject: b,a,a>'],
+            ordered=False
         )

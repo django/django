@@ -440,7 +440,7 @@ Handlers
 Django provides one log handler in addition to those provided by the
 Python logging module.
 
-.. class:: AdminEmailHandler([include_html=False])
+.. class:: AdminEmailHandler(include_html=False, email_backend=None)
 
     This handler sends an email to the site admins for each log
     message it receives.
@@ -470,13 +470,30 @@ Python logging module.
     with names and values of local variables at each level of the stack, plus
     the values of your Django settings. This information is potentially very
     sensitive, and you may not want to send it over email. Consider using
-    something such as `django-sentry`_ to get the best of both worlds -- the
+    something such as `Sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
     information over email. You may also explicitly designate certain
     sensitive information to be filtered out of error reports -- learn more on
     :ref:`Filtering error reports<filtering-error-reports>`.
 
-.. _django-sentry: http://pypi.python.org/pypi/django-sentry
+    .. versionadded:: 1.6
+
+    By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
+    :ref:`email backend <topic-email-backends>` that is being used by the
+    handler can be overridden, like this::
+
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+            }
+        },
+
+    By default, an instance of the email backend specified in
+    :setting:`EMAIL_BACKEND` will be used.
+
+.. _Sentry: http://pypi.python.org/pypi/sentry
 
 
 Filters

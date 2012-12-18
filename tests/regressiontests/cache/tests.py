@@ -257,6 +257,7 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('answer'), 42)
         self.assertEqual(self.cache.incr('answer', 10), 52)
         self.assertEqual(self.cache.get('answer'), 52)
+        self.assertEqual(self.cache.incr('answer', -10), 42)
         self.assertRaises(ValueError, self.cache.incr, 'does_not_exist')
 
     def test_decr(self):
@@ -266,7 +267,12 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('answer'), 42)
         self.assertEqual(self.cache.decr('answer', 10), 32)
         self.assertEqual(self.cache.get('answer'), 32)
+        self.assertEqual(self.cache.decr('answer', -10), 42)
         self.assertRaises(ValueError, self.cache.decr, 'does_not_exist')
+
+    def test_close(self):
+        self.assertTrue(hasattr(self.cache, 'close'))
+        self.cache.close()
 
     def test_data_types(self):
         # Many different data types can be cached

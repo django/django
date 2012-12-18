@@ -14,6 +14,8 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
+from django.utils._os import upath
 from django.utils import six
 from django.utils.six import PY3, StringIO
 
@@ -126,7 +128,7 @@ class TestFixtures(TestCase):
         fixture directory.
         """
         load_absolute_path = os.path.join(
-            os.path.dirname(__file__),
+            os.path.dirname(upath(__file__)),
             'fixtures',
             'absolute.json'
         )
@@ -388,7 +390,7 @@ class TestFixtures(TestCase):
                 commit=False,
             )
 
-    _cur_dir = os.path.dirname(os.path.abspath(__file__))
+    _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_2')])
@@ -430,7 +432,7 @@ class TestFixtures(TestCase):
             stdout=stdout_output,
         )
         self.assertTrue("No xml fixture 'this_fixture_doesnt_exist' in" in
-            stdout_output.getvalue())
+            force_text(stdout_output.getvalue()))
 
 
 class NaturalKeyFixtureTests(TestCase):

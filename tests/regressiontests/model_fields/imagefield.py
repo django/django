@@ -6,6 +6,7 @@ import shutil
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.test import TestCase
+from django.utils._os import upath
 from django.utils.unittest import skipIf
 
 from .models import Image
@@ -43,10 +44,10 @@ class ImageFieldTestMixin(object):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
 
-        file_path1 = os.path.join(os.path.dirname(__file__), "4x8.png")
+        file_path1 = os.path.join(os.path.dirname(upath(__file__)), "4x8.png")
         self.file1 = self.File(open(file_path1, 'rb'))
 
-        file_path2 = os.path.join(os.path.dirname(__file__), "8x4.png")
+        file_path2 = os.path.join(os.path.dirname(upath(__file__)), "8x4.png")
         self.file2 = self.File(open(file_path2, 'rb'))
 
     def tearDown(self):

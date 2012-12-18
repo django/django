@@ -6,10 +6,17 @@ from os import path
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
-from django.utils import six
-from django.utils.translation import override, get_language
+from django.test import LiveServerTestCase, TestCase
+from django.test.utils import override_settings
+from django.utils import six, unittest
+from django.utils._os import upath
+from django.utils.translation import override
 from django.utils.text import javascript_quote
+
+try:
+    from selenium.webdriver.firefox import webdriver as firefox
+except ImportError:
+    firefox = None
 
 from ..urls import locale_dir
 
@@ -18,12 +25,27 @@ class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
 
     def test_setlang(self):
-        """The set_language view can be used to change the session language"""
+        """
+        The set_language view can be used to change the session language.
+
+        The user is redirected to the 'next' argument if provided.
+        """
         for lang_code, lang_name in settings.LANGUAGES:
             post_data = dict(language=lang_code, next='/views/')
             response = self.client.post('/views/i18n/setlang/', data=post_data)
             self.assertRedirects(response, 'http://testserver/views/')
             self.assertEqual(self.client.session['django_language'], lang_code)
+
+    def test_setlang_unsafe_next(self):
+        """
+        The set_language view only redirects to the 'next' argument if it is
+        "safe".
+        """
+        lang_code, lang_name = settings.LANGUAGES[0]
+        post_data = dict(language=lang_code, next='//unsafe/redirection/')
+        response = self.client.post('/views/i18n/setlang/', data=post_data)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        self.assertEqual(self.client.session['django_language'], lang_code)
 
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/views/i18n/setlang/')
@@ -146,9 +168,49 @@ class JsI18NTestsMultiPackage(TestCase):
     def testI18NWithLocalePaths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (
             path.join(path.dirname(
-                path.dirname(path.abspath(__file__))), 'app3', 'locale'),)
+                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/views/jsi18n/')
                 self.assertContains(response,
                     javascript_quote('este texto de app3 debe ser traducido'))
+
+
+@unittest.skipUnless(firefox, 'Selenium not installed')
+class JavascriptI18nTests(LiveServerTestCase):
+    urls = 'regressiontests.views.urls'
+
+    @classmethod
+    def setUpClass(cls):
+        cls.selenium = firefox.WebDriver()
+        super(JavascriptI18nTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super(JavascriptI18nTests, cls).tearDownClass()
+
+    @override_settings(LANGUAGE_CODE='de')
+    def test_javascript_gettext(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+
+            elem = self.selenium.find_element_by_id("gettext")
+            self.assertEqual(elem.text, "Entfernen")
+            elem = self.selenium.find_element_by_id("ngettext_sing")
+            self.assertEqual(elem.text, "1 Element")
+            elem = self.selenium.find_element_by_id("ngettext_plur")
+            self.assertEqual(elem.text, "455 Elemente")
+            elem = self.selenium.find_element_by_id("pgettext")
+            self.assertEqual(elem.text, "Kann")
+            elem = self.selenium.find_element_by_id("npgettext_sing")
+            self.assertEqual(elem.text, "1 Resultat")
+            elem = self.selenium.find_element_by_id("npgettext_plur")
+            self.assertEqual(elem.text, "455 Resultate")
+
+    def test_escaping(self):
+        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        with self.settings(INSTALLED_APPS=extended_apps):
+            response = self.client.get('%s%s' % (self.live_server_url, '/jsi18n_admin/'))
+            self.assertContains(response, '\\x04')

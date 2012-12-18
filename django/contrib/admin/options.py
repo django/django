@@ -1,3 +1,4 @@
+import copy
 from functools import update_wrapper, partial
 import warnings
 
@@ -130,7 +131,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # passed to formfield_for_dbfield override the defaults.
         for klass in db_field.__class__.mro():
             if klass in self.formfield_overrides:
-                kwargs = dict(self.formfield_overrides[klass], **kwargs)
+                kwargs = dict(copy.deepcopy(self.formfield_overrides[klass]), **kwargs)
                 return db_field.formfield(**kwargs)
 
         # For any other type of field, just call its formfield() method.
@@ -407,8 +408,6 @@ class ModelAdmin(BaseModelAdmin):
             js.append('actions%s.js' % extra)
         if self.prepopulated_fields:
             js.extend(['urlify.js', 'prepopulate%s.js' % extra])
-        if self.opts.get_ordered_objects():
-            js.extend(['getElementsBySelector.js', 'dom-drag.js' , 'admin/ordering.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_model_perms(self, request):
@@ -552,7 +551,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
-            user_id         = request.user.id,
+            user_id         = request.user.pk,
             content_type_id = ContentType.objects.get_for_model(self.model).pk,
             object_id       = object.pk,
             object_repr     = object_repr,
@@ -665,6 +664,13 @@ class ModelAdmin(BaseModelAdmin):
             # Use only the first item in list_display as link
             return list(list_display)[:1]
 
+    def get_list_filter(self, request):
+        """
+        Returns a sequence containing the fields to be displayed as filters in
+        the right sidebar of the changelist page.
+        """
+        return self.list_filter
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
@@ -691,12 +697,30 @@ class ModelAdmin(BaseModelAdmin):
         change_message = ' '.join(change_message)
         return change_message or _('No fields changed.')
 
-    def message_user(self, request, message):
+    def message_user(self, request, message, level=messages.INFO, extra_tags='',
+                     fail_silently=False):
         """
         Send a message to the user. The default implementation
         posts a message using the django.contrib.messages backend.
+
+        Exposes almost the same API as messages.add_message(), but accepts the
+        positional arguments in a different order to maintain backwards
+        compatibility. For convenience, it accepts the `level` argument as
+        a string rather than the usual level number.
         """
-        messages.info(request, message)
+
+        if not isinstance(level, int):
+            # attempt to get the level if passed a string
+            try:
+                level = getattr(messages.constants, level.upper())
+            except AttributeError:
+                levels = messages.constants.DEFAULT_TAGS.values()
+                levels_repr = ', '.join('`%s`' % l for l in levels)
+                raise ValueError('Bad message level string: `%s`. '
+                        'Possible values are: %s' % (level, levels_repr))
+
+        messages.add_message(request, level, message, extra_tags=extra_tags,
+                fail_silently=fail_silently)
 
     def save_form(self, request, form, change):
         """
@@ -738,7 +762,6 @@ class ModelAdmin(BaseModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         opts = self.model._meta
         app_label = opts.app_label
-        ordered_objects = opts.get_ordered_objects()
         context.update({
             'add': add,
             'change': change,
@@ -747,7 +770,6 @@ class ModelAdmin(BaseModelAdmin):
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
-            'ordered_objects': ordered_objects,
             'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
@@ -1174,6 +1196,7 @@ class ModelAdmin(BaseModelAdmin):
 
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
+        list_filter = self.get_list_filter(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1184,7 +1207,7 @@ class ModelAdmin(BaseModelAdmin):
         ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display,
-                list_display_links, self.list_filter, self.date_hierarchy,
+                list_display_links, list_filter, self.date_hierarchy,
                 self.search_fields, self.list_select_related,
                 self.list_per_page, self.list_max_show_all, self.list_editable,
                 self)

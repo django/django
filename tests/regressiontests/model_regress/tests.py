@@ -71,7 +71,8 @@ class ModelTests(TestCase):
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
-            attrgetter("when")
+            attrgetter("when"),
+            ordered=False
         )
         self.assertQuerysetEqual(
             Party.objects.filter(when__year=1998), [
@@ -85,14 +86,16 @@ class ModelTests(TestCase):
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
-            attrgetter("when")
+            attrgetter("when"),
+            ordered=False
         )
         self.assertQuerysetEqual(
             Party.objects.filter(when__month="12"), [
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
-            attrgetter("when")
+            attrgetter("when"),
+            ordered=False
         )
         self.assertQuerysetEqual(
             Party.objects.filter(when__year="1998"), [

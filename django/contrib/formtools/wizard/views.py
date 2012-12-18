@@ -174,7 +174,9 @@ class WizardView(TemplateView):
             for field in six.itervalues(form.base_fields):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
-                    raise NoFileStorageConfigured
+                    raise NoFileStorageConfigured(
+                            "You need to define 'file_storage' in your "
+                            "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = init_form_list
@@ -436,8 +438,8 @@ class WizardView(TemplateView):
     def get_all_cleaned_data(self):
         """
         Returns a merged dictionary of all step cleaned_data dictionaries.
-        If a step contains a `FormSet`, the key will be prefixed with formset
-        and contain a list of the formset cleaned_data dictionaries.
+        If a step contains a `FormSet`, the key will be prefixed with
+        'formset-' and contain a list of the formset cleaned_data dictionaries.
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
@@ -458,8 +460,8 @@ class WizardView(TemplateView):
     def get_cleaned_data_for_step(self, step):
         """
         Returns the cleaned data for a given `step`. Before returning the
-        cleaned data, the stored values are being revalidated through the
-        form. If the data doesn't validate, None will be returned.
+        cleaned data, the stored values are revalidated through the form.
+        If the data doesn't validate, None will be returned.
         """
         if step in self.form_list:
             form_obj = self.get_form(step=step,
@@ -528,7 +530,7 @@ class WizardView(TemplateView):
                         context.update({'another_var': True})
                     return context
         """
-        context = super(WizardView, self).get_context_data(**kwargs)
+        context = super(WizardView, self).get_context_data(form=form, **kwargs)
         context.update(self.storage.extra_data)
         context['wizard'] = {
             'form': form,

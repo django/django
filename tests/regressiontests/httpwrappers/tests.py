@@ -14,6 +14,7 @@ from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          parse_cookie)
 from django.test import TestCase
 from django.utils.encoding import smart_str
+from django.utils._os import upath
 from django.utils import six
 from django.utils import unittest
 
@@ -149,7 +150,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(q['foo'], 'bar')
         self.assertEqual(q.getlist('foo'), ['bar'])
-        self.assertEqual(q.urlencode(), 'foo=bar&name=john')
+        self.assertIn(q.urlencode(), ['foo=bar&name=john', 'name=john&foo=bar'])
 
         q.clear()
         self.assertEqual(len(q), 0)
@@ -266,14 +267,18 @@ class HttpResponseTests(unittest.TestCase):
         # The response also converts unicode or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
+        del r['Content-Type']
         r['foo'] = 'bar'
         l = list(r.items())
+        self.assertEqual(len(l), 1)
         self.assertEqual(l[0], ('foo', 'bar'))
         self.assertIsInstance(l[0][0], str)
 
         r = HttpResponse()
+        del r['Content-Type']
         r[b'foo'] = 'bar'
         l = list(r.items())
+        self.assertEqual(len(l), 1)
         self.assertEqual(l[0], ('foo', 'bar'))
         self.assertIsInstance(l[0][0], str)
 
@@ -479,7 +484,7 @@ class StreamingHttpResponseTests(TestCase):
 
 class FileCloseTests(TestCase):
     def test_response(self):
-        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -512,7 +517,7 @@ class FileCloseTests(TestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
+        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)

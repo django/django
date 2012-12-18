@@ -97,10 +97,10 @@ class JSONSerializer(object):
     signing.loads.
     """
     def dumps(self, obj):
-        return json.dumps(obj, separators=(',', ':'))
+        return json.dumps(obj, separators=(',', ':')).encode('latin-1')
 
     def loads(self, data):
-        return json.loads(data)
+        return json.loads(data.decode('latin-1'))
 
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
@@ -116,8 +116,10 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     only valid for a given namespace. Leaving this at the default
     value or re-using a salt value across different parts of your
     application without good cause is a security risk.
+
+    The serializer is expected to return a bytestring.
     """
-    data = force_bytes(serializer().dumps(obj))
+    data = serializer().dumps(obj)
 
     # Flag for if it's been compressed or not
     is_compressed = False
@@ -136,20 +138,22 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
     """
-    Reverse of dumps(), raises BadSignature if signature fails
+    Reverse of dumps(), raises BadSignature if signature fails.
+
+    The serializer is expected to accept a bytestring.
     """
     # TimestampSigner.unsign always returns unicode but base64 and zlib
     # compression operate on bytes.
     base64d = force_bytes(TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
     decompress = False
-    if base64d[0] == b'.':
+    if base64d[:1] == b'.':
         # It's compressed; uncompress it first
         base64d = base64d[1:]
         decompress = True
     data = b64_decode(base64d)
     if decompress:
         data = zlib.decompress(data)
-    return serializer().loads(force_str(data))
+    return serializer().loads(data)
 
 
 class Signer(object):

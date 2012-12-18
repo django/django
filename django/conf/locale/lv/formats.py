@@ -16,6 +16,7 @@ FIRST_DAY_OF_WEEK = 1 #Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+# Kept ISO formats as they are in first position
 DATE_INPUT_FORMATS = (
     '%Y-%m-%d', '%d.%m.%Y', '%d.%m.%y', # '2006-10-25', '25.10.2006', '25.10.06'
 )

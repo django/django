@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models
 from django.db.models import get_models
+from django.utils._os import upath
 
 
 def sql_create(app, style, connection):
@@ -145,21 +146,21 @@ def sql_all(app, style, connection):
 def _split_statements(content):
     comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
     statements = []
-    statement = ""
+    statement = []
     for line in content.split("\n"):
         cleaned_line = comment_re.sub(r"\1", line).strip()
         if not cleaned_line:
             continue
-        statement += cleaned_line
-        if statement.endswith(";"):
-            statements.append(statement)
-            statement = ""
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
     return statements
 
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(models.get_app(model._meta.app_label).__file__)), 'sql'))
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.

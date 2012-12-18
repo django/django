@@ -1,3 +1,4 @@
+import collections
 import sys
 
 from django.conf import settings
@@ -34,7 +35,7 @@ def get_validation_errors(outfile, app=None):
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
 
-    for cls in models.get_models(app):
+    for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
         # Check swappable attribute.
@@ -137,15 +138,16 @@ def get_validation_errors(outfile, app=None):
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 if f.rel.to not in models.get_models():
-                    e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+                    # If the related model is swapped, provide a hint;
+                    # otherwise, the model just hasn't been installed.
+                    if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                        e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+                    else:
+                        e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
                     continue
-
-                # Make sure the model we're related hasn't been swapped out
-                if f.rel.to._meta.swapped:
-                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
 
                 # Make sure the related field specified by a ForeignKey is unique
                 if not f.rel.to._meta.get_field(f.rel.field_name).unique:
@@ -183,15 +185,17 @@ def get_validation_errors(outfile, app=None):
             # existing fields, m2m fields, m2m related objects or related
             # objects
             if f.rel.to not in models.get_models():
-                e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+                # If the related model is swapped, provide a hint;
+                # otherwise, the model just hasn't been installed.
+                if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+                else:
+                    e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
                     continue
-
-            # Make sure the model we're related hasn't been swapped out
-            if f.rel.to._meta.swapped:
-                e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
 
             # Check that the field is not set to unique.  ManyToManyFields do not support unique.
             if f.unique:
@@ -327,15 +331,29 @@ def get_validation_errors(outfile, app=None):
 
         # Check unique_together.
         for ut in opts.unique_together:
-            for field_name in ut:
-                try:
-                    f = opts.get_field(field_name, many_to_many=True)
-                except models.FieldDoesNotExist:
-                    e.add(opts, '"unique_together" refers to %s, a field that doesn\'t exist. Check your syntax.' % field_name)
-                else:
-                    if isinstance(f.rel, models.ManyToManyRel):
-                        e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
-                    if f not in opts.local_fields:
-                        e.add(opts, '"unique_together" refers to %s. This is not in the same model as the unique_together statement.' % f.name)
+            validate_local_fields(e, opts, "unique_together", ut)
+        if not isinstance(opts.index_together, collections.Sequence):
+            e.add(opts, '"index_together" must a sequence')
+        else:
+            for it in opts.index_together:
+                validate_local_fields(e, opts, "index_together", it)
 
     return len(e.errors)
+
+
+def validate_local_fields(e, opts, field_name, fields):
+    from django.db import models
+
+    if not isinstance(fields, collections.Sequence):
+        e.add(opts, 'all %s elements must be sequences' % field_name)
+    else:
+        for field in fields:
+            try:
+                f = opts.get_field(field, many_to_many=True)
+            except models.FieldDoesNotExist:
+                e.add(opts, '"%s" refers to %s, a field that doesn\'t exist.' % (field_name, field))
+            else:
+                if isinstance(f.rel, models.ManyToManyRel):
+                    e.add(opts, '"%s" refers to %s. ManyToManyFields are not supported in %s.' % (field_name, f.name, field_name))
+                if f not in opts.local_fields:
+                    e.add(opts, '"%s" refers to %s. This is not in the same model as the %s statement.' % (field_name, f.name, field_name))

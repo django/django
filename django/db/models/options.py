@@ -9,11 +9,10 @@ from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
-from django.utils.translation import activate, deactivate_all, get_language, string_concat
-from django.utils.encoding import force_text, smart_text
-from django.utils.datastructures import SortedDict
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.datastructures import SortedDict
+from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
+from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
@@ -21,7 +20,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created', 'auto_register')
+                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created', 'index_together', 'auto_register')
 
 
 @python_2_unicode_compatible
@@ -34,6 +33,7 @@ class Options(object):
         self.db_table = ''
         self.ordering = []
         self.unique_together = []
+        self.index_together = []
         self.permissions = []
         self.object_name, self.app_label = None, app_label
         self.get_latest_by = None
@@ -58,7 +58,6 @@ class Options(object):
         self.concrete_model = None
         self.swappable = None
         self.parents = SortedDict()
-        self.duplicate_targets = {}
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
@@ -78,6 +77,7 @@ class Options(object):
         from django.db.backends.util import truncate_name
 
         cls._meta = self
+        self.model = cls
         self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
         self.object_name = cls.__name__
@@ -150,24 +150,6 @@ class Options(object):
                         auto_created=True)
                 model.add_to_class('id', auto)
 
-        # Determine any sets of fields that are pointing to the same targets
-        # (e.g. two ForeignKeys to the same remote model). The query
-        # construction code needs to know this. At the end of this,
-        # self.duplicate_targets will map each duplicate field column to the
-        # columns it duplicates.
-        collections = {}
-        for column, target in six.iteritems(self.duplicate_targets):
-            try:
-                collections[target].add(column)
-            except KeyError:
-                collections[target] = set([column])
-        self.duplicate_targets = {}
-        for elt in six.itervalues(collections):
-            if len(elt) == 1:
-                continue
-            for column in elt:
-                self.duplicate_targets[column] = elt.difference(set([column]))
-
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
@@ -194,6 +176,12 @@ class Options(object):
         if not self.pk and field.primary_key:
             self.pk = field
             field.serialize = False
+
+    def pk_index(self):
+        """
+        Returns the index of the primary key field in the self.fields list.
+        """
+        return self.fields.index(self.pk)
 
     def setup_proxy(self, target):
         """
@@ -481,7 +469,7 @@ class Options(object):
         a granparent or even more distant relation.
         """
         if not self.parents:
-            return
+            return None
         if model in self.parents:
             return [model]
         for parent in self.parents:
@@ -489,8 +477,7 @@ class Options(object):
             if res:
                 res.insert(0, parent)
                 return res
-        raise TypeError('%r is not an ancestor of this model'
-                % model._meta.module_name)
+        return None
 
     def get_parent_list(self):
         """
@@ -522,22 +509,3 @@ class Options(object):
                 # of the chain to the ancestor is that parent
                 # links
                 return self.parents[parent] or parent_link
-
-    def get_ordered_objects(self):
-        "Returns a list of Options objects that are ordered with respect to this object."
-        if not hasattr(self, '_ordered_objects'):
-            objects = []
-            # TODO
-            #for klass in get_models(get_app(self.app_label)):
-            #    opts = klass._meta
-            #    if opts.order_with_respect_to and opts.order_with_respect_to.rel \
-            #        and self == opts.order_with_respect_to.rel.to._meta:
-            #        objects.append(opts)
-            self._ordered_objects = objects
-        return self._ordered_objects
-
-    def pk_index(self):
-        """
-        Returns the index of the primary key field in the self.fields list.
-        """
-        return self.fields.index(self.pk)

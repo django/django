@@ -214,38 +214,49 @@ foundation for custom widgets.
         The 'value' given is not guaranteed to be valid input, therefore
         subclass implementations should program defensively.
 
+    .. method:: value_from_datadict(self, data, files, name)
+
+        Given a dictionary of data and this widget's name, returns the value
+        of this widget. Returns ``None`` if a value wasn't provided.
+
 .. class:: MultiWidget(widgets, attrs=None)
 
     A widget that is composed of multiple widgets.
     :class:`~django.forms.widgets.MultiWidget` works hand in hand with the
     :class:`~django.forms.MultiValueField`.
 
-    .. method:: render(name, value, attrs=None)
+    :class:`MultiWidget` has one required argument:
 
-        Argument `value` is handled differently in this method from the
-        subclasses of :class:`~Widget`.
+    .. attribute:: MultiWidget.widgets
 
-        If `value` is a list, output of :meth:`~MultiWidget.render` will be a
-        concatenation of rendered child widgets. If `value` is not a list, it
-        will be first processed by the method :meth:`~MultiWidget.decompress()`
-        to create the list and then processed as above.
+        An iterable containing the widgets needed.
 
-        Unlike in the single value widgets, method :meth:`~MultiWidget.render`
-        need not be implemented in the subclasses.
+    And one required method:
 
     .. method:: decompress(value)
 
-        Returns a list of "decompressed" values for the given value of the
-        multi-value field that makes use of the widget. The input value can be
-        assumed as valid, but not necessarily non-empty.
+        This method takes a single "compressed" value from the field and
+        returns a list of "decompressed" values. The input value can be
+        assumed valid, but not necessarily non-empty.
 
         This method **must be implemented** by the subclass, and since the
         value may be empty, the implementation must be defensive.
 
         The rationale behind "decompression" is that it is necessary to "split"
-        the combined value of the form field into the values of the individual
-        field encapsulated within the multi-value field (e.g. when displaying
-        the partially or fully filled-out form).
+        the combined value of the form field into the values for each widget.
+
+        An example of this is how :class:`SplitDateTimeWidget` turns a
+        :class:`datetime` value into a list with date and time split into two
+        separate values::
+
+            class SplitDateTimeWidget(MultiWidget):
+
+                # ...
+
+                def decompress(self, value):
+                    if value:
+                        return [value.date(), value.time().replace(microsecond=0)]
+                    return [None, None]
 
         .. tip::
 
@@ -254,6 +265,109 @@ foundation for custom widgets.
             with the opposite responsibility - to combine cleaned values of
             all member fields into one.
 
+    Other methods that may be useful to override include:
+
+    .. method:: render(name, value, attrs=None)
+
+        Argument ``value`` is handled differently in this method from the
+        subclasses of :class:`~Widget` because it has to figure out how to
+        split a single value for display in multiple widgets.
+
+        The ``value`` argument used when rendering can be one of two things:
+
+        * A ``list``.
+        * A single value (e.g., a string) that is the "compressed" representation
+          of a ``list`` of values.
+
+        If `value` is a list, output of :meth:`~MultiWidget.render` will be a
+        concatenation of rendered child widgets. If `value` is not a list, it
+        will be first processed by the method :meth:`~MultiWidget.decompress()`
+        to create the list and then processed as above.
+
+        In the second case -- i.e., if the value is *not* a list --
+        ``render()`` will first decompress the value into a ``list`` before
+        rendering it. It does so by calling the ``decompress()`` method, which
+        :class:`MultiWidget`'s subclasses must implement (see above).
+
+        When ``render()`` executes its HTML rendering, each value in the list
+        is rendered with the corresponding widget -- the first value is
+        rendered in the first widget, the second value is rendered in the
+        second widget, etc.
+
+        Unlike in the single value widgets, method :meth:`~MultiWidget.render`
+        need not be implemented in the subclasses.
+
+    .. method:: format_output(rendered_widgets)
+
+        Given a list of rendered widgets (as strings), returns a Unicode string
+        representing the HTML for the whole lot.
+
+        This hook allows you to format the HTML design of the widgets any way
+        you'd like.
+
+    Here's an example widget which subclasses :class:`MultiWidget` to display
+    a date with the day, month, and year in different select boxes. This widget
+    is intended to be used with a :class:`~django.forms.DateField` rather than
+    a :class:`~django.forms.MultiValueField`, thus we have implemented
+    :meth:`~Widget.value_from_datadict`::
+
+        from datetime import date
+        from django.forms import widgets
+
+        class DateSelectorWidget(widgets.MultiWidget):
+            def __init__(self, attrs=None):
+                # create choices for days, months, years
+                # example below, the rest snipped for brevity.
+                years = [(year, year) for year in (2011, 2012, 2013)]
+                _widgets = (
+                    widgets.Select(attrs=attrs, choices=days),
+                    widgets.Select(attrs=attrs, choices=months),
+                    widgets.Select(attrs=attrs, choices=years),
+                )
+                super(DateSelectorWidget, self).__init__(_widgets, attrs)
+
+            def decompress(self, value):
+                if value:
+                    return [value.day, value.month, value.year]
+                return [None, None, None]
+
+            def format_output(self, rendered_widgets):
+                return u''.join(rendered_widgets)
+
+            def value_from_datadict(self, data, files, name):
+                datelist = [
+                    widget.value_from_datadict(data, files, name + '_%s' % i)
+                    for i, widget in enumerate(self.widgets)]
+                try:
+                    D = date(day=int(datelist[0]), month=int(datelist[1]),
+                            year=int(datelist[2]))
+                except ValueError:
+                    return ''
+                else:
+                    return str(D)
+
+    The constructor creates several :class:`Select` widgets in a tuple. The
+    ``super`` class uses this tuple to setup the widget.
+
+    The :meth:`~MultiWidget.format_output` method is fairly vanilla here (in
+    fact, it's the same as what's been implemented as the default for
+    ``MultiWidget``), but the idea is that you could add custom HTML between
+    the widgets should you wish.
+
+    The required method :meth:`~MultiWidget.decompress` breaks up a
+    ``datetime.date`` value into the day, month, and year values corresponding
+    to each widget. Note how the method handles the case where ``value`` is
+    ``None``.
+
+    The default implementation of :meth:`~Widget.value_from_datadict` returns
+    a list of values corresponding to each ``Widget``.  This is appropriate
+    when using a ``MultiWidget`` with a :class:`~django.forms.MultiValueField`,
+    but since we want to use this widget with a :class:`~django.forms.DateField`
+    which takes a single value, we have overridden this method to combine the
+    data of all the subwidgets into a ``datetime.date``. The method extracts
+    data from the ``POST`` dictionary and constructs and validates the date.
+    If it is valid, we return the string, otherwise, we return an empty string
+    which will cause ``form.is_valid`` to return ``False``.
 
 .. _built-in widgets:
 
@@ -551,54 +665,6 @@ Composite widgets
         This attribute is optional when the field does not have a
         :attr:`~Field.choices` attribute. If it does, it will override anything
         you set here when the attribute is updated on the :class:`Field`.
-
-``MultiWidget``
-~~~~~~~~~~~~~~~
-
-.. class:: MultiWidget
-
-    Wrapper around multiple other widgets. You'll probably want to use this
-    class with :class:`MultiValueField`.
-
-    Its ``render()`` method is different than other widgets', because it has to
-    figure out how to split a single value for display in multiple widgets.
-
-    Subclasses may implement ``format_output``, which takes the list of
-    rendered widgets and returns a string of HTML that formats them any way
-    you'd like.
-
-    The ``value`` argument used when rendering can be one of two things:
-
-    * A ``list``.
-    * A single value (e.g., a string) that is the "compressed" representation
-      of a ``list`` of values.
-
-    In the second case -- i.e., if the value is *not* a list -- ``render()``
-    will first decompress the value into a ``list`` before rendering it. It
-    does so by calling the ``decompress()`` method, which
-    :class:`MultiWidget`'s subclasses must implement. This method takes a
-    single "compressed" value and returns a ``list``. An example of this is how
-    :class:`SplitDateTimeWidget` turns a :class:`datetime` value into a list
-    with date and time split into two seperate values::
-
-        class SplitDateTimeWidget(MultiWidget):
-
-            # ...
-
-            def decompress(self, value):
-                if value:
-                    return [value.date(), value.time().replace(microsecond=0)]
-                return [None, None]
-
-    When ``render()`` executes its HTML rendering, each value in the list is
-    rendered with the corresponding widget -- the first value is rendered in
-    the first widget, the second value is rendered in the second widget, etc.
-
-    :class:`MultiWidget` has one required argument:
-
-    .. attribute:: MultiWidget.widgets
-
-        An iterable containing the widgets needed.
 
 ``SplitDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~

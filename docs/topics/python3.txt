@@ -278,14 +278,12 @@ Iterators
 
 ::
 
-    class MyIterator(object):
+    class MyIterator(six.Iterator):
         def __iter__(self):
             return self             # implement some logic here
 
         def __next__(self):
             raise StopIteration     # implement some logic here
-
-        next = __next__             # Python 2 compatibility
 
 Boolean evaluation
 ~~~~~~~~~~~~~~~~~~
@@ -297,7 +295,8 @@ Boolean evaluation
         def __bool__(self):
             return True             # implement some logic here
 
-        __nonzero__ = __bool__      # Python 2 compatibility
+        def __nonzero__(self):      # Python 2 compatibility
+            return type(self).__bool__(self)
 
 Division
 ~~~~~~~~
@@ -309,12 +308,14 @@ Division
         def __truediv__(self, other):
             return self / other     # implement some logic here
 
-        __div__ = __truediv__           # Python 2 compatibility
+        def __div__(self, other):   # Python 2 compatibility
+            return type(self).__truediv__(self, other)
 
         def __itruediv__(self, other):
             return self // other    # implement some logic here
 
-        __idiv__ = __itruediv__         # Python 2 compatibility
+        def __idiv__(self, other):  # Python 2 compatibility
+            return type(self).__itruediv__(self, other)
 
 .. module: django.utils.six
 

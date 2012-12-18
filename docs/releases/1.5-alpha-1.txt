@@ -51,8 +51,8 @@ Other notable new features in Django 1.5 include:
 * `Support for saving a subset of model's fields`_ -
   :meth:`Model.save() <django.db.models.Model.save()>` now accepts an
   ``update_fields`` argument, letting you specify which fields are
-  written back to the databse when you call ``save()``. This can help
-  in high-concurrancy operations, and can improve performance.
+  written back to the database when you call ``save()``. This can help
+  in high-concurrency operations, and can improve performance.
 
 * Better `support for streaming responses <#explicit-streaming-responses>`_ via
   the new  :class:`~django.http.StreamingHttpResponse` response class.
@@ -83,7 +83,7 @@ Python compatibility
 ====================
 
 Django 1.5 requires Python 2.6.5 or above, though we **highly recommended**
-Python 2.7.3 or above. Support for Python 2.5 and below as been dropped.
+Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
@@ -106,17 +106,17 @@ need to install a different version of Django on Python 3. This means that
 you can write application targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
-However, we're labling this support "experimental" for now: although it's
-receved extensive testing via our automated test suite, it's recieved very
+However, we're labeling this support "experimental" for now: although it's
+received extensive testing via our automated test suite, it's received very
 little real-world testing. We've done our best to eliminate bugs, but we can't
 be sure we covered all possible uses of Django. Further, Django's more than a
 web framework; it's an ecosystem of pluggable components. At this point, very
-few third-party applications have been ported to Python 3, so it's unliukely
-that a real-world application will have all its dependecies satisfied under
+few third-party applications have been ported to Python 3, so it's unlikely
+that a real-world application will have all its dependencies satisfied under
 Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
-3. Instead, use this oportunity to begin :doc:`porting applications to Python 3
+3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
 </topics/python3>`. If you're an author of a pluggable component, we encourage you
 to start porting now.
 
@@ -207,7 +207,7 @@ Retrieval of ``ContentType`` instances associated with proxy models
 The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
 and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
 have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``.
-By passing ``False`` using this argument it is now possible to retreive the
+By passing ``False`` using this argument it is now possible to retrieve the
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>`
 associated with proxy models.
 
@@ -495,8 +495,8 @@ In order to be able to run unit tests in any order and to make sure they are
 always isolated from each other, :class:`~django.test.TransactionTestCase` will
 now reset the database *after* each test run instead.
 
-No more implict DB sequences reset
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+No more implicit DB sequences reset
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :class:`~django.test.TransactionTestCase` tests used to reset primary key
 sequences automatically together with the database flushing actions described
@@ -554,7 +554,7 @@ Miscellaneous
   available at :func:`django.utils.html.remove_tags`.
 
 * Uploaded files are no longer created as executable by default. If you need
-  them to be executeable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
+  them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
   needs. The new default value is `0666` (octal) and the current umask value
   is first masked out.
 

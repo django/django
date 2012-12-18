@@ -269,6 +269,11 @@ class FormsTestCase(TestCase):
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'false'}, auto_id=False)
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
 
+        # A value of '0' should be interpreted as a True value (#16820)
+        f = SignupForm({'email': 'test@example.com', 'get_spam': '0'})
+        self.assertTrue(f.is_valid())
+        self.assertTrue(f.cleaned_data.get('get_spam'))
+
     def test_widget_output(self):
         # Any Field can have a Widget class passed to its constructor:
         class ContactForm(Form):

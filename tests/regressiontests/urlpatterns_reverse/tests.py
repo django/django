@@ -171,6 +171,18 @@ class URLPatternReverse(TestCase):
         # Reversing None should raise an error, not return the last un-named view.
         self.assertRaises(NoReverseMatch, reverse, None)
 
+    def test_prefix_braces(self):
+        self.assertEqual('/%7B%7Binvalid%7D%7D/includes/non_path_include/',
+               reverse('non_path_include', prefix='/{{invalid}}/'))
+
+    def test_prefix_parenthesis(self):
+        self.assertEqual('/bogus%29/includes/non_path_include/',
+               reverse('non_path_include', prefix='/bogus)/'))
+
+    def test_prefix_format_char(self):
+        self.assertEqual('/bump%2520map/includes/non_path_include/',
+               reverse('non_path_include', prefix='/bump%20map/'))
+
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
         """
@@ -225,7 +237,7 @@ class ResolverTests(unittest.TestCase):
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), '%s is not an instance of %s' % (t, e['type']))
+                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)

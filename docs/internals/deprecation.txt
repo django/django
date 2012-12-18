@@ -140,6 +140,11 @@ these changes.
   removed.  In its place use
   :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
 
+* The template tags library ``adminmedia`` and the template tag ``{%
+  admin_media_prefix %}`` will be removed in favor of the generic static files
+  handling. (This is faster than the usual deprecation path; see the
+  :doc:`Django 1.4 release notes</releases/1.4>`.)
+
 * The :ttag:`url` and :ttag:`ssi` template tags will be
   modified so that the first argument to each tag is a template variable, not
   an implied string. In 1.4, this behavior is provided by a version of the tag
@@ -232,10 +237,6 @@ these changes.
   :setting:`LOGGING` setting should include this filter explicitly if
   it is desired.
 
-* The template tag
-  :func:`django.contrib.admin.templatetags.adminmedia.admin_media_prefix`
-  will be removed in favor of the generic static files handling.
-
 * The builtin truncation functions :func:`django.utils.text.truncate_words`
   and :func:`django.utils.text.truncate_html_words` will be removed in
   favor of the ``django.utils.text.Truncator`` class.
@@ -292,6 +293,14 @@ these changes.
 
 * The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
   the User model, will be removed.
+
+* The ``cleanup`` management command will be removed. It's replaced by
+  ``clearsessions``.
+
+* The ``daily_cleanup.py`` script will be removed.
+
+* The ``depth`` keyword argument will be removed from
+  :meth:`~django.db.models.query.QuerySet.select_related`.
 
 2.0
 ---

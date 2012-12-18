@@ -493,6 +493,21 @@ Advanced ``WizardView`` methods
             context = self.get_context_data(form=form, **kwargs)
             return self.render_to_response(context)
 
+.. method:: WizardView.get_cleaned_data_for_step(step)
+
+    This method returns the cleaned data for a given ``step``. Before returning
+    the cleaned data, the stored values are revalidated through the form. If
+    the data doesn't validate, ``None`` will be returned.
+
+.. method:: WizardView.get_all_cleaned_data()
+
+    This method returns a merged dictionary of all form steps' ``cleaned_data``
+    dictionaries. If a step contains a ``FormSet``, the key will be prefixed
+    with ``formset-`` and contain a list of the formset's ``cleaned_data``
+    dictionaries. Note that if two or more steps have a field with the same
+    name, the value for that field from the latest step will overwrite the
+    value from any earlier steps.
+
 Providing initial data for the forms
 ====================================
 
@@ -533,6 +548,16 @@ you have to add a :attr:`file_storage` to your :class:`WizardView` subclass.
 This storage will temporarily store the uploaded files for the wizard. The
 :attr:`file_storage` attribute should be a
 :class:`~django.core.files.storage.Storage` subclass.
+
+Django provides a built-in storage class (see :ref:`the built-in filesystem
+storage class <builtin-fs-storage>`)::
+
+    from django.conf import settings
+    from django.core.files.storage import FileSystemStorage
+
+    class CustomWizardView(WizardView):
+        ...
+        file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
 
 .. warning::
 
@@ -622,8 +647,11 @@ Usage of ``NamedUrlWizardView``
 
 .. class:: NamedUrlWizardView
 
-There is a :class:`WizardView` subclass which adds named-urls support to the wizard.
-By doing this, you can have single urls for every step.
+There is a :class:`WizardView` subclass which adds named-urls support to the
+wizard. By doing this, you can have single urls for every step. You can also
+use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
+classes which preselect the backend used for storing information (server-side
+sessions and browser cookies respectively).
 
 To use the named urls, you have to change the ``urls.py``.
 

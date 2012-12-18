@@ -227,3 +227,15 @@ def same_origin(url1, url2):
     """
     p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
     return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+
+def is_safe_url(url, host=None):
+    """
+    Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
+    a different host).
+
+    Always returns ``False`` on an empty url.
+    """
+    if not url:
+        return False
+    netloc = urllib_parse.urlparse(url)[1]
+    return not netloc or netloc == host

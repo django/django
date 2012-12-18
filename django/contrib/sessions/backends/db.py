@@ -14,7 +14,7 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             s = Session.objects.get(
-                session_key = self.session_key,
+                session_key=self.session_key,
                 expire_date__gt=timezone.now()
             )
             return self.decode(s.session_data)
@@ -70,6 +70,11 @@ class SessionStore(SessionBase):
             Session.objects.get(session_key=session_key).delete()
         except Session.DoesNotExist:
             pass
+
+    @classmethod
+    def clear_expired(cls):
+        Session.objects.filter(expire_date__lt=timezone.now()).delete()
+        transaction.commit_unless_managed()
 
 
 # At bottom to avoid circular import

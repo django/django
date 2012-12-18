@@ -470,7 +470,7 @@ class AggregationTests(TestCase):
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
         qs = Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by()
-        grouping, gb_params = qs.query.get_compiler(qs.db).get_grouping()
+        grouping, gb_params = qs.query.get_compiler(qs.db).get_grouping([])
         self.assertEqual(len(grouping), 1)
 
     def test_duplicate_alias(self):
@@ -889,3 +889,96 @@ class AggregationTests(TestCase):
         self.assertIs(qs.query.alias_map['aggregation_regress_book'].join_type, None)
         # Check that the query executes without problems.
         self.assertEqual(len(qs.exclude(publisher=-1)), 6)
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns(self):
+        # Regression test for #17144
+
+        results = Author.objects.annotate(num_contacts=Count('book_contact_set'))
+
+        # There should only be one GROUP BY clause, for the `id` column.
+        # `name` and `age` should not be grouped on.
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'age' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(a.name, a.num_contacts) for a in results.order_by('name')],
+            [
+                ('Adrian Holovaty', 1),
+                ('Brad Dayley', 1),
+                ('Jacob Kaplan-Moss', 0),
+                ('James Bennett', 1),
+                ('Jeffrey Forcier', 1),
+                ('Paul Bissex', 0),
+                ('Peter Norvig', 2),
+                ('Stuart Russell', 0),
+                ('Wesley J. Chun', 0),
+            ]
+        )
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns_only(self):
+        # Works with only() too.
+        results = Author.objects.only('id', 'name').annotate(num_contacts=Count('book_contact_set'))
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'age' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(a.name, a.num_contacts) for a in results.order_by('name')],
+            [
+                ('Adrian Holovaty', 1),
+                ('Brad Dayley', 1),
+                ('Jacob Kaplan-Moss', 0),
+                ('James Bennett', 1),
+                ('Jeffrey Forcier', 1),
+                ('Paul Bissex', 0),
+                ('Peter Norvig', 2),
+                ('Stuart Russell', 0),
+                ('Wesley J. Chun', 0),
+            ]
+        )
+
+    @skipUnlessDBFeature("allows_group_by_pk")
+    def test_aggregate_duplicate_columns_select_related(self):
+        # And select_related()
+        results = Book.objects.select_related('contact').annotate(
+            num_authors=Count('authors'))
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        self.assertEqual(len(grouping), 1)
+        assert 'id' in grouping[0]
+        assert 'name' not in grouping[0]
+        assert 'contact' not in grouping[0]
+
+        # The query group_by property should also only show the `id`.
+        self.assertEqual(results.query.group_by, [('aggregation_regress_book', 'id')])
+
+        # Ensure that we get correct results.
+        self.assertEqual(
+            [(b.name, b.num_authors) for b in results.order_by('name')],
+            [
+                ('Artificial Intelligence: A Modern Approach', 2),
+                ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                ('Practical Django Projects', 1),
+                ('Python Web Development with Django', 3),
+                ('Sams Teach Yourself Django in 24 Hours', 1),
+                ('The Definitive Guide to Django: Web Development Done Right', 2)
+            ]
+        )
+
+    def test_reverse_join_trimming(self):
+        qs = Author.objects.annotate(Count('book_contact_set__contact'))
+        self.assertIn(' JOIN ', str(qs.query))

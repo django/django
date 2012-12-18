@@ -18,7 +18,7 @@ from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('&lt;', '&gt;')]
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
@@ -33,6 +33,7 @@ link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
+strip_tags_re = re.compile(r'</?\S([^=]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
 def escape(text):
@@ -117,7 +118,7 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return re.sub(r'<[^>]*?>', '', force_text(value))
+    return strip_tags_re.sub('', force_text(value))
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
@@ -149,13 +150,17 @@ fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     # Handle IDN before quoting.
-    scheme, netloc, path, query, fragment = urlsplit(url)
     try:
-        netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-    except UnicodeError: # invalid domain part
+        scheme, netloc, path, query, fragment = urlsplit(url)
+        try:
+            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
+        except UnicodeError: # invalid domain part
+            pass
+        else:
+            url = urlunsplit((scheme, netloc, path, query, fragment))
+    except ValueError:
+        # invalid IPv6 URL (normally square brackets in hostname part).
         pass
-    else:
-        url = urlunsplit((scheme, netloc, path, query, fragment))
 
     # An URL is considered unquoted if it contains no % characters or
     # contains a % not followed by two hexadecimal digits. See #9655.

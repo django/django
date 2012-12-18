@@ -53,6 +53,13 @@ comment
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 
+Sample usage::
+
+    <p>Rendered text with {{ pub_date|date:"c" }}</p>
+    {% comment %}
+        <p>Commented out text with {{ create_date|date:"c" }}</p>
+    {% endcomment %}
+
 .. templatetag:: csrf_token
 
 csrf_token
@@ -611,7 +618,7 @@ Output the contents of the block if the two arguments equal each other.
 
 Example::
 
-    {% ifequal user.id comment.user_id %}
+    {% ifequal user.pk comment.user_id %}
         ...
     {% endifequal %}
 
@@ -947,6 +954,10 @@ Argument            Outputs
 ``closecomment``    ``#}``
 ==================  =======
 
+Sample usage::
+
+    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+
 .. templatetag:: url
 
 url
@@ -1023,6 +1034,16 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
+
+.. warning::
+
+    Don't forget to put quotes around the function path or pattern name!
+
+    .. versionchanged:: 1.5
+        The first parameter used not to be quoted, which was inconsistent with
+        other template tags. Since Django 1.5, it is evaluated according to
+        the usual rules: it can be a quoted string or a variable that will be
+        looked up in the context.
 
 .. templatetag:: verbatim
 
@@ -1226,7 +1247,8 @@ G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
 h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
 H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
 i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Not implemented.
+I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
 j                 Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
 l                 Day of the week, textual, long.           ``'Friday'``
@@ -1408,6 +1430,12 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
+For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
+
+    {% autoescape off %}
+        {{ title|escape }}
+    {% endautoescape %}
+
 .. templatefilter:: escapejs
 
 escapejs
@@ -1437,6 +1465,14 @@ For example::
     {{ value|filesizeformat }}
 
 If ``value`` is 123456789, the output would be ``117.7 MB``.
+
+.. admonition:: File sizes and SI units
+
+    Strictly speaking, ``filesizeformat`` does not conform to the International
+    System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
+    are calculated in powers of 1024 (which is the case here). Instead, Django
+    uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
+    are more commonly used.
 
 .. templatefilter:: first
 
@@ -1504,6 +1540,17 @@ that many decimal places. For example:
 ``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
 ============  =============================  ==========
 
+Particularly useful is passing 0 (zero) as the argument which will round the
+float to the nearest integer.
+
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"0" }}``   ``34``
+``34.00000``  ``{{ value|floatformat:"0" }}``   ``34``
+``39.56000``  ``{{ value|floatformat:"0" }}``   ``40``
+============  ================================  ==========
+
 If the argument passed to ``floatformat`` is negative, it will round a number
 to that many decimal places -- but only if there's a decimal part to be
 displayed. For example:
@@ -1529,6 +1576,13 @@ details). This filter is applied *immediately* and returns a new, escaped
 string. This is useful in the rare cases where you need multiple escaping or
 want to apply other filters to the escaped results. Normally, you want to use
 the :tfilter:`escape` filter.
+
+For example, if you want to catch the ``<p>`` HTML elements created by
+the :tfilter:`linebreaks` filter::
+
+    {% autoescape off %}
+        {{ body|linebreaks|force_escape }}
+    {% endautoescape %}
 
 .. templatefilter:: get_digit
 
@@ -1899,9 +1953,9 @@ for documentation of Python string formatting
 
 For example::
 
-    {{ value|stringformat:"s" }}
+    {{ value|stringformat:"E" }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is a slug"``.
+If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 .. templatefilter:: striptags
 
@@ -1967,7 +2021,9 @@ Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
-then ``{{ blog_date|timesince:comment_date }}`` would return "8 hours".
+then the following would return "8 hours"::
+
+    {{ blog_date|timesince:comment_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 
@@ -1986,7 +2042,9 @@ given date or datetime. For example, if today is 1 June 2006 and
 
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
-2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+2006, then the following will return "1 week"::
+
+    {{ conference_date|timeuntil:from_date }}
 
 Comparing offset-naive and offset-aware datetimes will return an empty string.
 

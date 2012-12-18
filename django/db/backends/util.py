@@ -24,11 +24,9 @@ class CursorWrapper(object):
             self.db.set_dirty()
 
     def __getattr__(self, attr):
-        self.set_dirty()
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+        if attr in ('execute', 'executemany', 'callproc'):
+            self.set_dirty()
+        return getattr(self.cursor, attr)
 
     def __iter__(self):
         return iter(self.cursor)

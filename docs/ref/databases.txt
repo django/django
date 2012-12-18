@@ -33,6 +33,11 @@ aggregate with a database backend that falls within the affected release range.
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
 
+PostgreSQL connection settings
+-------------------------------
+
+See :setting:`HOST` for details.
+
 Optimizing PostgreSQL's configuration
 -------------------------------------
 

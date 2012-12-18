@@ -8,7 +8,7 @@ consistent.
 """
 from __future__ import unicode_literals
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.test.utils import str_prefix
 from django.utils.tzinfo import LocalTimezone, FixedOffset
@@ -356,6 +356,9 @@ def get_filter_tests():
         # Timezone name
         'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
         'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
+        # Ticket 19370: Make sure |date doesn't blow up on a midnight time object
+        'date08': (r'{{ t|date:"H:i" }}', {'t': time(0, 1)}, '00:01'),
+        'date09': (r'{{ t|date:"H:i" }}', {'t': time(0, 0)}, '00:00'),
 
          # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),

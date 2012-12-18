@@ -73,7 +73,9 @@ class Node(object):
         For truth value testing.
         """
         return bool(self.children)
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def __contains__(self, other):
         """

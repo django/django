@@ -3,13 +3,15 @@ from __future__ import unicode_literals
 import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
-    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
+    ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
+from django.utils._os import upath
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
@@ -98,7 +100,9 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [force_text(form.error_messages['invalid_login'])])
+                [force_text(form.error_messages['invalid_login'] % {
+                   'username': User._meta.get_field('username').verbose_name
+                })])
 
     def test_inactive_user(self):
         # The user is inactive.
@@ -282,6 +286,14 @@ class UserChangeFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['password'], 'sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161')
 
+    def test_bug_19349_bound_password_field(self):
+        user = User.objects.get(username='testclient')
+        form = UserChangeForm(data={}, instance=user)
+        # When rendering the bound password field,
+        # ReadOnlyPasswordHashWidget needs the initial
+        # value to render correctly
+        self.assertEqual(form.initial['password'], form['password'].value())
+
 
 @skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -322,7 +334,7 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(form.cleaned_data['email'], email)
 
     def test_custom_email_subject(self):
-        template_path = os.path.join(os.path.dirname(__file__), 'templates')
+        template_path = os.path.join(os.path.dirname(upath(__file__)), 'templates')
         with self.settings(TEMPLATE_DIRS=(template_path,)):
             data = {'email': 'testclient@example.com'}
             form = PasswordResetForm(data)
@@ -362,3 +374,13 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
                          [_("The user account associated with this email address cannot reset the password.")])
+
+
+class ReadOnlyPasswordHashWidgetTest(TestCase):
+
+    def test_bug_19349_render_with_none_value(self):
+        # Rendering the widget with value set to None
+        # mustn't raise an exception.
+        widget = ReadOnlyPasswordHashWidget()
+        html = widget.render(name='password', value=None, attrs={})
+        self.assertIn(_("No password set."), html)

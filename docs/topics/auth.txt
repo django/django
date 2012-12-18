@@ -408,7 +408,7 @@ installation supports. The first entry in this list (that is,
 ``settings.PASSWORD_HASHERS[0]``) will be used to store passwords, and all the
 other entries are valid hashers that can be used to check existing passwords.
 This means that if you want to use a different algorithm, you'll need to modify
-:setting:`PASSWORD_HASHERS` to list your prefered algorithm first in the list.
+:setting:`PASSWORD_HASHERS` to list your preferred algorithm first in the list.
 
 The default for :setting:`PASSWORD_HASHERS` is::
 
@@ -1889,7 +1889,7 @@ password resets. You must then provide some key implementation details:
         as the identifying field::
 
             class MyUser(AbstractBaseUser):
-                identfier = models.CharField(max_length=40, unique=True, db_index=True)
+                identifier = models.CharField(max_length=40, unique=True, db_index=True)
                 ...
                 USERNAME_FIELD = 'identifier'
 
@@ -1910,6 +1910,15 @@ password resets. You must then provide some key implementation details:
 
             ``REQUIRED_FIELDS`` must contain all required fields on your User
             model, but should *not* contain the ``USERNAME_FIELD``.
+
+    .. attribute:: User.is_active
+
+        A boolean attribute that indicates whether the user is considered
+        "active".  This attribute is provided as an attribute on
+        ``AbstractBaseUser`` defaulting to ``True``. How you choose to
+        implement it will depend on the details of your chosen auth backends.
+        See the documentation of the :attr:`attribute on the builtin user model
+        <django.contrib.auth.models.User.is_active>` for details.
 
     .. method:: User.get_full_name():
 
@@ -2000,7 +2009,7 @@ additional methods:
 
     .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
 
-        The prototype of `create_user()` should accept the username field,
+        The prototype of `create_superuser()` should accept the username field,
         plus all required fields as arguments. For example, if your user model
         uses `email` as the username field, and has `date_of_birth` as a required
         fields, then create_superuser should be defined as::
@@ -2127,6 +2136,76 @@ override any of the definitions that refer to fields on
 :class:`~django.contrib.auth.models.AbstractUser` that aren't on your
 custom User class.
 
+Custom users and permissions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make it easy to include Django's permission framework into your own User
+class, Django provides :class:`~django.contrib.auth.model.PermissionsMixin`.
+This is an abstract model you can include in the class heirarchy for your User
+model, giving you all the methods and database fields necessary to support
+Django's permission model.
+
+:class:`~django.contrib.auth.model.PermissionsMixin` provides the following
+methods and attributes:
+
+.. class:: models.PermissionsMixin
+
+    .. attribute:: models.PermissionsMixin.is_superuser
+
+        Boolean. Designates that this user has all permissions without
+        explicitly assigning them.
+
+    .. method:: models.PermissionsMixin.get_group_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, through his/her
+        groups.
+
+        If ``obj`` is passed in, only returns the group permissions for
+        this specific object.
+
+    .. method:: models.PermissionsMixin.get_all_permissions(obj=None)
+
+        Returns a set of permission strings that the user has, both through
+        group and user permissions.
+
+        If ``obj`` is passed in, only returns the permissions for this
+        specific object.
+
+    .. method:: models.PermissionsMixin.has_perm(perm, obj=None)
+
+        Returns ``True`` if the user has the specified permission, where perm is
+        in the format ``"<app label>.<permission codename>"`` (see
+        `permissions`_). If the user is inactive, this method will
+        always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for a permission for
+        the model, but for this specific object.
+
+    .. method:: models.PermissionsMixin.has_perms(perm_list, obj=None)
+
+        Returns ``True`` if the user has each of the specified permissions,
+        where each perm is in the format
+        ``"<app label>.<permission codename>"``. If the user is inactive,
+        this method will always return ``False``.
+
+        If ``obj`` is passed in, this method won't check for permissions for
+        the model, but for the specific object.
+
+    .. method:: models.PermissionsMixin.has_module_perms(package_name)
+
+        Returns ``True`` if the user has any permissions in the given package
+        (the Django app label). If the user is inactive, this method will
+        always return ``False``.
+
+.. admonition:: ModelBackend
+
+    If you don't include the
+    :class:`~django.contrib.auth.model.PermissionsMixin`, you must ensure you
+    don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
+    assumes that certain fields are available on your user model. If your User
+    model doesn't provide  those fields, you will receive database errors when
+    you check permissions.
+
 Custom users and Proxy models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2138,6 +2217,68 @@ model, you remove the ability of Django to reliably identify the base class.
 If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
+
+Custom users and signals
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another limitation of custom User models is that you can't use
+:func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
+handler. Instead, you must register the handler with the actual User model.
+
+Custom users and testing/fixtures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are writing an application that interacts with the User model, you must
+take some precautions to ensure that your test suite will run regardless of
+the User model that is being used by a project. Any test that instantiates an
+instance of User will fail if the User model has been swapped out. This
+includes any attempt to create an instance of User with a fixture.
+
+To ensure that your test suite will pass in any project configuration,
+``django.contrib.auth.tests.utils`` defines a ``@skipIfCustomUser`` decorator.
+This decorator will cause a test case to be skipped if any User model other
+than the default Django user is in use. This decorator can be applied to a
+single test, or to an entire test class.
+
+Depending on your application, tests may also be needed to be added to ensure
+that the application works with *any* user model, not just the default User
+model. To assist with this, Django provides two substitute user models that
+can be used in test suites:
+
+* :class:`django.contrib.auth.tests.custom_user.CustomUser`, a custom user
+  model that uses an ``email`` field as the username, and has a basic
+  admin-compliant permissions setup
+
+* :class:`django.contrib.auth.tests.custom_user.ExtensionUser`, a custom
+  user model that extends :class:`~django.contrib.auth.models.AbstractUser`,
+  adding a ``date_of_birth`` field.
+
+You can then use the ``@override_settings`` decorator to make that test run
+with the custom User model. For example, here is a skeleton for a test that
+would test three possible User models -- the default, plus the two User
+models provided by ``auth`` app::
+
+    from django.contrib.auth.tests.utils import skipIfCustomUser
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+
+    class ApplicationTestCase(TestCase):
+        @skipIfCustomUser
+        def test_normal_user(self):
+            "Run tests for the normal user model"
+            self.assertSomething()
+
+        @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+        def test_custom_user(self):
+            "Run tests for a custom user model with email-based authentication"
+            self.assertSomething()
+
+        @override_settings(AUTH_USER_MODEL='auth.ExtensionUser')
+        def test_extension_user(self):
+            "Run tests for a simple extension of the built-in User."
+            self.assertSomething()
+
 
 A full example
 --------------
@@ -2272,14 +2413,20 @@ code would be required in the app's ``admin.py`` file::
 
 
     class UserChangeForm(forms.ModelForm):
-        """A form for updateing users. Includes all the fields on
+        """A form for updating users. Includes all the fields on
         the user, but replaces the password field with admin's
-        pasword hash display field.
+        password hash display field.
         """
         password = ReadOnlyPasswordHashField()
 
         class Meta:
             model = MyUser
+
+        def clean_password(self):
+            # Regardless of what the user provides, return the initial value.
+            # This is done here, rather than on the field, because the
+            # field does not have access to the initial value
+            return self.initial["password"]
 
 
     class MyUserAdmin(UserAdmin):
@@ -2375,6 +2522,12 @@ processing at the first positive match.
     :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
     you need to force users to re-authenticate using different methods. A simple
     way to do that is simply to execute ``Session.objects.all().delete()``.
+
+.. versionadded:: 1.6
+
+If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+exception, authentication will immediately fail. Django won't check the
+backends that follow.
 
 Writing an authentication backend
 ---------------------------------

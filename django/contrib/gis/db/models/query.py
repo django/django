@@ -760,8 +760,10 @@ class GeoQuerySet(QuerySet):
             self.query.add_select_related([field_name])
             compiler = self.query.get_compiler(self.db)
             compiler.pre_sql_setup()
-            rel_table, rel_col = self.query.related_select_cols[self.query.related_select_fields.index(geo_field)]
-            return compiler._field_column(geo_field, rel_table)
+            for (rel_table, rel_col), field in self.query.related_select_cols:
+                if field == geo_field:
+                    return compiler._field_column(geo_field, rel_table)
+            raise ValueError("%r not in self.query.related_select_cols" % geo_field)
         elif not geo_field in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.

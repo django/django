@@ -1,6 +1,12 @@
 from __future__ import unicode_literals
 import datetime
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
+from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase
@@ -10,6 +16,7 @@ from django.utils.timezone import utc
 from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils import tzinfo
+from django.utils.unittest import skipIf
 
 
 # Mock out datetime in some tests so they don't fail occasionally when they
@@ -141,14 +148,16 @@ class HumanizeTests(TestCase):
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
 
+    @skipIf(settings.TIME_ZONE != "America/Chicago" and pytz is None,
+            "this test requires pytz when a non-default time zone is set")
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
-        # This is 2012-03-08HT19:30:00-06:00 in Ameria/Chicago
+        # This is 2012-03-08HT19:30:00-06:00 in America/Chicago
         dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            with override_settings(USE_TZ=True):
+            with override_settings(TIME_ZONE="America/Chicago", USE_TZ=True):
                 self.humanize_tester([dt], ['yesterday'], 'naturalday')
         finally:
             humanize.datetime = orig_humanize_datetime

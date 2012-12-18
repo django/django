@@ -8,6 +8,8 @@ from django.utils.translation import check_for_language, activate, to_locale, ge
 from django.utils.text import javascript_quote
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
+from django.utils._os import upath
+from django.utils.http import is_safe_url
 from django.utils import six
 
 def set_language(request):
@@ -21,11 +23,11 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.REQUEST.get('next', None)
-    if not next:
-        next = request.META.get('HTTP_REFERER', None)
-    if not next:
-        next = '/'
+    next = request.REQUEST.get('next')
+    if not is_safe_url(url=next, host=request.get_host()):
+        next = request.META.get('HTTP_REFERER')
+        if not is_safe_url(url=next, host=request.get_host()):
+            next = '/'
     response = http.HttpResponseRedirect(next)
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
@@ -99,16 +101,16 @@ function ngettext(singular, plural, count) {
 function gettext_noop(msgid) { return msgid; }
 
 function pgettext(context, msgid) {
-  var value = gettext(context + '\x04' + msgid);
-  if (value.indexOf('\x04') != -1) {
+  var value = gettext(context + '\\x04' + msgid);
+  if (value.indexOf('\\x04') != -1) {
     value = msgid;
   }
   return value;
 }
 
 function npgettext(context, singular, plural, count) {
-  var value = ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-  if (value.indexOf('\x04') != -1) {
+  var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
+  if (value.indexOf('\\x04') != -1) {
     value = ngettext(singular, plural, count);
   }
   return value;
@@ -197,7 +199,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
-        path = os.path.join(os.path.dirname(p.__file__), 'locale')
+        path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
     paths.extend(list(reversed(settings.LOCALE_PATHS)))

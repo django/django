@@ -18,12 +18,22 @@ QUERY_TERMS = set([
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
 
-# Constants to make looking up tuple values clearer.
+# Namedtuples for sql.* internal use.
+
 # Join lists (indexes into the tuples that are values in the alias_map
 # dictionary in the Query class).
 JoinInfo = namedtuple('JoinInfo',
                       'table_name rhs_alias join_type lhs_alias '
-                      'lhs_join_col rhs_join_col nullable')
+                      'lhs_join_col rhs_join_col nullable join_field')
+
+# PathInfo is used when converting lookups (fk__somecol). The contents
+# describe the join in Model terms (model Options and Fields for both
+# sides of the join. The rel_field is the field we are joining along.
+PathInfo = namedtuple('PathInfo',
+                      'from_field to_field from_opts to_opts join_field')
+
+# Pairs of column clauses to select, and (possibly None) field for the clause.
+SelectInfo = namedtuple('SelectInfo', 'col field')
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
@@ -34,3 +44,6 @@ ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC'),
 }
+
+# A marker for join-reusability.
+REUSE_ALL = object()

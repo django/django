@@ -16,6 +16,17 @@ from django.utils.translation import get_language, to_locale, check_for_language
 _format_cache = {}
 _format_modules_cache = {}
 
+ISO_INPUT_FORMATS = {
+    'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
+    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M'),
+    'DATETIME_INPUT_FORMATS': (
+        '%Y-%m-%d %H:%M:%S',
+        '%Y-%m-%d %H:%M:%S.%f',
+        '%Y-%m-%d %H:%M',
+        '%Y-%m-%d'
+    ),
+}
+
 def reset_format_cache():
     """Clear any cached formats.
 
@@ -82,6 +93,11 @@ def get_format(format_type, lang=None, use_l10n=None):
             for module in get_format_modules(lang):
                 try:
                     val = getattr(module, format_type)
+                    for iso_input in ISO_INPUT_FORMATS.get(format_type, ()):
+                        if iso_input not in val:
+                            if isinstance(val, tuple):
+                                val = list(val)
+                            val.append(iso_input)
                     _format_cache[cache_key] = val
                     return val
                 except AttributeError:

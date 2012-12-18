@@ -2,30 +2,23 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.handlers.modwsgi import check_password, groups_for_user
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.tests import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TransactionTestCase
+from django.test.utils import override_settings
 
 
 class ModWsgiHandlerTestCase(TransactionTestCase):
     """
     Tests for the mod_wsgi authentication handler
     """
-
-    def setUp(self):
-        user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        User.objects.create_user('test1', 'test1@example.com', 'test1')
-        group = Group.objects.create(name='test_group')
-        user1.groups.add(group)
-
+    @skipIfCustomUser
     def test_check_password(self):
         """
         Verify that check_password returns the correct values as per
         http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Authentication_Provider
-
-        because the custom user available in the test framework does not
-        support the is_active attribute, we can't test this with a custom
-        user.
         """
+        User.objects.create_user('test', 'test@example.com', 'test')
 
         # User not in database
         self.assertTrue(check_password({}, 'unknown', '') is None)
@@ -33,8 +26,32 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         # Valid user with correct password
         self.assertTrue(check_password({}, 'test', 'test'))
 
+        # correct password, but user is inactive
+        User.objects.filter(username='test').update(is_active=False)
+        self.assertFalse(check_password({}, 'test', 'test'))
+
         # Valid user with incorrect password
         self.assertFalse(check_password({}, 'test', 'incorrect'))
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    def test_check_password_custom_user(self):
+        """
+        Verify that check_password returns the correct values as per
+        http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Authentication_Provider
+
+        with custom user installed
+        """
+
+        CustomUser.objects.create_user('test@example.com', '1990-01-01', 'test')
+
+        # User not in database
+        self.assertTrue(check_password({}, 'unknown', '') is None)
+
+        # Valid user with correct password'
+        self.assertTrue(check_password({}, 'test@example.com', 'test'))
+
+        # Valid user with incorrect password
+        self.assertFalse(check_password({}, 'test@example.com', 'incorrect'))
 
     @skipIfCustomUser
     def test_groups_for_user(self):
@@ -42,6 +59,10 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         Check that groups_for_user returns correct values as per
         http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms#Apache_Group_Authorisation
         """
+        user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        User.objects.create_user('test1', 'test1@example.com', 'test1')
+        group = Group.objects.create(name='test_group')
+        user1.groups.add(group)
 
         # User not in database
         self.assertEqual(groups_for_user({}, 'unknown'), [])

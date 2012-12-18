@@ -673,11 +673,12 @@ For example, this model has a few custom methods::
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
             import datetime
-            if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
-                return "Baby boomer"
             if self.birth_date < datetime.date(1945, 8, 1):
                 return "Pre-boomer"
-            return "Post-boomer"
+            elif self.birth_date < datetime.date(1965, 1, 1):
+                return "Baby boomer"
+            else:
+                return "Post-boomer"
 
         def is_midwestern(self):
             "Returns True if this person is from the Midwest."

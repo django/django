@@ -322,6 +322,10 @@ thead th.sorted {
     background: #c5c5c5 url(../img/nav-bg-selected.gif) top left repeat-x;
 }
 
+thead th.sorted .text {
+	padding-right: 42px;
+}
+
 table thead th .text span {
     padding: 2px 5px;
     display:block;

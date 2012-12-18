@@ -69,8 +69,27 @@ MultipleObjectMixin
         An integer specifying how many objects should be displayed per page. If
         this is given, the view will paginate objects with
         :attr:`MultipleObjectMixin.paginate_by` objects per page. The view will
-        expect either a ``page`` query string parameter (via ``GET``) or a
-        ``page`` variable specified in the URLconf.
+        expect either a ``page`` query string parameter (via ``request.GET``)
+        or a ``page`` variable specified in the URLconf.
+
+    .. attribute:: paginate_orphans
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. This extends the :attr:`MultipleObjectMixin.paginate_by`
+        limit on the last page by up to
+        :attr:`MultipleObjectMixin.paginate_orphans`, in order to keep the last
+        page from having a very small number of objects.
+
+    .. attribute:: page_kwarg
+
+        .. versionadded:: 1.5
+
+        A string specifying the name to use for the page parameter.
+        The view will expect this prameter to be available either as a query
+        string parameter (via ``request.GET``) or as a kwarg variable specified
+        in the URLconf. Defaults to ``page``.
 
     .. attribute:: paginator_class
 
@@ -109,6 +128,14 @@ MultipleObjectMixin
 
         Returns an instance of the paginator to use for this view. By default,
         instantiates an instance of :attr:`paginator_class`.
+
+    .. method:: get_paginate_by()
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. By default this simply returns the value of
+        :attr:`MultipleObjectMixin.paginate_orphans`.
 
     .. method:: get_allow_empty()
 

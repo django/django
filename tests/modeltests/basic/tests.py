@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import Field, FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
@@ -127,6 +127,40 @@ class ModelTest(TestCase):
         a = Article.objects.get(pk=a.id)
         b = Article.objects.get(pk=a.id)
         self.assertEqual(a, b)
+
+        # Create a very similar object
+        a = Article(
+            id=None,
+            headline='Area man programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        a.save()
+
+        self.assertEqual(Article.objects.count(), 2)
+
+        # Django raises an Article.MultipleObjectsReturned exception if the
+        # lookup matches more than one object
+        self.assertRaisesRegexp(
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+
+        self.assertRaisesRegexp(
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            pub_date__year=2005,
+        )
+
+        self.assertRaisesRegexp(
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            pub_date__year=2005,
+            pub_date__month=7,
+        )
 
     def test_object_creation(self):
         # Create an Article.

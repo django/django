@@ -25,6 +25,7 @@ from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
 
 RAISE_ERROR = object()
 absolute_http_url_re = re.compile(r"^https?://", re.I)
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(IOError):
@@ -64,7 +65,7 @@ class HttpRequest(object):
                 host = '%s:%s' % (host, server_port)
 
         # Disallow potentially poisoned hostnames.
-        if set(';/?@&=+$,').intersection(host):
+        if not host_validation_re.match(host.lower()):
             raise SuspiciousOperation('Invalid HTTP_HOST header: %s' % host)
 
         return host
@@ -276,6 +277,9 @@ class QueryDict(MultiValueDict):
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
         if six.PY3:
+            if isinstance(query_string, bytes):
+                # query_string contains URL-encoded data, a subset of ASCII.
+                query_string = query_string.decode()
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):

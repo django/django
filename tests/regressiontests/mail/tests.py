@@ -17,6 +17,7 @@ from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_str, force_text
 from django.utils.six import PY3, StringIO
 from django.utils.translation import ugettext_lazy
 
@@ -357,6 +358,14 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message["from"], "from@example.com")
         self.assertEqual(message.get_all("to"), ["to@example.com"])
 
+    def test_send_unicode(self):
+        email = EmailMessage('Chère maman', 'Je t\'aime très fort', 'from@example.com', ['to@example.com'])
+        num_sent = mail.get_connection().send_messages([email])
+        self.assertEqual(num_sent, 1)
+        message = self.get_the_message()
+        self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
+        self.assertEqual(force_text(message.get_payload()), 'Je t\'aime très fort')
+
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
         email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
@@ -526,8 +535,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         messages = []
         for filename in os.listdir(self.tmp_dir):
             with open(os.path.join(self.tmp_dir, filename), 'r') as fp:
-                session = fp.read().split('\n' + ('-' * 79) + '\n')
-            messages.extend(email.message_from_string(str(m)) for m in session if m)
+                session = force_text(fp.read()).split('\n' + ('-' * 79) + '\n')
+            messages.extend(email.message_from_string(force_str(m)) for m in session if m)
         return messages
 
     def test_file_sessions(self):
@@ -579,8 +588,8 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         self.stream = sys.stdout = StringIO()
 
     def get_mailbox_content(self):
-        messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
-        return [email.message_from_string(str(m)) for m in messages if m]
+        messages = force_text(self.stream.getvalue()).split('\n' + ('-' * 79) + '\n')
+        return [email.message_from_string(force_str(m)) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from xml.etree import ElementTree as ET
+
 from django.conf import settings
 from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
@@ -31,8 +33,21 @@ class CommentFeedTests(CommentTestCase):
         response = self.client.get(self.feed_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rss+xml; charset=utf-8')
-        self.assertContains(response, '<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">')
-        self.assertContains(response, '<title>example.com comments</title>')
-        self.assertContains(response, '<link>http://example.com/</link>')
-        self.assertContains(response, '</rss>')
+
+        rss_elem = ET.fromstring(response.content)
+
+        self.assertEqual(rss_elem.tag, "rss")
+        self.assertEqual(rss_elem.attrib, {"version": "2.0"})
+
+        channel_elem = rss_elem.find("channel")
+
+        title_elem = channel_elem.find("title")
+        self.assertEqual(title_elem.text, "example.com comments")
+
+        link_elem = channel_elem.find("link")
+        self.assertEqual(link_elem.text, "http://example.com/")
+
+        atomlink_elem = channel_elem.find("{http://www.w3.org/2005/Atom}link")
+        self.assertEqual(atomlink_elem.attrib, {"href": "http://example.com/rss/comments/", "rel": "self"})
+
         self.assertNotContains(response, "A comment for the second site.")

@@ -431,10 +431,12 @@ MySQL will connect via a Unix socket to the specified socket. For example::
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
 
-If you're using PostgreSQL, an empty string means to use a Unix domain socket
-for the connection, rather than a network connection to localhost. If you
-explicitly need to use a TCP/IP connection on the local machine with
-PostgreSQL, specify ``localhost`` here.
+If you're using PostgreSQL, by default (empty :setting:`HOST`), the connection
+to the database is done through UNIX domain sockets ('local' lines in
+``pg_hba.conf``). If you want to connect through TCP sockets, set
+:setting:`HOST` to 'localhost' or '127.0.0.1' ('host' lines in ``pg_hba.conf``).
+On Windows, you should always define :setting:`HOST`, as UNIX domain sockets
+are not available.
 
 .. setting:: NAME
 
@@ -1119,9 +1121,11 @@ Default: ``()``
 
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
-:doc:`/howto/error-reporting`). Use this if your site does not provide a
-commonly requested file such as ``favicon.ico`` or ``robots.txt``, or if it
-gets hammered by script kiddies.
+:doc:`/howto/error-reporting`). Regular expressions are matched against
+:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
+query string, if any). Use this if your site does not provide a commonly
+requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
+hammered by script kiddies.
 
 This is only used if :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True`` and
 ``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
@@ -1242,9 +1246,8 @@ Example::
         '/var/local/translations/locale'
     )
 
-Note that in the paths you add to the value of this setting, if you have the
-typical ``/path/to/locale/xx/LC_MESSAGES`` hierarchy, you should use the path to
-the ``locale`` directory (i.e. ``'/path/to/locale'``).
+Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
+directories containing the actual translation files.
 
 .. setting:: LOGGING
 
@@ -1373,7 +1376,7 @@ more details.
 MESSAGE_STORAGE
 ---------------
 
-Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
+Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
 Controls where Django stores message data.  See the
 :doc:`messages documentation </ref/contrib/messages>` for more details.
@@ -1560,9 +1563,9 @@ for.
 You'll need to set a tuple with two elements -- the name of the header to look
 for and the required value. For example::
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-Here, we're telling Django that we trust the ``X-Forwarded-Protocol`` header
+Here, we're telling Django that we trust the ``X-Forwarded-Proto`` header
 that comes from our proxy, and any time its value is ``'https'``, then the
 request is guaranteed to be secure (i.e., it originally came in via HTTPS).
 Obviously, you should *only* set this setting if you control your proxy or
@@ -1575,16 +1578,18 @@ available in ``request.META``.)
 
 .. warning::
 
-    **You will probably open security holes in your site if you set this without knowing what you're doing. And if you fail to set it when you should. Seriously.**
+    **You will probably open security holes in your site if you set this
+    without knowing what you're doing. And if you fail to set it when you
+    should. Seriously.**
 
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
 
     * Your Django app is behind a proxy.
-    * Your proxy strips the 'X-Forwarded-Protocol' header from all incoming
+    * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
       requests. In other words, if end users include that header in their
       requests, the proxy will discard it.
-    * Your proxy sets the 'X-Forwarded-Protocol' header and sends it to Django,
+    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 
     If any of those are not true, you should keep this setting set to ``None``
@@ -1692,6 +1697,16 @@ Django installation or be parent of that path.
 This is useful if you have multiple Django instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
+
+.. setting:: SESSION_CACHE_ALIAS
+
+SESSION_CACHE_ALIAS
+-------------------
+
+Default: ``default``
+
+If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
+this selects the cache to use.
 
 .. setting:: SESSION_COOKIE_SECURE
 
@@ -2054,6 +2069,16 @@ to ensure your processes are running in the correct environment.
 
 .. _pytz: http://pytz.sourceforge.net/
 
+.. setting:: TRANSACTIONS_MANAGED
+
+TRANSACTIONS_MANAGED
+--------------------
+
+Default: ``False``
+
+Set this to ``True`` if you want to :ref:`disable Django's transaction
+management <deactivate-transaction-management>` and implement your own.
+
 .. setting:: USE_ETAGS
 
 USE_ETAGS
@@ -2197,16 +2222,6 @@ The default value for the X-Frame-Options header used by
 
 Deprecated settings
 ===================
-
-.. setting:: ADMIN_MEDIA_PREFIX
-
-ADMIN_MEDIA_PREFIX
-------------------
-
-.. deprecated:: 1.4
-   This setting has been obsoleted by the ``django.contrib.staticfiles`` app
-   integration. See the :doc:`Django 1.4 release notes</releases/1.4>` for
-   more information.
 
 .. setting:: AUTH_PROFILE_MODULE
 

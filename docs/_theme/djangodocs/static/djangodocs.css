@@ -1,7 +1,7 @@
 /*** setup ***/
 html { background:#092e20;}
 body { font:12px/1.5 Verdana,sans-serif; background:#092e20; color: white;}
-#custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;} 
+#custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;}
 #hd { padding: 4px 0 12px 0; }
 #bd { background:#234F32; }
 #ft { color:#487858; font-size:90%; padding-bottom: 2em; }
@@ -54,7 +54,7 @@ hr { color:#ccc; background-color:#ccc; height:1px; border:0; }
 p, ul, dl { margin-top:.6em; margin-bottom:1em; padding-bottom: 0.1em;}
 #yui-main div.yui-b img { max-width: 50em; margin-left: auto; margin-right: auto; display: block; }
 caption { font-size:1em; font-weight:bold; margin-top:0.5em; margin-bottom:0.5em; margin-left: 2px; text-align: center; }
-blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; } 
+blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; }
 strong { font-weight: bold; }
 em { font-style: italic; }
 ins { font-weight: bold; text-decoration: none; }
@@ -111,6 +111,7 @@ dt .literal, table .literal { background:none; }
 .note, .admonition { padding-left:65px; background:url(docicons-note.png) .8em .8em no-repeat;}
 div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.png) .8em .8em no-repeat;}
 div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.png) .8em .8em no-repeat;}
+.admonition.warning { background:url(docicons-warning.png) .8em .8em no-repeat; border:1px solid #ffc83c;}
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
