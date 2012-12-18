@@ -115,8 +115,8 @@ Here is an example :class:`unittest.TestCase` subclass::
 
     class AnimalTestCase(unittest.TestCase):
         def setUp(self):
-            self.lion = Animal.objects.create(name="lion", sound="roar")
-            self.cat = Animal.objects.create(name="cat", sound="meow")
+            self.lion = Animal(name="lion", sound="roar")
+            self.cat = Animal(name="cat", sound="meow")
 
         def test_animals_can_speak(self):
             """Animals that can speak are correctly identified"""
@@ -138,6 +138,18 @@ suite.
 For more details about :mod:`unittest`, see the Python documentation.
 
 .. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
+
+.. warning::
+
+    If your tests rely on database access such as creating or querying models,
+    be sure to create your test classes as subclasses of
+    :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
+
+    In the example above, we instantiate some models but do not save them to
+    the database. Using :class:`unittest.TestCase` avoids the cost of running
+    each test in a transaction and flushing the database, but for most
+    applications the scope of tests you will be able to write this way will
+    be fairly limited, so it's easiest to use :class:`django.test.TestCase`.
 
 Writing doctests
 ----------------
@@ -343,7 +355,7 @@ This convenience method sets up the test database, and puts other
 Django features into modes that allow for repeatable testing.
 
 The call to :meth:`~django.test.utils.setup_test_environment` is made
-automatically as part of the setup of `./manage.py test`. You only
+automatically as part of the setup of ``./manage.py test``. You only
 need to manually invoke this method if you're not using running your
 tests via Django's test runner.
 
@@ -1191,6 +1203,8 @@ Normal Python unit test classes extend a base class of
    :width: 508
    :height: 391
 
+   Hierarchy of Django unit testing classes
+
 Regardless of the version of Python you're using, if you've installed
 :mod:`unittest2`, :mod:`django.utils.unittest` will point to that library.
 
@@ -1385,6 +1399,7 @@ attribute::
 
         def test_my_stuff(self):
             # Here self.client is an instance of MyTestClient...
+            call_some_test_code()
 
 .. _topics-testing-fixtures:
 
