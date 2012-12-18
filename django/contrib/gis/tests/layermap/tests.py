@@ -13,13 +13,14 @@ from django.db import router
 from django.conf import settings
 from django.test import TestCase
 from django.utils import unittest
+from django.utils._os import upath
 
 from .models import (
     City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
     city_mapping, co_mapping, cofeat_mapping, inter_mapping)
 
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')

@@ -51,6 +51,9 @@ def template_exception(request, n):
     return render_to_response('debug/template_exception.html',
         {'arg': except_args[int(n)]})
 
+def jsi18n(request):
+    return render_to_response('jsi18n.html')
+
 # Some views to exercise the shortcuts
 
 def render_to_response_view(request):

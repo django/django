@@ -5,6 +5,7 @@ import os
 import sys
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
+from django.utils._os import npath
 
 def has_bom(fn):
     with open(fn, 'rb') as f:
@@ -41,8 +42,8 @@ def compile_messages(stderr, locale=None):
                     # command, so that we can take advantage of shell quoting, to
                     # quote any malicious characters/escaping.
                     # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    os.environ['djangocompilemo'] = pf + '.mo'
-                    os.environ['djangocompilepo'] = pf + '.po'
+                    os.environ['djangocompilemo'] = npath(pf + '.mo')
+                    os.environ['djangocompilepo'] = npath(pf + '.po')
                     if sys.platform == 'win32': # Different shell-variable syntax
                         cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
                     else:

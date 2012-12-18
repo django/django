@@ -6,9 +6,10 @@ Running Django on Jython
 
 .. admonition:: Python 2.6 support
 
-    Django 1.5 has dropped support for Python 2.5. Until Jython provides a new
-    version that supports 2.6, Django 1.5 is no more compatible with Jython.
-    Please use Django 1.4 if you want to use Django over Jython.
+    Django 1.5 has dropped support for Python 2.5. Therefore, you have to use
+    a Jython 2.7 alpha release if you want to use Django 1.5 with Jython.
+    Please use Django 1.4 if you want to keep using Django on a stable Jython
+    version.
 
 Jython_ is an implementation of Python that runs on the Java platform (JVM).
 Django runs cleanly on Jython version 2.5 or later, which means you can deploy

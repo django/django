@@ -391,8 +391,8 @@ Comments
 --------
 
 If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
-upgrade to the new comments app introduced in 1.0. See
-:doc:`/ref/contrib/comments/upgrade` for details.
+upgrade to the new comments app introduced in 1.0. See the upgrade guide
+for details.
 
 Template tags
 -------------

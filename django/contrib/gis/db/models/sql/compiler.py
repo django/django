@@ -39,7 +39,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if self.query.select:
             only_load = self.deferred_to_columns()
             # This loop customized for GeoQuery.
-            for col, field in zip(self.query.select, self.query.select_fields):
+            for col, field in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias].table_name
@@ -85,7 +85,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         ])
 
         # This loop customized for GeoQuery.
-        for (table, col), field in zip(self.query.related_select_cols, self.query.related_select_fields):
+        for (table, col), field in self.query.related_select_cols:
             r = self.get_field_select(field, table, col)
             if with_aliases and col in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
@@ -101,7 +101,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         return result
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
-            start_alias=None, opts=None, as_pairs=False, local_only=False):
+            start_alias=None, opts=None, as_pairs=False, from_parent=None):
         """
         Computes the default columns for selecting every field in the base
         model. Will sometimes be called to pull in related models (e.g. via
@@ -127,7 +127,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
-            if local_only and model is not None:
+            if from_parent and model is not None and issubclass(from_parent, model):
                 continue
             if start_alias:
                 try:

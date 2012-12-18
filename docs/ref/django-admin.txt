@@ -96,6 +96,9 @@ cleanup
 Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
 
+.. versionchanged:: 1.5
+    :djadmin:`cleanup` is deprecated. Use :djadmin:`clearsessions` instead.
+
 compilemessages
 ---------------
 
@@ -876,14 +879,19 @@ either the path to a directory with the app template file, or a path to a
 compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
 containing the app template files.
 
-Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
-archives with the app template files, downloading and extracting them on the
-fly.
-
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
 
     django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
+
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the app template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
 
 .. versionadded:: 1.4
 
@@ -950,6 +958,15 @@ For example, this would look for a project template in the given directory
 when creating the ``myproject`` project::
 
     django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
+
+Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
+archives with the project template files, downloading and extracting them on the
+fly.
+
+For example, taking advantage of Github's feature to expose repositories as
+zip files, you can use a URL like::
+
+    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
 
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -1186,6 +1203,16 @@ This command is only available if :doc:`GeoDjango </ref/contrib/gis/index>`
 
 Please refer to its :djadmin:`description <ogrinspect>` in the GeoDjango
 documentation.
+
+``django.contrib.sessions``
+---------------------------
+
+clearsessions
+~~~~~~~~~~~~~~~
+
+.. django-admin:: clearsessions
+
+Can be run as a cron job or directly to clean out expired sessions.
 
 ``django.contrib.sitemaps``
 ---------------------------
@@ -1456,3 +1483,12 @@ Examples::
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+
+Output redirection
+==================
+
+Note that you can redirect standard output and error streams as all commands
+support the ``stdout`` and ``stderr`` options. For example, you could write::
+
+    with open('/tmp/command_output') as f:
+        management.call_command('dumpdata', stdout=f)

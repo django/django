@@ -161,8 +161,12 @@ managers, too.
     transactions. It tells Django you'll be managing the transaction on your
     own.
 
-    If your view changes data and doesn't ``commit()`` or ``rollback()``,
-    Django will raise a ``TransactionManagementError`` exception.
+    Whether you are writing or simply reading from the database, you must
+    ``commit()`` or ``rollback()`` explicitly or Django will raise a
+    :exc:`TransactionManagementError` exception. This is required when reading
+    from the database because ``SELECT`` statements may call functions which
+    modify tables, and thus it is impossible to know if any data has been
+    modified.
 
     Manual transaction management looks like this::
 
@@ -195,7 +199,8 @@ Requirements for transaction handling
 Django requires that every transaction that is opened is closed before
 the completion of a request. If you are using :func:`autocommit` (the
 default commit mode) or :func:`commit_on_success`, this will be done
-for you automatically. However, if you are manually managing
+for you automatically (with the exception of :ref:`executing custom SQL
+<executing-custom-sql>`). However, if you are manually managing
 transactions (using the :func:`commit_manually` decorator), you must
 ensure that the transaction is either committed or rolled back before
 a request is completed.
@@ -204,11 +209,13 @@ This applies to all database operations, not just write operations. Even
 if your transaction only reads from the database, the transaction must
 be committed or rolled back before you complete a request.
 
+.. _deactivate-transaction-management:
+
 How to globally deactivate transaction management
 =================================================
 
 Control freaks can totally disable all transaction management by setting
-``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in the Django settings file.
+:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file.
 
 If you do this, Django won't provide any automatic transaction management
 whatsoever. Middleware will no longer implicitly commit transactions, and

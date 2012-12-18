@@ -18,7 +18,9 @@ class PermLookupDict(object):
 
     def __bool__(self):
         return self.user.has_module_perms(self.module_name)
-    __nonzero__ = __bool__ # Python 2
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
 
 class PermWrapper(object):

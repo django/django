@@ -301,7 +301,7 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
     locales = []
     if locale is not None:
-        locales.append(locale)
+        locales.append(str(locale))
     elif all:
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
         locales = [os.path.basename(l) for l in locale_dirs]
@@ -316,8 +316,8 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         if not os.path.isdir(basedir):
             os.makedirs(basedir)
 
-        pofile = os.path.join(basedir, '%s.po' % domain)
-        potfile = os.path.join(basedir, '%s.pot' % domain)
+        pofile = os.path.join(basedir, '%s.po' % str(domain))
+        potfile = os.path.join(basedir, '%s.pot' % str(domain))
 
         if os.path.exists(potfile):
             os.unlink(potfile)

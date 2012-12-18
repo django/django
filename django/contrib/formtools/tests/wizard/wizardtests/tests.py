@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.formtools.wizard.views import CookieWizardView
 from django.contrib.formtools.tests.wizard.forms import UserForm, UserFormSet
+from django.utils._os import upath
 
 
 class WizardTests(object):
@@ -72,6 +73,10 @@ class WizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
         self.assertEqual(response.context.get('another_var', None), True)
 
+        # ticket #19025: `form` should be included in context
+        form = response.context_data['wizard']['form']
+        self.assertEqual(response.context_data['form'], form)            
+
     def test_form_finish(self):
         response = self.client.get(self.wizard_url)
         self.assertEqual(response.status_code, 200)
@@ -82,7 +87,7 @@ class WizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
 
         post_data = self.wizard_step_data[1]
-        post_data['form2-file1'] = open(__file__, 'rb')
+        post_data['form2-file1'] = open(upath(__file__), 'rb')
         response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['wizard']['steps'].current, 'form3')
@@ -95,7 +100,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         all_data = response.context['form_list']
-        with open(__file__, 'rb') as f:
+        with open(upath(__file__), 'rb') as f:
             self.assertEqual(all_data[1]['file1'].read(), f.read())
         all_data[1]['file1'].close()
         del all_data[1]['file1']
@@ -114,7 +119,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         post_data = self.wizard_step_data[1]
-        with open(__file__, 'rb') as post_file:
+        with open(upath(__file__), 'rb') as post_file:
             post_data['form2-file1'] = post_file
             response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
@@ -126,7 +131,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         all_data = response.context['all_cleaned_data']
-        with open(__file__, 'rb') as f:
+        with open(upath(__file__), 'rb') as f:
             self.assertEqual(all_data['file1'].read(), f.read())
         all_data['file1'].close()
         del all_data['file1']
@@ -146,7 +151,7 @@ class WizardTests(object):
 
         post_data = self.wizard_step_data[1]
         post_data['form2-file1'].close()
-        post_data['form2-file1'] = open(__file__, 'rb')
+        post_data['form2-file1'] = open(upath(__file__), 'rb')
         response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
 
@@ -174,7 +179,7 @@ class WizardTests(object):
 
         post_data = self.wizard_step_data[1]
         post_data['form2-file1'].close()
-        post_data['form2-file1'] = open(__file__, 'rb')
+        post_data['form2-file1'] = open(upath(__file__), 'rb')
         response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['wizard']['steps'].current, 'form3')
@@ -287,7 +292,7 @@ class WizardTestKwargs(TestCase):
         self.wizard_step_data[0]['form1-user'] = self.testuser.pk
 
     def test_template(self):
-        templates = os.path.join(os.path.dirname(__file__), 'templates')
+        templates = os.path.join(os.path.dirname(upath(__file__)), 'templates')
         with self.settings(
                 TEMPLATE_DIRS=list(settings.TEMPLATE_DIRS) + [templates]):
             response = self.client.get(self.wizard_url)

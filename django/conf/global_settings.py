@@ -150,12 +150,8 @@ SERVER_EMAIL = 'root@localhost'
 # Whether to send broken-link emails.
 SEND_BROKEN_LINK_EMAILS = False
 
-# Database connection info.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy',
-    },
-}
+# Database connection info. If left empty, will default to the dummy backend.
+DATABASES = {}
 
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
@@ -449,6 +445,7 @@ MIDDLEWARE_CLASSES = (
 # SESSIONS #
 ############
 
+SESSION_CACHE_ALIAS = 'default'                         # Cache to store session data if using the cache session backend.
 SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.

@@ -8,6 +8,7 @@ Functions that modify an HTTP request or response in some way.
 # it's a little fiddly to override this behavior, so they should be truly
 # universally applicable.
 
+
 def fix_location_header(request, response):
     """
     Ensures that we always use an absolute URI in any location header in the
@@ -20,17 +21,25 @@ def fix_location_header(request, response):
         response['Location'] = request.build_absolute_uri(response['Location'])
     return response
 
+
 def conditional_content_removal(request, response):
     """
     Removes the content of responses for HEAD requests, 1xx, 204 and 304
     responses. Ensures compliance with RFC 2616, section 4.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
-       response.content = ''
-       response['Content-Length'] = 0
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = ''
+        response['Content-Length'] = '0'
     if request.method == 'HEAD':
-        response.content = ''
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = ''
     return response
+
 
 def fix_IE_for_attach(request, response):
     """
@@ -60,6 +69,7 @@ def fix_IE_for_attach(request, response):
 
     return response
 
+
 def fix_IE_for_vary(request, response):
     """
     This function will fix the bug reported at
@@ -84,4 +94,3 @@ def fix_IE_for_vary(request, response):
             pass
 
     return response
-

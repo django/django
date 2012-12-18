@@ -30,8 +30,9 @@ If you'd like to start contributing to our docs, get the development version of
 Django from the source code repository
 (see :ref:`installing-development-version`). The development version has the
 latest-and-greatest documentation, just as it has latest-and-greatest code.
-Generally, we only revise documentation in the development version, as our
-policy is to freeze documentation for existing releases (see
+We also backport documentation fixes and improvements, at the discretion of the
+committer, to the last release branch. That's because it's highly advantageous
+to have the docs for the last release be up-to-date and correct (see
 :ref:`differences-between-doc-versions`).
 
 Getting started with Sphinx

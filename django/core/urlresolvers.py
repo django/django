@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import memoize, lazy
+from django.utils.http import urlquote
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
@@ -250,9 +251,9 @@ class RegexURLResolver(LocaleRegexProvider):
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return force_str('<%s %s (%s:%s) %s>' % (
+        return str('<%s %s (%s:%s) %s>') % (
             self.__class__.__name__, urlconf_repr, self.app_name,
-            self.namespace, self.regex.pattern))
+            self.namespace, self.regex.pattern)
 
     def _populate(self):
         lookups = MultiValueDict()
@@ -379,14 +380,15 @@ class RegexURLResolver(LocaleRegexProvider):
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
         possibilities = self.reverse_dict.getlist(lookup_view)
-        prefix_norm, prefix_args = normalize(_prefix)[0]
+
+        prefix_norm, prefix_args = normalize(urlquote(_prefix))[0]
         for possibility, pattern, defaults in possibilities:
             for result, params in possibility:
                 if args:
                     if len(args) != len(params) + len(prefix_args):
                         continue
                     unicode_args = [force_text(val) for val in args]
-                    candidate =  (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
+                    candidate = (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
                     if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
@@ -398,8 +400,8 @@ class RegexURLResolver(LocaleRegexProvider):
                     if not matches:
                         continue
                     unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
-                    candidate = (prefix_norm + result) % unicode_kwargs
-                if re.search('^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
+                    candidate = (prefix_norm.replace('%', '%%') + result) % unicode_kwargs
+                if re.search('^%s%s' % (prefix_norm, pattern), candidate, re.UNICODE):
                     return candidate
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in

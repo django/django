@@ -651,8 +651,16 @@ class UndeletableObject(models.Model):
     """
     name = models.CharField(max_length=255)
 
+class UserMessenger(models.Model):
+    """
+    Dummy class for testing message_user functions on ModelAdmin
+    """
 
 class Simple(models.Model):
     """
     Simple model with nothing on it for use in testing
     """
+
+class Choice(models.Model):
+    choice = models.IntegerField(blank=True, null=True,
+        choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))

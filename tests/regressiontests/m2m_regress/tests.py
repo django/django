@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet)
+    SelfReferChildSibling, Worksheet, RegressionModelSplit)
 
 
 class M2MRegressionTests(TestCase):
@@ -74,7 +74,7 @@ class M2MRegressionTests(TestCase):
         c1.tags = [t1, t2]
         c1 = TagCollection.objects.get(name='c1')
 
-        self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"])
+        self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"], ordered=False)
         self.assertQuerysetEqual(t1.tag_collections.all(), ["<TagCollection: c1>"])
 
     def test_manager_class_caching(self):
@@ -90,3 +90,9 @@ class M2MRegressionTests(TestCase):
         # Get same manager for different instances
         self.assertTrue(e1.topics.__class__ is e2.topics.__class__)
         self.assertTrue(t1.entry_set.__class__ is t2.entry_set.__class__)
+
+    def test_m2m_abstract_split(self):
+        # Regression for #19236 - an abstract class with a 'split' method
+        # causes a TypeError in add_lazy_relation
+        m1 = RegressionModelSplit(name='1')
+        m1.save()

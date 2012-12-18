@@ -947,7 +947,7 @@ __ http://geohash.org/
 
 .. method:: GeoQuerySet.geojson(**kwargs)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite
 
 Attaches a ``geojson`` attribute to every model in the queryset that contains the
 `GeoJSON`__ representation of the geometry.

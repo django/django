@@ -267,7 +267,9 @@ class ManyToOneTests(TestCase):
             ["<Reporter: John Smith>"])
         self.assertQuerysetEqual(
             Reporter.objects.filter(article__headline__startswith='T'),
-            ["<Reporter: John Smith>", "<Reporter: John Smith>"])
+            ["<Reporter: John Smith>", "<Reporter: John Smith>"],
+            ordered=False
+        )
         self.assertQuerysetEqual(
             Reporter.objects.filter(article__headline__startswith='T').distinct(),
             ["<Reporter: John Smith>"])
@@ -285,7 +287,9 @@ class ManyToOneTests(TestCase):
                 "<Reporter: John Smith>",
                 "<Reporter: John Smith>",
                 "<Reporter: John Smith>",
-            ])
+            ],
+            ordered=False
+        )
         self.assertQuerysetEqual(
             Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct(),
             ["<Reporter: John Smith>"])

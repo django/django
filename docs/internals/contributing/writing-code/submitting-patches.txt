@@ -52,8 +52,15 @@ and time availability), claim it by following these steps:
      page,
   2. then click "Submit changes."
 
+.. note::
+    The Django software foundation requests that anyone contributing more than
+    a trivial patch to Django sign and submit a `Contributor License
+    Agreement`_, this ensures that the Django Software Foundation has clear
+    license to all contributions allowing for a clear license for all users.
+
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
+.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
 
 Ticket claimers' responsibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

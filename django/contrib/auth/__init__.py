@@ -1,6 +1,6 @@
 import re
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -60,6 +60,9 @@ def authenticate(**credentials):
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
+        except PermissionDenied:
+            # This backend says to stop in our tracks - this user should not be allowed in at all.
+            return None
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
@@ -81,14 +84,14 @@ def login(request, user):
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
     if SESSION_KEY in request.session:
-        if request.session[SESSION_KEY] != user.id:
+        if request.session[SESSION_KEY] != user.pk:
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
             request.session.flush()
     else:
         request.session.cycle_key()
-    request.session[SESSION_KEY] = user.id
+    request.session[SESSION_KEY] = user.pk
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):
         request.user = user

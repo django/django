@@ -19,14 +19,14 @@ class BaseCommentAbstractModel(models.Model):
     """
 
     # Content-object field
-    content_type   = models.ForeignKey(ContentType,
+    content_type = models.ForeignKey(ContentType,
             verbose_name=_('content type'),
             related_name="content_type_set_for_%(class)s")
-    object_pk      = models.TextField(_('object ID'))
+    object_pk = models.TextField(_('object ID'))
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     # Metadata about the comment
-    site        = models.ForeignKey(Site)
+    site = models.ForeignKey(Site)
 
     class Meta:
         abstract = True
@@ -50,21 +50,21 @@ class Comment(BaseCommentAbstractModel):
     # Who posted this comment? If ``user`` is set then it was an authenticated
     # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
-    user        = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'),
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'),
                     blank=True, null=True, related_name="%(class)s_comments")
-    user_name   = models.CharField(_("user's name"), max_length=50, blank=True)
-    user_email  = models.EmailField(_("user's email address"), blank=True)
-    user_url    = models.URLField(_("user's URL"), blank=True)
+    user_name = models.CharField(_("user's name"), max_length=50, blank=True)
+    user_email = models.EmailField(_("user's email address"), blank=True)
+    user_url = models.URLField(_("user's URL"), blank=True)
 
     comment = models.TextField(_('comment'), max_length=COMMENT_MAX_LENGTH)
 
     # Metadata about the comment
     submit_date = models.DateTimeField(_('date/time submitted'), default=None)
-    ip_address  = models.IPAddressField(_('IP address'), blank=True, null=True)
-    is_public   = models.BooleanField(_('is public'), default=True,
+    ip_address = models.IPAddressField(_('IP address'), blank=True, null=True)
+    is_public = models.BooleanField(_('is public'), default=True,
                     help_text=_('Uncheck this box to make the comment effectively ' \
                                 'disappear from the site.'))
-    is_removed  = models.BooleanField(_('is removed'), default=False,
+    is_removed = models.BooleanField(_('is removed'), default=False,
                     help_text=_('Check this box if the comment is inappropriate. ' \
                                 'A "This comment has been removed" message will ' \
                                 'be displayed instead.'))
@@ -96,9 +96,9 @@ class Comment(BaseCommentAbstractModel):
         """
         if not hasattr(self, "_userinfo"):
             userinfo = {
-                "name"  : self.user_name,
-                "email" : self.user_email,
-                "url"   : self.user_url
+                "name": self.user_name,
+                "email": self.user_email,
+                "url": self.user_url
             }
             if self.user_id:
                 u = self.user
@@ -111,7 +111,7 @@ class Comment(BaseCommentAbstractModel):
                 if u.get_full_name():
                     userinfo["name"] = self.user.get_full_name()
                 elif not self.user_name:
-                    userinfo["name"] = u.username
+                    userinfo["name"] = u.get_username()
             self._userinfo = userinfo
         return self._userinfo
     userinfo = property(_get_userinfo, doc=_get_userinfo.__doc__)
@@ -174,9 +174,9 @@ class CommentFlag(models.Model):
     design users are only allowed to flag a comment with a given flag once;
     if you want rating look elsewhere.
     """
-    user      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), related_name="comment_flags")
-    comment   = models.ForeignKey(Comment, verbose_name=_('comment'), related_name="flags")
-    flag      = models.CharField(_('flag'), max_length=30, db_index=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), related_name="comment_flags")
+    comment = models.ForeignKey(Comment, verbose_name=_('comment'), related_name="flags")
+    flag = models.CharField(_('flag'), max_length=30, db_index=True)
     flag_date = models.DateTimeField(_('date'), default=None)
 
     # Constants for flag types
@@ -192,7 +192,7 @@ class CommentFlag(models.Model):
 
     def __str__(self):
         return "%s flag of comment ID %s by %s" % \
-            (self.flag, self.comment_id, self.user.username)
+            (self.flag, self.comment_id, self.user.get_username())
 
     def save(self, *args, **kwargs):
         if self.flag_date is None:

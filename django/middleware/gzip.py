@@ -1,6 +1,6 @@
 import re
 
-from django.utils.text import compress_string
+from django.utils.text import compress_sequence, compress_string
 from django.utils.cache import patch_vary_headers
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
@@ -13,7 +13,7 @@ class GZipMiddleware(object):
     """
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
-        if len(response.content) < 200:
+        if not response.streaming and len(response.content) < 200:
             return response
 
         patch_vary_headers(response, ('Accept-Encoding',))
@@ -32,15 +32,21 @@ class GZipMiddleware(object):
         if not re_accepts_gzip.search(ae):
             return response
 
-        # Return the compressed content only if it's actually shorter.
-        compressed_content = compress_string(response.content)
-        if len(compressed_content) >= len(response.content):
-            return response
+        if response.streaming:
+            # Delete the `Content-Length` header for streaming content, because
+            # we won't know the compressed size until we stream it.
+            response.streaming_content = compress_sequence(response.streaming_content)
+            del response['Content-Length']
+        else:
+            # Return the compressed content only if it's actually shorter.
+            compressed_content = compress_string(response.content)
+            if len(compressed_content) >= len(response.content):
+                return response
+            response.content = compressed_content
+            response['Content-Length'] = str(len(response.content))
 
         if response.has_header('ETag'):
             response['ETag'] = re.sub('"$', ';gzip"', response['ETag'])
-
-        response.content = compressed_content
         response['Content-Encoding'] = 'gzip'
-        response['Content-Length'] = str(len(response.content))
+
         return response

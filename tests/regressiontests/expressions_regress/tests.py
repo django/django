@@ -26,12 +26,13 @@ class ExpressionsRegressTests(TestCase):
         same object.
         """
         self.assertQuerysetEqual(
-                Number.objects.all(),
-                [
-                    '<Number: -1, -1.000>',
-                    '<Number: 42, 42.000>',
-                    '<Number: 1337, 1337.000>'
-                ]
+            Number.objects.all(),
+            [
+                '<Number: -1, -1.000>',
+                '<Number: 42, 42.000>',
+                '<Number: 1337, 1337.000>'
+            ],
+            ordered=False
         )
 
     def test_increment_value(self):
@@ -44,12 +45,13 @@ class ExpressionsRegressTests(TestCase):
             2)
 
         self.assertQuerysetEqual(
-                Number.objects.all(),
-                [
-                    '<Number: -1, -1.000>',
-                    '<Number: 43, 42.000>',
-                    '<Number: 1338, 1337.000>'
-                ]
+            Number.objects.all(),
+            [
+                '<Number: -1, -1.000>',
+                '<Number: 43, 42.000>',
+                '<Number: 1338, 1337.000>'
+            ],
+            ordered=False
         )
 
     def test_filter_not_equals_other_field(self):
@@ -62,11 +64,12 @@ class ExpressionsRegressTests(TestCase):
                   .update(integer=F('integer') + 1),
             2)
         self.assertQuerysetEqual(
-                Number.objects.exclude(float=F('integer')),
-                [
-                    '<Number: 43, 42.000>',
-                    '<Number: 1338, 1337.000>'
-                ]
+            Number.objects.exclude(float=F('integer')),
+            [
+                '<Number: 43, 42.000>',
+                '<Number: 1338, 1337.000>'
+            ],
+            ordered=False
         )
 
     def test_complex_expressions(self):
@@ -371,7 +374,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_and(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')&self.deltas[0]))
+            r = repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary and a datetime with a timedelta.")
@@ -379,7 +382,7 @@ class FTimeDeltaTests(TestCase):
     def test_delta_invalid_op_or(self):
         raised = False
         try:
-            r = repr(Experiment.objects.filter(end__lt=F('start')|self.deltas[0]))
+            r = repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
         except TypeError:
             raised = True
         self.assertTrue(raised, "TypeError not raised on attempt to binary or a datetime with a timedelta.")

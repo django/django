@@ -19,6 +19,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
+from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
@@ -296,7 +297,7 @@ class AppStaticStorage(FileSystemStorage):
         """
         # app is the actual app module
         mod = import_module(app)
-        mod_path = os.path.dirname(mod.__file__)
+        mod_path = os.path.dirname(upath(mod.__file__))
         location = os.path.join(mod_path, self.source_dir)
         super(AppStaticStorage, self).__init__(location, *args, **kwargs)
 

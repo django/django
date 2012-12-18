@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.utils._os import upath
 from django.utils import six
 
 import imp
@@ -24,24 +25,24 @@ class AppCache(object):
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
     __shared_state = dict(
         # Keys of app_store are the model modules for each application.
-        app_store = SortedDict(),
+        app_store=SortedDict(),
 
         # Mapping of installed app_labels to model modules for that app.
-        app_labels = {},
+        app_labels={},
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
-        app_models = SortedDict(),
+        app_models=SortedDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
+        app_errors={},
 
         # -- Everything below here is only used when populating the cache --
-        loaded = False,
-        handled = {},
-        postponed = [],
-        nesting_level = 0,
-        _get_models_cache = {},
+        loaded=False,
+        handled={},
+        postponed=[],
+        nesting_level=0,
+        _get_models_cache={},
     )
 
     def __init__(self):
@@ -167,7 +168,7 @@ class AppCache(object):
 
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,
-                   only_installed=True):
+                   only_installed=True, include_swapped=False):
         """
         Given a module containing models, returns a list of the models.
         Otherwise returns a list of all installed models.
@@ -179,8 +180,16 @@ class AppCache(object):
         By default, models created to satisfy deferred attribute
         queries are *not* included in the list of models. However, if
         you specify include_deferred, they will be.
+
+        By default, models that aren't part of installed apps will *not*
+        be included in the list of models. However, if you specify
+        only_installed=False, they will be.
+
+        By default, models that have been swapped out will *not* be
+        included in the list of models. However, if you specify
+        include_swapped, they will be.
         """
-        cache_key = (app_mod, include_auto_created, include_deferred, only_installed)
+        cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
         try:
             return self._get_models_cache[cache_key]
         except KeyError:
@@ -203,7 +212,8 @@ class AppCache(object):
             model_list.extend(
                 model for model in app.values()
                 if ((not model._deferred or include_deferred) and
-                    (not model._meta.auto_created or include_auto_created))
+                    (not model._meta.auto_created or include_auto_created) and
+                    (not model._meta.swapped or include_swapped))
             )
         self._get_models_cache[cache_key] = model_list
         return model_list
@@ -235,8 +245,8 @@ class AppCache(object):
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
                 # filename as a means to detect identity.
-                fname1 = os.path.abspath(sys.modules[model.__module__].__file__)
-                fname2 = os.path.abspath(sys.modules[model_dict[model_name].__module__].__file__)
+                fname1 = os.path.abspath(upath(sys.modules[model.__module__].__file__))
+                fname2 = os.path.abspath(upath(sys.modules[model_dict[model_name].__module__].__file__))
                 # Since the filename extension could be .py the first time and
                 # .pyc or .pyo the second time, ignore the extension when
                 # comparing.

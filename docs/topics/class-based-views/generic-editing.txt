@@ -90,8 +90,8 @@ class:
 .. code-block:: python
 
     # models.py
-    from django import models
     from django.core.urlresolvers import reverse
+    from django.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -102,7 +102,7 @@ class:
 Then we can use :class:`CreateView` and friends to do the actual
 work. Notice how we're just configuring the generic class-based views
 here; we don't have to write any logic ourselves::
-   
+
     # views.py
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
     from django.core.urlresolvers import reverse_lazy
@@ -134,7 +134,7 @@ Finally, we hook these new views into the URLconf::
         url(r'author/(?P<pk>\d+)/$', AuthorUpdate.as_view(), name='author_update'),
         url(r'author/(?P<pk>\d+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
     )
-        
+
 .. note::
 
     These views inherit :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
@@ -160,8 +160,8 @@ you can use a custom :class:`ModelForm` to do this. First, add the
 foreign key relation to the model::
 
     # models.py
-    from django import models
     from django.contrib.auth import User
+    from django.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -177,7 +177,7 @@ Create a custom :class:`ModelForm` in order to exclude the
     # forms.py
     from django import forms
     from myapp.models import Author
-    
+
     class AuthorForm(forms.ModelForm):
         class Meta:
             model = Author
@@ -190,7 +190,7 @@ In the view, use the custom :attr:`form_class` and override
     from django.views.generic.edit import CreateView
     from myapp.models import Author
     from myapp.forms import AuthorForm
-    
+
     class AuthorCreate(CreateView):
         form_class = AuthorForm
         model = Author

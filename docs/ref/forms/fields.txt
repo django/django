@@ -405,7 +405,7 @@ For each field, we describe the default widget used if you don't specify
     Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
     following will also be included in the default input formats::
 
-        '%b %m %d',       # 'Oct 25 2006'
+        '%b %d %Y',       # 'Oct 25 2006'
         '%b %d, %Y',      # 'Oct 25, 2006'
         '%d %b %Y',       # '25 Oct 2006'
         '%d %b, %Y',      # '25 Oct, 2006'
@@ -413,6 +413,8 @@ For each field, we describe the default widget used if you don't specify
         '%B %d, %Y',      # 'October 25, 2006'
         '%d %B %Y',       # '25 October 2006'
         '%d %B, %Y',      # '25 October, 2006'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -444,6 +446,8 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
+
+    See also :ref:`format localization <format-localization>`.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -679,7 +683,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: unpack_ipv4
 
-        Unpacks IPv4 mapped addresses like ``::ffff::192.0.2.1``.
+        Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
         If this option is enabled that address would be unpacked to
         ``192.0.2.1``. Default is disabled. Can only be used
         when ``protocol`` is set to ``'both'``.

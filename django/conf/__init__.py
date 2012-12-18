@@ -6,6 +6,7 @@ variable, and then from django.conf.global_settings; see the global settings fil
 a list of all possible variables.
 """
 
+import logging
 import os
 import time     # Needed for Windows
 import warnings
@@ -25,7 +26,7 @@ class LazySettings(LazyObject):
     The user can manually configure settings prior to using them. Otherwise,
     Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
-    def _setup(self, name):
+    def _setup(self, name=None):
         """
         Load the settings module pointed to by the environment variable. This
         is used the first time we need any settings at all, if the user has not
@@ -36,11 +37,12 @@ class LazySettings(LazyObject):
             if not settings_module: # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
+            desc = ("setting %s" % name) if name else "settings"
             raise ImproperlyConfigured(
-                "Requested setting %s, but settings are not configured. "
+                "Requested %s, but settings are not configured. "
                 "You must either define the environment variable %s "
                 "or call settings.configure() before accessing settings."
-                % (name, ENVIRONMENT_VARIABLE))
+                % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
         self._configure_logging()
@@ -54,6 +56,15 @@ class LazySettings(LazyObject):
         """
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
+        try:
+            # Route warnings through python logging
+            logging.captureWarnings(True)
+            # Allow DeprecationWarnings through the warnings filters
+            warnings.simplefilter("default", DeprecationWarning)
+        except AttributeError:
+            # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
+            pass
+
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING
             # First find the logging configuration function ...
@@ -82,6 +93,7 @@ class LazySettings(LazyObject):
         for name, value in options.items():
             setattr(holder, name, value)
         self._wrapped = holder
+        self._configure_logging()
 
     @property
     def configured(self):
@@ -98,9 +110,6 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        elif name == "ADMIN_MEDIA_PREFIX":
-            warnings.warn("The ADMIN_MEDIA_PREFIX setting has been removed; "
-                          "use STATIC_URL instead.", DeprecationWarning)
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")

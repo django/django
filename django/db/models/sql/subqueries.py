@@ -48,6 +48,11 @@ class DeleteQuery(Query):
             self.do_query(self.model._meta.db_table, where, using=using)
 
     def delete_qs(self, query, using):
+        """
+        Delete the queryset in one SQL query (if possible). For simple queries
+        this is done by copying the query.query.where to self.query, for
+        complex queries by using subquery.
+        """
         innerq = query.query
         # Make sure the inner query has at least one table in use.
         innerq.get_initial_alias()
@@ -70,8 +75,9 @@ class DeleteQuery(Query):
                 self.delete_batch(values, using)
                 return
             else:
+                innerq.clear_select_clause()
+                innerq.select = [SelectInfo((self.get_initial_alias(), pk.column), None)]
                 values = innerq
-                innerq.select = [(self.get_initial_alias(), pk.column)]
             where = self.where_class()
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
             self.where = where
@@ -237,11 +243,8 @@ class DateQuery(Query):
                 % field.name
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
-        self.select = [select]
-        self.select_fields = [None]
-        self.select_related = False # See #7097.
-        self.aggregates = SortedDict() # See 18056.
-        self.set_extra_mask([])
+        self.clear_select_clause()
+        self.select = [SelectInfo(select, None)]
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

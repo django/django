@@ -1,25 +1,18 @@
 from datetime import time, date, datetime
 
 from django import forms
-from django.conf import settings
+from django.test.utils import override_settings
 from django.utils.translation import activate, deactivate
-from django.utils.unittest import TestCase
+from django.test import SimpleTestCase
 
 
-class LocalizedTimeTests(TestCase):
+@override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)
+class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
-        self.old_TIME_INPUT_FORMATS = settings.TIME_INPUT_FORMATS
-        self.old_USE_L10N = settings.USE_L10N
-
-        settings.TIME_INPUT_FORMATS = ["%I:%M:%S %p", "%I:%M %p"]
-        settings.USE_L10N = True
-
-        activate('de')
+        # nl/formats.py has customized TIME_INPUT_FORMATS
+        activate('nl')
 
     def tearDown(self):
-        settings.TIME_INPUT_FORMATS = self.old_TIME_INPUT_FORMATS
-        settings.USE_L10N = self.old_USE_L10N
-
         deactivate()
 
     def test_timeField(self):
@@ -100,7 +93,7 @@ class LocalizedTimeTests(TestCase):
         result = f.clean('13.30.05')
         self.assertEqual(result, time(13,30,5))
 
-        # # Check that the parsed result does a round trip to the same format
+        # Check that the parsed result does a round trip to the same format
         text = f.widget._format_value(result)
         self.assertEqual(text, "13:30:05")
 
@@ -113,14 +106,8 @@ class LocalizedTimeTests(TestCase):
         self.assertEqual(text, "13:30:00")
 
 
-class CustomTimeInputFormatsTests(TestCase):
-    def setUp(self):
-        self.old_TIME_INPUT_FORMATS = settings.TIME_INPUT_FORMATS
-        settings.TIME_INPUT_FORMATS = ["%I:%M:%S %p", "%I:%M %p"]
-
-    def tearDown(self):
-        settings.TIME_INPUT_FORMATS = self.old_TIME_INPUT_FORMATS
-
+@override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"])
+class CustomTimeInputFormatsTests(SimpleTestCase):
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
         f = forms.TimeField()
@@ -212,7 +199,7 @@ class CustomTimeInputFormatsTests(TestCase):
         self.assertEqual(text, "01:30:00 PM")
 
 
-class SimpleTimeFormatTests(TestCase):
+class SimpleTimeFormatTests(SimpleTestCase):
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
         f = forms.TimeField()
@@ -302,20 +289,12 @@ class SimpleTimeFormatTests(TestCase):
         self.assertEqual(text, "13:30:00")
 
 
-class LocalizedDateTests(TestCase):
+@override_settings(DATE_INPUT_FORMATS=["%d/%m/%Y", "%d-%m-%Y"], USE_L10N=True)
+class LocalizedDateTests(SimpleTestCase):
     def setUp(self):
-        self.old_DATE_INPUT_FORMATS = settings.DATE_INPUT_FORMATS
-        self.old_USE_L10N = settings.USE_L10N
-
-        settings.DATE_INPUT_FORMATS = ["%d/%m/%Y", "%d-%m-%Y"]
-        settings.USE_L10N = True
-
         activate('de')
 
     def tearDown(self):
-        settings.DATE_INPUT_FORMATS = self.old_DATE_INPUT_FORMATS
-        settings.USE_L10N = self.old_USE_L10N
-
         deactivate()
 
     def test_dateField(self):
@@ -324,6 +303,9 @@ class LocalizedDateTests(TestCase):
         # Parse a date in an unaccepted format; get an error
         self.assertRaises(forms.ValidationError, f.clean, '21/12/2010')
 
+        # ISO formats are accepted, even if not specified in formats.py
+        self.assertEqual(f.clean('2010-12-21'), date(2010,12,21))
+
         # Parse a date in a valid format, get a parsed result
         result = f.clean('21.12.2010')
         self.assertEqual(result, date(2010,12,21))
@@ -410,14 +392,9 @@ class LocalizedDateTests(TestCase):
         text = f.widget._format_value(result)
         self.assertEqual(text, "21.12.2010")
 
-class CustomDateInputFormatsTests(TestCase):
-    def setUp(self):
-        self.old_DATE_INPUT_FORMATS = settings.DATE_INPUT_FORMATS
-        settings.DATE_INPUT_FORMATS = ["%d.%m.%Y", "%d-%m-%Y"]
 
-    def tearDown(self):
-        settings.DATE_INPUT_FORMATS = self.old_DATE_INPUT_FORMATS
-
+@override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y", "%d-%m-%Y"])
+class CustomDateInputFormatsTests(SimpleTestCase):
     def test_dateField(self):
         "DateFields can parse dates in the default format"
         f = forms.DateField()
@@ -508,7 +485,7 @@ class CustomDateInputFormatsTests(TestCase):
         text = f.widget._format_value(result)
         self.assertEqual(text, "21.12.2010")
 
-class SimpleDateFormatTests(TestCase):
+class SimpleDateFormatTests(SimpleTestCase):
     def test_dateField(self):
         "DateFields can parse dates in the default format"
         f = forms.DateField()
@@ -597,20 +574,13 @@ class SimpleDateFormatTests(TestCase):
         text = f.widget._format_value(result)
         self.assertEqual(text, "2010-12-21")
 
-class LocalizedDateTimeTests(TestCase):
+
+@override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"], USE_L10N=True)
+class LocalizedDateTimeTests(SimpleTestCase):
     def setUp(self):
-        self.old_DATETIME_INPUT_FORMATS = settings.DATETIME_INPUT_FORMATS
-        self.old_USE_L10N = settings.USE_L10N
-
-        settings.DATETIME_INPUT_FORMATS = ["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"]
-        settings.USE_L10N = True
-
         activate('de')
 
     def tearDown(self):
-        settings.DATETIME_INPUT_FORMATS = self.old_DATETIME_INPUT_FORMATS
-        settings.USE_L10N = self.old_USE_L10N
-
         deactivate()
 
     def test_dateTimeField(self):
@@ -618,6 +588,9 @@ class LocalizedDateTimeTests(TestCase):
         f = forms.DateTimeField()
         # Parse a date in an unaccepted format; get an error
         self.assertRaises(forms.ValidationError, f.clean, '1:30:05 PM 21/12/2010')
+
+        # ISO formats are accepted, even if not specified in formats.py
+        self.assertEqual(f.clean('2010-12-21 13:30:05'), datetime(2010,12,21,13,30,5))
 
         # Parse a date in a valid format, get a parsed result
         result = f.clean('21.12.2010 13:30:05')
@@ -706,14 +679,8 @@ class LocalizedDateTimeTests(TestCase):
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
-class CustomDateTimeInputFormatsTests(TestCase):
-    def setUp(self):
-        self.old_DATETIME_INPUT_FORMATS = settings.DATETIME_INPUT_FORMATS
-        settings.DATETIME_INPUT_FORMATS = ["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"]
-
-    def tearDown(self):
-        settings.DATETIME_INPUT_FORMATS = self.old_DATETIME_INPUT_FORMATS
-
+@override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"])
+class CustomDateTimeInputFormatsTests(SimpleTestCase):
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"
         f = forms.DateTimeField()
@@ -804,7 +771,7 @@ class CustomDateTimeInputFormatsTests(TestCase):
         text = f.widget._format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
 
-class SimpleDateTimeFormatTests(TestCase):
+class SimpleDateTimeFormatTests(SimpleTestCase):
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"
         f = forms.DateTimeField()

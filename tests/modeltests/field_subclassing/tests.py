@@ -77,7 +77,8 @@ class CustomField(TestCase):
                 "12",
                 "23",
             ],
-            lambda m: str(m.data)
+            lambda m: str(m.data),
+            ordered=False
         )
 
     def test_field_subclassing(self):

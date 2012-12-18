@@ -61,7 +61,8 @@ class ManagersRegressionTests(TestCase):
         self.assertQuerysetEqual(Child4.manager1.all(), [
                 "<Child4: d1>",
                 "<Child4: f1>"
-            ]
+            ],
+            ordered=False
         )
         self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
         self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>"])

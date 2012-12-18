@@ -187,8 +187,12 @@ class override_settings(object):
         self.disable()
 
     def __call__(self, test_func):
-        from django.test import TransactionTestCase
-        if isinstance(test_func, type) and issubclass(test_func, TransactionTestCase):
+        from django.test import SimpleTestCase
+        if isinstance(test_func, type):
+            if not issubclass(test_func, SimpleTestCase):
+                raise Exception(
+                    "Only subclasses of Django SimpleTestCase can be decorated "
+                    "with override_settings")
             original_pre_setup = test_func._pre_setup
             original_post_teardown = test_func._post_teardown
 
@@ -227,9 +231,10 @@ class override_settings(object):
 
 
 def compare_xml(want, got):
-    """Tries to do a 'xml-comparision' of want and got.  Plain string
-    comparision doesn't always work because, for example, attribute
-    ordering should not be important.
+    """Tries to do a 'xml-comparison' of want and got.  Plain string
+    comparison doesn't always work because, for example, attribute
+    ordering should not be important. Comment nodes are not considered in the
+    comparison.
 
     Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
     """
@@ -267,6 +272,11 @@ def compare_xml(want, got):
                 return False
         return True
 
+    def first_node(document):
+        for node in document.childNodes:
+            if node.nodeType != Node.COMMENT_NODE:
+                return node
+
     want, got = strip_quotes(want, got)
     want = want.replace('\\n','\n')
     got = got.replace('\\n','\n')
@@ -279,8 +289,8 @@ def compare_xml(want, got):
         got = wrapper % got
 
     # Parse the want and got strings, and compare the parsings.
-    want_root = parseString(want).firstChild
-    got_root = parseString(got).firstChild
+    want_root = first_node(parseString(want))
+    got_root = first_node(parseString(got))
 
     return check_element(want_root, got_root)
 

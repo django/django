@@ -704,7 +704,7 @@ def get_digit(value, arg):
 @register.filter(expects_localtime=True, is_safe=False)
 def date(value, arg=None):
     """Formats a date according to the given format."""
-    if not value:
+    if value in (None, ''):
         return ''
     if arg is None:
         arg = settings.DATE_FORMAT

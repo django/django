@@ -6,8 +6,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy
 
-ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
-        "for a staff account. Note that both fields are case-sensitive.")
+ERROR_MESSAGE = ugettext_lazy("Please enter the correct %(username)s and password "
+        "for a staff account. Note that both fields may be case-sensitive.")
 
 
 class AdminAuthenticationForm(AuthenticationForm):
@@ -26,8 +26,12 @@ class AdminAuthenticationForm(AuthenticationForm):
         if username and password:
             self.user_cache = authenticate(username=username, password=password)
             if self.user_cache is None:
-                raise forms.ValidationError(message)
+                raise forms.ValidationError(message % {
+                    'username': self.username_field.verbose_name
+                })
             elif not self.user_cache.is_active or not self.user_cache.is_staff:
-                raise forms.ValidationError(message)
+                raise forms.ValidationError(message % {
+                    'username': self.username_field.verbose_name
+                })
         self.check_for_test_cookie()
         return self.cleaned_data

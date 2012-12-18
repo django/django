@@ -146,13 +146,14 @@ class GeoQuerySet(QuerySet):
         """
         backend = connections[self.db].ops
         if not backend.geojson:
-            raise NotImplementedError('Only PostGIS 1.3.4+ supports GeoJSON serialization.')
+            raise NotImplementedError('Only PostGIS 1.3.4+ and SpatiaLite 3.0+ '
+                                      'support GeoJSON serialization.')
 
         if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')
 
         # Setting the options flag -- which depends on which version of
-        # PostGIS we're using.
+        # PostGIS we're using. SpatiaLite only uses the first group of options.
         if backend.spatial_version >= (1, 4, 0):
             options = 0
             if crs and bbox: options = 3
@@ -759,8 +760,10 @@ class GeoQuerySet(QuerySet):
             self.query.add_select_related([field_name])
             compiler = self.query.get_compiler(self.db)
             compiler.pre_sql_setup()
-            rel_table, rel_col = self.query.related_select_cols[self.query.related_select_fields.index(geo_field)]
-            return compiler._field_column(geo_field, rel_table)
+            for (rel_table, rel_col), field in self.query.related_select_cols:
+                if field == geo_field:
+                    return compiler._field_column(geo_field, rel_table)
+            raise ValueError("%r not in self.query.related_select_cols" % geo_field)
         elif not geo_field in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.

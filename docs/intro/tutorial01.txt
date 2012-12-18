@@ -52,25 +52,8 @@ code, then run the following command:
 
    django-admin.py startproject mysite
 
-This will create a ``mysite`` directory in your current directory.  If it didn't 
-work, see :doc:`Troubleshooting </faq/troubleshooting>`.
-
-.. admonition:: Script name may differ in distribution packages
-
-   If you installed Django using a Linux distribution's package manager
-   (e.g. apt-get or yum) ``django-admin.py`` may have been renamed to
-   ``django-admin``. You may continue through this documentation by omitting
-   ``.py`` from each command.
-
-.. admonition:: Mac OS X permissions
-
-   If you're using Mac OS X, you may see the message "permission denied" when
-   you try to run ``django-admin.py startproject``. This is because, on
-   Unix-based systems like OS X, a file must be marked as "executable" before it
-   can be run as a program. To do this, open Terminal.app and navigate (using
-   the ``cd`` command) to the directory where :doc:`django-admin.py
-   </ref/django-admin>` is installed, then run the command
-   ``sudo chmod +x django-admin.py``.
+This will create a ``mysite`` directory in your current directory. If it didn't
+work, see :ref:`troubleshooting-django-admin-py`.
 
 .. note::
 
@@ -81,12 +64,12 @@ work, see :doc:`Troubleshooting </faq/troubleshooting>`.
 
 .. admonition:: Where should this code live?
 
-    If your background is in PHP, you're probably used to putting code under the
-    Web server's document root (in a place such as ``/var/www``). With Django,
-    you don't do that. It's not a good idea to put any of this Python code
-    within your Web server's document root, because it risks the possibility
-    that people may be able to view your code over the Web. That's not good for
-    security.
+    If your background is in plain old PHP (with no use of modern frameworks),
+    you're probably used to putting code under the Web server's document root
+    (in a place such as ``/var/www``). With Django, you don't do that. It's
+    not a good idea to put any of this Python code within your Web server's
+    document root, because it risks the possibility that people may be able
+    to view your code over the Web. That's not good for security.
 
     Put your code in some directory **outside** of the document root, such as
     :file:`/home/mycode`.
@@ -220,8 +203,8 @@ your database connection settings.
   SQLite).
 
 * :setting:`HOST` -- The host your database is on. Leave this as
-  an empty string if your database server is on the same physical
-  machine (not used for SQLite).
+  an empty string (or possibly ``127.0.0.1``) if your database server is on the
+  same physical machine (not used for SQLite). See :setting:`HOST` for details.
 
 If you're new to databases, we recommend simply using SQLite by setting
 :setting:`ENGINE` to ``'django.db.backends.sqlite3'`` and :setting:`NAME` to
@@ -666,6 +649,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Poll.objects.get(pub_date__year=2012)
     <Poll: What's up?>
 
+    # Request an ID that doesn't exist, this will raise an exception.
     >>> Poll.objects.get(id=2)
     Traceback (most recent call last):
         ...

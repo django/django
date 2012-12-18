@@ -56,6 +56,10 @@ urlpatterns = patterns('',
     (r'^detail/nonmodel/1/$',
         views.NonModelDetail.as_view()),
 
+    # FormView
+    (r'^contact/$',
+        views.ContactView.as_view()),
+
     # Create/UpdateView
     (r'^edit/artists/create/$',
         views.ArtistCreate.as_view()),
@@ -133,6 +137,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(paginate_by=30)),
     (r'^list/authors/paginated/(?P<page>\d+)/$',
         views.AuthorList.as_view(paginate_by=30)),
+    (r'^list/authors/paginated-orphaned/$',
+        views.AuthorList.as_view(paginate_by=30, paginate_orphans=2)),
     (r'^list/authors/notempty/$',
         views.AuthorList.as_view(allow_empty=False)),
     (r'^list/authors/notempty/paginated/$',
@@ -149,6 +155,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(queryset=None)),
     (r'^list/authors/paginated/custom_class/$',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
+    (r'^list/authors/paginated/custom_page_kwarg/$',
+        views.AuthorList.as_view(paginate_by=30, page_kwarg='pagina')),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
 

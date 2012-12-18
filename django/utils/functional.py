@@ -5,9 +5,9 @@ import sys
 
 from django.utils import six
 
-# You can't trivially replace this `functools.partial` because this binds to
-# classes and returns bound instances, whereas functools.partial (on CPython)
-# is a type and its instances don't bind.
+# You can't trivially replace this with `functools.partial` because this binds
+# to classes and returns bound instances, whereas functools.partial (on
+# CPython) is a type and its instances don't bind.
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
@@ -33,8 +33,8 @@ def memoize(func, cache, num_args):
 
 class cached_property(object):
     """
-    Decorator that creates converts a method with a single
-    self argument into a property cached on the instance.
+    Decorator that converts a method with a single self argument into a
+    property cached on the instance.
     """
     def __init__(self, func):
         self.func = func
@@ -292,6 +292,16 @@ class SimpleLazyObject(LazyObject):
         if self._wrapped is empty:
             self._setup()
         return self._wrapped.__dict__
+
+    # Python 3.3 will call __reduce__ when pickling; these methods are needed
+    # to serialize and deserialize correctly. They are not called in earlier
+    # versions of Python.
+    @classmethod
+    def __newobj__(cls, *args):
+        return cls.__new__(cls, *args)
+
+    def __reduce__(self):
+        return (self.__newobj__, (self.__class__,), self.__getstate__())
 
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)

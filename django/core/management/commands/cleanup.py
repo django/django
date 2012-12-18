@@ -1,11 +1,11 @@
-from django.core.management.base import NoArgsCommand
-from django.utils import timezone
+import warnings
 
-class Command(NoArgsCommand):
-    help = "Can be run as a cronjob or directly to clean out old data from the database (only expired sessions at the moment)."
+from django.contrib.sessions.management.commands import clearsessions
 
+
+class Command(clearsessions.Command):
     def handle_noargs(self, **options):
-        from django.db import transaction
-        from django.contrib.sessions.models import Session
-        Session.objects.filter(expire_date__lt=timezone.now()).delete()
-        transaction.commit_unless_managed()
+        warnings.warn(
+            "The `cleanup` command has been deprecated in favor of `clearsessions`.",
+            PendingDeprecationWarning)
+        super(Command, self).handle_noargs(**options)

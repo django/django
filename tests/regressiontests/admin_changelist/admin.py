@@ -32,6 +32,7 @@ class ParentAdmin(admin.ModelAdmin):
 class ChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']
     list_per_page = 10
+    list_filter = ['parent', 'age']
 
     def queryset(self, request):
         return super(ChildAdmin, self).queryset(request).select_related("parent__name")
@@ -90,3 +91,14 @@ class SwallowAdmin(admin.ModelAdmin):
     list_display = ('origin', 'load', 'speed')
 
 site.register(Swallow, SwallowAdmin)
+
+class DynamicListFilterChildAdmin(admin.ModelAdmin):
+    list_filter = ('parent', 'name', 'age')
+
+    def get_list_filter(self, request):
+        my_list_filter = super(DynamicListFilterChildAdmin, self).get_list_filter(request)
+        if request.user.username == 'noparents':
+            my_list_filter = list(my_list_filter)
+            my_list_filter.remove('parent')
+        return my_list_filter
+

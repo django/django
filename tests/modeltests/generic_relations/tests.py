@@ -169,8 +169,8 @@ class GenericRelationsTests(TestCase):
         # Filtering works
         self.assertQuerysetEqual(tiger.comparisons.filter(comparative="cooler"), [
             "<Comparison: tiger is cooler than cheetah>",
-            "<Comparison: tiger is cooler than bear>"
-        ])
+            "<Comparison: tiger is cooler than bear>",
+        ], ordered=False)
 
         # Filtering and deleting works
         subjective = ["cooler"]
@@ -178,7 +178,7 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(Comparison.objects.all(), [
             "<Comparison: cheetah is faster than tiger>",
             "<Comparison: tiger is stronger than cheetah>"
-        ])
+        ], ordered=False)
 
         # If we delete cheetah, Comparisons with cheetah as 'first_obj' will be
         # deleted since Animal has an explicit GenericRelation to Comparison

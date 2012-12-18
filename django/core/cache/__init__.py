@@ -93,8 +93,6 @@ def parse_backend_conf(backend, **kwargs):
             raise InvalidCacheBackendError("Could not find backend '%s'" % backend)
         location = kwargs.pop('LOCATION', '')
         return backend, location, kwargs
-    raise InvalidCacheBackendError(
-        "Couldn't find a cache backend named '%s'" % backend)
 
 def get_cache(backend, **kwargs):
     """
@@ -136,11 +134,9 @@ def get_cache(backend, **kwargs):
             "Could not find backend '%s': %s" % (backend, e))
     cache = backend_cls(location, params)
     # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If the cache provides a close() method, wire it up
-    # here.
-    if hasattr(cache, 'close'):
-        signals.request_finished.connect(cache.close)
+    # end of a request cycle. If not implemented in a particular backend
+    # cache.close is a no-op
+    signals.request_finished.connect(cache.close)
     return cache
 
 cache = get_cache(DEFAULT_CACHE_ALIAS)
-

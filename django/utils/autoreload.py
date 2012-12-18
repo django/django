@@ -28,7 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os, sys, time, signal
+import os, sys, time, signal, traceback
 
 try:
     from django.utils.six.moves import _thread as thread
@@ -52,10 +52,17 @@ RUN_RELOADER = True
 _mtimes = {}
 _win = (sys.platform == "win32")
 
+_error_files = []
+
 def code_changed():
     global _mtimes, _win
-    filenames = [getattr(m, "__file__", None) for m in sys.modules.values()]
-    for filename in filter(None, filenames):
+    filenames = []
+    for m in sys.modules.values():
+        try:
+            filenames.append(m.__file__)
+        except AttributeError:
+            pass
+    for filename in filenames + _error_files:
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if filename.endswith("$py.class"):
@@ -71,8 +78,33 @@ def code_changed():
             continue
         if mtime != _mtimes[filename]:
             _mtimes = {}
+            try:
+                del _error_files[_error_files.index(filename)]
+            except ValueError:
+                pass
             return True
     return False
+
+def check_errors(fn):
+    def wrapper(*args, **kwargs):
+        try:
+            fn(*args, **kwargs)
+        except (ImportError, IndentationError, NameError, SyntaxError,
+                TypeError, AttributeError):
+            et, ev, tb = sys.exc_info()
+
+            if getattr(ev, 'filename', None) is None:
+                # get the filename from the last item in the stack
+                filename = traceback.extract_tb(tb)[-1][0]
+            else:
+                filename = ev.filename
+
+            if filename not in _error_files:
+                _error_files.append(filename)
+
+            raise
+
+    return wrapper
 
 def ensure_echo_on():
     if termios:
@@ -142,5 +174,7 @@ def main(main_func, args=None, kwargs=None):
         reloader = jython_reloader
     else:
         reloader = python_reloader
-    reloader(main_func, args, kwargs)
+
+    wrapped_main_func = check_errors(main_func)
+    reloader(wrapped_main_func, args, kwargs)
 

@@ -11,13 +11,12 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import escape
 from django.utils.decorators import method_decorator
-from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
 csrf_protect_m = method_decorator(csrf_protect)
+
 
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
@@ -57,7 +56,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
-    filter_horizontal = ('user_permissions',)
+    filter_horizontal = ('groups', 'user_permissions',)
 
     def get_fieldsets(self, request, obj=None):
         if not obj:
@@ -106,9 +105,10 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
+        username_field = self.model._meta.get_field(self.model.USERNAME_FIELD)
         defaults = {
             'auto_populated_fields': (),
-            'username_help_text': self.model._meta.get_field('username').help_text,
+            'username_help_text': username_field.help_text,
         }
         extra_context.update(defaults)
         return super(UserAdmin, self).add_view(request, form_url,
@@ -133,7 +133,7 @@ class UserAdmin(admin.ModelAdmin):
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
-            'title': _('Change password: %s') % escape(user.username),
+            'title': _('Change password: %s') % escape(user.get_username()),
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
@@ -148,12 +148,12 @@ class UserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
         }
-        return TemplateResponse(request, [
+        return TemplateResponse(request,
             self.change_user_password_template or
-            'admin/auth/user/change_password.html'
-        ], context, current_app=self.admin_site.name)
+            'admin/auth/user/change_password.html',
+            context, current_app=self.admin_site.name)
 
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, **kwargs):
         """
         Determines the HttpResponse for the add_view stage. It mostly defers to
         its superclass implementation but is customized because the User model
@@ -166,9 +166,7 @@ class UserAdmin(admin.ModelAdmin):
         # * We are adding a user in a popup
         if '_addanother' not in request.POST and '_popup' not in request.POST:
             request.POST['_continue'] = 1
-        return super(UserAdmin, self).response_add(request, obj,
-                                                   post_url_continue)
+        return super(UserAdmin, self).response_add(request, obj, **kwargs)
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
-

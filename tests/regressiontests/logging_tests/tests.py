@@ -2,17 +2,23 @@ from __future__ import unicode_literals
 
 import copy
 import logging
+import sys
 import warnings
 
-from django.conf import compat_patch_logging_config
+from django.conf import compat_patch_logging_config, LazySettings
 from django.core import mail
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.log import CallbackFilter, RequireDebugFalse
 from django.utils.six import StringIO
+from django.utils.unittest import skipUnless
 
 from ..admin_scripts.tests import AdminScriptTestCase
 
+from .logconfig import MyEmailBackend
+
+PYVERS = sys.version_info[:2]
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {
@@ -130,6 +136,32 @@ class DefaultLoggingTest(TestCase):
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+
+@skipUnless(PYVERS > (2,6), "warnings captured only in Python >= 2.7")
+class WarningLoggerTests(TestCase):
+    """
+    Tests that warnings output for DeprecationWarnings is enabled
+    and captured to the logging system
+    """
+    def setUp(self):
+        self.logger = logging.getLogger('py.warnings')
+        self.old_stream = self.logger.handlers[0].stream
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream
+
+    @override_settings(DEBUG=True)
+    def test_warnings_capture(self):
+        output = StringIO()
+        self.logger.handlers[0].stream = output
+        warnings.warn('Foo Deprecated', DeprecationWarning)
+        self.assertTrue('Foo Deprecated' in force_text(output.getvalue()))
+
+    def test_warnings_capture_debug_false(self):
+        output = StringIO()
+        self.logger.handlers[0].stream = output
+        warnings.warn('Foo Deprecated', DeprecationWarning)
+        self.assertFalse('Foo Deprecated' in force_text(output.getvalue()))
 
 
 class CallbackFilterTest(TestCase):
@@ -276,6 +308,38 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
+    @override_settings(
+            ADMINS=(('admin', 'admin@example.com'),),
+            DEBUG=False,
+        )
+    def test_uses_custom_email_backend(self):
+        """
+        Refs #19325
+        """
+        message = 'All work and no play makes Jack a dull boy'
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        mail_admins_called = {'called': False}
+
+        def my_mail_admins(*args, **kwargs):
+            connection = kwargs['connection']
+            self.assertTrue(isinstance(connection, MyEmailBackend))
+            mail_admins_called['called'] = True
+
+        # Monkeypatches
+        orig_mail_admins = mail.mail_admins
+        orig_email_backend = admin_email_handler.email_backend
+        mail.mail_admins = my_mail_admins
+        admin_email_handler.email_backend = (
+            'regressiontests.logging_tests.logconfig.MyEmailBackend')
+
+        try:
+            self.logger.error(message)
+            self.assertTrue(mail_admins_called['called'])
+        finally:
+            # Revert Monkeypatches
+            mail.mail_admins = orig_mail_admins
+            admin_email_handler.email_backend = orig_email_backend
+
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
@@ -302,3 +366,20 @@ class SettingsConfigTest(AdminScriptTestCase):
         out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
         self.assertOutput(out, "0 errors found")
+
+
+def dictConfig(config):
+    dictConfig.called = True
+dictConfig.called = False
+
+
+class SettingsConfigureLogging(TestCase):
+    """
+    Test that calling settings.configure() initializes the logging
+    configuration.
+    """
+    def test_configure_initializes_logging(self):
+        settings = LazySettings()
+        settings.configure(
+            LOGGING_CONFIG='regressiontests.logging_tests.tests.dictConfig')
+        self.assertTrue(dictConfig.called)

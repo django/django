@@ -134,7 +134,7 @@ class BaseHandler(object):
                     raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
 
                 # If the response supports deferred rendering, apply template
-                # response middleware and the render the response
+                # response middleware and then render the response
                 if hasattr(response, 'render') and callable(response.render):
                     for middleware_method in self._template_response_middleware:
                         response = middleware_method(request, response)

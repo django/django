@@ -14,7 +14,7 @@
 
 {% if app_list %}
     {% for app in app_list %}
-        <div class="module">
+        <div class="app-{{ app.app_label }} module">
         <table>
         <caption>
             <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">
@@ -22,7 +22,7 @@
             </a>
         </caption>
         {% for model in app.models %}
-            <tr>
+            <tr class="model-{{ model.object_name|lower }}">
             {% if model.admin_url %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
             {% else %}

@@ -104,10 +104,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
 
-        self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
-        self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
-        self.connection.settings_dict['TEST_USER'] = self.connection.settings_dict['USER'] = TEST_USER
-        self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
+        from django.db import settings
+        real_settings = settings.DATABASES[self.connection.alias]
+        real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
+        real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
+        real_settings['TEST_USER'] = real_settings['USER'] = self.connection.settings_dict['TEST_USER'] = self.connection.settings_dict['USER'] = TEST_USER
+        real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
 
         return self.connection.settings_dict['NAME']
 

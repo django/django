@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.six import StringIO
 
@@ -60,14 +61,16 @@ class InspectDBTestCase(TestCase):
         self.assertIn("number_45extra = models.CharField", output)
 
     def test_special_column_name_introspection(self):
-        """Introspection of column names containing special characters,
-           unsuitable for Python identifiers
+        """
+        Introspection of column names containing special characters,
+        unsuitable for Python identifiers
         """
         out = StringIO()
         call_command('inspectdb', stdout=out)
         output = out.getvalue()
+        base_name = 'Field' if connection.vendor != 'oracle' else 'field'
         self.assertIn("field = models.IntegerField()", output)
-        self.assertIn("field_field = models.IntegerField(db_column='Field_')", output)
-        self.assertIn("field_field_0 = models.IntegerField(db_column='Field__')", output)
+        self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
+        self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)

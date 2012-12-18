@@ -54,6 +54,46 @@ class AssertNumQueriesTests(TestCase):
         self.assertNumQueries(2, test_func)
 
 
+class AssertQuerysetEqualTests(TestCase):
+    def setUp(self):
+        self.p1 = Person.objects.create(name='p1')
+        self.p2 = Person.objects.create(name='p2')
+
+    def test_ordered(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1), repr(self.p2)]
+        )
+
+    def test_unordered(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p2), repr(self.p1)],
+            ordered=False
+        )
+
+    def test_transform(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [self.p1.pk, self.p2.pk],
+            transform=lambda x: x.pk
+        )
+
+    def test_undefined_order(self):
+        # Using an unordered queryset with more than one ordered value
+        # is an error.
+        with self.assertRaises(ValueError):
+            self.assertQuerysetEqual(
+                Person.objects.all(),
+                [repr(self.p1), repr(self.p2)]
+            )
+        # No error for one value.
+        self.assertQuerysetEqual(
+            Person.objects.filter(name='p1'),
+            [repr(self.p1)]
+        )
+
+
 class AssertNumQueriesContextManagerTests(TestCase):
     urls = 'regressiontests.test_utils.urls'
 
@@ -483,6 +523,11 @@ class XMLEqualTests(TestCase):
         xml2 = "<elem attr2='b' attr1='a' />"
         with self.assertRaises(AssertionError):
             self.assertXMLNotEqual(xml_unvalid, xml2)
+
+    def test_comment_root(self):
+        xml1 = "<?xml version='1.0'?><!-- comment1 --><elem attr1='a' attr2='b' />"
+        xml2 = "<?xml version='1.0'?><!-- comment2 --><elem attr2='b' attr1='a' />"
+        self.assertXMLEqual(xml1, xml2)
 
 
 class SkippingExtraTests(TestCase):

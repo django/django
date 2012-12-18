@@ -1,6 +1,9 @@
+# -*- encoding: utf-8 -*-
 """
 Tests for django.core.servers.
 """
+from __future__ import unicode_literals
+
 import os
 try:
     from urllib.request import urlopen, HTTPError
@@ -11,11 +14,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
 from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
+from django.utils.http import urlencode
+from django.utils._os import upath
 
 from .models import Person
 
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
@@ -133,6 +138,10 @@ class LiveServerViews(LiveServerBase):
         """
         f = self.urlopen('/media/example_media_file.txt')
         self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
+
+    def test_environ(self):
+        f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
+        self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
 class LiveServerDatabase(LiveServerBase):

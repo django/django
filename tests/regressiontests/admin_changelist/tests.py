@@ -17,7 +17,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin)
+    SwallowAdmin, DynamicListFilterChildAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject)
@@ -541,3 +541,26 @@ class ChangeListTests(TestCase):
         check_results_order()
         OrderedObjectAdmin.ordering = ['id', 'bool']
         check_results_order(ascending=True)
+
+    def test_dynamic_list_filter(self):
+        """
+        Regression tests for ticket #17646: dynamic list_filter support.
+        """
+        parent = Parent.objects.create(name='parent')
+        for i in range(10):
+            Child.objects.create(name='child %s' % i, parent=parent)
+
+        user_noparents = self._create_superuser('noparents')
+        user_parents = self._create_superuser('parents')
+
+        # Test with user 'noparents'
+        m =  DynamicListFilterChildAdmin(Child, admin.site)
+        request = self._mocked_authenticated_request('/child/', user_noparents)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].list_filter, ['name', 'age'])
+
+        # Test with user 'parents'
+        m = DynamicListFilterChildAdmin(Child, admin.site)
+        request = self._mocked_authenticated_request('/child/', user_parents)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))

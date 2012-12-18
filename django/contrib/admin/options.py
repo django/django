@@ -1,4 +1,7 @@
+import copy
 from functools import update_wrapper, partial
+import warnings
+
 from django import forms
 from django.conf import settings
 from django.forms.formsets import all_valid
@@ -6,7 +9,7 @@ from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
+from django.contrib.admin.util import quote, unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -128,7 +131,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # passed to formfield_for_dbfield override the defaults.
         for klass in db_field.__class__.mro():
             if klass in self.formfield_overrides:
-                kwargs = dict(self.formfield_overrides[klass], **kwargs)
+                kwargs = dict(copy.deepcopy(self.formfield_overrides[klass]), **kwargs)
                 return db_field.formfield(**kwargs)
 
         # For any other type of field, just call its formfield() method.
@@ -344,14 +347,14 @@ class ModelAdmin(BaseModelAdmin):
         self.admin_site = admin_site
         super(ModelAdmin, self).__init__()
 
-    def get_inline_instances(self, request):
+    def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
             if request:
                 if not (inline.has_add_permission(request) or
-                        inline.has_change_permission(request) or
-                        inline.has_delete_permission(request)):
+                        inline.has_change_permission(request, obj) or
+                        inline.has_delete_permission(request, obj)):
                     continue
                 if not inline.has_add_permission(request):
                     inline.max_num = 0
@@ -405,8 +408,6 @@ class ModelAdmin(BaseModelAdmin):
             js.append('actions%s.js' % extra)
         if self.prepopulated_fields:
             js.extend(['urlify.js', 'prepopulate%s.js' % extra])
-        if self.opts.get_ordered_objects():
-            js.extend(['getElementsBySelector.js', 'dom-drag.js' , 'admin/ordering.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_model_perms(self, request):
@@ -504,7 +505,7 @@ class ModelAdmin(BaseModelAdmin):
             fields=self.list_editable, **defaults)
 
     def get_formsets(self, request, obj=None):
-        for inline in self.get_inline_instances(request):
+        for inline in self.get_inline_instances(request, obj):
             yield inline.get_formset(request, obj)
 
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
@@ -550,7 +551,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
-            user_id         = request.user.id,
+            user_id         = request.user.pk,
             content_type_id = ContentType.objects.get_for_model(self.model).pk,
             object_id       = object.pk,
             object_repr     = object_repr,
@@ -663,6 +664,13 @@ class ModelAdmin(BaseModelAdmin):
             # Use only the first item in list_display as link
             return list(list_display)[:1]
 
+    def get_list_filter(self, request):
+        """
+        Returns a sequence containing the fields to be displayed as filters in
+        the right sidebar of the changelist page.
+        """
+        return self.list_filter
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
@@ -689,12 +697,30 @@ class ModelAdmin(BaseModelAdmin):
         change_message = ' '.join(change_message)
         return change_message or _('No fields changed.')
 
-    def message_user(self, request, message):
+    def message_user(self, request, message, level=messages.INFO, extra_tags='',
+                     fail_silently=False):
         """
         Send a message to the user. The default implementation
         posts a message using the django.contrib.messages backend.
+
+        Exposes almost the same API as messages.add_message(), but accepts the
+        positional arguments in a different order to maintain backwards
+        compatibility. For convenience, it accepts the `level` argument as
+        a string rather than the usual level number.
         """
-        messages.info(request, message)
+
+        if not isinstance(level, int):
+            # attempt to get the level if passed a string
+            try:
+                level = getattr(messages.constants, level.upper())
+            except AttributeError:
+                levels = messages.constants.DEFAULT_TAGS.values()
+                levels_repr = ', '.join('`%s`' % l for l in levels)
+                raise ValueError('Bad message level string: `%s`. '
+                        'Possible values are: %s' % (level, levels_repr))
+
+        messages.add_message(request, level, message, extra_tags=extra_tags,
+                fail_silently=fail_silently)
 
     def save_form(self, request, form, change):
         """
@@ -736,7 +762,6 @@ class ModelAdmin(BaseModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         opts = self.model._meta
         app_label = opts.app_label
-        ordered_objects = opts.get_ordered_objects()
         context.update({
             'add': add,
             'change': change,
@@ -745,7 +770,6 @@ class ModelAdmin(BaseModelAdmin):
             'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
-            'ordered_objects': ordered_objects,
             'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
@@ -763,21 +787,49 @@ class ModelAdmin(BaseModelAdmin):
             "admin/change_form.html"
         ], context, current_app=self.admin_site.name)
 
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, post_url_continue='../%s/',
+                     continue_editing_url=None, add_another_url=None,
+                     hasperm_url=None, noperm_url=None):
         """
         Determines the HttpResponse for the add_view stage.
-        """
-        opts = obj._meta
-        pk_value = obj._get_pk_val()
 
-        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        :param request: HttpRequest instance.
+        :param obj: Object just added.
+        :param post_url_continue: Deprecated/undocumented.
+        :param continue_editing_url: URL where user will be redirected after
+                                     pressing 'Save and continue editing'.
+        :param add_another_url: URL where user will be redirected after
+                                pressing 'Save and add another'.
+        :param hasperm_url: URL to redirect after a successful object creation
+                            when the user has change permissions.
+        :param noperm_url: URL to redirect after a successful object creation
+                           when the user has no change permissions.
+        """
+        if post_url_continue != '../%s/':
+            warnings.warn("The undocumented 'post_url_continue' argument to "
+                          "ModelAdmin.response_add() is deprecated, use the new "
+                          "*_url arguments instead.", DeprecationWarning,
+                          stacklevel=2)
+        opts = obj._meta
+        pk_value = obj.pk
+        app_label = opts.app_label
+        model_name = opts.module_name
+        site_name = self.admin_site.name
+
+        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if "_continue" in request.POST:
-            self.message_user(request, msg + ' ' + _("You may edit it again below."))
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
+            self.message_user(request, msg)
+            if continue_editing_url is None:
+                continue_editing_url = 'admin:%s_%s_change' % (app_label, model_name)
+            url = reverse(continue_editing_url, args=(quote(pk_value),),
+                          current_app=site_name)
             if "_popup" in request.POST:
-                post_url_continue += "?_popup=1"
-            return HttpResponseRedirect(post_url_continue % pk_value)
+                url += "?_popup=1"
+            return HttpResponseRedirect(url)
 
         if "_popup" in request.POST:
             return HttpResponse(
@@ -786,72 +838,104 @@ class ModelAdmin(BaseModelAdmin):
                 # escape() calls force_text.
                 (escape(pk_value), escapejs(obj)))
         elif "_addanother" in request.POST:
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_text(opts.verbose_name)))
-            return HttpResponseRedirect(request.path)
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
+            self.message_user(request, msg)
+            if add_another_url is None:
+                add_another_url = 'admin:%s_%s_add' % (app_label, model_name)
+            url = reverse(add_another_url, current_app=site_name)
+            return HttpResponseRedirect(url)
         else:
+            msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
             self.message_user(request, msg)
 
             # Figure out where to redirect. If the user has change permission,
             # redirect to the change-list page for this object. Otherwise,
             # redirect to the admin index.
             if self.has_change_permission(request, None):
-                post_url = reverse('admin:%s_%s_changelist' %
-                                   (opts.app_label, opts.module_name),
-                                   current_app=self.admin_site.name)
+                if hasperm_url is None:
+                    hasperm_url = 'admin:%s_%s_changelist' % (app_label, model_name)
+                url = reverse(hasperm_url, current_app=site_name)
             else:
-                post_url = reverse('admin:index',
-                                   current_app=self.admin_site.name)
-            return HttpResponseRedirect(post_url)
+                if noperm_url is None:
+                    noperm_url = 'admin:index'
+                url = reverse(noperm_url, current_app=site_name)
+            return HttpResponseRedirect(url)
 
-    def response_change(self, request, obj):
+    def response_change(self, request, obj, continue_editing_url=None,
+                        save_as_new_url=None, add_another_url=None,
+                        hasperm_url=None, noperm_url=None):
         """
         Determines the HttpResponse for the change_view stage.
+
+        :param request: HttpRequest instance.
+        :param obj: Object just modified.
+        :param continue_editing_url: URL where user will be redirected after
+                                     pressing 'Save and continue editing'.
+        :param save_as_new_url: URL where user will be redirected after pressing
+                                'Save as new' (when applicable).
+        :param add_another_url: URL where user will be redirected after pressing
+                                'Save and add another'.
+        :param hasperm_url: URL to redirect after a successful object edition when
+                            the user has change permissions.
+        :param noperm_url: URL to redirect after a successful object edition when
+                           the user has no change permissions.
         """
         opts = obj._meta
 
+        app_label = opts.app_label
+        model_name = opts.module_name
+        site_name = self.admin_site.name
+        verbose_name = opts.verbose_name
         # Handle proxy models automatically created by .only() or .defer().
         # Refs #14529
-        verbose_name = opts.verbose_name
-        module_name = opts.module_name
         if obj._deferred:
             opts_ = opts.proxy_for_model._meta
             verbose_name = opts_.verbose_name
-            module_name = opts_.module_name
+            model_name = opts_.module_name
 
-        pk_value = obj._get_pk_val()
+        msg_dict = {'name': force_text(verbose_name), 'obj': force_text(obj)}
 
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_text(verbose_name), 'obj': force_text(obj)}
         if "_continue" in request.POST:
-            self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if "_popup" in request.REQUEST:
-                return HttpResponseRedirect(request.path + "?_popup=1")
-            else:
-                return HttpResponseRedirect(request.path)
-        elif "_saveasnew" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_text(verbose_name), 'obj': obj}
+            msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
             self.message_user(request, msg)
-            return HttpResponseRedirect(reverse('admin:%s_%s_change' %
-                                        (opts.app_label, module_name),
-                                        args=(pk_value,),
-                                        current_app=self.admin_site.name))
+            if continue_editing_url is None:
+                continue_editing_url = 'admin:%s_%s_change' % (app_label, model_name)
+            url = reverse(continue_editing_url, args=(quote(obj.pk),),
+                          current_app=site_name)
+            if "_popup" in request.POST:
+                url += "?_popup=1"
+            return HttpResponseRedirect(url)
+        elif "_saveasnew" in request.POST:
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
+            self.message_user(request, msg)
+            if save_as_new_url is None:
+                save_as_new_url = 'admin:%s_%s_change' % (app_label, model_name)
+            url = reverse(save_as_new_url, args=(quote(obj.pk),),
+                          current_app=site_name)
+            return HttpResponseRedirect(url)
         elif "_addanother" in request.POST:
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_text(verbose_name)))
-            return HttpResponseRedirect(reverse('admin:%s_%s_add' %
-                                        (opts.app_label, module_name),
-                                        current_app=self.admin_site.name))
+            msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
+            self.message_user(request, msg)
+            if add_another_url is None:
+                add_another_url = 'admin:%s_%s_add' % (app_label, model_name)
+            url = reverse(add_another_url, current_app=site_name)
+            return HttpResponseRedirect(url)
         else:
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
             self.message_user(request, msg)
             # Figure out where to redirect. If the user has change permission,
             # redirect to the change-list page for this object. Otherwise,
             # redirect to the admin index.
             if self.has_change_permission(request, None):
-                post_url = reverse('admin:%s_%s_changelist' %
-                                   (opts.app_label, module_name),
-                                   current_app=self.admin_site.name)
+                if hasperm_url is None:
+                    hasperm_url = 'admin:%s_%s_changelist' % (app_label,
+                                                              model_name)
+                url = reverse(hasperm_url, current_app=site_name)
             else:
-                post_url = reverse('admin:index',
-                                   current_app=self.admin_site.name)
-            return HttpResponseRedirect(post_url)
+                if noperm_url is None:
+                    noperm_url = 'admin:index'
+                url = reverse(noperm_url, current_app=site_name)
+            return HttpResponseRedirect(url)
 
     def response_action(self, request, queryset):
         """
@@ -932,7 +1016,7 @@ class ModelAdmin(BaseModelAdmin):
 
         ModelForm = self.get_form(request)
         formsets = []
-        inline_instances = self.get_inline_instances(request)
+        inline_instances = self.get_inline_instances(request, None)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             if form.is_valid():
@@ -1029,7 +1113,7 @@ class ModelAdmin(BaseModelAdmin):
 
         ModelForm = self.get_form(request, obj)
         formsets = []
-        inline_instances = self.get_inline_instances(request)
+        inline_instances = self.get_inline_instances(request, obj)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
@@ -1112,6 +1196,7 @@ class ModelAdmin(BaseModelAdmin):
 
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
+        list_filter = self.get_list_filter(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1122,7 +1207,7 @@ class ModelAdmin(BaseModelAdmin):
         ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display,
-                list_display_links, self.list_filter, self.date_hierarchy,
+                list_display_links, list_filter, self.date_hierarchy,
                 self.search_fields, self.list_select_related,
                 self.list_per_page, self.list_max_show_all, self.list_editable,
                 self)

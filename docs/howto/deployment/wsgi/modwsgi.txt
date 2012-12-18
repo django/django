@@ -88,12 +88,20 @@ Using mod_wsgi daemon mode
 ==========================
 
 "Daemon mode" is the recommended mode for running mod_wsgi (on non-Windows
-platforms). See the `official mod_wsgi documentation`_ for details on setting
-up daemon mode. The only change required to the above configuration if you use
-daemon mode is that you can't use ``WSGIPythonPath``; instead you should use
-the ``python-path`` option to ``WSGIDaemonProcess``, for example::
+platforms). To create the required daemon process group and delegate the
+Django instance to run in it, you will need to add appropriate
+``WSGIDaemonProcess`` and ``WSGIProcessGroup`` directives. A further change
+required to the above configuration if you use daemon mode is that you can't
+use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
+``WSGIDaemonProcess``, for example::
 
     WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
+    WSGIProcessGroup example.com
+
+See the official mod_wsgi documentation for `details on setting up daemon
+mode`_.
+
+.. _details on setting up daemon mode: http://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide#Delegation_To_Daemon_Process
 
 .. _serving-files:
 

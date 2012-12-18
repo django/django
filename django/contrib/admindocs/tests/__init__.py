@@ -26,7 +26,7 @@ class TestFieldType(unittest.TestCase):
     def test_custom_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(fields.CustomField()),
-            _('A custom field type')
+            'A custom field type'
         )
         self.assertEqual(
             views.get_readable_field_data_type(fields.DescriptionLackingField()),

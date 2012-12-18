@@ -261,6 +261,21 @@ Django quotes column and table names behind the scenes.
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
+``index_together``
+
+.. attribute:: Options.index_together
+
+    .. versionadded:: 1.5
+
+    Sets of field names that, taken together, are indexed::
+
+        index_together = [
+            ["pub_date", "deadline"],
+        ]
+
+    This list of fields will be indexed together (i.e. the appropriate
+    ``CREATE INDEX`` statement will be issued.)
+
 ``verbose_name``
 ----------------
 

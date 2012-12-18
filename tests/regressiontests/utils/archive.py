@@ -4,9 +4,10 @@ import tempfile
 from django.utils import unittest
 
 from django.utils.archive import Archive, extract
+from django.utils._os import upath
 
 
-TEST_DIR = os.path.join(os.path.dirname(__file__), 'archives')
+TEST_DIR = os.path.join(os.path.dirname(upath(__file__)), 'archives')
 
 
 class ArchiveTester(object):

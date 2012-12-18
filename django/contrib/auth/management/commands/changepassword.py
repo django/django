@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
         try:
             u = UserModel.objects.using(options.get('database')).get(**{
-                    getattr(UserModel, 'USERNAME_FIELD', 'username'): username
+                    UserModel.USERNAME_FIELD: username
                 })
         except UserModel.DoesNotExist:
             raise CommandError("user '%s' does not exist" % username)
