@@ -1319,11 +1319,11 @@ def widthratio(parser, token):
 
     For example::
 
-        <img src='bar.gif' height='10' width='{% widthratio this_value max_value 100 %}' />
+        <img src='bar.gif' height='10' width='{% widthratio this_value max_value max_width %}' />
 
-    Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in
-    the above example will be 88 pixels wide (because 175/200 = .875;
-    .875 * 100 = 87.5 which is rounded up to 88).
+    If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
+    the image in the above example will be 88 pixels wide
+    (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
     """
     bits = token.contents.split()
     if len(bits) != 4:
