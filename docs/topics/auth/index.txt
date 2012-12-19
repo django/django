@@ -64,6 +64,14 @@ Usage
 * `Managing users in the admin <auth-admin>`
 
 :doc:`API reference for the default implementation </ref/contrib/auth>`
+
 :doc:`Customizing Users and authentication <customizing>`
+
 :doc:`Password management in Django <passwords>`
 
+.. toctree::
+   :maxdepth: 1
+
+   default
+   passwords
+   customizing
