@@ -8,9 +8,9 @@ This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
 implementation of passwords and permissions. While this default configuration
-may handle the majority of cases as is, Django supports extensive extension and
-customization of authentication, :doc:`documented here
-</topics/auth/customizing>`.
+may handle the majority of cases as is. For projects where authentication needs
+differ from the default, Django supports extensive :doc:`extension and
+customization </topics/auth/customizing` of authentication.
 
 Django authentication provides both authentication and authorization, together
 and is generally referred to as the authenticaiton system, as these features
