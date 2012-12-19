@@ -19,7 +19,8 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
-    Product, TextFile, Writer, WriterProfile, test_images)
+    Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
+    test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -173,6 +174,10 @@ class PriceFormWithoutQuantity(forms.ModelForm):
     class Meta:
         model = Price
         exclude = ('quantity',)
+
+class ColourfulItemForm(forms.ModelForm):
+    class Meta:
+        model = ColourfulItem
 
 
 class ModelFormBaseTest(TestCase):
@@ -1518,3 +1523,12 @@ class OldFormForXTests(TestCase):
                          ['name'])
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
+
+    def test_iterable_model_m2m(self) :
+        colour = Colour.objects.create(name='Blue')
+        form = ColourfulItemForm()
+        self.maxDiff = 1024
+        self.assertHTMLEqual(form.as_p(), """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" /></p>
+        <p><label for="id_colours">Colours:</label> <select multiple="multiple" name="colours" id="id_colours">
+        <option value="1">Blue</option>
+        </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
