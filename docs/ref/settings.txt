@@ -1450,6 +1450,25 @@ format has higher precedence and will be applied instead.
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
+.. setting:: PASSWORD_HASHERS
+
+PASSWORD_HASHERS
+----------------
+
+.. versionadded:: 1.4
+
+See :ref:`auth_password_storage`.
+
+Default::
+
+    ('django.contrib.auth.hashers.PBKDF2PasswordHasher',
+     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+     'django.contrib.auth.hashers.BCryptPasswordHasher',
+     'django.contrib.auth.hashers.SHA1PasswordHasher',
+     'django.contrib.auth.hashers.MD5PasswordHasher',
+     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+     'django.contrib.auth.hashers.CryptPasswordHasher',)
+
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
 PASSWORD_RESET_TIMEOUT_DAYS
