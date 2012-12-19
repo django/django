@@ -8,7 +8,7 @@ User
 ====
 
 Fields
-~~~~~~
+------
 
 .. class:: User
 
@@ -37,12 +37,11 @@ Fields
         Required. A hash of, and metadata about, the password. (Django doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
         contain any character. See the :doc:`password documentation
-        </topics/auth/passwords>`_.
+        </topics/auth/passwords>`.
 
+    .. attribute:: models.User.groups
 
-
----TODO: Groups
-
+        Many-to-many relationship to :class:`~django.contrib.auth.models.Group`
 
     .. attribute:: models.User.is_staff
 
@@ -83,7 +82,7 @@ Fields
         current date/time by default when the account is created.
 
 Methods
-~~~~~~~
+-------
 
 .. class:: User
 
@@ -228,7 +227,7 @@ Methods
         have a profile.
 
 Manager functions
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. class:: UserManager
 
@@ -308,7 +307,7 @@ Permission
 .. class:: Permission
 
 Fields
-~~~~~~
+------
 
 :class:`~django.contrib.auth.models.Permission` objects have the following
 fields:
@@ -327,7 +326,7 @@ fields:
     Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
-~~~~~~~
+-------
 
 :class:`~django.contrib.auth.models.Permission` objects have the standard
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
@@ -339,7 +338,7 @@ Group
 .. class:: Group
 
 Fields
-~~~~~~
+------
 
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
@@ -412,6 +411,7 @@ Sent when the user failed to login successfully
     authentication backend. Credentials matching a set of 'sensitive' patterns,
     (including password) will not be sent in the clear as part of the signal.
 
+.. _authentication-backends-reference:
 
 Authentication backends
 =======================
