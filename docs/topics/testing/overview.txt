@@ -5,6 +5,11 @@ Testing Django applications
 .. module:: django.test
    :synopsis: Testing tools for Django applications.
 
+.. seealso::
+
+    The :doc:`testing introductory tutorial </intro/tutorial05>` and the
+    :doc:`advanced testing topics document </topics/testing/advanced>`.
+
 Automated testing is an extremely useful bug-killing tool for the modern
 Web developer. You can use a collection of tests -- a **test suite** -- to
 solve, or avoid, a number of problems:
@@ -302,6 +307,10 @@ advanced settings.
     module-level code and a real database exists, production data could pollute
     your tests. *It is a bad idea to have such import-time database queries in
     your code* anyway - rewrite your code so that it doesn't do this.
+
+.. seealso::
+
+    The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.
 
 Order in which tests are executed
 ---------------------------------
@@ -914,54 +923,9 @@ The following is a simple unit test using the test client::
             # Check that the rendered context contains 5 customers.
             self.assertEqual(len(response.context['customers']), 5)
 
-The request factory
--------------------
+.. seealso::
 
-.. class:: RequestFactory
-
-The :class:`~django.test.client.RequestFactory` shares the same API as
-the test client. However, instead of behaving like a browser, the
-RequestFactory provides a way to generate a request instance that can
-be used as the first argument to any view. This means you can test a
-view function the same way as you would test any other function -- as
-a black box, with exactly known inputs, testing for specific outputs.
-
-The API for the :class:`~django.test.client.RequestFactory` is a slightly
-restricted subset of the test client API:
-
-* It only has access to the HTTP methods :meth:`~Client.get()`,
-  :meth:`~Client.post()`, :meth:`~Client.put()`,
-  :meth:`~Client.delete()`, :meth:`~Client.head()` and
-  :meth:`~Client.options()`.
-
-* These methods accept all the same arguments *except* for
-  ``follows``. Since this is just a factory for producing
-  requests, it's up to you to handle the response.
-
-* It does not support middleware. Session and authentication
-  attributes must be supplied by the test itself if required
-  for the view to function properly.
-
-Example
-~~~~~~~
-
-The following is a simple unit test using the request factory::
-
-    from django.utils import unittest
-    from django.test.client import RequestFactory
-
-    class SimpleTest(unittest.TestCase):
-        def setUp(self):
-            # Every test needs access to the request factory.
-            self.factory = RequestFactory()
-
-        def test_details(self):
-            # Create an instance of a GET request.
-            request = self.factory.get('/customer/details')
-
-            # Test my_view() as if it were deployed at /customer/details
-            response = my_view(request)
-            self.assertEqual(response.status_code, 200)
+    :class:`django.test.client.RequestFactory`
 
 Provided test case classes
 --------------------------
