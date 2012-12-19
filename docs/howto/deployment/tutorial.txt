@@ -8,24 +8,6 @@ This tutorial takes you through the steps required to set up Django so that it
 works nicely with your your web server. It covers Django, uWSGI and nginx, a
 complete stack of web application and server software.
 
-.. admonition:: Note
-
-    This is a **tutorial**. It is not intended to provide a reference guide,
-    never mind an exhaustive reference, to the subject of deployment.
-
-	nginx and uWSGI are good choices for deployment, but they are not the only
-	ones, or the 'official' ones. There are excellent alternatives to both, and 
-	you are encouraged to investigate them.
-
-	The way we deploy Django here is a good way, but it is **not* the *only* 
-	way; for some purposes it is probably not even the best way.
-
-    It is however a reliable and easy way, and the material covered here will
-    introduce you to concepts and procedures you will need to be familiar with
-    whatever software you use for deploying Django. By providing you with a
-    working setup, and rehearsing the steps you must take to get there, it will
-    offer you a basis for exploring other ways to achieve this.
-
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
@@ -35,16 +17,42 @@ nginx_ (pronounced *engine-x*) is a free, open-source, high-performance HTTP ser
 
 .. _nginx: http://nginx.org/
 
+
+Some notes about this tutorial
+==============================
+
 .. admonition:: Note
 
-    This tutorial assumes Django 1.4 or later, which will automatically create a
-    wsgi module in your new project. The instructions will work with earlier
-    versions, but you will need to obtain that Django wsgi module yourself, and
-    you may find that the Django project directory structure is slightly
-    different.
+    This is a **tutorial**. It is not intended to provide a reference guide,
+    never mind an exhaustive reference, to the subject of deployment.
 
-	It is also assumed that you are using a Unix-like system, and that it 
-	features an aptitude-like package manager.
+nginx and uWSGI are good choices for deployment, but they are not the only ones,
+or the 'official' ones. There are excellent alternatives to both, and you are
+encouraged to investigate them.
+
+The way we deploy Django here is a good way, but it is **not** the *only* way;
+for some purposes it is probably not even the best way.
+
+It is however a reliable and easy way, and the material covered here will
+introduce you to concepts and procedures you will need to be familiar with
+whatever software you use for deploying Django. By providing you with a working
+setup, and rehearsing the steps you must take to get there, it will offer you a
+basis for exploring other ways to achieve this.
+
+.. admonition:: Note
+
+	This tutorial makes some assumptions about the system you are using.
+
+It is assumed that you are using a Unix-like system, and that it features
+an aptitude-like package manager. However if you need to ask questions like
+"What's the equivalent of aptitude on Mac OS X?", you'll be able to find that
+kind of help fairly easily.
+
+While this tutorial assumes Django 1.4 or later, which will automatically create
+a wsgi module in your new project, the instructions will work with earlier
+versions. You will though need to obtain that Django wsgi module yourself, and
+you may find that the Django project directory structure is slightly different.
+
 
 Concept
 =======
