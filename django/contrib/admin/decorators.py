@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.sites import site, AlreadyRegistered
+from django.contrib.admin.sites import site, AlreadyRegistered, AdminSite
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 
@@ -23,6 +23,9 @@ def register(*models, **kwargs):
         # If there are any kwargs left after `site` is popped, they are invalid
         if kwargs:
             raise TypeError('Unsupported arguments: %s' % kwargs.keys())
+
+        if not isinstance(admin_site, AdminSite):
+            raise ValueError('Site must derive from AdminSite')
 
         if not issubclass(admin_class, ModelAdmin):
             raise ValueError('Wrapped class must derive from ModelAdmin.')

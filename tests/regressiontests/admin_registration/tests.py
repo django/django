@@ -134,3 +134,7 @@ class TestRegistrationDecorator(TestCase):
 
     def test_wrapped_class_not_a_model_admin(self):
         self.assertRaises(ValueError, register(Person), CustomSite)
+
+    def test_custom_site_not_an_admin_site(self):
+        self.assertRaises(ValueError,
+                          register(Person, site=Traveler), NameAdmin)
