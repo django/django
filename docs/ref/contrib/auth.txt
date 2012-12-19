@@ -1,19 +1,16 @@
 ``django.contrib.auth``
 =======================
 
+.. currentmodule:: django.contrib.auth.models
 
-Users
-=====
 
-.. class:: models.User
-
-API reference
--------------
+User
+====
 
 Fields
 ~~~~~~
 
-.. class:: models.User
+.. class:: User
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -39,7 +36,8 @@ Fields
 
         Required. A hash of, and metadata about, the password. (Django doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
-        contain any character. See the "Passwords" section below.
+        contain any character. See the :doc:`password documentation
+        </topics/auth/passwords>`_.
 
 
 
@@ -87,7 +85,7 @@ Fields
 Methods
 ~~~~~~~
 
-.. class:: models.User
+.. class:: User
 
     :class:`~django.contrib.auth.models.User` objects have two many-to-many
     fields: ``groups`` and ``user_permissions``.
@@ -185,10 +183,10 @@ Methods
 
     .. method:: models.User.has_perm(perm, obj=None)
 
-        Returns ``True`` if the user has the specified permission, where perm is
-        in the format ``"<app label>.<permission codename>"``. (see
-        `permissions`_ section below). If the user is inactive, this method will
-        always return ``False``.
+        Returns ``True`` if the user has the specified permission, where perm
+        is in the format ``"<app label>.<permission codename>"``. (see
+        documentation on `permissions <topic-authorization>`_). If the user is
+        inactive, this method will always return ``False``.
 
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
@@ -227,15 +225,12 @@ Methods
         :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
         current site doesn't allow profiles, or
         :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
-        have a profile. For information on how to define a site-specific user
-        profile, see the section on `storing additional user information`_ below.
-
-.. _storing additional user information: #storing-additional-information-about-users
+        have a profile.
 
 Manager functions
 ~~~~~~~~~~~~~~~~~
 
-.. class:: models.UserManager
+.. class:: UserManager
 
     The :class:`~django.contrib.auth.models.User` model has a custom manager
     that has the following helper functions:
@@ -260,7 +255,7 @@ Manager functions
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
-        See `Creating users`_ for example usage.
+        See `Creating users <topics-auth-creating-users>`_ for example usage.
 
     .. method:: models.UserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
@@ -275,9 +270,9 @@ Manager functions
 
 
 Anonymous users
----------------
+===============
 
-.. class:: models.AnonymousUser
+.. class:: AnonymousUser
 
     :class:`django.contrib.auth.models.AnonymousUser` is a class that
     implements the :class:`django.contrib.auth.models.User` interface, with
@@ -307,12 +302,65 @@ In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
 
+Permission
+==========
 
+.. class:: Permission
+
+Fields
+~~~~~~
+
+:class:`~django.contrib.auth.models.Permission` objects have the following
+fields:
+
+.. attribute:: Permission.name
+
+    Required. 50 characters or fewer. Example: ``'Can vote'``.
+
+.. attribute:: Permission.content_type
+
+    Required. A reference to the ``django_content_type`` database table, which
+    contains a record for each installed Django model.
+
+.. attribute:: Permission.codename
+
+    Required. 100 characters or fewer. Example: ``'can_vote'``.
+
+Methods
+~~~~~~~
+
+:class:`~django.contrib.auth.models.Permission` objects have the standard
+data-access methods like any other :doc:`Django model </ref/models/instances>`.
+
+
+Group
+=====
+
+.. class:: Group
+
+Fields
+~~~~~~
+
+:class:`~django.contrib.auth.models.Group` objects have the following fields:
+
+.. attribute:: Group.name
+
+    Required. 80 characters or fewer. Any characters are permitted. Example:
+    ``'Awesome Users'``.
+
+.. attribute:: Group.permissions
+
+    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
+
+        group.permissions = [permission_list]
+        group.permissions.add(permission, permission, ...)
+        group.permissions.remove(permission, permission, ...)
+        group.permissions.clear()
 
 .. _topics-auth-signals:
 
 Login and logout signals
-------------------------
+========================
 
 The auth framework uses two :doc:`signals </topics/signals>` that can be used
 for notification when a user logs in or out.
@@ -365,99 +413,35 @@ Sent when the user failed to login successfully
     (including password) will not be sent in the clear as part of the signal.
 
 
+Authentication backends
+=======================
 
-Permission API reference
-------------------------
+.. module:: django.contrib.auth.backends
+   :synopsis: Django's built-in authentication backend classes.
 
-.. currentmodule:: django.contrib.auth.models
-
-.. class:: models.Permission
-
-Fields
-~~~~~~
-
-:class:`~django.contrib.auth.models.Permission` objects have the following
-fields:
-
-.. attribute:: Permission.name
-
-    Required. 50 characters or fewer. Example: ``'Can vote'``.
-
-.. attribute:: Permission.content_type
-
-    Required. A reference to the ``django_content_type`` database table, which
-    contains a record for each installed Django model.
-
-.. attribute:: Permission.codename
-
-    Required. 100 characters or fewer. Example: ``'can_vote'``.
-
-Methods
-~~~~~~~
-
-:class:`~django.contrib.auth.models.Permission` objects have the standard
-data-access methods like any other :doc:`Django model </ref/models/instances>`.
-
-.. currentmodule:: django.contrib.auth
-
-Programmatically creating permissions
--------------------------------------
-
-While custom permissions can be defined within a model's ``Meta`` class, you
-can also create permissions directly. For example, you can create the
-``can_publish`` permission for a ``BlogPost`` model in ``myapp``::
-
-    from django.contrib.auth.models import Group, Permission
-    from django.contrib.contenttypes.models import ContentType
-
-    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
-    permission = Permission.objects.create(codename='can_publish',
-                                           name='Can Publish Posts',
-                                           content_type=content_type)
-
-The permission can then be assigned to a
-:class:`~django.contrib.auth.models.User` via its ``user_permissions``
-attribute or to a :class:`~django.contrib.auth.models.Group` via its
-``permissions`` attribute.
-
-Groups
-======
-
-Groups are a generic way of categorizing users so you can apply permissions, or
-some other label, to those users. A user can belong to any number of groups.
-
-A user in a group automatically has the permissions granted to that group. For
-example, if the group ``Site editors`` has the permission
-``can_edit_home_page``, any user in that group will have that permission.
-
-Beyond permissions, groups are a convenient way to categorize users to give
-them some label, or extended functionality. For example, you could create a
-group ``'Special users'``, and you could write code that could, say, give them
-access to a members-only portion of your site, or send them members-only email
-messages.
-
-API reference
--------------
-
-.. class:: models.Group
-
-Fields
-~~~~~~
-
-:class:`~django.contrib.auth.models.Group` objects have the following fields:
-
-.. attribute:: Group.name
-
-    Required. 80 characters or fewer. Any characters are permitted. Example:
-    ``'Awesome Users'``.
-
-.. attribute:: Group.permissions
-
-    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
-
-        group.permissions = [permission_list]
-        group.permissions.add(permission, permission, ...)
-        group.permissions.remove(permission, permission, ...)
-        group.permissions.clear()
+This section details the authentication backends that come with Django. For
+information on how to use them and how to write your own authentication
+backends, see the :ref:`Other authentication sources section
+<authentication-backends>` of the :doc:`User authentication guide
+</topics/auth>`.
 
 
+Available authentication backends
+---------------------------------
+
+The following backends are available in :mod:`django.contrib.auth.backends`:
+
+.. class:: ModelBackend
+
+    This is the default authentication backend used by Django.  It
+    authenticates using usernames and passwords stored in the
+    :class:`~django.contrib.auth.models.User` model.
+
+
+.. class:: RemoteUserBackend
+
+    Use this backend to take advantage of external-to-Django-handled
+    authentication.  It authenticates using usernames passed in
+    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
+    documentation.
