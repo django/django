@@ -2,14 +2,30 @@
 Customising authentication in Django
 ====================================
 
+The authentication that comes with Django is good enough for most common cases,
+but you may have needs not met by the out-of-the-box defaults. To customize
+authentication to your projects needs involves understanding what points of the
+provided system are extendable or replaceable. This document provides details
+about how the auth system can be customized.
+
+`Authentication backends <authentication-backends`_ provide an extensible
+system for when a username and password stored with the User model need
+to be authenticated against a different service than Django's default.
+
+You can give your models `custom permissions <custom-permissions>`_ that can be
+checked through Django's authorization system.
+
+You can `extend <extend-user>`_ the default User model, or `substitute
+<substitute-user>`_ a completely customized model.
+
 .. _authentication-backends:
 
 Other authentication sources
 ============================
 
-The authentication that comes with Django is good enough for most common cases,
-but you may have the need to hook into another authentication source -- that
-is, another source of usernames and passwords or authentication methods.
+There may be times you have the need to hook into another authentication source
+-- that is, another source of usernames and passwords or authentication
+methods.
 
 For example, your company may already have an LDAP setup that stores a username
 and password for every employee. It'd be a hassle for both the network
@@ -239,7 +255,7 @@ method and can return the object level permission as appropriate.
 .. _custom-permissions:
 
 Custom permissions
-------------------
+==================
 
 To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
@@ -265,8 +281,116 @@ view tasks::
 
     user.has_perm('app.view_task')
 
-Customizing the User model
-==========================
+.. _extending-user:
+
+Extending the existing User model
+=================================
+
+There are two ways to extend the default
+:class:`~django.contrib.auth.models.User` model without substituting your own
+model. If the changes you need are purely behavioral, and don't require any
+change to what is stored in the database, you can create a `proxy model
+<proxy-models>`_ derived from :class:`~django.contrib.auth.models.User`. This
+allows for any of the features offered by `proxy models
+<proxy-models>`_ including default ordering, custom managers, or custom model
+methods.
+
+If you wish to store information related to ``User``, you can use a `one-to-one
+relationship <one-to-one-relationships>`_ to a model containing the fields for
+additional information. This one-to-one model is often called a profile model,
+as it might store non-auth related information about a site user. For example
+you might create an Employee model::
+
+    from django.contrib.auth.models import User
+
+    class Employee(models.Model):
+        user = models.OneToOneField(User)
+        department = models.CharField(max_length=100)
+
+Assuming an existing Employee Fred Smith who has both a User and Employee
+model, you can access the related information using Django's standard related
+model conventions::
+
+    >>> u = User.objects.get(username='fsmith')
+    >>> freds_department = u.employee.department
+
+To add a profile model's fields to the user page in the admin, define an
+:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+add it to a ``UserAdmin`` class which is registered with the
+:class:`~django.contrib.auth.models.User` class::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from my_user_profile_app.models import Employee
+
+    # Define an inline admin descriptor for Employee model
+    # which acts a bit like a singleton
+    class EmployeeInline(admin.StackedInline):
+        model = Employee
+        can_delete = False
+        verbose_name_plural = 'employee'
+
+    # Define a new User admin
+    class UserAdmin(UserAdmin):
+        inlines = (EmployeeInline, )
+
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
+
+These profile models are not special in any way - they are just Django models that
+happen to have a one-to-one link with a User model. As such, they do not get
+auto created when a user is created, but
+a :attr:`django.db.models.signals.post_save` could be used to create or update
+related models as appropriate.
+
+Note that using related models results in additional queries or joins to
+retrieve the related data, and depending on your needs substituting the User
+model and adding the related fields may be your better option.  However
+existing links to the default User model within your project's apps may justify
+the extra database load.
+
+.. _auth-profiles:
+
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
+Prior to 1.5, a single profile model could be spedified site-wide with the
+setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
+following items, separated by a dot:
+
+1. The name of the application (case sensitive) in which the user
+   profile model is defined (in other words, the
+   name which was passed to :djadmin:`manage.py startapp <startapp>` to create
+   the application).
+
+2. The name of the model (not case sensitive) class.
+
+For example, if the profile model was a class named ``UserProfile`` and was
+defined inside an application named ``accounts``, the appropriate setting would
+be::
+
+    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
+
+When a user profile model has been defined and specified in this manner, each
+:class:`~django.contrib.auth.models.User` object will have a method --
+:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
+instance of the user profile model associated with that
+:class:`~django.contrib.auth.models.User`.
+
+The method :class:`~django.contrib.auth.models.User.get_profile()`
+does not create a profile if one does not exist.
+
+.. _substitute-user:
+
+Substituting a custom User model
+================================
 
 .. versionadded:: 1.5
 
@@ -938,111 +1062,3 @@ code would be required in the app's ``admin.py`` file::
     admin.site.unregister(Group)
 
 
-.. _auth-profiles:
-
-Storing additional information about users
-------------------------------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-If you'd like to store additional information related to your users, Django
-provides a method to specify a site-specific related model -- termed a "user
-profile" -- for this purpose.
-
-To make use of this feature, define a model with fields for the
-additional information you'd like to store, or additional methods
-you'd like to have available, and also add a
-:class:`~django.db.models.Field.OneToOneField` named ``user`` from your model
-to the :class:`~django.contrib.auth.models.User` model. This will ensure only
-one instance of your model can be created for each
-:class:`~django.contrib.auth.models.User`. For example::
-
-    from django.contrib.auth.models import User
-
-    class UserProfile(models.Model):
-        # This field is required.
-        user = models.OneToOneField(User)
-
-        # Other fields here
-        accepted_eula = models.BooleanField()
-        favorite_animal = models.CharField(max_length=20, default="Dragons.")
-
-
-To indicate that this model is the user profile model for a given site, fill in
-the setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
-following items, separated by a dot:
-
-1. The name of the application (case sensitive) in which the user
-   profile model is defined (in other words, the
-   name which was passed to :djadmin:`manage.py startapp <startapp>` to create
-   the application).
-
-2. The name of the model (not case sensitive) class.
-
-For example, if the profile model was a class named ``UserProfile`` and was
-defined inside an application named ``accounts``, the appropriate setting would
-be::
-
-    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
-
-When a user profile model has been defined and specified in this manner, each
-:class:`~django.contrib.auth.models.User` object will have a method --
-:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
-instance of the user profile model associated with that
-:class:`~django.contrib.auth.models.User`.
-
-The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create a profile if one does not exist. You need to register a handler
-for the User model's :attr:`django.db.models.signals.post_save` signal and, in
-the handler, if ``created`` is ``True``, create the associated user profile::
-
-    # in models.py
-
-    from django.contrib.auth.models import User
-    from django.db.models.signals import post_save
-
-    # definition of UserProfile from above
-    # ...
-
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            UserProfile.objects.create(user=instance)
-
-    post_save.connect(create_user_profile, sender=User)
-
-.. seealso:: :doc:`/topics/signals` for more information on Django's signal
-    dispatcher.
-
-Adding UserProfile fields to the admin
---------------------------------------
-
-To add the UserProfile fields to the user page in the admin, define an
-:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
-:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
-add it to a ``UserAdmin`` class which is registered with the
-:class:`~django.contrib.auth.models.User` class::
-
-    from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
-    from django.contrib.auth.models import User
-
-    from my_user_profile_app.models import UserProfile
-
-    # Define an inline admin descriptor for UserProfile model
-    # which acts a bit like a singleton
-    class UserProfileInline(admin.StackedInline):
-        model = UserProfile
-        can_delete = False
-        verbose_name_plural = 'profile'
-
-    # Define a new User admin
-    class UserAdmin(UserAdmin):
-        inlines = (UserProfileInline, )
-
-    # Re-register UserAdmin
-    admin.site.unregister(User)
-    admin.site.register(User, UserAdmin)
