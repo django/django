@@ -8,7 +8,7 @@ authentication to your projects needs involves understanding what points of the
 provided system are extendable or replaceable. This document provides details
 about how the auth system can be customized.
 
-`Authentication backends <authentication-backends`_ provide an extensible
+`Authentication backends <authentication-backends>`_ provide an extensible
 system for when a username and password stored with the User model need
 to be authenticated against a different service than Django's default.
 
@@ -37,8 +37,9 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the :doc:`authentication backend reference </ref/authbackends>`
-for information on the authentication backends included with Django.
+See the :doc:`authentication backend reference
+<authentication-backends-reference>` for information on the authentication
+backends included with Django.
 
 Specifying authentication backends
 ----------------------------------
@@ -775,7 +776,7 @@ methods and attributes:
 
         Returns ``True`` if the user has the specified permission, where perm is
         in the format ``"<app label>.<permission codename>"`` (see
-        `permissions`_). If the user is inactive, this method will
+        `permissions <topic-authorization>`_). If the user is inactive, this method will
         always return ``False``.
 
         If ``obj`` is passed in, this method won't check for a permission for

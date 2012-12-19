@@ -2,6 +2,8 @@
 Using the Django authentication system
 ======================================
 
+.. currentmodule:: django.contrib.auth
+
 This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
@@ -112,8 +114,6 @@ passwords.
 Authenticating Users
 --------------------
 
---- todo ensure sphinx current module set
-
 .. function:: django.contrib.auth.authenticate()
 
     To authenticate a given username and password, use
@@ -189,13 +189,15 @@ to test for basic permissions you should use:
 * change: ``user.has_perm('foo.change_bar')``
 * delete: ``user.has_perm('foo.delete_bar')``
 
---- link to custom permissions docs
+The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
+directly.
 
 Groups
 ------
 
-Groups are a generic way of categorizing users so you can apply permissions, or
-some other label, to those users. A user can belong to any number of groups.
+:class:`django.contrib.auth.models.Group` models are a generic way of
+categorizing users so you can apply permissions, or some other label, to those
+users. A user can belong to any number of groups.
 
 A user in a group automatically has the permissions granted to that group. For
 example, if the group ``Site editors`` has the permission
@@ -206,6 +208,27 @@ them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
 access to a members-only portion of your site, or send them members-only email
 messages.
+
+Programmatically creating permissions
+-------------------------------------
+
+While `custom permissions <custom-permissions>`_ can be defined within
+a model's ``Meta`` class, you can also create permissions directly. For
+example, you can create the ``can_publish`` permission for a ``BlogPost`` model
+in ``myapp``::
+
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    permission = Permission.objects.create(codename='can_publish',
+                                           name='Can Publish Posts',
+                                           content_type=content_type)
+
+The permission can then be assigned to a
+:class:`~django.contrib.auth.models.User` via its ``user_permissions``
+attribute or to a :class:`~django.contrib.auth.models.Group` via its
+``permissions`` attribute.
 
 .. _auth-web-requests:
 
@@ -275,22 +298,12 @@ If you have an authenticated user you want to attach to the current session
     :func:`~django.contrib.auth.authenticate()`
     sets an attribute on the :class:`~django.contrib.auth.models.User` noting
     which authentication backend successfully authenticated that user (see the
-    `backends documentation`_ for details), and this information is needed
+    `backends documentation <authentication-backends>`_ for details), and this information is needed
     later during the login process. An error will be raise if you try to login
     a user object retrieved from the database directly.
 
---- todo - update link to backends docs:
-
-.. _backends documentation: #other-authentication-sources
-
-
---- link to managing passwords?
-
-
 How to log a user out
 ---------------------
-
-.. currentmodule:: django.contrib.auth
 
 .. function:: logout()
 

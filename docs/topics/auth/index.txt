@@ -58,10 +58,10 @@ Usage
 
 :doc:`Using Django's default implementation <default>`
 
-* `Working with User objects <user-objects>`
-* `Permissions and authorization <topic-authorization>`
-* `Authentication in web requests <auth-web-requests>`
-* `Managing users in the admin <auth-admin>`
+* `Working with User objects <user-objects>`_
+* `Permissions and authorization <topic-authorization>`_
+* `Authentication in web requests <auth-web-requests>`_
+* `Managing users in the admin <auth-admin>`_
 
 :doc:`API reference for the default implementation </ref/contrib/auth>`
 
