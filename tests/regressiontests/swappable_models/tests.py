@@ -9,6 +9,8 @@ from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from regressiontests.swappable_models.models import Article
+
 
 class SwappableModelTests(TestCase):
     def setUp(self):
@@ -44,3 +46,13 @@ class SwappableModelTests(TestCase):
                        for ct in ContentType.objects.all()]
         self.assertIn(('swappable_models', 'alternatearticle'), apps_models)
         self.assertNotIn(('swappable_models', 'article'), apps_models)
+
+    @override_settings(TEST_ARTICLE_MODEL='swappable_models.article')
+    def test_case_insensitive(self):
+        "Model names are case insensitive. Check that model swapping honors this."
+        try:
+            Article.objects.all()
+        except AttributeError:
+            self.fail('Swappable model names should be case insensitive.')
+
+        self.assertIsNone(Article._meta.swapped)
