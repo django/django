@@ -31,7 +31,8 @@ class LocaleMiddleware(object):
                     and self.is_language_prefix_patterns_used()):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
-            if settings.APPEND_SLASH and not language_path.endswith('/'):
+            if (settings.APPEND_SLASH and not language_path.endswith('/') and
+                not is_valid_path(language_path, urlconf)):
                 language_path = language_path + '/'
 
             if is_valid_path(language_path, urlconf):
