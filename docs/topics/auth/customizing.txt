@@ -16,7 +16,7 @@ You can give your models `custom permissions <custom-permissions>`_ that can be
 checked through Django's authorization system.
 
 You can `extend <extend-user>`_ the default User model, or `substitute
-<substitute-user>`_ a completely customized model.
+<auth-custom-user>`_ a completely customized model.
 
 .. _authentication-backends:
 
@@ -388,7 +388,7 @@ instance of the user profile model associated with that
 The method :class:`~django.contrib.auth.models.User.get_profile()`
 does not create a profile if one does not exist.
 
-.. _substitute-user:
+.. _auth-custom-user:
 
 Substituting a custom User model
 ================================
