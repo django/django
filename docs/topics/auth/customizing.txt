@@ -37,7 +37,7 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the :doc:`authentication backend reference
+See the `authentication backend reference
 <authentication-backends-reference>` for information on the authentication
 backends included with Django.
 
@@ -658,9 +658,9 @@ custom profile fields.
 Custom users and the built-in auth forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>`
-and :ref:`views <other-built-in-views>` make certain assumptions about
-the user model that they are working with.
+As you may expect, built-in Django's `forms <built-in-auth-forms>`_ and `views
+<other-built-in-views>`_ make certain assumptions about the user model that
+they are working with.
 
 If your user model doesn't follow the same assumptions, it may be necessary to define
 a replacement form, and pass that form in as part of the configuration of the

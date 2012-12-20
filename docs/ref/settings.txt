@@ -107,8 +107,8 @@ AUTHENTICATION_BACKENDS
 Default: ``('django.contrib.auth.backends.ModelBackend',)``
 
 A tuple of authentication backend classes (as strings) to use when attempting to
-authenticate a user. See the :doc:`authentication backends documentation
-</ref/authbackends>` for details.
+authenticate a user. See the `authentication backends documentation
+<authentication-backends>`_ for details.
 
 .. setting:: AUTH_USER_MODEL
 
@@ -2237,7 +2237,7 @@ AUTH_PROFILE_MODULE
 Default: Not defined
 
 The site-specific user profile model used by this site. See
-:ref:`auth-profiles`.
+`User profiles <auth-profiles>`_.
 
 .. setting:: IGNORABLE_404_ENDS
 

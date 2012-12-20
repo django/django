@@ -423,7 +423,7 @@ This section details the authentication backends that come with Django. For
 information on how to use them and how to write your own authentication
 backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
-</topics/auth>`.
+</topics/auth/index>`.
 
 
 Available authentication backends

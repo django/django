@@ -1145,7 +1145,7 @@ changepassword
 .. django-admin:: changepassword
 
 This command is only available if Django's :doc:`authentication system
-</topics/auth>` (``django.contrib.auth``) is installed.
+</topics/auth/index>` (``django.contrib.auth``) is installed.
 
 Allows changing a user's password. It prompts you to enter twice the password of
 the user given as parameter. If they both match, the new password will be
@@ -1167,7 +1167,7 @@ createsuperuser
 .. django-admin:: createsuperuser
 
 This command is only available if Django's :doc:`authentication system
-</topics/auth>` (``django.contrib.auth``) is installed.
+</topics/auth/index>` (``django.contrib.auth``) is installed.
 
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account but did not

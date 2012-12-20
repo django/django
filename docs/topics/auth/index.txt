@@ -8,7 +8,8 @@ User authentication in Django
 Django comes with an user authentication system. It handles user accounts,
 groups, permissions and cookie-based user sessions. This section of the
 documentation explains how the default implementation works out of the box, as
-well as how to extend and customize it to suit your project's needs.
+well as how to :doc:`extend and customize </topics/auth/customizing>` it to
+suit your project's needs.
 
 Overview
 ========

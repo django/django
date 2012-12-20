@@ -38,7 +38,7 @@ In general, everything covered in the documentation -- with the exception of
 anything in the :doc:`internals area </internals/index>` is considered stable as
 of 1.0. This includes these APIs:
 
-- :doc:`Authorization </topics/auth>`
+- :doc:`Authorization </topics/auth/index>`
 
 - :doc:`Caching </topics/cache>`.
 
