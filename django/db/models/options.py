@@ -58,6 +58,7 @@ class Options(object):
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
+        self.swapped = None
         self.parents = SortedDict()
         self.duplicate_targets = {}
         self.auto_created = False
@@ -121,6 +122,22 @@ class Options(object):
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+        # If the model is swappable, determine if it is swapped
+        if self.swappable:
+            try:
+                swapped_for = getattr ( settings, self.swappable )
+            except AttributeError:
+                pass
+            else:
+                try:
+                    swapped_app_label, swapped_object_name = swapped_for.split('.')
+                except ValueError:
+                    raise TypeError("'%s' if present must be of the form 'app_label.object_name'" % (self.swappable))
+                else:
+                    # If the swapping model refers to the current model, then it is not really swapped
+                    if swapped_app_label != self.app_label or swapped_object_name.lower() != self.module_name:
+                        self.swapped = swapped_for
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -226,19 +243,6 @@ class Options(object):
         activate(lang)
         return raw
     verbose_name_raw = property(verbose_name_raw)
-
-    def _swapped(self):
-        """
-        Has this model been swapped out for another? If so, return the model
-        name of the replacement; otherwise, return None.
-        """
-        if self.swappable:
-            model_label = '%s.%s' % (self.app_label, self.object_name)
-            swapped_for = getattr(settings, self.swappable, None)
-            if swapped_for not in (None, model_label):
-                return swapped_for
-        return None
-    swapped = property(_swapped)
 
     def _fields(self):
         """
