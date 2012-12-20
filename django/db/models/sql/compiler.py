@@ -6,7 +6,7 @@ from django.db.backends.util import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
-        GET_ITERATOR_CHUNK_SIZE, REUSE_ALL, SelectInfo)
+        GET_ITERATOR_CHUNK_SIZE, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
@@ -317,7 +317,7 @@ class SQLCompiler(object):
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            field, col, alias, _, _ = self._setup_joins(parts, opts, None)
+            field, col, alias, _, _ = self._setup_joins(parts, opts)
             col, alias = self._final_join_removal(col, alias)
             result.append("%s.%s" % (qn(alias), qn2(col)))
         return result
@@ -450,7 +450,7 @@ class SQLCompiler(object):
         if not alias:
             alias = self.query.get_initial_alias()
         field, target, opts, joins, _ = self.query.setup_joins(
-            pieces, opts, alias, REUSE_ALL)
+            pieces, opts, alias)
         # We will later on need to promote those joins that were added to the
         # query afresh above.
         joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
@@ -688,7 +688,7 @@ class SQLCompiler(object):
                         int_opts = int_model._meta
                         alias = self.query.join(
                             (alias, int_opts.db_table, lhs_col, int_opts.pk.column),
-                            promote=True,
+                            promote=True
                         )
                         alias_chain.append(alias)
                 alias = self.query.join(

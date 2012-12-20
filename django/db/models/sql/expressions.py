@@ -1,10 +1,9 @@
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.sql.constants import REUSE_ALL
 
 class SQLEvaluator(object):
-    def __init__(self, expression, query, allow_joins=True, reuse=REUSE_ALL):
+    def __init__(self, expression, query, allow_joins=True, reuse=None):
         self.expression = expression
         self.opts = query.get_meta()
         self.cols = []
@@ -54,7 +53,7 @@ class SQLEvaluator(object):
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
                 col, _, join_list = query.trim_joins(source, join_list, path)
-                if self.reuse is not None and self.reuse != REUSE_ALL:
+                if self.reuse is not None:
                     self.reuse.update(join_list)
                 self.cols.append((node, (join_list[-1], col)))
             except FieldDoesNotExist:

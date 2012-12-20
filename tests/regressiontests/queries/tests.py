@@ -2418,3 +2418,36 @@ class ReverseJoinTrimmingTest(TestCase):
         qs = Tag.objects.filter(annotation__tag=t.pk)
         self.assertIn('INNER JOIN', str(qs.query))
         self.assertEquals(list(qs), [])
+
+class JoinReuseTest(TestCase):
+    """
+    Test that the queries reuse joins sensibly (for example, direct joins
+    are always reused).
+    """
+    def test_fk_reuse(self):
+        qs = Annotation.objects.filter(tag__name='foo').filter(tag__name='bar')
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_fk_reuse_select_related(self):
+        qs = Annotation.objects.filter(tag__name='foo').select_related('tag')
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_fk_reuse_annotation(self):
+        qs = Annotation.objects.filter(tag__name='foo').annotate(cnt=Count('tag__name'))
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_fk_reuse_disjunction(self):
+        qs = Annotation.objects.filter(Q(tag__name='foo') | Q(tag__name='bar'))
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_fk_reuse_order_by(self):
+        qs = Annotation.objects.filter(tag__name='foo').order_by('tag__name')
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_revo2o_reuse(self):
+        qs = Detail.objects.filter(member__name='foo').filter(member__name='foo')
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
+
+    def test_revfk_noreuse(self):
+        qs = Author.objects.filter(report__name='r4').filter(report__name='r1')
+        self.assertEqual(str(qs.query).count('JOIN'), 2)
