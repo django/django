@@ -317,7 +317,7 @@ class SQLCompiler(object):
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            field, col, alias, _, _ = self._setup_joins(parts, opts)
+            field, col, alias, _, _ = self._setup_joins(parts, opts, None)
             col, alias = self._final_join_removal(col, alias)
             result.append("%s.%s" % (qn(alias), qn2(col)))
         return result
