@@ -1445,8 +1445,7 @@ class Query(object):
         the join.
         """
         for info in reversed(path):
-            direct = info.join_field == info.from_field
-            if info.to_field == target and direct:
+            if info.to_field == target and info.direct:
                 target = info.from_field
                 self.unref_alias(joins.pop())
             else:
