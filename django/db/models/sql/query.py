@@ -997,8 +997,7 @@ class Query(object):
         whereas column determination is a later part, and side-effect, of
         as_sql()).
         """
-        # Skip all proxy models
-        opts = self.model._meta.concrete_model._meta
+        opts = self.model._meta
         root_alias = self.tables[0]
         seen = {None: root_alias}
 
@@ -1013,7 +1012,8 @@ class Query(object):
         a parent of 'opts' or if it is None this method is a no-op.
 
         The 'alias' is the root alias for starting the join, 'seen' is a dict
-        of model -> alias of existing joins.
+        of model -> alias of existing joins. It must also contain a mapping
+        of None -> some alias. This will be returned in the no-op case.
         """
         if model in seen:
             return seen[model]
@@ -1036,7 +1036,7 @@ class Query(object):
             connection = (alias, int_opts.db_table, link_field.column, int_opts.pk.column)
             alias = seen[int_model] = self.join(connection, nullable=False,
                                                 join_field=link_field)
-        return alias
+        return alias or seen[None]
 
     def remove_inherited_models(self):
         """
