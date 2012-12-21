@@ -7,8 +7,8 @@ Testing Django applications
 
 .. seealso::
 
-    The :doc:`testing introductory tutorial </intro/tutorial05>` and the
-    :doc:`advanced testing topics document </topics/testing/advanced>`.
+    The :doc:`testing tutorial </intro/tutorial05>` and the
+    :doc:`advanced testing topics </topics/testing/advanced>`.
 
 This document is split into two primary sections. First, we explain how to write
 tests with Django. Then, we explain how to run them.
@@ -172,6 +172,8 @@ be reported, and any test databases created by the run will not be destroyed.
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
+
+.. _the-test-database:
 
 The test database
 -----------------

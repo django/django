@@ -1072,7 +1072,7 @@ For example, this command::
 
 ...would perform the following steps:
 
-1. Create a test database, as described in :doc:`/topics/testing/index`.
+1. Create a test database, as described in :ref:`the-test-database`.
 2. Populate the test database with fixture data from the given fixtures.
    (For more on fixtures, see the documentation for ``loaddata`` above.)
 3. Runs the Django development server (as in ``runserver``), pointed at
@@ -1080,9 +1080,9 @@ For example, this command::
 
 This is useful in a number of ways:
 
-* When you're writing :doc:`unit tests </topics/testing/index>` of how your views
-  act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a Web browser, manually.
+* When you're writing :doc:`unit tests </topics/testing/overview>` of how your
+  views act with certain fixture data, you can use ``testserver`` to interact
+  with the views in a Web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your

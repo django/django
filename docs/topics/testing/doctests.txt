@@ -79,4 +79,3 @@ the database user Django is connecting as must have ``CREATE DATABASE``
 rights.
 
 For more details about :mod:`doctest`, see the Python documentation.
-
