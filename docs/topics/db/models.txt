@@ -66,13 +66,13 @@ those models. Do this by editing your settings file and changing the
 your ``models.py``.
 
 For example, if the models for your application live in the module
-``mysite.myapp.models`` (the package structure that is created for an
+``myapp.models`` (the package structure that is created for an
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = (
         #...
-        'mysite.myapp',
+        'myapp',
         #...
     )
 
