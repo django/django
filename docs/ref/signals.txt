@@ -476,7 +476,7 @@ Test signals
 .. module:: django.test.signals
    :synopsis: Signals sent during testing.
 
-Signals only sent when :doc:`running tests </topics/testing>`.
+Signals only sent when :ref:`running tests <running-tests>`.
 
 setting_changed
 ---------------

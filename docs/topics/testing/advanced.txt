@@ -1,0 +1,429 @@
+=======================
+Advanced testing topics
+=======================
+
+The request factory
+===================
+
+.. module:: django.test.client
+
+.. class:: RequestFactory
+
+The :class:`~django.test.client.RequestFactory` shares the same API as
+the test client. However, instead of behaving like a browser, the
+RequestFactory provides a way to generate a request instance that can
+be used as the first argument to any view. This means you can test a
+view function the same way as you would test any other function -- as
+a black box, with exactly known inputs, testing for specific outputs.
+
+The API for the :class:`~django.test.client.RequestFactory` is a slightly
+restricted subset of the test client API:
+
+* It only has access to the HTTP methods :meth:`~Client.get()`,
+  :meth:`~Client.post()`, :meth:`~Client.put()`,
+  :meth:`~Client.delete()`, :meth:`~Client.head()` and
+  :meth:`~Client.options()`.
+
+* These methods accept all the same arguments *except* for
+  ``follows``. Since this is just a factory for producing
+  requests, it's up to you to handle the response.
+
+* It does not support middleware. Session and authentication
+  attributes must be supplied by the test itself if required
+  for the view to function properly.
+
+Example
+-------
+
+The following is a simple unit test using the request factory::
+
+    from django.utils import unittest
+    from django.test.client import RequestFactory
+
+    class SimpleTest(unittest.TestCase):
+        def setUp(self):
+            # Every test needs access to the request factory.
+            self.factory = RequestFactory()
+
+        def test_details(self):
+            # Create an instance of a GET request.
+            request = self.factory.get('/customer/details')
+
+            # Test my_view() as if it were deployed at /customer/details
+            response = my_view(request)
+            self.assertEqual(response.status_code, 200)
+
+.. _topics-testing-advanced-multidb:
+
+Tests and multiple databases
+============================
+
+.. _topics-testing-masterslave:
+
+Testing master/slave configurations
+-----------------------------------
+
+If you're testing a multiple database configuration with master/slave
+replication, this strategy of creating test databases poses a problem.
+When the test databases are created, there won't be any replication,
+and as a result, data created on the master won't be seen on the
+slave.
+
+To compensate for this, Django allows you to define that a database is
+a *test mirror*. Consider the following (simplified) example database
+configuration::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'myproject',
+            'HOST': 'dbmaster',
+             # ... plus some other settings
+        },
+        'slave': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'myproject',
+            'HOST': 'dbslave',
+            'TEST_MIRROR': 'default'
+            # ... plus some other settings
+        }
+    }
+
+In this setup, we have two database servers: ``dbmaster``, described
+by the database alias ``default``, and ``dbslave`` described by the
+alias ``slave``. As you might expect, ``dbslave`` has been configured
+by the database administrator as a read slave of ``dbmaster``, so in
+normal activity, any write to ``default`` will appear on ``slave``.
+
+If Django created two independent test databases, this would break any
+tests that expected replication to occur. However, the ``slave``
+database has been configured as a test mirror (using the
+:setting:`TEST_MIRROR` setting), indicating that under testing,
+``slave`` should be treated as a mirror of ``default``.
+
+When the test environment is configured, a test version of ``slave``
+will *not* be created. Instead the connection to ``slave``
+will be redirected to point at ``default``. As a result, writes to
+``default`` will appear on ``slave`` -- but because they are actually
+the same database, not because there is data replication between the
+two databases.
+
+.. _topics-testing-creation-dependencies:
+
+Controlling creation order for test databases
+---------------------------------------------
+
+By default, Django will always create the ``default`` database first.
+However, no guarantees are made on the creation order of any other
+databases in your test setup.
+
+If your database configuration requires a specific creation order, you
+can specify the dependencies that exist using the
+:setting:`TEST_DEPENDENCIES` setting. Consider the following
+(simplified) example database configuration::
+
+    DATABASES = {
+        'default': {
+             # ... db settings
+             'TEST_DEPENDENCIES': ['diamonds']
+        },
+        'diamonds': {
+            # ... db settings
+        },
+        'clubs': {
+            # ... db settings
+            'TEST_DEPENDENCIES': ['diamonds']
+        },
+        'spades': {
+            # ... db settings
+            'TEST_DEPENDENCIES': ['diamonds','hearts']
+        },
+        'hearts': {
+            # ... db settings
+            'TEST_DEPENDENCIES': ['diamonds','clubs']
+        }
+    }
+
+Under this configuration, the ``diamonds`` database will be created first,
+as it is the only database alias without dependencies. The ``default`` and
+``clubs`` alias will be created next (although the order of creation of this
+pair is not guaranteed); then ``hearts``; and finally ``spades``.
+
+If there are any circular dependencies in the
+:setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
+exception will be raised.
+
+Running tests outside the test runner
+=====================================
+
+If you want to run tests outside of ``./manage.py test`` -- for example,
+from a shell prompt -- you will need to set up the test
+environment first. Django provides a convenience method to do this::
+
+    >>> from django.test.utils import setup_test_environment
+    >>> setup_test_environment()
+
+This convenience method sets up the test database, and puts other
+Django features into modes that allow for repeatable testing.
+
+The call to :meth:`~django.test.utils.setup_test_environment` is made
+automatically as part of the setup of ``./manage.py test``. You only
+need to manually invoke this method if you're not using running your
+tests via Django's test runner.
+
+.. _other-testing-frameworks:
+
+Using different testing frameworks
+==================================
+
+Clearly, :mod:`doctest` and :mod:`unittest` are not the only Python testing
+frameworks. While Django doesn't provide explicit support for alternative
+frameworks, it does provide a way to invoke tests constructed for an
+alternative framework as if they were normal Django tests.
+
+When you run ``./manage.py test``, Django looks at the :setting:`TEST_RUNNER`
+setting to determine what to do. By default, :setting:`TEST_RUNNER` points to
+``'django.test.simple.DjangoTestSuiteRunner'``. This class defines the default Django
+testing behavior. This behavior involves:
+
+#. Performing global pre-test setup.
+
+#. Looking for unit tests and doctests in the ``models.py`` and
+   ``tests.py`` files in each installed application.
+
+#. Creating the test databases.
+
+#. Running ``syncdb`` to install models and initial data into the test
+   databases.
+
+#. Running the unit tests and doctests that are found.
+
+#. Destroying the test databases.
+
+#. Performing global post-test teardown.
+
+If you define your own test runner class and point :setting:`TEST_RUNNER` at
+that class, Django will execute your test runner whenever you run
+``./manage.py test``. In this way, it is possible to use any test framework
+that can be executed from Python code, or to modify the Django test execution
+process to satisfy whatever testing requirements you may have.
+
+.. _topics-testing-test_runner:
+
+Defining a test runner
+----------------------
+
+.. currentmodule:: django.test.simple
+
+A test runner is a class defining a ``run_tests()`` method. Django ships
+with a ``DjangoTestSuiteRunner`` class that defines the default Django
+testing behavior. This class defines the ``run_tests()`` entry point,
+plus a selection of other methods that are used to by ``run_tests()`` to
+set up, execute and tear down the test suite.
+
+.. class:: DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=True, **kwargs)
+
+    ``verbosity`` determines the amount of notification and debug information
+    that will be printed to the console; ``0`` is no output, ``1`` is normal
+    output, and ``2`` is verbose output.
+
+    If ``interactive`` is ``True``, the test suite has permission to ask the
+    user for instructions when the test suite is executed. An example of this
+    behavior would be asking for permission to delete an existing test
+    database. If ``interactive`` is ``False``, the test suite must be able to
+    run without any manual intervention.
+
+    If ``failfast`` is ``True``, the test suite will stop running after the
+    first test failure is detected.
+
+    Django will, from time to time, extend the capabilities of
+    the test runner by adding new arguments. The ``**kwargs`` declaration
+    allows for this expansion. If you subclass ``DjangoTestSuiteRunner`` or
+    write your own test runner, ensure accept and handle the ``**kwargs``
+    parameter.
+
+    .. versionadded:: 1.4
+
+    Your test runner may also define additional command-line options.
+    If you add an ``option_list`` attribute to a subclassed test runner,
+    those options will be added to the list of command-line options that
+    the :djadmin:`test` command can use.
+
+Attributes
+~~~~~~~~~~
+
+.. attribute:: DjangoTestSuiteRunner.option_list
+
+    .. versionadded:: 1.4
+
+    This is the tuple of ``optparse`` options which will be fed into the
+    management command's ``OptionParser`` for parsing arguments. See the
+    documentation for Python's ``optparse`` module for more details.
+
+Methods
+~~~~~~~
+
+.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=None, **kwargs)
+
+    Run the test suite.
+
+    ``test_labels`` is a list of strings describing the tests to be run. A test
+    label can take one of three forms:
+
+    * ``app.TestCase.test_method`` -- Run a single test method in a test
+      case.
+    * ``app.TestCase`` -- Run all the test methods in a test case.
+    * ``app`` -- Search for and run all tests in the named application.
+
+    If ``test_labels`` has a value of ``None``, the test runner should run
+    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+
+    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+    suite that is executed by the test runner. These extra tests are run
+    in addition to those discovered in the modules listed in ``test_labels``.
+
+    This method should return the number of tests that failed.
+
+.. method:: DjangoTestSuiteRunner.setup_test_environment(**kwargs)
+
+    Sets up the test environment ready for testing.
+
+.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=None, **kwargs)
+
+    Constructs a test suite that matches the test labels provided.
+
+    ``test_labels`` is a list of strings describing the tests to be run. A test
+    label can take one of three forms:
+
+    * ``app.TestCase.test_method`` -- Run a single test method in a test
+      case.
+    * ``app.TestCase`` -- Run all the test methods in a test case.
+    * ``app`` -- Search for and run all tests in the named application.
+
+    If ``test_labels`` has a value of ``None``, the test runner should run
+    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+
+    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+    suite that is executed by the test runner. These extra tests are run
+    in addition to those discovered in the modules listed in ``test_labels``.
+
+    Returns a ``TestSuite`` instance ready to be run.
+
+.. method:: DjangoTestSuiteRunner.setup_databases(**kwargs)
+
+    Creates the test databases.
+
+    Returns a data structure that provides enough detail to undo the changes
+    that have been made. This data will be provided to the ``teardown_databases()``
+    function at the conclusion of testing.
+
+.. method:: DjangoTestSuiteRunner.run_suite(suite, **kwargs)
+
+    Runs the test suite.
+
+    Returns the result produced by the running the test suite.
+
+.. method:: DjangoTestSuiteRunner.teardown_databases(old_config, **kwargs)
+
+    Destroys the test databases, restoring pre-test conditions.
+
+    ``old_config`` is a data structure defining the changes in the
+    database configuration that need to be reversed. It is the return
+    value of the ``setup_databases()`` method.
+
+.. method:: DjangoTestSuiteRunner.teardown_test_environment(**kwargs)
+
+    Restores the pre-test environment.
+
+.. method:: DjangoTestSuiteRunner.suite_result(suite, result, **kwargs)
+
+    Computes and returns a return code based on a test suite, and the result
+    from that test suite.
+
+
+Testing utilities
+-----------------
+
+.. module:: django.test.utils
+   :synopsis: Helpers to write custom test runners.
+
+To assist in the creation of your own test runner, Django provides a number of
+utility methods in the ``django.test.utils`` module.
+
+.. function:: setup_test_environment()
+
+    Performs any global pre-test setup, such as the installing the
+    instrumentation of the template rendering system and setting up
+    the dummy email outbox.
+
+.. function:: teardown_test_environment()
+
+    Performs any global post-test teardown, such as removing the black
+    magic hooks into the template system and restoring normal email
+    services.
+
+.. currentmodule:: django.db.connection.creation
+
+The creation module of the database backend (``connection.creation``)
+also provides some utilities that can be useful during testing.
+
+.. function:: create_test_db([verbosity=1, autoclobber=False])
+
+    Creates a new test database and runs ``syncdb`` against it.
+
+    ``verbosity`` has the same behavior as in ``run_tests()``.
+
+    ``autoclobber`` describes the behavior that will occur if a
+    database with the same name as the test database is discovered:
+
+    * If ``autoclobber`` is ``False``, the user will be asked to
+      approve destroying the existing database. ``sys.exit`` is
+      called if the user does not approve.
+
+    * If autoclobber is ``True``, the database will be destroyed
+      without consulting the user.
+
+    Returns the name of the test database that it created.
+
+    ``create_test_db()`` has the side effect of modifying the value of
+    :setting:`NAME` in :setting:`DATABASES` to match the name of the test
+    database.
+
+.. function:: destroy_test_db(old_database_name, [verbosity=1])
+
+    Destroys the database whose name is the value of :setting:`NAME` in
+    :setting:`DATABASES`, and sets :setting:`NAME` to the value of
+    ``old_database_name``.
+
+    The ``verbosity`` argument has the same behavior as for
+    :class:`~django.test.simple.DjangoTestSuiteRunner`.
+
+.. _topics-testing-code-coverage:
+
+Integration with coverage.py
+============================
+
+Code coverage describes how much source code has been tested. It shows which
+parts of your code are being exercised by tests and which are not. It's an
+important part of testing applications, so it's strongly recommended to check
+the coverage of your tests.
+
+Django can be easily integrated with `coverage.py`_, a tool for measuring code
+coverage of Python programs. First, `install coverage.py`_. Next, run the
+following from your project folder containing ``manage.py``::
+
+   coverage run --source='.' manage.py test myapp
+
+This runs your tests and collects coverage data of the executed files in your
+project. You can see a report of this data by typing following command::
+
+   coverage report
+
+Note that some Django code was executed while running tests, but it is not
+listed here because of the ``source`` flag passed to the previous command.
+
+For more options like annotated HTML listings detailing missed lines, see the
+`coverage.py`_ docs.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
+.. _install coverage.py: http://pypi.python.org/pypi/coverage
