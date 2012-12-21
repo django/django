@@ -1,5 +1,8 @@
+from django.contrib.messages import constants
 from django.contrib.messages.tests.base import BaseTest
+from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.session import SessionStorage
+from django.utils.safestring import SafeData, mark_safe
 
 
 def set_session_data(storage, messages):
@@ -36,3 +39,14 @@ class SessionTest(BaseTest):
         set_session_data(storage, example_messages)
         # Test that the message actually contains what we expect.
         self.assertEqual(list(storage), example_messages)
+
+    def test_safedata(self):
+        """
+        Tests that a message containing SafeData is keeping its safe status when
+        retrieved from the message storage.
+        """
+        storage = self.get_storage()
+
+        message = Message(constants.DEBUG, mark_safe("<b>Hello Django!</b>"))
+        set_session_data(storage, [message])
+        self.assertIsInstance(list(storage)[0].message, SafeData)
