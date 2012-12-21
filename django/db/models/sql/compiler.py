@@ -255,8 +255,6 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.model._meta
-        # Skip all proxy to the root proxied model
-        opts = opts.concrete_model._meta
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
