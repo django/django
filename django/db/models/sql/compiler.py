@@ -255,8 +255,6 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.model._meta
-        # Skip all proxy to the root proxied model
-        opts = opts.concrete_model._meta
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
@@ -265,6 +263,10 @@ class SQLCompiler(object):
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
+            # For local fields (even if through proxy) the model should
+            # be None.
+            if model == opts.concrete_model:
+                model = None
             if local_only and model is not None:
                 continue
             if start_alias:
