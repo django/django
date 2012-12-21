@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
 from django.utils.crypto import salted_hmac, constant_time_compare
+from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
 
 
@@ -15,7 +16,9 @@ class MessageEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, Message):
-            message = [self.message_key, obj.level, obj.message]
+            # Using 0/1 here instead of False/True to produce more compact json
+            is_safedata = 1 if isinstance(obj.message, SafeData) else 0
+            message = [self.message_key, is_safedata, obj.level, obj.message]
             if obj.extra_tags:
                 message.append(obj.extra_tags)
             return message
@@ -30,7 +33,9 @@ class MessageDecoder(json.JSONDecoder):
     def process_messages(self, obj):
         if isinstance(obj, list) and obj:
             if obj[0] == MessageEncoder.message_key:
-                return Message(*obj[1:])
+                if obj[1]:
+                    obj[3] = mark_safe(obj[3])
+                return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return dict([(key, self.process_messages(value))
