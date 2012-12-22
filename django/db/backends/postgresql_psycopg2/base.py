@@ -29,7 +29,6 @@ except ImportError as e:
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
@@ -211,6 +210,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.init_connection_state()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
+        psycopg2.extensions.register_type(psycopg2.extensions.UNICODE, cursor)
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return CursorWrapper(cursor)
 
