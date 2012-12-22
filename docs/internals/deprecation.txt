@@ -268,6 +268,12 @@ these changes.
 * ``django.contrib.markup`` will be removed following an accelerated
   deprecation.
 
+* The value for the ``post_url_continue`` parameter in
+  ``ModelAdmin.response_add()`` will have to be either ``None`` (to redirect
+  to the newly created object's edit page) or a pre-formatted url. String
+  formats, such as the previous default ``'../%s/'``, will not be accepted any
+  more.
+
 1.7
 ---
 
