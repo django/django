@@ -102,7 +102,7 @@ Testing improvements
 .. currentmodule:: django.test.client
 
 A couple of small but very useful improvements have been made to the
-:doc:`testing framework </topics/testing>`:
+:doc:`testing framework </topics/testing/index>`:
 
 * The test :class:`Client` now can automatically follow redirects with the
   ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This

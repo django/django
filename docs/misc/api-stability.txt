@@ -71,7 +71,7 @@ of 1.0. This includes these APIs:
   external template tags. Before adding any such tags, we'll ensure that
   Django raises an error if it tries to load tags with duplicate names.
 
-- :doc:`Testing </topics/testing>`
+- :doc:`Testing </topics/testing/index>`
 
 - :doc:`django-admin utility </ref/django-admin>`.
 

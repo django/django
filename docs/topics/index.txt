@@ -13,7 +13,7 @@ Introductions to all the key parts of Django you'll need to know:
    templates
    class-based-views/index
    files
-   testing
+   testing/index
    auth
    cache
    conditional-view-processing
