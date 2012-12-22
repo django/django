@@ -153,7 +153,7 @@ class UserAdmin(admin.ModelAdmin):
             'admin/auth/user/change_password.html',
             context, current_app=self.admin_site.name)
 
-    def response_add(self, request, obj, **kwargs):
+    def response_add(self, request, obj, post_url_continue=None):
         """
         Determines the HttpResponse for the add_view stage. It mostly defers to
         its superclass implementation but is customized because the User model
@@ -166,7 +166,8 @@ class UserAdmin(admin.ModelAdmin):
         # * We are adding a user in a popup
         if '_addanother' not in request.POST and '_popup' not in request.POST:
             request.POST['_continue'] = 1
-        return super(UserAdmin, self).response_add(request, obj, **kwargs)
+        return super(UserAdmin, self).response_add(request, obj,
+                                                   post_url_continue)
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
