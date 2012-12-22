@@ -8,7 +8,7 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_str
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
@@ -275,14 +275,16 @@ class BCryptPasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
-        data = bcrypt.hashpw(password, salt)
+        # Need to reevaluate the force_bytes call once bcrypt is supported on
+        # Python 3
+        data = bcrypt.hashpw(force_bytes(password), salt)
         return "%s$%s" % (self.algorithm, data)
 
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
         bcrypt = self._load_library()
-        return constant_time_compare(data, bcrypt.hashpw(password, data))
+        return constant_time_compare(data, bcrypt.hashpw(force_bytes(password), data))
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -395,7 +397,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         crypt = self._load_library()
         assert len(salt) == 2
-        data = crypt.crypt(password, salt)
+        data = crypt.crypt(force_str(password), salt)
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
 
@@ -403,7 +405,7 @@ class CryptPasswordHasher(BasePasswordHasher):
         crypt = self._load_library()
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return constant_time_compare(data, crypt.crypt(password, data))
+        return constant_time_compare(data, crypt.crypt(force_str(password), data))
 
     def safe_summary(self, encoded):
         algorithm, salt, data = encoded.split('$', 2)
