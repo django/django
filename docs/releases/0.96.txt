@@ -220,7 +220,7 @@ supported :doc:`serialization formats </topics/serialization>`, that will be
 loaded into your database at the start of your tests. This makes testing with
 real data much easier.
 
-See :doc:`the testing documentation </topics/testing>` for the full details.
+See :doc:`the testing documentation </topics/testing/index>` for the full details.
 
 Improvements to the admin interface
 -----------------------------------
