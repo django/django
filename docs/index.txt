@@ -181,7 +181,7 @@ testing of Django applications:
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
 * **Testing:**
-  :doc:`Overview <topics/testing/index>` |
+  :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
   :doc:`Advanced topics <topics/testing/advanced>` |
   :doc:`Doctests <topics/testing/doctests>`
