@@ -562,7 +562,7 @@ If the default value (``None``) is used with the SQLite database engine, the
 tests will use a memory resident database. For all other database engines the
 test database will use the name ``'test_' + DATABASE_NAME``.
 
-See :doc:`/topics/testing`.
+See :ref:`the-test-database`.
 
 .. setting:: TEST_CREATE
 
@@ -1982,9 +1982,7 @@ TEST_RUNNER
 Default: ``'django.test.simple.DjangoTestSuiteRunner'``
 
 The name of the class to use for starting the test suite. See
-:doc:`/topics/testing`.
-
-.. _Testing Django Applications: ../testing/
+:ref:`other-testing-frameworks`.
 
 .. setting:: THOUSAND_SEPARATOR
 

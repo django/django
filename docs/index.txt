@@ -180,7 +180,11 @@ testing of Django applications:
   :doc:`Overview <ref/django-admin>` |
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
-* **Testing:**  :doc:`Overview <topics/testing>`
+* **Testing:**
+  :doc:`Overview <topics/testing/index>` |
+  :doc:`Writing and running tests <topics/testing/overview>` |
+  :doc:`Advanced topics <topics/testing/advanced>` |
+  :doc:`Doctests <topics/testing/doctests>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
