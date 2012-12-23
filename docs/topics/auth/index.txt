@@ -2,6 +2,13 @@
 User authentication in Django
 =============================
 
+.. toctree::
+   :hidden:
+
+   default
+   passwords
+   customizing
+
 .. module:: django.contrib.auth
    :synopsis: Django's authentication framework.
 
@@ -72,10 +79,3 @@ Usage
 :doc:`Customizing Users and authentication <customizing>`
 
 :doc:`Password management in Django <passwords>`
-
-.. toctree::
-   :maxdepth: 1
-
-   default
-   passwords
-   customizing
