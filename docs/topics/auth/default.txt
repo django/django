@@ -7,10 +7,10 @@ Using the Django authentication system
 This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
-implementation of passwords and permissions. While this default configuration
-may handle the majority of cases as is. For projects where authentication needs
-differ from the default, Django supports extensive :doc:`extension and
-customization </topics/auth/customizing>` of authentication.
+implementation of passwords and permissions, and can handle many projects as
+is.  For projects where authentication needs differ from the default, Django
+supports extensive :doc:`extension and customization
+</topics/auth/customizing>` of authentication.
 
 Django authentication provides both authentication and authorization, together
 and is generally referred to as the authenticaiton system, as these features
@@ -1056,5 +1056,3 @@ User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
 a password change form that allows admins to change user passwords.
-
-

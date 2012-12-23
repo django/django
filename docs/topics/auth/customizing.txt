@@ -1,11 +1,11 @@
 ====================================
-Customising authentication in Django
+Customizing authentication in Django
 ====================================
 
 The authentication that comes with Django is good enough for most common cases,
 but you may have needs not met by the out-of-the-box defaults. To customize
 authentication to your projects needs involves understanding what points of the
-provided system are extendable or replaceable. This document provides details
+provided system are extendible or replaceable. This document provides details
 about how the auth system can be customized.
 
 `Authentication backends <authentication-backends>`_ provide an extensible
@@ -61,7 +61,7 @@ By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
     ('django.contrib.auth.backends.ModelBackend',)
 
 That's the basic authentication backend that checks the Django users database
-and queries the builtin permissions. It does not provide protection against
+and queries the built-in permissions. It does not provide protection against
 brute force attacks via any rate limiting mechanism. You may either implement
 your own rate limiting mechanism in a custom auth backend, or use the
 mechanisms provided by most Web servers.
@@ -201,7 +201,7 @@ A full authorization implementation can be found in the ``ModelBackend`` class
 in `django/contrib/auth/backends.py`_, which is the default backend and queries
 the ``auth_permission`` table most of the time. If you wish to provide
 custom behavior for only part of the backend API, you can take advantage of
-Python inheritence and subclass ``ModelBackend`` instead of implementing the
+Python inheritance and subclass ``ModelBackend`` instead of implementing the
 complete API in a custom backend.
 
 .. _django/contrib/auth/backends.py: https://github.com/django/django/blob/master/django/contrib/auth/backends.py
@@ -742,7 +742,7 @@ Custom users and permissions
 
 To make it easy to include Django's permission framework into your own User
 class, Django provides :class:`~django.contrib.auth.model.PermissionsMixin`.
-This is an abstract model you can include in the class heirarchy for your User
+This is an abstract model you can include in the class hierarchy for your User
 model, giving you all the methods and database fields necessary to support
 Django's permission model.
 
@@ -824,7 +824,9 @@ Custom users and signals
 
 Another limitation of custom User models is that you can't use
 :func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
-handler. Instead, you must register the handler with the actual User model.
+handler. Instead, you must register the handler with the resulting User model.
+See :doc:`/topics/signals` for more information on registering an sending
+signals.
 
 Custom users and testing/fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1061,5 +1063,3 @@ code would be required in the app's ``admin.py`` file::
     # ... and, since we're not using Django's builtin permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
-
-
