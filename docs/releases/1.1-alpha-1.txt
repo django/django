@@ -51,7 +51,7 @@ Performance improvements
 
 .. currentmodule:: django.test
 
-Tests written using Django's :doc:`testing framework </topics/testing>` now run
+Tests written using Django's :doc:`testing framework </topics/testing/index>` now run
 dramatically faster (as much as 10 times faster in many cases).
 
 This was accomplished through the introduction of transaction-based tests: when

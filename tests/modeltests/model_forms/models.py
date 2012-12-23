@@ -263,3 +263,18 @@ class FlexibleDatePost(models.Model):
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField(blank=True, null=True)
+
+@python_2_unicode_compatible
+class Colour(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __iter__(self):
+        for number in xrange(5):
+            yield number
+
+    def __str__(self):
+        return self.name
+
+class ColourfulItem(models.Model):
+    name = models.CharField(max_length=50)
+    colours = models.ManyToManyField(Colour)

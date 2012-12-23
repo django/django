@@ -232,7 +232,6 @@ class DateQuery(Query):
                 field_name.split(LOOKUP_SEP),
                 self.get_meta(),
                 self.get_initial_alias(),
-                False
             )
         except FieldError:
             raise FieldDoesNotExist("%s has no field named '%s'" % (

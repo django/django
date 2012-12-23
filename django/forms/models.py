@@ -1033,6 +1033,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         return qs
 
     def prepare_value(self, value):
-        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
+        if (hasattr(value, '__iter__') and
+                not isinstance(value, six.text_type) and
+                not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
