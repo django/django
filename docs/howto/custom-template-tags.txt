@@ -328,26 +328,6 @@ Template filter code falls into one of two situations:
    handle the auto-escaping issues and return a safe string, the
    ``is_safe`` flag won't change anything either way.
 
-.. versionchanged:: 1.4
-
-``is_safe`` and ``needs_autoescape`` used to be attributes of the filter
-function; this syntax is deprecated.
-
-.. code-block:: python
-
-    @register.filter
-    def myfilter(value):
-        return value
-    myfilter.is_safe = True
-
-.. code-block:: python
-
-    @register.filter
-    def initial_letter_filter(text, autoescape=None):
-        # ...
-        return mark_safe(result)
-    initial_letter_filter.needs_autoescape = True
-
 .. _filters-timezones:
 
 Filters and time zones
