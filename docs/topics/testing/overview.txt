@@ -195,9 +195,9 @@ entirely!). If you want to use a different database name, specify
 
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
-:setting:`ENGINE`, :setting:`USER`, :setting:`HOST`, etc. The test
-database is created by the user specified by :setting:`USER`, so you'll need
-to make sure that the given user account has sufficient privileges to
+:setting:`ENGINE <DATABASE-ENGINE>`, :setting:`USER`, :setting:`HOST`, etc. The
+test database is created by the user specified by :setting:`USER`, so you'll
+need to make sure that the given user account has sufficient privileges to
 create a new database on the system.
 
 For fine-grained control over the character encoding of your test
