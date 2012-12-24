@@ -207,9 +207,10 @@ your database connection settings.
   same physical machine (not used for SQLite). See :setting:`HOST` for details.
 
 If you're new to databases, we recommend simply using SQLite by setting
-:setting:`ENGINE` to ``'django.db.backends.sqlite3'`` and :setting:`NAME` to
-the place where you'd like to store the database. SQLite is included in Python,
-so you won't need to install anything else to support your database.
+:setting:`ENGINE <DATABASE-ENGINE>` to ``'django.db.backends.sqlite3'`` and
+:setting:`NAME` to the place where you'd like to store the database. SQLite is
+included in Python, so you won't need to install anything else to support your
+database.
 
 .. note::
 

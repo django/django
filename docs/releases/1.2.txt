@@ -819,16 +819,16 @@ This affects the following settings:
 =========================================  ==========================
  Old setting                                New Setting
 =========================================  ==========================
-:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-:setting:`DATABASE_HOST`                   :setting:`HOST`
-:setting:`DATABASE_NAME`                   :setting:`NAME`
-:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-:setting:`DATABASE_PORT`                   :setting:`PORT`
-:setting:`DATABASE_USER`                   :setting:`USER`
-:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+`DATABASE_ENGINE`                          :setting:`ENGINE <DATABASE-ENGINE>`
+`DATABASE_HOST`                            :setting:`HOST`
+`DATABASE_NAME`                            :setting:`NAME`
+`DATABASE_OPTIONS`                         :setting:`OPTIONS`
+`DATABASE_PASSWORD`                        :setting:`PASSWORD`
+`DATABASE_PORT`                            :setting:`PORT`
+`DATABASE_USER`                            :setting:`USER`
+`TEST_DATABASE_CHARSET`                    :setting:`TEST_CHARSET`
+`TEST_DATABASE_COLLATION`                  :setting:`TEST_COLLATION`
+`TEST_DATABASE_NAME`                       :setting:`TEST_NAME`
 =========================================  ==========================
 
 These changes are also required if you have manually created a database
@@ -850,7 +850,7 @@ has been deprecated.
 If you are currently using the ``postgresql`` backend, you should
 migrate to using the ``postgresql_psycopg2`` backend. To update your
 code, install the ``psycopg2`` library and change the
-:setting:`DATABASE_ENGINE` setting to use
+:setting:`ENGINE <DATABASE-ENGINE>` setting to use
 ``django.db.backends.postgresql_psycopg2``.
 
 CSRF response-rewriting middleware
