@@ -212,7 +212,7 @@ messages.
 Programmatically creating permissions
 -------------------------------------
 
-While `custom permissions <custom-permissions>`_ can be defined within
+While :ref:`custom permissions <custom-permissions>` can be defined within
 a model's ``Meta`` class, you can also create permissions directly. For
 example, you can create the ``can_publish`` permission for a ``BlogPost`` model
 in ``myapp``::
@@ -298,9 +298,10 @@ If you have an authenticated user you want to attach to the current session
     :func:`~django.contrib.auth.authenticate()`
     sets an attribute on the :class:`~django.contrib.auth.models.User` noting
     which authentication backend successfully authenticated that user (see the
-    `backends documentation <authentication-backends>`_ for details), and this information is needed
-    later during the login process. An error will be raise if you try to login
-    a user object retrieved from the database directly.
+    :ref:`backends documentation <authentication-backends>` for details), and
+    this information is needed later during the login process. An error will be
+    raise if you try to login a user object retrieved from the database
+    directly.
 
 How to log a user out
 ---------------------

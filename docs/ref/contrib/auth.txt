@@ -184,7 +184,7 @@ Methods
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
-        documentation on `permissions <topic-authorization>`_). If the user is
+        documentation on :ref:`permissions <topic-authorization>`). If the user is
         inactive, this method will always return ``False``.
 
         If ``obj`` is passed in, this method won't check for a permission for
@@ -254,7 +254,7 @@ Manager functions
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
-        See `Creating users <topics-auth-creating-users>`_ for example usage.
+        See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
     .. method:: models.UserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 

@@ -8,15 +8,15 @@ authentication to your projects needs involves understanding what points of the
 provided system are extendible or replaceable. This document provides details
 about how the auth system can be customized.
 
-`Authentication backends <authentication-backends>`_ provide an extensible
+:ref:`Authentication backends <authentication-backends>` provide an extensible
 system for when a username and password stored with the User model need
 to be authenticated against a different service than Django's default.
 
-You can give your models `custom permissions <custom-permissions>`_ that can be
+You can give your models :ref:`custom permissions <custom-permissions>` that can be
 checked through Django's authorization system.
 
-You can `extend <extend-user>`_ the default User model, or `substitute
-<auth-custom-user>`_ a completely customized model.
+You can :ref:`extend <extending-user>` the default User model, or :ref:`substitute
+<auth-custom-user>` a completely customized model.
 
 .. _authentication-backends:
 
@@ -290,14 +290,13 @@ Extending the existing User model
 There are two ways to extend the default
 :class:`~django.contrib.auth.models.User` model without substituting your own
 model. If the changes you need are purely behavioral, and don't require any
-change to what is stored in the database, you can create a `proxy model
-<proxy-models>`_ derived from :class:`~django.contrib.auth.models.User`. This
-allows for any of the features offered by `proxy models
-<proxy-models>`_ including default ordering, custom managers, or custom model
-methods.
+change to what is stored in the database, you can create a :ref:`proxy model
+<proxy-models>` based on :class:`~django.contrib.auth.models.User`. This
+allows for any of the features offered by proxy models including default
+ordering, custom managers, or custom model methods.
 
-If you wish to store information related to ``User``, you can use a `one-to-one
-relationship <one-to-one-relationships>`_ to a model containing the fields for
+If you wish to store information related to ``User``, you can use a :ref:`one-to-one
+relationship <ref-onetoone>` to a model containing the fields for
 additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
 you might create an Employee model::
@@ -658,9 +657,9 @@ custom profile fields.
 Custom users and the built-in auth forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As you may expect, built-in Django's `forms <built-in-auth-forms>`_ and `views
-<other-built-in-views>`_ make certain assumptions about the user model that
-they are working with.
+As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
+:ref:`views <other-built-in-views>` make certain assumptions about the user
+model that they are working with.
 
 If your user model doesn't follow the same assumptions, it may be necessary to define
 a replacement form, and pass that form in as part of the configuration of the
@@ -776,7 +775,7 @@ methods and attributes:
 
         Returns ``True`` if the user has the specified permission, where perm is
         in the format ``"<app label>.<permission codename>"`` (see
-        `permissions <topic-authorization>`_). If the user is inactive, this method will
+        :ref:`permissions <topic-authorization>`). If the user is inactive, this method will
         always return ``False``.
 
         If ``obj`` is passed in, this method won't check for a permission for
