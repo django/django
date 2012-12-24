@@ -548,7 +548,7 @@ need to reload your data. Do this after you have made the change to using
   **Back up your database first!**
 
   For SQLite, this means making a copy of the single file that stores the
-  database (the name of that file is the :setting:`DATABASE_NAME` in your
+  database (the name of that file is the ``DATABASE_NAME`` in your
   settings.py file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
@@ -769,4 +769,3 @@ Old (0.96)                               New (1.0)
 ``backend.uses_case_insensitive_names``  ``connection.features.uses_case_insensitive_names``
 ``backend.uses_custom_queryset``         ``connection.features.uses_custom_queryset``
 =======================================  ===================================================
-
