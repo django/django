@@ -2244,22 +2244,6 @@ Default: Not defined
 The site-specific user profile model used by this site. See
 :ref:`User profiles <auth-profiles>`.
 
-.. setting:: IGNORABLE_404_ENDS
-
-IGNORABLE_404_ENDS
-------------------
-
-.. deprecated:: 1.4
-   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
-
-.. setting:: IGNORABLE_404_STARTS
-
-IGNORABLE_404_STARTS
---------------------
-
-.. deprecated:: 1.4
-   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
-
 .. setting:: URL_VALIDATOR_USER_AGENT
 
 URL_VALIDATOR_USER_AGENT

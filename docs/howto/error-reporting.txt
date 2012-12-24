@@ -101,14 +101,6 @@ The best way to disable this behavior is to set
    records are ignored, but you can use them for error reporting by writing a
    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
-.. seealso::
-
-   .. versionchanged:: 1.4
-
-   Previously, two settings were used to control which URLs not to report:
-   :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`. They
-   were replaced by :setting:`IGNORABLE_404_URLS`.
-
 .. _filtering-error-reports:
 
 Filtering error reports
