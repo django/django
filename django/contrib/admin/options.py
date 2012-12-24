@@ -807,16 +807,6 @@ class ModelAdmin(BaseModelAdmin):
                                             (opts.app_label, opts.module_name),
                                             args=(pk_value,),
                                             current_app=self.admin_site.name)
-            else:
-                try:
-                    post_url_continue = post_url_continue % pk_value
-                    warnings.warn(
-                        "The use of string formats for post_url_continue "
-                        "in ModelAdmin.response_add() is deprecated. Provide "
-                        "a pre-formatted url instead.",
-                        DeprecationWarning, stacklevel=2)
-                except TypeError:
-                    pass
             if "_popup" in request.POST:
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue)
