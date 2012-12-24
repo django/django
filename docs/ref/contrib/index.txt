@@ -31,7 +31,6 @@ those packages have.
    formtools/index
    gis/index
    humanize
-   markup
    messages
    redirects
    sitemaps
@@ -120,13 +119,6 @@ humanize
 A set of Django template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
-
-markup
-======
-
-A collection of template filters that implement common markup languages
-
-See the :doc:`markup documentation </ref/contrib/markup>`.
 
 messages
 ========

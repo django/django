@@ -48,13 +48,6 @@ escaping.
 You should also be very careful when storing HTML in the database, especially
 when that HTML is retrieved and displayed.
 
-Markup library
---------------
-
-If you use :mod:`django.contrib.markup`, you need to ensure that the filters are
-only used on trusted input, or that you have correctly configured them to ensure
-they do not allow raw HTML output. See the documentation of that module for more
-information.
 
 Cross site request forgery (CSRF) protection
 ============================================
