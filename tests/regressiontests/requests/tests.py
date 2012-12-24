@@ -507,20 +507,6 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
-    def test_raw_post_data_returns_body(self):
-        """
-        HttpRequest.raw_post_body should be the same as HttpRequest.body
-        """
-        payload = FakePayload('Hello There!')
-        request = WSGIRequest({
-            'REQUEST_METHOD': 'POST',
-            'CONTENT_LENGTH': len(payload),
-            'wsgi.input': payload,
-        })
-
-        with warnings.catch_warnings(record=True):
-            self.assertEqual(request.body, request.raw_post_data)
-
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
@@ -536,8 +522,5 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': ExplodingBytesIO(payload)})
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            with self.assertRaises(UnreadablePostError):
-                request.raw_post_data
-            self.assertEqual(len(w), 1)
+        with self.assertRaises(UnreadablePostError):
+            request.body
