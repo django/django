@@ -27,7 +27,6 @@ those packages have.
    comments/index
    contenttypes
    csrf
-   databrowse
    flatpages
    formtools/index
    gis/index

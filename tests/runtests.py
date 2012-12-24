@@ -10,10 +10,6 @@ from django import contrib
 from django.utils._os import upath
 from django.utils import six
 
-# databrowse is deprecated, but we still want to run its tests
-warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
-                        DeprecationWarning, 'django.contrib.databrowse')
-
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
@@ -40,7 +36,6 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.comments',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'django.contrib.databrowse',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'regressiontests.staticfiles_tests',
