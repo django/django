@@ -2356,16 +2356,6 @@ django.contrib.humanize
 A set of Django template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
-django.contrib.markup
-^^^^^^^^^^^^^^^^^^^^^
-
-A collection of template filters that implement these common markup languages:
-
-* Textile
-* Markdown
-* reST (reStructuredText)
-
-See the :doc:`markup documentation </ref/contrib/markup>`.
 
 django.contrib.webdesign
 ^^^^^^^^^^^^^^^^^^^^^^^^
