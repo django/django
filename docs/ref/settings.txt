@@ -1502,20 +1502,6 @@ Default: ``()`` (Empty tuple)
 A tuple of profanities, as strings, that will be forbidden in comments when
 ``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
 
-.. setting:: RESTRUCTUREDTEXT_FILTER_SETTINGS
-
-RESTRUCTUREDTEXT_FILTER_SETTINGS
---------------------------------
-
-Default: ``{}``
-
-A dictionary containing settings for the ``restructuredtext`` markup filter from
-the :doc:`django.contrib.markup application </ref/contrib/markup>`. They override
-the default writer settings. See the Docutils restructuredtext `writer settings
-docs`_ for details.
-
-.. _writer settings docs: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
-
 .. setting:: ROOT_URLCONF
 
 ROOT_URLCONF
