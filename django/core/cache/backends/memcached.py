@@ -138,23 +138,6 @@ class BaseMemcachedCache(BaseCache):
     def clear(self):
         self._cache.flush_all()
 
-class CacheClass(BaseMemcachedCache):
-    def __init__(self, server, params):
-        import warnings
-        warnings.warn(
-            "memcached.CacheClass has been split into memcached.MemcachedCache and memcached.PyLibMCCache. Please update your cache backend setting.",
-            DeprecationWarning
-        )
-        try:
-            import memcache
-        except ImportError:
-            raise InvalidCacheBackendError(
-                "Memcached cache backend requires either the 'memcache' or 'cmemcache' library"
-                )
-        super(CacheClass, self).__init__(server, params,
-                                         library=memcache,
-                                         value_not_found_exception=ValueError)
-
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
