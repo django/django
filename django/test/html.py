@@ -182,6 +182,14 @@ class Parser(HTMLParser):
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
+        # Special case handling of 'class' attribute, so that comparisons of DOM
+        # instances are not sensitive to ordering of classes.
+        attrs = [
+            (name, " ".join(sorted(value.split(" "))))
+            if name == "class"
+            else (name, value)
+            for name, value in attrs
+            ]
         element = Element(tag, attrs)
         self.current.append(element)
         if tag not in self.SELF_CLOSING_TAGS:
