@@ -1478,19 +1478,12 @@ def hello_world_view(request, value):
 )
 class CacheMiddlewareTest(TestCase):
 
-    # The following tests will need to be modified in Django 1.6 to not use
-    # deprecated ways of using the cache_page decorator that will be removed in
-    # such version
     def setUp(self):
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-            module='django.views.decorators.cache')
 
     def tearDown(self):
-        self.restore_warnings_state()
         self.default_cache.clear()
         self.other_cache.clear()
 
@@ -1603,21 +1596,20 @@ class CacheMiddlewareTest(TestCase):
         request.user = MockAuthenticatedUser()
         request.session = MockAccessedSession()
 
-        response = cache_page(hello_world_view)(request, '1')
+        response = cache_page(60)(hello_world_view)(request, '1')
 
         self.assertFalse("Cache-Control" in response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
-        default_view = cache_page(hello_world_view)
-        default_with_prefix_view = cache_page(key_prefix='prefix1')(hello_world_view)
+        default_view = cache_page(3)(hello_world_view)
+        default_with_prefix_view = cache_page(3, key_prefix='prefix1')(hello_world_view)
 
-        explicit_default_view = cache_page(cache='default')(hello_world_view)
-        explicit_default_with_prefix_view = cache_page(cache='default', key_prefix='prefix1')(hello_world_view)
+        explicit_default_view = cache_page(3, cache='default')(hello_world_view)
+        explicit_default_with_prefix_view = cache_page(3, cache='default', key_prefix='prefix1')(hello_world_view)
 
-        other_view = cache_page(cache='other')(hello_world_view)
-        other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(hello_world_view)
-        other_with_timeout_view = cache_page(3, cache='other', key_prefix='prefix3')(hello_world_view)
+        other_view = cache_page(1, cache='other')(hello_world_view)
+        other_with_prefix_view = cache_page(1, cache='other', key_prefix='prefix2')(hello_world_view)
 
         request = self.factory.get('/view/')
 
@@ -1657,10 +1649,6 @@ class CacheMiddlewareTest(TestCase):
         response = other_with_prefix_view(request, '9')
         self.assertEqual(response.content, b'Hello World 9')
 
-        # Request from the alternate cache with a new prefix and a custom timeout
-        response = other_with_timeout_view(request, '10')
-        self.assertEqual(response.content, b'Hello World 10')
-
         # But if we wait a couple of seconds...
         time.sleep(2)
 
@@ -1688,18 +1676,6 @@ class CacheMiddlewareTest(TestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
-
-        # ... but a view with a custom timeout will still hit
-        response = other_with_timeout_view(request, '17')
-        self.assertEqual(response.content, b'Hello World 10')
-
-        # And if we wait a few more seconds
-        time.sleep(2)
-
-        # the custom timeout cache will miss
-        response = other_with_timeout_view(request, '18')
-        self.assertEqual(response.content, b'Hello World 18')
-
 
 @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
