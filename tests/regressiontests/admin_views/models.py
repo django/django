@@ -548,11 +548,6 @@ class FoodDelivery(models.Model):
         unique_together = (("driver", "restaurant"),)
 
 
-class Paper(models.Model):
-    title = models.CharField(max_length=30)
-    author = models.CharField(max_length=30, blank=True, null=True)
-
-
 @python_2_unicode_compatible
 class CoverLetter(models.Model):
     author = models.CharField(max_length=30)
@@ -560,6 +555,25 @@ class CoverLetter(models.Model):
 
     def __str__(self):
         return self.author
+
+
+class Paper(models.Model):
+    title = models.CharField(max_length=30)
+    author = models.CharField(max_length=30, blank=True, null=True)
+
+
+class ShortMessage(models.Model):
+    content = models.CharField(max_length=140)
+    timestamp = models.DateTimeField(null=True, blank=True)
+
+
+@python_2_unicode_compatible
+class Telegram(models.Model):
+    title = models.CharField(max_length=30)
+    date_sent = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Story(models.Model):
