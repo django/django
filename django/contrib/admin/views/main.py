@@ -158,7 +158,7 @@ class ChangeList(object):
                     del p[k]
             else:
                 p[k] = v
-        return '?%s' % urlencode(p)
+        return '?%s' % urlencode(sorted(p.items()))
 
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
