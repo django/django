@@ -152,4 +152,4 @@ class RequireDebugFalse(logging.Filter):
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
-       return settings.DEBUG
+        return settings.DEBUG

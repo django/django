@@ -74,11 +74,8 @@ class LazySettings(LazyObject):
 
             logging_config_func(DEFAULT_LOGGING)
 
+            # ... then invoke it with the logging settings
             if self.LOGGING:
-                # Backwards-compatibility shim for #16288 fix
-                compat_patch_logging_config(self.LOGGING)
-
-                # ... then invoke it with the logging settings
                 logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
@@ -195,37 +192,3 @@ class UserSettingsHolder(BaseSettings):
         return list(self.__dict__) + dir(self.default_settings)
 
 settings = LazySettings()
-
-
-
-def compat_patch_logging_config(logging_config):
-    """
-    Backwards-compatibility shim for #16288 fix. Takes initial value of
-    ``LOGGING`` setting and patches it in-place (issuing deprecation warning)
-    if "mail_admins" logging handler is configured but has no filters.
-
-    """
-    #  Shim only if LOGGING["handlers"]["mail_admins"] exists,
-    #  but has no "filters" key
-    if "filters" not in logging_config.get(
-        "handlers", {}).get(
-        "mail_admins", {"filters": []}):
-
-        warnings.warn(
-            "You have no filters defined on the 'mail_admins' logging "
-            "handler: adding implicit debug-false-only filter. "
-            "See http://docs.djangoproject.com/en/dev/releases/1.4/"
-            "#request-exceptions-are-now-always-logged",
-            DeprecationWarning)
-
-        filter_name = "require_debug_false"
-
-        filters = logging_config.setdefault("filters", {})
-        while filter_name in filters:
-            filter_name = filter_name + "_"
-
-        filters[filter_name] = {
-            "()": "django.utils.log.RequireDebugFalse",
-        }
-
-        logging_config["handlers"]["mail_admins"]["filters"] = [filter_name]
