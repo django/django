@@ -534,13 +534,13 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]['display'], 'the 2000\'s')
         self.assertEqual(choices[3]['selected'], True)
-        self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
+        self.assertEqual(choices[3]['query_string'], '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk)
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(force_text(filterspec.title), 'Verbose Author')
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
+        self.assertEqual(choice['query_string'], '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk)
 
     def test_listfilter_without_title(self):
         """
