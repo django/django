@@ -1428,24 +1428,21 @@ class CacheI18nTest(TestCase):
             CACHE_MIDDLEWARE_SECONDS=60,
             USE_ETAGS=True,
     )
-    def test_middleware_with_streaming_response(self):
-        # cache with non empty request.GET
-        request = self._get_request_cache(query_string='foo=baz&other=true')
-
-        # first access, cache must return None
+    def test_middleware_doesnt_cache_streaming_response(self):
+        request = self._get_request()
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data, None)
+        self.assertIsNone(get_cache_data)
 
-        # pass streaming response through UpdateCacheMiddleware.
-        content = 'Check for cache with QUERY_STRING and streaming content'
+        # This test passes on Python < 3.3 even without the corresponding code
+        # in UpdateCacheMiddleware, because pickling a StreamingHttpResponse
+        # fails (http://bugs.python.org/issue14288). LocMemCache silently
+        # swallows the exception and doesn't store the response in cache.
+        content = ['Check for cache with streaming content.']
         response = StreamingHttpResponse(content)
         UpdateCacheMiddleware().process_response(request, response)
 
-        # second access, cache must still return None, because we can't cache
-        # streaming response.
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data, None)
-
+        self.assertIsNone(get_cache_data)
 
 @override_settings(
         CACHES={
