@@ -4,14 +4,6 @@
 
 .. module:: django.conf.urls
 
-.. versionchanged:: 1.4
-    Starting with Django 1.4 functions ``patterns``, ``url``, ``include`` plus
-    the ``handler*`` symbols described below live in the ``django.conf.urls``
-    module.
-
-    Until Django 1.3 they were located in ``django.conf.urls.defaults``. You
-    still can import them from there but it will be removed in Django 1.6.
-
 patterns()
 ----------
 
