@@ -31,7 +31,6 @@ those packages have.
    formtools/index
    gis/index
    humanize
-   localflavor
    markup
    messages
    redirects
@@ -121,15 +120,6 @@ humanize
 A set of Django template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
-
-localflavor
-===========
-
-A collection of various Django snippets that are useful only for a particular
-country or culture. For example, ``django.contrib.localflavor.us.forms``
-contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
-
-See the :doc:`localflavor documentation </ref/contrib/localflavor>`.
 
 markup
 ======

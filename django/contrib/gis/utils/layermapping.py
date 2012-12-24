@@ -16,7 +16,6 @@ from django.contrib.gis.gdal import (CoordTransform, DataSource,
 from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
-from django.contrib.localflavor.us.models import USStateField
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -55,7 +54,6 @@ class LayerMapping(object):
         models.SlugField : OFTString,
         models.TextField : OFTString,
         models.URLField : OFTString,
-        USStateField : OFTString,
         models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),

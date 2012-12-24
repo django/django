@@ -1,5 +1,5 @@
 """
-Common checksum routines (used in multiple localflavor/ cases, for example).
+Common checksum routines.
 """
 
 __all__ = ['luhn',]

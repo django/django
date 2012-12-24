@@ -222,7 +222,7 @@ assist you in the development of applications for multiple languages and world
 regions:
 
 * :doc:`Internationalization <topics/i18n/index>`
-* :doc:`"Local flavor" <ref/contrib/localflavor>`
+* :doc:`"Local flavor" <topics/localflavor>`
 
 Python compatibility
 ====================

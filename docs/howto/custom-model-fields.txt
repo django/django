@@ -606,8 +606,7 @@ All of the ``kwargs`` dictionary is passed directly to the form field's
 for the ``form_class`` argument and then delegate further handling to the
 parent class. This might require you to write a custom form field (and even a
 form widget). See the :doc:`forms documentation </topics/forms/index>` for
-information about this, and take a look at the code in
-:mod:`django.contrib.localflavor` for some examples of custom widgets.
+information about this.
 
 Continuing our ongoing example, we can write the :meth:`.formfield` method as::
 
