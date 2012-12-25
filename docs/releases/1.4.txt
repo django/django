@@ -37,8 +37,8 @@ Other notable new features in Django 1.4 include:
   the ability to `bulk insert <#model-objects-bulk-create-in-the-orm>`_
   large datasets for improved performance, and
   `QuerySet.prefetch_related`_, a method to batch-load related objects
-  in areas where :meth:`~django.db.models.QuerySet.select_related` doesn't
-  work.
+  in areas where :meth:`~django.db.models.query.QuerySet.select_related`
+  doesn't work.
 
 * Some nice security additions, including `improved password hashing`_
   (featuring PBKDF2_ and bcrypt_ support), new `tools for cryptographic

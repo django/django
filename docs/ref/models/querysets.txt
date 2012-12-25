@@ -1637,7 +1637,7 @@ Finally, realize that ``update()`` does an update at the SQL level and, thus,
 does not call any ``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
-calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
+calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
 update a bunch of records for a model that has a custom
 :meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
