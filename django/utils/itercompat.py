@@ -19,5 +19,5 @@ def is_iterable(x):
 
 def product(*args, **kwds):
     warnings.warn("django.utils.itercompat.product is deprecated; use the native version instead",
-                  PendingDeprecationWarning)
+                  DeprecationWarning, stacklevel=2)
     return itertools.product(*args, **kwds)

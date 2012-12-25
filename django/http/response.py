@@ -42,7 +42,8 @@ class HttpResponseBase(six.Iterator):
         self._closable_objects = []
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead", PendingDeprecationWarning)
+                          " content_type instead",
+                          DeprecationWarning, stacklevel=2)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
@@ -296,7 +297,7 @@ class HttpResponse(HttpResponseBase):
                 'Creating streaming responses with `HttpResponse` is '
                 'deprecated. Use `StreamingHttpResponse` instead '
                 'if you need the streaming behavior.',
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_iterator'):
             self._iterator = iter(self._container)
         return self
@@ -352,14 +353,14 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
 
     These responses will stream only if no middleware attempts to access the
     `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a `PendingDeprecationWarning`.
+    and raise a `DeprecationWarning`.
     """
     @property
     def content(self):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         content = b''.join(self)
         self.streaming_content = [content]
         return content
@@ -369,7 +370,7 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         self.streaming_content = [content]
 
 

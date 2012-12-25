@@ -139,7 +139,7 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types):
                     warnings.warn("The %s setting must be a tuple. Please fix your "
                                   "settings, as auto-correction is now deprecated." % setting,
-                        PendingDeprecationWarning)
+                                  DeprecationWarning, stacklevel=2)
                     setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
