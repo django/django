@@ -885,7 +885,7 @@ Slightly complex built-in ``Field`` classes
     .. attribute:: MultiValueField.widget
 
         Must be a subclass of :class:`django.forms.MultiWidget`.
-        Default value is :class:`~django.forms.widgets.TextInput`, which
+        Default value is :class:`~django.forms.TextInput`, which
         probably is not very useful in this case.
 
     .. method:: compress(data_list)

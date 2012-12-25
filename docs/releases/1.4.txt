@@ -526,8 +526,8 @@ Extended IPv6 support
 ~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.4 can now better handle IPv6 addresses with the new
-:class:`~django.db.models.fields.GenericIPAddressField` model field,
-:class:`~django.forms.fields.GenericIPAddressField` form field and
+:class:`~django.db.models.GenericIPAddressField` model field,
+:class:`~django.forms.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`.
 
@@ -890,7 +890,7 @@ object, Django raises an exception.
 
 The MySQL backend historically has raised :class:`MySQLdb.OperationalError`
 when a query triggered an exception. We've fixed this bug, and we now raise
-:class:`django.db.utils.DatabaseError` instead. If you were testing for
+:exc:`django.db.DatabaseError` instead. If you were testing for
 :class:`MySQLdb.OperationalError`, you'll need to update your ``except``
 clauses.
 
@@ -1092,8 +1092,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.test.TestCase.assertTemplateUsed` and
-:meth:`~django.test.test.TestCase.assertTemplateNotUsed`. And they
+code with :meth:`~django.test.TestCase.assertTemplateUsed` and
+:meth:`~django.test.TestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):

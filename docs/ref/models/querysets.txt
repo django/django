@@ -1112,9 +1112,9 @@ one, doing so will result in an error.
 
 .. note::
 
-    When calling :meth:`~Model.save()` for instances with deferred fields,
-    only the loaded fields will be saved. See :meth:`~Model.save()` for more
-    details.
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 
 only
@@ -1164,9 +1164,9 @@ using :meth:`select_related` is an error as well.
 
 .. note::
 
-    When calling :meth:`~Model.save()` for instances with deferred fields,
-    only the loaded fields will be saved. See :meth:`~Model.save()` for more
-    details.
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1248,7 +1248,7 @@ the format described in `Field lookups`_.
 
 ``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
 than one object was found. The
-:exc:`~django.core.excpetions.MultipleObjectsReturned` exception is an
+:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
 ``get()`` raises a :exc:`~django.core.exceptions.DoesNotExist` exception if an
