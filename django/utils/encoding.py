@@ -36,7 +36,7 @@ class StrAndUnicode(object):
     def __init__(self, *args, **kwargs):
         warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
                       "and apply the @python_2_unicode_compatible decorator "
-                      "instead.", PendingDeprecationWarning, stacklevel=2)
+                      "instead.", DeprecationWarning, stacklevel=2)
         super(StrAndUnicode, self).__init__(*args, **kwargs)
 
     if six.PY3:

@@ -326,13 +326,13 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
             my_iter = iter(r)
-            self.assertEqual(w[0].category, PendingDeprecationWarning)
+            self.assertEqual(w[0].category, DeprecationWarning)
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
             result = list(my_iter)
-            self.assertEqual(w[0].category, PendingDeprecationWarning)
+            self.assertEqual(w[0].category, DeprecationWarning)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
@@ -360,7 +360,7 @@ class HttpResponseTests(unittest.TestCase):
         # XXX change this when the deprecation completes in HttpResponse
         r = HttpResponse(iter(['hello', 'world']))
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             self.assertEqual(b''.join(r), b'helloworld')
         self.assertEqual(r.content, b'')                # not the expected result!
 
@@ -497,7 +497,7 @@ class FileCloseTests(TestCase):
         r = HttpResponse(file1)
         self.assertFalse(file1.closed)
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             list(r)
         self.assertFalse(file1.closed)
         r.close()
