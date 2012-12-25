@@ -123,7 +123,7 @@ Error reports are really helpful for debugging errors, so it is generally
 useful to record as much relevant information about those errors as possible.
 For example, by default Django records the `full traceback`_ for the
 exception raised, each `traceback frame`_'s local variables, and the
-:class:`HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
+:class:`~django.http.HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
@@ -165,11 +165,11 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 
 .. function:: sensitive_post_parameters(*parameters)
 
-    If one of your views receives an :class:`HttpRequest` object with
-    :attr:`POST parameters<HttpRequest.POST>` susceptible to contain sensitive
-    information, you may prevent the values of those parameters from being
-    included in the error reports using the ``sensitive_post_parameters``
-    decorator::
+    If one of your views receives an :class:`~django.http.HttpRequest` object
+    with :attr:`POST parameters<django.http.HttpRequest.POST>` susceptible to
+    contain sensitive information, you may prevent the values of those
+    parameters from being included in the error reports using the
+    ``sensitive_post_parameters`` decorator::
 
         from django.views.decorators.debug import sensitive_post_parameters
 
@@ -198,10 +198,10 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     .. versionchanged:: 1.4
 
     Since version 1.4, all POST parameters are systematically filtered out of
-    error reports for certain :mod:`contrib.views.auth` views (``login``,
-    ``password_reset_confirm``, ``password_change``, and ``add_view`` and
-    ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
-    sensitive information such as user passwords.
+    error reports for certain :mod:`django.contrib.auth.views` views (
+    ``login``, ``password_reset_confirm``, ``password_change``, and
+    ``add_view`` and ``user_change_password`` in the ``auth`` admin) to prevent
+    the leaking of sensitive information such as user passwords.
 
 .. _custom-error-reports:
 

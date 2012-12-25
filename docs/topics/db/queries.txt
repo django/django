@@ -327,8 +327,8 @@ a primary key of 1, Django will raise ``Entry.DoesNotExist``.
 
 Similarly, Django will complain if more than one item matches the
 :meth:`~django.db.models.query.QuerySet.get` query. In this case, it will raise
-``MultipleObjectsReturned``, which again is an attribute of the model class
-itself.
+:exc:`~django.core.exceptions.MultipleObjectsReturned`, which again is an
+attribute of the model class itself.
 
 
 Other QuerySet methods

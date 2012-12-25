@@ -343,7 +343,7 @@ meaning of ``str`` changed. To test these types, use the following idioms::
     isinstance(myvalue, bytes)                  # replacement for str
 
 Python ≥ 2.6 provides ``bytes`` as an alias for ``str``, so you don't need
-:attr:`six.binary_type`.
+:data:`six.binary_type`.
 
 ``long``
 ~~~~~~~~
@@ -356,7 +356,7 @@ The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
 ``xrange``
 ~~~~~~~~~~
 
-Import :func:`six.moves.xrange` wherever you use ``xrange``.
+Import ``six.moves.xrange`` wherever you use ``xrange``.
 
 Moved modules
 ~~~~~~~~~~~~~

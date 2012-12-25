@@ -150,11 +150,11 @@ it's not necessary to include every field in your form. For example::
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
 
-Note that if a :class:`~django.forms.fields.Field` defines
-:attr:`~Form.initial` *and* you include ``initial`` when instantiating the
-``Form``, then the latter ``initial`` will have precedence. In this example,
-``initial`` is provided both at the field level and at the form instance level,
-and the latter gets precedence::
+Note that if a :class:`~django.forms.Field` defines :attr:`~Form.initial` *and*
+you include ``initial`` when instantiating the ``Form``, then the latter
+``initial`` will have precedence. In this example, ``initial`` is provided both
+at the field level and at the form instance level, and the latter gets
+precedence::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='class')

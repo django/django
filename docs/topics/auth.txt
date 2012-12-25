@@ -284,7 +284,7 @@ Manager functions
         .. versionchanged:: 1.4
            The ``email`` parameter was made optional. The username
            parameter is now checked for emptiness and raises a
-           :exc:`ValueError` in case of a negative result.
+           :exc:`~exceptions.ValueError` in case of a negative result.
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 
@@ -558,7 +558,7 @@ Anonymous users
       :meth:`~django.contrib.auth.models.User.delete()`,
       :meth:`~django.contrib.auth.models.User.set_groups()` and
       :meth:`~django.contrib.auth.models.User.set_permissions()` raise
-      :exc:`NotImplementedError`.
+      :exc:`~exceptions.NotImplementedError`.
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but

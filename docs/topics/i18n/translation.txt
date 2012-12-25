@@ -928,7 +928,7 @@ function. Example::
 
     :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
     URLconf. Using it within an included URLconf will throw an
-    :exc:`ImproperlyConfigured` exception.
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 .. warning::
 

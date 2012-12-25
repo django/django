@@ -81,8 +81,8 @@ Built-in moderation options
     .. attribute:: auto_close_field
 
         If this is set to the name of a
-        :class:`~django.db.models.fields.DateField` or
-        :class:`~django.db.models.fields.DateTimeField` on the model for which
+        :class:`~django.db.models.DateField` or
+        :class:`~django.db.models.DateTimeField` on the model for which
         comments are being moderated, new comments for objects of that model
         will be disallowed (immediately deleted) when a certain number of days
         have passed after the date specified in that field. Must be
@@ -117,7 +117,7 @@ Built-in moderation options
     .. attribute:: enable_field
 
         If this is set to the name of a
-        :class:`~django.db.models.fields.BooleanField` on the model
+        :class:`~django.db.models.BooleanField` on the model
         for which comments are being moderated, new comments on
         objects of that model will be disallowed (immediately deleted)
         whenever the value of that field is ``False`` on the object
