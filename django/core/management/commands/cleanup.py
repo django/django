@@ -7,5 +7,5 @@ class Command(clearsessions.Command):
     def handle_noargs(self, **options):
         warnings.warn(
             "The `cleanup` command has been deprecated in favor of `clearsessions`.",
-            PendingDeprecationWarning)
+            DeprecationWarning)
         super(Command, self).handle_noargs(**options)
