@@ -85,14 +85,14 @@ Django quotes column and table names behind the scenes.
 
     The name of an orderable field in the model, typically a :class:`DateField`,
     :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`'s :class:`~QuerySet.latest`
-    method.
+    field to use in your model :class:`Manager`'s
+    :meth:`~django.db.models.query.QuerySet.latest` method.
 
     Example::
 
         get_latest_by = "order_date"
 
-    See the docs for :meth:`~django.db.models.query.QuerySet.latest` for more.
+    See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
 ``managed``
 -----------
