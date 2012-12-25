@@ -547,8 +547,7 @@ Also has one optional argument:
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
 
-The default form widget for this field is a
-:class:`~django.forms.widgets.FileInput`.
+The default form widget for this field is a :class:`~django.forms.FileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
@@ -590,7 +589,7 @@ topic guide.
     saved.
 
 The uploaded file's relative URL can be obtained using the
-:attr:`~django.db.models.fields.FileField.url` attribute. Internally,
+:attr:`~django.db.models.FileField.url` attribute. Internally,
 this calls the :meth:`~django.core.files.storage.Storage.url` method of the
 underlying :class:`~django.core.files.storage.Storage` class.
 

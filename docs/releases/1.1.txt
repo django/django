@@ -132,7 +132,7 @@ public methods.
 Fixed the ``join`` filter's escaping behavior
 ---------------------------------------------
 
-The :ttag:`join` filter no longer escapes the literal value that is
+The :tfilter:`join` filter no longer escapes the literal value that is
 passed in for the connector.
 
 This is backwards incompatible for the special situation of the literal string

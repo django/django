@@ -429,12 +429,12 @@ System version of :mod:`simplejson` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`As explained below <simplejson-deprecation>`, Django 1.5 deprecates
-:mod:`django.utils.simplejson` in favor of Python 2.6's built-in :mod:`json`
+``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of :mod:`simplejson`, it may trigger errors
 in some circumstances.
 
-JSON-related features in Django 1.4 always used :mod:`django.utils.simplejson`.
+JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
 - A system version of :mod:`simplejson`, if one was available (ie. ``import
@@ -598,8 +598,9 @@ Miscellaneous
 * :class:`django.forms.ModelMultipleChoiceField` now returns an empty
   ``QuerySet`` as the empty value instead of an empty list.
 
-* :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
-  instead of :exc:`ValueError` for non-integer inputs.
+* :func:`~django.utils.http.int_to_base36` properly raises a
+  :exc:`~exceptions.TypeError` instead of :exc:`~exceptions.ValueError` for
+  non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
@@ -668,8 +669,8 @@ the :setting:`AUTH_PROFILE_MODULE` setting, and the
 :meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
 the user profile model, should not be used any longer.
 
-Streaming behavior of :class:`HttpResponse`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Streaming behavior of :class:`~django.http.HttpResponse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.5 deprecates the ability to stream a response by passing an iterator
 to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
@@ -687,7 +688,7 @@ In Django 1.7 and above, the iterator will be consumed immediately by
 Since Django 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
 removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
-instead :mod:`django.utils.simplejson`.
+instead of ``django.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
 incompatibilities between versions of :mod:`simplejson` -- see the

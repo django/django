@@ -38,7 +38,7 @@ frameworks are:
 
 * **Unit tests** -- tests that are expressed as methods on a Python class
   that subclasses :class:`unittest.TestCase` or Django's customized
-  :class:`TestCase`. For example::
+  :class:`~django.test.TestCase`. For example::
 
       import unittest
 

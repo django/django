@@ -398,9 +398,9 @@ That adds a "Filter" sidebar that lets people filter the change list by the
    :alt: Polls change list page, updated
 
 The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a :class:`~django.db.models.fields.DateTimeField`,
-Django knows to give appropriate filter options: "Any date," "Today," "Past 7
-days," "This month," "This year."
+Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
+knows to give appropriate filter options: "Any date," "Today," "Past 7 days,"
+"This month," "This year."
 
 This is shaping up well. Let's add some search capability::
 

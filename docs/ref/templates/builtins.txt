@@ -864,7 +864,7 @@ an attribute "description," you could use::
     {% regroup cities by country.description as country_list %}
 
 Or, if ``country`` is a field with ``choices``, it will have a
-:meth:`^django.db.models.Model.get_FOO_display` method available as an
+:meth:`~django.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key::
 
