@@ -381,10 +381,6 @@ As you can see, the ``if`` tag may take one or several `` {% elif %}``
 clauses, as well as an ``{% else %}`` clause that will be displayed if all
 previous conditions fail. These clauses are optional.
 
-.. versionadded:: 1.4
-
-The ``if`` tag now supports ``{% elif %}`` clauses.
-
 Boolean operators
 ^^^^^^^^^^^^^^^^^
 
@@ -742,8 +738,6 @@ escaped, because it's not a format character::
     It is the {% now "jS o\f F" %}
 
 This would display as "It is the 4th of September".
-
-.. versionchanged:: 1.4
 
 .. note::
 
@@ -1288,10 +1282,6 @@ Z                 Time zone offset in seconds. The          ``-43200`` to ``4320
                   always negative, and for those east of
                   UTC is always positive.
 ================  ========================================  =====================
-
-.. versionadded:: 1.4
-
-The ``e`` and ``o`` format specification characters were added in Django 1.4.
 
 For example::
 
@@ -2069,8 +2059,6 @@ If ``value`` is ``"my first post"``, the output will be ``"My First Post"``.
 truncatechars
 ^^^^^^^^^^^^^
 
-.. versionadded:: 1.4
-
 Truncates a string if it is longer than the specified number of characters.
 Truncated strings will end with a translatable ellipsis sequence ("...").
 
@@ -2200,11 +2188,6 @@ It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
 
-.. versionchanged:: 1.4
-
-Until Django 1.4, only the ``.com``, ``.net`` and ``.org`` suffixes were
-supported for domain-only links.
-
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
 
@@ -2333,8 +2316,6 @@ See :ref:`topic-l10n-templates`.
 
 tz
 ^^
-
-.. versionadded:: 1.4
 
 This library provides control over time zone conversions in templates.
 Like ``l10n``, you only need to load the library using ``{% load tz %}``,

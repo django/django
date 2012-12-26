@@ -480,8 +480,6 @@ Signals only sent when :ref:`running tests <running-tests>`.
 setting_changed
 ---------------
 
-.. versionadded:: 1.4
-
 .. data:: django.test.signals.setting_changed
    :module:
 
