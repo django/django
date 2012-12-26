@@ -14,7 +14,7 @@ See the :doc:`Django 1.2 release notes</releases/1.2>` for more details on
 these changes.
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed.  Use
-  the {% csrf_token %} template tag inside forms to enable CSRF
+  the ``{% csrf_token %}`` template tag inside forms to enable CSRF
   protection. ``CsrfViewMiddleware`` remains and is enabled by default.
 
 * The old imports for CSRF functionality (``django.contrib.csrf.*``),
@@ -200,6 +200,14 @@ these changes.
 See the :doc:`Django 1.4 release notes</releases/1.4>` for more details on
 these changes.
 
+* ``django.contrib.databrowse`` will be removed.
+
+* ``django.contrib.localflavor`` will be removed following an accelerated
+  deprecation.
+
+* ``django.contrib.markup`` will be removed following an accelerated
+  deprecation.
+
 * The compatibility modules ``django.utils.copycompat`` and
   ``django.utils.hashcompat`` as well as the functions
   ``django.utils.itercompat.all`` and ``django.utils.itercompat.any`` will
@@ -251,8 +259,6 @@ these changes.
   :data:`~django.conf.urls.handler500`, are now available through
   :mod:`django.conf.urls` .
 
-* The Databrowse contrib module will be removed.
-
 * The functions :func:`~django.core.management.setup_environ` and
   :func:`~django.core.management.execute_manager` will be removed from
   :mod:`django.core.management`. This also means that the old (pre-1.4)
@@ -265,8 +271,6 @@ these changes.
   in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
 
-* ``django.contrib.markup`` will be removed following an accelerated
-  deprecation.
 
 * The value for the ``post_url_continue`` parameter in
   ``ModelAdmin.response_add()`` will have to be either ``None`` (to redirect

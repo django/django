@@ -634,7 +634,26 @@ Miscellaneous
 Features deprecated in 1.5
 ==========================
 
-.. _simplejson-deprecation:
+``django.contrib.localflavor``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The localflavor contrib app has been split into separate packages.
+``django.contrib.localflavor`` itself will be removed in Django 1.6, after an
+:ref:`accelerated deprecation <localflavor-deprecation-policy>`. The docs
+provide :ref:`migration instructions <localflavor-how-to-migrate>`.
+
+The new packages are available :ref:`on Github <localflavor-packages>`. The
+core team cannot efficiently maintain these packages in the long term — it
+spans just a dozen countries at this time; similar to translations, maintenance
+will be handed over to interested members of the community.
+
+``django.contrib.markup``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The markup contrib module has been deprecated and will follow an accelerated
+deprecation schedule. Direct use of python markup libraries or 3rd party tag
+libraries is preferred to Django maintaining this functionality in the
+framework.
 
 :setting:`AUTH_PROFILE_MODULE`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -659,6 +678,8 @@ to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
 
 In Django 1.7 and above, the iterator will be consumed immediately by
 :class:`~django.http.HttpResponse`.
+
+.. _simplejson-deprecation:
 
 ``django.utils.simplejson``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -686,14 +707,6 @@ Define a ``__str__`` method and apply the
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
-
-``django.utils.markup``
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The markup contrib module has been deprecated and will follow an accelerated
-deprecation schedule. Direct use of python markup libraries or 3rd party tag
-libraries is preferred to Django maintaining this functionality in the
-framework.
 
 ``cleanup`` management command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
