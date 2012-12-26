@@ -625,8 +625,6 @@ exclude::
 Providing initial values
 ------------------------
 
-.. versionadded:: 1.4
-
 As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by

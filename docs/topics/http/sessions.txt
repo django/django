@@ -110,8 +110,6 @@ server has permissions to read and write to this location.
 Using cookie-based sessions
 ---------------------------
 
-.. versionadded:: 1.4
-
 To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
 ``"django.contrib.sessions.backends.signed_cookies"``. The session data will be
 stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
@@ -557,9 +555,6 @@ is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
-
-.. versionchanged:: 1.4
-    The default value of the setting was changed from ``False`` to ``True``.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 

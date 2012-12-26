@@ -410,8 +410,6 @@ Utilities
 
 .. function:: ensure_csrf_cookie(view)
 
-    .. versionadded:: 1.4
-
     This decorator forces a view to send the CSRF cookie.
 
 Scenarios
@@ -517,8 +515,6 @@ whatever you want.
 CSRF_COOKIE_PATH
 ----------------
 
-.. versionadded:: 1.4
-
 Default: ``'/'``
 
 The path set on the CSRF cookie. This should either match the URL path of your
@@ -530,8 +526,6 @@ its own CSRF cookie.
 
 CSRF_COOKIE_SECURE
 ------------------
-
-.. versionadded:: 1.4
 
 Default: ``False``
 

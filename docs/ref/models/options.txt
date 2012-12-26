@@ -209,10 +209,6 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
-    .. versionchanged:: 1.4
-       The Django admin honors all elements in the list/tuple; before 1.4, only
-       the first one was respected.
-
 ``permissions``
 ---------------
 

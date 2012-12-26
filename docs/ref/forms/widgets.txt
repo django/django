@@ -542,8 +542,6 @@ Selector and checkbox widgets
           ...
         </ul>
 
-    .. versionadded:: 1.4
-
     For more granular control over the generated markup, you can loop over the
     radio buttons in the template. Assuming a form ``myform`` with a field
     ``beatles`` that uses a ``RadioSelect`` as its widget:

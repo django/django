@@ -114,9 +114,6 @@ value should suffice.
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
 
-.. versionadded:: 1.4
-    ``handler403`` is new in Django 1.4.
-
 handler404
 ----------
 

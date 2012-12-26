@@ -287,8 +287,6 @@ will appear in the ``.po`` file as:
     msgid "May"
     msgstr ""
 
-.. versionadded:: 1.4
-
 Contextual markers are also supported by the :ttag:`trans` and
 :ttag:`blocktrans` template tags.
 
@@ -507,7 +505,6 @@ It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
 ``{% blocktrans %}`` instead.
 
-.. versionadded:: 1.4
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
@@ -532,8 +529,6 @@ or should be used as arguments for other template tags or filters::
         {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
     {% endfor %}
     </p>
-
-.. versionadded:: 1.4
 
 ``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
@@ -573,8 +568,6 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 
 .. note:: The previous more verbose format is still supported:
    ``{% blocktrans with book|title as book_t and author|title as author_t %}``
-
-.. versionchanged:: 1.4
 
 If resolving one of the block arguments fails, blocktrans will fall back to
 the default language by deactivating the currently active language
@@ -619,8 +612,6 @@ be retrieved (and stored) beforehand::
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
-
-.. versionadded:: 1.4
 
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
@@ -1409,8 +1400,6 @@ For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
 ``LocaleMiddleware`` tries to determine the user's language preference by
 following this algorithm:
-
-.. versionchanged:: 1.4
 
 * First, it looks for the language prefix in the requested URL.  This is
   only performed when you are using the ``i18n_patterns`` function in your

@@ -504,8 +504,6 @@ logging module.
 
 .. class:: CallbackFilter(callback)
 
-   .. versionadded:: 1.4
-
    This filter accepts a callback function (which should accept a single
    argument, the record to be logged), and calls it for each record that passes
    through the filter. Handling of that record will not proceed if the callback
@@ -541,8 +539,6 @@ logging module.
         },
 
 .. class:: RequireDebugFalse()
-
-   .. versionadded:: 1.4
 
    This filter will only pass on records when settings.DEBUG is False.
 

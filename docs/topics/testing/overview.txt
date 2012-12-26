@@ -860,8 +860,6 @@ SimpleTestCase
 
 .. class:: SimpleTestCase()
 
-.. versionadded:: 1.4
-
 A very thin subclass of :class:`unittest.TestCase`, it extends it with some
 basic functionality like:
 
@@ -991,8 +989,6 @@ additions, including:
 
 LiveServerTestCase
 ~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.4
 
 .. class:: LiveServerTestCase()
 
@@ -1346,8 +1342,6 @@ Overriding settings
 
 .. method:: TestCase.settings
 
-.. versionadded:: 1.4
-
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
 Django provides a standard Python context manager (see :pep:`343`)
@@ -1459,8 +1453,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertRaisesMessage(expected_exception, expected_message, callable_obj=None, *args, **kwargs)
 
-    .. versionadded:: 1.4
-
     Asserts that execution of callable ``callable_obj`` raised the
     ``expected_exception`` exception and that such exception has an
     ``expected_message`` representation. Any other outcome is reported as a
@@ -1468,8 +1460,6 @@ your test suite.
     with the difference that ``expected_message`` isn't a regular expression.
 
 .. method:: SimpleTestCase.assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
-
-    .. versionadded:: 1.4
 
     Asserts that a form field behaves correctly with various inputs.
 
@@ -1495,8 +1485,6 @@ your test suite.
     that ``text`` appears in the content of the response. If ``count`` is
     provided, ``text`` must occur exactly ``count`` times in the response.
 
-    .. versionadded:: 1.4
-
     Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
     the response content will be based on HTML semantics instead of
     character-by-character equality. Whitespace is ignored in most cases,
@@ -1507,8 +1495,6 @@ your test suite.
 
     Asserts that a ``Response`` instance produced the given ``status_code`` and
     that ``text`` does not appears in the content of the response.
-
-    .. versionadded:: 1.4
 
     Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
     the response content will be based on HTML semantics instead of
@@ -1538,8 +1524,6 @@ your test suite.
 
     The name is a string such as ``'admin/index.html'``.
 
-    .. versionadded:: 1.4
-
     You can use this as a context manager, like this::
 
         with self.assertTemplateUsed('index.html'):
@@ -1551,8 +1535,6 @@ your test suite.
 
     Asserts that the template with the given name was *not* used in rendering
     the response.
-
-    .. versionadded:: 1.4
 
     You can use this as a context manager in the same way as
     :meth:`~TestCase.assertTemplateUsed`.
@@ -1580,12 +1562,6 @@ your test suite.
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a Python set comparison.
 
-    .. versionchanged:: 1.4
-	The ``ordered`` parameter is new in version 1.4. In earlier versions,
-	you would need to ensure the queryset is ordered consistently, possibly
-	via an explicit ``order_by()`` call on the queryset prior to
-	comparison.
-
     .. versionchanged:: 1.6
         The method now checks for undefined order and raises ``ValueError``
         if undefined order is spotted. The ordering is seen as undefined if
@@ -1611,8 +1587,6 @@ your test suite.
             Person.objects.create(name="Daniel")
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
-
-    .. versionadded:: 1.4
 
     Asserts that the strings ``html1`` and ``html2`` are equal. The comparison
     is based on HTML semantics. The comparison takes following things into
@@ -1642,8 +1616,6 @@ your test suite.
     raised if one of them cannot be parsed.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
-
-    .. versionadded:: 1.4
 
     Asserts that the strings ``html1`` and ``html2`` are *not* equal. The
     comparison is based on HTML semantics. See

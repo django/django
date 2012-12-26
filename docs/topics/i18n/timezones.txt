@@ -4,8 +4,6 @@
 Time zones
 ==========
 
-.. versionadded:: 1.4
-
 .. _time-zones-overview:
 
 Overview

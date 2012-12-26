@@ -100,10 +100,8 @@ Examples (when 'today' is 17 Feb 2007):
 naturaltime
 -----------
 
-.. versionadded:: 1.4
-
 For datetime values, returns a string representing how many seconds,
-minutes or hours ago it was -- falling back to the :tfilter:`timesince` 
+minutes or hours ago it was -- falling back to the :tfilter:`timesince`
 format if the value is more than a day old. In case the datetime value is in
 the future the return value will automatically use an appropriate phrase.
 
