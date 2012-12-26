@@ -72,6 +72,8 @@ class GeoQuery(sql.Query):
             value = Area(**{field.area_att : value})
         elif isinstance(field, (GeomField, GeometryField)) and value:
             value = Geometry(value)
+        elif field is not None:
+            return super(GeoQuery, self).convert_values(value, field, connection)
         return value
 
     def get_aggregation(self, using):
