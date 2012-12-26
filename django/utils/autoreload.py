@@ -63,6 +63,8 @@ def code_changed():
         except AttributeError:
             pass
     for filename in filenames + _error_files:
+        if not filename:
+            continue
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if filename.endswith("$py.class"):
