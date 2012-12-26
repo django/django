@@ -5,7 +5,7 @@ from datetime import datetime
 
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.test import TestCase
 
 from .models import City, PennsylvaniaCity, State, Truth
@@ -50,6 +50,7 @@ class GeoRegressionTests(TestCase):
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
+        self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):
          "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
