@@ -37,6 +37,8 @@ file.
 
 .. _ISO 3166 country code: http://www.iso.org/iso/country_codes.htm
 
+.. _localflavor-how-to-migrate:
+
 How to migrate
 ==============
 
@@ -60,6 +62,8 @@ The code in the new packages is the same (it was copied directly from Django),
 so you don't have to worry about backwards compatibility in terms of
 functionality. Only the imports have changed.
 
+.. _localflavor-deprecation-policy:
+
 Deprecation policy
 ==================
 
@@ -69,6 +73,8 @@ change it as soon as possible.
 
 In Django 1.6, importing from ``django.contrib.localflavor`` will no longer
 work.
+
+.. _localflavor-packages:
 
 Supported countries
 ===================
