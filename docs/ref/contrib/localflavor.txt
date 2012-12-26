@@ -142,13 +142,10 @@ default formats. Here's an example of how to use them::
     class MyForm(forms.Form):
         my_date_field = generic.forms.DateField()
 
-Internationalization of localflavor
-===================================
+Internationalization of localflavors
+====================================
 
-Localflavor has its own catalog of translations, in the directory
-``django/contrib/localflavor/locale``, and it's not loaded automatically like
-Django's general catalog in ``django/conf/locale``. If you want localflavor's
-texts to be translated, like form fields error messages, you must include
-:mod:`django.contrib.localflavor` in the :setting:`INSTALLED_APPS` setting, so
-the internationalization system can find the catalog, as explained in
-:ref:`how-django-discovers-translations`.
+To activate translations for a ``localflavor`` application, you must include
+the application's name (e.g. ``django_localflavor_jp``) in the
+:setting:`INSTALLED_APPS` setting, so the internationalization system can find
+the catalog, as explained in :ref:`how-django-discovers-translations`.
