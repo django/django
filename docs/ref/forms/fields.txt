@@ -654,8 +654,6 @@ For each field, we describe the default widget used if you don't specify
 ``GenericIPAddressField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.4
-
 .. class:: GenericIPAddressField(**kwargs)
 
     A field containing either an IPv4 or an IPv6 address.

@@ -238,9 +238,6 @@ with the PostgreSQL 8, Oracle and MySQL (when using the InnoDB storage engine)
 backends. Other backends provide the savepoint functions, but they're empty
 operations -- they don't actually do anything.
 
-.. versionchanged:: 1.4
-   Savepoint support for the MySQL backend was added in Django 1.4.
-
 Savepoints aren't especially useful if you are using the default
 ``autocommit`` behavior of Django. However, if you are using
 ``commit_on_success`` or ``commit_manually``, each open transaction will build

@@ -126,12 +126,6 @@ pages along with any interesting information from the objects themselves::
         </span>
     </div>
 
-.. versionchanged:: 1.4
-    Previously, you would need to use
-    ``{% for contact in contacts.object_list %}``, since the ``Page``
-    object was not iterable.
-
-
 ``Paginator`` objects
 =====================
 
@@ -234,7 +228,6 @@ using :meth:`Paginator.page`.
 
 .. class:: Page(object_list, number, paginator)
 
-.. versionadded:: 1.4
     A page acts like a sequence of :attr:`Page.object_list` when using
     ``len()`` or iterating it directly.
 

@@ -31,14 +31,10 @@ SingleObjectMixin
 
     .. attribute:: slug_url_kwarg
 
-        .. versionadded:: 1.4
-
         The name of the URLConf keyword argument that contains the slug. By
         default, ``slug_url_kwarg`` is ``'slug'``.
 
     .. attribute:: pk_url_kwarg
-
-        .. versionadded:: 1.4
 
         The name of the URLConf keyword argument that contains the primary key.
         By default, ``pk_url_kwarg`` is ``'pk'``.

@@ -28,8 +28,6 @@ callable object which the webserver uses to communicate with your code. This is
 commonly specified as an object named ``application`` in a Python module
 accessible to the server.
 
-.. versionchanged:: 1.4
-
 The :djadmin:`startproject` command creates a :file:`projectname/wsgi.py` that
 contains such an application callable.
 

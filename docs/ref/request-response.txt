@@ -262,8 +262,6 @@ Methods
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
-   .. versionadded:: 1.4
-
    Returns a cookie value for a signed cookie, or raises a
    :class:`~django.core.signing.BadSignature` exception if the signature is
    no longer valid. If you provide the ``default`` argument the exception
@@ -473,9 +471,6 @@ In addition, ``QueryDict`` has the following methods:
     It's guaranteed to return a list of some sort unless the default value
     was no list.
 
-    .. versionchanged:: 1.4
-        The ``default`` parameter was added.
-
 .. method:: QueryDict.setlist(key, list_)
 
     Sets the given key to ``list_`` (unlike ``__setitem__()``).
@@ -499,8 +494,6 @@ In addition, ``QueryDict`` has the following methods:
         [(u'a', [u'1', u'2', u'3'])]
 
 .. method:: QueryDict.dict()
-
-    .. versionadded:: 1.4
 
     Returns ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
@@ -704,8 +697,6 @@ Methods
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
-
-    .. versionadded:: 1.4
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting

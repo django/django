@@ -68,6 +68,3 @@ PostgreSQL and Oracle support tablespaces. SQLite and MySQL don't.
 
 When you use a backend that lacks support for tablespaces, Django ignores all
 tablespace-related options.
-
-.. versionchanged:: 1.4
-    Since Django 1.4, the PostgreSQL backend supports tablespaces.

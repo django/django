@@ -466,8 +466,6 @@ several lines in language files.
 
 .. django-admin-option:: --no-location
 
-.. versionadded:: 1.4
-
 Use the ``--no-location`` option to not write '``#: filename:line``'
 comment lines in language files. Note that using this option makes it harder
 for technically skilled translators to understand each message's context.
@@ -482,9 +480,8 @@ supports the FastCGI protocol. See the :doc:`FastCGI deployment documentation
 </howto/deployment/fastcgi>` for details. Requires the Python FastCGI module from
 `flup`_.
 
-.. versionadded:: 1.4
-    Internally, this wraps the WSGI application object specified by the
-    :setting:`WSGI_APPLICATION` setting.
+Internally, this wraps the WSGI application object specified by the
+:setting:`WSGI_APPLICATION` setting.
 
 .. _flup: http://www.saddi.com/software/flup/
 
@@ -610,9 +607,8 @@ If you run this script as a user with normal privileges (recommended), you
 might not have access to start a port on a low port number. Low port numbers
 are reserved for the superuser (root).
 
-.. versionadded:: 1.4
-    This server uses the WSGI application object specified by the
-    :setting:`WSGI_APPLICATION` setting.
+This server uses the WSGI application object specified by the
+:setting:`WSGI_APPLICATION` setting.
 
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that's how it's gonna stay. We're in
@@ -658,11 +654,8 @@ Example usage::
 
 .. django-admin-option:: --nothreading
 
-.. versionadded:: 1.4
-
-Since version 1.4, the development server is multithreaded by default.
-Use the ``--nothreading`` option to disable the use of threading in the
-development server.
+The development server is multithreaded by default. Use the ``--nothreading``
+option to disable the use of threading in the development server.
 
 .. django-admin-option:: --ipv6, -6
 
@@ -856,8 +849,6 @@ startapp <appname> [destination]
 Creates a Django app directory structure for the given app name in the current
 directory or the given destination.
 
-.. versionchanged:: 1.4
-
 By default the directory created contains a ``models.py`` file and other app
 template files. (See the `source`_ for more details.) If only the app
 name is given, the app directory will be created in the current working
@@ -871,7 +862,6 @@ For example::
 
     django-admin.py startapp myapp /Users/jezdez/Code/myapp
 
-.. versionadded:: 1.4
 .. django-admin-option:: --template
 
 With the ``--template`` option, you can use a custom app template by providing
@@ -892,8 +882,6 @@ For example, taking advantage of Github's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
-
-.. versionadded:: 1.4
 
 When Django copies the app template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -929,8 +917,6 @@ startproject <projectname> [destination]
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
 
-.. versionchanged:: 1.4
-
 By default, the new directory contains ``manage.py`` and a project package
 (containing a ``settings.py`` and other files). See the `template source`_ for
 details.
@@ -946,8 +932,6 @@ package within it. Use '.' to denote the current working directory.
 For example::
 
     django-admin.py startproject myproject /Users/jezdez/Code/myproject_repo
-
-.. versionadded:: 1.4
 
 As with the :djadmin:`startapp` command, the ``--template`` option lets you
 specify a directory, file path or URL of a custom project template. See the
@@ -1044,14 +1028,12 @@ information.
 The ``--failfast`` option can be used to stop running tests and report the
 failure immediately after a test fails.
 
-.. versionadded:: 1.4
 .. django-admin-option:: --testrunner
 
 The ``--testrunner`` option can be used to control the test runner class that
 is used to execute tests. If this value is provided, it overrides the value
 provided by the :setting:`TEST_RUNNER` setting.
 
-.. versionadded:: 1.4
 .. django-admin-option:: --liveserver
 
 The ``--liveserver`` option can be used to override the default address where
@@ -1152,8 +1134,6 @@ the user given as parameter. If they both match, the new password will be
 changed immediately. If you do not supply a user, the command will attempt to
 change the password whose username matches the current user.
 
-.. versionadded:: 1.4
-
 Use the ``--database`` option to specify the database to query for the user. If
 it's not supplied, Django will use the ``default`` database.
 
@@ -1186,8 +1166,6 @@ The username and email address for the new account can be supplied by
 using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
-
-.. versionadded:: 1.4
 
 Use the ``--database`` option to specify the database into which the superuser
 object will be saved.

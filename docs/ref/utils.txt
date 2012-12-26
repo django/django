@@ -138,8 +138,6 @@ results. Instead do::
 ``django.utils.dateparse``
 ==========================
 
-.. versionadded:: 1.4
-
 .. module:: django.utils.dateparse
    :synopsis: Functions to parse datetime objects.
 
@@ -788,8 +786,6 @@ For a complete discussion on the usage of the following see the
 
 .. function:: override(language, deactivate=False)
 
-    .. versionadded:: 1.4
-
     A Python context manager that uses
     :func:`django.utils.translation.activate` to fetch the translation object
     for a given language, installing it as the translation object for the
@@ -811,8 +807,6 @@ For a complete discussion on the usage of the following see the
     * ``True`` = right-to-left layout
 
 .. function:: get_language_from_request(request, check_path=False)
-
-    .. versionchanged:: 1.4
 
     Analyzes the request to find what language the user wants the system to show.
     Only languages listed in settings.LANGUAGES are taken into account. If the user
@@ -837,8 +831,6 @@ For a complete discussion on the usage of the following see the
 
 ``django.utils.timezone``
 =========================
-
-.. versionadded:: 1.4
 
 .. module:: django.utils.timezone
     :synopsis: Timezone support.

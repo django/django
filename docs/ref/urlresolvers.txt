@@ -71,8 +71,6 @@ You can use ``kwargs`` instead of ``args``. For example::
 reverse_lazy()
 --------------
 
-.. versionadded:: 1.4
-
 A lazily evaluated version of `reverse()`_.
 
 .. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])

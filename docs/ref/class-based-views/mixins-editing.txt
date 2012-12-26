@@ -40,11 +40,6 @@ FormMixin
         Retrieve initial data for the form. By default, returns a copy of
         :attr:`~django.views.generic.edit.FormMixin.initial`.
 
-        .. versionchanged:: 1.4
-            In Django 1.3, this method was returning the
-            :attr:`~django.views.generic.edit.FormMixin.initial` class variable
-            itself.
-
     .. method:: get_form_class()
 
         Retrieve the form class to instantiate. By default
