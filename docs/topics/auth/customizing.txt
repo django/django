@@ -479,9 +479,11 @@ The easiest way to construct a compliant custom User model is to inherit from
 implementation of a `User` model, including hashed passwords and tokenized
 password resets. You must then provide some key implementation details:
 
+.. currentmodule:: django.contrib.auth
+
 .. class:: models.CustomUser
 
-    .. attribute:: User.USERNAME_FIELD
+    .. attribute:: USERNAME_FIELD
 
         A string describing the name of the field on the User model that is
         used as the unique identifier. This will usually be a username of
@@ -494,7 +496,7 @@ password resets. You must then provide some key implementation details:
                 ...
                 USERNAME_FIELD = 'identifier'
 
-    .. attribute:: User.REQUIRED_FIELDS
+    .. attribute:: REQUIRED_FIELDS
 
         A list of the field names that *must* be provided when creating
         a user. For example, here is the partial definition for a User model
@@ -512,7 +514,7 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your User
             model, but should *not* contain the ``USERNAME_FIELD``.
 
-    .. attribute:: User.is_active
+    .. attribute:: is_active
 
         A boolean attribute that indicates whether the user is considered
         "active".  This attribute is provided as an attribute on
@@ -521,13 +523,13 @@ password resets. You must then provide some key implementation details:
         See the documentation of the :attr:`attribute on the builtin user model
         <django.contrib.auth.models.User.is_active>` for details.
 
-    .. method:: User.get_full_name():
+    .. method:: get_full_name()
 
         A longer formal identifier for the user. A common interpretation
         would be the full name name of the user, but it can be any string that
         identifies the user.
 
-    .. method:: User.get_short_name():
+    .. method:: get_short_name()
 
         A short, informal identifier for the user. A common interpretation
         would be the first name of the user, but it can be any string that
@@ -539,7 +541,7 @@ The following methods are available on any subclass of
 
 .. class:: models.AbstractBaseUser
 
-    .. method:: models.AbstractBaseUser.get_username()
+    .. method:: get_username()
 
         Returns the value of the field nominated by ``USERNAME_FIELD``.
 
@@ -706,21 +708,23 @@ If you want your custom User model to also work with Admin, your User model must
 define some additional attributes and methods. These methods allow the admin to
 control access of the User to admin content:
 
-.. attribute:: User.is_staff
+.. class:: models.CustomUser
+
+.. attribute:: is_staff
 
     Returns True if the user is allowed to have access to the admin site.
 
-.. attribute:: User.is_active
+.. attribute:: is_active
 
     Returns True if the user account is currently active.
 
-.. method:: User.has_perm(perm, obj=None):
+.. method:: has_perm(perm, obj=None):
 
     Returns True if the user has the named permission. If `obj` is
     provided, the permission needs to be checked against a specific object
     instance.
 
-.. method:: User.has_module_perms(app_label):
+.. method:: has_module_perms(app_label):
 
     Returns True if the user has permission to access models in
     the given app.
