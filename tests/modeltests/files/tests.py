@@ -5,7 +5,6 @@ import shutil
 import tempfile
 
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -102,24 +101,6 @@ class FileStorageTests(TestCase):
         obj4 = Storage()
         obj4.random.save("random_file", ContentFile("random content"))
         self.assertTrue(obj4.random.name.endswith("/random_file"))
-
-    def test_max_length(self):
-        """
-        Test that FileField validates the length of the generated file name
-        that will be stored in the database. Regression for #9893.
-        """
-        # upload_to = 'unused', so file names are saved as '456/xxxxx'.
-        # max_length = 16, so names longer than 12 characters are rejected.
-        s1 = Storage(random=SimpleUploadedFile(12 * 'x', b"content"))
-        s1.full_clean()
-        with self.assertRaises(ValidationError):
-            Storage(random=SimpleUploadedFile(13 * 'x', b"content")).full_clean()
-
-        # Ticket #18515: validation for an already saved file should not check
-        # against a regenerated file name (and potentially raise a ValidationError
-        # if max_length is exceeded
-        s1.save()
-        s1.full_clean()
 
 
 class FileTests(unittest.TestCase):

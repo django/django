@@ -26,5 +26,5 @@ class Storage(models.Model):
 
     normal = models.FileField(storage=temp_storage, upload_to='tests')
     custom = models.FileField(storage=temp_storage, upload_to=custom_upload_to)
-    random = models.FileField(storage=temp_storage, upload_to=random_upload_to, max_length=16)
+    random = models.FileField(storage=temp_storage, upload_to=random_upload_to)
     default = models.FileField(storage=temp_storage, upload_to='tests', default='tests/default.txt')
