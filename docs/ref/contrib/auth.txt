@@ -47,6 +47,10 @@ Fields
 
         Many-to-many relationship to :class:`~django.contrib.auth.models.Group`
 
+    .. attribute:: user_permissions
+
+         Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+
     .. attribute:: is_staff
 
         Boolean. Designates whether this user can access the admin site.
@@ -66,9 +70,9 @@ Fields
         :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
         :func:`~django.contrib.auth.views.login` view (which is the default)
         *does* perform this check, as do the permission-checking methods such
-        as :meth:`~models.User.has_perm` and the authentication in the Django
-        admin. All of those functions/methods will return ``False`` for
-        inactive users.
+        as :meth:`~django.contrib.auth.models.User.has_perm` and the
+        authentication in the Django admin. All of those functions/methods will
+        return ``False`` for inactive users.
 
     .. attribute:: is_superuser
 
@@ -191,9 +195,8 @@ Methods
 
     .. method:: email_user(subject, message, from_email=None)
 
-        Sends an email to the user. If
-        :attr:`~django.contrib.auth.models.User.from_email` is ``None``, Django
-        uses the :setting:`DEFAULT_FROM_EMAIL`.
+        Sends an email to the user. If ``from_email`` is ``None``, Django uses
+        the :setting:`DEFAULT_FROM_EMAIL`.
 
     .. method:: get_profile()
 
@@ -204,18 +207,18 @@ Methods
             :doc:`Django 1.5 release notes</releases/1.5>` for more information.
 
         Returns a site-specific profile for this user. Raises
-        :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
+        ``django.contrib.auth.models.SiteProfileNotAvailable`` if the
         current site doesn't allow profiles, or
         :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
         have a profile.
 
-Manager functions
------------------
+Manager methods
+---------------
 
 .. class:: UserManager
 
     The :class:`~django.contrib.auth.models.User` model has a custom manager
-    that has the following helper functions:
+    that has the following helper methods:
 
     .. method:: create_user(username, email=None, password=None)
 
@@ -231,7 +234,7 @@ Manager functions
         domain portion of :attr:`~django.contrib.auth.models.User.email` is
         automatically converted to lowercase, and the returned
         :class:`~django.contrib.auth.models.User` object will have
-        :attr:`~models.User.is_active` set to ``True``.
+        :attr:`~django.contrib.auth.models.User.is_active` set to ``True``.
 
         If no password is provided,
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
@@ -260,7 +263,7 @@ Anonymous users
     implements the :class:`django.contrib.auth.models.User` interface, with
     these differences:
 
-    * :attr:`~django.contrib.auth.models.User.id` is always ``None``.
+    * :ref:`id <automatic-primary-key-fields>` is always ``None``.
     * :attr:`~django.contrib.auth.models.User.is_staff` and
       :attr:`~django.contrib.auth.models.User.is_superuser` are always
       ``False``.
@@ -274,10 +277,8 @@ Anonymous users
       ``False`` instead of ``True``.
     * :meth:`~django.contrib.auth.models.User.set_password()`,
       :meth:`~django.contrib.auth.models.User.check_password()`,
-      :meth:`~django.contrib.auth.models.User.save()`,
-      :meth:`~django.contrib.auth.models.User.delete()`,
-      :meth:`~django.contrib.auth.models.User.set_groups()` and
-      :meth:`~django.contrib.auth.models.User.set_permissions()` raise
+      :meth:`~django.db.models.Model.save` and
+      :meth:`~django.db.models.Model.delete()` raise
       :exc:`~exceptions.NotImplementedError`.
 
 In practice, you probably won't need to use
@@ -331,7 +332,7 @@ Fields
 
 .. attribute:: permissions
 
-    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
+    Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
 
         group.permissions = [permission_list]
         group.permissions.add(permission, permission, ...)

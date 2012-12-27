@@ -424,27 +424,31 @@ model that you wish to use as your User model.
 Referencing the User model
 --------------------------
 
+.. currentmodule:: django.contrib.auth
+
 If you reference :class:`~django.contrib.auth.models.User` directly (for
 example, by referring to it in a foreign key), your code will not work in
 projects where the :setting:`AUTH_USER_MODEL` setting has been changed to a
 different User model.
 
-Instead of referring to :class:`~django.contrib.auth.models.User` directly,
-you should reference the user model using
-:func:`django.contrib.auth.get_user_model()`. This method will return the
-currently active User model -- the custom User model if one is specified, or
-:class:`~django.contrib.auth.User` otherwise.
+.. function:: get_user_model()
 
-When you define a foreign key or many-to-many relations to the User model,
-you should specify the custom model using the :setting:`AUTH_USER_MODEL`
-setting. For example::
+    Instead of referring to :class:`~django.contrib.auth.models.User` directly,
+    you should reference the user model using
+    ``django.contrib.auth.get_user_model()``. This method will return the
+    currently active User model -- the custom User model if one is specified, or
+    :class:`~django.contrib.auth.User` otherwise.
+
+    When you define a foreign key or many-to-many relations to the User model,
+    you should specify the custom model using the :setting:`AUTH_USER_MODEL`
+    setting. For example::
 
 
-    from django.conf import settings
-    from django.db import models
+        from django.conf import settings
+        from django.db import models
 
-    class Article(models.Model)
-        author = models.ForeignKey(settings.AUTH_USER_MODEL)
+        class Article(models.Model)
+            author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
 Specifying a custom User model
 ------------------------------
