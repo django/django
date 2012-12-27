@@ -363,7 +363,7 @@ login page::
 The login_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: decorators.login_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url=None])
+.. function:: login_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url=None])
 
     As a shortcut, you can use the convenient
     :func:`~django.contrib.auth.decorators.login_required` decorator::
@@ -546,7 +546,7 @@ Most built-in authentication views provide a URL name for easier reference. See
 patterns.
 
 
-.. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
+.. function:: login(request, [template_name, redirect_field_name, authentication_form])
 
     **URL name:** ``login``
 

@@ -19,39 +19,39 @@ Fields
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
 
-    .. attribute:: models.User.username
+    .. attribute:: username
 
         Required. 30 characters or fewer. Usernames may contain alphanumeric,
         ``_``, ``@``, ``+``, ``.`` and ``-`` characters.
 
-    .. attribute:: models.User.first_name
+    .. attribute:: first_name
 
         Optional. 30 characters or fewer.
 
-    .. attribute:: models.User.last_name
+    .. attribute:: last_name
 
         Optional. 30 characters or fewer.
 
-    .. attribute:: models.User.email
+    .. attribute:: email
 
         Optional. Email address.
 
-    .. attribute:: models.User.password
+    .. attribute:: password
 
         Required. A hash of, and metadata about, the password. (Django doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
         contain any character. See the :doc:`password documentation
         </topics/auth/passwords>`.
 
-    .. attribute:: models.User.groups
+    .. attribute:: groups
 
         Many-to-many relationship to :class:`~django.contrib.auth.models.Group`
 
-    .. attribute:: models.User.is_staff
+    .. attribute:: is_staff
 
         Boolean. Designates whether this user can access the admin site.
 
-    .. attribute:: models.User.is_active
+    .. attribute:: is_active
 
         Boolean. Designates whether this user account should be considered
         active. We recommend that you set this flag to ``False`` instead of
@@ -70,25 +70,23 @@ Fields
         admin. All of those functions/methods will return ``False`` for
         inactive users.
 
-    .. attribute:: models.User.is_superuser
+    .. attribute:: is_superuser
 
         Boolean. Designates that this user has all permissions without
         explicitly assigning them.
 
-    .. attribute:: models.User.last_login
+    .. attribute:: last_login
 
         A datetime of the user's last login. Is set to the current date/time by
         default.
 
-    .. attribute:: models.User.date_joined
+    .. attribute:: date_joined
 
         A datetime designating when the account was created. Is set to the
         current date/time by default when the account is created.
 
 Methods
 -------
-
-.. class:: User
 
     :class:`~django.contrib.auth.models.User` objects have two many-to-many
     fields: ``groups`` and ``user_permissions``.
@@ -111,13 +109,13 @@ Methods
     :class:`~django.contrib.auth.models.User` objects have the following custom
     methods:
 
-    .. method:: models.User.get_username()
+    .. method:: get_username()
 
         Returns the username for the user. Since the User model can be swapped
         out, you should use  this method instead of referencing the username
         attribute directly.
 
-    .. method:: models.User.is_anonymous()
+    .. method:: is_anonymous()
 
         Always returns ``False``. This is a way of differentiating
         :class:`~django.contrib.auth.models.User` and
@@ -126,32 +124,32 @@ Methods
         :meth:`~django.contrib.auth.models.User.is_authenticated()` to this
         method.
 
-    .. method:: models.User.is_authenticated()
+    .. method:: is_authenticated()
 
         Always returns ``True``. This is a way to tell if the user has been
         authenticated. This does not imply any permissions, and doesn't check
         if the user is active - it only indicates that the user has provided a
         valid username and password.
 
-    .. method:: models.User.get_full_name()
+    .. method:: get_full_name()
 
         Returns the :attr:`~django.contrib.auth.models.User.first_name` plus
         the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
         between.
 
-    .. method:: models.User.set_password(raw_password)
+    .. method:: set_password(raw_password)
 
         Sets the user's password to the given raw string, taking care of the
         password hashing. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
 
-    .. method:: models.User.check_password(raw_password)
+    .. method:: check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
 
-    .. method:: models.User.set_unusable_password()
+    .. method:: set_unusable_password()
 
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
@@ -162,13 +160,13 @@ Methods
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
 
-    .. method:: models.User.has_usable_password()
+    .. method:: has_usable_password()
 
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
-    .. method:: models.User.get_group_permissions(obj=None)
+    .. method:: get_group_permissions(obj=None)
 
         Returns a set of permission strings that the user has, through his/her
         groups.
@@ -176,7 +174,7 @@ Methods
         If ``obj`` is passed in, only returns the group permissions for
         this specific object.
 
-    .. method:: models.User.get_all_permissions(obj=None)
+    .. method:: get_all_permissions(obj=None)
 
         Returns a set of permission strings that the user has, both through
         group and user permissions.
@@ -184,7 +182,7 @@ Methods
         If ``obj`` is passed in, only returns the permissions for this
         specific object.
 
-    .. method:: models.User.has_perm(perm, obj=None)
+    .. method:: has_perm(perm, obj=None)
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
@@ -194,7 +192,7 @@ Methods
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
 
-    .. method:: models.User.has_perms(perm_list, obj=None)
+    .. method:: has_perms(perm_list, obj=None)
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
@@ -204,19 +202,19 @@ Methods
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
 
-    .. method:: models.User.has_module_perms(package_name)
+    .. method:: has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
 
-    .. method:: models.User.email_user(subject, message, from_email=None)
+    .. method:: email_user(subject, message, from_email=None)
 
         Sends an email to the user. If
         :attr:`~django.contrib.auth.models.User.from_email` is ``None``, Django
         uses the :setting:`DEFAULT_FROM_EMAIL`.
 
-    .. method:: models.User.get_profile()
+    .. method:: get_profile()
 
         .. deprecated:: 1.5
             With the introduction of :ref:`custom User models <auth-custom-user>`,
@@ -238,7 +236,7 @@ Manager functions
     The :class:`~django.contrib.auth.models.User` model has a custom manager
     that has the following helper functions:
 
-    .. method:: models.UserManager.create_user(username, email=None, password=None)
+    .. method:: create_user(username, email=None, password=None)
 
         .. versionchanged:: 1.4
            The ``email`` parameter was made optional. The username
@@ -260,7 +258,7 @@ Manager functions
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
-    .. method:: models.UserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+    .. method:: make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
         Returns a random password with the given length and given string of
         allowed characters. (Note that the default value of ``allowed_chars``
@@ -316,16 +314,16 @@ Fields
 :class:`~django.contrib.auth.models.Permission` objects have the following
 fields:
 
-.. attribute:: Permission.name
+.. attribute:: name
 
     Required. 50 characters or fewer. Example: ``'Can vote'``.
 
-.. attribute:: Permission.content_type
+.. attribute:: content_type
 
     Required. A reference to the ``django_content_type`` database table, which
     contains a record for each installed Django model.
 
-.. attribute:: Permission.codename
+.. attribute:: codename
 
     Required. 100 characters or fewer. Example: ``'can_vote'``.
 
@@ -334,7 +332,6 @@ Methods
 
 :class:`~django.contrib.auth.models.Permission` objects have the standard
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
-
 
 Group
 =====
@@ -346,12 +343,12 @@ Fields
 
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
-.. attribute:: Group.name
+.. attribute:: name
 
     Required. 80 characters or fewer. Any characters are permitted. Example:
     ``'Awesome Users'``.
 
-.. attribute:: Group.permissions
+.. attribute:: permissions
 
     Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
 
