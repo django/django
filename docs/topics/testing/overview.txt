@@ -651,7 +651,7 @@ Use the ``django.test.client.Client`` class to make requests.
 
     .. method:: Client.login(**credentials)
 
-        If your site uses Django's :doc:`authentication system</topics/auth>`
+        If your site uses Django's :doc:`authentication system</topics/auth/index>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
         site.
@@ -695,7 +695,7 @@ Use the ``django.test.client.Client`` class to make requests.
 
     .. method:: Client.logout()
 
-        If your site uses Django's :doc:`authentication system</topics/auth>`,
+        If your site uses Django's :doc:`authentication system</topics/auth/index>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
 

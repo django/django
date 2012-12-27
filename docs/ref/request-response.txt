@@ -181,7 +181,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     ``user`` is only available if your Django installation has the
     ``AuthenticationMiddleware`` activated. For more, see
-    :doc:`/topics/auth`.
+    :doc:`/topics/auth/index`.
 
 .. attribute:: HttpRequest.session
 

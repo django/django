@@ -14,7 +14,7 @@ Introductions to all the key parts of Django you'll need to know:
    class-based-views/index
    files
    testing/index
-   auth
+   auth/index
    cache
    conditional-view-processing
    signing

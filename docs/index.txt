@@ -246,7 +246,7 @@ Common Web application tools
 Django offers multiple tools commonly needed in the development of Web
 applications:
 
-* :doc:`Authentication <topics/auth>`
+* :doc:`Authentication <topics/auth/index>`
 * :doc:`Caching <topics/cache>`
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`

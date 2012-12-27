@@ -5,7 +5,6 @@ API Reference
 .. toctree::
    :maxdepth: 1
 
-   authbackends
    class-based-views/index
    clickjacking
    contrib/index
