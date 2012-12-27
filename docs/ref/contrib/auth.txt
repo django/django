@@ -1,8 +1,12 @@
 ``django.contrib.auth``
 =======================
 
-.. currentmodule:: django.contrib.auth.models
+This document provides API reference material for the components of Django's
+authentication system, for more details on the usage of these components, or
+how to customize authentication and authorization see the :doc:`authentication
+topic guide</topics/auth/index>`
 
+.. currentmodule:: django.contrib.auth.models
 
 User
 ====
