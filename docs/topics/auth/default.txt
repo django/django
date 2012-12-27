@@ -114,7 +114,7 @@ passwords.
 Authenticating Users
 --------------------
 
-.. function:: django.contrib.auth.authenticate()
+.. function:: authenticate(\**credentials)
 
     To authenticate a given username and password, use
     :func:`~django.contrib.auth.authenticate()`. It takes credentials in the

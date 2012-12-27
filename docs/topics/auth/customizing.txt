@@ -437,7 +437,7 @@ different User model.
     you should reference the user model using
     ``django.contrib.auth.get_user_model()``. This method will return the
     currently active User model -- the custom User model if one is specified, or
-    :class:`~django.contrib.auth.User` otherwise.
+    :class:`~django.contrib.auth.models.User` otherwise.
 
     When you define a foreign key or many-to-many relations to the User model,
     you should specify the custom model using the :setting:`AUTH_USER_MODEL`
@@ -538,7 +538,7 @@ password resets. You must then provide some key implementation details:
         A short, informal identifier for the user. A common interpretation
         would be the first name of the user, but it can be any string that
         identifies the user in an informal way. It may also return the same
-        value as :meth:`django.contrib.auth.User.get_full_name()`.
+        value as :meth:`django.contrib.auth.models.User.get_full_name()`.
 
 The following methods are available on any subclass of
 :class:`~django.contrib.auth.models.AbstractBaseUser`:
@@ -736,26 +736,26 @@ control access of the User to admin content:
     the given app.
 
 You will also need to register your custom User model with the admin. If
-your custom User model extends :class:`~django.contrib.auth.models.AbstractUser`,
-you can use Django's existing :class:`~django.contrib.auth.admin.UserAdmin`
+your custom User model extends ``django.contrib.auth.models.AbstractUser``,
+you can use Django's existing ``django.contrib.auth.admin.UserAdmin``
 class. However, if your User model extends
 :class:`~django.contrib.auth.models.AbstractBaseUser`, you'll need to define
 a custom ModelAdmin class. It may be possible to subclass the default
-:class:`~django.contrib.auth.admin.UserAdmin`; however, you'll need to
+``django.contrib.auth.admin.UserAdmin``; however, you'll need to
 override any of the definitions that refer to fields on
-:class:`~django.contrib.auth.models.AbstractUser` that aren't on your
+``django.contrib.auth.models.AbstractUser`` that aren't on your
 custom User class.
 
 Custom users and permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To make it easy to include Django's permission framework into your own User
-class, Django provides :class:`~django.contrib.auth.model.PermissionsMixin`.
+class, Django provides :class:`~django.contrib.auth.models.PermissionsMixin`.
 This is an abstract model you can include in the class hierarchy for your User
 model, giving you all the methods and database fields necessary to support
 Django's permission model.
 
-:class:`~django.contrib.auth.model.PermissionsMixin` provides the following
+:class:`~django.contrib.auth.models.PermissionsMixin` provides the following
 methods and attributes:
 
 .. class:: models.PermissionsMixin
@@ -810,7 +810,7 @@ methods and attributes:
 .. admonition:: ModelBackend
 
     If you don't include the
-    :class:`~django.contrib.auth.model.PermissionsMixin`, you must ensure you
+    :class:`~django.contrib.auth.models.PermissionsMixin`, you must ensure you
     don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
     assumes that certain fields are available on your user model. If your User
     model doesn't provide  those fields, you will receive database errors when
@@ -857,12 +857,12 @@ that the application works with *any* user model, not just the default User
 model. To assist with this, Django provides two substitute user models that
 can be used in test suites:
 
-* :class:`django.contrib.auth.tests.custom_user.CustomUser`, a custom user
+* ``django.contrib.auth.tests.custom_user.CustomUser``, a custom user
   model that uses an ``email`` field as the username, and has a basic
   admin-compliant permissions setup
 
-* :class:`django.contrib.auth.tests.custom_user.ExtensionUser`, a custom
-  user model that extends :class:`~django.contrib.auth.models.AbstractUser`,
+* ``django.contrib.auth.tests.custom_user.ExtensionUser``, a custom
+  user model that extends ``django.contrib.auth.models.AbstractUser``,
   adding a ``date_of_birth`` field.
 
 You can then use the ``@override_settings`` decorator to make that test run
