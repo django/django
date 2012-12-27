@@ -21,7 +21,7 @@ setting and assigning values to the following keys for the ``'default'``
 connection:
 
 * :setting:`NAME`
-* :setting:`ENGINE`
+* :setting:`ENGINE <DATABASE-ENGINE>`
 * :setting:`USER`
 * :setting:`PASSWORD`
 * :setting:`HOST`

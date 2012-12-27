@@ -159,7 +159,7 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
-:setting:`BACKEND <CACHE-BACKEND>` to a fully-qualified path of a cache
+:setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 Writing a whole new cache backend from scratch is left as an exercise
 to the reader; see the other backends for examples.
@@ -830,7 +830,7 @@ DEFAULT_EXCEPTION_REPORTER_FILTER
 Default: :class:`django.views.debug.SafeExceptionReporterFilter`
 
 Default exception reporter filter class to be used if none has been assigned to
-the :class:`HttpRequest` instance yet.
+the :class:`~django.http.HttpRequest` instance yet.
 See :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. setting:: DEFAULT_FILE_STORAGE
@@ -1069,6 +1069,8 @@ List of directories searched for fixture files, in addition to the
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
 See :ref:`initial-data-via-fixtures` and :ref:`topics-testing-fixtures`.
+
+.. setting:: FORCE_SCRIPT_NAME
 
 FORCE_SCRIPT_NAME
 ------------------
@@ -1498,7 +1500,7 @@ PROFANITIES_LIST
 Default: ``()`` (Empty tuple)
 
 A tuple of profanities, as strings, that will be forbidden in comments when
-:setting:`COMMENTS_ALLOW_PROFANITIES` is ``False``.
+``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
 
 .. setting:: RESTRUCTUREDTEXT_FILTER_SETTINGS
 

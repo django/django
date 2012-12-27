@@ -212,24 +212,24 @@ m2m_changed
 .. data:: django.db.models.signals.m2m_changed
    :module:
 
-Sent when a :class:`ManyToManyField` is changed on a model instance.
-Strictly speaking, this is not a model signal since it is sent by the
-:class:`ManyToManyField`, but since it complements the
+Sent when a :class:`~django.db.models.ManyToManyField` is changed on a model
+instance. Strictly speaking, this is not a model signal since it is sent by the
+:class:`~django.db.models.ManyToManyField`, but since it complements the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
 Arguments sent with this signal:
 
 ``sender``
-    The intermediate model class describing the :class:`ManyToManyField`.
-    This class is automatically created when a many-to-many field is
-    defined; you can access it using the ``through`` attribute on the
-    many-to-many field.
+    The intermediate model class describing the
+    :class:`~django.db.models.ManyToManyField`. This class is automatically
+    created when a many-to-many field is defined; you can access it using the
+    ``through`` attribute on the many-to-many field.
 
 ``instance``
     The instance whose many-to-many relation is updated. This can be an
-    instance of the ``sender``, or of the class the :class:`ManyToManyField`
-    is related to.
+    instance of the ``sender``, or of the class the
+    :class:`~django.db.models.ManyToManyField` is related to.
 
 ``action``
     A string indicating the type of update that is done on the relation.
@@ -303,8 +303,9 @@ Argument        Value
 
 ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
-``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the forward relation)
+``reverse``     ``False`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the forward relation)
 
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
@@ -329,8 +330,9 @@ Argument        Value
 
 ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
-``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the reverse relation)
+``reverse``     ``True`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the reverse relation)
 
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)

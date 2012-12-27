@@ -1596,7 +1596,7 @@ class AuthTestCase(TestCase):
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
         command_output = new_io.getvalue().strip()
-        self.assertTrue('"email": "alice@example.com",' in command_output)
+        self.assertTrue('"email": "alice@example.com"' in command_output)
 
 
 @override_settings(AUTH_PROFILE_MODULE='multiple_database.UserProfile')

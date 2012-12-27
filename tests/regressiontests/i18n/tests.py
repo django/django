@@ -634,7 +634,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 # Checking for the localized "products_delivered" field
-                self.assertTrue('<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />' in form6.as_ul())
+                self.assertInHTML('<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />', form6.as_ul())
 
     def test_iter_format_modules(self):
         """

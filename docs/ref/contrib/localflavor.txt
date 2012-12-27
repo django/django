@@ -37,6 +37,8 @@ file.
 
 .. _ISO 3166 country code: http://www.iso.org/iso/country_codes.htm
 
+.. _localflavor-how-to-migrate:
+
 How to migrate
 ==============
 
@@ -60,6 +62,8 @@ The code in the new packages is the same (it was copied directly from Django),
 so you don't have to worry about backwards compatibility in terms of
 functionality. Only the imports have changed.
 
+.. _localflavor-deprecation-policy:
+
 Deprecation policy
 ==================
 
@@ -69,6 +73,8 @@ change it as soon as possible.
 
 In Django 1.6, importing from ``django.contrib.localflavor`` will no longer
 work.
+
+.. _localflavor-packages:
 
 Supported countries
 ===================
@@ -136,13 +142,10 @@ default formats. Here's an example of how to use them::
     class MyForm(forms.Form):
         my_date_field = generic.forms.DateField()
 
-Internationalization of localflavor
-===================================
+Internationalization of localflavors
+====================================
 
-Localflavor has its own catalog of translations, in the directory
-``django/contrib/localflavor/locale``, and it's not loaded automatically like
-Django's general catalog in ``django/conf/locale``. If you want localflavor's
-texts to be translated, like form fields error messages, you must include
-:mod:`django.contrib.localflavor` in the :setting:`INSTALLED_APPS` setting, so
-the internationalization system can find the catalog, as explained in
-:ref:`how-django-discovers-translations`.
+To activate translations for a ``localflavor`` application, you must include
+the application's name (e.g. ``django_localflavor_jp``) in the
+:setting:`INSTALLED_APPS` setting, so the internationalization system can find
+the catalog, as explained in :ref:`how-django-discovers-translations`.

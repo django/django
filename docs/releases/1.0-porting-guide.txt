@@ -439,9 +439,10 @@ Settings
 Better exceptions
 ~~~~~~~~~~~~~~~~~
 
-The old :exc:`EnvironmentError` has split into an :exc:`ImportError` when
-Django fails to find the settings module and a :exc:`RuntimeError` when you try
-to reconfigure settings after having already used them
+The old :exc:`~exceptions.EnvironmentError` has split into an
+:exc:`~exceptions.ImportError` when Django fails to find the settings module
+and a :exc:`~exceptions.RuntimeError` when you try to reconfigure settings
+after having already used them.
 
 :setting:`LOGIN_URL` has moved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -476,8 +477,8 @@ Smaller model changes
 Different exception from ``get()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Managers now return a :exc:`MultipleObjectsReturned` exception
-instead of :exc:`AssertionError`:
+Managers now return a :exc:`~django.core.exceptions.MultipleObjectsReturned`
+exception instead of :exc:`~exceptions.AssertionError`:
 
 Old (0.96)::
 
@@ -548,7 +549,7 @@ need to reload your data. Do this after you have made the change to using
   **Back up your database first!**
 
   For SQLite, this means making a copy of the single file that stores the
-  database (the name of that file is the :setting:`DATABASE_NAME` in your
+  database (the name of that file is the ``DATABASE_NAME`` in your
   settings.py file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
@@ -769,4 +770,3 @@ Old (0.96)                               New (1.0)
 ``backend.uses_case_insensitive_names``  ``connection.features.uses_case_insensitive_names``
 ``backend.uses_custom_queryset``         ``connection.features.uses_custom_queryset``
 =======================================  ===================================================
-

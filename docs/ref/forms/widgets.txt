@@ -49,8 +49,8 @@ Setting arguments for widgets
 
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
-:attr:`~SelectDateWidget.years` attribute is set for a
-:class:`~django.forms.extras.widgets.SelectDateWidget`::
+:attr:`~django.forms.extras.widgets.SelectDateWidget.years` attribute is set
+for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
 
     from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
     from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
@@ -222,7 +222,7 @@ foundation for custom widgets.
 .. class:: MultiWidget(widgets, attrs=None)
 
     A widget that is composed of multiple widgets.
-    :class:`~django.forms.widgets.MultiWidget` works hand in hand with the
+    :class:`~django.forms.MultiWidget` works hand in hand with the
     :class:`~django.forms.MultiValueField`.
 
     :class:`MultiWidget` has one required argument:
@@ -246,8 +246,8 @@ foundation for custom widgets.
         the combined value of the form field into the values for each widget.
 
         An example of this is how :class:`SplitDateTimeWidget` turns a
-        :class:`datetime` value into a list with date and time split into two
-        separate values::
+        :class:`~datetime.datetime` value into a list with date and time split
+        into two separate values::
 
             class SplitDateTimeWidget(MultiWidget):
 

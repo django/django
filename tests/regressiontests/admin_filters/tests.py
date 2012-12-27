@@ -83,11 +83,11 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
     parameter_name = 'department'
 
     def lookups(self, request, model_admin):
-        return set([
+        return sorted(set([
             (employee.department.id,  # Intentionally not a string (Refs #19318)
              employee.department.code)
             for employee in model_admin.queryset(request).all()
-        ])
+        ]))
 
     def queryset(self, request, queryset):
         if self.value():
@@ -534,13 +534,13 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]['display'], 'the 2000\'s')
         self.assertEqual(choices[3]['selected'], True)
-        self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
+        self.assertEqual(choices[3]['query_string'], '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk)
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(force_text(filterspec.title), 'Verbose Author')
         choice = select_by(filterspec.choices(changelist), "display", "alfred")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
+        self.assertEqual(choice['query_string'], '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk)
 
     def test_listfilter_without_title(self):
         """
@@ -683,9 +683,9 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(force_text(filterspec.title), 'department')
         choices = list(filterspec.choices(changelist))
-        self.assertEqual(choices[2]['display'], 'DEV')
-        self.assertEqual(choices[2]['selected'], True)
-        self.assertEqual(choices[2]['query_string'], '?department=%s' % self.john.pk)
+        self.assertEqual(choices[1]['display'], 'DEV')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?department=%s' % self.john.pk)
 
     def test_fk_with_to_field(self):
         """
