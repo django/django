@@ -407,7 +407,7 @@ Sent when the user failed to login successfully
     The name of the module used for authentication.
 
 ``credentials``
-    A dictonary of keyword arguments containing the user credentials that were
+    A dictionary of keyword arguments containing the user credentials that were
     passed to :func:`~django.contrib.auth.authenticate()` or your own custom
     authentication backend. Credentials matching a set of 'sensitive' patterns,
     (including password) will not be sent in the clear as part of the signal.

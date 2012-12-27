@@ -361,7 +361,7 @@ the extra database load.
     model is no longer supported. See the
     :doc:`Django 1.5 release notes</releases/1.5>` for more information.
 
-Prior to 1.5, a single profile model could be spedified site-wide with the
+Prior to 1.5, a single profile model could be specified site-wide with the
 setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
 following items, separated by a dot:
 
