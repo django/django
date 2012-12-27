@@ -658,7 +658,7 @@ Custom users and the built-in auth forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
-:ref:`views <other-built-in-views>` make certain assumptions about the user
+:ref:`views <built-in-auth-views>` make certain assumptions about the user
 model that they are working with.
 
 If your user model doesn't follow the same assumptions, it may be necessary to define
