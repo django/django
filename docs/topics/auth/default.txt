@@ -13,7 +13,7 @@ supports extensive :doc:`extension and customization
 </topics/auth/customizing>` of authentication.
 
 Django authentication provides both authentication and authorization, together
-and is generally referred to as the authenticaiton system, as these features
+and is generally referred to as the authentication system, as these features
 somewhat coupled.
 
 .. _user-objects:
