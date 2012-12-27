@@ -165,6 +165,23 @@ object instance. By using the
 by the :class:`~django.contrib.admin.ModelAdmin` class, it is possible to
 customize permissions for different object instances of the same type.
 
+:class:`~django.contrib.auth.models.User` objects have two many-to-many
+fields: ``groups`` and ``user_permissions``.
+:class:`~django.contrib.auth.models.User` objects can access their related
+objects in the same way as any other :doc:`Django model
+</topics/db/models>`:
+
+.. code-block:: python
+
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group, ...)
+    myuser.groups.remove(group, group, ...)
+    myuser.groups.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...)
+    myuser.user_permissions.clear()
+
 Default permissions
 -------------------
 
