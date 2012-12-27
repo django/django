@@ -653,7 +653,7 @@ utility methods:
           and zero)
 
 Extending Django's default User
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
 model and you just want to add some additional profile information, you can
@@ -663,7 +663,7 @@ default :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
 <abstract-base-classes>`.
 
 Custom users and the built-in auth forms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
 :ref:`views <built-in-auth-views>` make certain assumptions about the user
@@ -708,7 +708,7 @@ auth views.
 
 
 Custom users and django.contrib.admin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 If you want your custom User model to also work with Admin, your User model must
 define some additional attributes and methods. These methods allow the admin to
@@ -747,7 +747,7 @@ override any of the definitions that refer to fields on
 custom User class.
 
 Custom users and permissions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 To make it easy to include Django's permission framework into your own User
 class, Django provides :class:`~django.contrib.auth.models.PermissionsMixin`.
@@ -817,7 +817,7 @@ methods and attributes:
     you check permissions.
 
 Custom users and Proxy models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 One limitation of custom User models is that installing a custom User model
 will break any proxy model extending :class:`~django.contrib.auth.models.User`.
@@ -829,7 +829,7 @@ the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
 
 Custom users and signals
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Another limitation of custom User models is that you can't use
 :func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
@@ -838,7 +838,7 @@ See :doc:`/topics/signals` for more information on registering an sending
 signals.
 
 Custom users and testing/fixtures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 If you are writing an application that interacts with the User model, you must
 take some precautions to ensure that your test suite will run regardless of
