@@ -4,7 +4,7 @@ Authenticating against Django's user database from Apache
 
 Since keeping multiple authentication databases in sync is a common problem when
 dealing with Apache, you can configure Apache to authenticate against Django's
-:doc:`authentication system </topics/auth>` directly. This requires Apache
+:doc:`authentication system </topics/auth/index>` directly. This requires Apache
 version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 
 * Serve static/media files directly from Apache only to authenticated users.

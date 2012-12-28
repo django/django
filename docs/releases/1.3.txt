@@ -254,7 +254,7 @@ Permissions for inactive users
 If you provide a custom auth backend with ``supports_inactive_user``
 set to ``True``, an inactive ``User`` instance will check the backend
 for permissions.  This is useful for further centralizing the
-permission handling. See the :doc:`authentication docs </topics/auth>`
+permission handling. See the :doc:`authentication docs </topics/auth/index>`
 for more details.
 
 GeoDjango

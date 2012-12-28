@@ -179,8 +179,8 @@ Authentication middleware
 .. class:: AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :doc:`Authentication in Web requests
-</topics/auth>`.
+every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+<auth-web-requests>`.
 
 CSRF protection middleware
 --------------------------
