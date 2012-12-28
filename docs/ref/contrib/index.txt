@@ -56,7 +56,7 @@ auth
 
 Django's authentication framework.
 
-See :doc:`/topics/auth`.
+See :doc:`/topics/auth/index`.
 
 comments
 ========
