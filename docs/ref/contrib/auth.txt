@@ -6,7 +6,7 @@ authentication system. For more details on the usage of these components or
 how to customize authentication and authorization see the :doc:`authentication
 topic guide</topics/auth/index>`.
 
-.. currentmodule:: django.contrib.auth.models
+.. currentmodule:: django.contrib.auth
 
 User
 ====
@@ -14,7 +14,7 @@ User
 Fields
 ------
 
-.. class:: User
+.. class:: models.User
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -92,7 +92,7 @@ Fields
 Methods
 -------
 
-.. class:: User
+.. class:: models.User
 
     .. method:: get_username()
 
@@ -215,7 +215,7 @@ Methods
 Manager methods
 ---------------
 
-.. class:: UserManager
+.. class:: models.UserManager
 
     The :class:`~django.contrib.auth.models.User` model has a custom manager
     that has the following helper methods:
@@ -257,7 +257,7 @@ Manager methods
 Anonymous users
 ===============
 
-.. class:: AnonymousUser
+.. class:: models.AnonymousUser
 
     :class:`django.contrib.auth.models.AnonymousUser` is a class that
     implements the :class:`django.contrib.auth.models.User` interface, with
@@ -288,7 +288,7 @@ they're used by Web requests, as explained in the next section.
 Permission
 ==========
 
-.. class:: Permission
+.. class:: models.Permission
 
 Fields
 ------
@@ -318,7 +318,7 @@ data-access methods like any other :doc:`Django model </ref/models/instances>`.
 Group
 =====
 
-.. class:: Group
+.. class:: models.Group
 
 Fields
 ------
@@ -344,55 +344,55 @@ Fields
 Login and logout signals
 ========================
 
+.. module:: django.contrib.auth.signals
+
 The auth framework uses two :doc:`signals </topics/signals>` that can be used
 for notification when a user logs in or out.
 
-.. data:: django.contrib.auth.signals.user_logged_in
-   :module:
+.. function:: django.contrib.auth.signals.user_logged_in
 
-Sent when a user logs in successfully.
+    Sent when a user logs in successfully.
 
-Arguments sent with this signal:
+    Arguments sent with this signal:
 
-``sender``
-    The class of the user that just logged in.
+    ``sender``
+        The class of the user that just logged in.
 
-``request``
-    The current :class:`~django.http.HttpRequest` instance.
+    ``request``
+        The current :class:`~django.http.HttpRequest` instance.
 
-``user``
-    The user instance that just logged in.
+    ``user``
+        The user instance that just logged in.
 
-.. data:: django.contrib.auth.signals.user_logged_out
-   :module:
+.. function:: django.contrib.auth.signals.user_logged_out
 
-Sent when the logout method is called.
+    Sent when the logout method is called.
 
-``sender``
-    As above: the class of the user that just logged out or ``None``
-    if the user was not authenticated.
+    ``sender``
+        As above: the class of the user that just logged out or ``None``
+        if the user was not authenticated.
 
-``request``
-    The current :class:`~django.http.HttpRequest` instance.
+    ``request``
+        The current :class:`~django.http.HttpRequest` instance.
 
-``user``
-    The user instance that just logged out or ``None`` if the
-    user was not authenticated.
+    ``user``
+        The user instance that just logged out or ``None`` if the
+        user was not authenticated.
 
-.. data:: django.contrib.auth.signals.user_login_failed
-   :module:
+.. function:: django.contrib.auth.signals.user_login_failed
+
 .. versionadded:: 1.5
 
-Sent when the user failed to login successfully
+    Sent when the user failed to login successfully
 
-``sender``
-    The name of the module used for authentication.
+    ``sender``
+        The name of the module used for authentication.
 
-``credentials``
-    A dictionary of keyword arguments containing the user credentials that were
-    passed to :func:`~django.contrib.auth.authenticate()` or your own custom
-    authentication backend. Credentials matching a set of 'sensitive' patterns,
-    (including password) will not be sent in the clear as part of the signal.
+    ``credentials``
+        A dictionary of keyword arguments containing the user credentials that were
+        passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+        authentication backend. Credentials matching a set of 'sensitive' patterns,
+        (including password) will not be sent in the clear as part of the signal.
 
 .. _authentication-backends-reference:
 
