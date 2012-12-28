@@ -692,7 +692,10 @@ class BaseInlineFormSet(BaseModelFormSet):
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
         if queryset is None:
             queryset = self.model._default_manager
-        qs = queryset.filter(**{self.fk.name: self.instance})
+        if self.instance.pk:
+            qs = queryset.filter(**{self.fk.name: self.instance})
+        else:
+            qs = queryset.none()
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs, **kwargs)
 
