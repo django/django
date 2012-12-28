@@ -12,7 +12,7 @@ from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Title)
+    Sighting, Title)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -171,6 +171,23 @@ class TestInline(TestCase):
         child2_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child2).pk, child2.pk)
         self.assertContains(response, child1_shortcut)
         self.assertContains(response, child2_shortcut)
+
+    def test_create_inlines_on_inherited_model(self):
+        """
+        Ensure that an object can be created with inlines when it inherits
+        another class. Bug #19524.
+        """
+        data = {
+            'name': 'Martian',
+            'sighting_set-TOTAL_FORMS': 1,
+            'sighting_set-INITIAL_FORMS': 0,
+            'sighting_set-MAX_NUM_FORMS': 0,
+            'sighting_set-0-place': 'Zone 51',
+            '_save': 'Save',
+        }
+        response = self.client.post('/admin/admin_inlines/extraterrestrial/add/', data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Sighting.objects.filter(et__name='Martian').count(), 1)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

@@ -583,6 +583,15 @@ class Model(six.with_metaclass(ModelBase, object)):
 
                 if field:
                     setattr(self, field.attname, self._get_pk_val(parent._meta))
+                    # Since we didn't have an instance of the parent handy, we
+                    # set attname directly, bypassing the descriptor.
+                    # Invalidate the related object cache, in case it's been
+                    # accidentally populated. A fresh instance will be
+                    # re-built from the database if necessary.
+                    cache_name = field.get_cache_name()
+                    if hasattr(self, cache_name):
+                        delattr(self, cache_name)
+
             if meta.proxy:
                 return
 

@@ -124,6 +124,9 @@ class ChildModel1Inline(admin.TabularInline):
 class ChildModel2Inline(admin.StackedInline):
     model = ChildModel2
 
+# admin for #19524
+class SightingInline(admin.TabularInline):
+    model = Sighting
 
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
@@ -142,3 +145,4 @@ site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
+site.register(ExtraTerrestrial, inlines=[SightingInline])

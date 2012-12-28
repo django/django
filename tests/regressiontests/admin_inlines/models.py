@@ -90,7 +90,6 @@ class Inner4Tabular(models.Model):
     dummy = models.IntegerField(help_text="Awesome tabular help text is awesome.")
     holder = models.ForeignKey(Holder4)
 
-
 # Models for #12749
 
 class Person(models.Model):
@@ -133,6 +132,7 @@ class Chapter(models.Model):
 
 
 # Models for #16838
+
 class CapoFamiglia(models.Model):
     name = models.CharField(max_length=100)
 
@@ -170,6 +170,17 @@ class ChildModel2(models.Model):
     def get_absolute_url(self):
         return '/child_model2/'
 
+# Models for #19524
+
+class LifeForm(models.Model):
+    pass
+
+class ExtraTerrestrial(LifeForm):
+    name = models.CharField(max_length=100)
+
+class Sighting(models.Model):
+    et = models.ForeignKey(ExtraTerrestrial)
+    place = models.CharField(max_length=100)
 
 # Other models
 
