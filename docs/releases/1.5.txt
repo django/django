@@ -94,11 +94,19 @@ applications that support both platforms.
 However, we're labeling this support "experimental" for now: although it's
 received extensive testing via our automated test suite, it's received very
 little real-world testing. We've done our best to eliminate bugs, but we can't
-be sure we covered all possible uses of Django. Further, Django's more than a
-web framework; it's an ecosystem of pluggable components. At this point, very
-few third-party applications have been ported to Python 3, so it's unlikely
-that a real-world application will have all its dependencies satisfied under
-Python 3.
+be sure we covered all possible uses of Django.
+
+Some features of Django aren't available because they depend on third-party
+software that hasn't been ported to Python 3 yet, including:
+
+- the MySQL database backend (depends on MySQLdb)
+- :class:`~django.db.models.fields.ImageField` (depends on PIL)
+- :class:`~django.test.LiveServerTestCase` (depends on Selenium WebDriver)
+
+Further, Django's more than a web framework; it's an ecosystem of pluggable
+components. At this point, very few third-party applications have been ported
+to Python 3, so it's unlikely that a real-world application will have all its
+dependencies satisfied under Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
 3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
