@@ -505,9 +505,10 @@ The permission_required decorator
         def my_view(request):
             ...
 
-    As for the :meth:`~django.contrib.auth.models.User.has_perm` method, permission names take the form
-    ``"<app label>.<permission codename>"`` (i.e. ``polls.can_vote`` for a
-    permission on a model in the ``polls`` application).
+    As for the :meth:`~django.contrib.auth.models.User.has_perm` method,
+    permission names take the form ``"<app label>.<permission codename>"``
+    (i.e. ``polls.can_vote`` for a permission on a model in the ``polls``
+    application).
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
     also takes an optional ``login_url`` parameter. Example::
@@ -518,8 +519,8 @@ The permission_required decorator
         def my_view(request):
             ...
 
-    As in the :func:`~django.contrib.auth.decorators.login_required` decorator, ``login_url``
-    defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+    As in the :func:`~django.contrib.auth.decorators.login_required` decorator,
+    ``login_url`` defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
     .. versionchanged:: 1.4
 
