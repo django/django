@@ -453,7 +453,7 @@ class WidthRatioNode(Node):
         except VariableDoesNotExist:
             return ''
         except (ValueError, TypeError):
-            raise TemplateSyntaxError("widthratio final argument must be an number")
+            raise TemplateSyntaxError("widthratio final argument must be a number")
         try:
             value = float(value)
             max_value = float(max_value)
