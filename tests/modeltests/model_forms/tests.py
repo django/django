@@ -1528,7 +1528,10 @@ class OldFormForXTests(TestCase):
         colour = Colour.objects.create(name='Blue')
         form = ColourfulItemForm()
         self.maxDiff = 1024
-        self.assertHTMLEqual(form.as_p(), """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" /></p>
+        self.assertHTMLEqual(
+            form.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" /></p>
         <p><label for="id_colours">Colours:</label> <select multiple="multiple" name="colours" id="id_colours">
-        <option value="1">Blue</option>
-        </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+        <option value="%(blue_pk)s">Blue</option>
+        </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
+            % {'blue_pk': colour.pk})
