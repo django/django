@@ -3,7 +3,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils.unittest import skipUnless
 
-from .models import Article, IndexedArticle
+from .models import Article
 
 
 class IndexesTests(TestCase):
@@ -16,6 +16,7 @@ class IndexesTests(TestCase):
         "This is a postgresql-specific issue")
     def test_postgresql_text_indexes(self):
         """Test creation of PostgreSQL-specific text indexes (#12234)"""
+        from .models import IndexedArticle
         connection = connections[DEFAULT_DB_ALIAS]
         index_sql = connection.creation.sql_indexes_for_model(IndexedArticle, no_style())
         self.assertEqual(len(index_sql), 5)
