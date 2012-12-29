@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
+import warnings
+
 from django.test import TestCase
 
 from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
@@ -53,7 +55,9 @@ class SelectRelatedTests(TestCase):
         extra queries
         """
         with self.assertNumQueries(1):
-            person = Species.objects.select_related(depth=10).get(name="sapiens")
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                person = Species.objects.select_related(depth=10).get(name="sapiens")
             domain = person.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
 
@@ -94,7 +98,9 @@ class SelectRelatedTests(TestCase):
         """
         # Notice: one fewer queries than above because of depth=1
         with self.assertNumQueries(expected):
-            pea = Species.objects.select_related(depth=depth).get(name="sativum")
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                pea = Species.objects.select_related(depth=depth).get(name="sativum")
             self.assertEqual(
                 pea.genus.family.order.klass.phylum.kingdom.domain.name,
                 'Eukaryota'
@@ -113,14 +119,18 @@ class SelectRelatedTests(TestCase):
         particular level. This can be used on lists as well.
         """
         with self.assertNumQueries(5):
-            world = Species.objects.all().select_related(depth=2)
-            orders = [o.genus.family.order.name for o in world]
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                world = Species.objects.all().select_related(depth=2)
+                orders = [o.genus.family.order.name for o in world]
             self.assertEqual(sorted(orders),
                 ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
-        s = Species.objects.all().select_related(depth=1)\
-            .extra(select={'a': 'select_related_species.id + 10'})[0]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            s = Species.objects.all().select_related(depth=1)\
+                .extra(select={'a': 'select_related_species.id + 10'})[0]
         self.assertEqual(s.id + 10, s.a)
 
     def test_certain_fields(self):
@@ -156,7 +166,9 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):
-        self.assertRaises(TypeError,
-            Species.objects.select_related,
-            'genus__family__order', depth=4
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.assertRaises(TypeError,
+                Species.objects.select_related,
+                'genus__family__order', depth=4
+            )

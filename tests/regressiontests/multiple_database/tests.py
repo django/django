@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import pickle
 from operator import attrgetter
+import warnings
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -1612,8 +1613,10 @@ class UserProfileTestCase(TestCase):
         bob_profile = UserProfile(user=bob, flavor='crunchy frog')
         bob_profile.save()
 
-        self.assertEqual(alice.get_profile().flavor, 'chocolate')
-        self.assertEqual(bob.get_profile().flavor, 'crunchy frog')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.assertEqual(alice.get_profile().flavor, 'chocolate')
+            self.assertEqual(bob.get_profile().flavor, 'crunchy frog')
 
 class AntiPetRouter(object):
     # A router that only expresses an opinion on syncdb,
