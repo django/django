@@ -82,8 +82,6 @@ Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
 The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
 
-.. versionadded:: 1.4
-
 A ready-to-use instance of the storage backend defined in this setting
 can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
 
@@ -146,8 +144,6 @@ Files are searched by using the :setting:`enabled finders
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
 specified by the :setting:`INSTALLED_APPS` setting.
 
-.. versionadded:: 1.4
-
 The :djadmin:`collectstatic` management command calls the
 :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
@@ -176,8 +172,6 @@ Some commonly used options are:
 .. django-admin-option:: -c
 .. django-admin-option:: --clear
 
-    .. versionadded:: 1.4
-
     Clear the existing files before trying to copy or link the original file.
 
 .. django-admin-option:: -l
@@ -186,8 +180,6 @@ Some commonly used options are:
     Create a symbolic link to each file instead of copying.
 
 .. django-admin-option:: --no-post-process
-
-    .. versionadded:: 1.4
 
     Don't call the
     :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
@@ -276,8 +268,6 @@ StaticFilesStorage
 
     .. method:: post_process(paths, **options)
 
-    .. versionadded:: 1.4
-
     This method is called by the :djadmin:`collectstatic` management command
     after each run and gets passed the local storages and paths of found
     files as a dictionary, as well as the command line options.
@@ -290,8 +280,6 @@ CachedStaticFilesStorage
 ------------------------
 
 .. class:: storage.CachedStaticFilesStorage
-
-    .. versionadded:: 1.4
 
     A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
     storage backend which caches the files it saves by appending the MD5 hash
@@ -369,8 +357,6 @@ static
 ------
 
 .. templatetag:: staticfiles-static
-
-.. versionadded:: 1.4
 
 Uses the configured :setting:`STATICFILES_STORAGE` storage to create the
 full URL for the given relative path, e.g.:

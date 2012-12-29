@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from .models import Action, Person, Car, CarDeprecated
+from .models import Action, Person, Car
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -122,21 +122,3 @@ class CustomRedirects(TestCase):
         self.assertEqual(len(cars), 1)
         self.assertRedirects(
             response, reverse('admin:admin_custom_urls_car_history', args=[cars[0].pk]))
-
-    def test_post_url_continue_string_formats(self):
-        """
-        Ensures that string formats are accepted for post_url_continue. This
-        is a deprecated functionality that will be removed in Django 1.6 along
-        with this test.
-        """
-        with warnings.catch_warnings(record=True) as w:
-            post_data = { 'name': 'SuperFast', '_continue': '1' }
-            self.assertEqual(Car.objects.count(), 0)
-            response = self.client.post(
-                reverse('admin:admin_custom_urls_cardeprecated_add'), post_data)
-            cars = CarDeprecated.objects.all()
-            self.assertEqual(len(cars), 1)
-            self.assertRedirects(
-                response, reverse('admin:admin_custom_urls_cardeprecated_history', args=[cars[0].pk]))
-        self.assertEqual(len(w), 1)
-        self.assertTrue(isinstance(w[0].message, DeprecationWarning))

@@ -139,14 +139,14 @@ class SortedDictTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             d.insert(0, "hello", "world")
-        assert w[0].category is PendingDeprecationWarning
+        assert w[0].category is DeprecationWarning
 
     def test_value_for_index(self):
         d = SortedDict({"a": 3})
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             self.assertEqual(d.value_for_index(0), 3)
-        assert w[0].category is PendingDeprecationWarning
+        assert w[0].category is DeprecationWarning
 
 
 class MergeDictTests(SimpleTestCase):

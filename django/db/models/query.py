@@ -703,7 +703,7 @@ class QuerySet(object):
         """
         if 'depth' in kwargs:
             warnings.warn('The "depth" keyword argument has been deprecated.\n'
-                    'Use related field names instead.', PendingDeprecationWarning)
+                    'Use related field names instead.', DeprecationWarning, stacklevel=2)
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'

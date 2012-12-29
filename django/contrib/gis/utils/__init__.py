@@ -14,12 +14,4 @@ if HAS_GDAL:
     except:
         pass
 
-# GeoIP now lives in `django.contrib.gis.geoip`; this shortcut will be
-# removed in Django 1.6.
-from django.contrib.gis.utils import geoip
-HAS_GEOIP = geoip.HAS_GEOIP
-if HAS_GEOIP:
-    GeoIP = geoip.GeoIP
-    GeoIPException = geoip.GeoIPException
-
 from django.contrib.gis.utils.wkt import precision_wkt

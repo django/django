@@ -26,10 +26,9 @@ This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
-.. versionadded:: 1.4
-    Django also provides a way to translate URLs according to the active
-    language. See the :ref:`internationalization documentation
-    <url-internationalization>` for more information.
+Django also provides a way to translate URLs according to the active
+language. See the :ref:`internationalization documentation
+<url-internationalization>` for more information.
 
 .. _how-django-processes-a-request:
 
@@ -245,9 +244,6 @@ The variables are:
 * ``handler404`` -- See :data:`django.conf.urls.handler404`.
 * ``handler500`` -- See :data:`django.conf.urls.handler500`.
 * ``handler403`` -- See :data:`django.conf.urls.handler403`.
-
-.. versionadded:: 1.4
-    ``handler403`` is new in Django 1.4.
 
 .. _urlpatterns-view-prefix:
 

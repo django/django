@@ -427,7 +427,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):

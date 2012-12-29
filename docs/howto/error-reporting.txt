@@ -101,20 +101,10 @@ The best way to disable this behavior is to set
    records are ignored, but you can use them for error reporting by writing a
    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
-.. seealso::
-
-   .. versionchanged:: 1.4
-
-   Previously, two settings were used to control which URLs not to report:
-   :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`. They
-   were replaced by :setting:`IGNORABLE_404_URLS`.
-
 .. _filtering-error-reports:
 
 Filtering error reports
 -----------------------
-
-.. versionadded:: 1.4
 
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,15 +183,11 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
         def my_view(request):
             ...
 
-.. note::
-
-    .. versionchanged:: 1.4
-
-    Since version 1.4, all POST parameters are systematically filtered out of
-    error reports for certain :mod:`django.contrib.auth.views` views (
-    ``login``, ``password_reset_confirm``, ``password_change``, and
-    ``add_view`` and ``user_change_password`` in the ``auth`` admin) to prevent
-    the leaking of sensitive information such as user passwords.
+    All POST parameters are systematically filtered out of error reports for
+    certain :mod:`django.contrib.auth.views` views (``login``,
+    ``password_reset_confirm``, ``password_change``, and ``add_view`` and
+    ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
+    sensitive information such as user passwords.
 
 .. _custom-error-reports:
 

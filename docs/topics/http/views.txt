@@ -199,8 +199,6 @@ One thing to note about 500 views:
 The 403 (HTTP Forbidden) view
 -----------------------------
 
-.. versionadded:: 1.4
-
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by
 default, call the view ``django.views.defaults.permission_denied``.

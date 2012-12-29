@@ -378,16 +378,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-.. versionadded:: 1.4
-
-As of Django 1.4, you can pass positional arguments (``*fields``) in order to
-specify the names of fields to which the ``DISTINCT`` should apply. This
-translates to a ``SELECT DISTINCT ON`` SQL query.
-
-Here's the difference. For a normal ``distinct()`` call, the database compares
-*each* field in each row when determining which rows are distinct. For a
-``distinct()`` call with specified field names, the database will only compare
-the specified field names.
+You can pass positional arguments (``*fields``) in order to specify the names
+of fields to which the ``DISTINCT`` should apply. This translates to a
+``SELECT DISTINCT ON`` SQL query. Here's the difference. For a normal
+``distinct()`` call, the database compares *each* field in each row when
+determining which rows are distinct. For a ``distinct()`` call with specified
+field names, the database will only compare the specified field names.
 
 .. note::
     This ability to specify field names is only available in PostgreSQL.
@@ -739,8 +735,6 @@ prefetch_related
 ~~~~~~~~~~~~~~~~
 
 .. method:: prefetch_related(*lookups)
-
-.. versionadded:: 1.4
 
 Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
 related objects for each of the specified lookups.
@@ -1191,8 +1185,6 @@ select_for_update
 
 .. method:: select_for_update(nowait=False)
 
-.. versionadded:: 1.4
-
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
@@ -1367,8 +1359,6 @@ bulk_create
 ~~~~~~~~~~~
 
 .. method:: bulk_create(objs, batch_size=None)
-
-.. versionadded:: 1.4
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there

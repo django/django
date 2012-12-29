@@ -222,7 +222,4 @@ X-Frame-Options middleware
 
 .. class:: XFrameOptionsMiddleware
 
-.. versionadded:: 1.4
-   ``XFrameOptionsMiddleware`` was added.
-
 Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.

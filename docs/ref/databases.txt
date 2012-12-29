@@ -16,8 +16,6 @@ documentation or reference manuals.
 PostgreSQL notes
 ================
 
-.. versionchanged:: 1.4
-
 Django supports PostgreSQL 8.2 and higher.
 
 PostgreSQL 8.2 to 8.2.4
@@ -172,18 +170,6 @@ running ``syncdb``::
     _mysql_exceptions.OperationalError: (
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
-
-.. versionchanged:: 1.4
-
-In previous versions of Django, fixtures with forward references (i.e.
-relations to rows that have not yet been inserted into the database) would fail
-to load when using the InnoDB storage engine. This was due to the fact that InnoDB
-deviates from the SQL standard by checking foreign key constraints immediately
-instead of deferring the check until the transaction is committed. This
-problem has been resolved in Django 1.4. Fixture data is now loaded with foreign key
-checks turned off; foreign key checks are then re-enabled when the data has
-finished loading, at which point the entire table is checked for invalid foreign
-key references and an `IntegrityError` is raised if any are found.
 
 .. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
 .. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html

@@ -180,8 +180,6 @@ subclass::
     values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
     read-only.
 
-    .. versionadded:: 1.4
-
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
     same line and the ``content`` field will be displayed below them in its
@@ -586,8 +584,6 @@ subclass::
           class PersonAdmin(UserAdmin):
               list_filter = ('company__name',)
 
-    .. versionadded:: 1.4
-
     * a class inheriting from :mod:`django.contrib.admin.SimpleListFilter`,
       which you need to provide the ``title`` and ``parameter_name``
       attributes to and override the ``lookups`` and ``queryset`` methods,
@@ -673,8 +669,6 @@ subclass::
                                     birthday__lte=date(1999, 12, 31)).exists():
                           yield ('90s', _('in the nineties'))
 
-    .. versionadded:: 1.4
-
     * a tuple, where the first element is a field name and the second
       element is a class inheriting from
       :mod:`django.contrib.admin.FieldListFilter`, for example::
@@ -691,8 +685,6 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
-    .. versionadded:: 1.4
-
     It is possible to specify a custom template for rendering a list filter::
 
         class FilterWithCustomTemplate(SimpleListFilter):
@@ -702,8 +694,6 @@ subclass::
     a concrete example.
 
 .. attribute:: ModelAdmin.list_max_show_all
-
-    .. versionadded:: 1.4
 
     Set ``list_max_show_all`` to control how many items can appear on a "Show
     all" admin change list page. The admin will display a "Show all" link on the
@@ -738,15 +728,9 @@ subclass::
     If this isn't provided, the Django admin will use the model's default
     ordering.
 
-    .. versionadded:: 1.4
-
     If you need to specify a dynamic order (for example depending on user or
     language) you can implement a :meth:`~ModelAdmin.get_ordering` method.
 
-    .. versionchanged:: 1.4
-
-    Django honors all elements in the list/tuple; before 1.4, only the first
-    was respected.
 
 .. attribute:: ModelAdmin.paginator
 
@@ -1017,8 +1001,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_ordering(self, request)
 
-    .. versionadded:: 1.4
-
     The ``get_ordering`` method takes a``request`` as parameter and
     is expected to return a ``list`` or ``tuple`` for ordering similar
     to the :attr:`ordering` attribute. For example::
@@ -1032,8 +1014,6 @@ templates used by the :class:`ModelAdmin` views:
                     return ['name']
 
 .. method:: ModelAdmin.save_related(self, request, form, formsets, change)
-
-    .. versionadded:: 1.4
 
     The ``save_related`` method is given the ``HttpRequest``, the parent
     ``ModelForm`` instance, the list of inline formsets and a boolean value
@@ -1050,8 +1030,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_prepopulated_fields(self, request, obj=None)
 
-    .. versionadded:: 1.4
-
     The ``get_prepopulated_fields`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``dictionary``, as described above in the :attr:`ModelAdmin.prepopulated_fields`
@@ -1059,16 +1037,12 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_list_display(self, request)
 
-    .. versionadded:: 1.4
-
     The ``get_list_display`` method is given the ``HttpRequest`` and is
     expected to return a ``list`` or ``tuple`` of field names that will be
     displayed on the changelist view as described above in the
     :attr:`ModelAdmin.list_display` section.
 
 .. method:: ModelAdmin.get_list_display_links(self, request, list_display)
-
-    .. versionadded:: 1.4
 
     The ``get_list_display_links`` method is given the ``HttpRequest`` and
     the ``list`` or ``tuple`` returned by :meth:`ModelAdmin.get_list_display`.
@@ -1341,10 +1315,6 @@ Other methods
 
     Django view for the model instance edition page. See note below.
 
-    .. versionchanged:: 1.4
-
-    The ``form_url`` parameter was added.
-
 .. method:: ModelAdmin.changelist_view(self, request, extra_context=None)
 
     Django view for the model instances change list/actions page. See note
@@ -1386,12 +1356,10 @@ provided some extra mapping data that would not otherwise be available::
             return super(MyModelAdmin, self).change_view(request, object_id,
                 form_url, extra_context=extra_context)
 
-.. versionadded:: 1.4
-
-These views now return :class:`~django.template.response.TemplateResponse`
+These views return :class:`~django.template.response.TemplateResponse`
 instances which allow you to easily customize the response data before
-rendering. For more details, see the
-:doc:`TemplateResponse documentation </ref/template-response>`.
+rendering. For more details, see the :doc:`TemplateResponse documentation
+</ref/template-response>`.
 
 .. _modeladmin-media-definitions:
 
@@ -1514,9 +1482,6 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~InlineModelAdmin.raw_id_fields`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
-
-.. versionadded:: 1.4
-
 - :meth:`~ModelAdmin.has_add_permission`
 - :meth:`~ModelAdmin.has_change_permission`
 - :meth:`~ModelAdmin.has_delete_permission`
@@ -2043,8 +2008,6 @@ your URLconf. Specifically, add these four patterns:
 the URLs starting with ``^admin/`` before the line that includes the admin app
 itself).
 
-.. versionchanged:: 1.4
-
 The presence of the ``admin_password_reset`` named URL will cause a "forgotten
 your password?" link to appear on the default admin log-in page under the
 password box.
@@ -2107,8 +2070,6 @@ if you specifically wanted the admin view from the admin instance named
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
-
-.. versionadded:: 1.4
 
 To allow easier reversing of the admin urls in templates, Django provides an
 ``admin_urlname`` filter which takes an action as argument:

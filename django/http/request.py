@@ -187,11 +187,6 @@ class HttpRequest(object):
             self._stream = BytesIO(self._body)
         return self._body
 
-    @property
-    def raw_post_data(self):
-        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', DeprecationWarning)
-        return self.body
-
     def _mark_post_parse_error(self):
         self._post = QueryDict('')
         self._files = MultiValueDict()

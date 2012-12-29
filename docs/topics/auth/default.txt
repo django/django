@@ -522,12 +522,10 @@ The permission_required decorator
     As in the :func:`~django.contrib.auth.decorators.login_required` decorator,
     ``login_url`` defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
-    .. versionchanged:: 1.4
-
-    Added ``raise_exception`` parameter. If given, the decorator will raise
-    :exc:`~django.core.exceptions.PermissionDenied`, prompting
-    :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` instead of
-    redirecting to the login page.
+    If the ``raise_exception`` parameter is given, the decorator will raise
+    :exc:`~django.core.exceptions.PermissionDenied`, prompting :ref:`the 403
+    (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
+    login page.
 
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -551,8 +549,6 @@ password management. These make use of the :ref:`stock auth forms
 
 Django provides no default template for the authentication views - however the
 template context is documented for each view below.
-
-.. versionadded:: 1.4
 
 The built-in views all return
 a :class:`~django.template.response.TemplateResponse` instance, which allows
@@ -747,11 +743,10 @@ patterns.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
-    .. versionchanged:: 1.4
-        Users flagged with an unusable password (see
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
-        will not be able to request a password reset to prevent misuse
-        when using an external authentication source like LDAP.
+    Users flagged with an unusable password (see
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
+    allowed to request a password reset to prevent misuse when using an
+    external authentication source like LDAP.
 
     **URL name:** ``password_reset``
 
@@ -768,8 +763,6 @@ patterns.
     * ``subject_template_name``: The full name of a template to use for
       the subject of the email with the reset password link. Defaults
       to :file:`registration/password_reset_subject.txt` if not supplied.
-
-      .. versionadded:: 1.4
 
     * ``password_reset_form``: Form that will be used to get the email of
       the user to reset the password for. Defaults to

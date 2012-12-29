@@ -325,8 +325,6 @@ want.  See :doc:`/ref/contrib/csrf`.
 CSRF_COOKIE_PATH
 ----------------
 
-.. versionadded:: 1.4
-
 Default: ``'/'``
 
 The path set on the CSRF cookie. This should either match the URL path of your
@@ -340,8 +338,6 @@ its own CSRF cookie.
 
 CSRF_COOKIE_SECURE
 ------------------
-
-.. versionadded:: 1.4
 
 Default: ``False``
 
@@ -756,11 +752,6 @@ name includes any of the following:
     * SIGNATURE
     * TOKEN
 
-.. versionchanged:: 1.4
-
-    We changed ``'PASSWORD'`` ``'PASS'``. ``'API'``, ``'TOKEN'`` and ``'KEY'``
-    were added.
-
 Note that these are *partial* matches. ``'PASS'`` will also match PASSWORD,
 just as ``'TOKEN'`` will also match TOKENIZED and so on.
 
@@ -1117,8 +1108,6 @@ Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 IGNORABLE_404_URLS
 ------------------
 
-.. versionadded:: 1.4
-
 Default: ``()``
 
 List of compiled regular expression objects describing URLs that should be
@@ -1457,8 +1446,6 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 PASSWORD_HASHERS
 ----------------
 
-.. versionadded:: 1.4
-
 See :ref:`auth_password_storage`.
 
 Default::
@@ -1502,20 +1489,6 @@ Default: ``()`` (Empty tuple)
 A tuple of profanities, as strings, that will be forbidden in comments when
 ``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
 
-.. setting:: RESTRUCTUREDTEXT_FILTER_SETTINGS
-
-RESTRUCTUREDTEXT_FILTER_SETTINGS
---------------------------------
-
-Default: ``{}``
-
-A dictionary containing settings for the ``restructuredtext`` markup filter from
-the :doc:`django.contrib.markup application </ref/contrib/markup>`. They override
-the default writer settings. See the Docutils restructuredtext `writer settings
-docs`_ for details.
-
-.. _writer settings docs: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
-
 .. setting:: ROOT_URLCONF
 
 ROOT_URLCONF
@@ -1557,8 +1530,6 @@ randomly-generated ``SECRET_KEY`` to each new project.
 
 SECURE_PROXY_SSL_HEADER
 -----------------------
-
-.. versionadded:: 1.4
 
 Default: ``None``
 
@@ -1691,9 +1662,6 @@ protected cookie data.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
-.. versionchanged:: 1.4
-    The default value of the setting was changed from ``False`` to ``True``.
-
 .. setting:: SESSION_COOKIE_NAME
 
 SESSION_COOKIE_NAME
@@ -1823,8 +1791,6 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 SIGNING_BACKEND
 ---------------
 
-.. versionadded:: 1.4
-
 Default: 'django.core.signing.TimestampSigner'
 
 The backend used for signing cookies and other data.
@@ -1914,10 +1880,6 @@ Default::
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
-
-.. versionadded:: 1.4
-    The ``django.core.context_processors.tz`` context processor
-    was added in this release.
 
 .. setting:: TEMPLATE_DEBUG
 
@@ -2043,9 +2005,6 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-.. versionchanged:: 1.4
-   The meaning of this setting now depends on the value of :setting:`USE_TZ`.
-
 A string representing the time zone for this installation, or
 ``None``. `See available choices`_. (Note that list of available
 choices lists more than one on the same line; you'll want to use just
@@ -2162,8 +2121,6 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 USE_TZ
 ------
 
-.. versionadded:: 1.4
-
 Default: ``False``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
@@ -2193,8 +2150,6 @@ which sets this header is in use.
 
 WSGI_APPLICATION
 ----------------
-
-.. versionadded:: 1.4
 
 Default: ``None``
 
@@ -2257,22 +2212,6 @@ Default: Not defined
 
 The site-specific user profile model used by this site. See
 :ref:`User profiles <auth-profiles>`.
-
-.. setting:: IGNORABLE_404_ENDS
-
-IGNORABLE_404_ENDS
-------------------
-
-.. deprecated:: 1.4
-   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
-
-.. setting:: IGNORABLE_404_STARTS
-
-IGNORABLE_404_STARTS
---------------------
-
-.. deprecated:: 1.4
-   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
 
 .. setting:: URL_VALIDATOR_USER_AGENT
 

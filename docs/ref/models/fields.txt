@@ -12,8 +12,8 @@ This document contains all the gory details about all the `field options`_ and
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try
-    :mod:`django.contrib.localflavor`, which contains assorted pieces of code
+    If the built-in fields don't do the trick, you can try :doc:`localflavor
+    </topics/localflavor>`, which contains assorted pieces of code
     that are useful for particular countries or cultures. Also, you can easily
     :doc:`write your own custom model fields </howto/custom-model-fields>`.
 
@@ -803,8 +803,6 @@ for this field is a :class:`~django.forms.TextInput`.
 -------------------------
 
 .. class:: GenericIPAddressField([protocol=both, unpack_ipv4=False, **options])
-
-.. versionadded:: 1.4
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a

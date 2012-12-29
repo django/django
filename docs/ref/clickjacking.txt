@@ -10,9 +10,6 @@ against `clickjacking`_.  This type of attack occurs when a malicious site
 tricks a user into clicking on a concealed element of another site which they
 have loaded in a hidden frame or iframe.
 
-.. versionadded:: 1.4
-   The clickjacking middleware and decorators were added.
-
 .. _clickjacking: http://en.wikipedia.org/wiki/Clickjacking
 
 An example of clickjacking

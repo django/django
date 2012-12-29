@@ -213,8 +213,6 @@ Sitemap class reference
 
     .. attribute:: Sitemap.protocol
 
-        .. versionadded:: 1.4
-
         **Optional.**
 
         This attribute defines the protocol (``'http'`` or ``'https'``) of the
@@ -308,8 +306,6 @@ You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
 index will reflect that.
 
-.. versionadded:: 1.4
-
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
 ``sitemap_url_name`` to the index view::
@@ -346,12 +342,10 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     )
 
 
-.. versionchanged:: 1.4
-    In addition, these views also return
-    :class:`~django.template.response.TemplateResponse`
-    instances which allow you to easily customize the response data before
-    rendering. For more details, see the
-    :doc:`TemplateResponse documentation </ref/template-response>`.
+These views return :class:`~django.template.response.TemplateResponse`
+instances which allow you to easily customize the response data before
+rendering. For more details, see the :doc:`TemplateResponse documentation
+</ref/template-response>`.
 
 Context variables
 ------------------
@@ -377,8 +371,6 @@ sitemap. Each URL exposes attributes as defined in the
 - ``lastmod``
 - ``location``
 - ``priority``
-
-.. versionadded:: 1.4
 
 The ``item`` attribute has been added for each URL to allow more flexible
 customization of the templates, such as `Google news sitemaps`_. Assuming
