@@ -853,7 +853,7 @@ Normal Python unit test classes extend a base class of
    Hierarchy of Django unit testing classes
 
 Regardless of the version of Python you're using, if you've installed
-:mod:`unittest2`, :mod:`django.utils.unittest` will point to that library.
+``unittest2``, :mod:`django.utils.unittest` will point to that library.
 
 SimpleTestCase
 ~~~~~~~~~~~~~~
@@ -1376,7 +1376,7 @@ in the ``with`` block and reset its value to the previous state afterwards.
 .. function:: override_settings
 
 In case you want to override a setting for just one test method or even the
-whole :class:`TestCase` class, Django provides the
+whole :class:`~django.test.TestCase` class, Django provides the
 :func:`~django.test.utils.override_settings` decorator (see :pep:`318`). It's
 used like this::
 

@@ -142,10 +142,9 @@ Changes to ``USStateField``
 
 The :mod:`django.contrib.localflavor` application contains collections
 of code relevant to specific countries or cultures. One such is
-:class:`~django.contrib.localflavor.us.models.USStateField`, which
-provides a field for storing the two-letter postal abbreviation of a
-U.S. state. This field has consistently caused problems, however,
-because it is often used to store the state portion of a U.S postal
+``USStateField``, which provides a field for storing the two-letter postal
+abbreviation of a U.S. state. This field has consistently caused problems,
+however, because it is often used to store the state portion of a U.S postal
 address, but not all "states" recognized by the U.S Postal Service are
 actually states of the U.S. or even U.S. territory. Several
 compromises over the list of choices resulted in some users feeling
@@ -161,7 +160,7 @@ as a pair of changes:
   choices, plus the U.S. Armed Forces postal codes.
 
 * A new model field,
-  :class:`django.contrib.localflavor.us.models.USPostalCodeField`, has
+  ``django.contrib.localflavor.us.models.USPostalCodeField``, has
   been added which draws its choices from a list of all postal
   abbreviations recognized by the U.S Postal Service. This includes
   all abbreviations recognized by `USStateField`, plus three

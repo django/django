@@ -311,37 +311,35 @@ As a result of the introduction of class-based generic views, the
 function-based generic views provided by Django have been deprecated.
 The following modules and the views they contain have been deprecated:
 
-* :mod:`django.views.generic.create_update`
-* :mod:`django.views.generic.date_based`
-* :mod:`django.views.generic.list_detail`
-* :mod:`django.views.generic.simple`
+* ``django.views.generic.create_update``
+* ``django.views.generic.date_based``
+* ``django.views.generic.list_detail``
+* ``django.views.generic.simple``
 
 Test client response ``template`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django's :ref:`test client <test-client>` returns
 :class:`~django.test.client.Response` objects annotated with extra testing
-information. In Django versions prior to 1.3, this included a
-:attr:`~django.test.client.Response.template` attribute containing information
-about templates rendered in generating the response: either None, a single
-:class:`~django.template.Template` object, or a list of
-:class:`~django.template.Template` objects. This inconsistency in return values
-(sometimes a list, sometimes not) made the attribute difficult to work with.
+information. In Django versions prior to 1.3, this included a ``template``
+attribute containing information about templates rendered in generating the
+response: either None, a single :class:`~django.template.Template` object, or a
+list of :class:`~django.template.Template` objects. This inconsistency in
+return values (sometimes a list, sometimes not) made the attribute difficult
+to work with.
 
-In Django 1.3 the :attr:`~django.test.client.Response.template` attribute is
-deprecated in favor of a new :attr:`~django.test.client.Response.templates`
-attribute, which is always a list, even if it has only a single element or no
-elements.
+In Django 1.3 the ``template`` attribute is deprecated in favor of a new
+:attr:`~django.test.client.Response.templates` attribute, which is always a
+list, even if it has only a single element or no elements.
 
 ``DjangoTestRunner``
 ~~~~~~~~~~~~~~~~~~~~
 
 As a result of the introduction of support for unittest2, the features
-of :class:`django.test.simple.DjangoTestRunner` (including fail-fast
+of ``django.test.simple.DjangoTestRunner`` (including fail-fast
 and Ctrl-C test termination) have been made redundant. In view of this
-redundancy, :class:`~django.test.simple.DjangoTestRunner` has been
-turned into an empty placeholder class, and will be removed entirely
-in Django 1.5.
+redundancy, ``DjangoTestRunner`` has been turned into an empty placeholder
+class, and will be removed entirely in Django 1.5.
 
 The Django 1.3 roadmap
 ======================

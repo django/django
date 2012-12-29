@@ -149,6 +149,8 @@ tags for the levels you wish to override::
 Using messages in views and templates
 =====================================
 
+.. function:: add_message(request, level, message, extra_tags='', fail_silently=False)
+
 Adding a message
 ----------------
 

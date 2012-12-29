@@ -153,8 +153,8 @@ class, from which everything is descended.
 
 Initializing your new field is a matter of separating out any arguments that are
 specific to your case from the common arguments and passing the latter to the
-:meth:`~django.db.models.Field.__init__` method of
-:class:`~django.db.models.Field` (or your parent class).
+``__init__()`` method of :class:`~django.db.models.Field` (or your parent
+class).
 
 In our example, we'll call our field ``HandField``. (It's a good idea to call
 your :class:`~django.db.models.Field` subclass ``<Something>Field``, so it's
@@ -602,11 +602,11 @@ Returns the default form field to use when this field is displayed in a model.
 This method is called by the :class:`~django.forms.ModelForm` helper.
 
 All of the ``kwargs`` dictionary is passed directly to the form field's
-:meth:`~django.forms.Field__init__` method. Normally, all you need to do is
-set up a good default for the ``form_class`` argument and then delegate further
-handling to the parent class. This might require you to write a custom form
-field (and even a form widget). See the :doc:`forms documentation
-</topics/forms/index>` for information about this, and take a look at the code in
+``__init__()`` method. Normally, all you need to do is set up a good default
+for the ``form_class`` argument and then delegate further handling to the
+parent class. This might require you to write a custom form field (and even a
+form widget). See the :doc:`forms documentation </topics/forms/index>` for
+information about this, and take a look at the code in
 :mod:`django.contrib.localflavor` for some examples of custom widgets.
 
 Continuing our ongoing example, we can write the :meth:`.formfield` method as::
@@ -668,7 +668,7 @@ Converting field data for serialization
 .. method:: Field.value_to_string(self, obj)
 
 This method is used by the serializers to convert the field into a string for
-output. Calling :meth:`Field._get_val_from_obj(obj)` is the best way to get the
+output. Calling ``Field._get_val_from_obj(obj)`` is the best way to get the
 value to serialize. For example, since our ``HandField`` uses strings for its
 data storage anyway, we can reuse some existing conversion code::
 
@@ -692,12 +692,12 @@ smoothly:
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
-2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
+2. Put a ``__str__()`` or ``__unicode__()`` method on the class you're
    wrapping up as a field. There are a lot of places where the default
    behavior of the field code is to call
    :func:`~django.utils.encoding.force_text` on the value. (In our
    examples in this document, ``value`` would be a ``Hand`` instance, not a
-   ``HandField``). So if your :meth:`__unicode__` method automatically
+   ``HandField``). So if your ``__unicode__()`` method automatically
    converts to the string form of your Python object, you can save yourself
    a lot of work.
 
