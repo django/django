@@ -300,9 +300,9 @@ loop::
         <p><input type="submit" value="Send message" /></p>
     </form>
 
-Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
-``BoundField`` also has the following attributes, which can be useful in your
-templates:
+Within this loop, ``{{ field }}`` is an instance of
+:class:`~django.forms.BoundField`. ``BoundField`` also has the following
+attributes, which can be useful in your templates:
 
 ``{{ field.label }}``
     The label of the field, e.g. ``Email address``.

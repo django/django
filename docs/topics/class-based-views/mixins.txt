@@ -93,8 +93,8 @@ DetailView: working with a single Django object
 
 To show the detail of an object, we basically need to do two things:
 we need to look up the object and then we need to make a
-:class:`TemplateResponse` with a suitable template, and that object as
-context.
+:class:`~django.template.response.TemplateResponse` with a suitable template,
+and that object as context.
 
 To get the object, :class:`~django.views.generic.detail.DetailView`
 relies on :class:`~django.views.generic.detail.SingleObjectMixin`,
@@ -111,15 +111,14 @@ attribute if that's provided). :class:`SingleObjectMixin` also overrides
 which is used across all Django's built in class-based views to supply
 context data for template renders.
 
-To then make a :class:`TemplateResponse`, :class:`DetailView` uses
+To then make a :class:`~django.template.response.TemplateResponse`,
+:class:`DetailView` uses
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
-which extends
-:class:`~django.views.generic.base.TemplateResponseMixin`, overriding
-:meth:`get_template_names()` as discussed above. It actually provides
-a fairly sophisticated set of options, but the main one that most
-people are going to use is
-``<app_label>/<object_name>_detail.html``. The ``_detail`` part can be
-changed by setting
+which extends :class:`~django.views.generic.base.TemplateResponseMixin`,
+overriding :meth:`get_template_names()` as discussed above. It actually
+provides a fairly sophisticated set of options, but the main one that most
+people are going to use is ``<app_label>/<object_name>_detail.html``. The
+``_detail`` part can be changed by setting
 :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
 on a subclass to something else. (For instance, the :doc:`generic edit
 views<generic-editing>` use ``_form`` for create and update views, and
@@ -265,7 +264,7 @@ We can hook this into our URLs easily enough::
 
 Note the ``pk`` named group, which
 :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` uses
-to look up the :class:`Author` instance. You could also use a slug, or
+to look up the ``Author`` instance. You could also use a slug, or
 any of the other features of :class:`SingleObjectMixin`.
 
 Using SingleObjectMixin with ListView
@@ -299,7 +298,7 @@ object. In order to do this, we need to have two different querysets:
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.
 
-Now we can write a new :class:`PublisherDetail`::
+Now we can write a new ``PublisherDetail``::
 
     from django.views.generic import ListView
     from django.views.generic.detail import SingleObjectMixin
@@ -403,7 +402,7 @@ At this point it's natural to reach for a :class:`Form` to encapsulate
 the information sent from the user's browser to Django. Say also that
 we're heavily invested in `REST`_, so we want to use the same URL for
 displaying the author as for capturing the message from the
-user. Let's rewrite our :class:`AuthorDetailView` to do that.
+user. Let's rewrite our ``AuthorDetailView`` to do that.
 
 .. _REST: http://en.wikipedia.org/wiki/Representational_state_transfer
 
@@ -423,7 +422,7 @@ code so that on ``POST`` the form gets called appropriately.
 
 .. highlightlang:: python
 
-Our new :class:`AuthorDetail` looks like this::
+Our new ``AuthorDetail`` looks like this::
 
     # CAUTION: you almost certainly do not want to do this.
     # It is provided as part of a discussion of problems you can
@@ -507,10 +506,10 @@ clear division here: ``GET`` requests should get the
 data), and ``POST`` requests should get the :class:`FormView`. Let's
 set up those views first.
 
-The :class:`AuthorDisplay` view is almost the same as :ref:`when we
+The ``AuthorDisplay`` view is almost the same as :ref:`when we
 first introduced AuthorDetail<generic-views-extra-work>`; we have to
 write our own :meth:`get_context_data()` to make the
-:class:`AuthorInterestForm` available to the template. We'll skip the
+``AuthorInterestForm`` available to the template. We'll skip the
 :meth:`get_object()` override from before for clarity.
 
 .. code-block:: python
@@ -533,11 +532,11 @@ write our own :meth:`get_context_data()` to make the
             context.update(kwargs)
             return super(AuthorDisplay, self).get_context_data(**context)
 
-Then the :class:`AuthorInterest` is a simple :class:`FormView`, but we
+Then the ``AuthorInterest`` is a simple :class:`FormView`, but we
 have to bring in :class:`SingleObjectMixin` so we can find the author
 we're talking about, and we have to remember to set
 :attr:`template_name` to ensure that form errors will render the same
-template as :class:`AuthorDisplay` is using on ``GET``.
+template as ``AuthorDisplay`` is using on ``GET``.
 
 .. code-block:: python
 
@@ -568,14 +567,14 @@ template as :class:`AuthorDisplay` is using on ``GET``.
             # record the interest using the message in form.cleaned_data
             return super(AuthorInterest, self).form_valid(form)
 
-Finally we bring this together in a new :class:`AuthorDetail` view. We
+Finally we bring this together in a new ``AuthorDetail`` view. We
 already know that calling :meth:`as_view()` on a class-based view
 gives us something that behaves exactly like a function based view, so
 we can do that at the point we choose between the two subviews.
 
 You can of course pass through keyword arguments to :meth:`as_view()`
 in the same way you would in your URLconf, such as if you wanted the
-:class:`AuthorInterest` behaviour to also appear at another URL but
+``AuthorInterest`` behaviour to also appear at another URL but
 using a different template.
 
 .. code-block:: python

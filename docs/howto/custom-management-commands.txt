@@ -2,6 +2,8 @@
 Writing custom django-admin commands
 ====================================
 
+.. module:: django.core.management
+
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're
 distributing. In this document, we will be building a custom ``closepoll``
@@ -260,6 +262,13 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. method:: BaseCommand.handle(*args, **options)
 
     The actual logic of the command. Subclasses must implement this method.
+
+.. method:: BaseCommand.validate(app=None, display_num_errors=False)
+
+    Validates the given app, raising :class:`CommandError` for any errors.
+
+    If ``app`` is None, then all installed apps are validated.
+
 
 .. _ref-basecommand-subclasses:
 

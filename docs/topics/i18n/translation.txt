@@ -1248,6 +1248,8 @@ The ``set_language`` redirect view
 
 .. highlightlang:: python
 
+.. currentmodule:: django.views.i18n
+
 .. function:: set_language(request)
 
 As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,

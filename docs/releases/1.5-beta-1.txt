@@ -448,7 +448,7 @@ More information on these incompatibilities is available in `ticket #18023`_.
 
 The net result is that, if you have installed :mod:`simplejson` and your code
 uses Django's serialization internals directly -- for instance
-:class:`django.core.serializers.json.DjangoJSONEncoder`, the switch from
+``django.core.serializers.json.DjangoJSONEncoder``, the switch from
 :mod:`simplejson` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
@@ -474,8 +474,8 @@ When using :doc:`object pagination </topics/pagination>`,
 the ``previous_page_number()`` and ``next_page_number()`` methods of the
 :class:`~django.core.paginator.Page` object did not check if the returned
 number was inside the existing page range.
-It does check it now and raises an :exc:`InvalidPage` exception when the number
-is either too low or too high.
+It does check it now and raises an :exc:`~django.core.paginator.InvalidPage`
+exception when the number is either too low or too high.
 
 Behavior of autocommit database option on PostgreSQL changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -672,7 +672,7 @@ Define a ``__str__`` method and apply the
 ``django.utils.itercompat.product``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+The ``django.utils.itercompat.product`` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
 
 ``django.utils.markup``

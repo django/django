@@ -37,7 +37,7 @@ display two blank forms::
 
 Iterating over the ``formset`` will render the forms in the order they were
 created. You can change this order by providing an alternate implementation for
-the :meth:`__iter__()` method.
+the ``__iter__()`` method.
 
 Formsets can also be indexed into, which returns the corresponding form. If you
 override ``__iter__``, you will need to also override ``__getitem__`` to have

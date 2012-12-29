@@ -349,7 +349,7 @@ Login and logout signals
 The auth framework uses two :doc:`signals </topics/signals>` that can be used
 for notification when a user logs in or out.
 
-.. function:: django.contrib.auth.signals.user_logged_in
+.. function:: user_logged_in
 
     Sent when a user logs in successfully.
 
@@ -364,7 +364,7 @@ for notification when a user logs in or out.
     ``user``
         The user instance that just logged in.
 
-.. function:: django.contrib.auth.signals.user_logged_out
+.. function:: user_logged_out
 
     Sent when the logout method is called.
 
@@ -379,9 +379,9 @@ for notification when a user logs in or out.
         The user instance that just logged out or ``None`` if the
         user was not authenticated.
 
-.. function:: django.contrib.auth.signals.user_login_failed
+.. function:: user_login_failed
 
-.. versionadded:: 1.5
+    .. versionadded:: 1.5
 
     Sent when the user failed to login successfully
 

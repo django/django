@@ -277,8 +277,9 @@ Handle uploaded files using the new API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Replace use of uploaded files -- that is, entries in ``request.FILES`` -- as
-simple dictionaries with the new :class:`~django.core.files.UploadedFile`. The
-old dictionary syntax no longer works.
+simple dictionaries with the new
+:class:`~django.core.files.uploadedfile.UploadedFile`. The old dictionary
+syntax no longer works.
 
 Thus, in a view like::
 
@@ -410,7 +411,7 @@ U.S. local flavor
 ~~~~~~~~~~~~~~~~~
 
 ``django.contrib.localflavor.usa`` has been renamed to
-:mod:`django.contrib.localflavor.us`. This change was made to match the naming
+``django.contrib.localflavor.us``. This change was made to match the naming
 scheme of other local flavors. To migrate your code, all you need to do is
 change the imports.
 
@@ -642,8 +643,8 @@ The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
 Testing
 -------
 
-:meth:`django.test.Client.login` has changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:meth:`django.test.client.Client.login` has changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Old (0.96)::
 
@@ -721,7 +722,7 @@ To update your code:
 1. Use :class:`django.utils.datastructures.SortedDict` wherever you were
    using ``django.newforms.forms.SortedDictFromList``.
 
-2. Because :meth:`django.utils.datastructures.SortedDict.copy` doesn't
+2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
    return a deepcopy as ``SortedDictFromList.copy()`` did, you will need
    to update your code if you were relying on a deepcopy. Do this by using
    ``copy.deepcopy`` directly.
