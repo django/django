@@ -601,6 +601,8 @@ relation may end up filtering on different linked objects.
 Filters can reference fields on the model
 -----------------------------------------
 
+.. class:: F
+
 In the examples given so far, we have constructed filters that compare
 the value of a model field with a constant. But what if you want to compare
 the value of a model field with another field on the same model?
@@ -754,6 +756,8 @@ To avoid this problem, simply save the
 
 Complex lookups with Q objects
 ==============================
+
+.. class:: Q
 
 Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for

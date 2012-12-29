@@ -20,7 +20,7 @@ these changes.
 * The old imports for CSRF functionality (``django.contrib.csrf.*``),
   which moved to core in 1.2, will be removed.
 
-* The :mod:`django.contrib.gis.db.backend` module will be removed in favor
+* The ``django.contrib.gis.db.backend`` module will be removed in favor
   of the specific backends.
 
 * ``SMTPConnection`` will be removed in favor of a generic Email backend API.
@@ -122,23 +122,23 @@ these changes.
   The :attr:`~django.test.client.Response.templates` attribute should be
   used instead.
 
-* The :class:`~django.test.simple.DjangoTestRunner` will be removed.
+* The ``django.test.simple.DjangoTestRunner`` will be removed.
   Instead use a unittest-native class.  The features of the
-  :class:`django.test.simple.DjangoTestRunner` (including fail-fast and
+  ``django.test.simple.DjangoTestRunner`` (including fail-fast and
   Ctrl-C test termination) can currently be provided by the unittest-native
-  :class:`TextTestRunner`.
+  :class:`~unittest.TextTestRunner`.
 
 * The undocumented function
-  :func:`django.contrib.formtools.utils.security_hash` will be removed,
-  instead use :func:`django.contrib.formtools.utils.form_hmac`
+  ``django.contrib.formtools.utils.security_hash`` will be removed,
+  instead use ``django.contrib.formtools.utils.form_hmac``
 
 * The function-based generic view modules will be removed in favor of their
   class-based equivalents, outlined :doc:`here
   </topics/class-based-views/index>`.
 
-* The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
+* The ``django.core.servers.basehttp.AdminMediaHandler`` will be
   removed.  In its place use
-  :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
+  ``django.contrib.staticfiles.handlers.StaticFilesHandler``.
 
 * The template tags library ``adminmedia`` and the template tag ``{%
   admin_media_prefix %}`` will be removed in favor of the generic static files
@@ -150,8 +150,7 @@ these changes.
   an implied string. In 1.4, this behavior is provided by a version of the tag
   in the ``future`` template tag library.
 
-* The :djadmin:`reset` and :djadmin:`sqlreset` management commands
-  will be removed.
+* The ``reset`` and ``sqlreset`` management commands will be removed.
 
 * Authentication backends will need to support an inactive user
   being passed to all methods dealing with permissions.
@@ -162,11 +161,11 @@ these changes.
   a :class:`~django.contrib.gis.geos.GEOSException` when called
   on a geometry with no SRID value.
 
-* :class:`~django.http.CompatCookie` will be removed in favor of
-  :class:`~django.http.SimpleCookie`.
+* ``django.http.CompatCookie`` will be removed in favor of
+  ``django.http.SimpleCookie``.
 
-* :class:`django.core.context_processors.PermWrapper` and
-  :class:`django.core.context_processors.PermLookupDict` will be removed in
+* ``django.core.context_processors.PermWrapper`` and
+  ``django.core.context_processors.PermLookupDict`` will be removed in
   favor of the corresponding
   :class:`django.contrib.auth.context_processors.PermWrapper` and
   :class:`django.contrib.auth.context_processors.PermLookupDict`,
@@ -213,8 +212,7 @@ these changes.
   ``django.utils.itercompat.all`` and ``django.utils.itercompat.any`` will
   be removed. The Python builtin versions should be used instead.
 
-* The :func:`~django.views.decorators.csrf.csrf_response_exempt` and
-  :func:`~django.views.decorators.csrf.csrf_view_exempt` decorators will
+* The ``csrf_response_exempt`` and ``csrf_view_exempt`` decorators will
   be removed. Since 1.4 ``csrf_response_exempt`` has been a no-op (it
   returns the same function), and ``csrf_view_exempt`` has been a
   synonym for ``django.views.decorators.csrf.csrf_exempt``, which should

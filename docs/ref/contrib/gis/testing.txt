@@ -140,6 +140,8 @@ with the rest of :ref:`Django's unit tests <running-unit-tests>`.
 Run only GeoDjango tests
 ------------------------
 
+.. class:: django.contrib.gis.tests.GeoDjangoTestSuiteRunner
+
 To run *only* the tests for GeoDjango, the :setting:`TEST_RUNNER`
 setting must be changed to use the
 :class:`~django.contrib.gis.tests.GeoDjangoTestSuiteRunner`::

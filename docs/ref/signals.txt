@@ -27,9 +27,8 @@ module system.
 .. warning::
 
     Many of these signals are sent by various model methods like
-    :meth:`~django.db.models.Model.__init__` or
-    :meth:`~django.db.models.Model.save` that you can overwrite in your own
-    code.
+    ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
+    override in your own code.
 
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
@@ -47,7 +46,7 @@ pre_init
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
 Whenever you instantiate a Django model, this signal is sent at the beginning
-of the model's :meth:`~django.db.models.Model.__init__` method.
+of the model's ``__init__()`` method.
 
 Arguments sent with this signal:
 
@@ -55,12 +54,10 @@ Arguments sent with this signal:
     The model class that just had an instance created.
 
 ``args``
-    A list of positional arguments passed to
-    :meth:`~django.db.models.Model.__init__`:
+    A list of positional arguments passed to ``__init__()``:
 
 ``kwargs``
-    A dictionary of keyword arguments passed to
-    :meth:`~django.db.models.Model.__init__`:.
+    A dictionary of keyword arguments passed to ``__init__()``:
 
 For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
@@ -74,7 +71,7 @@ Argument    Value
 ``sender``  ``Poll`` (the class itself)
 
 ``args``    ``[]`` (an empty list because there were no positional
-            arguments passed to ``__init__``.)
+            arguments passed to ``__init__()``.)
 
 ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
 ==========  ===============================================================
@@ -85,7 +82,7 @@ post_init
 .. data:: django.db.models.signals.post_init
    :module:
 
-Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__init__`: method finishes.
+Like pre_init, but this one is sent when the ``__init__()`` method finishes.
 
 Arguments sent with this signal:
 
