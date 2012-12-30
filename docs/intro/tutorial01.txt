@@ -133,7 +133,7 @@ see the following output on the command line::
     0 errors found.
 
     Django version 1.4, using settings 'mysite.settings'
-    Development server is running at http://127.0.0.1:8000/
+    Development server is starting at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
 You've started the Django development server, a lightweight Web server written
