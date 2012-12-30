@@ -448,6 +448,18 @@ request_finished
 
 Sent when Django finishes processing an HTTP request.
 
+.. note::
+
+    When a view returns a :ref:`streaming response <httpresponse-streaming>`,
+    this signal is sent only after the entire response is consumed by the
+    client (strictly speaking, by the WSGI gateway).
+
+.. versionchanged:: 1.5
+
+    Before Django 1.5, this signal was fired before sending the content to the
+    client. In order to accomodate streaming responses, it is now fired after
+    sending the content.
+
 Arguments sent with this signal:
 
 ``sender``
