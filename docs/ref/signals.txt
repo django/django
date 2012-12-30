@@ -406,6 +406,10 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database.
+
 For example, ``yourapp/management/__init__.py`` could be written like::
 
     from django.db.models.signals import post_syncdb
