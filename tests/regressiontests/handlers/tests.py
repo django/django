@@ -1,10 +1,11 @@
 from django.core.handlers.wsgi import WSGIHandler
-from django.test import RequestFactory
+from django.core import signals
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils import six
-from django.utils import unittest
 
-class HandlerTests(unittest.TestCase):
+
+class HandlerTests(TestCase):
 
     # Mangle settings so the handler will fail
     @override_settings(MIDDLEWARE_CLASSES=42)
@@ -27,3 +28,34 @@ class HandlerTests(unittest.TestCase):
         handler = WSGIHandler()
         response = handler(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)
+
+
+class SignalsTests(TestCase):
+    urls = 'regressiontests.handlers.urls'
+
+    def setUp(self):
+        self.signals = []
+        signals.request_started.connect(self.register_started)
+        signals.request_finished.connect(self.register_finished)
+
+    def tearDown(self):
+        signals.request_started.disconnect(self.register_started)
+        signals.request_finished.disconnect(self.register_finished)
+
+    def register_started(self, **kwargs):
+        self.signals.append('started')
+
+    def register_finished(self, **kwargs):
+        self.signals.append('finished')
+
+    def test_request_signals(self):
+        response = self.client.get('/regular/')
+        self.assertEqual(self.signals, ['started', 'finished'])
+        self.assertEqual(response.content, b"regular content")
+
+    def test_request_signals_streaming_response(self):
+        response = self.client.get('/streaming/')
+        self.assertEqual(self.signals, ['started'])
+        # Avoid self.assertContains, because it explicitly calls response.close()
+        self.assertEqual(b''.join(response.streaming_content), b"streaming content")
+        self.assertEqual(self.signals, ['started', 'finished'])
