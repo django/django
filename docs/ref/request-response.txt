@@ -790,6 +790,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
+.. _httpresponse-streaming:
+
 StreamingHttpResponse objects
 =============================
 

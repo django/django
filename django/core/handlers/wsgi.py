@@ -253,8 +253,8 @@ class WSGIHandler(base.BaseHandler):
             response = http.HttpResponseBadRequest()
         else:
             response = self.get_response(request)
-        finally:
-            signals.request_finished.send(sender=self.__class__)
+
+        response._handler_class = self.__class__
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]

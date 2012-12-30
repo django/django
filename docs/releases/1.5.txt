@@ -411,6 +411,19 @@ attribute. Developers wishing to access the raw POST data for these cases,
 should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
 instead.
 
+:data:`~django.core.signals.request_finished` signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django used to send the :data:`~django.core.signals.request_finished` signal
+as soon as the view function returned a response. This interacted badly with
+:ref:`streaming responses <httpresponse-streaming>` that delay content
+generation.
+
+This signal is now sent after the content is fully consumed by the WSGI
+gateway. This might be backwards incompatible if you rely on the signal being
+fired before sending the response content to the client. If you do, you should
+consider using a middleware instead.
+
 OPTIONS, PUT and DELETE requests in the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

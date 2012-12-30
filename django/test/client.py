@@ -26,7 +26,6 @@ from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils import six
-from django.db import close_connection
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
@@ -72,6 +71,14 @@ class FakePayload(object):
         self.__len += len(content)
 
 
+def closing_iterator_wrapper(iterable, close):
+    try:
+        for item in iterable:
+            yield item
+    finally:
+        close()
+
+
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes.
@@ -92,18 +99,20 @@ class ClientHandler(BaseHandler):
             self.load_middleware()
 
         signals.request_started.send(sender=self.__class__)
-        try:
-            request = WSGIRequest(environ)
-            # sneaky little hack so that we can easily get round
-            # CsrfViewMiddleware.  This makes life easier, and is probably
-            # required for backwards compatibility with external tests against
-            # admin views.
-            request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
-            response = self.get_response(request)
-        finally:
-            signals.request_finished.disconnect(close_connection)
-            signals.request_finished.send(sender=self.__class__)
-            signals.request_finished.connect(close_connection)
+        request = WSGIRequest(environ)
+        # sneaky little hack so that we can easily get round
+        # CsrfViewMiddleware.  This makes life easier, and is probably
+        # required for backwards compatibility with external tests against
+        # admin views.
+        request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
+        response = self.get_response(request)
+        # We're emulating a WSGI server; we must call the close method
+        # on completion.
+        if response.streaming:
+            response.streaming_content = closing_iterator_wrapper(
+                response.streaming_content, response.close)
+        else:
+            response.close()
 
         return response
 
