@@ -1030,19 +1030,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
             *args, **kwargs)
 
     def clean(self, value):
-        if self.required and not value:
-            raise ValidationError(self.error_messages['required'])
-        elif not self.required and not value:
+        if not self.required and not value:
             return self.queryset.none()
-        if not isinstance(value, (list, tuple)):
-            raise ValidationError(self.error_messages['list'])
         key = self.to_field_name or 'pk'
-        for pk in value:
-            try:
-                self.queryset.filter(**{key: pk})
-            except ValueError:
-                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
-        qs = self.queryset.filter(**{'%s__in' % key: value})
+        qs = self.to_python(value)
         pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
             if force_text(val) not in pks:
@@ -1058,3 +1049,20 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
+
+    def validate(self, value):
+        if self.required and not value:
+            raise ValidationError(self.error_messages['required'])
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(self.error_messages['list'])
+
+    def to_python(self, value):
+        self.validate(value)
+        key = self.to_field_name or 'pk'
+        for pk in value:
+            try:
+                self.queryset.filter(**{key: pk})
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
+        qs = self.queryset.filter(**{'%s__in' % key: value})
+        return qs
