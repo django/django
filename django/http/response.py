@@ -10,6 +10,7 @@ except ImportError:
     from urlparse import urlparse
 
 from django.conf import settings
+from django.core import signals
 from django.core import signing
 from django.core.exceptions import SuspiciousOperation
 from django.http.cookie import SimpleCookie
@@ -40,6 +41,9 @@ class HttpResponseBase(six.Iterator):
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
         self._closable_objects = []
+        # This parameter is set by the handler. It's necessary to preserve the
+        # historical behavior of request_finished.
+        self._handler_class = None
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
                           " content_type instead",
@@ -226,7 +230,11 @@ class HttpResponseBase(six.Iterator):
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            closable.close()
+            try:
+                closable.close()
+            except Exception:
+                pass
+        signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
         raise Exception("This %s instance is not writable" % self.__class__.__name__)
