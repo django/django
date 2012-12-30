@@ -119,29 +119,16 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         result = []
         if opts is None:
             opts = self.query.model._meta
-        # Skip all proxy to the root proxied model
-        opts = opts.concrete_model._meta
         aliases = set()
         only_load = self.deferred_to_columns()
-
+        seen = self.query.included_inherited_models.copy()
         if start_alias:
-            seen = {None: start_alias}
+            seen[None] = start_alias
         for field, model in opts.get_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
+                # Avoid loading data for already loaded parents.
                 continue
-            if start_alias:
-                try:
-                    alias = seen[model]
-                except KeyError:
-                    link_field = opts.get_ancestor_link(model)
-                    alias = self.query.join((start_alias, model._meta.db_table,
-                            link_field.column, model._meta.pk.column))
-                    seen[model] = alias
-            else:
-                # If we're starting from the base model of the queryset, the
-                # aliases will have already been set up in pre_sql_setup(), so
-                # we can save time here.
-                alias = self.query.included_inherited_models[model]
+            alias = self.query.join_parent_model(opts, model, start_alias, seen)
             table = self.query.alias_map[alias].table_name
             if table in only_load and field.column not in only_load[table]:
                 continue
