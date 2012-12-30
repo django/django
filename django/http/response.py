@@ -226,7 +226,10 @@ class HttpResponseBase(six.Iterator):
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            closable.close()
+            try:
+                closable.close()
+            except Exception:
+                pass
 
     def write(self, content):
         raise Exception("This %s instance is not writable" % self.__class__.__name__)
