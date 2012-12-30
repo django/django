@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load admin_urls %}
 
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} delete-confirmation{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
