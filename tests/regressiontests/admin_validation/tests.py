@@ -6,7 +6,7 @@ from django.contrib.admin.validation import validate, validate_inline
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, State, City, Author
 
 
 class SongForm(forms.ModelForm):
@@ -281,3 +281,25 @@ class ValidationTestCase(TestCase):
             fields = ['extra_data', 'title']
 
         validate(FieldsOnFormOnlyAdmin, Song)
+
+    def test_modelform_with_other_model(self):
+        """
+        The model specified in ModelForm.Meta should not limit the available 
+        fields.
+        
+        Bug #17428: Admin formfield validation uses form model instead of 
+        registered model.
+        """
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+
+        class SongAdmin(admin.ModelAdmin):
+            form = AuthorForm
+            fields = ['title']
+
+        validate(SongAdmin, Song)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'SongAdmin.fields' refers to field 'title' that is missing from the form.",
+            validate,
+            SongAdmin, Author)

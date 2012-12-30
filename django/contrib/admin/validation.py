@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import (BaseModelForm, BaseModelFormSet, fields_for_model,
-    _get_foreign_key)
+    _get_foreign_key, modelform_factory)
 from django.contrib.admin import ListFilter, FieldListFilter
 from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.contrib.admin.options import (flatten_fieldsets, BaseModelAdmin,
@@ -381,19 +381,12 @@ def get_field(cls, model, opts, label, field):
                 % (cls.__name__, label, field, model._meta.app_label, model.__name__))
 
 def check_formfield(cls, model, opts, label, field):
-    if getattr(cls.form, 'base_fields', None):
-        try:
-            cls.form.base_fields[field]
-        except KeyError:
-            raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
-                "is missing from the form." % (cls.__name__, label, field))
-    else:
-        fields = fields_for_model(model)
-        try:
-            fields[field]
-        except KeyError:
-            raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
-                "is missing from the form." % (cls.__name__, label, field))
+    form = modelform_factory(model, form=cls.form)
+    try:
+        form.base_fields[field]
+    except KeyError:
+        raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
+            "is missing from the form." % (cls.__name__, label, field))
 
 def fetch_attr(cls, model, opts, label, field):
     try:
