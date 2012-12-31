@@ -19,8 +19,10 @@ class Command(NoArgsCommand):
 
     def ipython(self):
         try:
-            from IPython import embed
-            embed()
+            from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+            app = TerminalIPythonApp.instance()
+            app.initialize(argv=[])
+            app.start()
         except ImportError:
             # IPython < 0.11
             # Explicitly pass an empty list as arguments, because otherwise
