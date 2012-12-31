@@ -153,6 +153,20 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
         def my_function():
             ...
 
+    .. admonition:: When using mutiple decorators
+
+        If the variable you want to hide is also a function argument (e.g.
+        '``user``' in the following example), and if the decorated function has
+        mutiple decorators, then make sure to place ``@sensible_variables`` at
+        the top of the decorator chain. This way it will also hide the function
+        argument as it gets passed through the other decorators::
+
+            @sensitive_variables('user', 'pw', 'cc')
+            @some_decorator
+            @another_decorator
+            def process_info(user):
+                ...
+
 .. function:: sensitive_post_parameters(*parameters)
 
     If one of your views receives an :class:`~django.http.HttpRequest` object

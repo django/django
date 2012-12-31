@@ -26,12 +26,12 @@ def sensitive_variables(*variables):
     """
     def decorator(func):
         @functools.wraps(func)
-        def sensitive_variables_wrapper(*args, **kwargs):
+        def sensitive_variables_wrapper(*func_args, **func_kwargs):
             if variables:
                 sensitive_variables_wrapper.sensitive_variables = variables
             else:
                 sensitive_variables_wrapper.sensitive_variables = '__ALL__'
-            return func(*args, **kwargs)
+            return func(*func_args, **func_kwargs)
         return sensitive_variables_wrapper
     return decorator
 

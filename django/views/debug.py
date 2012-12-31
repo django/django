@@ -172,13 +172,12 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 break
             current_frame = current_frame.f_back
 
-        cleansed = []
+        cleansed = {}
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
                 for name, value in tb_frame.f_locals.items():
-                    cleansed.append((name, CLEANSED_SUBSTITUTE))
-                return cleansed
+                    cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables
                 for name, value in tb_frame.f_locals.items():
@@ -187,16 +186,25 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                     elif isinstance(value, HttpRequest):
                         # Cleanse the request's POST parameters.
                         value = self.get_request_repr(value)
-                    cleansed.append((name, value))
-                return cleansed
+                    cleansed[name] = value
         else:
             # Potentially cleanse only the request if it's one of the frame variables.
             for name, value in tb_frame.f_locals.items():
                 if isinstance(value, HttpRequest):
                     # Cleanse the request's POST parameters.
                     value = self.get_request_repr(value)
-                cleansed.append((name, value))
-            return cleansed
+                cleansed[name] = value
+
+        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
+            and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+            # For good measure, obfuscate the decorated function's arguments in
+            # the sensitive_variables decorator's frame, in case the variables
+            # associated with those arguments were meant to be obfuscated from
+            # the decorated function's frame.
+            cleansed['func_args'] = CLEANSED_SUBSTITUTE
+            cleansed['func_kwargs'] = CLEANSED_SUBSTITUTE
+
+        return cleansed.items()
 
 class ExceptionReporter(object):
     """
