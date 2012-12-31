@@ -94,10 +94,11 @@ class CustomRedirects(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_post_save_redirect(self):
+    def test_post_save_add_redirect(self):
         """
-        Ensures that ModelAdmin.response_post_save() controls the redirection
-        after the 'Save' button has been pressed.
+        Ensures that ModelAdmin.response_post_save_add() controls the
+        redirection after the 'Save' button has been pressed when adding a
+        new object.
         Refs 8001, 18310, 19505.
         """
         post_data = { 'name': 'John Doe', }
@@ -108,6 +109,22 @@ class CustomRedirects(TestCase):
         self.assertEqual(len(persons), 1)
         self.assertRedirects(
             response, reverse('admin:admin_custom_urls_person_history', args=[persons[0].pk]))
+
+    def test_post_save_change_redirect(self):
+        """
+        Ensures that ModelAdmin.response_post_save_change() controls the
+        redirection after the 'Save' button has been pressed when editing an
+        existing object.
+        Refs 8001, 18310, 19505.
+        """
+        Person.objects.create(name='John Doe')
+        self.assertEqual(Person.objects.count(), 1)
+        person = Person.objects.all()[0]
+        post_data = { 'name': 'Jack Doe', }
+        response = self.client.post(
+            reverse('admin:admin_custom_urls_person_change', args=[person.pk]), post_data)
+        self.assertRedirects(
+            response, reverse('admin:admin_custom_urls_person_delete', args=[person.pk]))
 
     def test_post_url_continue(self):
         """

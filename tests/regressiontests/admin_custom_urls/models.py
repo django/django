@@ -56,9 +56,13 @@ class Person(models.Model):
 
 class PersonAdmin(admin.ModelAdmin):
 
-    def response_post_save(self, request, obj):
+    def response_post_save_add(self, request, obj):
         return HttpResponseRedirect(
             reverse('admin:admin_custom_urls_person_history', args=[obj.pk]))
+
+    def response_post_save_change(self, request, obj):
+        return HttpResponseRedirect(
+            reverse('admin:admin_custom_urls_person_delete', args=[obj.pk]))
 
 
 class Car(models.Model):
