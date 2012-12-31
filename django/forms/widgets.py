@@ -533,6 +533,9 @@ class CheckboxInput(Widget):
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
+        if initial == 'False':
+            # show_hidden_initial may have transformed False to 'False'
+            initial = False
         return bool(initial) != bool(data)
 
 class Select(Widget):
