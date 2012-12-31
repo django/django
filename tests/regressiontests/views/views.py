@@ -132,6 +132,7 @@ def send_log(request, exc_info):
         ][0]
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
+    admin_email_handler.include_html = True
     logger.error('Internal Server Error: %s', request.path,
         exc_info=exc_info,
         extra={
@@ -183,6 +184,38 @@ def paranoid_view(request):
         exc_info = sys.exc_info()
         send_log(request, exc_info)
         return technical_500_response(request, *exc_info)
+
+def sensitive_args_function_caller(request):
+    try:
+        sensitive_args_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables('sauce')
+def sensitive_args_function(sauce):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    raise Exception
+
+def sensitive_kwargs_function_caller(request):
+    try:
+        sensitive_kwargs_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables('sauce')
+def sensitive_kwargs_function(sauce=None):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    raise Exception
 
 class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
     """
