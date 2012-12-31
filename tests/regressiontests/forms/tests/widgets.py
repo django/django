@@ -240,6 +240,8 @@ class FormsWidgetTestCase(TestCase):
         self.assertTrue(w._has_changed(False, 'on'))
         self.assertFalse(w._has_changed(True, 'on'))
         self.assertTrue(w._has_changed(True, ''))
+        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
+        self.assertTrue(w._has_changed('False', 'on'))
 
     def test_select(self):
         w = Select()
