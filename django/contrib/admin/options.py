@@ -1,6 +1,5 @@
 import copy
 from functools import update_wrapper, partial
-import warnings
 
 from django import forms
 from django.conf import settings
@@ -824,7 +823,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
             self.message_user(request, msg)
-            return self.response_post_save(request, obj)
+            return self.response_post_save_add(request, obj)
 
     def response_change(self, request, obj):
         """
@@ -858,13 +857,27 @@ class ModelAdmin(BaseModelAdmin):
         else:
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
             self.message_user(request, msg)
-            return self.response_post_save(request, obj)
+            return self.response_post_save_change(request, obj)
 
-    def response_post_save(self, request, obj):
+    def response_post_save_add(self, request, obj):
         """
-        Figure out where to redirect after the 'Save' button has been pressed.
-        If the user has change permission, redirect to the change-list page for
-        this object. Otherwise, redirect to the admin index.
+        Figure out where to redirect after the 'Save' button has been pressed
+        when adding a new object.
+        """
+        opts = self.model._meta
+        if self.has_change_permission(request, None):
+            post_url = reverse('admin:%s_%s_changelist' %
+                               (opts.app_label, opts.module_name),
+                               current_app=self.admin_site.name)
+        else:
+            post_url = reverse('admin:index',
+                               current_app=self.admin_site.name)
+        return HttpResponseRedirect(post_url)
+
+    def response_post_save_change(self, request, obj):
+        """
+        Figure out where to redirect after the 'Save' button has been pressed
+        when editing an existing object.
         """
         opts = self.model._meta
         if self.has_change_permission(request, None):
