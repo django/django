@@ -81,8 +81,8 @@ Arguments sent with this signal:
     :meth:`~django.db.models.Model.save` again.
 
 ``flag``
-    The :class:`~django.contrib.comments.models.CommentFlag` that's been
-    attached to the comment.
+    The ``django.contrib.comments.models.CommentFlag`` that's been attached to
+    the comment.
 
 ``created``
     ``True`` if this is a new flag; ``False`` if it's a duplicate flag.

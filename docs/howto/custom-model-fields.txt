@@ -199,20 +199,20 @@ The :meth:`~django.db.models.Field.__init__` method takes the following
 parameters:
 
 * :attr:`~django.db.models.Field.verbose_name`
-* :attr:`~django.db.models.Field.name`
+* ``name``
 * :attr:`~django.db.models.Field.primary_key`
-* :attr:`~django.db.models.Field.max_length`
+* :attr:`~django.db.models.CharField.max_length`
 * :attr:`~django.db.models.Field.unique`
 * :attr:`~django.db.models.Field.blank`
 * :attr:`~django.db.models.Field.null`
 * :attr:`~django.db.models.Field.db_index`
-* :attr:`~django.db.models.Field.rel`: Used for related fields (like
-  :class:`ForeignKey`). For advanced use only.
+* ``rel``: Used for related fields (like :class:`ForeignKey`). For advanced
+  use only.
 * :attr:`~django.db.models.Field.default`
 * :attr:`~django.db.models.Field.editable`
-* :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
-  not be serialized when the model is passed to Django's :doc:`serializers
-  </topics/serialization>`. Defaults to ``True``.
+* ``serialize``: If ``False``, the field will not be serialized when the model
+  is passed to Django's :doc:`serializers </topics/serialization>`. Defaults to
+  ``True``.
 * :attr:`~django.db.models.Field.unique_for_date`
 * :attr:`~django.db.models.Field.unique_for_month`
 * :attr:`~django.db.models.Field.unique_for_year`
@@ -222,7 +222,7 @@ parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* :attr:`~django.db.models.Field.auto_created`: True if the field was
+* ``auto_created``: True if the field was
   automatically created, as for the `OneToOneField` used by model
   inheritance. For advanced use only.
 
@@ -443,7 +443,7 @@ Python object type we want to store in the model's attribute. If anything is
 going wrong during value conversion, you should raise a
 :exc:`~django.core.exceptions.ValidationError` exception.
 
-**Remember:** If your custom field needs the :meth:`to_python` method to be
+**Remember:** If your custom field needs the :meth:`.to_python` method to be
 called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`.to_python` won't be called
 automatically.

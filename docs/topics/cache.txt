@@ -664,6 +664,8 @@ pickling.)
 Accessing the cache
 -------------------
 
+.. function:: django.core.cache.get_cache(backend, **kwargs)
+
 The cache module, ``django.core.cache``, has a ``cache`` object that's
 automatically created from the ``'default'`` entry in the :setting:`CACHES`
 setting::
@@ -676,7 +678,7 @@ If you have multiple caches defined in :setting:`CACHES`, then you can use
     >>> from django.core.cache import get_cache
     >>> cache = get_cache('alternate')
 
-If the named key does not exist, :exc:`InvalidCacheBackendError` will be raised.
+If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
 
 
 Basic usage
@@ -844,7 +846,7 @@ key version to set or get. For example::
     'hello world!'
 
 The version of a specific key can be incremented and decremented using
-the :func:`incr_version()` and :func:`decr_version()` methods. This
+the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
 keys unaffected. Continuing our previous example::
 
@@ -879,7 +881,7 @@ parts), you can provide a custom key function.
 
 The :setting:`KEY_FUNCTION <CACHES-KEY_FUNCTION>` cache setting
 specifies a dotted-path to a function matching the prototype of
-:func:`make_key()` above. If provided, this custom key function will
+``make_key()`` above. If provided, this custom key function will
 be used instead of the default key combining function.
 
 Cache key warnings

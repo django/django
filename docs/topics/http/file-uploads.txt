@@ -227,8 +227,8 @@ field in the model::
 ``UploadedFile`` objects
 ========================
 
-In addition to those inherited from :class:`File`, all ``UploadedFile`` objects
-define the following methods/attributes:
+In addition to those inherited from :class:`~django.core.files.File`, all
+``UploadedFile`` objects define the following methods/attributes:
 
 .. attribute:: UploadedFile.content_type
 

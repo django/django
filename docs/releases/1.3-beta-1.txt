@@ -140,7 +140,7 @@ attribute.
 Changes to ``USStateField``
 ===========================
 
-The :mod:`django.contrib.localflavor` application contains collections
+The ``django.contrib.localflavor`` application contains collections
 of code relevant to specific countries or cultures. One such is
 ``USStateField``, which provides a field for storing the two-letter postal
 abbreviation of a U.S. state. This field has consistently caused problems,
@@ -167,13 +167,13 @@ as a pair of changes:
   independent nations -- the Federated States of Micronesia, the
   Republic of the Marshall Islands and the Republic of Palau -- which
   are serviced under treaty by the U.S. postal system. A new form
-  widget, :class:`django.contrib.localflavor.us.forms.USPSSelect`, is
+  widget, ``django.contrib.localflavor.us.forms.USPSSelect``, is
   also available and provides the same set of choices.
 
 Additionally, several finer-grained choice tuples are provided which
 allow mixing and matching of subsets of the U.S. states and
 territories, and other locations serviced by the U.S. postal
-system. Consult the :mod:`django.contrib.localflavor` documentation
+system. Consult the ``django.contrib.localflavor`` documentation
 for more details.
 
 The change to `USStateField` is technically backwards-incompatible for

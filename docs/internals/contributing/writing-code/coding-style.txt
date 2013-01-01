@@ -177,9 +177,9 @@ That means that the ability for third parties to import the module at the top
 level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
-Instead of the above code, a level of laziness or indirection must be used, such
-as :class:`django.utils.functional.LazyObject`,
-:func:`django.utils.functional.lazy` or ``lambda``.
+Instead of the above code, a level of laziness or indirection must be used,
+such as ``django.utils.functional.LazyObject``,
+``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
 -------------

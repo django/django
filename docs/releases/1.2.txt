@@ -345,10 +345,10 @@ in 1.2 is support for multiple spatial databases.  As a result,
 the following :ref:`spatial database backends <spatial-backends>`
 are now included:
 
-* :mod:`django.contrib.gis.db.backends.postgis`
-* :mod:`django.contrib.gis.db.backends.mysql`
-* :mod:`django.contrib.gis.db.backends.oracle`
-* :mod:`django.contrib.gis.db.backends.spatialite`
+* ``django.contrib.gis.db.backends.postgis``
+* ``django.contrib.gis.db.backends.mysql``
+* ``django.contrib.gis.db.backends.oracle``
+* ``django.contrib.gis.db.backends.spatialite``
 
 GeoDjango now supports the rich capabilities added
 in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
@@ -986,7 +986,7 @@ should be updated to use the new :ref:`class-based runners
 ``Feed`` in ``django.contrib.syndication.feeds``
 ------------------------------------------------
 
-The :class:`django.contrib.syndication.feeds.Feed` class has been
+The ``django.contrib.syndication.feeds.Feed`` class has been
 replaced by the :class:`django.contrib.syndication.views.Feed` class.
 The old ``feeds.Feed`` class is deprecated, and will be removed in
 Django 1.4.

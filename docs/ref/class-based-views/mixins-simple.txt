@@ -48,7 +48,7 @@ TemplateResponseMixin
     .. attribute:: template_name
 
         The full name of a template to use as defined by a string. Not defining
-        a template_name will raise a
+        a ``template_name`` will raise a
         :class:`django.core.exceptions.ImproperlyConfigured` exception.
 
     .. attribute:: response_class
@@ -73,15 +73,13 @@ TemplateResponseMixin
         If any keyword arguments are provided, they will be passed to the
         constructor of the response class.
 
-        Calls :meth:`~TemplateResponseMixin.get_template_names()` to obtain the
-        list of template names that will be searched looking for an existent
-        template.
+        Calls :meth:`get_template_names()` to obtain the list of template names
+        that will be searched looking for an existent template.
 
     .. method:: get_template_names()
 
         Returns a list of template names to search for when rendering the
         template.
 
-        If :attr:`TemplateResponseMixin.template_name` is specified, the
-        default implementation will return a list containing
-        :attr:`TemplateResponseMixin.template_name` (if it is specified).
+        If :attr:`template_name` is specified, the default implementation will
+        return a list containing :attr:`template_name` (if it is specified).

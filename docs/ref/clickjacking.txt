@@ -111,10 +111,10 @@ Browsers that support X-Frame-Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Internet Explorer 8+
-* Firefox	3.6.9+
-* Opera	10.5+
-* Safari	4+
-* Chrome	4.1+
+* Firefox 3.6.9+
+* Opera 10.5+
+* Safari 4+
+* Chrome 4.1+
 
 See also
 ~~~~~~~~

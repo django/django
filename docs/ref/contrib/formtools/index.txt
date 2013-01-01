@@ -1,6 +1,8 @@
 django.contrib.formtools
 ========================
 
+.. module:: django.contrib.formtools
+
 A set of high-level abstractions for Django forms (:mod:`django.forms`).
 
 .. toctree::

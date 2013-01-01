@@ -38,7 +38,7 @@ FormView
 
     * :class:`django.views.generic.edit.FormView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseFormView`
+    * ``django.views.generic.edit.BaseFormView``
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
@@ -86,7 +86,7 @@ CreateView
     * :class:`django.views.generic.edit.CreateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseCreateView`
+    * ``django.views.generic.edit.BaseCreateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -128,7 +128,7 @@ UpdateView
     * :class:`django.views.generic.edit.UpdateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseUpdateView`
+    * ``django.views.generic.edit.BaseUpdateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -170,9 +170,9 @@ DeleteView
     * :class:`django.views.generic.edit.DeleteView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseDeleteView`
+    * ``django.views.generic.edit.BaseDeleteView``
     * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 

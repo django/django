@@ -530,6 +530,6 @@ Finally, :ref:`install Django <installing-official-release>` on your system.
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
-       :mod:`ctypes.util` to locate shared libraries.
+       ``ctypes.util`` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.
