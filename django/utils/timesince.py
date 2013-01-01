@@ -36,30 +36,36 @@ def timesince(d, now=None, reversed=False):
         now = datetime.datetime.now(utc if is_aware(d) else None)
 
     delta = (d - now) if reversed else (now - d)
-    # ignore microseconds
-    since = delta.days * 24 * 60 * 60 + delta.seconds
-    if since <= 0:
-        # d is in the future compared to now, stop processing.
-        return '0 ' + ugettext('minutes')
-    for i, (seconds, name) in enumerate(chunks):
-        count = since // seconds
-        if count != 0:
-            break
-    if i == 0:
+    if delta.days > 365:
+        y_name = chunks[0][1]
+        m_name = chunks[1][1]
         # Case of Year
         count = d.year - now.year if reversed else now.year - d.year
-        s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
-        m_count = d.month - now.month if reversed else now.month - d.month
+        if d.month > now.month:
+            count -= 1
+            m_count = 12 - (d.month - now.month)
+        else:
+            m_count = d.month - now.month if reversed else now.month - d.month
+        s = ugettext('%(number)d %(type)s') % {'number': count, 'type': y_name(count)}
         if m_count > 0:
-            s += ugettext(', %(number)d %(type)s') % {'number': m_count, 'type': name2(m_count)}
+            s += ugettext(', %(number)d %(type)s') % {'number': m_count, 'type': m_name(m_count)}
     else:
+        # ignore microseconds
+        since = delta.days * 24 * 60 * 60 + delta.seconds
+        if since <= 0:
+            # d is in the future compared to now, stop processing.
+            return '0 ' + ugettext('minutes')
+        for i, (seconds, name) in enumerate(chunks):
+            count = since // seconds
+            if count != 0:
+                break
         s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
-    if i + 1 < len(chunks) and i != 0:
-        # Now get the second item
-        seconds2, name2 = chunks[i + 1]
-        count2 = (since - (seconds * count)) // seconds2
-        if count2 != 0:
-            s += ugettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
+        if i + 1 < len(chunks):
+            # Now get the second item
+            seconds2, name2 = chunks[i + 1]
+            count2 = (since - (seconds * count)) // seconds2
+            if count2 != 0:
+                s += ugettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
     return s
 
 def timeuntil(d, now=None):
