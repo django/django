@@ -16,7 +16,9 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.signals import got_request_exception
+from django.core.signals import (request_started, request_finished,
+    got_request_exception)
+from django.db import close_connection
 from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
@@ -76,7 +78,9 @@ def closing_iterator_wrapper(iterable, close):
         for item in iterable:
             yield item
     finally:
-        close()
+        request_finished.disconnect(close_connection)
+        close()                                 # will fire request_finished
+        request_finished.connect(close_connection)
 
 
 class ClientHandler(BaseHandler):
@@ -91,14 +95,13 @@ class ClientHandler(BaseHandler):
 
     def __call__(self, environ):
         from django.conf import settings
-        from django.core import signals
 
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
             self.load_middleware()
 
-        signals.request_started.send(sender=self.__class__)
+        request_started.send(sender=self.__class__)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round
         # CsrfViewMiddleware.  This makes life easier, and is probably
@@ -112,7 +115,9 @@ class ClientHandler(BaseHandler):
             response.streaming_content = closing_iterator_wrapper(
                 response.streaming_content, response.close)
         else:
-            response.close()
+            request_finished.disconnect(close_connection)
+            response.close()                    # will fire request_finished
+            request_finished.connect(close_connection)
 
         return response
 
