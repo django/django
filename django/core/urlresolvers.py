@@ -8,6 +8,7 @@ a string) and returns a tuple in this format:
 """
 from __future__ import unicode_literals
 
+from itertools import ifilter
 import re
 from threading import local
 
@@ -35,6 +36,10 @@ _prefixes = local()
 
 # Overridden URLconfs for each thread are stored here.
 _urlconfs = local()
+
+# Stores which resolvers are populating as a result of a parent resolver.
+# Allows recursive URLconfs to be detected and handled.
+_populating = local()
 
 
 class ResolverMatch(object):
@@ -256,6 +261,8 @@ class RegexURLResolver(LocaleRegexProvider):
             self.namespace, self.regex.pattern)
 
     def _populate(self):
+        if not hasattr(_populating, "value"):
+            _populating.value = set()
         lookups = MultiValueDict()
         namespaces = {}
         apps = {}
@@ -269,6 +276,25 @@ class RegexURLResolver(LocaleRegexProvider):
                     namespaces[pattern.namespace] = (p_pattern, pattern)
                     if pattern.app_name:
                         apps.setdefault(pattern.app_name, []).append(pattern.namespace)
+                    key = (self, pattern)
+                    if key not in _populating.value:
+                        _populating.value.add(key)
+                        # Since a namespace has been provided for the included resolver,
+                        # we can rely on urlresolvers.reverse() to traverse the tree
+                        # to honor and find the correct resolver to finally be able to
+                        # call resolver.reverse(name).
+                        # However when reversing a callable, no namespace information
+                        # is attached to the callable so all lookups for all descendant
+                        # views functions *must* be included in each resolver.
+                        include_lookups = ifilter(callable, pattern.reverse_dict)
+                        # If there's recursion in the URLconf, it's possible
+                        # that this resolver is now populated. If that's the
+                        # case, we can bail out.
+                        if language_code in self._reverse_dict:
+                            _populating.value.remove(key)
+                            return
+                    else:
+                        include_lookups = []
                 else:
                     parent = normalize(pattern.regex.pattern)
                     for name in pattern.reverse_dict:
@@ -281,6 +307,24 @@ class RegexURLResolver(LocaleRegexProvider):
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
+                    # When no namespace is provided, *all* the callable
+                    # patterns in the included resolver should be available in
+                    # this resolver.
+                    include_lookups = ifilter(callable, pattern.reverse_dict)
+                # Add each of the child lookups to this resolver, being careful
+                # to add appropriate URL and regex prefixes so reversing results
+                # are correct.
+                parent = normalize(pattern.regex.pattern)
+                for name in include_lookups:
+                    new_lookups = []
+                    for matches, pat, defaults in pattern.reverse_dict.getlist(name):
+                        new_matches = []
+                        for piece, p_args in parent:
+                            new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
+                        new_lookups.append((new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                    # prepend lookups as we're doing reverse pattern traversal
+                    lookups.setlist(name, new_lookups + lookups.getlist(name))
+
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern, pattern.default_args))

@@ -50,6 +50,8 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     (r'^ns-included[135]/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     (r'^ns-included2/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
+    (r'^ns-only-included/', include('regressiontests.urlpatterns_reverse.included_only_namespace_urls', namespace='inc-only-ns1')),
+
     (r'^included/', include('regressiontests.urlpatterns_reverse.included_namespace_urls')),
     (r'^inc(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_urls', namespace='inc-ns5')),
 
