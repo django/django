@@ -64,7 +64,7 @@ def get_image_dimensions(file_or_path, close=False):
             except zlib.error as e:
                 # ignore zlib complaining on truncated stream, just feed more
                 # data to parser (ticket #19457).
-                if e.message.startswith("Error -5"):
+                if e.args[0].startswith("Error -5"):
                     pass
                 else:
                     six.reraise(*sys.exc_info())
