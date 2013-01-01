@@ -641,8 +641,6 @@ class TransactionTestCase(SimpleTestCase):
         else:
             content = response.content
         content = content.decode(response._charset)
-        # Avoid ResourceWarning about unclosed files.
-        response.close()
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")

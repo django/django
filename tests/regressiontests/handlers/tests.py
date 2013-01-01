@@ -56,6 +56,5 @@ class SignalsTests(TestCase):
     def test_request_signals_streaming_response(self):
         response = self.client.get('/streaming/')
         self.assertEqual(self.signals, ['started'])
-        # Avoid self.assertContains, because it explicitly calls response.close()
         self.assertEqual(b''.join(response.streaming_content), b"streaming content")
         self.assertEqual(self.signals, ['started', 'finished'])
