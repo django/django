@@ -32,6 +32,8 @@ Because a settings file is a Python module, the following apply:
 Designating the settings
 ========================
 
+.. envvar:: DJANGO_SETTINGS_MODULE
+
 When you use Django, you have to tell it which settings you're using. Do this
 by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
 
@@ -260,4 +262,3 @@ It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
 
 .. _@login_required: ../authentication/#the-login-required-decorator
-

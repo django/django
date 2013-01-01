@@ -14,7 +14,7 @@ The ``File`` Class
     The :class:`File` is a thin wrapper around Python's built-in file object
     with some Django-specific additions. Internally, Django uses this class
     any time it needs to represent a file.
-    
+
     :class:`File` objects have the following attributes and methods:
 
     .. attribute:: name
@@ -148,7 +148,7 @@ below) will also have a couple of extra methods:
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
-    :class:`ContentFile`.
+    :class:`~django.core.files.base.ContentFile`.
 
 .. method:: File.delete([save=True])
 

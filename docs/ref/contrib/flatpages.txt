@@ -186,7 +186,7 @@ Via the Python API
     If you add or modify flatpages via your own code, you will likely want to
     check for duplicate flatpage URLs within the same site. The flatpage form
     used in the admin performs this validation check, and can be imported from
-    :class:`django.contrib.flatpages.forms.FlatPageForm` and used in your own
+    ``django.contrib.flatpages.forms.FlatPageForm`` and used in your own
     views.
 
 Flatpage templates
@@ -256,7 +256,7 @@ Displaying ``registration_required`` flatpages
 By default, the :ttag:`get_flatpages` templatetag will only show
 flatpages that are marked ``registration_required = False``. If you
 want to display registration-protected flatpages, you need to specify
-an authenticated user using a``for`` clause.
+an authenticated user using a ``for`` clause.
 
 For example:
 

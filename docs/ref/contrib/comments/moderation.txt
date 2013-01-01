@@ -185,15 +185,14 @@ via two methods:
     be moderated using the options defined in the
     ``CommentModerator`` subclass. If any of the models are
     already registered for moderation, the exception
-    :exc:`AlreadyModerated` will be raised.
+    ``AlreadyModerated`` will be raised.
 
 .. function:: moderator.unregister(model_or_iterable)
 
     Takes one argument: a model class or list of model classes,
     and removes the model or models from the set of models which
     are being moderated. If any of the models are not currently
-    being moderated, the exception
-    :exc:`NotModerated` will be raised.
+    being moderated, the exception ``NotModerated`` will be raised.
 
 
 Customizing the moderation system
@@ -207,8 +206,8 @@ models with an instance of the subclass.
 
 .. class:: Moderator
 
-    In addition to the :meth:`Moderator.register` and
-    :meth:`Moderator.unregister` methods detailed above, the following methods
+    In addition to the :func:`moderator.register` and
+    :func:`moderator.unregister` methods detailed above, the following methods
     on :class:`Moderator` can be overridden to achieve customized behavior:
 
     .. method:: connect

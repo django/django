@@ -28,7 +28,7 @@ module defines tests in class-based approach.
     backported for Python 2.5 compatibility.
 
     To access this library, Django provides the
-    :mod:`django.utils.unittest` module alias. If you are using Python
+    ``django.utils.unittest`` module alias. If you are using Python
     2.7, or you have installed unittest2 locally, Django will map the
     alias to the installed version of the unittest library. Otherwise,
     Django will use its own bundled version of unittest2.
@@ -853,7 +853,7 @@ Normal Python unit test classes extend a base class of
    Hierarchy of Django unit testing classes
 
 Regardless of the version of Python you're using, if you've installed
-``unittest2``, :mod:`django.utils.unittest` will point to that library.
+``unittest2``, ``django.utils.unittest`` will point to that library.
 
 SimpleTestCase
 ~~~~~~~~~~~~~~
@@ -882,7 +882,7 @@ features like:
 then you should use :class:`~django.test.TransactionTestCase` or
 :class:`~django.test.TestCase` instead.
 
-``SimpleTestCase`` inherits from :class:`django.utils.unittest.TestCase`.
+``SimpleTestCase`` inherits from ``django.utils.unittest.TestCase``.
 
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
@@ -1724,7 +1724,7 @@ test if the database doesn't support a specific named feature.
 
 The decorators use a string identifier to describe database features.
 This string corresponds to attributes of the database connection
-features class. See :class:`~django.db.backends.BaseDatabaseFeatures`
+features class. See ``django.db.backends.BaseDatabaseFeatures``
 class for a full list of database features that can be used as a basis
 for skipping tests.
 

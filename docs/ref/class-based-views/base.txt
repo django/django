@@ -49,9 +49,13 @@ View
 
     **Attributes**
 
-    .. attribute:: http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+    .. attribute:: http_method_names
 
-        The default list of HTTP method names that this view will accept.
+        The list of HTTP method names that this view will accept.
+
+        Default::
+
+            ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
 
     **Methods**
 
@@ -68,12 +72,11 @@ View
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
-        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
-        and so on.
+        delegated to ``get()``, a ``POST`` to ``post()``, and so on.
 
-        By default, a ``HEAD`` request will be delegated to :meth:`~View.get()`.
+        By default, a ``HEAD`` request will be delegated to ``get()``.
         If you need to handle ``HEAD`` requests in a different way than ``GET``,
-        you can override the :meth:`~View.head()` method. See
+        you can override the ``head()`` method. See
         :ref:`supporting-other-http-methods` for an example.
 
         The default implementation also sets ``request``, ``args`` and
@@ -111,9 +114,9 @@ TemplateView
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_context_data()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
 
     **Example views.py**::
 
@@ -169,8 +172,8 @@ RedirectView
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     3. :meth:`get_redirect_url()`
 
     **Example views.py**::
@@ -230,9 +233,8 @@ RedirectView
 
         Constructs the target URL for redirection.
 
-        The default implementation uses :attr:`~RedirectView.url` as a starting
+        The default implementation uses :attr:`url` as a starting
         string, performs expansion of ``%`` parameters in that string, as well
-        as the appending of query string if requested by
-        :attr:`~RedirectView.query_string`. Subclasses may implement any
-        behavior they wish, as long as the method returns a redirect-ready URL
-        string.
+        as the appending of query string if requested by :attr:`query_string`.
+        Subclasses may implement any behavior they wish, as long as the method
+        returns a redirect-ready URL string.

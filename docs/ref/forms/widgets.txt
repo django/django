@@ -508,9 +508,9 @@ Selector and checkbox widgets
 
     .. attribute:: Select.choices
 
-        This attribute is optional when the field does not have a
-        :attr:`~Field.choices` attribute. If it does, it will override anything
-        you set here when the attribute is updated on the :class:`Field`.
+        This attribute is optional when the form field does not have a
+        ``choices`` attribute. If it does, it will override anything you set
+        here when the attribute is updated on the :class:`Field`.
 
 ``NullBooleanSelect``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -660,9 +660,9 @@ Composite widgets
 
     .. attribute:: MultipleHiddenInput.choices
 
-        This attribute is optional when the field does not have a
-        :attr:`~Field.choices` attribute. If it does, it will override anything
-        you set here when the attribute is updated on the :class:`Field`.
+        This attribute is optional when the form field does not have a
+        ``choices`` attribute. If it does, it will override anything you set
+        here when the attribute is updated on the :class:`Field`.
 
 ``SplitDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~

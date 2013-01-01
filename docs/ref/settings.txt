@@ -2159,7 +2159,7 @@ startproject <startproject>` management command will create a simple
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
 
-If not set, the return value of :func:`django.core.wsgi.get_wsgi_application`
+If not set, the return value of ``django.core.wsgi.get_wsgi_application()``
 will be used. In this case, the behavior of :djadmin:`runserver` will be
 identical to previous Django versions.
 

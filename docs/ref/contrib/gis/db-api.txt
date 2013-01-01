@@ -4,20 +4,23 @@
 GeoDjango Database API
 ======================
 
-.. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango's database API.
-
 .. _spatial-backends:
 
 Spatial Backends
 ================
 
+.. module:: django.contrib.gis.db.backends
+   :synopsis: GeoDjango's spatial database backends.
+
 GeoDjango currently provides the following spatial database backends:
 
-* :mod:`django.contrib.gis.db.backends.postgis`
-* :mod:`django.contrib.gis.db.backends.mysql`
-* :mod:`django.contrib.gis.db.backends.oracle`
-* :mod:`django.contrib.gis.db.backends.spatialite`
+* ``django.contrib.gis.db.backends.postgis``
+* ``django.contrib.gis.db.backends.mysql``
+* ``django.contrib.gis.db.backends.oracle``
+* ``django.contrib.gis.db.backends.spatialite``
+
+.. module:: django.contrib.gis.db.models
+   :synopsis: GeoDjango's database API.
 
 .. _mysql-spatial-limitations:
 

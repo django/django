@@ -190,8 +190,7 @@ The functions defined in this module share the following properties:
     Like ``decorator_from_middleware``, but returns a function
     that accepts the arguments to be passed to the middleware_class.
     For example, the :func:`~django.views.decorators.cache.cache_page`
-    decorator is created from the
-    :class:`~django.middleware.cache.CacheMiddleware` like this::
+    decorator is created from the ``CacheMiddleware`` like this::
 
          cache_page = decorator_from_middleware_with_args(CacheMiddleware)
 
@@ -282,15 +281,15 @@ The functions defined in this module share the following properties:
 .. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Alias of :func:`smart_bytes` on Python 2 and :func:`smart_text` on Python
-    3. This function returns a :class:`str` or a lazy string.
+    3. This function returns a ``str`` or a lazy string.
 
-    For instance, this is  suitable for writing to :attr:`sys.stdout` on
+    For instance, this is  suitable for writing to :data:`sys.stdout` on
     Python 2 and 3.
 
 .. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Alias of :func:`force_bytes` on Python 2 and :func:`force_text` on Python
-    3. This function always returns a :class:`str`.
+    3. This function always returns a ``str``.
 
 .. function:: iri_to_uri(iri)
 
@@ -624,12 +623,12 @@ escaping HTML.
 .. function:: base36_to_int(s)
 
     Converts a base 36 string to an integer. On Python 2 the output is
-    guaranteed to be an :class:`int` and not a :class:`long`.
+    guaranteed to be an ``int`` and not a ``long``.
 
 .. function:: int_to_base36(i)
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
-    smaller than :attr:`sys.maxint`.
+    smaller than :data:`sys.maxint`.
 
 ``django.utils.safestring``
 ===========================
@@ -647,12 +646,12 @@ appropriate entities.
 
     .. versionadded:: 1.5
 
-    A :class:`bytes` subclass that has been specifically marked as "safe"
+    A ``bytes`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes.
 
 .. class:: SafeString
 
-    A :class:`str` subclass that has been specifically marked as "safe"
+    A ``str`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes. This is
     :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
 
@@ -660,7 +659,7 @@ appropriate entities.
 
     .. versionadded:: 1.5
 
-    A :class:`str` (in Python 3) or :class:`unicode` (in Python 2) subclass
+    A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
     that has been specifically marked as "safe" for HTML output purposes.
 
 .. class:: SafeUnicode
