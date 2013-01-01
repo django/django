@@ -122,3 +122,10 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timesince(future), '0 minutes')
         past = datetime.datetime(1980, 1, 1, tzinfo=naive())
         self.assertEqual(timeuntil(past), '0 minutes')
+
+    def test_thousand_years_ago(self):
+        from dateutil.relativedelta import relativedelta
+        now = datetime.datetime.now()
+        thousand_years_ago = now - relativedelta(years=1000)
+
+        self.assertEqual(timesince(thousand_years_ago), '1000 years')
