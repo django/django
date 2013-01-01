@@ -97,11 +97,11 @@ CreateView
 
     .. attribute:: template_name_suffix
 
-        The CreateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form.html'``. For
-        example, changing this attribute to ``'_create_form.html'`` for a view
-        creating objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_create_form.html'``.
+        The ``CreateView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_form'``. For
+        example, changing this attribute to ``'_create_form'`` for a view
+        creating objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_create_form.html'``.
 
     **Example views.py**::
 
@@ -139,11 +139,11 @@ UpdateView
 
     .. attribute:: template_name_suffix
 
-        The UpdateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form.html'``. For
-        example, changing this attribute to ``'_update_form.html'`` for a view
-        updating objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_update_form.html'``.
+        The ``UpdateView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_form'``. For
+        example, changing this attribute to ``'_update_form'`` for a view
+        updating objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_update_form.html'``.
 
     **Example views.py**::
 
@@ -180,11 +180,11 @@ DeleteView
 
     .. attribute:: template_name_suffix
 
-        The DeleteView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_confirm_delete.html'``. For
-        example, changing this attribute to ``'_check_delete.html'`` for a view
-        deleting objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_check_delete.html'``.
+        The ``DeleteView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_confirm_delete'``. For
+        example, changing this attribute to ``'_check_delete'`` for a view
+        deleting objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_check_delete.html'``.
 
 
     **Example views.py**::
