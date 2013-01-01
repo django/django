@@ -3,12 +3,10 @@ Utility functions for handling images.
 
 Requires PIL, as you might imagine.
 """
-
 import zlib
-import sys
 
 from django.core.files import File
-from django.utils import six
+
 
 class ImageFile(File):
     """
@@ -29,6 +27,7 @@ class ImageFile(File):
             self.open()
             self._dimensions_cache = get_image_dimensions(self, close=close)
         return self._dimensions_cache
+
 
 def get_image_dimensions(file_or_path, close=False):
     """
@@ -67,7 +66,7 @@ def get_image_dimensions(file_or_path, close=False):
                 if e.args[0].startswith("Error -5"):
                     pass
                 else:
-                    six.reraise(*sys.exc_info())
+                    raise
             if p.image:
                 return p.image.size
             chunk_size = chunk_size*2
