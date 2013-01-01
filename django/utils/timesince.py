@@ -19,7 +19,7 @@ def timesince(d, now=None, reversed=False):
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
-      (60 * 60 * 24 * 365.2425, lambda n: ungettext('year', 'years', n)),
+      (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
       (60 * 60 * 24 * 30, lambda n: ungettext('month', 'months', n)),
       (60 * 60 * 24 * 7, lambda n : ungettext('week', 'weeks', n)),
       (60 * 60 * 24, lambda n : ungettext('day', 'days', n)),
@@ -45,8 +45,16 @@ def timesince(d, now=None, reversed=False):
         count = since // seconds
         if count != 0:
             break
-    s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
-    if i + 1 < len(chunks):
+    if i == 0:
+        # Case of Year
+        count = d.year - now.year if reversed else now.year - d.year
+        s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
+        m_count = d.month - now.month if reversed else now.month - d.month
+        if m_count > 0:
+            s += ugettext(', %(number)d %(type)s') % {'number': m_count, 'type': name2(m_count)}
+    else:
+        s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
+    if i + 1 < len(chunks) and i != 0:
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
         count2 = (since - (seconds * count)) // seconds2
