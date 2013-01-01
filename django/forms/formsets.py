@@ -157,14 +157,12 @@ class BaseFormSet(object):
         return self.forms[self.initial_form_count():]
 
     @property
-    def empty_form(self, **kwargs):
-        defaults = {
-            'auto_id': self.auto_id,
-            'prefix': self.add_prefix('__prefix__'),
-            'empty_permitted': True,
-        }
-        defaults.update(kwargs)
-        form = self.form(**defaults)
+    def empty_form(self):
+        form = self.form(
+            auto_id=self.auto_id,
+            prefix=self.add_prefix('__prefix__'),
+            empty_permitted=True,
+        )
         self.add_fields(form, None)
         return form
 
