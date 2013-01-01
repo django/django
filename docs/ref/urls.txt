@@ -94,7 +94,6 @@ include()
     application and instance namespaces.
 
     :arg module: URLconf module (or module name)
-    :type module: Module or string
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
     :arg app_name: Application namespace for the URL entries being included
@@ -153,4 +152,3 @@ value should suffice.
 
 See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
 <http_internal_server_error_view>` for more information.
-

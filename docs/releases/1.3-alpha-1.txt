@@ -150,7 +150,7 @@ process has been on adding lots of smaller, long standing feature
 requests. These include:
 
 * Improved tools for accessing and manipulating the current Site via
-  :func:`django.contrib.sites.models.get_current_site`.
+  ``django.contrib.sites.models.get_current_site()``.
 
 * A :class:`~django.test.client.RequestFactory` for mocking
   requests in tests.

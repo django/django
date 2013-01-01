@@ -683,7 +683,7 @@ Keyword Argument       Description
                        a method name clashes with an existing
                        ``GeoQuerySet`` method -- if you wanted to use the
                        ``area()`` method on model with a ``PolygonField``
-		       named ``area``, for example.
+                       named ``area``, for example.
 =====================  =====================================================
 
 Measurement
@@ -1043,7 +1043,7 @@ Keyword Argument       Description
 =====================  =====================================================
 ``relative``           If set to ``True``, the path data will be implemented
                        in terms of relative moves.  Defaults to ``False``,
-		       meaning that absolute moves are used instead.
+                       meaning that absolute moves are used instead.
 
 ``precision``          This keyword may be used to specify the number of
                        significant digits for the coordinates in the SVG

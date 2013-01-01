@@ -580,7 +580,7 @@ DateDetailView
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
     * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 

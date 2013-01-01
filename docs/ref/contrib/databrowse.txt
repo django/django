@@ -43,7 +43,7 @@ How to use Databrowse
    .. versionchanged:: 1.4
 
    Since Django 1.4, it is possible to register several models in the same
-   call to :func:`~databrowse.site.register`.
+   call to ``databrowse.site.register()``.
 
    It doesn't matter where you put this, as long as it gets executed at some
    point. A good place for it is in your :doc:`URLconf file
@@ -71,7 +71,7 @@ code. Simply add the following import to your URLconf::
     from django.contrib.auth.decorators import login_required
 
 Then modify the :doc:`URLconf </topics/http/urls>` so that the
-:func:`databrowse.site.root` view is decorated with
+``databrowse.site.root()`` view is decorated with
 :func:`django.contrib.auth.decorators.login_required`::
 
     (r'^databrowse/(.*)', login_required(databrowse.site.root)),

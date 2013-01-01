@@ -66,15 +66,17 @@ In the ``models.py`` we'll define a ``CommentWithTitle`` model::
     class CommentWithTitle(Comment):
         title = models.CharField(max_length=300)
 
-Most custom comment models will subclass the :class:`Comment` model. However,
+Most custom comment models will subclass the
+:class:`~django.contrib.comments.models.Comment` model. However,
 if you want to substantially remove or change the fields available in the
-:class:`Comment` model, but don't want to rewrite the templates, you could
-try subclassing from :class:`BaseCommentAbstractModel`.
+:class:`~django.contrib.comments.models.Comment` model, but don't want to
+rewrite the templates, you could try subclassing from
+``BaseCommentAbstractModel``.
 
 Next, we'll define a custom comment form in ``forms.py``. This is a little more
 tricky: we have to both create a form and override
-:meth:`CommentForm.get_comment_model` and
-:meth:`CommentForm.get_comment_create_data` to return deal with our custom title
+``CommentForm.get_comment_model()`` and
+``CommentForm.get_comment_create_data()`` to return deal with our custom title
 field::
 
     from django import forms
@@ -139,7 +141,7 @@ however.
 
     Return the :class:`~django.db.models.Model` class to use for comments. This
     model should inherit from
-    :class:`django.contrib.comments.models.BaseCommentAbstractModel`, which
+    ``django.contrib.comments.models.BaseCommentAbstractModel``, which
     defines necessary core fields.
 
     The default implementation returns
@@ -170,33 +172,33 @@ however.
     attribute when rendering your comment form.
 
     The default implementation returns a reverse-resolved URL pointing
-    to the :func:`post_comment` view.
+    to the ``post_comment()`` view.
 
     .. note::
 
         If you provide a custom comment model and/or form, but you
-        want to use the default :func:`post_comment` view, you will
+        want to use the default ``post_comment()`` view, you will
         need to be aware that it requires the model and form to have
         certain additional attributes and methods: see the
-        :func:`post_comment` view documentation for details.
+        ``django.contrib.comments.views.post_comment()`` view for details.
 
 .. function:: get_flag_url()
 
     Return the URL for the "flag this comment" view.
 
     The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.flag` view.
+    to the ``django.contrib.comments.views.moderation.flag()`` view.
 
 .. function:: get_delete_url()
 
     Return the URL for the "delete this comment" view.
 
     The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.delete` view.
+    to the ``django.contrib.comments.views.moderation.delete()`` view.
 
 .. function:: get_approve_url()
 
     Return the URL for the "approve this comment from moderation" view.
 
     The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.approve` view.
+    to the ``django.contrib.comments.views.moderation.approve()`` view.

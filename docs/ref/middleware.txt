@@ -111,7 +111,7 @@ It will NOT compress content if any of the following are true:
   not to be performed on certain content types.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.http.gzip_page()` decorator.
+:func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -124,7 +124,7 @@ Conditional GET middleware
 Handles conditional GET operations. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpNotModified`.
+:class:`~django.http.HttpResponseNotModified`.
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 

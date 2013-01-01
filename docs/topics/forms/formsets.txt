@@ -3,6 +3,8 @@
 Formsets
 ========
 
+.. class:: django.forms.formset.BaseFormSet
+
 A formset is a layer of abstraction to working with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
 form::
