@@ -584,6 +584,8 @@ class QuerySet(object):
     _update.alters_data = True
 
     def exists(self):
+        assert self.query.can_filter(),\
+                "Cannot check existance once a slice has been taken."
         if self._result_cache is None:
             return self.query.has_results(using=self.db)
         return bool(self._result_cache)

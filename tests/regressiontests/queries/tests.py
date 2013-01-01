@@ -1848,11 +1848,20 @@ class ComparisonTests(TestCase):
 class ExistsSql(TestCase):
     def setUp(self):
         settings.DEBUG = True
+        Article.objects.create(name='one', created=datetime.datetime.now())
 
     def test_exists(self):
         self.assertFalse(Tag.objects.exists())
         # Ok - so the exist query worked - but did it include too many columns?
         self.assertTrue("id" not in connection.queries[-1]['sql'] and "name" not in connection.queries[-1]['sql'])
+
+    def test_ticket_18414(self):
+        self.assertEqual(Article.objects.all().exists(), True)
+        self.assertRaisesMessage(
+            AssertionError,
+            'Cannot check existance once a slice has been taken.',
+            Article.objects.all()[:1].exists
+        )
 
     def tearDown(self):
         settings.DEBUG = False
