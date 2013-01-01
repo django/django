@@ -167,9 +167,8 @@ these changes.
 * ``django.core.context_processors.PermWrapper`` and
   ``django.core.context_processors.PermLookupDict`` will be removed in
   favor of the corresponding
-  :class:`django.contrib.auth.context_processors.PermWrapper` and
-  :class:`django.contrib.auth.context_processors.PermLookupDict`,
-  respectively.
+  ``django.contrib.auth.context_processors.PermWrapper`` and
+  ``django.contrib.auth.context_processors.PermLookupDict``, respectively.
 
 * The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings will be
   required to end with a trailing slash to ensure there is a consistent
@@ -218,10 +217,10 @@ these changes.
   synonym for ``django.views.decorators.csrf.csrf_exempt``, which should
   be used to replace it.
 
-* The :class:`~django.core.cache.backends.memcached.CacheClass` backend
+* The ``django.core.cache.backends.memcached.CacheClass`` backend
   was split into two in Django 1.3 in order to introduce support for
-  PyLibMC. The historical :class:`~django.core.cache.backends.memcached.CacheClass`
-  will be removed in favor of :class:`~django.core.cache.backends.memcached.MemcachedCache`.
+  PyLibMC. The historical ``CacheClass`` will be removed in favor of
+  ``django.core.cache.backends.memcached.MemcachedCache``.
 
 * The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
   be accessible through their GB-prefixed names (GB is the correct
@@ -243,8 +242,8 @@ these changes.
   :setting:`LOGGING` setting should include this filter explicitly if
   it is desired.
 
-* The builtin truncation functions :func:`django.utils.text.truncate_words`
-  and :func:`django.utils.text.truncate_html_words` will be removed in
+* The builtin truncation functions ``django.utils.text.truncate_words()``
+  and ``django.utils.text.truncate_html_words()`` will be removed in
   favor of the ``django.utils.text.Truncator`` class.
 
 * The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
@@ -257,9 +256,8 @@ these changes.
   :data:`~django.conf.urls.handler500`, are now available through
   :mod:`django.conf.urls` .
 
-* The functions :func:`~django.core.management.setup_environ` and
-  :func:`~django.core.management.execute_manager` will be removed from
-  :mod:`django.core.management`. This also means that the old (pre-1.4)
+* The functions ``setup_environ()`` and ``execute_manager()`` will be removed
+  from :mod:`django.core.management`. This also means that the old (pre-1.4)
   style of :file:`manage.py` file will no longer work.
 
 * Setting the ``is_safe`` and ``needs_autoescape`` flags as attributes of

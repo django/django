@@ -334,7 +334,7 @@ And the accompanying URLconf::
 Feed class reference
 --------------------
 
-.. class:: django.contrib.syndication.views.Feed
+.. class:: views.Feed
 
 This example illustrates all possible attributes and methods for a
 :class:`~django.contrib.syndication.views.Feed` class::

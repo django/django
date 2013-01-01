@@ -131,6 +131,21 @@ The Django wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
 
+.. exception:: models.ProtectedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.PROTECT`. Subclass of :exc:`IntegrityError`.
+
+.. currentmodule:: django.http
+
+Http Exceptions
+===============
+
+.. exception:: UnreadablePostError
+
+    The :exc:`UnreadablePostError` is raised when a user cancels an upload.
+    It is available from :mod:`django.http`.
+
 .. currentmodule:: django.db.transaction
 
 Transaction Exceptions

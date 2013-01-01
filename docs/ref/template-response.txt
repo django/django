@@ -121,15 +121,14 @@ Methods
     used as the response instead of the original response object (and
     will be passed to the next post rendering callback etc.)
 
-.. method:: SimpleTemplateResponse.render():
+.. method:: SimpleTemplateResponse.render()
 
-    Sets :attr:`response.content` to the result obtained by
+    Sets ``response.content`` to the result obtained by
     :attr:`SimpleTemplateResponse.rendered_content`, runs all post-rendering
     callbacks, and returns the resulting response object.
 
-    :meth:`~SimpleTemplateResponse.render()` will only have an effect
-    the first time it is called. On subsequent calls, it will return
-    the result obtained from the first call.
+    ``render()`` will only have an effect the first time it is called. On
+    subsequent calls, it will return the result obtained from the first call.
 
 
 TemplateResponse objects
@@ -188,24 +187,23 @@ returned to the client, it must be rendered. The rendering process takes the
 intermediate representation of template and context, and turns it into the
 final byte stream that can be served to the client.
 
-There are three circumstances under which a TemplateResponse will be
+There are three circumstances under which a ``TemplateResponse`` will be
 rendered:
 
-* When the TemplateResponse instance is explicitly rendered, using
+* When the ``TemplateResponse`` instance is explicitly rendered, using
   the :meth:`SimpleTemplateResponse.render()` method.
 
 * When the content of the response is explicitly set by assigning
-  :attr:`response.content`.
+  ``response.content``.
 
 * After passing through template response middleware, but before
   passing through response middleware.
 
-A TemplateResponse can only be rendered once. The first call to
-:meth:`SimpleTemplateResponse.render` sets the content of the
-response; subsequent rendering calls do not change the response
-content.
+A ``TemplateResponse`` can only be rendered once. The first call to
+:meth:`SimpleTemplateResponse.render` sets the content of the response;
+subsequent rendering calls do not change the response content.
 
-However, when :attr:`response.content` is explicitly assigned, the
+However, when ``response.content`` is explicitly assigned, the
 change is always applied. If you want to force the content to be
 re-rendered, you can re-evaluate the rendered content, and assign
 the content of the response manually::

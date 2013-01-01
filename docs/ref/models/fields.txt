@@ -113,7 +113,7 @@ define a suitably-named constant for each value::
                                           default=FRESHMAN)
 
         def is_upperclass(self):
-	    return self.year_in_school in (self.JUNIOR, self.SENIOR)
+            return self.year_in_school in (self.JUNIOR, self.SENIOR)
 
 Though you can define a choices list outside of a model class and then
 refer to it, defining the choices and names for each choice inside the
@@ -509,8 +509,8 @@ Has one **required** argument:
 .. attribute:: FileField.upload_to
 
     A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
-    setting to determine the value of the :attr:`~django.core.files.File.url`
-    attribute.
+    setting to determine the value of the
+    :attr:`~django.db.models.fields.files.FieldFile.url` attribute.
 
     This path may contain :func:`~time.strftime` formatting, which will be
     replaced by the date/time of the file upload (so that uploaded files don't
@@ -564,9 +564,9 @@ takes a few steps:
 
 3. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-   convenience :attr:`~django.core.files.File.url` function provided by
-   Django. For example, if your :class:`ImageField` is called ``mug_shot``,
-   you can get the absolute path to your image in a template with
+   convenience :attr:`~django.db.models.fields.files.FieldFile.url` attribute
+   provided by Django. For example, if your :class:`ImageField` is called
+   ``mug_shot``, you can get the absolute path to your image in a template with
    ``{{ object.mug_shot.url }}``.
 
 For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
@@ -589,7 +589,7 @@ topic guide.
     saved.
 
 The uploaded file's relative URL can be obtained using the
-:attr:`~django.db.models.FileField.url` attribute. Internally,
+:attr:`~django.db.models.fields.files.FieldFile.url` attribute. Internally,
 this calls the :meth:`~django.core.files.storage.Storage.url` method of the
 underlying :class:`~django.core.files.storage.Storage` class.
 
@@ -614,9 +614,20 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 FileField and FieldFile
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When you access a :class:`FileField` on a model, you are given an instance
-of :class:`FieldFile` as a proxy for accessing the underlying file. This
-class has several methods that can be used to interact with file data:
+.. currentmodule:: django.db.models.fields.files
+
+.. class:: FieldFile
+
+When you access a :class:`~django.db.models.FileField` on a model, you are
+given an instance of :class:`FieldFile` as a proxy for accessing the underlying
+file. This class has several attributes and methods that can be used to
+interact with file data:
+
+.. attribute:: FieldFile.url
+
+A read-only property to access the file's relative URL by calling the
+:meth:`~django.core.files.storage.Storage.url` method of the underlying
+:class:`~django.core.files.storage.Storage` class.
 
 .. method:: FieldFile.open(mode='rb')
 
@@ -632,9 +643,9 @@ associated with this instance.
 
 This method takes a filename and file contents and passes them to the storage
 class for the field, then associates the stored file with the model field.
-If you want to manually associate file data with :class:`FileField`
-instances on your model, the ``save()`` method is used to persist that file
-data.
+If you want to manually associate file data with
+:class:`~django.db.models.FileField` instances on your model, the ``save()``
+method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
 ``content`` which is an object containing the file's contents.  The
@@ -671,6 +682,8 @@ Note that when a model is deleted, related files are not deleted. If you need
 to cleanup orphaned files, you'll need to handle it yourself (for instance,
 with a custom management command that can be run manually or scheduled to run
 periodically via e.g. cron).
+
+.. currentmodule:: django.db.models
 
 ``FilePathField``
 -----------------
@@ -759,8 +772,7 @@ Inherits all attributes and methods from :class:`FileField`, but also
 validates that the uploaded object is a valid image.
 
 In addition to the special attributes that are available for :class:`FileField`,
-an :class:`ImageField` also has :attr:`~django.core.files.File.height` and
-:attr:`~django.core.files.File.width` attributes.
+an :class:`ImageField` also has ``height`` and ``width`` attributes.
 
 To facilitate querying on those attributes, :class:`ImageField` has two extra
 optional arguments:
@@ -1047,26 +1059,36 @@ define the details of how the relation works.
 
         user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
-    The possible values for :attr:`on_delete` are found in
-    :mod:`django.db.models`:
+The possible values for :attr:`~ForeignKey.on_delete` are found in
+:mod:`django.db.models`:
 
-    * :attr:`~django.db.models.CASCADE`: Cascade deletes; the default.
+* .. attribute:: CASCADE
 
-    * :attr:`~django.db.models.PROTECT`: Prevent deletion of the referenced
-      object by raising :exc:`django.db.models.ProtectedError`, a subclass of
-      :exc:`django.db.IntegrityError`.
+    Cascade deletes; the default.
 
-    * :attr:`~django.db.models.SET_NULL`: Set the :class:`ForeignKey` null;
-      this is only possible if :attr:`null` is ``True``.
+* .. attribute:: PROTECT
 
-    * :attr:`~django.db.models.SET_DEFAULT`: Set the :class:`ForeignKey` to its
-      default value; a default for the :class:`ForeignKey` must be set.
+    Prevent deletion of the referenced object by raising
+    :exc:`~django.db.models.ProtectedError`, a subclass of
+    :exc:`django.db.IntegrityError`.
 
-    * :func:`~django.db.models.SET()`: Set the :class:`ForeignKey` to the value
-      passed to :func:`~django.db.models.SET()`, or if a callable is passed in,
-      the result of calling it. In most cases, passing a callable will be
-      necessary to avoid executing queries at the time your models.py is
-      imported::
+* .. attribute:: SET_NULL
+
+    Set the :class:`ForeignKey` null; this is only possible if
+    :attr:`~Field.null` is ``True``.
+
+* .. attribute:: SET_DEFAULT
+
+    Set the :class:`ForeignKey` to its default value; a default for the
+    :class:`ForeignKey` must be set.
+
+* .. function:: SET()
+
+    Set the :class:`ForeignKey` to the value passed to
+    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    the result of calling it. In most cases, passing a callable will be
+    necessary to avoid executing queries at the time your models.py is
+    imported::
 
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
@@ -1074,11 +1096,12 @@ define the details of how the relation works.
         class MyModel(models.Model):
             user = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user))
 
-    * :attr:`~django.db.models.DO_NOTHING`: Take no action. If your database
-      backend enforces referential integrity, this will cause an
-      :exc:`~django.db.IntegrityError` unless you manually add a SQL ``ON
-      DELETE`` constraint to the database field (perhaps using
-      :ref:`initial sql<initial-sql>`).
+* .. attribute:: DO_NOTHING
+
+    Take no action. If your database backend enforces referential
+    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
+    you manually add a SQL ``ON DELETE`` constraint to the database field
+    (perhaps using :ref:`initial sql<initial-sql>`).
 
 .. _ref-manytomany:
 

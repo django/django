@@ -2,9 +2,7 @@
 The Forms API
 =============
 
-.. module:: django.forms.forms
-
-.. currentmodule:: django.forms
+.. module:: django.forms
 
 .. admonition:: About this document
 
@@ -380,6 +378,9 @@ a form object, and each rendering method returns a Unicode object.
 Styling required or erroneous form rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. attribute:: Form.error_css_class
+.. attribute:: Form.required_css_class
+
 It's pretty common to style form rows and fields that are required or have
 errors. For example, you might want to present required form rows in bold and
 highlight errors in red.
@@ -587,24 +588,24 @@ lazy developers -- they're not the only way a form object can be displayed.
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
 
-   The :meth:`__unicode__` and :meth:`__str__` methods of this object displays
+   The ``__unicode__()`` and ``__str__()`` methods of this object displays
    the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key::
 
-	>>> form = ContactForm()
-	>>> print(form['subject'])
-	<input id="id_subject" type="text" name="subject" maxlength="100" />
+    >>> form = ContactForm()
+    >>> print(form['subject'])
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
 
 To retrieve all ``BoundField`` objects, iterate the form::
 
-	>>> form = ContactForm()
-	>>> for boundfield in form: print(boundfield)
-	<input id="id_subject" type="text" name="subject" maxlength="100" />
-	<input type="text" name="message" id="id_message" />
-	<input type="text" name="sender" id="id_sender" />
-	<input type="checkbox" name="cc_myself" id="id_cc_myself" />
+    >>> form = ContactForm()
+    >>> for boundfield in form: print(boundfield)
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    <input type="text" name="message" id="id_message" />
+    <input type="text" name="sender" id="id_sender" />
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
 
 The field-specific output honors the form object's ``auto_id`` setting::
 
@@ -635,7 +636,7 @@ For a field's list of errors, access the field's ``errors`` attribute.
         >>> print(f['subject'].errors)
 
         >>> str(f['subject'].errors)
-	    ''
+        ''
 
 .. method:: BoundField.css_classes()
 
@@ -644,17 +645,17 @@ indicate required form fields or fields that contain errors. If you're
 manually rendering a form, you can access these CSS classes using the
 ``css_classes`` method::
 
-	>>> f = ContactForm(data)
-	>>> f['message'].css_classes()
-	'required'
+    >>> f = ContactForm(data)
+    >>> f['message'].css_classes()
+    'required'
 
 If you want to provide some additional classes in addition to the
 error and required classes that may be required, you can provide
 those classes as an argument::
 
-	>>> f = ContactForm(data)
-	>>> f['message'].css_classes('foo bar')
-	'foo bar required'
+    >>> f = ContactForm(data)
+    >>> f['message'].css_classes('foo bar')
+    'foo bar required'
 
 .. method:: BoundField.value()
 
