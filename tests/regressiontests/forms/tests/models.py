@@ -125,7 +125,7 @@ class ModelFormCallableModelDefault(TestCase):
 
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
-        # FileModel with unicode filename and data #########################
+        # FileModel with unicode filename and data
         f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))}, auto_id=False)
         self.assertTrue(f.is_valid())
         self.assertTrue('file1' in f.cleaned_data)
@@ -133,8 +133,12 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(m.file.name, 'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
         m.delete()
 
+    def test_incorrect_instance_raises_exception(self):
+        # ModelForm with incorrect instance raises ValueError on init
+        self.assertRaises(ValueError, ChoiceFieldForm, instance=Group)
+
     def test_boundary_conditions(self):
-        # Boundary conditions on a PostitiveIntegerField #########################
+        # Boundary conditions on a PostitiveIntegerField
         class BoundaryForm(ModelForm):
             class Meta:
                 model = BoundaryModel
@@ -147,7 +151,7 @@ class FormsModelTestCase(TestCase):
         self.assertFalse(f.is_valid())
 
     def test_formfield_initial(self):
-        # Formfield initial values ########
+        # Formfield initial values
         # If the model has default values for some fields, they are used as the formfield
         # initial values.
         class DefaultsForm(ModelForm):

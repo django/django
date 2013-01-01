@@ -235,6 +235,9 @@ class BaseModelForm(BaseForm):
             self.instance = opts.model()
             object_data = {}
         else:
+            if not isinstance(instance, opts.model):
+                raise ValueError('"instance" must be an instance of {0}'.format(
+                                    opts.model._meta.object_name))
             self.instance = instance
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
         # if initial was provided, it should override the values from instance
