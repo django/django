@@ -46,3 +46,21 @@ Backwards incompatible changes in 1.6
 
 Features deprecated in 1.6
 ==========================
+
+``SEND_BROKEN_LINK_EMAILS`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.middleware.common.CommonMiddleware` used to provide basic
+reporting of broken links by email when ``SEND_BROKEN_LINK_EMAILS`` is set to
+``True``.
+
+Because of intractable ordering problems between
+:class:`~django.middleware.common.CommonMiddleware` and
+:class:`~django.middleware.locale.LocaleMiddleware`, this feature was split
+out into a new middleware:
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware`.
+
+If you're relying on this feature, you should add
+``'django.middleware.common.BrokenLinkEmailsMiddleware'`` to your
+:setting:`MIDDLEWARE_CLASSES` setting and remove ``SEND_BROKEN_LINK_EMAILS``
+from your settings.

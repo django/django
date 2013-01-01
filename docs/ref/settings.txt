@@ -1090,8 +1090,9 @@ query string, if any). Use this if your site does not provide a commonly
 requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
 hammered by script kiddies.
 
-This is only used if :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True`` and
-``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
+This is only used if
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
+:doc:`/topics/http/middleware`).
 
 .. setting:: INSTALLED_APPS
 
@@ -1250,7 +1251,8 @@ MANAGERS
 Default: ``()`` (Empty tuple)
 
 A tuple in the same format as :setting:`ADMINS` that specifies who should get
-broken-link notifications when :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``.
+broken link notifications when
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
 .. setting:: MEDIA_ROOT
 
@@ -1447,6 +1449,11 @@ available in ``request.META``.)
 
 SEND_BROKEN_LINK_EMAILS
 -----------------------
+
+.. deprecated:: 1.6
+    Since :class:`~django.middleware.common.BrokenLinkEmailsMiddleware`
+    was split from :class:`~django.middleware.common.CommonMiddleware`,
+    this setting no longer serves a purpose.
 
 Default: ``False``
 

@@ -146,7 +146,7 @@ FILE_CHARSET = 'utf-8'
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
-# Whether to send broken-link emails.
+# Whether to send broken-link emails. Deprecated, must be removed in 1.8.
 SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info. If left empty, will default to the dummy backend.
@@ -245,7 +245,7 @@ ALLOWED_INCLUDE_ROOTS = ()
 ADMIN_FOR = ()
 
 # List of compiled regular expression objects representing URLs that need not
-# be reported when SEND_BROKEN_LINK_EMAILS is True. Here are a few examples:
+# be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re
 #    IGNORABLE_404_URLS = (
 #        re.compile(r'^/apple-touch-icon.*\.png$'),

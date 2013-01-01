@@ -308,6 +308,13 @@ these changes.
 * The ``depth`` keyword argument will be removed from
   :meth:`~django.db.models.query.QuerySet.select_related`.
 
+1.8
+---
+
+* The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
+  :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
+  your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
 2.0
 ---
 
