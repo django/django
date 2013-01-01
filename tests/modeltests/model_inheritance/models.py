@@ -41,9 +41,6 @@ class Student(CommonInfo):
     class Meta:
         pass
 
-class StudentWorker(Student, Worker):
-    pass
-
 #
 # Abstract base classes with related models
 #
