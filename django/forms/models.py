@@ -418,6 +418,7 @@ class BaseModelFormSet(BaseFormSet):
         self.initial_extra = kwargs.pop('initial', None)
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         defaults.update(kwargs)
+        self._deleted_object_pks = []
         super(BaseModelFormSet, self).__init__(**defaults)
 
     def initial_form_count(self):
@@ -599,6 +600,11 @@ class BaseModelFormSet(BaseFormSet):
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
 
+            # check if this object was deleted already,
+            # skip this form if it was deleted. See #17988
+            if raw_pk_value in self._deleted_object_pks:
+                continue
+
             # clean() for different types of PK fields can sometimes return
             # the model instance, and sometimes the PK. Handle either.
             pk_value = form.fields[pk_name].clean(raw_pk_value)
@@ -607,6 +613,7 @@ class BaseModelFormSet(BaseFormSet):
             obj = self._existing_object(pk_value)
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
+                self._deleted_object_pks.append(unicode(obj.pk))
                 obj.delete()
                 continue
             if form.has_changed():
