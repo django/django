@@ -19,7 +19,7 @@ def timesince(d, now=None, reversed=False):
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
-      (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
+      (60 * 60 * 24 * 365.2425, lambda n: ungettext('year', 'years', n)),
       (60 * 60 * 24 * 30, lambda n: ungettext('month', 'months', n)),
       (60 * 60 * 24 * 7, lambda n : ungettext('week', 'weeks', n)),
       (60 * 60 * 24, lambda n : ungettext('day', 'days', n)),
