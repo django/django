@@ -19,8 +19,8 @@ else:
 
 # Getting the path to the GeoIP library.
 if lib_name: lib_path = find_library(lib_name)
-if lib_path is None: raise GeoIPException('Could not find the GeoIP library (tried "%s"). '
-                                          'Try setting GEOIP_LIBRARY_PATH in your settings.' % lib_name)
+if lib_path is None: raise RuntimeError('Could not find the GeoIP library (tried "%s"). '
+                                        'Try setting GEOIP_LIBRARY_PATH in your settings.' % lib_name)
 lgeoip = CDLL(lib_path)
 
 # Getting the C `free` for the platform.
