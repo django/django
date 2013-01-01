@@ -576,7 +576,7 @@ with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
 long as the :setting:`DEBUG` setting is set to ``False``.
 
 All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
-`True` are sent ot the console. They are simply discarded (sent to
+`True` are sent to the console. They are simply discarded (sent to
 ``NullHandler``) when :setting:`DEBUG` is `False`.
 
 .. versionchanged:: 1.5
