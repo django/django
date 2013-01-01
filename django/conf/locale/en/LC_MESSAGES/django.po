@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-23 22:54+0100\n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -383,16 +383,16 @@ msgid ""
 "%(show_value)d)."
 msgstr ""
 
-#: db/models/base.py:843
+#: db/models/base.py:857
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 
-#: db/models/base.py:866 forms/models.py:573
+#: db/models/base.py:880 forms/models.py:573
 msgid "and"
 msgstr ""
 
-#: db/models/base.py:867 db/models/fields/__init__.py:70
+#: db/models/base.py:881 db/models/fields/__init__.py:70
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
@@ -564,16 +564,11 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: db/models/fields/files.py:211
-#, python-format
-msgid "Filename is %(extra)d characters too long."
-msgstr ""
-
-#: db/models/fields/files.py:221
+#: db/models/fields/files.py:216
 msgid "File"
 msgstr ""
 
-#: db/models/fields/files.py:347
+#: db/models/fields/files.py:323
 msgid "Image"
 msgstr ""
 
@@ -675,15 +670,15 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: forms/fields.py:747 forms/fields.py:835 forms/models.py:999
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr ""
 
-#: forms/formsets.py:325 forms/formsets.py:327
+#: forms/formsets.py:324 forms/formsets.py:326
 msgid "Order"
 msgstr ""
 
-#: forms/formsets.py:329
+#: forms/formsets.py:328
 msgid "Delete"
 msgstr ""
 
@@ -708,20 +703,20 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: forms/models.py:849
+#: forms/models.py:852
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:910
+#: forms/models.py:913
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1000
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1002
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
@@ -745,15 +740,15 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: forms/widgets.py:591
+#: forms/widgets.py:594
 msgid "Unknown"
 msgstr ""
 
-#: forms/widgets.py:592
+#: forms/widgets.py:595
 msgid "Yes"
 msgstr ""
 
-#: forms/widgets.py:593
+#: forms/widgets.py:596
 msgid "No"
 msgstr ""
 
