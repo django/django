@@ -47,6 +47,10 @@ class TimesinceTests(unittest.TestCase):
             self.t+2*self.oneday+6*self.onehour), '2 days, 6 hours')
         self.assertEqual(timesince(self.t,
             self.t+2*self.oneweek+2*self.oneday), '2 weeks, 2 days')
+        self.assertEqual(timesince(self.t,
+            self.t+2*self.oneyear+3*self.onemonth), '2 years, 3 months')
+        self.assertEqual(timesince(self.t,
+            self.t+2*self.oneyear+9*self.onemonth), '2 years, 9 months')
 
     def test_display_first_unit(self):
         """
