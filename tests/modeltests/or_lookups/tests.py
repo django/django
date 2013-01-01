@@ -209,6 +209,12 @@ class OrLookupsTests(TestCase):
             attrgetter("headline")
         )
 
+    def test_nested_q(self):
+        self.assertEqual(
+            Article.objects.get(headline=Q(startswith='Hello') & Q(endswith='goodbye')).headline,
+            'Hello and goodbye'
+        )
+
     def test_other_arg_queries(self):
         # Try some arg queries with operations other than filter.
         self.assertEqual(

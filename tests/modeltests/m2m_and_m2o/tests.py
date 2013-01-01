@@ -76,7 +76,6 @@ class RelatedObjectTests(TestCase):
             lambda i: i.num
         )
 
-class RelatedObjectTests(TestCase):
     def test_m2m_with_unicode_reference(self):
         """
         Regression test for #6045: references to other models can be unicode
@@ -88,3 +87,27 @@ class RelatedObjectTests(TestCase):
         m2.save()
         list(m2.others.all()) # Force retrieval.
 
+
+    def test_nested_q(self):
+        r = User.objects.create(username="russell")
+        g = User.objects.create(username="gustav")
+        p = User.objects.create(username="peter")
+
+        i1 = Issue.objects.create(num=1, client=r)
+        i2 = Issue.objects.create(num=2, client=p)
+        i2.cc.add(r)
+        i3 = Issue.objects.create(num=3, client=g)
+        i3.cc.add(p)
+
+        self.assertQuerysetEqual(
+            Issue.objects.filter(client=Q(username="russell")), 
+            [1],
+            lambda i: i.num,
+        )
+
+        russell_or_peter = Q(username="russell") | Q(username="peter")
+        self.assertQuerysetEqual(
+            Issue.objects.filter(cc=russell_or_peter, client=russell_or_peter),
+            [2],
+            lambda i: i.num,
+        )

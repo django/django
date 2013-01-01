@@ -828,6 +828,12 @@ precede the definition of any keyword arguments. For example::
 
 ... would not be valid.
 
+``Q`` objects can be nested to factor out common prefixes from keyword arguments. 
+The following expressions are equivalent::
+
+    >>> Blog.objects.filter(Q(entry__rating=5) & Q(entry__pub_date__year=2012))
+    >>> Blog.objects.filter(entry=Q(rating=5) & Q(pub_date__year=2012))
+
 .. seealso::
 
     The `OR lookups examples`_ in the Django unit tests show some possible uses

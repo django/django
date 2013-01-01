@@ -41,7 +41,23 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        children = list(args)
+        for name, value in six.iteritems(kwargs):
+            if isinstance(value, Q):
+                children.append(value._push(name))
+            else:
+                children.append((name, value))
+        super(Q, self).__init__(children=children)
+
+    def _push(self, lookup):
+        children = []
+        for child in self.children:
+            if isinstance(child, Q):
+                children.append(child._push(lookup))
+            else:
+                name, value = child
+                children.append(('%s__%s' % (lookup, name), value))
+        return self._new_instance(children, self.connector, self.negated)
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
