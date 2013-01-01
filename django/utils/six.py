@@ -1,5 +1,24 @@
 """Utilities for writing code that runs on Python 2 and 3"""
 
+# Copyright (c) 2010-2012 Benjamin Peterson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import operator
 import sys
 import types
@@ -26,7 +45,7 @@ else:
     text_type = unicode
     binary_type = str
 
-    if sys.platform == "java":
+    if sys.platform.startswith("java"):
         # Jython always uses 32 bits.
         MAXSIZE = int((1 << 31) - 1)
     else:
@@ -133,6 +152,9 @@ _moved_attributes = [
     MovedModule("html_entities", "htmlentitydefs", "html.entities"),
     MovedModule("html_parser", "HTMLParser", "html.parser"),
     MovedModule("http_client", "httplib", "http.client"),
+    MovedModule("email_mime_multipart", "email.MIMEMultipart", "email.mime.multipart"),
+    MovedModule("email_mime_text", "email.MIMEText", "email.mime.text"),
+    MovedModule("email_mime_base", "email.MIMEBase", "email.mime.base"),
     MovedModule("BaseHTTPServer", "BaseHTTPServer", "http.server"),
     MovedModule("CGIHTTPServer", "CGIHTTPServer", "http.server"),
     MovedModule("SimpleHTTPServer", "SimpleHTTPServer", "http.server"),
@@ -164,7 +186,7 @@ for attr in _moved_attributes:
     setattr(_MovedItems, attr.name, attr)
 del attr
 
-moves = sys.modules["django.utils.six.moves"] = _MovedItems("moves")
+moves = sys.modules[__name__ + ".moves"] = _MovedItems("moves")
 
 
 def add_move(move):
