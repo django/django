@@ -38,7 +38,7 @@ The FileSystemStorage Class
 
     .. note::
 
-        The :class:`FileSystemStorage.delete` method will not raise
+        The ``FileSystemStorage.delete()`` method will not raise
         raise an exception if the given file name does not exist.
 
 The Storage Class

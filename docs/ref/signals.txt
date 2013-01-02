@@ -436,9 +436,8 @@ Sent when Django begins processing an HTTP request.
 Arguments sent with this signal:
 
 ``sender``
-    The handler class -- e.g.
-    :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
-    the request.
+    The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
+    handled the request.
 
 request_finished
 ----------------
@@ -496,7 +495,7 @@ setting_changed
    :module:
 
 This signal is sent when the value of a setting is changed through the
-:meth:`django.test.TestCase.setting` context manager or the
+``django.test.TestCase.settings()`` context manager or the
 :func:`django.test.utils.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
@@ -558,8 +557,8 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
-    :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
+    ``django.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
+    ``django.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``
     The database connection that was opened. This can be used in a

@@ -888,10 +888,10 @@ object, Django raises an exception.
 ``MySQLdb``-specific exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The MySQL backend historically has raised :class:`MySQLdb.OperationalError`
+The MySQL backend historically has raised ``MySQLdb.OperationalError``
 when a query triggered an exception. We've fixed this bug, and we now raise
 :exc:`django.db.DatabaseError` instead. If you were testing for
-:class:`MySQLdb.OperationalError`, you'll need to update your ``except``
+``MySQLdb.OperationalError``, you'll need to update your ``except``
 clauses.
 
 Database connection's thread-locality

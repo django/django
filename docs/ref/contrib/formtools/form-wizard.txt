@@ -54,7 +54,8 @@ you just have to do these things:
 4. Add ``django.contrib.formtools`` to your
    :setting:`INSTALLED_APPS` list in your settings file.
 
-5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view` method.
+5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view`
+   method.
 
 Defining ``Form`` classes
 -------------------------
@@ -88,6 +89,9 @@ the message itself. Here's what the :file:`forms.py` might look like::
 
 Creating a ``WizardView`` subclass
 ----------------------------------
+
+.. class:: SessionWizardView
+.. class:: CookieWizardView
 
 The next step is to create a
 :class:`django.contrib.formtools.wizard.views.WizardView` subclass. You can
@@ -225,9 +229,11 @@ Here's a full example template:
 Hooking the wizard into a URLconf
 ---------------------------------
 
+.. method:: WizardView.as_view
+
 Finally, we need to specify which forms to use in the wizard, and then
 deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
-wizard's :meth:`as_view` method takes a list of your
+wizard's ``as_view()`` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 
     from django.conf.urls import patterns
@@ -346,9 +352,9 @@ Advanced ``WizardView`` methods
     used as the form for step ``step``.
 
     Returns an :class:`~django.db.models.Model` object which will be passed as
-    the :attr:`~django.forms.ModelForm.instance` argument when instantiating the
-    ModelForm for step ``step``.  If no instance object was provided while
-    initializing the form wizard, ``None`` will be returned.
+    the ``instance`` argument when instantiating the ``ModelForm`` for step
+    ``step``.  If no instance object was provided while initializing the form
+    wizard, ``None`` will be returned.
 
     The default implementation::
 
@@ -514,10 +520,10 @@ Providing initial data for the forms
 .. attribute:: WizardView.initial_dict
 
     Initial data for a wizard's :class:`~django.forms.Form` objects can be
-    provided using the optional :attr:`~Wizard.initial_dict` keyword argument.
-    This argument should be a dictionary mapping the steps to dictionaries
-    containing the initial data for each step. The dictionary of initial data
-    will be passed along to the constructor of the step's
+    provided using the optional :attr:`~WizardView.initial_dict` keyword
+    argument. This argument should be a dictionary mapping the steps to
+    dictionaries containing the initial data for each step. The dictionary of
+    initial data will be passed along to the constructor of the step's
     :class:`~django.forms.Form`::
 
         >>> from myapp.forms import ContactForm1, ContactForm2
@@ -542,11 +548,13 @@ Providing initial data for the forms
 Handling files
 ==============
 
+.. attribute:: WizardView.file_storage
+
 To handle :class:`~django.forms.FileField` within any step form of the wizard,
-you have to add a :attr:`file_storage` to your :class:`WizardView` subclass.
+you have to add a ``file_storage`` to your :class:`WizardView` subclass.
 
 This storage will temporarily store the uploaded files for the wizard. The
-:attr:`file_storage` attribute should be a
+``file_storage`` attribute should be a
 :class:`~django.core.files.storage.Storage` subclass.
 
 Django provides a built-in storage class (see :ref:`the built-in filesystem
@@ -646,6 +654,8 @@ Usage of ``NamedUrlWizardView``
 ===============================
 
 .. class:: NamedUrlWizardView
+.. class:: NamedUrlSessionWizardView
+.. class:: NamedUrlCookieWizardView
 
 There is a :class:`WizardView` subclass which adds named-urls support to the
 wizard. By doing this, you can have single urls for every step. You can also

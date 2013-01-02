@@ -33,7 +33,7 @@ STATICFILES_DIRS
 Default: ``[]``
 
 This setting defines the additional locations the staticfiles app will traverse
-if the :class:`FileSystemFinder` finder is enabled, e.g. if you use the
+if the ``FileSystemFinder`` finder is enabled, e.g. if you use the
 :djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
 static file serving view.
 
@@ -101,19 +101,19 @@ The list of finder backends that know how to find static files in
 various locations.
 
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
-(using :class:`django.contrib.staticfiles.finders.FileSystemFinder`) and in a
+(using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-:class:`django.contrib.staticfiles.finders.AppDirectoriesFinder`)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
 
 One finder is disabled by default:
-:class:`django.contrib.staticfiles.finders.DefaultStorageFinder`. If added to
+``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
 your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
 the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
 setting.
 
 .. note::
 
-    When using the :class:`AppDirectoriesFinder` finder, make sure your apps
+    When using the ``AppDirectoriesFinder`` finder, make sure your apps
     can be found by staticfiles. Simply add the app to the
     :setting:`INSTALLED_APPS` setting of your site.
 

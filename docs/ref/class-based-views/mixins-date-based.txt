@@ -100,7 +100,7 @@ MonthMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-    .. method:: get_prev_month(date)
+    .. method:: get_previous_month(date)
 
         Returns a date object containing the first day of the month before the
         date provided. This function can also return ``None`` or raise an
@@ -152,7 +152,7 @@ DayMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-    .. method:: get_prev_day(date)
+    .. method:: get_previous_day(date)
 
         Returns a date object containing the previous valid day. This function
         can also return ``None`` or raise an :class:`~django.http.Http404`
@@ -287,8 +287,9 @@ BaseDateListView
         available. If this is ``True`` and no objects are available, the view
         will display an empty page instead of raising a 404.
 
-        This is identical to :attr:`MultipleObjectMixin.allow_empty`, except
-        for the default value, which is ``False``.
+        This is identical to
+        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        except for the default value, which is ``False``.
 
     .. attribute:: date_list_period
 

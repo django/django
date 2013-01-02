@@ -453,7 +453,7 @@ Generic relations in forms and admin
 ------------------------------------
 
 The :mod:`django.contrib.contenttypes.generic` module provides
-:class:`~django.contrib.contenttypes.generic.BaseGenericInlineFormSet`,
+``BaseGenericInlineFormSet``,
 :class:`~django.contrib.contenttypes.generic.GenericTabularInline`
 and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
 (the last two are subclasses of
@@ -480,3 +480,9 @@ information.
 
         The name of the integer field that represents the ID of the related
         object. Defaults to ``object_id``.
+
+.. class:: GenericTabularInline
+.. class:: GenericStackedInline
+
+    Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
+    layouts, respectively.

@@ -141,7 +141,7 @@ error log record will be written.
 Naming loggers
 --------------
 
-The call to :meth:`logging.getLogger()` obtains (creating, if
+The call to :func:`logging.getLogger()` obtains (creating, if
 necessary) an instance of a logger. The logger instance is identified
 by a name. This name is used to identify the logger for configuration
 purposes.
@@ -242,7 +242,7 @@ An example
 The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here is an example of a fairly
-complex logging setup, configured using :meth:`logging.dictConfig`::
+complex logging setup, configured using :func:`logging.config.dictConfig`::
 
     LOGGING = {
         'version': 1,
@@ -317,12 +317,12 @@ This logging configuration does the following things:
     message, plus the time, process, thread and module that
     generate the log message.
 
-* Defines one filter -- :class:`project.logging.SpecialFilter`,
+* Defines one filter -- ``project.logging.SpecialFilter``,
   using the alias ``special``. If this filter required additional
   arguments at time of construction, they can be provided as
   additional keys in the filter configuration dictionary. In this
   case, the argument ``foo`` will be given a value of ``bar`` when
-  instantiating the :class:`SpecialFilter`.
+  instantiating the ``SpecialFilter``.
 
 * Defines three handlers:
 
@@ -365,7 +365,7 @@ logger, you can specify your own configuration scheme.
 
 The :setting:`LOGGING_CONFIG` setting defines the callable that will
 be used to configure Django's loggers. By default, it points at
-Python's :meth:`logging.dictConfig()` method. However, if you want to
+Python's :func:`logging.config.dictConfig()` function. However, if you want to
 use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
 be provided as the value of that argument when logging is configured.
@@ -509,7 +509,7 @@ logging module.
    through the filter. Handling of that record will not proceed if the callback
    returns False.
 
-   For instance, to filter out :class:`~django.http.UnreadablePostError`
+   For instance, to filter out :exc:`~django.http.UnreadablePostError`
    (raised when a user cancels an upload) from the admin emails, you would
    create a filter function::
 

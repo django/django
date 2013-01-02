@@ -19,22 +19,22 @@ DetailView
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_template_names()`
-    4. :meth:`get_slug_field()`
-    5. :meth:`get_queryset()`
-    6. :meth:`get_object()`
-    7. :meth:`get_context_object_name()`
-    8. :meth:`get_context_data()`
-    9. :meth:`get()`
-    10. :meth:`render_to_response()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    4. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
+    5. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
+    6. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+    7. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
+    8. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
+    9. ``get()``
+    10. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example views.py**::
 
@@ -86,14 +86,14 @@ ListView
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_template_names()`
-    4. :meth:`get_queryset()`
-    5. :meth:`get_objects()`
-    6. :meth:`get_context_data()`
-    7. :meth:`get()`
-    8. :meth:`render_to_response()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    4. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
+    5. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
+    6. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
+    7. ``get()``
+    8. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
 
     **Example views.py**::
@@ -140,7 +140,7 @@ ListView
 
     .. method:: get(request, *args, **kwargs)
 
-        Adds :attr:`object_list` to the context. If
+        Adds ``object_list`` to the context. If
         :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty`
         is True then display an empty list. If
         :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` is
