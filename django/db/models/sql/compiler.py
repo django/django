@@ -30,7 +30,7 @@ class SQLCompiler(object):
         # cleaned. We are not using a clone() of the query here.
         """
         if not self.query.tables:
-            self.query.join((None, self.query.model._meta.db_table, None, None))
+            self.query.join((None, self.query.model._meta.db_table, None))
         if (not self.query.select and self.query.default_cols and not
                 self.query.included_inherited_models):
             self.query.setup_inherited_models()
@@ -465,11 +465,11 @@ class SQLCompiler(object):
         if alias:
             while 1:
                 join = self.query.alias_map[alias]
-                if col != join.rhs_join_col:
+                if col != join.join_cols[0][1]:
                     break
                 self.query.unref_alias(alias)
                 alias = join.lhs_alias
-                col = join.lhs_join_col
+                col = join.join_cols[0][0]
         return col, alias
 
     def get_from_clause(self):
@@ -492,7 +492,7 @@ class SQLCompiler(object):
             if not self.query.alias_refcount[alias]:
                 continue
             try:
-                name, alias, join_type, lhs, lhs_col, col, _, join_field = self.query.alias_map[alias]
+                name, alias, join_type, lhs, join_cols, _, join_field = self.query.alias_map[alias]
             except KeyError:
                 # Extra tables can end up in self.tables, but not in the
                 # alias_map if they aren't in a join. That's OK. We skip them.
@@ -505,9 +505,14 @@ class SQLCompiler(object):
                     from_params.extend(extra_params)
                 else:
                     extra_cond = ""
-                result.append('%s %s%s ON (%s.%s = %s.%s%s)' %
-                              (join_type, qn(name), alias_str, qn(lhs),
-                               qn2(lhs_col), qn(alias), qn2(col), extra_cond))
+                result.append('%s %s%s ON ('
+                        % (join_type, qn(name), alias_str))
+                for index, (lhs_col, rhs_col) in enumerate(join_cols):
+                    if index != 0:
+                        result.append(' AND ')
+                    result.append('%s.%s = %s.%s' %
+                    (qn(lhs), qn2(lhs_col), qn(alias), qn2(rhs_col)))
+                result.append('%s)' % extra_cond)
             else:
                 connector = not first and ', ' or ''
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
@@ -609,9 +614,8 @@ class SQLCompiler(object):
             table = f.rel.to._meta.db_table
             promote = nullable or f.null
             alias = self.query.join_parent_model(opts, model, root_alias, {})
-
-            alias = self.query.join((alias, table, f.column,
-                    f.rel.get_related_field().column),
+            join_cols = f.get_joining_columns()
+            alias = self.query.join((alias, table, join_cols),
                     promote=promote, join_field=f)
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
@@ -639,7 +643,7 @@ class SQLCompiler(object):
                 alias = self.query.join_parent_model(opts, f.rel.to, root_alias, {})
                 table = model._meta.db_table
                 alias = self.query.join(
-                    (alias, table, f.rel.get_related_field().column, f.column),
+                    (alias, table, f.get_joining_columns(reverse_join=True)),
                     promote=True, join_field=f
                 )
                 from_parent = (opts.model if issubclass(model, opts.model)
