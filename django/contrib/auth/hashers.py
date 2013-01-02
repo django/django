@@ -51,8 +51,11 @@ def check_password(password, encoded, setter=None, preferred='default'):
     preferred = get_hasher(preferred)
     hasher = identify_hasher(encoded)
 
-    must_update = hasher.algorithm != preferred.algorithm
+    must_update = (
+        hasher.algorithm != preferred.algorithm or
+        not hasher.is_current(encoded))
     is_correct = hasher.verify(password, encoded)
+    
     if setter and is_correct and must_update:
         setter(password)
     return is_correct
@@ -176,6 +179,13 @@ class BasePasswordHasher(object):
         raise ValueError("Hasher '%s' doesn't specify a library attribute" %
                          self.__class__)
 
+    def is_current(self):
+        """
+        Determines whether or not a password needs to be reencoded based on 
+        arbitrary criteria defined by the Hasher
+        """
+        return True
+
     def salt(self):
         """
         Generates a cryptographically secure nonce salt in ascii
@@ -216,8 +226,12 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 10000
+    iterations = getattr(settings, 'PBKDF2_ITERATIONS', 10000)
     digest = hashlib.sha256
+
+    def is_current(self, encoded):
+        summary = self.safe_summary(encoded)
+        return int(summary['iterations']) == self.iterations
 
     def encode(self, password, salt, iterations=None):
         assert password
@@ -267,7 +281,11 @@ class BCryptPasswordHasher(BasePasswordHasher):
     """
     algorithm = "bcrypt"
     library = ("py-bcrypt", "bcrypt")
-    rounds = 12
+    rounds = getattr(settings, 'BCRYPT_ROUNDS', 12)
+
+    def is_current(self, encoded):
+        summary = self.safe_summary(encoded)
+        return int(summary['work factor']) == self.rounds
 
     def salt(self):
         bcrypt = self._load_library()

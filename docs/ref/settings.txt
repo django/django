@@ -119,6 +119,13 @@ Default: 'auth.User'
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
 
+BCRYPT_ROUNDS
+---------------
+
+Default: '12'
+
+The work factor used for generating bcrypt hashes when using Django's BCryptPasswordHasher.
+
 .. setting:: CACHES
 
 CACHES
@@ -1469,6 +1476,14 @@ The number of days a password reset link is valid for. Used by the
 :mod:`django.contrib.auth` password reset mechanism.
 
 .. setting:: PREPEND_WWW
+
+PBKDF2_ITERATIONS
+---------------
+
+Default: '10000'
+
+The number of iterations used when generating PBKDF2 hashes when using Django's 
+PBKDF2PasswordHasher.
 
 PREPEND_WWW
 -----------

@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
 from django.contrib.auth.hashers import (is_password_usable, 
     check_password, make_password, PBKDF2PasswordHasher, load_hashers,
-    PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
+    PBKDF2SHA1PasswordHasher, BCryptPasswordHasher, get_hasher, identify_hasher,
+    UNUSABLE_PASSWORD)
 from django.utils import unittest
 from django.utils.unittest import skipUnless
 
@@ -118,6 +119,47 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertEqual(encoded,
             'pbkdf2_sha1$10000$seasalt$oAfF6vgs95ncksAhGXOWf4Okq7o=')
         self.assertTrue(hasher.verify('lètmein', encoded))
+
+    def test_pbkdf2_is_current_returns_false_if_iterations_differs(self):
+        hasher = PBKDF2PasswordHasher()
+        hasher.iterations = 1000
+        encoded = hasher.encode('letmein', 'seasalt')
+        hasher.iterations = 2000
+        self.assertFalse(hasher.is_current(encoded))
+
+    @skipUnless(bcrypt, "py-bcrypt not installed")
+    def test_bcrypt_is_current_returns_false_if_work_factor_differs(self):
+        hasher = BCryptPasswordHasher()
+        hasher.rounds = 2
+        encoded = hasher.encode('letmein', hasher.salt())
+        hasher.rounds = 3
+        self.assertFalse(hasher.is_current(encoded))
+
+    def test_check_password_setter_called_when_is_current_false(self):
+        class ExceptionSetterCalled(Exception):
+            pass
+        def setter(password):
+            raise ExceptionSetterCalled
+        raw_password = 'letmein'
+        hasher = PBKDF2PasswordHasher()
+        # We're going to hash with an iteration of 1. In check_password() below,
+        # it is going to instantiate a new Hasher with the iterations value from 
+        # settings or default of 10000, which will make is_current() False.
+        # Is there a better way to guarantee is_current() is false?
+        hasher.iterations = 1
+        encoded = make_password(raw_password, hasher=hasher)
+        self.assertRaises(ExceptionSetterCalled,
+            check_password, *(raw_password, encoded), **{ 'setter': setter })
+
+    def test_check_password_setter_not_called_when_is_current_true(self):
+        class ExceptionSetterCalled(Exception):
+            pass
+        def setter(password):
+            raise ExceptionSetterCalled
+        raw_password = 'letmein'
+        hasher = PBKDF2PasswordHasher()
+        encoded = make_password(raw_password, hasher=hasher)
+        self.assertTrue(check_password(raw_password, encoded, setter))
 
     def test_upgrade(self):
         self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
