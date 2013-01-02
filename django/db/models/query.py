@@ -44,7 +44,7 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_objects = None       # (raw_attname, attname, {id: rel_obj})
+        self._known_related_objects = {}       # {raw_attname: (attname, {id: rel_obj})}
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -221,6 +221,7 @@ class QuerySet(object):
         if isinstance(other, EmptyQuerySet):
             return other._clone()
         combined = self._clone()
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.AND)
         return combined
 
@@ -229,8 +230,7 @@ class QuerySet(object):
         combined = self._clone()
         if isinstance(other, EmptyQuerySet):
             return combined
-        if self._known_related_objects and other._known_related_objects:
-            self._known_related_objects[2].update(other._known_related_objects[2])
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -294,7 +294,6 @@ class QuerySet(object):
         # Cache db, model and known_related_object outside the loop
         db = self.db
         model = self.model
-        kro_raw_attname, kro_attname, kro_instances = self._known_related_objects or (None, None, None)
         compiler = self.query.get_compiler(using=db)
         if fill_cache:
             klass_info = get_klass_info(model, max_depth=max_depth,
@@ -325,9 +324,11 @@ class QuerySet(object):
                 for i, aggregate in enumerate(aggregate_select):
                     setattr(obj, aggregate, row[i + aggregate_start])
 
-            # Add the known related object to the model, if there is one
-            if self._known_related_objects and getattr(obj, kro_raw_attname) in kro_instances:
-                setattr(obj, kro_attname, kro_instances[getattr(obj, kro_raw_attname)])
+            # Add the known related objects to the model, if there are any
+            for kro_raw_attname, kro_information in self._known_related_objects.items():
+                kro_attname, kro_instances = kro_information
+                if getattr(obj, kro_raw_attname) in kro_instances:
+                    setattr(obj, kro_attname, kro_instances[getattr(obj, kro_raw_attname)])
 
             yield obj
 
@@ -943,6 +944,16 @@ class QuerySet(object):
         it's useful.
         """
         pass
+
+    def _merge_known_related_objects(self, other):
+        """
+        Keep track of all known related objects from either QuerySet instance.
+        """
+        for key, values in other._known_related_objects.items():
+            if key in self._known_related_objects:
+                self._known_related_objects[key][1].update(values[1])
+            else:
+                self._known_related_objects[key] = values
 
     def _setup_aggregate_query(self, aggregates):
         """
