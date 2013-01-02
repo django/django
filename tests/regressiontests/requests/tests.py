@@ -119,6 +119,24 @@ class RequestsTests(unittest.TestCase):
         }
         self.assertEqual(request.get_host(), 'internal.com:8042')
 
+        # Check if HTTP_HOST isn't provided, and X-FORWARDED-PORT is set
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'internal.com',
+            'SERVER_PORT': 8080,
+            'HTTP_X_FORWARDED_PORT': 80,
+        }
+        self.assertEqual(request.get_host(), 'internal.com')
+
+        # Check if HTTP_HOST isn't provided, and X-FORWARDED-PORT is set to non-standard port
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'internal.com',
+            'SERVER_PORT': 8080,
+            'HTTP_X_FORWARDED_PORT': 8042,
+        }
+        self.assertEqual(request.get_host(), 'internal.com:8042')
+
         # Poisoned host headers are rejected as suspicious
         legit_hosts = [
             'example.com',
