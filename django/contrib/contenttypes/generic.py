@@ -1,10 +1,10 @@
 """
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 from collections import defaultdict
-from functools import partial
+import warnings
 
 from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,10 +15,9 @@ from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.datastructures import Col
-from django.forms import ModelForm, ALL_FIELDS
-from django.forms.models import (BaseModelFormSet, modelformset_factory,
-    modelform_defines_fields)
-from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
+from django.forms import ModelForm
+from django.forms.models import BaseModelFormSet, modelformset_factory
+from django.contrib.admin.options import RenameBaseModelAdminMethods
 from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
@@ -665,52 +664,31 @@ def generic_inlineformset_factory(model, form=ModelForm,
     FormSet.for_concrete_model = for_concrete_model
     return FormSet
 
-
-class GenericInlineModelAdmin(InlineModelAdmin):
-    ct_field = "content_type"
-    ct_fk_field = "object_id"
-    formset = BaseGenericInlineFormSet
-
-    def get_formset(self, request, obj=None, **kwargs):
-        if 'fields' in kwargs:
-            fields = kwargs.pop('fields')
-        else:
-            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
-            exclude = []
-        else:
-            exclude = list(self.exclude)
-        exclude.extend(self.get_readonly_fields(request, obj))
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
-            # Take the custom ModelForm's Meta.exclude into account only if the
-            # GenericInlineModelAdmin doesn't define its own.
-            exclude.extend(self.form._meta.exclude)
-        exclude = exclude or None
-        can_delete = self.can_delete and self.has_delete_permission(request, obj)
-        defaults = {
-            "ct_field": self.ct_field,
-            "fk_field": self.ct_fk_field,
-            "form": self.form,
-            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "formset": self.formset,
-            "extra": self.extra,
-            "can_delete": can_delete,
-            "can_order": False,
-            "fields": fields,
-            "max_num": self.max_num,
-            "exclude": exclude
-        }
-        defaults.update(kwargs)
-
-        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
-            defaults['fields'] = ALL_FIELDS
-
-        return generic_inlineformset_factory(self.model, **defaults)
+from .admin_tools import (GenericInlineModelAdmin as _gima,
+                          GenericStackedInline as _gsi,
+                          GenericTabularInline as _gti)
 
 
-class GenericStackedInline(GenericInlineModelAdmin):
-    template = 'admin/edit_inline/stacked.html'
+class AuxMetaclass(RenameBaseModelAdminMethods):
+
+    def __new__(mcs, name, bases, attrs):
+        for b in bases:
+            bname = b.__name__
+            if bname in ('GenericInlineModelAdmin', 'GenericStackedInline',
+                         'GenericTabularInline') and name != 'NewBase':
+                warnings.simplefilter('always')
+                msg = "django.contrib.contenttypes.generic.%s is deprecated and will be removed in Django 1.9. Use its equally-named replacement from django.contrib.contenttypes.admin_tools" % bname
+                warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+        return super(AuxMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
-class GenericTabularInline(GenericInlineModelAdmin):
-    template = 'admin/edit_inline/tabular.html'
+class GenericInlineModelAdmin(six.with_metaclass(AuxMetaclass, _gima)):
+    pass
+
+
+class GenericStackedInline(six.with_metaclass(AuxMetaclass, _gsi)):
+    pass
+
+
+class GenericTabularInline(six.with_metaclass(AuxMetaclass, _gti)):
+    pass
