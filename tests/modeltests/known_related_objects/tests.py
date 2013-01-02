@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from .models import Tournament, Pool, PoolStyle
+from .models import Tournament, Organiser, Pool, PoolStyle
 
 class ExistingRelatedInstancesTests(TestCase):
     fixtures = ['tournament.json']
@@ -26,6 +26,46 @@ class ExistingRelatedInstancesTests(TestCase):
             self.assertIs(tournaments[0], pool1.tournament)
             pool2 = tournaments[1].pool_set.all()[0]
             self.assertIs(tournaments[1], pool2.tournament)
+
+    def test_queryset_or(self):
+        tournament_1 = Tournament.objects.get(pk=1)
+        tournament_2 = Tournament.objects.get(pk=2)
+        with self.assertNumQueries(1):
+            pools = tournament_1.pool_set.all() | tournament_2.pool_set.all()
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+
+    def test_queryset_or_different_cached_items(self):
+        tournament = Tournament.objects.get(pk=1)
+        organiser = Organiser.objects.get(pk=1)
+        with self.assertNumQueries(1):
+            pools = tournament.pool_set.all() | organiser.pool_set.all()
+            first = pools.filter(pk=1)[0]
+            self.assertIs(first.tournament, tournament)
+            self.assertIs(first.organiser, organiser)
+
+    def test_queryset_or_only_one_with_precache(self):
+        tournament_1 = Tournament.objects.get(pk=1)
+        tournament_2 = Tournament.objects.get(pk=2)
+        # 2 queries here as pool id 3 has tournament 2, which is not cached
+        with self.assertNumQueries(2):
+            pools = tournament_1.pool_set.all() | Pool.objects.filter(pk=3)
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+        # and the other direction
+        with self.assertNumQueries(2):
+            pools = Pool.objects.filter(pk=3) | tournament_1.pool_set.all()
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+
+    def test_queryset_and(self):
+        tournament = Tournament.objects.get(pk=1)
+        organiser = Organiser.objects.get(pk=1)
+        with self.assertNumQueries(1):
+            pools = tournament.pool_set.all() & organiser.pool_set.all()
+            first = pools.filter(pk=1)[0]
+            self.assertIs(first.tournament, tournament)
+            self.assertIs(first.organiser, organiser)
 
     def test_one_to_one(self):
         with self.assertNumQueries(2):
