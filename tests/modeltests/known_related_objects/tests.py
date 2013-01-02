@@ -44,6 +44,20 @@ class ExistingRelatedInstancesTests(TestCase):
             self.assertIs(first.tournament, tournament)
             self.assertIs(first.organiser, organiser)
 
+    def test_queryset_or_only_one_with_precache(self):
+        tournament_1 = Tournament.objects.get(pk=1)
+        tournament_2 = Tournament.objects.get(pk=2)
+        # 2 queries here as pool id 3 has tournament 2, which is not cached
+        with self.assertNumQueries(2):
+            pools = tournament_1.pool_set.all() | Pool.objects.filter(pk=3)
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+        # and the other direction
+        with self.assertNumQueries(2):
+            pools = Pool.objects.filter(pk=3) | tournament_1.pool_set.all()
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+
     def test_queryset_and(self):
         tournament = Tournament.objects.get(pk=1)
         organiser = Organiser.objects.get(pk=1)
