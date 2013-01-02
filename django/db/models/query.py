@@ -44,7 +44,7 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_object = None       # (attname, rel_obj)
+        self._known_related_objects = None       # (raw_attname, attname, {id: rel_obj})
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -229,6 +229,8 @@ class QuerySet(object):
         combined = self._clone()
         if isinstance(other, EmptyQuerySet):
             return combined
+        if self._known_related_objects and other._known_related_objects:
+            self._known_related_objects[2].update(other._known_related_objects[2])
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -292,7 +294,7 @@ class QuerySet(object):
         # Cache db, model and known_related_object outside the loop
         db = self.db
         model = self.model
-        kro_raw_attname, kro_attname, kro_instance = self._known_related_object or (None, None, None)
+        kro_raw_attname, kro_attname, kro_instances = self._known_related_objects or (None, None, None)
         compiler = self.query.get_compiler(using=db)
         if fill_cache:
             klass_info = get_klass_info(model, max_depth=max_depth,
@@ -324,8 +326,8 @@ class QuerySet(object):
                     setattr(obj, aggregate, row[i + aggregate_start])
 
             # Add the known related object to the model, if there is one
-            if kro_instance and getattr(obj, kro_raw_attname) == kro_instance.pk:
-                setattr(obj, kro_attname, kro_instance)
+            if self._known_related_objects and getattr(obj, kro_raw_attname) in kro_instances:
+                setattr(obj, kro_attname, kro_instances[getattr(obj, kro_raw_attname)])
 
             yield obj
 
@@ -902,7 +904,7 @@ class QuerySet(object):
         c = klass(model=self.model, query=query, using=self._db)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
-        c._known_related_object = self._known_related_object
+        c._known_related_objects = self._known_related_objects
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
