@@ -326,7 +326,7 @@ class QuerySet(object):
 
             # Add the known related objects to the model, if there are any
             if self._known_related_objects:
-                for field, kro_instances in six.iteritems(self._known_related_objects):
+                for field, kro_instances in self._known_related_objects.items():
                     raw_attname = field.get_attname()
                     if getattr(obj, raw_attname) in kro_instances:
                         setattr(obj, field.name, kro_instances[getattr(obj, raw_attname)])
@@ -950,7 +950,7 @@ class QuerySet(object):
         """
         Keep track of all known related objects from either QuerySet instance.
         """
-        for field, objects in six.iteritems(other._known_related_objects):
+        for field, objects in other._known_related_objects.items():
             if field in self._known_related_objects:
                 self._known_related_objects[field].update(objects)
             else:
