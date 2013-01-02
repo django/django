@@ -496,7 +496,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 except (AttributeError, KeyError):
                     db = self._db or router.db_for_read(self.model, instance=self.instance)
                     qs = super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
-                    qs._known_related_object = (rel_field.name, self.instance)
+                    qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
                     return qs
 
             def get_prefetch_query_set(self, instances):

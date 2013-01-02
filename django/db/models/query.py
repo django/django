@@ -44,7 +44,7 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_object = None       # (attname, rel_obj)
+        self._known_related_objects = {}       # {rel_field, {id: rel_obj}}
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -221,6 +221,7 @@ class QuerySet(object):
         if isinstance(other, EmptyQuerySet):
             return other._clone()
         combined = self._clone()
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.AND)
         return combined
 
@@ -229,6 +230,7 @@ class QuerySet(object):
         combined = self._clone()
         if isinstance(other, EmptyQuerySet):
             return combined
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -292,7 +294,6 @@ class QuerySet(object):
         # Cache db, model and known_related_object outside the loop
         db = self.db
         model = self.model
-        kro_attname, kro_instance = self._known_related_object or (None, None)
         compiler = self.query.get_compiler(using=db)
         if fill_cache:
             klass_info = get_klass_info(model, max_depth=max_depth,
@@ -323,9 +324,12 @@ class QuerySet(object):
                 for i, aggregate in enumerate(aggregate_select):
                     setattr(obj, aggregate, row[i + aggregate_start])
 
-            # Add the known related object to the model, if there is one
-            if kro_instance:
-                setattr(obj, kro_attname, kro_instance)
+            # Add the known related objects to the model, if there are any
+            if self._known_related_objects:
+                for field, kro_instances in self._known_related_objects.items():
+                    raw_attname = field.get_attname()
+                    if getattr(obj, raw_attname) in kro_instances:
+                        setattr(obj, field.name, kro_instances[getattr(obj, raw_attname)])
 
             yield obj
 
@@ -902,7 +906,7 @@ class QuerySet(object):
         c = klass(model=self.model, query=query, using=self._db)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
-        c._known_related_object = self._known_related_object
+        c._known_related_objects = self._known_related_objects
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -941,6 +945,16 @@ class QuerySet(object):
         it's useful.
         """
         pass
+
+    def _merge_known_related_objects(self, other):
+        """
+        Keep track of all known related objects from either QuerySet instance.
+        """
+        for field, objects in other._known_related_objects.items():
+            if field in self._known_related_objects:
+                self._known_related_objects[field].update(objects)
+            else:
+                self._known_related_objects[field] = objects
 
     def _setup_aggregate_query(self, aggregates):
         """
