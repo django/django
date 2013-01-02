@@ -27,6 +27,14 @@ class ExistingRelatedInstancesTests(TestCase):
             pool2 = tournaments[1].pool_set.all()[0]
             self.assertIs(tournaments[1], pool2.tournament)
 
+    def test_queryset_or(self):
+        tournament_1 = Tournament.objects.get(pk=1)
+        tournament_2 = Tournament.objects.get(pk=2)
+        with self.assertNumQueries(1):
+            pools = tournament_1.pool_set.all() | tournament_2.pool_set.all()
+            related_objects = set(pool.tournament for pool in pools)
+            self.assertEqual(related_objects, set((tournament_1, tournament_2)))
+
     def test_one_to_one(self):
         with self.assertNumQueries(2):
             style = PoolStyle.objects.get(pk=1)
