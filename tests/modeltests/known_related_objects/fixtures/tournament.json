@@ -15,9 +15,17 @@
         },
     {
         "pk": 1,
+        "model": "known_related_objects.organiser",
+        "fields": {
+            "name": "Organiser 1"
+            }
+        },
+    {
+        "pk": 1,
         "model": "known_related_objects.pool",
         "fields": {
             "tournament": 1,
+            "organiser": 1,
             "name": "T1 Pool 1"
             }
         },
@@ -26,6 +34,7 @@
         "model": "known_related_objects.pool",
         "fields": {
             "tournament": 1,
+            "organiser": 1,
             "name": "T1 Pool 2"
             }
         },
@@ -34,6 +43,7 @@
         "model": "known_related_objects.pool",
         "fields": {
             "tournament": 2,
+            "organiser": 1,
             "name": "T2 Pool 1"
             }
         },
@@ -42,6 +52,7 @@
         "model": "known_related_objects.pool",
         "fields": {
             "tournament": 2,
+            "organiser": 1,
             "name": "T2 Pool 2"
             }
         },
