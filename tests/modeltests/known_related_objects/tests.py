@@ -21,7 +21,7 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_foreign_key_multiple_prefetch(self):
         with self.assertNumQueries(2):
-            tournaments = list(Tournament.objects.prefetch_related('pool_set'))
+            tournaments = list(Tournament.objects.prefetch_related('pool_set').order_by('pk'))
             pool1 = tournaments[0].pool_set.all()[0]
             self.assertIs(tournaments[0], pool1.tournament)
             pool2 = tournaments[1].pool_set.all()[0]
@@ -81,7 +81,7 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_one_to_one_multi_select_related(self):
         with self.assertNumQueries(1):
-            poolstyles = list(PoolStyle.objects.select_related('pool'))
+            poolstyles = list(PoolStyle.objects.select_related('pool').order_by('pk'))
             self.assertIs(poolstyles[0], poolstyles[0].pool.poolstyle)
             self.assertIs(poolstyles[1], poolstyles[1].pool.poolstyle)
 
@@ -93,7 +93,7 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_one_to_one_multi_prefetch_related(self):
         with self.assertNumQueries(2):
-            poolstyles = list(PoolStyle.objects.prefetch_related('pool'))
+            poolstyles = list(PoolStyle.objects.prefetch_related('pool').order_by('pk'))
             self.assertIs(poolstyles[0], poolstyles[0].pool.poolstyle)
             self.assertIs(poolstyles[1], poolstyles[1].pool.poolstyle)
 
@@ -117,12 +117,12 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_reverse_one_to_one_multi_select_related(self):
         with self.assertNumQueries(1):
-            pools = list(Pool.objects.select_related('poolstyle'))
+            pools = list(Pool.objects.select_related('poolstyle').order_by('pk'))
             self.assertIs(pools[1], pools[1].poolstyle.pool)
             self.assertIs(pools[2], pools[2].poolstyle.pool)
 
     def test_reverse_one_to_one_multi_prefetch_related(self):
         with self.assertNumQueries(2):
-            pools = list(Pool.objects.prefetch_related('poolstyle'))
+            pools = list(Pool.objects.prefetch_related('poolstyle').order_by('pk'))
             self.assertIs(pools[1], pools[1].poolstyle.pool)
             self.assertIs(pools[2], pools[2].poolstyle.pool)
