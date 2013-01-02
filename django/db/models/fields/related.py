@@ -7,7 +7,7 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.query_utils import QueryWrapper
+from django.db.models.query_utils import Q, QueryWrapper
 from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -90,6 +90,34 @@ def do_pending_lookups(sender, **kwargs):
 
 signals.class_prepared.connect(do_pending_lookups)
 
+def create_prefetch_query(query_field_name, related_fields, instances):
+    """
+    Creates a Q object which dictates a prefetch query.
+
+    query_field_name: the query field path from the model to prefetch to the model of the instance objects
+    related_fields: the fields that are related between the two models (the field of the instances should be lhs fields)
+    instances: the instances of Model to fetch the related objects for
+    """
+
+    prefix = '%s__' % (query_field_name) if query_field_name is not None else ''
+    query = Q()
+
+    # In the case of a single field, we can use a simple IN statment
+    if 1 == len(related_fields):
+        lh_field, rh_field = related_fields[0]
+        query_dict = {'%s%s__in' % (prefix, lh_field.attname):
+                      set(getattr(instance, lh_field.attname) for instance in instances)}
+        query = Q(**query_dict)
+    else:
+    # Since we have more than one related field, we will create conditions for
+    # each instance and then OR them together. Example tbl.col1=1 AND tbl.col2=2 OR tbl.col1=2 AND tbl.col2=3
+    # This relies on the database itself to reduce the conditions down to its simplest form
+        for instance in instances:
+            query_dict = {}
+            for lh_field, rh_field in related_fields:
+                query_dict['%s%s' % (prefix, lh_field.attname)] = getattr(instance, lh_field.attname)
+            query |= Q(**query_dict)
+    return query
 
 #HACK
 class RelatedField(object):
@@ -246,8 +274,10 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        params = {'%s__pk__in' % self.related.field.name: list(instances_dict)}
-        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        query = create_prefetch_query(query_field_name=self.related.field.name,
+                                      related_fields=self.related.field.reverse_related_fields,
+                                      instances=instances)
+        qs = self.get_query_set(instance=instances[0]).filter(query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = self.related.field.get_cache_name()
@@ -266,7 +296,9 @@ class SingleRelatedObjectDescriptor(object):
             if related_pk is None:
                 rel_obj = None
             else:
-                params = {'%s__pk' % self.related.field.name: related_pk}
+                params = {}
+                for lh_field, rh_field in self.related.field.related_fields:
+                    params['%s__%s' % (self.related.field.name, rh_field.name)] = getattr(instance, rh_field.attname)
                 try:
                     rel_obj = self.get_query_set(instance=instance).get(**params)
                 except self.related.model.DoesNotExist:
@@ -349,11 +381,10 @@ class ReverseSingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(other_field.attname)
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: list(instances_dict)}
-        else:
-            params = {'%s__in' % self.field.rel.field_name: list(instances_dict)}
-        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        query = create_prefetch_query(query_field_name=self.field.related_query_name(),
+                                      related_fields=self.field.related_fields,
+                                      instances=instances)
+        qs = self.get_query_set(instance=instances[0]).filter(query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         if not self.field.rel.multiple:
@@ -373,11 +404,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
             if val is None:
                 rel_obj = None
             else:
-                other_field = self.field.rel.get_related_field()
-                if other_field.rel:
-                    params = {'%s__%s' % (self.field.rel.field_name, other_field.rel.field_name): val}
-                else:
-                    params = {'%s__exact' % self.field.rel.field_name: val}
+                params = {}
+                for lh_field, rh_field in self.field.related_fields:
+                    params[rh_field.attname] = getattr(instance, lh_field.attname)
                 qs = self.get_query_set(instance=instance)
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get(**params)
@@ -485,9 +514,10 @@ class ForeignRelatedObjectsDescriptor(object):
             def __init__(self, instance):
                 super(RelatedManager, self).__init__()
                 self.instance = instance
-                self.core_filters = {
-                    '%s__%s' % (rel_field.name, attname): getattr(instance, attname)
-                }
+                self.core_filters = {}
+                for lh_field, rh_field in rel_field.related_fields:
+                    self.core_filters['%s__%s' % (rel_field.name, rh_field.attname)] = getattr(instance, rh_field.attname)
+
                 self.model = rel_model
 
             def get_query_set(self):
@@ -506,8 +536,10 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname): list(instances_dict)}
-                qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
+                query = create_prefetch_query(query_field_name=rel_field.name,
+                                              related_fields=rel_field.reverse_related_fields,
+                                              instances=instances)
+                qs = super(RelatedManager, self).get_query_set().using(db).filter(query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.
                 for rel_obj in qs:
@@ -568,9 +600,17 @@ def create_many_related_manager(superclass, rel):
             super(ManyRelatedManager, self).__init__()
             self.model = model
             self.query_field_name = query_field_name
-            self.core_filters = {'%s__pk' % query_field_name: instance._get_pk_val()}
+
+            source_field = through._meta.get_field(source_field_name)
+            source_related_fields = source_field.related_fields
+
+            self.core_filters = {}
+            for lh_field, rh_field in source_related_fields:
+                self.core_filters['%s__%s' % (query_field_name, rh_field.name)] = getattr(instance, rh_field.attname)
+
             self.instance = instance
             self.symmetrical = symmetrical
+            self.source_field = source_field
             self.source_field_name = source_field_name
             self.target_field_name = target_field_name
             self.reverse = reverse
@@ -613,9 +653,10 @@ def create_many_related_manager(superclass, rel):
             instance = instances[0]
             from django.db import connections
             db = self._db or router.db_for_read(instance.__class__, instance=instance)
-            query = {'%s__pk__in' % self.query_field_name:
-                         set(obj._get_pk_val() for obj in instances)}
-            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
+            query = create_prefetch_query(query_field_name=self.query_field_name,
+                                          related_fields=self.source_field.reverse_related_fields,
+                                          instances=instances)
+            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
@@ -1004,6 +1045,30 @@ class ForeignKey(RelatedField, Field):
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
         Field.__init__(self, **kwargs)
+
+    def get_related_fields(self):
+        '''Returns a list of tuples containing that fields that should match in the foriegn key relationship'''
+        return [(self, self.rel.get_related_field())]
+
+    @property
+    def related_fields(self):
+        return self.get_related_fields()
+
+    @property
+    def reverse_related_fields(self):
+        return [(rhs_field, lhs_field) for lhs_field, rhs_field in self.related_fields]
+
+    @property
+    def native_related_fields(self):
+        return [lhs_field for lhs_field, rhs_field in self.related_fields]
+
+    @property
+    def foreign_related_fields(self):
+        return [rhs_field for lhs_field, rhs_field in self.related_fields]
+
+    def get_joining_columns(self, reverse_join=False):
+        source = self.reverse_related_fields if reverse_join else self.related_fields
+        return tuple([(lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source])
 
     def get_path_info(self):
         """
