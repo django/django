@@ -4,8 +4,6 @@ from xml.dom.minidom import parseString, Node
 
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
-from django.core.signals import request_finished
-from django.db import close_connection
 from django.test.signals import template_rendered, setting_changed
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
@@ -70,10 +68,8 @@ def setup_test_environment():
     """Perform any global pre-test setup. This involves:
 
         - Installing the instrumented test renderer
-        - Setting the email backend to the locmem email backend.
+        - Set the email backend to the locmem email backend.
         - Setting the active locale to match the LANGUAGE_CODE setting.
-        - Disconnecting the request_finished signal to avoid closing
-          the database connection within tests.
     """
     Template.original_render = Template._render
     Template._render = instrumented_test_render
@@ -84,8 +80,6 @@ def setup_test_environment():
     mail.outbox = []
 
     deactivate()
-
-    request_finished.disconnect(close_connection)
 
 
 def teardown_test_environment():

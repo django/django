@@ -3,8 +3,10 @@ Utility functions for handling images.
 
 Requires PIL, as you might imagine.
 """
+import zlib
 
 from django.core.files import File
+
 
 class ImageFile(File):
     """
@@ -25,6 +27,7 @@ class ImageFile(File):
             self.open()
             self._dimensions_cache = get_image_dimensions(self, close=close)
         return self._dimensions_cache
+
 
 def get_image_dimensions(file_or_path, close=False):
     """
@@ -55,7 +58,15 @@ def get_image_dimensions(file_or_path, close=False):
             data = file.read(chunk_size)
             if not data:
                 break
-            p.feed(data)
+            try:
+                p.feed(data)
+            except zlib.error as e:
+                # ignore zlib complaining on truncated stream, just feed more
+                # data to parser (ticket #19457).
+                if e.args[0].startswith("Error -5"):
+                    pass
+                else:
+                    raise
             if p.image:
                 return p.image.size
             chunk_size = chunk_size*2

@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import time
+import zlib
 from datetime import datetime, timedelta
 from io import BytesIO
 
@@ -558,6 +559,20 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
+
+    @unittest.skipUnless(Image, "PIL not installed")
+    def test_bug_19457(self):
+        """
+        Regression test for #19457
+        get_image_dimensions fails on some pngs, while Image.size is working good on them
+        """
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "magic.png")
+        try:
+            size = get_image_dimensions(img_path)
+        except zlib.error:
+            self.fail("Exception raised from get_image_dimensions().")
+        self.assertEqual(size, Image.open(img_path).size)
+
 
 class ContentFileTestCase(unittest.TestCase):
 
