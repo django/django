@@ -44,7 +44,7 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_objects = {}       # {raw_attname: (attname, {id: rel_obj})}
+        self._known_related_objects = {}       # {rel_field, {id: rel_obj}}
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -325,10 +325,11 @@ class QuerySet(object):
                     setattr(obj, aggregate, row[i + aggregate_start])
 
             # Add the known related objects to the model, if there are any
-            for kro_raw_attname, kro_information in self._known_related_objects.items():
-                kro_attname, kro_instances = kro_information
-                if getattr(obj, kro_raw_attname) in kro_instances:
-                    setattr(obj, kro_attname, kro_instances[getattr(obj, kro_raw_attname)])
+            if self._known_related_objects:
+                for field, kro_instances in six.iteritems(self._known_related_objects):
+                    raw_attname = field.get_attname()
+                    if getattr(obj, raw_attname) in kro_instances:
+                        setattr(obj, field.name, kro_instances[getattr(obj, raw_attname)])
 
             yield obj
 
@@ -949,11 +950,11 @@ class QuerySet(object):
         """
         Keep track of all known related objects from either QuerySet instance.
         """
-        for key, values in other._known_related_objects.items():
-            if key in self._known_related_objects:
-                self._known_related_objects[key][1].update(values[1])
+        for field, objects in six.iteritems(other._known_related_objects):
+            if field in self._known_related_objects:
+                self._known_related_objects[field].update(objects)
             else:
-                self._known_related_objects[key] = values
+                self._known_related_objects[field] = objects
 
     def _setup_aggregate_query(self, aggregates):
         """
