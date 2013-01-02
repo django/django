@@ -209,12 +209,10 @@ class QuerySet(object):
                 stop = None
             qs.query.set_limits(start, stop)
             return k.step and list(qs)[::k.step] or qs
-        try:
-            qs = self._clone()
-            qs.query.set_limits(k, k + 1)
-            return list(qs)[0]
-        except self.model.DoesNotExist as e:
-            raise IndexError(e.args)
+
+        qs = self._clone()
+        qs.query.set_limits(k, k + 1)
+        return list(qs)[0]
 
     def __and__(self, other):
         self._merge_sanity_check(other)
