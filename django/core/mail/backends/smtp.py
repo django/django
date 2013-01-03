@@ -60,6 +60,8 @@ class EmailBackend(BaseEmailBackend):
 
     def close(self):
         """Closes the connection to the email server."""
+        if self.connection is None:
+            return
         try:
             try:
                 self.connection.quit()
