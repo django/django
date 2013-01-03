@@ -279,6 +279,25 @@ class DummyBackendTest(unittest.TestCase):
             db.connections = old_db_connections
 
 
+class DeprecationDisplayTest(AdminScriptTestCase):
+    # tests for 19546
+    def setUp(self):
+        settings = {'INSTALLED_APPS': '("regressiontests.test_runner.deprecation_app",)' }
+        self.write_settings('settings.py', sdict=settings)
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_runner_deprecation_verbosity_default(self):
+        args = ['test', '--settings=regressiontests.settings']
+        out, err = self.run_django_admin(args)
+        self.assertTrue("DeprecationWarning: warning from test" in err)
+
+    def test_runner_deprecation_verbosity_zero(self):
+        args = ['test', '--settings=regressiontests.settings', '--verbosity=0']
+        out, err = self.run_django_admin(args)
+        self.assertFalse("DeprecationWarning: warning from test" in err)
+
 class AutoIncrementResetTest(TransactionTestCase):
     """
     Here we test creating the same model two times in different test methods,
