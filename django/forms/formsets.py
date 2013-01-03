@@ -333,7 +333,10 @@ class BaseFormSet(object):
         Returns True if the formset needs to be multipart, i.e. it
         has FileInput. Otherwise, False.
         """
-        return self.forms and self.forms[0].is_multipart()
+        if self.forms:
+            return self.forms[0].is_multipart()
+        else:
+            return self.empty_form.is_multipart()
 
     @property
     def media(self):
@@ -342,7 +345,7 @@ class BaseFormSet(object):
         if self.forms:
             return self.forms[0].media
         else:
-            return Media()
+            return self.empty_form.media
 
     def as_table(self):
         "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."
