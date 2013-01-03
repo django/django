@@ -63,9 +63,10 @@ class EmailBackend(BaseEmailBackend):
         try:
             try:
                 self.connection.quit()
-            except socket.sslerror:
+            except (socket.sslerror, smtplib.SMTPServerDisconnected):
                 # This happens when calling quit() on a TLS connection
-                # sometimes.
+                # sometimes, or when the connection was already disconnected
+                # by the server.
                 self.connection.close()
             except:
                 if self.fail_silently:

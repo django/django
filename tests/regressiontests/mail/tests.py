@@ -659,9 +659,9 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         asyncore.close_all()
 
     def stop(self):
-        assert self.active
-        self.active = False
-        self.join()
+        if self.active:
+            self.active = False
+            self.join()
 
 
 class SMTPBackendTests(BaseEmailBackendTests, TestCase):
@@ -715,3 +715,16 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
         backend = smtp.EmailBackend(username='', password='')
         self.assertEqual(backend.username, '')
         self.assertEqual(backend.password, '')
+
+    def test_server_stopped(self):
+        """
+        Test that closing the backend while the SMTP server is stopped doesn't
+        raise an exception.
+        """
+        backend = smtp.EmailBackend(username='', password='')
+        backend.open()
+        self.server.stop()
+        try:
+            backend.close()
+        except Exception as e:
+            self.fail("close() unexpectedly raised an exception: %s" % e)
