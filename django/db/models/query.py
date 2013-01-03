@@ -1251,7 +1251,7 @@ class EmptyQuerySet(QuerySet):
         """
         return self
 
-    def distinct(self, fields=None):
+    def distinct(self, *field_names):
         """
         Always returns EmptyQuerySet.
         """
