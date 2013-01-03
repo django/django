@@ -295,10 +295,8 @@ class GeoLookupTest(TestCase):
         self.assertEqual(2, len(qs))
         for c in qs: self.assertEqual(True, c.name in cities)
 
-    # The left/right lookup tests are known failures on PostGIS 2.0+
-    # until the following bug is fixed:
-    #  http://trac.osgeo.org/postgis/ticket/2035
-    # TODO: Ensure fixed in 2.0.2, else modify upper bound for version here.
+    # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
+    # http://trac.osgeo.org/postgis/ticket/2035
     if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
         test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
