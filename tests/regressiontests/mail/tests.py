@@ -492,6 +492,16 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message.get('from'), "tester")
         self.assertEqual(message.get('to'), "django")
 
+    def test_close_connection(self):
+        """
+        Test that connection can be closed (even when not explicitely opened)
+        """
+        conn = mail.get_connection(username='', password='')
+        try:
+            conn.close()
+        except Exception as e:
+            self.fail("close() unexpectedly raised an exception: %s" % e)
+
 
 class LocmemBackendTests(BaseEmailBackendTests, TestCase):
     email_backend = 'django.core.mail.backends.locmem.EmailBackend'
