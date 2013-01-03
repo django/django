@@ -93,24 +93,31 @@ class WarningLoggerTests(TestCase):
     and captured to the logging system
     """
     def setUp(self):
+        # this convoluted setup is to avoid printing this deprecation to
+        # stderr during test running - as the test runner forces deprecations
+        # to be displayed at the global py.warnings level
         self.logger = logging.getLogger('py.warnings')
-        self.old_stream = self.logger.handlers[0].stream
+        self.outputs = []
+        self.old_streams = []
+        for handler in self.logger.handlers:
+            self.old_streams.append(handler.stream)
+            self.outputs.append(StringIO())
+            handler.stream = self.outputs[-1]
 
     def tearDown(self):
-        self.logger.handlers[0].stream = self.old_stream
+        for i, handler in enumerate(self.logger.handlers):
+            self.logger.handlers[i].stream = self.old_streams[i]
 
     @override_settings(DEBUG=True)
     def test_warnings_capture(self):
-        output = StringIO()
-        self.logger.handlers[0].stream = output
         warnings.warn('Foo Deprecated', DeprecationWarning)
-        self.assertTrue('Foo Deprecated' in force_text(output.getvalue()))
+        output = force_text(self.outputs[0].getvalue())
+        self.assertTrue('Foo Deprecated' in output)
 
     def test_warnings_capture_debug_false(self):
-        output = StringIO()
-        self.logger.handlers[0].stream = output
         warnings.warn('Foo Deprecated', DeprecationWarning)
-        self.assertFalse('Foo Deprecated' in force_text(output.getvalue()))
+        output = force_text(self.outputs[0].getvalue())
+        self.assertFalse('Foo Deprecated' in output)
 
 
 class CallbackFilterTest(TestCase):
