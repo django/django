@@ -31,6 +31,10 @@ class DatabaseOperations(BaseDatabaseOperations):
 class DatabaseClient(BaseDatabaseClient):
     runshell = complain
 
+class DatabaseCreation(BaseDatabaseCreation):
+    create_test_db = ignore
+    destroy_test_db = ignore
+
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_list = complain
     get_table_description = complain
@@ -64,6 +68,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = BaseDatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
-        self.creation = BaseDatabaseCreation(self)
+        self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)

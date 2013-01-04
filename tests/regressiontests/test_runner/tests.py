@@ -261,6 +261,24 @@ class Sqlite3InMemoryTestDbs(unittest.TestCase):
                 db.connections = old_db_connections
 
 
+class DummyBackendTest(unittest.TestCase):
+    def test_setup_databases(self):
+        """
+        Test that setup_databases() doesn't fail with dummy database backend.
+        """
+        runner = DjangoTestSuiteRunner(verbosity=0)
+        old_db_connections = db.connections
+        try:
+            db.connections = db.ConnectionHandler({})
+            old_config = runner.setup_databases()
+            runner.teardown_databases(old_config)
+        except Exception as e:
+            self.fail("setup_databases/teardown_databases unexpectedly raised "
+                      "an error: %s" % e)
+        finally:
+            db.connections = old_db_connections
+
+
 class AutoIncrementResetTest(TransactionTestCase):
     """
     Here we test creating the same model two times in different test methods,
