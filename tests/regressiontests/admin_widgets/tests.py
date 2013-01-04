@@ -14,11 +14,15 @@ from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 from django.utils import translation
+from django.utils.importlib import import_module
 from django.utils.html import conditional_escape
 from django.utils.unittest import TestCase
+import os
+
 
 from . import models
 from .widgetadmin import site as widget_admin_site
+import gettext as gettext_module
 
 
 admin_static_prefix = lambda: {
@@ -511,6 +515,40 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Check that the time picker is hidden again
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'none')
+
+    def test_show_correct_date(self):
+        '''
+        Ensure that click on date widget shows correct date for every
+        locale included with django
+        '''
+        self.admin_login(username='super', password='secret', login_url='/')
+        birthdate = datetime(1969, 7, 15)
+        member = models.Member(name = 'Alexander Vasilyev', birthdate = birthdate, gender = 'M')
+        member.save()
+        month_string = 'January February March April May June July August September October November December'
+        path = os.path.join(os.path.dirname(import_module('django.contrib.admin').__file__), 'locale')
+        for language_code, language_name in settings.LANGUAGES:
+            try:
+                catalog = gettext_module.translation('djangojs', path, [language_code])
+            except IOError:
+                continue
+            if month_string in catalog._catalog:
+                month_names = catalog._catalog[month_string]
+            else:
+                month_names = month_string
+            july_translation = month_names.split(' ')[6]
+            expected_caption = '{0:s} {1:d}'.format(july_translation, 1969)
+            with override_settings(LANGUAGE_CODE = language_code):
+                self.selenium.get('{}{}'.format(self.live_server_url, '/admin_widgets/member/{}/'.format(member.pk)))
+                self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'none')
+                # Click the calendar icon
+                self.selenium.find_element_by_id('calendarlink0').click()
+                # Check that the date picker is visible
+                self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'block')
+                # Check that calendar's caption is what we expected
+                caption = self.selenium.find_element_by_css_selector('#calendarin0>table>caption').text
+                self.assertEqual(caption, expected_caption)
+
 
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
