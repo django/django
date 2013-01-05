@@ -829,6 +829,14 @@ def custom_key_func(key, key_prefix, version):
     return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
 
 
+@override_settings(
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'test cache table',
+        },
+    },
+)
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     available_apps = ['cache']
@@ -837,7 +845,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def setUp(self):
         # Spaces are used in the table name to ensure quoting/escaping is working
         self._table_name = 'test cache table'
-        management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False)
+        management.call_command('createcachetable', verbosity=0, interactive=False)
         self.cache = get_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30})
         self.prefix_cache = get_cache(self.backend_name, LOCATION=self._table_name, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, LOCATION=self._table_name, VERSION=2)
@@ -862,10 +870,25 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 "Cache table 'test cache table' could not be created"):
             management.call_command(
                'createcachetable',
-                self._table_name,
                 verbosity=0,
                 interactive=False
             )
+
+    def test_createcachetable_with_table_argument(self):
+        """
+        Delete and recreate cache table with legacy behavior (explicitely
+        specifying the table name).
+        """
+        self.tearDown()
+        stdout = six.StringIO()
+        management.call_command(
+            'createcachetable',
+            self._table_name,
+            verbosity=2,
+            stdout=stdout
+        )
+        self.assertEqual(stdout.getvalue(),
+            "Cache table '%s' created.\n" % self._table_name)
 
     def test_clear_commits_transaction(self):
         # Ensure the database transaction is committed (#19896)
@@ -896,6 +919,14 @@ class DBCacheRouter(object):
             return db == 'other'
 
 
+@override_settings(
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'my_cache_table',
+        },
+    },
+)
 class CreateCacheTableForDBCacheTests(TestCase):
     multi_db = True
 
@@ -905,13 +936,13 @@ class CreateCacheTableForDBCacheTests(TestCase):
             router.routers = [DBCacheRouter()]
             # cache table should not be created on 'default'
             with self.assertNumQueries(0, using='default'):
-                management.call_command('createcachetable', 'cache_table',
+                management.call_command('createcachetable',
                                         database='default',
                                         verbosity=0, interactive=False)
             # cache table should be created on 'other'
             # one query is used to create the table and another one the index
             with self.assertNumQueries(2, using='other'):
-                management.call_command('createcachetable', 'cache_table',
+                management.call_command('createcachetable',
                                         database='other',
                                         verbosity=0, interactive=False)
         finally:
