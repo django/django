@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
 from django.core import management
+from django.db.models.query import EmptyQuerySet
 from django.test import TestCase
 from django.utils.six import StringIO
 
@@ -205,7 +206,11 @@ class ToFieldThroughTests(TestCase):
 
     def test_add_null(self):
         nullcar = Car.objects.create(make=None)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(
+            ValueError,
+            '"<Car: None>" needs to have a value for field "car" '
+            'before this many-to-many relationship can be used.'
+        ):
             nullcar.drivers._add_items('car', 'driver', self.unused_driver)
 
     def test_add_related_null(self):
@@ -233,7 +238,11 @@ class ToFieldThroughTests(TestCase):
 
     def test_add_null_reverse_related(self):
         nulldriver = Driver.objects.create(name=None)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(
+            ValueError,
+            '"<Driver: None>" needs to have a value for field "driver" '
+            'before this many-to-many relationship can be used.'
+        ):
             nulldriver.car_set._add_items('driver', 'car', self.car)
 
     def test_remove(self):
@@ -253,6 +262,41 @@ class ToFieldThroughTests(TestCase):
         self.driver.car_set._remove_items('driver', 'car', self.car)
         self.assertQuerysetEqual(
             self.driver.car_set.all(), [])
+
+    def test_remove_empty(self):
+        c = Car.objects.create(make=None)
+        with self.assertRaisesMessage(
+            ValueError,
+            '"<Car: None>" needs to have a value for field "car" '
+            'before this many-to-many relationship can be used.'
+        ):
+            c.drivers._remove_items('car', 'drivers', self.driver)
+
+    def test_clear_empty(self):
+        c = Car.objects.create(make=None)
+        with self.assertRaisesMessage(
+            ValueError,
+            '"<Car: None>" needs to have a value for field "car" '
+            'before this many-to-many relationship can be used.'
+        ):
+            c.drivers.clear()
+
+    def test_null_query(self):
+        cd = CarDriver(driver=self.driver)
+        new_car = Car()
+        with self.assertRaisesMessage(
+            ValueError,
+            '"<Car: None>" needs to have a value for field "car" '
+            'before this many-to-many relationship can be used.'
+        ):
+            new_car.drivers.all(),
+        new_car.save()
+        self.assertIsInstance(new_car.drivers.all(), EmptyQuerySet)
+        new_car.make = 'Foo'
+        new_car.save()
+        cd.car = new_car
+        cd.save()
+        self.assertEqual(list(new_car.drivers.all()), [self.driver])
 
 
 class ThroughLoadDataTestCase(TestCase):

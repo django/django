@@ -442,6 +442,28 @@ Validators
 Backwards incompatible changes in 1.11
 ======================================
 
+Related QuerySet behavior for nullable relations
+------------------------------------------------
+
+The behavior of nullable related ``QuerySet`` has changed.
+
+Nullable related ``QuerySet`` means a ``QuerySet`` for reverse relation
+to a field which can be set to null.
+
+In 1.10 querying a nullable many-to-many relation was an error. For foreign
+key relations there was no error. To make the nullable relations consistent
+the following changes were made:
+
+* Nullable many-to-many and foreign key relations will return an empty
+  queryset when the relation field is null. For many-to-many this was
+  previously an error (no change for foreign keys).
+
+* Trying to add objects to a foreign key relation when the relation field
+  is null is now an error (no change for m2m).
+
+* Trying to use a relation of any kind when the object isn't saved is now
+  an error (no change for m2m).
+
 :mod:`django.contrib.gis`
 -------------------------
 
