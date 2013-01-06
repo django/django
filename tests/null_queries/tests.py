@@ -40,10 +40,6 @@ class NullQueriesTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'Cannot use None as a query value'):
             Choice.objects.filter(id__gt=None)
 
-        # Related managers use __exact=None implicitly if the object hasn't been saved.
-        p2 = Poll(question="How?")
-        self.assertEqual(repr(p2.choice_set.all()), '<QuerySet []>')
-
     def test_reverse_relations(self):
         """
         Querying across reverse relations and then another relation should

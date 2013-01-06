@@ -30,8 +30,7 @@ class ManyToManyTests(TestCase):
         a5 = Article(headline='Django lets you create Web apps easily')
         # You can't associate it with a Publication until it's been saved.
         msg = (
-            '"<Article: Django lets you create Web apps easily>" needs to have '
-            'a value for field "id" before this many-to-many relationship can be used.'
+            "'Article' instance needs to have a primary key value before a many-to-many relationship can be used."
         )
         with self.assertRaisesMessage(ValueError, msg):
             getattr(a5, 'publications')

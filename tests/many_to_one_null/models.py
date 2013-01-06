@@ -29,6 +29,24 @@ class Article(models.Model):
 class Car(models.Model):
     make = models.CharField(max_length=100, null=True, unique=True)
 
+    def __str__(self):
+        return "%s" % self.make
+
 
 class Driver(models.Model):
     car = models.ForeignKey(Car, models.SET_NULL, to_field='make', null=True, related_name='drivers')
+
+
+class Poll(models.Model):
+    question = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "Q: %s" % self.question
+
+
+class Choice(models.Model):
+    poll = models.ForeignKey(Poll, models.CASCADE)
+    choice = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "Choice: %s in poll %s" % (self.choice, self.poll)

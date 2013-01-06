@@ -2,6 +2,7 @@ from io import StringIO
 
 from django.contrib.auth.models import User
 from django.core import management
+from django.db.models.query import EmptyQuerySet
 from django.test import TestCase
 
 from .models import (
@@ -215,8 +216,8 @@ class ToFieldThroughTests(TestCase):
     def test_m2m_relations_unusable_on_null_to_field(self):
         nullcar = Car(make=None)
         msg = (
-            '"<Car: None>" needs to have a value for field "make" before this '
-            'many-to-many relationship can be used.'
+            "'Car' instance needs to have a primary key value"
+            " before a many-to-many relationship can be used."
         )
         with self.assertRaisesMessage(ValueError, msg):
             nullcar.drivers.all()
@@ -228,6 +229,15 @@ class ToFieldThroughTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Car(make='Ford').drivers.all()
+
+    def test_add_null(self):
+        nullcar = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make"'
+            ' before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            nullcar.drivers._add_items('car', 'driver', self.unused_driver)
 
     def test_add_related_null(self):
         nulldriver = Driver.objects.create(name=None)
@@ -280,6 +290,41 @@ class ToFieldThroughTests(TestCase):
         self.driver.car_set._remove_items('driver', 'car', self.car)
         self.assertQuerysetEqual(
             self.driver.car_set.all(), [])
+
+    def test_remove_empty(self):
+        c = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            c.drivers._remove_items('car', 'drivers', self.driver)
+
+    def test_clear_empty(self):
+        c = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            c.drivers.clear()
+
+    def test_null_query(self):
+        cd = CarDriver(driver=self.driver)
+        new_car = Car()
+        msg = (
+            "'Car' instance needs to have a primary key value"
+            " before a many-to-many relationship can be used."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            new_car.drivers
+        new_car.save()
+        self.assertIsInstance(new_car.drivers.all(), EmptyQuerySet)
+        new_car.make = 'Foo'
+        new_car.save()
+        cd.car = new_car
+        cd.save()
+        self.assertEqual(list(new_car.drivers.all()), [self.driver])
 
 
 class ThroughLoadDataTestCase(TestCase):
