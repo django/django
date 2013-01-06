@@ -48,3 +48,9 @@ class Relation(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.left.category.name, self.right.category.name)
+
+class Car(models.Model):
+    make = models.CharField(max_length=100, null=True, unique=True)
+
+class Driver(models.Model):
+    car = models.ForeignKey(Car, to_field='make', null=True, related_name='drivers')
