@@ -130,9 +130,10 @@ you haven't already, and run the command ``python manage.py runserver``. You'll
 see the following output on the command line::
 
     Validating models...
-    0 errors found.
 
-    Django version 1.4, using settings 'mysite.settings'
+    0 errors found
+    January 06, 2013 - 15:50:53
+    Django version 1.5, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
