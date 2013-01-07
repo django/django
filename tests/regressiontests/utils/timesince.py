@@ -47,6 +47,10 @@ class TimesinceTests(unittest.TestCase):
             self.t+2*self.oneday+6*self.onehour), '2 days, 6 hours')
         self.assertEqual(timesince(self.t,
             self.t+2*self.oneweek+2*self.oneday), '2 weeks, 2 days')
+        self.assertEqual(timesince(self.t,
+            self.t+2*self.oneyear+3*self.onemonth), '2 years, 3 months')
+        self.assertEqual(timesince(self.t,
+            self.t+2*self.oneyear+9*self.onemonth), '2 years, 9 months')
 
     def test_display_first_unit(self):
         """
@@ -122,3 +126,8 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timesince(future), '0 minutes')
         past = datetime.datetime(1980, 1, 1, tzinfo=naive())
         self.assertEqual(timeuntil(past), '0 minutes')
+
+    def test_thousand_years_ago(self):
+        t = datetime.datetime(1007, 8, 14, 13, 46, 0)
+
+        self.assertEqual(timesince(t, self.t), '1000 years')
