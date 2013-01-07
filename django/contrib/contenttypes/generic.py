@@ -168,8 +168,7 @@ class GenericRelation(RelatedField, Field):
         # Note that we are using different field for the join_field
         # than from_field or to_field. This is a hack, but we need the
         # GenericRelation to generate the extra SQL.
-        return ([PathInfo(from_field, target, self.model._meta, opts, self, True, False)],
-                opts, target, self)
+        return [PathInfo(from_field, target, self.model._meta, opts, self, True, False)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
@@ -182,7 +181,7 @@ class GenericRelation(RelatedField, Field):
         # Our second join will happen in the extra sql
         join_cols = ((self.m2m_target_field_name(), self.m2m_column_name()),)
         if not reverse_join:
-            raise ValueError('Reverse join is not supported on generic relations')
+            raise ValueError('GenericRelation only supports reverse joins.')
 
         return join_cols
 

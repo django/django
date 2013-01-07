@@ -1077,7 +1077,7 @@ class ForeignKey(RelatedField, Field):
         opts = self.rel.to._meta
         target = self.rel.get_related_field()
         from_opts = self.model._meta
-        return [PathInfo(self, target, from_opts, opts, self, False, True)], opts, target, self
+        return [PathInfo(self, target, from_opts, opts, self, False, True)]
 
     def get_reverse_path_info(self):
         """
@@ -1086,14 +1086,14 @@ class ForeignKey(RelatedField, Field):
         opts = self.model._meta
         from_field = self.rel.get_related_field()
         from_opts = from_field.model._meta
-        pathinfos = [PathInfo(from_field, self, from_opts, opts, self, not self.unique, False)]
         if from_field.model is self.model:
             # Recursive foreign key to self.
             target = opts.get_field_by_name(
                 self.rel.field_name)[0]
         else:
             target = opts.pk
-        return pathinfos, opts, target, self
+        pathinfos = [PathInfo(from_field, target, from_opts, opts, self, not self.unique, False)]
+        return pathinfos
 
     def validate(self, value, model_instance):
         if self.rel.parent_link:
@@ -1298,14 +1298,14 @@ class ManyToManyField(RelatedField, Field):
         linkfield1 = int_model._meta.get_field_by_name(self.m2m_field_name())[0]
         linkfield2 = int_model._meta.get_field_by_name(self.m2m_reverse_field_name())[0]
         if direct:
-            join1infos, _, _, _ = linkfield1.get_reverse_path_info()
-            join2infos, opts, target, final_field = linkfield2.get_path_info()
+            join1infos = linkfield1.get_reverse_path_info()
+            join2infos = linkfield2.get_path_info()
         else:
-            join1infos, _, _, _ = linkfield2.get_reverse_path_info()
-            join2infos, opts, target, final_field = linkfield1.get_path_info()
+            join1infos = linkfield2.get_reverse_path_info()
+            join2infos = linkfield1.get_path_info()
         pathinfos.extend(join1infos)
         pathinfos.extend(join2infos)
-        return pathinfos, opts, target, final_field
+        return pathinfos
 
     def get_path_info(self):
         return self._get_path_info(direct=True)

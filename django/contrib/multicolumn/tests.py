@@ -139,6 +139,20 @@ class MultiColumnFKTests(TestCase):
             attrgetter('name')
         )
 
+    def test_forard_in_lookup_filters_correctly(self):
+        Membership.objects.create(membership_country_id=self.usa.id, person_id=self.bob.id, group_id=self.cia.id)
+        Membership.objects.create(membership_country_id=self.usa.id, person_id=self.jim.id, group_id=self.cia.id)
+        
+        # Creating an invalid membership
+        Membership.objects.create(membership_country_id=self.soviet_union.id, person_id=self.george.id, group_id=self.cia.id)
+
+        self.assertQuerysetEqual(
+            Membership.objects.filter(person__in=[self.george, self.jim]),[
+                self.jim.id,
+            ],
+            attrgetter('person_id')
+        )
+
     def test_select_related_foreignkey_forward_works(self):
         Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
         Membership.objects.create(membership_country=self.usa, person=self.jim, group=self.democrat)

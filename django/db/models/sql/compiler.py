@@ -465,11 +465,12 @@ class SQLCompiler(object):
         if alias:
             while 1:
                 join = self.query.alias_map[alias]
-                if col != join.join_cols[0][1]:
+                if len(join.join_cols) != 1 or join.join_cols[0][1] != col:
                     break
+
+                col = join.join_cols[0][0]
                 self.query.unref_alias(alias)
                 alias = join.lhs_alias
-                col = join.join_cols[0][0]
         return col, alias
 
     def get_from_clause(self):
