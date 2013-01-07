@@ -64,6 +64,11 @@ class Command(BaseCommand):
         TestRunner = get_runner(settings, options.get('testrunner'))
         options['verbosity'] = int(options.get('verbosity'))
 
+        # if supplying kwargs directly to call_command
+        interactive = options.get('interactive')
+        interactive = not options.get('noinput', not interactive)
+        options['interactive'] = interactive
+
         if options.get('liveserver') is not None:
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options['liveserver']
             del options['liveserver']

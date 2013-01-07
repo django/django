@@ -24,6 +24,11 @@ class Command(BaseCommand):
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
         addrport = options.get('addrport')
+        use_ipv6 = options['use_ipv6'],
+
+        # if supplying kwargs directly to call_command
+        interactive = not options.get('noinput', not interactive)
+        use_ipv6 = options.get('ipv6', False)
 
         # Create a test database.
         db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive)
@@ -40,6 +45,6 @@ class Command(BaseCommand):
             addrport=addrport,
             shutdown_message=shutdown_message,
             use_reloader=False,
-            use_ipv6=options['use_ipv6'],
+            use_ipv6=use_ipv6,
             use_threading=use_threading
         )

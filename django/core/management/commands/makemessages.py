@@ -373,12 +373,21 @@ class Command(NoArgsCommand):
         extensions = options.get('extensions')
         symlinks = options.get('symlinks')
         ignore_patterns = options.get('ignore_patterns')
-        if options.get('use_default_ignore_patterns'):
-            ignore_patterns += ['CVS', '.*', '*~']
-        ignore_patterns = list(set(ignore_patterns))
         no_wrap = options.get('no_wrap')
         no_location = options.get('no_location')
         no_obsolete = options.get('no_obsolete')
+        use_default_ignore_patterns = options.get('use_default_ignore_patterns')
+
+        # if supplying kwargs directly to call_command
+        extensions = options.get('extension', extensions)
+        use_default_ignore_patterns = not options.get('no-default-ignore',
+            not use_default_ignore_patterns)
+        ignore_patterns = options.get('ignore', ignore_patterns)
+
+        if use_default_ignore_patterns:
+            ignore_patterns += ['CVS', '.*', '*~']
+        ignore_patterns = list(set(ignore_patterns))
+
         if domain == 'djangojs':
             exts = extensions if extensions else ['js']
         else:

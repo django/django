@@ -41,6 +41,10 @@ class Command(BaseCommand):
 
     def handle(self, addrport='', *args, **options):
         self.use_ipv6 = options.get('use_ipv6')
+
+        # if supplying kwargs directly to call_command
+        self.use_ipv6 = options.get('ipv6', self.use_ipv6)
+
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
         if args:
@@ -75,6 +79,9 @@ class Command(BaseCommand):
         """
         use_reloader = options.get('use_reloader')
 
+        # if supplying kwargs directly to call_command
+        use_reloader = not options.get('noreload', not use_reloader)
+
         if use_reloader:
             autoreload.main(self.inner_run, args, options)
         else:
@@ -85,6 +92,10 @@ class Command(BaseCommand):
         from django.utils import translation
 
         threading = options.get('use_threading')
+
+        # if supplying kwargs directly to call_command
+        threading = not options.get('nothreading', not threading)
+
         shutdown_message = options.get('shutdown_message', '')
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 

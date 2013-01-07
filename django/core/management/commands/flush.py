@@ -30,8 +30,13 @@ class Command(NoArgsCommand):
         connection = connections[db]
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
+        load_initial_data = options.get('load_initial_data')
         # 'reset_sequences' is a stealth option
         reset_sequences = options.get('reset_sequences', True)
+
+        # if supplying kwargs directly to call_command
+        interactive = not options.get('noinput', not interactive)
+        load_initial_data = not options.get('no_initial_data', not load_initial_data)
 
         self.style = no_style()
 
@@ -84,7 +89,7 @@ The full error: %s""" % (connection.settings_dict['NAME'], e))
             # Reinstall the initial_data fixture.
             kwargs = options.copy()
             kwargs['database'] = db
-            if options.get('load_initial_data'):
+            if load_initial_data:
                 # Reinstall the initial_data fixture.
                 call_command('loaddata', 'initial_data', **options)
 
