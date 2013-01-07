@@ -1,6 +1,6 @@
 import re
 
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, SuspiciousOperation
 from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -12,6 +12,9 @@ REDIRECT_FIELD_NAME = 'next'
 def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i + 1:]
+    from django.conf import settings
+    if path not in settings.AUTHENTICATION_BACKENDS:
+        raise SuspiciousOperation('"%s" is not an valid authentication backend' % path)
     try:
         mod = import_module(module)
     except ImportError as e:
