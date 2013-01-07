@@ -201,7 +201,7 @@ class TestInline(TestCase):
         response = self.client.get('/admin/admin_inlines/binarytree/add/')
         self.assertNotContains(response, inline_form)
 
-        response = self.client.get('/admin/admin_inlines/binarytree/' + str(bt_head.id) + '/')
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" %(bt_head.id))
         self.assertNotContains(response, inline_form)
 
 
