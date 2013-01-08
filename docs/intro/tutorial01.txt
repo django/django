@@ -658,8 +658,10 @@ Save these changes and start a new Python interactive shell by running
     >>> Poll.objects.filter(question__startswith='What')
     [<Poll: What's up?>]
 
-    # Get the poll whose year is 2012.
-    >>> Poll.objects.get(pub_date__year=2012)
+    # Get the poll that was published this year.
+    >>> from django.utils import timezone
+    >>> current_year = timezone.now().year
+    >>> Poll.objects.get(pub_date__year=current_year)
     <Poll: What's up?>
 
     >>> Poll.objects.get(id=2)
@@ -709,8 +711,9 @@ Save these changes and start a new Python interactive shell by running
     # The API automatically follows relationships as far as you need.
     # Use double underscores to separate relationships.
     # This works as many levels deep as you want; there's no limit.
-    # Find all Choices for any poll whose pub_date is in 2012.
-    >>> Choice.objects.filter(poll__pub_date__year=2012)
+    # Find all Choices for any poll whose pub_date is in this year
+    # (reusing the 'current_year' variable we created above).
+    >>> Choice.objects.filter(poll__pub_date__year=current_year)
     [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
     # Let's delete one of the choices. Use delete() for that.
