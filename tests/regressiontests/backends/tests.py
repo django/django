@@ -42,7 +42,7 @@ class OracleChecks(unittest.TestCase):
         # Check that '%' chars are escaped for query execution.
         name = '"SOME%NAME"'
         quoted_name = connection.ops.quote_name(name)
-        self.assertEquals(quoted_name % (), name)
+        self.assertEqual(quoted_name % (), name)
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")

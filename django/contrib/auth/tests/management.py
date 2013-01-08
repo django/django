@@ -186,7 +186,7 @@ class PermissionDuplicationTestCase(TestCase):
         # check duplicated default permission
         models.Permission._meta.permissions = [
            ('change_permission', 'Can edit permission (duplicate)')]
-        self.assertRaisesRegexp(CommandError,
+        six.assertRaisesRegex(self, CommandError,
             "The permission codename 'change_permission' clashes with a "
             "builtin permission for model 'auth.Permission'.",
             create_permissions, models, [], verbosity=0)
@@ -197,7 +197,7 @@ class PermissionDuplicationTestCase(TestCase):
             ('other_one', 'Some other permission'),
             ('my_custom_permission', 'Some permission with duplicate permission code'),
         ]
-        self.assertRaisesRegexp(CommandError,
+        six.assertRaisesRegex(self, CommandError,
             "The permission codename 'my_custom_permission' is duplicated for model "
             "'auth.Permission'.",
             create_permissions, models, [], verbosity=0)

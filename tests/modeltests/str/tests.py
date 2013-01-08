@@ -28,7 +28,7 @@ class SimpleTests(TestCase):
             headline='Girl wins €12.500 in lottery',
             pub_date=datetime.datetime(2005, 7, 28)
         )
-        self.assertRaisesRegexp(RuntimeError, "Did you apply "
+        six.assertRaisesRegex(self, RuntimeError, "Did you apply "
             "@python_2_unicode_compatible without defining __str__\?", str, a)
 
     def test_international(self):
