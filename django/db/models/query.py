@@ -990,7 +990,7 @@ class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
         return instance.query.is_empty()
 
-class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta), object):
+class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
     """
     Marker class usable for checking if a queryset is empty by .none():
         isinstance(qs.none(), EmptyQuerySet) -> True
