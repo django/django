@@ -1293,9 +1293,9 @@ class Queries4Tests(BaseQuerysetTest):
         q1 = Author.objects.filter(report__name='r5')
         q2 = Author.objects.filter(report__name='r4').filter(report__name='r1')
         combined = q1|q2
-        self.assertEquals(str(combined.query).count('JOIN'), 2)
-        self.assertEquals(len(combined), 1)
-        self.assertEquals(combined[0].name, 'a1')
+        self.assertEqual(str(combined.query).count('JOIN'), 2)
+        self.assertEqual(len(combined), 1)
+        self.assertEqual(combined[0].name, 'a1')
 
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
@@ -1644,8 +1644,8 @@ class NullableRelOrderingTests(TestCase):
         # and that join must be LEFT join. The already existing join to related
         # objects must be kept INNER. So, we have both a INNER and a LEFT join
         # in the query.
-        self.assertEquals(str(qs.query).count('LEFT'), 1)
-        self.assertEquals(str(qs.query).count('INNER'), 1)
+        self.assertEqual(str(qs.query).count('LEFT'), 1)
+        self.assertEqual(str(qs.query).count('INNER'), 1)
         self.assertQuerysetEqual(
             qs,
             ['<Plaything: p2>']
@@ -2452,7 +2452,7 @@ class ReverseJoinTrimmingTest(TestCase):
         t = Tag.objects.create()
         qs = Tag.objects.filter(annotation__tag=t.pk)
         self.assertIn('INNER JOIN', str(qs.query))
-        self.assertEquals(list(qs), [])
+        self.assertEqual(list(qs), [])
 
 class JoinReuseTest(TestCase):
     """

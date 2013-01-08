@@ -141,21 +141,21 @@ class ModelTest(TestCase):
 
         # Django raises an Article.MultipleObjectsReturned exception if the
         # lookup matches more than one object
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
             headline__startswith='Area',
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
             pub_date__year=2005,
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
