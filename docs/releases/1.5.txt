@@ -67,7 +67,7 @@ can simply remove that line under Django 1.5
 Python compatibility
 ====================
 
-Django 1.5 requires Python 2.6.5 or above, though we **highly recommended**
+Django 1.5 requires Python 2.6.5 or above, though we **highly recommend**
 Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
