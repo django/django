@@ -311,7 +311,7 @@ class ModelState(object):
         self.adding = True
 
 
-class Model(six.with_metaclass(ModelBase, object)):
+class Model(six.with_metaclass(ModelBase)):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
