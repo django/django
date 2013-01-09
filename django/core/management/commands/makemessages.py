@@ -232,7 +232,6 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
     with open(pofile, 'w') as fp:
         fp.write(msgs)
-    os.unlink(potfile)
     if no_obsolete:
         msgs, errors, status = _popen(
             'msgattrib %s %s -o "%s" --no-obsolete "%s"' %
@@ -309,6 +308,16 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
     wrap = '--no-wrap' if no_wrap else ''
     location = '--no-location' if no_location else ''
 
+    potfile = os.path.join(localedir, '%s.pot' % str(domain))
+
+    if os.path.exists(potfile):
+        os.unlink(potfile)
+
+    for dirpath, file in find_files(".", ignore_patterns, verbosity,
+            stdout, symlinks=symlinks):
+        process_file(file, dirpath, potfile, domain, verbosity, extensions,
+                wrap, location, stdout)
+
     for locale in locales:
         if verbosity > 0:
             stdout.write("processing language %s\n" % locale)
@@ -317,19 +326,12 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
             os.makedirs(basedir)
 
         pofile = os.path.join(basedir, '%s.po' % str(domain))
-        potfile = os.path.join(basedir, '%s.pot' % str(domain))
-
-        if os.path.exists(potfile):
-            os.unlink(potfile)
-
-        for dirpath, file in find_files(".", ignore_patterns, verbosity,
-                stdout, symlinks=symlinks):
-            process_file(file, dirpath, potfile, domain, verbosity, extensions,
-                    wrap, location, stdout)
 
         if os.path.exists(potfile):
             write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
                     not invoked_for_django, wrap, location, no_obsolete)
+
+    os.unlink(potfile)
 
 
 class Command(NoArgsCommand):
