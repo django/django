@@ -754,17 +754,17 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
-        has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
+        id_ = final_attrs.get('id', None)
         output = ['<ul>']
         # Normalize to strings
         str_values = set([force_text(v) for v in value])
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
-            if has_id:
-                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
-                label_for = format_html(' for="{0}"', final_attrs['id'])
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+                label_for = format_html(' for="{0}_{1}"', id_, i)
             else:
                 label_for = ''
 
