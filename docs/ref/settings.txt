@@ -2273,12 +2273,3 @@ IGNORABLE_404_STARTS
 
 .. deprecated:: 1.4
    This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
-
-.. setting:: URL_VALIDATOR_USER_AGENT
-
-URL_VALIDATOR_USER_AGENT
-------------------------
-
-.. deprecated:: 1.5
-    This value was used as the ``User-Agent`` header when checking if a URL
-    exists, a feature that was removed due to security and performance issues.
