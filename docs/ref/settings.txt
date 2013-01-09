@@ -2212,12 +2212,3 @@ Default: Not defined
 
 The site-specific user profile model used by this site. See
 :ref:`User profiles <auth-profiles>`.
-
-.. setting:: URL_VALIDATOR_USER_AGENT
-
-URL_VALIDATOR_USER_AGENT
-------------------------
-
-.. deprecated:: 1.5
-    This value was used as the ``User-Agent`` header when checking if a URL
-    exists, a feature that was removed due to security and performance issues.
