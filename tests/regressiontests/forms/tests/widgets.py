@@ -863,6 +863,13 @@ beatle J R Ringo False""")
 <li><label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label></li>
 </ul>""")
 
+        # Each input gets a separate ID when the ID is passed to the constructor
+        self.assertHTMLEqual(CheckboxSelectMultiple(attrs={'id': 'abc'}).render('letters', list('ac'), choices=zip(list('abc'), list('ABC'))), """<ul>
+<li><label for="abc_0"><input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" /> A</label></li>
+<li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
+<li><label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label></li>
+</ul>""")
+
     def test_multi(self):
         class MyMultiWidget(MultiWidget):
             def decompress(self, value):
