@@ -42,8 +42,7 @@ USE_TZ = False
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-# Languages we provide translations for, out of the box. The language name
-# should be the utf-8 encoded local name for the language.
+# Languages we provide translations for, out of the box.
 LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
     ('az', gettext_noop('Azerbaijani')),
