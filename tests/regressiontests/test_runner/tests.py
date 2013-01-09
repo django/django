@@ -3,6 +3,7 @@ Tests for django test runner
 """
 from __future__ import absolute_import
 
+import sys
 from optparse import make_option
 
 from django.core.exceptions import ImproperlyConfigured
@@ -293,10 +294,13 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertTrue("DeprecationWarning: warning from test" in err)
 
+    @unittest.skipIf(sys.version_info[:2] == (2, 6),
+        "On Python 2.6, DeprecationWarnings are visible anyway")
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=regressiontests.settings', '--verbosity=0']
         out, err = self.run_django_admin(args)
         self.assertFalse("DeprecationWarning: warning from test" in err)
+
 
 class AutoIncrementResetTest(TransactionTestCase):
     """
