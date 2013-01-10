@@ -89,6 +89,7 @@ class Command(BaseCommand):
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 
         self.stdout.write("Validating models...\n\n")
+        self.stdout.flush()
         self.validate(display_num_errors=True)
         self.stdout.write((
             "%(started_at)s\n"
@@ -103,6 +104,7 @@ class Command(BaseCommand):
             "port": self.port,
             "quit_command": quit_command,
         })
+        self.stdout.flush()
         # django.core.management.base forces the locale to en-us. We should
         # set it up correctly for the first request (particularly important
         # in the "--noreload" case).
@@ -124,6 +126,7 @@ class Command(BaseCommand):
             except (AttributeError, KeyError):
                 error_text = str(e)
             self.stderr.write("Error: %s" % error_text)
+            self.stderr.flush()
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:
