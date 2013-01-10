@@ -218,9 +218,10 @@ Manager methods
 .. class:: models.UserManager
 
     The :class:`~django.contrib.auth.models.User` model has a custom manager
-    that has the following helper methods:
+    that has the following helper methods (in addition to the methods provided
+    by :class:`~django.contrib.auth.models.BaseUserManager`):
 
-    .. method:: create_user(username, email=None, password=None)
+    .. method:: create_user(username, email=None, password=None, **extra_fields)
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 
@@ -235,18 +236,17 @@ Manager methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
+        The ``extra_fields`` keyword arguments are passed through to the
+        :class:`~django.contrib.auth.models.User`'s ``__init__`` method to
+        allow setting arbitrary fields on a :ref:`custom User model
+        <auth-custom-user>`.
+
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
-    .. method:: make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+    .. method:: create_superuser(self, username, email, password, **extra_fields)
 
-        Returns a random password with the given length and given string of
-        allowed characters. (Note that the default value of ``allowed_chars``
-        doesn't contain letters that can cause user confusion, including:
-
-        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
-          letter L, uppercase letter i, and the number one)
-        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
-          and zero)
+        Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
+        :attr:`~models.User.is_superuser` to ``True``.
 
 
 Anonymous users
