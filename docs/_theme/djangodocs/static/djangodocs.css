@@ -115,7 +115,7 @@ div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-be
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
-div.versionadded span.title, div.versionchanged span.title { font-weight: bold; }
+div.versionadded span.title, div.versionchanged span.title, div.deprecated span.title { font-weight: bold; }
 
 /*** p-links ***/
 a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }
