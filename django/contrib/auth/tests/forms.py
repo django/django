@@ -7,7 +7,7 @@ from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
-from django.forms.fields import Field, EmailField
+from django.forms.fields import Field, EmailField, CharField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
@@ -137,6 +137,14 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
+
+    def test_username_field_label(self):
+
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = CharField(label="Name", max_length=75)
+
+        form = CustomAuthenticationForm()
+        self.assertEqual(form['username'].label, "Name")
 
 
 @skipIfCustomUser
