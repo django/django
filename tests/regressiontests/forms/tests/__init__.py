@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from .error_messages import (FormsErrorMessagesTestCase,
     ModelChoiceFieldErrorMessagesTestCase)
+from .warning_messages import WarningTests
 from .extra import FormsExtraTestCase, FormsExtraL10NTestCase
 from .fields import FieldsTests
 from .forms import FormsTestCase
