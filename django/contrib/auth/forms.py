@@ -169,7 +169,8 @@ class AuthenticationForm(forms.Form):
         # Set the label for the "username" field.
         UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.fields['username'].label = capfirst(self.username_field.verbose_name)
+        if not self.fields['username'].label:
+            self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
         username = self.cleaned_data.get('username')
