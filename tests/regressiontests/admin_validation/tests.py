@@ -20,6 +20,18 @@ class InvalidFields(admin.ModelAdmin):
     form = SongForm
     fields = ['spam']
 
+class ValidFormFieldsets(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        class ExtraFieldForm(SongForm):
+            name = forms.CharField(max_length=50)
+        return ExtraFieldForm
+
+    fieldsets = (
+        (None, {
+            'fields': ('name',),
+        }),
+    )
+
 class ValidationTestCase(TestCase):
 
     def test_readonly_and_editable(self):
@@ -41,6 +53,9 @@ class ValidationTestCase(TestCase):
             "'InvalidFields.fields' refers to field 'spam' that is missing from the form.",
             validate,
             InvalidFields, Song)
+
+    def test_custom_get_form_with_fieldsets(self):
+        validate(ValidFormFieldsets, Song)
 
     def test_exclude_values(self):
         """
