@@ -16,8 +16,9 @@ Settings
 Core settings
 =============
 
-Here's a list of settings available in Django core, and their default values.
-Settings provided by contrib apps are listed below.
+Here's a list of settings available in Django core and their default values.
+Settings provided by contrib apps are listed below, followed by a topical index
+of the core settings.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
@@ -1885,6 +1886,22 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
+.. setting:: AUTH_PROFILE_MODULE
+
+AUTH_PROFILE_MODULE
+-------------------
+
+.. deprecated:: 1.5
+    With the introduction of :ref:`custom User models <auth-custom-user>`,
+    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
+    model is no longer supported. See the
+    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See
+:ref:`User profiles <auth-profiles>`.
+
 .. setting:: AUTH_USER_MODEL
 
 AUTH_USER_MODEL
@@ -2410,24 +2427,164 @@ setting.
 Static file finders are currently considered a private interface, and this
 interface is thus undocumented.
 
+Core Settings Topical Index
+===========================
 
-Deprecated settings
-===================
+Cache
+-----
+* :setting:`CACHES`
+* :setting:`CACHE_MIDDLEWARE_ALIAS`
+* :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
+* :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
+* :setting:`CACHE_MIDDLEWARE_SECONDS`
 
-The settings in this section are deprecated.
+Database
+--------
+* :setting:`DATABASES`
+* :setting:`DATABASE_ROUTERS`
+* :setting:`DEFAULT_INDEX_TABLESPACE`
+* :setting:`DEFAULT_TABLESPACE`
+* :setting:`TRANSACTIONS_MANAGED`
 
-.. setting:: AUTH_PROFILE_MODULE
+Debugging
+---------
+* :setting:`DEBUG`
+* :setting:`DEBUG_PROPAGATE_EXCEPTIONS`
 
-AUTH_PROFILE_MODULE
--------------------
+Email
+-----
+* :setting:`ADMINS`
+* :setting:`DEFAULT_CHARSET`
+* :setting:`DEFAULT_FROM_EMAIL`
+* :setting:`EMAIL_BACKEND`
+* :setting:`EMAIL_FILE_PATH`
+* :setting:`EMAIL_HOST`
+* :setting:`EMAIL_HOST_PASSWORD`
+* :setting:`EMAIL_HOST_USER`
+* :setting:`EMAIL_PORT`
+* :setting:`EMAIL_SUBJECT_PREFIX`
+* :setting:`EMAIL_USE_TLS`
+* :setting:`MANAGERS`
+* :setting:`SEND_BROKEN_LINK_EMAILS`
+* :setting:`SERVER_EMAIL`
 
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
+Error reporting
+---------------
+* :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
+* :setting:`IGNORABLE_404_URLS`
+* :setting:`MANAGERS`
+* :setting:`SEND_BROKEN_LINK_EMAILS`
 
-Default: Not defined
+File uploads
+------------
+* :setting:`DEFAULT_FILE_STORAGE`
+* :setting:`FILE_CHARSET`
+* :setting:`FILE_UPLOAD_HANDLERS`
+* :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`FILE_UPLOAD_PERMISSIONS`
+* :setting:`FILE_UPLOAD_TEMP_DIR`
+* :setting:`MEDIA_ROOT`
+* :setting:`MEDIA_URL`
 
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
+Globalization (i18n/l10n)
+-------------------------
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`FIRST_DAY_OF_WEEK`
+* :setting:`FORMAT_MODULE_PATH`
+* :setting:`LANGUAGE_CODE`
+* :setting:`LANGUAGE_COOKIE_NAME`
+* :setting:`LANGUAGES`
+* :setting:`LOCALE_PATHS`
+* :setting:`MONTH_DAY_FORMAT`
+* :setting:`NUMBER_GROUPING`
+* :setting:`SHORT_DATE_FORMAT`
+* :setting:`SHORT_DATETIME_FORMAT`
+* :setting:`THOUSAND_SEPARATOR`
+* :setting:`TIME_FORMAT`
+* :setting:`TIME_INPUT_FORMATS`
+* :setting:`TIME_ZONE`
+* :setting:`USE_I18N`
+* :setting:`USE_L10N`
+* :setting:`USE_THOUSAND_SEPARATOR`
+* :setting:`USE_TZ`
+* :setting:`YEAR_MONTH_FORMAT`
+
+HTTP
+----
+* :setting:`DEFAULT_CHARSET`
+* :setting:`DEFAULT_CONTENT_TYPE`
+* :setting:`DISALLOWED_USER_AGENTS`
+* :setting:`FORCE_SCRIPT_NAME`
+* :setting:`INTERNAL_IPS`
+* :setting:`MIDDLEWARE_CLASSES`
+* :setting:`SECURE_PROXY_SSL_HEADER`
+* :setting:`SIGNING_BACKEND`
+* :setting:`USE_ETAGS`
+* :setting:`USE_X_FORWARDED_HOST`
+* :setting:`WSGI_APPLICATION`
+
+Logging
+-------
+* :setting:`LOGGING`
+* :setting:`LOGGING_CONFIG`
+
+Models
+------
+* :setting:`ABSOLUTE_URL_OVERRIDES`
+* :setting:`FIXTURE_DIRS`
+* :setting:`INSTALLED_APPS`
+
+Security
+--------
+* Cross Site Request Forgery protection
+
+  * :setting:`CSRF_COOKIE_DOMAIN`
+  * :setting:`CSRF_COOKIE_NAME`
+  * :setting:`CSRF_COOKIE_PATH`
+  * :setting:`CSRF_COOKIE_SECURE`
+  * :setting:`CSRF_FAILURE_VIEW`
+
+* :setting:`SECRET_KEY`
+* :setting:`X_FRAME_OPTIONS`
+
+Serialization
+-------------
+* :setting:`DEFAULT_CHARSET`
+* :setting:`SERIALIZATION_MODULES`
+
+Templates
+---------
+* :setting:`ALLOWED_INCLUDE_ROOTS`
+* :setting:`TEMPLATE_CONTEXT_PROCESSORS`
+* :setting:`TEMPLATE_DEBUG`
+* :setting:`TEMPLATE_DIRS`
+* :setting:`TEMPLATE_LOADERS`
+* :setting:`TEMPLATE_STRING_IF_INVALID`
+
+Testing
+-------
+* Database
+
+  * :setting:`TEST_CHARSET`
+  * :setting:`TEST_COLLATION`
+  * :setting:`TEST_DEPENDENCIES`
+  * :setting:`TEST_MIRROR`
+  * :setting:`TEST_NAME`
+  * :setting:`TEST_CREATE`
+  * :setting:`TEST_USER`
+  * :setting:`TEST_USER_CREATE`
+  * :setting:`TEST_PASSWD`
+  * :setting:`TEST_TBLSPACE`
+  * :setting:`TEST_TBLSPACE_TMP`
+
+* :setting:`TEST_RUNNER`
+
+URLs
+----
+* :setting:`APPEND_SLASH`
+* :setting:`PREPEND_WWW`
+* :setting:`ROOT_URLCONF`
