@@ -13,8 +13,8 @@ from django.template.defaultfilters import (
     linebreaks_filter, linenumbers, ljust, lower, make_list,
     phone2numeric_filter, pluralize, removetags, rjust, slice_filter, slugify,
     stringformat, striptags, time, timesince_filter, timeuntil_filter, title,
-    truncatewords, truncatewords_html, unordered_list, upper, urlencode,
-    urlize, urlizetrunc, wordcount, wordwrap, yesno,
+    truncatechars_html, truncatewords, truncatewords_html, unordered_list,
+    upper, urlencode, urlize, urlizetrunc, wordcount, wordwrap, yesno,
 )
 from django.test import TestCase
 from django.utils import six
@@ -194,6 +194,23 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(truncatewords_html('<i>Buenos d&iacute;as! '
             '&#x00bf;C&oacute;mo est&aacute;?</i>', 3),
             '<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo ...</i>')
+
+    def test_truncatechars_html(self):
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '...')
+        self.assertEqual(truncatechars_html('<p>one <a href="#">two - '
+            'three <br>four</a> five</p>', 6),
+            '<p>one...</p>')
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 11),
+            '<p>one <a href="#">two ...</a></p>')
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 100),
+            '<p>one <a href="#">two - three <br>four</a> five</p>')
+        self.assertEqual(truncatechars_html(
+            '<b>\xc5ngstr\xf6m</b> was here', 5), '<b>\xc5n...</b>')
+        self.assertEqual(truncatechars_html(
+            'a<b>b</b>c', 3), 'a<b>b</b>c')
 
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')

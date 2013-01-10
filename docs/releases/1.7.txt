@@ -657,7 +657,7 @@ Templates
   * :func:`django.shortcuts.render()`
   * :func:`django.shortcuts.render_to_response()`
 
-* The :tfilter:`time` filter now accepts timzone-related :ref:`format
+* The :tfilter:`time` filter now accepts timezone-related :ref:`format
   specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``
   and ``'Z'`` and is able to digest :ref:`time-zone-aware
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
@@ -667,6 +667,9 @@ Templates
   "template_fragments" if it exists and fall back to using the default cache
   otherwise. It also now accepts an optional ``using`` keyword argument to
   control which cache it uses.
+
+* The new :tfilter:`truncatechars_html` filter truncates a string to be no
+  longer than the specified number of characters, taking HTML into account.
 
 Requests
 ^^^^^^^^
