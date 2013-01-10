@@ -183,11 +183,11 @@ class ReverseSelectRelatedTestCase(TestCase):
         p = Parent2.objects.select_related('child1').only(
             'id2',  'child1__value').get(name2="n2")
         with self.assertNumQueries(1):
-            self.assertEquals(p.name2, 'n2')
+            self.assertEqual(p.name2, 'n2')
         p = Parent2.objects.select_related('child1').only(
             'id2',  'child1__value').get(name2="n2")
         with self.assertNumQueries(1):
-            self.assertEquals(p.child1.name2, 'n2')
+            self.assertEqual(p.child1.name2, 'n2')
 
     @unittest.expectedFailure
     def test_inheritance_deferred2(self):
@@ -202,9 +202,9 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(p.child1.child4.id2, c.id2)
         p = qs.get(name2="n2")
         with self.assertNumQueries(1):
-            self.assertEquals(p.child1.name2, 'n2')
+            self.assertEqual(p.child1.name2, 'n2')
         p = qs.get(name2="n2")
         with self.assertNumQueries(1):
-            self.assertEquals(p.child1.name1, 'n1')
+            self.assertEqual(p.child1.name1, 'n1')
         with self.assertNumQueries(1):
-            self.assertEquals(p.child1.child4.name1, 'n1')
+            self.assertEqual(p.child1.child4.name1, 'n1')

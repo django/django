@@ -53,7 +53,7 @@ class GetObjectOr404Tests(TestCase):
             get_object_or_404, Author.objects.all()
         )
 
-        # Using an EmptyQuerySet raises a Http404 error.
+        # Using an empty QuerySet raises a Http404 error.
         self.assertRaises(Http404,
             get_object_or_404, Article.objects.none(), title__contains="Run"
         )

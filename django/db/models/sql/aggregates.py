@@ -1,6 +1,7 @@
 """
 Classes to represent the default SQL aggregate functions
 """
+import copy
 
 from django.db.models.fields import IntegerField, FloatField
 
@@ -61,6 +62,11 @@ class Aggregate(object):
                 tmp = tmp.source
 
         self.field = tmp
+
+    def clone(self):
+        # Different aggregates have different init methods, so use copy here
+        # deepcopy is not needed, as self.col is only changing variable.
+        return copy.copy(self)
 
     def relabel_aliases(self, change_map):
         if isinstance(self.col, (list, tuple)):

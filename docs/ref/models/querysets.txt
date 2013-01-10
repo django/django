@@ -593,15 +593,17 @@ none
 
 .. method:: none()
 
-Returns an ``EmptyQuerySet`` — a ``QuerySet`` subclass that always evaluates to
-an empty list. This can be used in cases where you know that you should return
-an empty result set and your caller is expecting a ``QuerySet`` object (instead
-of returning an empty list, for example.)
+Calling none() will create a queryset that never returns any objects and no
+query will be executed when accessing the results. A qs.none() queryset
+is an instance of ``EmptyQuerySet``.
 
 Examples::
 
     >>> Entry.objects.none()
     []
+    >>> from django.db.models.query import EmptyQuerySet
+    >>> isinstance(Entry.objects.none(), EmptyQuerySet)
+    True
 
 all
 ~~~

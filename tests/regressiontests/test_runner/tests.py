@@ -3,6 +3,7 @@ Tests for django test runner
 """
 from __future__ import absolute_import
 
+import sys
 from optparse import make_option
 
 from django.core.exceptions import ImproperlyConfigured
@@ -277,6 +278,29 @@ class DummyBackendTest(unittest.TestCase):
                       "an error: %s" % e)
         finally:
             db.connections = old_db_connections
+
+
+class DeprecationDisplayTest(AdminScriptTestCase):
+    # tests for 19546
+    def setUp(self):
+        settings = {'INSTALLED_APPS': '("regressiontests.test_runner.deprecation_app",)',
+                    'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
+        self.write_settings('settings.py', sdict=settings)
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_runner_deprecation_verbosity_default(self):
+        args = ['test', '--settings=regressiontests.settings']
+        out, err = self.run_django_admin(args)
+        self.assertTrue("DeprecationWarning: warning from test" in err)
+
+    @unittest.skipIf(sys.version_info[:2] == (2, 6),
+        "On Python 2.6, DeprecationWarnings are visible anyway")
+    def test_runner_deprecation_verbosity_zero(self):
+        args = ['test', '--settings=regressiontests.settings', '--verbosity=0']
+        out, err = self.run_django_admin(args)
+        self.assertFalse("DeprecationWarning: warning from test" in err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):
