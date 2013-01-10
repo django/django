@@ -662,14 +662,15 @@ class BaseModelFormSet(BaseFormSet):
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
-                         formset=BaseModelFormSet,
-                         extra=1, can_delete=False, can_order=False,
-                         max_num=None, fields=None, exclude=None):
+                         formset=BaseModelFormSet, extra=1, can_delete=False,
+                         can_order=False, max_num=None, fields=None,
+                         exclude=None, widgets=None):
     """
     Returns a FormSet class for the given Django model class.
     """
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
-                             formfield_callback=formfield_callback)
+                             formfield_callback=formfield_callback,
+                             widgets=widgets)
     FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
                               can_order=can_order, can_delete=can_delete)
     FormSet.model = model

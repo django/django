@@ -1190,3 +1190,16 @@ class ModelFormsetTest(TestCase):
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset._non_form_errors,
             ['Please correct the duplicate data for subtitle which must be unique for the month in posted.'])
+
+
+class TestModelFormsetWidgets(TestCase):
+    def test_widgets(self):
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'poet'})
+        }
+        PoetFormSet = modelformset_factory(Poet, widgets=widgets)
+        form = PoetFormSet.form()
+        self.assertHTMLEqual(
+            str(form['name']),
+            '<input id="id_name" maxlength="100" type="text" class="poet" name="name" />'
+        )

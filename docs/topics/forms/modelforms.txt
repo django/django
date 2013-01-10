@@ -622,6 +622,16 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Specifying widgets to use in the ``ModelForm`` with ``widgets``
+---------------------------------------------------------------
+
+Using the ``widgets`` parameter, you can specify a dictionary of values to
+customize the ``ModelForm``'s widget class for a particular field. This
+works the same way as the ``widgets`` dictionary on the inner ``Meta``
+class of a ``ModelForm`` works::
+
+    >>> AuthorFormSet = modelformset_factory(Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
+
 Providing initial values
 ------------------------
 
