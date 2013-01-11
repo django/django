@@ -1406,7 +1406,7 @@ Django provides both uncompressed and 'minified' versions of jQuery, as
 ``jquery.js`` and ``jquery.min.js`` respectively.
 
 The ``BaseModelAdmin`` superclass has a ``media`` property that returns a list
-of media files' URLS to the form. If :setting:`DEBUG` is ``True`` it will return
+of media files' URLs to the form. If :setting:`DEBUG` is ``True`` it will return
 the uncompressed versions of various JavaScript files, including ``jquery.js``;
 if not, it will return the 'minified' versions.
 
