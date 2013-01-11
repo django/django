@@ -18,6 +18,8 @@ from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+from django.db.models import fields
+from django.db.models.sql import aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
@@ -126,6 +128,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         limit = 999 if len(fields) > 1 else 500
         return (limit // len(fields)) if len(fields) > 0 else len(objs)
+
+    def check_aggregate_support(self, aggregate):
+        bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
+        bad_aggregates = (aggregates.Sum, aggregates.Avg,
+                          aggregates.Variance, aggregates.StdDev)
+        if (isinstance(aggregate.source, bad_fields) and
+                isinstance(aggregate, bad_aggregates)):
+            raise NotImplementedError(
+                'You cannot use Sum, Avg, StdDev and Variance aggregations '
+                'on date/time fields in sqlite3 '
+                'since date/time is saved as text.')
 
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
