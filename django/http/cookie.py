@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.utils.encoding import force_str
+from django.utils import six
 from django.utils.six.moves import http_cookies
 
 
@@ -48,7 +49,9 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(force_str(rawdata))
+                if not six.PY3 and isinstance(rawdata, six.text_type):
+                    rawdata = force_str(rawdata)
+                super(SimpleCookie, self).load(rawdata)
                 for key in self.bad_cookies:
                     del self[key]
 
