@@ -75,3 +75,14 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+
+
+@python_2_unicode_compatible
+class Item(models.Model):
+    name = models.CharField(max_length=30)
+    date = models.DateField()
+    time = models.TimeField()
+    last_modified = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
