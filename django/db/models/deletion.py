@@ -75,17 +75,17 @@ class Collector(object):
         self.using = using
         # Initially, {model: set([instances])}, later values become lists.
         self.data = {}
-        self.field_updates = {} # {model: {(field, value): set([instances])}}
+        self.field_updates = {}  # {model: {(field, value): set([instances])}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
-        self.fast_deletes = [] 
+        self.fast_deletes = []
 
         # Tracks deletion-order dependency for databases without transactions
         # or ability to defer constraint checks. Only concrete model classes
         # should be included, as the dependencies exist only between actual
         # database tables; proxy models are represented here by their concrete
         # parent.
-        self.dependencies = {} # {model: set([models])}
+        self.dependencies = {}  # {model: set([models])}
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
@@ -262,6 +262,14 @@ class Collector(object):
         self.data = SortedDict([(model, self.data[model])
                                 for model in sorted_models])
 
+    def send_post_delete_signals(self, model, instances):
+        if model._meta.auto_created:
+            return
+        for obj in instances:
+            signals.post_delete.send(
+                sender=model, instance=obj, using=self.using
+            )
+
     @force_managed
     def delete(self):
         # sort instance collections
@@ -300,13 +308,7 @@ class Collector(object):
             query = sql.DeleteQuery(model)
             pk_list = [obj.pk for obj in instances]
             query.delete_batch(pk_list, self.using)
-
-        # send post_delete signals
-        for model, obj in self.instances_with_model():
-            if not model._meta.auto_created:
-                signals.post_delete.send(
-                    sender=model, instance=obj, using=self.using
-                )
+            self.send_post_delete_signals(model, instances)
 
         # update collected instances
         for model, instances_for_fieldvalues in six.iteritems(self.field_updates):

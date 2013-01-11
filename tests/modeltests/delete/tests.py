@@ -229,6 +229,18 @@ class DeletionTests(TestCase):
         models.signals.post_delete.disconnect(log_post_delete)
         models.signals.post_delete.disconnect(log_pre_delete)
 
+    def test_relational_post_delete_signals_happen_before_parent_object(self):
+        def log_post_delete(instance, **kwargs):
+            self.assertTrue(R.objects.filter(pk=instance.r_id))
+
+        models.signals.post_delete.connect(log_post_delete, sender=S)
+
+        r = R.objects.create(pk=1)
+        S.objects.create(pk=1, r=r)
+        r.delete()
+
+        models.signals.post_delete.disconnect(log_post_delete)
+
     @skipUnlessDBFeature("can_defer_constraint_checks")
     def test_can_defer_constraint_checks(self):
         u = User.objects.create(
