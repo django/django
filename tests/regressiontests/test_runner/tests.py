@@ -11,9 +11,11 @@ from django.core.management import call_command
 from django import db
 from django.test import simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
+from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
 from django.utils.importlib import import_module
+from django.test.utils import override_settings
 
 from ..admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -21,6 +23,8 @@ from .models import Person
 
 TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
 TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
+DISCOVER_APP_TESTS = 'regressiontests.test_runner.discovery_app'
+DISCOVER_APP_MODEL_TESTS = 'regressiontests.test_runner.discovery_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -37,7 +41,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig,value in ordered]
+        ordered_sigs = [sig for sig, value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -57,7 +61,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig,value in ordered]
+        ordered_sigs = [sig for sig, value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -78,13 +82,13 @@ class DependencyOrderingTests(unittest.TestCase):
             ('s4', ('s4_db', ['delta'])),
         ]
         dependencies = {
-            'alpha': ['bravo','delta'],
+            'alpha': ['bravo', 'delta'],
             'bravo': ['charlie'],
             'delta': ['charlie'],
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig,aliases in ordered]
+        ordered_sigs = [sig for sig, aliases in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -153,9 +157,9 @@ class ManageCommandTests(unittest.TestCase):
 
 class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
     option_list = (
-        make_option('--option_a','-a', action='store', dest='option_a', default='1'),
-        make_option('--option_b','-b', action='store', dest='option_b', default='2'),
-        make_option('--option_c','-c', action='store', dest='option_c', default='3'),
+        make_option('--option_a', '-a', action='store', dest='option_a', default='1'),
+        make_option('--option_b', '-b', action='store', dest='option_b', default='2'),
+        make_option('--option_c', '-c', action='store', dest='option_c', default='3'),
     )
 
     def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
@@ -321,3 +325,22 @@ class AutoIncrementResetTest(TransactionTestCase):
     def test_autoincrement_reset2(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)
+
+
+class DiscoverTestRunnerTests(AdminScriptTestCase):
+
+    def test_discovery_of_tests_default_settings(self):
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_TESTS, ))
+        discovered_tests = suite.countTestCases()
+        self.assertEqual(3, discovered_tests)
+
+    def test_discovery_of_tests_inside_module(self):
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_MODEL_TESTS, ))
+        discovered_tests = suite.countTestCases()
+        self.assertEqual(1, discovered_tests)
+
+    @override_settings(TEST_DISCOVER_PATTERN='*_test.py')
+    def test_discovery_of_tests_with_pattern(self):
+        suite = DiscoverRunner().build_suite((DISCOVER_APP_TESTS, ))
+        discovered_tests = suite.countTestCases()
+        self.assertEqual(4, discovered_tests)

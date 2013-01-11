@@ -24,6 +24,7 @@ def _CmpToKey(mycmp):
     class K(object):
         def __init__(self, obj):
             self.obj = obj
+
         def __lt__(self, other):
             return mycmp(self.obj, other.obj) == -1
     return K
@@ -44,8 +45,10 @@ def _make_failed_import_test(name, suiteClass):
     return _make_failed_test('ModuleImportFailure', name, ImportError(message),
                              suiteClass)
 
+
 def _make_failed_load_tests(name, exception, suiteClass):
     return _make_failed_test('LoadTestsFailure', name, exception, suiteClass)
+
 
 def _make_failed_test(classname, methodname, exception, suiteClass):
     def testFailure(self):
@@ -310,12 +313,15 @@ def _makeLoader(prefix, sortUsing, suiteClass=None):
         loader.suiteClass = suiteClass
     return loader
 
+
 def getTestCaseNames(testCaseClass, prefix, sortUsing=cmp):
     return _makeLoader(prefix, sortUsing).getTestCaseNames(testCaseClass)
+
 
 def makeSuite(testCaseClass, prefix='test', sortUsing=cmp,
               suiteClass=suite.TestSuite):
     return _makeLoader(prefix, sortUsing, suiteClass).loadTestsFromTestCase(testCaseClass)
+
 
 def findTestCases(module, prefix='test', sortUsing=cmp,
                   suiteClass=suite.TestSuite):
