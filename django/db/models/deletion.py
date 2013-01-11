@@ -305,18 +305,20 @@ class Collector(object):
 
         # delete batches
         for model, batches in six.iteritems(self.batches):
+            auto_created = model._meta.auto_created
             query = sql.DeleteQuery(model)
             for field, instances in six.iteritems(batches):
                 query.delete_batch([obj.pk for obj in instances], self.using, field)
+            if not auto_created:
+                signals.post_delete.send(
+                    sender=model, instance=obj, using=self.using
+                )
 
         # delete instances
         for model, instances in six.iteritems(self.data):
             query = sql.DeleteQuery(model)
             pk_list = [obj.pk for obj in instances]
             query.delete_batch(pk_list, self.using)
-
-        # send post_delete signals
-        for model, obj in self.instances_with_model():
             if not model._meta.auto_created:
                 signals.post_delete.send(
                     sender=model, instance=obj, using=self.using
