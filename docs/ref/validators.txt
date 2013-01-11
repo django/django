@@ -96,7 +96,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ------------------
 .. data:: validate_email
 
-    A :class:`RegexValidator` instance that ensures a value looks like an
+    An ``EmailValidator`` instance that ensures a value looks like an
     email address.
 
 ``validate_slug``
