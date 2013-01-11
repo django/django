@@ -115,6 +115,7 @@ class URLTranslationTests(URLTestCaseBase):
 
         with translation.override('nl'):
             self.assertEqual(reverse('users'), '/nl/gebruikers/')
+            self.assertEqual(reverse('prefixed_xml'), '/nl/prefixed.xml')
 
         with translation.override('pt-br'):
             self.assertEqual(reverse('users'), '/pt-br/usuarios/')
@@ -185,6 +186,9 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
         # target status code of 301 because of CommonMiddleware redirecting
         self.assertIn(('http://testserver/en/account/register/', 301), response.redirect_chain)
         self.assertRedirects(response, '/en/account/register/', 302)
+
+        response = self.client.get('/prefixed.xml', HTTP_ACCEPT_LANGUAGE='en', follow=True)
+        self.assertRedirects(response, '/en/prefixed.xml', 302)
 
 
 class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
