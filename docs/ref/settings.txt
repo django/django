@@ -744,13 +744,13 @@ sensitive (or offensive), such as :setting:`SECRET_KEY` or
 :setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
 name includes any of the following:
 
-    * API
-    * KEY
-    * PASS
-    * PROFANITIES_LIST
-    * SECRET
-    * SIGNATURE
-    * TOKEN
+* ``'API'``
+* ``'KEY'``
+* ``'PASS'``
+* ``'PROFANITIES_LIST'``
+* ``'SECRET'``
+* ``'SIGNATURE'``
+* ``'TOKEN'``
 
 Note that these are *partial* matches. ``'PASS'`` will also match PASSWORD,
 just as ``'TOKEN'`` will also match TOKENIZED and so on.
