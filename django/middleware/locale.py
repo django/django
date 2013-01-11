@@ -31,10 +31,12 @@ class LocaleMiddleware(object):
                     and self.is_language_prefix_patterns_used()):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
-            if settings.APPEND_SLASH and not language_path.endswith('/'):
-                language_path = language_path + '/'
+            path_valid = is_valid_path(language_path, urlconf)
+            if (not path_valid and settings.APPEND_SLASH
+                    and not language_path.endswith('/')):
+                path_valid = is_valid_path("%s/" % language_path, urlconf)
 
-            if is_valid_path(language_path, urlconf):
+            if path_valid:
                 language_url = "%s://%s/%s%s" % (
                     request.is_secure() and 'https' or 'http',
                     request.get_host(), language, request.get_full_path())
