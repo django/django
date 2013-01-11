@@ -588,3 +588,7 @@ class CookieTests(unittest.TestCase):
         c['name']['httponly'] = True
         self.assertTrue(c['name']['httponly'])
 
+    def test_load_dict(self):
+        c = SimpleCookie()
+        c.load({'name': 'val'})
+        self.assertEqual(c['name'].value, 'val')
