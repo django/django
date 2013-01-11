@@ -16,6 +16,7 @@ class LocaleMiddleware(object):
     translated to the language the user desires (if the language
     is available, of course).
     """
+    redirect_class = HttpResponseRedirect
 
     def process_request(self, request):
         check_path = self.is_language_prefix_patterns_used()
@@ -38,7 +39,7 @@ class LocaleMiddleware(object):
                 language_url = "%s://%s/%s%s" % (
                     request.is_secure() and 'https' or 'http',
                     request.get_host(), language, request.get_full_path())
-                return HttpResponseRedirect(language_url)
+                return self.redirect_class(language_url)
         translation.deactivate()
 
         patch_vary_headers(response, ('Accept-Language',))
