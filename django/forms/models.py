@@ -811,7 +811,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None,
                           extra=3, can_order=False, can_delete=True, max_num=None,
-                          formfield_callback=None):
+                          formfield_callback=None, widgets=None):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 
@@ -832,6 +832,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'fields': fields,
         'exclude': exclude,
         'max_num': max_num,
+        'widgets': widgets
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
