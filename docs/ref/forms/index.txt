@@ -9,5 +9,6 @@ Detailed form API reference. For introductory material, see :doc:`/topics/forms/
 
    api
    fields
+   models
    widgets
    validation
