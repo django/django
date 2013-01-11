@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import os
+import re
 import sys
 import time
 import warnings
@@ -504,7 +505,9 @@ class SerializationTests(TestCase):
         self.assertXMLEqual(field.childNodes[0].wholeText, dt)
 
     def assert_yaml_contains_datetime(self, yaml, dt):
-        self.assertIn("- fields: {dt: !!timestamp '%s'}" % dt, yaml)
+        # Depending on the yaml dumper, '!timestamp' might be absent
+        self.assertRegexpMatches(yaml,
+            r"- fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
