@@ -12,6 +12,7 @@ from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
     IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
+from django.db.models import fields, Sum, Avg, Variance, StdDev
 from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
@@ -362,6 +363,22 @@ class EscapingChecks(TestCase):
         self.assertTrue(int(response))
 
 
+class SqlliteAggregationTests(TestCase):
+    """
+    #19360: Raise NotImplementedError when aggregating on date/time fields.
+    """
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "No need to check SQLite aggregation semantics")
+    def test_aggregation(self):
+        for aggregate in (Sum, Avg, Variance, StdDev):
+            self.assertRaises(NotImplementedError,
+                models.Item.objects.all().aggregate, aggregate('time'))
+            self.assertRaises(NotImplementedError,
+                models.Item.objects.all().aggregate, aggregate('date'))
+            self.assertRaises(NotImplementedError,
+                models.Item.objects.all().aggregate, aggregate('last_modified'))
+
+
 class BackendTestCase(TestCase):
 
     def create_squares_with_executemany(self, args):
@@ -399,7 +416,6 @@ class BackendTestCase(TestCase):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 9)
-
 
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects

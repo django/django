@@ -2188,6 +2188,14 @@ Django provides the following aggregation functions in the
 aggregate functions, see
 :doc:`the topic guide on aggregation </topics/db/aggregation>`.
 
+.. warning::
+
+    SQLite can't handle aggregation on date/time fields out of the box.
+    This is because there are no native date/time fields in SQLite and Django
+    currently emulates these features using a text field. Attempts to use
+    aggregation on date/time fields in SQLite will raise
+    ``NotImplementedError``.
+
 Avg
 ~~~
 
