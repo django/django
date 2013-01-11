@@ -96,9 +96,10 @@ Download the Django source code repository using the following command::
 
         pip install -e /path/to/your/local/clone/django/
 
-    to link your cloned checkout into a virtual environment. This is a great
-    option to isolate your development copy of Django from the rest of your
-    system and avoids potential package conflicts.
+    (where ``django`` is the directory of your clone that contains
+    ``setup.py``) to link your cloned checkout into a virtual environment. This
+    is a great option to isolate your development copy of Django from the rest
+    of your system and avoids potential package conflicts.
 
 __ http://www.virtualenv.org
 
