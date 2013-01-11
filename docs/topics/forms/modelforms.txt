@@ -544,6 +544,33 @@ for more on how field cleaning and validation work. Also, your model's
 :ref:`Validating objects <validating-objects>` for more information on the
 model's ``clean()`` hook.
 
+.. _modelforms-factory:
+
+ModelForm factory function
+--------------------------
+
+You can create forms from a given model using the standalone function
+:class:`~django.forms.models.modelform_factory`, instead of using a class
+definition. This may be more convenient if you do not have many customizations
+to make::
+
+    >>> from django.forms.models import modelform_factory
+    >>> BookForm = modelform_factory(Book)
+
+This can also be used to make simple modifications to existing forms, for
+example by specifying which fields should be displayed::
+
+    >>> Form = modelform_factory(Book, form=BookForm, fields=("author",))
+
+... or which fields should be excluded::
+
+    >>> Form = modelform_factory(Book, form=BookForm, exclude=("title",))
+
+You can also specify the widgets to be used for a given field::
+
+    >>> from django.forms import Textarea
+    >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
+
 .. _model-formsets:
 
 Model formsets
@@ -574,9 +601,10 @@ with the ``Author`` model. It works just like a regular formset::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    ``modelformset_factory`` uses ``formset_factory`` to generate formsets.
-    This means that a model formset is just an extension of a basic formset
-    that knows how to interact with a particular model.
+
+    :func:`~django.forms.models.modelformset_factory` uses ``formset_factory``
+    to generate formsets. This means that a model formset is just an extension
+    of a basic formset that knows how to interact with a particular model.
 
 Changing the queryset
 ---------------------
@@ -628,8 +656,9 @@ Providing initial values
 As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
-``modelformset_factory``. However, with model formsets, the initial values only
-apply to extra forms, those that aren't bound to an existing object instance.
+:func:`~django.forms.models.modelformset_factory`. However, with model
+formsets, the initial values only apply to extra forms, those that aren't bound
+to an existing object instance.
 
 .. _saving-objects-in-the-formset:
 
@@ -675,7 +704,8 @@ Limiting the number of editable objects
 ---------------------------------------
 
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
-to ``modelformset_factory`` to limit the number of extra forms displayed.
+to :func:`~django.forms.models.modelformset_factory` to limit the number of
+extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed::
 
@@ -850,7 +880,9 @@ a particular author, you could do this::
     >>> formset = BookFormSet(instance=author)
 
 .. note::
-    ``inlineformset_factory`` uses ``modelformset_factory`` and marks
+
+    ``inlineformset_factory`` uses
+    :func:`~django.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
 .. seealso::
