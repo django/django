@@ -75,3 +75,13 @@ class TestStorage(object):
         storage.extra_data = extra_context
         storage2 = self.get_storage()('wizard2', request, None)
         self.assertEqual(storage2.extra_data, {})
+
+    def test_extra_context_key_persistence(self):
+        request = get_request()
+        storage = self.get_storage()('wizard1', request, None)
+
+        self.assertFalse('test' in storage.extra_data)
+
+        storage.extra_data['test'] = True
+
+        self.assertTrue('test' in storage.extra_data)
