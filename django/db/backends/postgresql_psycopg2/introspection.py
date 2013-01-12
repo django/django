@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db.backends import BaseDatabaseIntrospection
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -45,7 +45,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE table_name = %s""", [table_name])
         null_map = dict(cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [line[:6] + (null_map[line[0]]=='YES',)
+        return [FieldInfo(*(line[:6] + (null_map[line[0]]=='YES',)))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
