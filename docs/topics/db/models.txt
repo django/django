@@ -989,10 +989,10 @@ right).
 
 So a child model does not have access to its parent's :ref:`Meta
 <meta-options>` class. However, there are a few limited cases where the child
-inherits behavior from the parent: if the child does not specify an
-:attr:`~django.db.models.Options.ordering` attribute or a
-:attr:`~django.db.models.Options.get_latest_by` attribute, it will inherit
-these from its parent.
+inherits behavior from the parent: if the child does not specify an attribute
+:attr:`~django.db.models.Options.ordering` or
+:attr:`~django.db.models.Options.get_latest_by`,
+, it will inherit these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
 ordering, you can explicitly disable it::
