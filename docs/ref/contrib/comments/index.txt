@@ -34,7 +34,8 @@ To get started using the ``comments`` app, follow these steps:
 #. Use the `comment template tags`_ below to embed comments in your
    templates.
 
-You might also want to examine :doc:`/ref/contrib/comments/settings`.
+You might also want to examine :ref:`the available settings
+<settings-comments>`.
 
 Comment template tags
 =====================
@@ -335,6 +336,13 @@ output the CSRF token and cookie.
 
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
 
+
+Configuration
+=============
+
+See :ref:`comment settings <settings-comments>`.
+
+
 More information
 ================
 
@@ -342,7 +350,6 @@ More information
    :maxdepth: 1
 
    models
-   settings
    signals
    custom
    forms

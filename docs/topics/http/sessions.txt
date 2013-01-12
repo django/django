@@ -28,6 +28,8 @@ If you don't want to use sessions, you might as well remove the
 ``'django.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
 It'll save you a small bit of overhead.
 
+.. _configuring-sessions:
+
 Configuring the session engine
 ==============================
 
@@ -499,111 +501,20 @@ session data is stored by the users' browsers.
 Settings
 ========
 
-A few :doc:`Django settings </ref/settings>` give you control over session
+A few :ref:`Django settings <settings-sessions>` give you control over session
 behavior:
 
-SESSION_ENGINE
---------------
-
-Default: ``django.contrib.sessions.backends.db``
-
-Controls where Django stores session data. Valid values are:
-
-* ``'django.contrib.sessions.backends.db'``
-* ``'django.contrib.sessions.backends.file'``
-* ``'django.contrib.sessions.backends.cache'``
-* ``'django.contrib.sessions.backends.cached_db'``
-* ``'django.contrib.sessions.backends.signed_cookies'``
-
-See `configuring the session engine`_ for more details.
-
-SESSION_FILE_PATH
------------------
-
-Default: ``/tmp/``
-
-If you're using file-based session storage, this sets the directory in
-which Django will store session data.
-
-SESSION_COOKIE_AGE
-------------------
-
-Default: ``1209600`` (2 weeks, in seconds)
-
-The age of session cookies, in seconds.
-
-SESSION_COOKIE_DOMAIN
----------------------
-
-Default: ``None``
-
-The domain to use for session cookies. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
-
-SESSION_COOKIE_HTTPONLY
------------------------
-
-Default: ``True``
-
-Whether to use HTTPOnly flag on the session cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the
-session cookie.
-
-HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
-is not part of the :rfc:`2109` standard for cookies, and it isn't honored
-consistently by all browsers. However, when it is honored, it can be a
-useful way to mitigate the risk of client side script accessing the
-protected cookie data.
-
-.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
-
-SESSION_COOKIE_NAME
--------------------
-
-Default: ``'sessionid'``
-
-The name of the cookie to use for sessions. This can be whatever you want.
-
-SESSION_COOKIE_PATH
--------------------
-
-Default: ``'/'``
-
-The path set on the session cookie. This should either match the URL path of
-your Django installation or be parent of that path.
-
-This is useful if you have multiple Django instances running under the same
-hostname. They can use different cookie paths, and each instance will only see
-its own session cookie.
-
-SESSION_COOKIE_SECURE
----------------------
-
-Default: ``False``
-
-Whether to use a secure cookie for the session cookie. If this is set to
-``True``, the cookie will be marked as "secure," which means browsers may
-ensure that the cookie is only sent under an HTTPS connection.
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE
--------------------------------
-
-Default: ``False``
-
-Whether to expire the session when the user closes his or her browser. See
-"Browser-length sessions vs. persistent sessions" above.
-
-SESSION_SAVE_EVERY_REQUEST
---------------------------
-
-Default: ``False``
-
-Whether to save the session data on every request. If this is ``False``
-(default), then the session data will only be saved if it has been modified --
-that is, if any of its dictionary values have been assigned or deleted.
-
-.. _Django settings: ../settings/
+* :setting:`SESSION_CACHE_ALIAS`
+* :setting:`SESSION_COOKIE_AGE`
+* :setting:`SESSION_COOKIE_DOMAIN`
+* :setting:`SESSION_COOKIE_HTTPONLY`
+* :setting:`SESSION_COOKIE_NAME`
+* :setting:`SESSION_COOKIE_PATH`
+* :setting:`SESSION_COOKIE_SECURE`
+* :setting:`SESSION_ENGINE`
+* :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
+* :setting:`SESSION_FILE_PATH`
+* :setting:`SESSION_SAVE_EVERY_REQUEST`
 
 Technical details
 =================
