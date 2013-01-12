@@ -318,11 +318,11 @@ Advanced ``WizardView`` methods
     counter as string representing the current step of the wizard. (E.g., the
     first form is ``'0'`` and the second form is ``'1'``)
 
-.. method:: WizardView.get_form_prefix(step)
+.. method:: WizardView.get_form_prefix(step, form)
 
-    Given the step, returns a form prefix to use. By default, this simply uses
-    the step itself. For more, see the :ref:`form prefix documentation
-    <form-prefix>`.
+    Given the step and the form class which will be called with the returned
+    form prefix. By default, this simply uses the step itself.
+    For more, see the :ref:`form prefix documentation <form-prefix>`.
 
 .. method:: WizardView.get_form_initial(step)
 
