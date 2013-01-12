@@ -4,6 +4,7 @@ try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
+from collections import namedtuple
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -917,6 +918,12 @@ class BaseDatabaseOperations(object):
         backend due to #10888.
         """
         return params
+
+
+# Structure returned by the DB-API cursor.description interface (PEP 249)
+FieldInfo = namedtuple('FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok'
+)
 
 class BaseDatabaseIntrospection(object):
     """
