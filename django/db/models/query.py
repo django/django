@@ -29,6 +29,7 @@ REPR_OUTPUT_SIZE = 20
 # Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
 
+
 class QuerySet(object):
     """
     Represents a lazy database lookup for a set of objects.
@@ -487,20 +488,27 @@ class QuerySet(object):
                     # Re-raise the IntegrityError with its original traceback.
                     six.reraise(*exc_info)
 
-    def latest(self, field_name=None):
+    def _earliest_or_latest(self, field_name=None, direction="-"):
         """
-        Returns the latest object, according to the model's 'get_latest_by'
-        option or optional given field_name.
+        Returns the latest object, according to the model's
+        'get_latest_by' option or optional given field_name.
         """
-        latest_by = field_name or self.model._meta.get_latest_by
-        assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
+        order_by = field_name or getattr(self.model._meta, 'get_latest_by')
+        assert bool(order_by), "earliest() and latest() require either a "\
+            "field_name parameter or 'get_latest_by' in the model"
         assert self.query.can_filter(), \
-                "Cannot change a query once a slice has been taken."
+            "Cannot change a query once a slice has been taken."
         obj = self._clone()
         obj.query.set_limits(high=1)
         obj.query.clear_ordering()
-        obj.query.add_ordering('-%s' % latest_by)
+        obj.query.add_ordering('%s%s' % (direction, order_by))
         return obj.get()
+
+    def earliest(self, field_name=None):
+        return self._earliest_or_latest(field_name=field_name, direction="")
+
+    def latest(self, field_name=None):
+        return self._earliest_or_latest(field_name=field_name, direction="-")
 
     def in_bulk(self, id_list):
         """

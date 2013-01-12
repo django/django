@@ -1477,14 +1477,23 @@ This example returns the latest ``Entry`` in the table, according to the
 
 If your model's :ref:`Meta <meta-options>` specifies
 :attr:`~django.db.models.Options.get_latest_by`, you can leave off the
-``field_name`` argument to ``latest()``. Django will use the field specified
-in :attr:`~django.db.models.Options.get_latest_by` by default.
+``field_name`` argument to ``earliest()`` or ``latest()``. Django will use the
+field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
 
-Like :meth:`get()`, ``latest()`` raises
-:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the given
-parameters.
+Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
+:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the
+given parameters.
 
-Note ``latest()`` exists purely for convenience and readability.
+Note that ``earliest()`` and ``latest()`` exist purely for convenience and
+readability.
+
+earliest
+~~~~~~~~
+
+.. method:: earliest(field_name=None)
+
+Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
+the direction is changed.
 
 aggregate
 ~~~~~~~~~

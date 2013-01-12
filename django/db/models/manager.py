@@ -172,6 +172,9 @@ class Manager(object):
     def iterator(self, *args, **kwargs):
         return self.get_query_set().iterator(*args, **kwargs)
 
+    def earliest(self, *args, **kwargs):
+        return self.get_query_set().earliest(*args, **kwargs)
+
     def latest(self, *args, **kwargs):
         return self.get_query_set().latest(*args, **kwargs)
 

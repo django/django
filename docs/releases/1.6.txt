@@ -28,6 +28,9 @@ Minor features
   undefined if the given ``QuerySet`` isn't ordered and there are more than
   one ordered values to compare against.
 
+* Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
+  :meth:`~django.db.models.query.QuerySet.latest`.
+
 Backwards incompatible changes in 1.6
 =====================================
 
