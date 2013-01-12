@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
@@ -157,10 +159,9 @@ class AuthenticationForm(forms.Form):
 
     def __init__(self, request=None, *args, **kwargs):
         """
-        If request is passed in, the form will validate that cookies are
-        enabled. Note that the request (a HttpRequest object) must have set a
-        cookie with the key TEST_COOKIE_NAME and value TEST_COOKIE_VALUE before
-        running this validation.
+        The 'request' parameter was historically set to test for cookie
+        support (now obsoleted by csrf checks). It has been kept for potential
+        subclasses usage.
         """
         self.request = request
         self.user_cache = None
@@ -186,12 +187,11 @@ class AuthenticationForm(forms.Form):
                     })
             elif not self.user_cache.is_active:
                 raise forms.ValidationError(self.error_messages['inactive'])
-        self.check_for_test_cookie()
         return self.cleaned_data
 
     def check_for_test_cookie(self):
-        if self.request and not self.request.session.test_cookie_worked():
-            raise forms.ValidationError(self.error_messages['no_cookies'])
+        warnings.warn("check_for_test_cookie is deprecated; but don't forget to "
+            "CSRF-protect your login view.", PendingDeprecationWarning)
 
     def get_user_id(self):
         if self.user_cache:
