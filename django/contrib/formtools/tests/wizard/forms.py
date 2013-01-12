@@ -78,6 +78,12 @@ class TestWizard(WizardView):
             kwargs['test'] = True
         return kwargs
 
+class TestWizardWithInitAttrs(TestWizard):
+    form_list = [Step1, Step2]
+    condition_dict = {'step2': True}
+    initial_dict = {'start': {'name': 'value1'}}
+    instance_dict = {'start': User()}
+
 class FormTests(TestCase):
     def test_form_init(self):
         testform = TestWizard.get_initkwargs([Step1, Step2])
@@ -90,6 +96,9 @@ class FormTests(TestCase):
         testform = TestWizard.get_initkwargs([Step1, Step2, ('finish', Step3)])
         self.assertEqual(
             testform['form_list'], {'0': Step1, '1': Step2, 'finish': Step3})
+
+        testform = TestWizardWithInitAttrs.get_initkwargs()
+        self.assertEqual(testform['form_list'], {'0': Step1, '1': Step2})
 
     def test_first_step(self):
         request = get_request()
@@ -132,6 +141,11 @@ class FormTests(TestCase):
         response, instance = testform(request)
         self.assertEqual(instance.get_next_step(), 'step3')
 
+        testform = TestWizardWithInitAttrs.as_view(
+            [('start', Step1), ('step2', Step2), ('step3', Step3)])
+        response, instance = testform(request)
+        self.assertEqual(instance.get_next_step(), 'step2')
+
     def test_form_kwargs(self):
         request = get_request()
 
@@ -162,6 +176,13 @@ class FormTests(TestCase):
         self.assertEqual(instance.get_form_initial('start'), {'name': 'value1'})
         self.assertEqual(instance.get_form_initial('step2'), {})
 
+        testform = TestWizardWithInitAttrs.as_view(
+            [('start', Step1), ('step2', Step2)])
+        response, instance = testform(request)
+
+        self.assertEqual(instance.get_form_initial('start'), {'name': 'value1'})
+        self.assertEqual(instance.get_form_initial('step2'), {})
+
     def test_form_instance(self):
         request = get_request()
         the_instance = TestModel()
@@ -175,6 +196,14 @@ class FormTests(TestCase):
         self.assertEqual(
             instance.get_form_instance('non_exist_instance'),
             None)
+
+        testform = TestWizardWithInitAttrs.as_view(
+            [('start', TestModelForm), ('step2', Step2)])
+        response, instance = testform(request)
+
+        self.assertEqual(
+            instance.get_form_instance('start'),
+            TestWizardWithInitAttrs.instance_dict['start'])
 
     def test_formset_instance(self):
         request = get_request()
