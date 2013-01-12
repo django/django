@@ -75,7 +75,6 @@ class Collector(object):
         self.using = using
         # Initially, {model: set([instances])}, later values become lists.
         self.data = {}
-        self.batches = {} # {model: {field: set([instances])}}
         self.field_updates = {} # {model: {(field, value): set([instances])}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
@@ -114,13 +113,6 @@ class Collector(object):
             self.dependencies.setdefault(
                 source._meta.concrete_model, set()).add(model._meta.concrete_model)
         return new_objs
-
-    def add_batch(self, model, field, objs):
-        """
-        Schedules a batch delete. Every instance of 'model' that is related to
-        an instance of 'obj' through 'field' will be deleted.
-        """
-        self.batches.setdefault(model, {}).setdefault(field, set()).update(objs)
 
     def add_field_update(self, field, value, objs):
         """
@@ -302,12 +294,6 @@ class Collector(object):
         # reverse instance collections
         for instances in six.itervalues(self.data):
             instances.reverse()
-
-        # delete batches
-        for model, batches in six.iteritems(self.batches):
-            query = sql.DeleteQuery(model)
-            for field, instances in six.iteritems(batches):
-                query.delete_batch([obj.pk for obj in instances], self.using, field)
 
         # delete instances
         for model, instances in six.iteritems(self.data):
