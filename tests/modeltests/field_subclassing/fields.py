@@ -72,3 +72,11 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
         if value is None:
             return None
         return json.dumps(value)
+
+class LowerTextField(six.with_metaclass(models.SubfieldBase, models.TextField)) :
+
+    description = ("A textfield that enforces that all text will be converted to lowercase")
+
+    def setter(self, value):
+        if isinstance(value, (str, unicode)) :
+            return value.lower()

@@ -508,6 +508,59 @@ unless your custom field needs a special conversion when being saved
 that is not the same as the conversion used for normal query
 parameters (which is implemented by :meth:`.get_db_prep_value`).
 
+Preprocessing values before assignment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: Field.setter(self, value)
+
+This method is called when a value is assigned to a non-relational model field.
+The method is given the value that is attempting to be assigned, so that it
+can be validated or transformed, then the return value is what actually gets 
+assigned to the field.
+
+By default this method simply returns the value assigned to it, which means
+that it does nothing. Overriding this method means that transformation that you
+might otherwise put into :meth:`get_prep_value` can instead be run when the
+value is assigned, which can allow you to enforce some restrictions between the
+time of assignment and when the object is stored.
+
+This type of thing can also be done at the model level using ``__setattr__()``,
+but this functionality is meant to control field assignment, so the code should
+be portable along with the field itself.
+
+Consider an example where you wanted a text field in which all the contents are
+to be forced as lower case. In this type of situation if you enforced the
+casing by overriding :meth:`get_prep_value` then anything retrieved from the
+database would reliably be in lower case, however if a new object is created
+and saved and that original object is then used for an operation, the
+assumption of lower case cannot be safely made. If the conversion to lower case
+is done during assignment, then the text can be safely converted before
+anything else happens.
+
+For example::
+
+    class LowercaseTextField(models.TextField):
+    # ...
+
+        def setter(self, value):
+            value = super(LowercaseTextField, self).setter(value)
+            if isinstance(value, (str, unicode)):
+                return value.lower()
+            else:
+                return value
+
+Though it is recommended that you call the parent ``setter()`` first in order to
+maintain any changes implemented in the parent model, it is not required. 
+Transformations like this are convenient, but it's best if you leave the actual
+field validation to validators that get called during a ``save()``.
+
+.. warning::
+
+    If the ``__setattr__()`` method has been overridden on the model that owns
+    this field without including a call to 
+    ``super.(MyClass, self)__setattr__(name, value)`` then this ``getter()``
+    method will not be called.
+
 Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

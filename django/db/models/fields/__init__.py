@@ -243,6 +243,12 @@ class Field(object):
     def unique(self):
         return self._unique or self.primary_key
 
+    def setter(self, value):
+        """
+        Perform some logic before actually assigning a value to the field
+        """
+        return value
+
     def set_attributes_from_name(self, name):
         if not self.name:
             self.name = name
