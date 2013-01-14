@@ -262,14 +262,6 @@ class Collector(object):
         self.data = SortedDict([(model, self.data[model])
                                 for model in sorted_models])
 
-    def send_post_delete_signals(self, model, instances):
-        if model._meta.auto_created:
-            return
-        for obj in instances:
-            signals.post_delete.send(
-                sender=model, instance=obj, using=self.using
-            )
-
     @force_managed
     def delete(self):
         # sort instance collections
@@ -308,7 +300,12 @@ class Collector(object):
             query = sql.DeleteQuery(model)
             pk_list = [obj.pk for obj in instances]
             query.delete_batch(pk_list, self.using)
-            self.send_post_delete_signals(model, instances)
+
+            if not model._meta.auto_created:
+                for obj in instances:
+                    signals.post_delete.send(
+                        sender=model, instance=obj, using=self.using
+                    )
 
         # update collected instances
         for model, instances_for_fieldvalues in six.iteritems(self.field_updates):
