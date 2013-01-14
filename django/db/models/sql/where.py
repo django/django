@@ -9,7 +9,9 @@ import datetime
 from itertools import repeat
 
 from django.utils import tree
+from django.db import connections
 from django.db.models.fields import Field
+from django.db.models.query_utils import QueryWrapper
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.db.models.sql.aggregates import Aggregate
 from django.utils.six.moves import xrange
@@ -408,18 +410,36 @@ class Constraint(object):
         return new
 
 class SubqueryConstraint(object):
-    def __init__(self, alias, columns, query_object):
+    def __init__(self, alias, columns, targets, query_object):
         self.alias = alias
         self.columns = columns
+        self.targets = targets
         self.query_object = query_object
 
     def as_sql(self, qn, connection):
-        sub_q = self.query_object
-        if hasattr(sub_q, 'get_compiler'):
-            sub_q = sub_q.get_compiler(connection=connection)
+        query = self.query_object
 
-        if hasattr(sub_q, 'as_sql'):
-            sql, params = sub_q.as_sql()
-        else:
-            sql, params = sub_q._as_sql(connection=connection)
-        return '%s IN (%s)' % (', '.join([ '%s.%s' % (qn(self.alias), qn(column)) for column in self.columns]), sql), params
+        # QuerySet was sent
+        if hasattr(query, 'values'):
+            # as_sql should throw if we are using a
+            # connection on another database
+            query._as_sql(connection=connection)
+            query = query.values(*self.targets).query
+
+        query_compiler = query.get_compiler(connection=connection)
+        if len(self.columns) == 1:
+            sql, params = query_compiler.as_sql()
+            return '%s.%s IN (%s)' % (qn(self.alias), qn(self.columns[0]), sql), params
+
+        query_compiler.query.where
+        for index, select_col in enumerate(query_compiler.query.select):
+            lhs = '%s.%s' % (select_col.col[0], select_col.col[1])
+            rhs = '%s.%s' % (self.alias, self.columns[index])
+            query_compiler.query.where.add(
+                QueryWrapper('%s = %s' % (lhs, rhs), []), AND)
+
+        sql, params = query_compiler.as_sql()
+        return 'EXISTS (%s)' % sql, params
+
+    def clone(self):
+        return SubqueryConstraint(self.alias, self.columns, self.targets, self.query_object)

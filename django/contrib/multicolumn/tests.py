@@ -153,7 +153,6 @@ class MultiColumnFKTests(TestCase):
             attrgetter('person_id')
         )
 
-        qs = Membership.objects.filter(person__in=Person.objects.filter(name='Jim'))
         self.assertQuerysetEqual(
             Membership.objects.filter(person__in=Person.objects.filter(name='Jim')),[
                 self.jim.id,

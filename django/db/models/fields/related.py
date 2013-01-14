@@ -1096,9 +1096,9 @@ class ForeignKey(RelatedField, Field):
                 return (value,)
             return value
 
-        if hasattr(raw_value, 'as_sql') or hasattr(raw_value, '_as_sql') or hasattr(raw_value, 'get_compiler'):
-            root_constraint.add(SubqueryConstraint(alias, columns, raw_value), AND)
-
+        if hasattr(raw_value, '_as_sql') or \
+           hasattr(raw_value, 'get_compiler'):
+            root_constraint.add(SubqueryConstraint(alias, columns, [target.name for target in targets], raw_value), AND)
         elif lookup_type == 'isnull':
             root_constraint.add((Constraint(alias, columns[0], None), lookup_type, raw_value), AND)
         elif lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
