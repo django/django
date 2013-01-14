@@ -90,34 +90,6 @@ def do_pending_lookups(sender, **kwargs):
 
 signals.class_prepared.connect(do_pending_lookups)
 
-def create_prefetch_query(query_field_name, related_fields, instances):
-    """
-    Creates a Q object which dictates a prefetch query.
-
-    query_field_name: the query field path from the model to prefetch to the model of the instance objects
-    related_fields: the fields that are related between the two models (the field of the instances should be lhs fields)
-    instances: the instances of Model to fetch the related objects for
-    """
-
-    prefix = '%s__' % (query_field_name) if query_field_name is not None else ''
-    query = Q()
-
-    # In the case of a single field, we can use a simple IN statment
-    if 1 == len(related_fields):
-        lh_field, rh_field = related_fields[0]
-        query_dict = {'%s%s__in' % (prefix, lh_field.attname):
-                      set(getattr(instance, lh_field.attname) for instance in instances)}
-        query = Q(**query_dict)
-    else:
-    # Since we have more than one related field, we will create conditions for
-    # each instance and then OR them together. Example tbl.col1=1 AND tbl.col2=2 OR tbl.col1=2 AND tbl.col2=3
-    # This relies on the database itself to reduce the conditions down to its simplest form
-        for instance in instances:
-            query_dict = {}
-            for lh_field, rh_field in related_fields:
-                query_dict['%s%s' % (prefix, lh_field.attname)] = getattr(instance, lh_field.attname)
-            query |= Q(**query_dict)
-    return query
 
 #HACK
 class RelatedField(object):
@@ -274,10 +246,8 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        query = create_prefetch_query(query_field_name=self.related.field.name,
-                                      related_fields=self.related.field.reverse_related_fields,
-                                      instances=instances)
-        qs = self.get_query_set(instance=instances[0]).filter(query)
+        query = {'%s__in' % self.related.field.name: instances}
+        qs = self.get_query_set(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = self.related.field.get_cache_name()
@@ -381,10 +351,8 @@ class ReverseSingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(other_field.attname)
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        query = create_prefetch_query(query_field_name=self.field.related_query_name(),
-                                      related_fields=self.field.related_fields,
-                                      instances=instances)
-        qs = self.get_query_set(instance=instances[0]).filter(query)
+        query = {'%s__in' % self.field.related_query_name(): instances}
+        qs = self.get_query_set(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         if not self.field.rel.multiple:
@@ -536,10 +504,8 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = create_prefetch_query(query_field_name=rel_field.name,
-                                              related_fields=rel_field.reverse_related_fields,
-                                              instances=instances)
-                qs = super(RelatedManager, self).get_query_set().using(db).filter(query)
+                query = {'%s__in' % rel_field.name: instances}
+                qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.
                 for rel_obj in qs:
@@ -653,10 +619,8 @@ def create_many_related_manager(superclass, rel):
             instance = instances[0]
             from django.db import connections
             db = self._db or router.db_for_read(instance.__class__, instance=instance)
-            query = create_prefetch_query(query_field_name=self.query_field_name,
-                                          related_fields=self.source_field.reverse_related_fields,
-                                          instances=instances)
-            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(query)
+            query = {'%s__in' % self.query_field_name: instances}
+            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
@@ -1060,11 +1024,11 @@ class ForeignKey(RelatedField, Field):
 
     @property
     def native_related_fields(self):
-        return [lhs_field for lhs_field, rhs_field in self.related_fields]
+        return tuple([lhs_field for lhs_field, rhs_field in self.related_fields])
 
     @property
     def foreign_related_fields(self):
-        return [rhs_field for lhs_field, rhs_field in self.related_fields]
+        return tuple([rhs_field for lhs_field, rhs_field in self.related_fields])
 
     def get_joining_columns(self, reverse_join=False):
         source = self.reverse_related_fields if reverse_join else self.related_fields
@@ -1077,7 +1041,8 @@ class ForeignKey(RelatedField, Field):
         opts = self.rel.to._meta
         target = self.rel.get_related_field()
         from_opts = self.model._meta
-        return [PathInfo(self, target, from_opts, opts, self, False, True)]
+        from_field, target = self.related_fields[0]
+        return [PathInfo(from_opts, opts, self.foreign_related_fields,  self, False, True)]
 
     def get_reverse_path_info(self):
         """
@@ -1086,13 +1051,7 @@ class ForeignKey(RelatedField, Field):
         opts = self.model._meta
         from_field = self.rel.get_related_field()
         from_opts = from_field.model._meta
-        if from_field.model is self.model:
-            # Recursive foreign key to self.
-            target = opts.get_field_by_name(
-                self.rel.field_name)[0]
-        else:
-            target = opts.pk
-        pathinfos = [PathInfo(from_field, target, from_opts, opts, self, not self.unique, False)]
+        pathinfos = [PathInfo(from_opts, opts, (opts.pk,),  self, not self.unique, False)]
         return pathinfos
 
     def validate(self, value, model_instance):
@@ -1123,6 +1082,44 @@ class ForeignKey(RelatedField, Field):
         if isinstance(field_default, self.rel.to):
             return getattr(field_default, self.rel.get_related_field().attname)
         return field_default
+
+    def get_lookup_constraint(self, constraint_class, alias, columns, targets, lookup_type, raw_value):
+        from django.db.models.sql.where import SubqueryConstraint, Constraint, AND, OR
+        root_constraint = constraint_class()
+
+        def get_normalized_value(value):
+            target_model = targets[0].model
+
+            if isinstance(value, target_model):
+                return tuple([getattr(value, field.attname) for field in targets])
+            elif not isinstance(value, tuple):
+                return (value,)
+            return value
+
+        if hasattr(raw_value, 'as_sql') or hasattr(raw_value, '_as_sql') or hasattr(raw_value, 'get_compiler'):
+            root_constraint.add(SubqueryConstraint(alias, columns, raw_value), AND)
+
+        elif lookup_type == 'isnull':
+            root_constraint.add((Constraint(alias, columns[0], None), lookup_type, raw_value), AND)
+        elif lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
+            value = get_normalized_value(raw_value)
+            for index, field in enumerate(targets):
+                root_constraint.add((Constraint(alias, columns[index], field), lookup_type, value[index]), AND)
+        elif lookup_type in ['range', 'in'] and len(self.related_fields) == 1:
+            values = [get_normalized_value(value) for value in raw_value]
+            value = [val[0] for val in values]
+            root_constraint.add((Constraint(alias, columns[0], targets[0]), lookup_type, value), AND)
+        elif lookup_type == 'in':
+            values = [get_normalized_value(value) for value in raw_value]
+            for value in values:
+                value_constraint = constraint_class()
+                for index, field in enumerate(targets):
+                    value_constraint.add((Constraint(alias, columns[index], field), 'exact', value[index]), AND)
+                root_constraint.add(value_constraint, OR)
+        else:
+            raise TypeError('Related Field has invalid lookup: %s' % lookup_type)
+
+        return root_constraint
 
     def get_db_prep_save(self, value, connection):
         if value == '' or value == None:

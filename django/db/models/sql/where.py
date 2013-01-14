@@ -406,3 +406,20 @@ class Constraint(object):
         new.__class__ = self.__class__
         new.alias, new.col, new.field = self.alias, self.col, self.field
         return new
+
+class SubqueryConstraint(object):
+    def __init__(self, alias, columns, query_object):
+        self.alias = alias
+        self.columns = columns
+        self.query_object = query_object
+
+    def as_sql(self, qn, connection):
+        sub_q = self.query_object
+        if hasattr(sub_q, 'get_compiler'):
+            sub_q = sub_q.get_compiler(connection=connection)
+
+        if hasattr(sub_q, 'as_sql'):
+            sql, params = sub_q.as_sql()
+        else:
+            sql, params = sub_q._as_sql(connection=connection)
+        return '%s IN (%s)' % (', '.join([ '%s.%s' % (qn(self.alias), qn(column)) for column in self.columns]), sql), params

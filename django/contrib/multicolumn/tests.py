@@ -139,7 +139,7 @@ class MultiColumnFKTests(TestCase):
             attrgetter('name')
         )
 
-    def test_forard_in_lookup_filters_correctly(self):
+    def test_forward_in_lookup_filters_correctly(self):
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.bob.id, group_id=self.cia.id)
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.jim.id, group_id=self.cia.id)
         
@@ -148,6 +148,14 @@ class MultiColumnFKTests(TestCase):
 
         self.assertQuerysetEqual(
             Membership.objects.filter(person__in=[self.george, self.jim]),[
+                self.jim.id,
+            ],
+            attrgetter('person_id')
+        )
+
+        qs = Membership.objects.filter(person__in=Person.objects.filter(name='Jim'))
+        self.assertQuerysetEqual(
+            Membership.objects.filter(person__in=Person.objects.filter(name='Jim')),[
                 self.jim.id,
             ],
             attrgetter('person_id')

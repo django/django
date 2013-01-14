@@ -168,7 +168,7 @@ class GenericRelation(RelatedField, Field):
         # Note that we are using different field for the join_field
         # than from_field or to_field. This is a hack, but we need the
         # GenericRelation to generate the extra SQL.
-        return [PathInfo(from_field, target, self.model._meta, opts, self, True, False)]
+        return [PathInfo(self.model._meta, opts, (target,), self, True, False)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
