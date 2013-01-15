@@ -6,22 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-02-14 13:40+0000\n"
 "Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
+"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
 "language/az/)\n"
-"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: az\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:7
+#: models.py:9
 msgid "redirect from"
 msgstr "buradan yönəlt"
 
-#: models.py:8
+#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -29,11 +29,11 @@ msgstr ""
 "Domen ünvanını çıxmaqla bu, mütləq ünvan kimi göstərilməlidir. Məsələn, \"/"
 "events/search/\"."
 
-#: models.py:9
+#: models.py:11
 msgid "redirect to"
 msgstr "bura yönəlt"
 
-#: models.py:10
+#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -41,10 +41,10 @@ msgstr ""
 "Bu həm mütləq ünvan (yuxarıdakı kimi) ola bilər, həm də \"http://\" ilə "
 "başlayan tam URL ola bilər."
 
-#: models.py:13
+#: models.py:15
 msgid "redirect"
 msgstr "yönəlt"
 
-#: models.py:14
+#: models.py:16
 msgid "redirects"
 msgstr "yönəldir"

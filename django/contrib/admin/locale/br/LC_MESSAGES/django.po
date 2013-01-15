@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-18 09:15-0300\n"
-"PO-Revision-Date: 2012-11-18 12:31+0000\n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:52+0000\n"
 "Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Breton (http://www.transifex.com/projects/p/django/language/"
 "br/)\n"
@@ -22,12 +22,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:60 options.py:1357
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:62 options.py:1359
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "Ha sur oc'h ?"
 
@@ -73,9 +73,10 @@ msgid "This year"
 msgstr "Ar bloaz-mañ"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
 
 #: forms.py:19
@@ -133,129 +134,129 @@ msgstr ""
 msgid "LogEntry Object"
 msgstr "Traezenn eus ar marilh"
 
-#: options.py:153 options.py:169
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "Hini ebet"
 
-#: options.py:674
+#: options.py:684
 #, python-format
 msgid "Changed %s."
 msgstr "Kemmet %s."
 
-#: options.py:674 options.py:684
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "ha"
 
-#: options.py:679
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:683
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:688
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:692
+#: options.py:702
 msgid "No fields changed."
 msgstr "N'eus bet kemmet maezienn ebet."
 
-#: options.py:802 options.py:887
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 
-#: options.py:819
+#: options.py:835
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:826
+#: options.py:839
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr ""
 
-#: options.py:877
+#: options.py:853
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
 
-#: options.py:895
+#: options.py:867
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
 
-#: options.py:902
+#: options.py:873
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
-#: options.py:962 options.py:1221
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:981
+#: options.py:970
 msgid "No action selected."
 msgstr ""
 
-#: options.py:1061
+#: options.py:1050
 #, python-format
 msgid "Add %s"
 msgstr "Ouzhpennañ %s"
 
-#: options.py:1085 options.py:1329
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:1151
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "Kemmañ %s"
 
-#: options.py:1200
+#: options.py:1190
 msgid "Database error"
 msgstr "Fazi en diaz roadennoù"
 
-#: options.py:1263
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1290
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1295
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1345
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: options.py:1392
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "Istor ar c'hemmoù : %s"

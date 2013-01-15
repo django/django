@@ -12,14 +12,14 @@ msgstr ""
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
 "PO-Revision-Date: 2012-03-10 14:58+0000\n"
 "Last-Translator: Ionel Cristian Mărieș <ionel.mc@gmail.com>\n"
-"Language-Team: Romanian (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
-"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1))\n"
+"2:1));\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format

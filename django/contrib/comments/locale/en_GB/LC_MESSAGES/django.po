@@ -6,68 +6,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Ross Poulton <ross@rossp.org>\n"
-"Language-Team: English (United Kingdom) (http://www.transifex.net/projects/p/"
+"Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "django/language/en_GB/)\n"
-"Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Content"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Metadata"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "flagged"
 msgstr[1] "flagged"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "Flag selected comments"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "approved"
 msgstr[1] "approved"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "Approve selected comments"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "removed"
 msgstr[1] "removed"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Remove selected comments"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] "%(count)s comments were successfully %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s comments"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Latest comments on %(site_name)s"
@@ -105,57 +105,57 @@ msgid ""
 msgstr ""
 "If you enter anything in this field your comment will be treated as spam"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "content type"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "object ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "user"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "user's name"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "user's email address"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "user's URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "comment"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "date/time submitted"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP address"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "is public"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 "Uncheck this box to make the comment effectively disappear from the site."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "is removed"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -163,11 +163,11 @@ msgstr ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "comments"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -175,7 +175,7 @@ msgstr ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -183,7 +183,7 @@ msgstr ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -198,19 +198,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "flag"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "date"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "comment flag"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "comment flags"
 

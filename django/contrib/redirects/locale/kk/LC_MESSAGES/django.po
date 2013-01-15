@@ -7,42 +7,42 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-02-14 13:40+0000\n"
 "Last-Translator: yun_man_ger <germanilyin@gmail.com>\n"
-"Language-Team: Kazakh (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
 "kk/)\n"
-"Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: kk\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:7
+#: models.py:9
 msgid "redirect from"
 msgstr " бағыттау (қайдан)"
 
-#: models.py:8
+#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "Бұл домен атаусыз абсолюттік жол болу керек. Мысал: '/events/search/'."
 
-#: models.py:9
+#: models.py:11
 msgid "redirect to"
 msgstr "бағыттау (қайда)"
 
-#: models.py:10
+#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
 "Бұл абсолюттік жол немесе 'http://'-мен басталатын толық URL бола алады."
 
-#: models.py:13
+#: models.py:15
 msgid "redirect"
 msgstr "қайта бағыттау"
 
-#: models.py:14
+#: models.py:16
 msgid "redirects"
 msgstr "қайта бағыттаулар"

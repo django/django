@@ -6,64 +6,64 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
-"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "내용"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "메타데이터"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "플래그되었습니다"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "선택된 코멘트에 플래그 달기"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "승인되었습니다"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "선택된 코멘트 승인하기"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "삭제되었습니다"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "선택된 코멘트 삭제"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s개의 코멘트가 성공적으로 %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s 의 코멘트"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "%(site_name)s 의 사용자 비밀번호가 초기화 되었습니다."
@@ -99,56 +99,56 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "이 필드에 무엇이라도 입력하면 코멘트는 스팸으로 처리될 것입니다."
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "콘텐츠 타입"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "오브젝트 ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "사용자"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "사용자명"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "사용자 이메일 주소"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "사용자 URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "코멘트"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "날짜/시간 확인"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP 주소"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "공개합니다."
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "이 사이트에서 코멘트가 나타나지 않게 하려면 체크 해제하세요."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "삭제합니다."
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -156,23 +156,23 @@ msgstr ""
 "코멘트가 부적절한 경우 체크하세요. \"코멘트가 삭제되었습니다.\" 메시지가 표시"
 "됩니다."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "코멘트(들)"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr "이 코멘트는 등록된 사용자가 작성하였으므로 읽기 전용입니다."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr "이 코멘트는 등록된 사용자가 작성하였으므로 읽기 전용입니다."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -187,19 +187,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "플래그"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "날짜"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "코멘트 플래그"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "코멘트 플래그"
 

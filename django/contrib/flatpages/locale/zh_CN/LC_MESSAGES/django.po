@@ -2,27 +2,28 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Kevin Shi <leiarix@gmail.com>, 2012.
 # Lele Long <schemacs@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:38+0100\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
+"Last-Translator: 磊 施 <leiarix@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
-"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "高级选项"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
 msgstr "URL"
 
@@ -39,34 +40,34 @@ msgstr "该值必须只能包含字母，数字，点号，下划线，破折号
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "URL头部缺失斜线."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "URL尾部缺失斜线."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "带有url %(url)s的Flatpage已经存在于站点 %(site)s"
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "标题"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "内容"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
 msgstr "允许评论"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "模板名称"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -74,18 +75,22 @@ msgstr ""
 "例如：'flatpages/contact_page.html'。若未提供，系统将使用'flatpages/default."
 "html'。"
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
 msgstr "请先注册"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "如果被选中，仅登录用户才可以查看此页。"
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "简单页面"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "简单页面"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "这个字段是必填项。"
