@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:42+0100\n"
-"PO-Revision-Date: 2012-03-08 12:24+0000\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-10-17 09:16+0000\n"
 "Last-Translator: Jaehong Kim <mixe@korea.com>\n"
-"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
-"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -37,6 +37,10 @@ msgstr "CUIT를 입력하세요.(XX-XXXXXXXX-X 또는 XXXXXXXXXXXX 형식)"
 #: ar/forms.py:83
 msgid "Invalid CUIT."
 msgstr "부적절한 CUIT"
+
+#: ar/forms.py:84
+msgid "Invalid legal type. Type must be 27, 20, 23 or 30."
+msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -202,6 +206,14 @@ msgstr "이 항목은 최소한 14개의 숫자를 입력해야 합니다."
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "우편번호를 입력하세요.(XXX XXX 형식)"
 
+#: ca/forms.py:47 us/forms.py:30
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "전화번호는 XX-XXXX-XXXX 형식으로 입력하세요."
+
+#: ca/forms.py:69
+msgid "Enter a Canadian province or territory."
+msgstr ""
+
 #: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr "올바른 캐나다 사회보장번호(XXX-XXX-XXX 형식)를 입력하세요."
@@ -309,6 +321,10 @@ msgstr "추크 주"
 #: ch/ch_states.py:30
 msgid "Zurich"
 msgstr "취리히"
+
+#: ch/forms.py:37
+msgid "Phone numbers must be in 0XX XXX XX XX format."
+msgstr ""
 
 #: ch/forms.py:68
 msgid ""
@@ -423,14 +439,10 @@ msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr "생년월일을 입력하세요. (XXXXXX/XXXX 또는 XXXXXXXXXX 형식)"
 
 #: cz/forms.py:53
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "성별은 'f' 또는 'm'으로 입력해야 합니다."
-
-#: cz/forms.py:54
 msgid "Enter a valid birth number."
 msgstr "올바른 생년월일을 입력하세요."
 
-#: cz/forms.py:115
+#: cz/forms.py:102
 msgid "Enter a valid IC number."
 msgstr "올바른 IC 번호를 입력하세요."
 
@@ -509,8 +521,8 @@ msgid ""
 msgstr "올바른 독일 주민번호(XXXXXXXXXXX-XXXXXXX-XXXXXXX-X 형식)를 입력하세요."
 
 #: es/es_provinces.py:5
-msgid "Arava"
-msgstr "알라바 주"
+msgid "Araba"
+msgstr ""
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -1104,11 +1116,26 @@ msgstr "스코틀랜드 주"
 msgid "Wales"
 msgstr "웨일즈 주"
 
-#: hr/forms.py:75
-msgid "Enter a valid 13 digit JMBG"
+#: hk/forms.py:37
+#, python-format
+msgid "Phone number should not start with one of the followings: %s."
+msgstr ""
+
+#: hk/forms.py:40
+#, python-format
+msgid "Phone number must be in one of the following formats: %s."
+msgstr ""
+
+#: hk/forms.py:42
+#, python-format
+msgid "Phone number should start with one of the followings: %s."
 msgstr ""
 
 #: hr/forms.py:76
+msgid "Enter a valid 13 digit JMBG"
+msgstr ""
+
+#: hr/forms.py:77
 msgid "Error in date segment"
 msgstr ""
 
@@ -1152,87 +1179,87 @@ msgstr ""
 msgid "Card issue number cannot be zero"
 msgstr ""
 
-#: hr/hr_choices.py:12
+#: hr/hr_choices.py:14
 msgid "Grad Zagreb"
 msgstr ""
 
-#: hr/hr_choices.py:13
+#: hr/hr_choices.py:15
 msgid "Bjelovarsko-bilogorska županija"
 msgstr ""
 
-#: hr/hr_choices.py:14
+#: hr/hr_choices.py:16
 msgid "Brodsko-posavska županija"
 msgstr ""
 
-#: hr/hr_choices.py:15
+#: hr/hr_choices.py:17
 msgid "Dubrovačko-neretvanska županija"
 msgstr ""
 
-#: hr/hr_choices.py:16
+#: hr/hr_choices.py:18
 msgid "Istarska županija"
 msgstr ""
 
-#: hr/hr_choices.py:17
+#: hr/hr_choices.py:19
 msgid "Karlovačka županija"
 msgstr ""
 
-#: hr/hr_choices.py:18
+#: hr/hr_choices.py:20
 msgid "Koprivničko-križevačka županija"
 msgstr ""
 
-#: hr/hr_choices.py:19
+#: hr/hr_choices.py:21
 msgid "Krapinsko-zagorska županija"
 msgstr ""
 
-#: hr/hr_choices.py:20
+#: hr/hr_choices.py:22
 msgid "Ličko-senjska županija"
 msgstr ""
 
-#: hr/hr_choices.py:21
+#: hr/hr_choices.py:23
 msgid "Međimurska županija"
 msgstr ""
 
-#: hr/hr_choices.py:22
+#: hr/hr_choices.py:24
 msgid "Osječko-baranjska županija"
 msgstr ""
 
-#: hr/hr_choices.py:23
+#: hr/hr_choices.py:25
 msgid "Požeško-slavonska županija"
 msgstr ""
 
-#: hr/hr_choices.py:24
+#: hr/hr_choices.py:26
 msgid "Primorsko-goranska županija"
 msgstr ""
 
-#: hr/hr_choices.py:25
+#: hr/hr_choices.py:27
 msgid "Sisačko-moslavačka županija"
 msgstr ""
 
-#: hr/hr_choices.py:26
+#: hr/hr_choices.py:28
 msgid "Splitsko-dalmatinska županija"
 msgstr ""
 
-#: hr/hr_choices.py:27
+#: hr/hr_choices.py:29
 msgid "Šibensko-kninska županija"
 msgstr ""
 
-#: hr/hr_choices.py:28
+#: hr/hr_choices.py:30
 msgid "Varaždinska županija"
 msgstr ""
 
-#: hr/hr_choices.py:29
+#: hr/hr_choices.py:31
 msgid "Virovitičko-podravska županija"
 msgstr ""
 
-#: hr/hr_choices.py:30
+#: hr/hr_choices.py:32
 msgid "Vukovarsko-srijemska županija"
 msgstr ""
 
-#: hr/hr_choices.py:31
+#: hr/hr_choices.py:33
 msgid "Zadarska županija"
 msgstr ""
 
-#: hr/hr_choices.py:32
+#: hr/hr_choices.py:34
 msgid "Zagrebačka županija"
 msgstr ""
 
@@ -1636,11 +1663,11 @@ msgstr "웩스포드"
 msgid "Wicklow"
 msgstr "위클로"
 
-#: il/forms.py:31
+#: il/forms.py:32
 msgid "Enter a postal code in the format XXXXX"
 msgstr "XXXXX형식의 우편 번호를 입력하세요."
 
-#: il/forms.py:50
+#: il/forms.py:51
 msgid "Enter a valid ID number."
 msgstr "올바른 ID 번호를 입력하세요."
 
@@ -1869,7 +1896,7 @@ msgstr "가고시마 현"
 msgid "Okinawa"
 msgstr "오키나와 현"
 
-#: kw/forms.py:25
+#: kw/forms.py:27
 msgid "Enter a valid Kuwaiti Civil ID number"
 msgstr "올바른 쿠웨이트 주민번호를 입력하세요."
 
@@ -1891,339 +1918,339 @@ msgstr ""
 msgid "The UMCN is not valid."
 msgstr ""
 
-#: mk/mk_choices.py:8
+#: mk/mk_choices.py:10
 msgid "Aerodrom"
 msgstr ""
 
-#: mk/mk_choices.py:9
+#: mk/mk_choices.py:11
 msgid "Aračinovo"
 msgstr ""
 
-#: mk/mk_choices.py:10
+#: mk/mk_choices.py:12
 msgid "Berovo"
 msgstr ""
 
-#: mk/mk_choices.py:11
+#: mk/mk_choices.py:13
 msgid "Bitola"
 msgstr ""
 
-#: mk/mk_choices.py:12
+#: mk/mk_choices.py:14
 msgid "Bogdanci"
 msgstr ""
 
-#: mk/mk_choices.py:13
+#: mk/mk_choices.py:15
 msgid "Bogovinje"
 msgstr ""
 
-#: mk/mk_choices.py:14
+#: mk/mk_choices.py:16
 msgid "Bosilovo"
 msgstr ""
 
-#: mk/mk_choices.py:15
+#: mk/mk_choices.py:17
 msgid "Brvenica"
 msgstr ""
 
-#: mk/mk_choices.py:16
+#: mk/mk_choices.py:18
 msgid "Butel"
 msgstr ""
 
-#: mk/mk_choices.py:17
+#: mk/mk_choices.py:19
 msgid "Valandovo"
 msgstr ""
 
-#: mk/mk_choices.py:18
+#: mk/mk_choices.py:20
 msgid "Vasilevo"
 msgstr ""
 
-#: mk/mk_choices.py:19
+#: mk/mk_choices.py:21
 msgid "Vevčani"
 msgstr ""
 
-#: mk/mk_choices.py:20
+#: mk/mk_choices.py:22
 msgid "Veles"
 msgstr ""
 
-#: mk/mk_choices.py:21
+#: mk/mk_choices.py:23
 msgid "Vinica"
 msgstr ""
 
-#: mk/mk_choices.py:22
+#: mk/mk_choices.py:24
 msgid "Vraneštica"
 msgstr ""
 
-#: mk/mk_choices.py:23
+#: mk/mk_choices.py:25
 msgid "Vrapčište"
 msgstr ""
 
-#: mk/mk_choices.py:24
+#: mk/mk_choices.py:26
 msgid "Gazi Baba"
 msgstr ""
 
-#: mk/mk_choices.py:25
+#: mk/mk_choices.py:27
 msgid "Gevgelija"
 msgstr ""
 
-#: mk/mk_choices.py:26
+#: mk/mk_choices.py:28
 msgid "Gostivar"
 msgstr ""
 
-#: mk/mk_choices.py:27
+#: mk/mk_choices.py:29
 msgid "Gradsko"
 msgstr ""
 
-#: mk/mk_choices.py:28
+#: mk/mk_choices.py:30
 msgid "Debar"
 msgstr ""
 
-#: mk/mk_choices.py:29
+#: mk/mk_choices.py:31
 msgid "Debarca"
 msgstr ""
 
-#: mk/mk_choices.py:30
+#: mk/mk_choices.py:32
 msgid "Delčevo"
 msgstr ""
 
-#: mk/mk_choices.py:31
+#: mk/mk_choices.py:33
 msgid "Demir Kapija"
 msgstr ""
 
-#: mk/mk_choices.py:32
+#: mk/mk_choices.py:34
 msgid "Demir Hisar"
 msgstr ""
 
-#: mk/mk_choices.py:33
+#: mk/mk_choices.py:35
 msgid "Dolneni"
 msgstr ""
 
-#: mk/mk_choices.py:34
+#: mk/mk_choices.py:36
 msgid "Drugovo"
 msgstr ""
 
-#: mk/mk_choices.py:35
+#: mk/mk_choices.py:37
 msgid "Gjorče Petrov"
 msgstr ""
 
-#: mk/mk_choices.py:36
+#: mk/mk_choices.py:38
 msgid "Želino"
 msgstr ""
 
-#: mk/mk_choices.py:37
+#: mk/mk_choices.py:39
 msgid "Zajas"
 msgstr ""
 
-#: mk/mk_choices.py:38
+#: mk/mk_choices.py:40
 msgid "Zelenikovo"
 msgstr ""
 
-#: mk/mk_choices.py:39
+#: mk/mk_choices.py:41
 msgid "Zrnovci"
 msgstr ""
 
-#: mk/mk_choices.py:40
+#: mk/mk_choices.py:42
 msgid "Ilinden"
 msgstr ""
 
-#: mk/mk_choices.py:41
+#: mk/mk_choices.py:43
 msgid "Jegunovce"
 msgstr ""
 
-#: mk/mk_choices.py:42
+#: mk/mk_choices.py:44
 msgid "Kavadarci"
 msgstr ""
 
-#: mk/mk_choices.py:43
+#: mk/mk_choices.py:45
 msgid "Karbinci"
 msgstr ""
 
-#: mk/mk_choices.py:44
+#: mk/mk_choices.py:46
 msgid "Karpoš"
 msgstr ""
 
-#: mk/mk_choices.py:45
+#: mk/mk_choices.py:47
 msgid "Kisela Voda"
 msgstr ""
 
-#: mk/mk_choices.py:46
+#: mk/mk_choices.py:48
 msgid "Kičevo"
 msgstr ""
 
-#: mk/mk_choices.py:47
+#: mk/mk_choices.py:49
 msgid "Konče"
 msgstr ""
 
-#: mk/mk_choices.py:48
+#: mk/mk_choices.py:50
 msgid "Koćani"
 msgstr ""
 
-#: mk/mk_choices.py:49
+#: mk/mk_choices.py:51
 msgid "Kratovo"
 msgstr ""
 
-#: mk/mk_choices.py:50
+#: mk/mk_choices.py:52
 msgid "Kriva Palanka"
 msgstr ""
 
-#: mk/mk_choices.py:51
+#: mk/mk_choices.py:53
 msgid "Krivogaštani"
 msgstr ""
 
-#: mk/mk_choices.py:52
+#: mk/mk_choices.py:54
 msgid "Kruševo"
 msgstr ""
 
-#: mk/mk_choices.py:53
+#: mk/mk_choices.py:55
 msgid "Kumanovo"
 msgstr ""
 
-#: mk/mk_choices.py:54
+#: mk/mk_choices.py:56
 msgid "Lipkovo"
 msgstr ""
 
-#: mk/mk_choices.py:55
+#: mk/mk_choices.py:57
 msgid "Lozovo"
 msgstr ""
 
-#: mk/mk_choices.py:56
+#: mk/mk_choices.py:58
 msgid "Mavrovo i Rostuša"
 msgstr ""
 
-#: mk/mk_choices.py:57
+#: mk/mk_choices.py:59
 msgid "Makedonska Kamenica"
 msgstr ""
 
-#: mk/mk_choices.py:58
+#: mk/mk_choices.py:60
 msgid "Makedonski Brod"
 msgstr ""
 
-#: mk/mk_choices.py:59
+#: mk/mk_choices.py:61
 msgid "Mogila"
 msgstr ""
 
-#: mk/mk_choices.py:60
+#: mk/mk_choices.py:62
 msgid "Negotino"
 msgstr ""
 
-#: mk/mk_choices.py:61
+#: mk/mk_choices.py:63
 msgid "Novaci"
 msgstr ""
 
-#: mk/mk_choices.py:62
+#: mk/mk_choices.py:64
 msgid "Novo Selo"
 msgstr ""
 
-#: mk/mk_choices.py:63
+#: mk/mk_choices.py:65
 msgid "Oslomej"
 msgstr ""
 
-#: mk/mk_choices.py:64
+#: mk/mk_choices.py:66
 msgid "Ohrid"
 msgstr ""
 
-#: mk/mk_choices.py:65
+#: mk/mk_choices.py:67
 msgid "Petrovec"
 msgstr ""
 
-#: mk/mk_choices.py:66
+#: mk/mk_choices.py:68
 msgid "Pehčevo"
 msgstr ""
 
-#: mk/mk_choices.py:67
+#: mk/mk_choices.py:69
 msgid "Plasnica"
 msgstr ""
 
-#: mk/mk_choices.py:68
+#: mk/mk_choices.py:70
 msgid "Prilep"
 msgstr ""
 
-#: mk/mk_choices.py:69
+#: mk/mk_choices.py:71
 msgid "Probištip"
 msgstr ""
 
-#: mk/mk_choices.py:70
+#: mk/mk_choices.py:72
 msgid "Radoviš"
 msgstr ""
 
-#: mk/mk_choices.py:71
+#: mk/mk_choices.py:73
 msgid "Rankovce"
 msgstr ""
 
-#: mk/mk_choices.py:72
+#: mk/mk_choices.py:74
 msgid "Resen"
 msgstr ""
 
-#: mk/mk_choices.py:73
+#: mk/mk_choices.py:75
 msgid "Rosoman"
 msgstr ""
 
-#: mk/mk_choices.py:74
+#: mk/mk_choices.py:76
 msgid "Saraj"
 msgstr ""
 
-#: mk/mk_choices.py:75
+#: mk/mk_choices.py:77
 msgid "Sveti Nikole"
 msgstr ""
 
-#: mk/mk_choices.py:76
+#: mk/mk_choices.py:78
 msgid "Sopište"
 msgstr ""
 
-#: mk/mk_choices.py:77
+#: mk/mk_choices.py:79
 msgid "Star Dojran"
 msgstr ""
 
-#: mk/mk_choices.py:78
+#: mk/mk_choices.py:80
 msgid "Staro Nagoričane"
 msgstr ""
 
-#: mk/mk_choices.py:79
+#: mk/mk_choices.py:81
 msgid "Struga"
 msgstr ""
 
-#: mk/mk_choices.py:80
+#: mk/mk_choices.py:82
 msgid "Strumica"
 msgstr ""
 
-#: mk/mk_choices.py:81
+#: mk/mk_choices.py:83
 msgid "Studeničani"
 msgstr ""
 
-#: mk/mk_choices.py:82
+#: mk/mk_choices.py:84
 msgid "Tearce"
 msgstr ""
 
-#: mk/mk_choices.py:83
+#: mk/mk_choices.py:85
 msgid "Tetovo"
 msgstr ""
 
-#: mk/mk_choices.py:84
+#: mk/mk_choices.py:86
 msgid "Centar"
 msgstr ""
 
-#: mk/mk_choices.py:85
+#: mk/mk_choices.py:87
 msgid "Centar-Župa"
 msgstr ""
 
-#: mk/mk_choices.py:86
+#: mk/mk_choices.py:88
 msgid "Čair"
 msgstr ""
 
-#: mk/mk_choices.py:87
+#: mk/mk_choices.py:89
 msgid "Čaška"
 msgstr ""
 
-#: mk/mk_choices.py:88
+#: mk/mk_choices.py:90
 msgid "Češinovo-Obleševo"
 msgstr ""
 
-#: mk/mk_choices.py:89
+#: mk/mk_choices.py:91
 msgid "Čučer-Sandevo"
 msgstr ""
 
-#: mk/mk_choices.py:90
+#: mk/mk_choices.py:92
 msgid "Štip"
 msgstr ""
 
-#: mk/mk_choices.py:91
+#: mk/mk_choices.py:93
 msgid "Šuto Orizari"
 msgstr ""
 
@@ -2239,23 +2266,23 @@ msgstr ""
 msgid "Unique master citizen number (13 digits)"
 msgstr ""
 
-#: mx/forms.py:65
+#: mx/forms.py:67
 msgid "Enter a valid zip code in the format XXXXX."
 msgstr ""
 
-#: mx/forms.py:108
+#: mx/forms.py:110
 msgid "Enter a valid RFC."
 msgstr ""
 
-#: mx/forms.py:109
+#: mx/forms.py:111
 msgid "Invalid checksum for RFC."
 msgstr ""
 
-#: mx/forms.py:189
+#: mx/forms.py:191
 msgid "Enter a valid CURP."
 msgstr ""
 
-#: mx/forms.py:190
+#: mx/forms.py:192
 msgid "Invalid checksum for CURP."
 msgstr ""
 
@@ -2275,131 +2302,131 @@ msgstr ""
 msgid "Mexican CURP"
 msgstr ""
 
-#: mx/mx_states.py:13
+#: mx/mx_states.py:14
 msgid "Aguascalientes"
 msgstr "아과스칼리엔테스 주"
 
-#: mx/mx_states.py:14
+#: mx/mx_states.py:15
 msgid "Baja California"
 msgstr "바하칼리포르니아 주"
 
-#: mx/mx_states.py:15
+#: mx/mx_states.py:16
 msgid "Baja California Sur"
 msgstr "바하칼리포르니아수르 주"
 
-#: mx/mx_states.py:16
+#: mx/mx_states.py:17
 msgid "Campeche"
 msgstr "캄페체 주"
 
-#: mx/mx_states.py:17
+#: mx/mx_states.py:18
 msgid "Chihuahua"
 msgstr "치와와 주"
 
-#: mx/mx_states.py:18
+#: mx/mx_states.py:19
 msgid "Chiapas"
 msgstr "치아파스 주"
 
-#: mx/mx_states.py:19
+#: mx/mx_states.py:20
 msgid "Coahuila"
 msgstr "코아우일라 주"
 
-#: mx/mx_states.py:20
+#: mx/mx_states.py:21
 msgid "Colima"
 msgstr "콜리마 주"
 
-#: mx/mx_states.py:21
+#: mx/mx_states.py:22
 msgid "Distrito Federal"
 msgstr "연방구 (멕시코시)"
 
-#: mx/mx_states.py:22
+#: mx/mx_states.py:23
 msgid "Durango"
 msgstr "두랑고 주"
 
-#: mx/mx_states.py:23
+#: mx/mx_states.py:24
 msgid "Guerrero"
 msgstr "게레로 주"
 
-#: mx/mx_states.py:24
+#: mx/mx_states.py:25
 msgid "Guanajuato"
 msgstr "과나후아토 주"
 
-#: mx/mx_states.py:25
+#: mx/mx_states.py:26
 msgid "Hidalgo"
 msgstr "이달고 주"
 
-#: mx/mx_states.py:26
+#: mx/mx_states.py:27
 msgid "Jalisco"
 msgstr "할리스코 주"
 
-#: mx/mx_states.py:27
+#: mx/mx_states.py:28
 msgid "Estado de México"
 msgstr "멕시코 주"
 
-#: mx/mx_states.py:28
+#: mx/mx_states.py:29
 msgid "Michoacán"
 msgstr "미초아칸 주"
 
-#: mx/mx_states.py:29
+#: mx/mx_states.py:30
 msgid "Morelos"
 msgstr "모렐로스 주"
 
-#: mx/mx_states.py:30
+#: mx/mx_states.py:31
 msgid "Nayarit"
 msgstr "나야리트 주"
 
-#: mx/mx_states.py:31
+#: mx/mx_states.py:32
 msgid "Nuevo León"
 msgstr "누에보레온 주"
 
-#: mx/mx_states.py:32
+#: mx/mx_states.py:33
 msgid "Oaxaca"
 msgstr "오아하카 주"
 
-#: mx/mx_states.py:33
+#: mx/mx_states.py:34
 msgid "Puebla"
 msgstr "푸에블라 주"
 
-#: mx/mx_states.py:34
+#: mx/mx_states.py:35
 msgid "Querétaro"
 msgstr "케레타로 주"
 
-#: mx/mx_states.py:35
+#: mx/mx_states.py:36
 msgid "Quintana Roo"
 msgstr "킨타나로오 주"
 
-#: mx/mx_states.py:36
+#: mx/mx_states.py:37
 msgid "Sinaloa"
 msgstr "시날로아 주"
 
-#: mx/mx_states.py:37
+#: mx/mx_states.py:38
 msgid "San Luis Potosí"
 msgstr "산루이스포토시 주"
 
-#: mx/mx_states.py:38
+#: mx/mx_states.py:39
 msgid "Sonora"
 msgstr "소노라 주"
 
-#: mx/mx_states.py:39
+#: mx/mx_states.py:40
 msgid "Tabasco"
 msgstr "타바스코 주"
 
-#: mx/mx_states.py:40
+#: mx/mx_states.py:41
 msgid "Tamaulipas"
 msgstr "타마울리파스 주"
 
-#: mx/mx_states.py:41
+#: mx/mx_states.py:42
 msgid "Tlaxcala"
 msgstr "틀락스칼라 주"
 
-#: mx/mx_states.py:42
+#: mx/mx_states.py:43
 msgid "Veracruz"
 msgstr "베라크루스 주"
 
-#: mx/mx_states.py:43
+#: mx/mx_states.py:44
 msgid "Yucatán"
 msgstr "유카탄 주"
 
-#: mx/mx_states.py:44
+#: mx/mx_states.py:45
 msgid "Zacatecas"
 msgstr "사카테카스 주"
 
@@ -2569,31 +2596,31 @@ msgstr "Greater Poland"
 msgid "West Pomerania"
 msgstr "West Pomerania"
 
-#: pt/forms.py:17
+#: pt/forms.py:19
 msgid "Enter a zip code in the format XXXX-XXX."
 msgstr "우편번호는 XXXXX-XXX 형식으로 입력하세요."
 
-#: pt/forms.py:37
+#: pt/forms.py:39
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr "전화번호는 9자리 숫자이거나 + 또는 00으로 시작해야 합니다."
 
-#: ro/forms.py:20
+#: ro/forms.py:22
 msgid "Enter a valid CIF."
 msgstr "올바른 CIF를 입력하세요."
 
-#: ro/forms.py:57
+#: ro/forms.py:59
 msgid "Enter a valid CNP."
 msgstr "올바른 CNP를 입력하세요."
 
-#: ro/forms.py:142
+#: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr "올바른 IBAN을 입력하세요. (ROXX-XXXX-XXXX-XXXX-XXXX-XXXX 형식)"
 
-#: ro/forms.py:174
+#: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
 msgstr "전화번호는 XXXX-XXXXXX 형식이어야 합니다."
 
-#: ro/forms.py:199
+#: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "올바른 우편번호를 입력하세요. (XXXXXX 형식)"
 
@@ -2989,87 +3016,87 @@ msgstr "조율 번호는 사용할 수 없습니다."
 msgid "Enter a Swedish postal code in the format XXXXX."
 msgstr "올바른 스웨덴 우편번호를 입력하세요. (XXXXX 형식)"
 
-#: se/se_counties.py:15
+#: se/se_counties.py:16
 msgid "Stockholm"
 msgstr "스톡홀름"
 
-#: se/se_counties.py:16
+#: se/se_counties.py:17
 msgid "Västerbotten"
 msgstr "Västerbotten"
 
-#: se/se_counties.py:17
+#: se/se_counties.py:18
 msgid "Norrbotten"
 msgstr "노르보텐"
 
-#: se/se_counties.py:18
+#: se/se_counties.py:19
 msgid "Uppsala"
 msgstr "웁살라"
 
-#: se/se_counties.py:19
+#: se/se_counties.py:20
 msgid "Södermanland"
 msgstr "Södermanland"
 
-#: se/se_counties.py:20
+#: se/se_counties.py:21
 msgid "Östergötland"
 msgstr "Östergötland"
 
-#: se/se_counties.py:21
+#: se/se_counties.py:22
 msgid "Jönköping"
 msgstr "Jönköping"
 
-#: se/se_counties.py:22
+#: se/se_counties.py:23
 msgid "Kronoberg"
 msgstr "Kronoberg"
 
-#: se/se_counties.py:23
+#: se/se_counties.py:24
 msgid "Kalmar"
 msgstr "칼마르"
 
-#: se/se_counties.py:24
+#: se/se_counties.py:25
 msgid "Gotland"
 msgstr "고틀랜드"
 
-#: se/se_counties.py:25
+#: se/se_counties.py:26
 msgid "Blekinge"
 msgstr "블레킹예"
 
-#: se/se_counties.py:26
+#: se/se_counties.py:27
 msgid "Skåne"
 msgstr "스코네"
 
-#: se/se_counties.py:27
+#: se/se_counties.py:28
 msgid "Halland"
 msgstr "Halland"
 
-#: se/se_counties.py:28
+#: se/se_counties.py:29
 msgid "Västra Götaland"
 msgstr "베스 Götaland"
 
-#: se/se_counties.py:29
+#: se/se_counties.py:30
 msgid "Värmland"
 msgstr "Värmland"
 
-#: se/se_counties.py:30
+#: se/se_counties.py:31
 msgid "Örebro"
 msgstr "외레브로"
 
-#: se/se_counties.py:31
+#: se/se_counties.py:32
 msgid "Västmanland"
 msgstr "Västmanland"
 
-#: se/se_counties.py:32
+#: se/se_counties.py:33
 msgid "Dalarna"
 msgstr "달라르나"
 
-#: se/se_counties.py:33
+#: se/se_counties.py:34
 msgid "Gävleborg"
 msgstr "Gävleborg"
 
-#: se/se_counties.py:34
+#: se/se_counties.py:35
 msgid "Västernorrland"
 msgstr "Västernorrland"
 
-#: se/se_counties.py:35
+#: se/se_counties.py:36
 msgid "Jämtland"
 msgstr "Jämtland"
 
@@ -3457,10 +3484,6 @@ msgstr "터키계 식별 번호는 11 자리 숫자입니다."
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "우편번호를 입력하세요. (XXXXX 또는 XXXXX-XXXX 형식)"
 
-#: us/forms.py:30
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "전화번호는 XX-XXXX-XXXX 형식으로 입력하세요."
-
 #: us/forms.py:59
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "올바른 미국 사회보장번호를 입력하세요. (XXX-XX-XXXX 형식)"
@@ -3490,11 +3513,11 @@ msgstr ""
 msgid "Enter a valid CI number."
 msgstr "올바른 CI 번호를 입력하세요."
 
-#: za/forms.py:21
+#: za/forms.py:22
 msgid "Enter a valid South African ID number"
 msgstr "올바른 남아프리카 주민번호를 입력하세요."
 
-#: za/forms.py:55
+#: za/forms.py:56
 msgid "Enter a valid South African postal code"
 msgstr "올바른 남아프리카 우편번호를 입력하세요."
 

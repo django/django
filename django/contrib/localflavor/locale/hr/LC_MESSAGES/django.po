@@ -2,22 +2,23 @@
 #
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2011.
+#   <aljosa.mohorovic@gmail.com>, 2012-2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:41+0100\n"
-"PO-Revision-Date: 2012-03-08 12:24+0000\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2013-01-14 18:45+0000\n"
 "Last-Translator: aljosa <aljosa.mohorovic@gmail.com>\n"
-"Language-Team: Croatian (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
 "hr/)\n"
-"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: hr\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -38,6 +39,10 @@ msgstr "Unesite ispravan CUIT formata XX-XXXXXXXX-X ili XXXXXXXXXXXX."
 #: ar/forms.py:83
 msgid "Invalid CUIT."
 msgstr "Neispravan CUIT."
+
+#: ar/forms.py:84
+msgid "Invalid legal type. Type must be 27, 20, 23 or 30."
+msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -86,19 +91,19 @@ msgstr ""
 
 #: au/forms.py:26
 msgid "Enter a 4 digit postcode."
-msgstr ""
+msgstr "Unesite 4 znamenkasti poštanski broj."
 
 #: au/models.py:9
 msgid "Australian State"
-msgstr ""
+msgstr "Australska država"
 
 #: au/models.py:19
 msgid "Australian Postcode"
-msgstr ""
+msgstr "Australski poštanski broj"
 
 #: au/models.py:33
 msgid "Australian Phone number"
-msgstr ""
+msgstr "Australski telefonski broj"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
@@ -204,6 +209,14 @@ msgstr "Ovo polje zahtjeva bar 14 numeričkih znakova"
 #: ca/forms.py:29
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Unesite poštanski broj formata XXX XXX."
+
+#: ca/forms.py:47 us/forms.py:30
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "Telefonski brojevi moraju biti u XXX-XXX-XXXX formatu."
+
+#: ca/forms.py:69
+msgid "Enter a Canadian province or territory."
+msgstr ""
 
 #: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
@@ -314,6 +327,10 @@ msgstr "Zug"
 msgid "Zurich"
 msgstr "Zurich"
 
+#: ch/forms.py:37
+msgid "Phone numbers must be in 0XX XXX XX XX format."
+msgstr ""
+
 #: ch/forms.py:68
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
@@ -336,31 +353,31 @@ msgstr "Čileanski RUT nije ispravan."
 
 #: cn/forms.py:84
 msgid "Enter a post code in the format XXXXXX."
-msgstr ""
+msgstr "Unesite poštanski kod u obliku XXXXXX."
 
 #: cn/forms.py:105
 msgid "ID Card Number consists of 15 or 18 digits."
-msgstr ""
+msgstr "Broj osobne iskaznice sastoji se od 15 ili 18 znamenki."
 
 #: cn/forms.py:106
 msgid "Invalid ID Card Number: Wrong checksum"
-msgstr ""
+msgstr "Neispravan broj osobne iskaznice: Pogrešan checksum"
 
 #: cn/forms.py:107
 msgid "Invalid ID Card Number: Wrong birthdate"
-msgstr ""
+msgstr "Neispravan broj osobne iskaznice: Pogrešan datum rođenja"
 
 #: cn/forms.py:108
 msgid "Invalid ID Card Number: Wrong location code"
-msgstr ""
+msgstr "Neispravan broj osobne iskaznice: Pogrešan kod lokacije"
 
 #: cn/forms.py:193
 msgid "Enter a valid phone number."
-msgstr ""
+msgstr "Unesite valjani telefonski broj."
 
 #: cn/forms.py:210
 msgid "Enter a valid cell number."
-msgstr ""
+msgstr "Unesite valjani broj mobitela."
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -427,15 +444,10 @@ msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr "Unesite datum rođenja formata XXXXXX/XXXX ili XXXXXXXXXX."
 
 #: cz/forms.py:53
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr ""
-"Neispravnan opcijonalni parametar spol, ispravne vrijednosti su 'f' i 'm'"
-
-#: cz/forms.py:54
 msgid "Enter a valid birth number."
 msgstr "Unesite ispravan datum rodenja."
 
-#: cz/forms.py:115
+#: cz/forms.py:102
 msgid "Enter a valid IC number."
 msgstr "Unesite ispravan IC broj."
 
@@ -516,8 +528,8 @@ msgstr ""
 "XXXXXXX-X."
 
 #: es/es_provinces.py:5
-msgid "Arava"
-msgstr "Arava"
+msgid "Araba"
+msgstr ""
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -1113,17 +1125,32 @@ msgstr "Škotska"
 msgid "Wales"
 msgstr "Wales"
 
-#: hr/forms.py:75
-msgid "Enter a valid 13 digit JMBG"
+#: hk/forms.py:37
+#, python-format
+msgid "Phone number should not start with one of the followings: %s."
+msgstr ""
+
+#: hk/forms.py:40
+#, python-format
+msgid "Phone number must be in one of the following formats: %s."
+msgstr ""
+
+#: hk/forms.py:42
+#, python-format
+msgid "Phone number should start with one of the followings: %s."
 msgstr ""
 
 #: hr/forms.py:76
+msgid "Enter a valid 13 digit JMBG"
+msgstr "Unesite valjani JMBG sa 13 znamenka"
+
+#: hr/forms.py:77
 msgid "Error in date segment"
-msgstr ""
+msgstr "Pogreška u dijelu datuma"
 
 #: hr/forms.py:123
 msgid "Enter a valid 11 digit OIB"
-msgstr ""
+msgstr "Unesite valjani 11 znamenkasti OIB"
 
 #: hr/forms.py:152 id/forms.py:112
 msgid "Enter a valid vehicle license plate number"
@@ -1131,15 +1158,15 @@ msgstr "Unesite ispravanu registraciju za vozilo"
 
 #: hr/forms.py:153
 msgid "Enter a valid location code"
-msgstr ""
+msgstr "Unesite valjani kod lokacije"
 
 #: hr/forms.py:154
 msgid "Number part cannot be zero"
-msgstr ""
+msgstr "Dio broja ne može biti nula"
 
 #: hr/forms.py:190
 msgid "Enter a valid 5 digit postal code"
-msgstr ""
+msgstr "Unesite valjani 5 znamenkasti poštanski broj"
 
 #: hr/forms.py:218 id/forms.py:72 nl/forms.py:56
 msgid "Enter a valid phone number"
@@ -1147,103 +1174,103 @@ msgstr "Unesite ispravan telefonski broj"
 
 #: hr/forms.py:219
 msgid "Enter a valid area or mobile network code"
-msgstr ""
+msgstr "Unesite valjani fiksni ili mobilni kod mreže"
 
 #: hr/forms.py:220
 msgid "The phone nubmer is too long"
-msgstr ""
+msgstr "Telefonski broj je predugačak"
 
 #: hr/forms.py:258
 msgid "Enter a valid 19 digit JMBAG starting with 601983"
-msgstr ""
+msgstr "Unesite valjani 19 znamenkasti JMBAG počevši od 601983"
 
 #: hr/forms.py:259
 msgid "Card issue number cannot be zero"
-msgstr ""
-
-#: hr/hr_choices.py:12
-msgid "Grad Zagreb"
-msgstr ""
-
-#: hr/hr_choices.py:13
-msgid "Bjelovarsko-bilogorska županija"
-msgstr ""
+msgstr "Broj izdanja kartice ne može biti nula"
 
 #: hr/hr_choices.py:14
-msgid "Brodsko-posavska županija"
-msgstr ""
+msgid "Grad Zagreb"
+msgstr "Grad Zagreb"
 
 #: hr/hr_choices.py:15
-msgid "Dubrovačko-neretvanska županija"
-msgstr ""
+msgid "Bjelovarsko-bilogorska županija"
+msgstr "Bjelovarsko-bilogorska županija"
 
 #: hr/hr_choices.py:16
-msgid "Istarska županija"
-msgstr ""
+msgid "Brodsko-posavska županija"
+msgstr "Brodsko-posavska županija"
 
 #: hr/hr_choices.py:17
-msgid "Karlovačka županija"
-msgstr ""
+msgid "Dubrovačko-neretvanska županija"
+msgstr "Dubrovačko-neretvanska županija"
 
 #: hr/hr_choices.py:18
-msgid "Koprivničko-križevačka županija"
-msgstr ""
+msgid "Istarska županija"
+msgstr "Istarska županija"
 
 #: hr/hr_choices.py:19
-msgid "Krapinsko-zagorska županija"
-msgstr ""
+msgid "Karlovačka županija"
+msgstr "Karlovačka županija"
 
 #: hr/hr_choices.py:20
-msgid "Ličko-senjska županija"
-msgstr ""
+msgid "Koprivničko-križevačka županija"
+msgstr "Koprivničko-križevačka županija"
 
 #: hr/hr_choices.py:21
-msgid "Međimurska županija"
-msgstr ""
+msgid "Krapinsko-zagorska županija"
+msgstr "Krapinsko-zagorska županija"
 
 #: hr/hr_choices.py:22
-msgid "Osječko-baranjska županija"
-msgstr ""
+msgid "Ličko-senjska županija"
+msgstr "Ličko-senjska županija"
 
 #: hr/hr_choices.py:23
-msgid "Požeško-slavonska županija"
-msgstr ""
+msgid "Međimurska županija"
+msgstr "Međimurska županija"
 
 #: hr/hr_choices.py:24
-msgid "Primorsko-goranska županija"
-msgstr ""
+msgid "Osječko-baranjska županija"
+msgstr "Osječko-baranjska županija"
 
 #: hr/hr_choices.py:25
-msgid "Sisačko-moslavačka županija"
-msgstr ""
+msgid "Požeško-slavonska županija"
+msgstr "Požeško-slavonska županija"
 
 #: hr/hr_choices.py:26
-msgid "Splitsko-dalmatinska županija"
-msgstr ""
+msgid "Primorsko-goranska županija"
+msgstr "Primorsko-goranska županija"
 
 #: hr/hr_choices.py:27
-msgid "Šibensko-kninska županija"
-msgstr ""
+msgid "Sisačko-moslavačka županija"
+msgstr "Sisačko-moslavačka županija"
 
 #: hr/hr_choices.py:28
-msgid "Varaždinska županija"
-msgstr ""
+msgid "Splitsko-dalmatinska županija"
+msgstr "Splitsko-dalmatinska županija"
 
 #: hr/hr_choices.py:29
-msgid "Virovitičko-podravska županija"
-msgstr ""
+msgid "Šibensko-kninska županija"
+msgstr "Šibensko-kninska županija"
 
 #: hr/hr_choices.py:30
-msgid "Vukovarsko-srijemska županija"
-msgstr ""
+msgid "Varaždinska županija"
+msgstr "Varaždinska županija"
 
 #: hr/hr_choices.py:31
-msgid "Zadarska županija"
-msgstr ""
+msgid "Virovitičko-podravska županija"
+msgstr "Virovitičko-podravska županija"
 
 #: hr/hr_choices.py:32
+msgid "Vukovarsko-srijemska županija"
+msgstr "Vukovarsko-srijemska županija"
+
+#: hr/hr_choices.py:33
+msgid "Zadarska županija"
+msgstr "Zadarska županija"
+
+#: hr/hr_choices.py:34
 msgid "Zagrebačka županija"
-msgstr ""
+msgstr "Zagrebačka županija"
 
 #: id/forms.py:31
 msgid "Enter a valid post code"
@@ -1645,21 +1672,21 @@ msgstr "Wexford"
 msgid "Wicklow"
 msgstr "Wexford"
 
-#: il/forms.py:31
+#: il/forms.py:32
 msgid "Enter a postal code in the format XXXXX"
 msgstr "Unesite poštanski broj u formatu XXXXX"
 
-#: il/forms.py:50
+#: il/forms.py:51
 msgid "Enter a valid ID number."
 msgstr "Unesite valjani ID broj."
 
 #: in_/forms.py:41
 msgid "Enter a zip code in the format XXXXXX or XXX XXX."
-msgstr ""
+msgstr "Unesite poštanski broj formata XXXXXX u ili XXX XXX."
 
 #: in_/forms.py:64
 msgid "Enter an Indian state or territory."
-msgstr ""
+msgstr "Unesite indijsku državu ili teritorij."
 
 #: in_/forms.py:103
 msgid "Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format."
@@ -1878,7 +1905,7 @@ msgstr "Kagoshima"
 msgid "Okinawa"
 msgstr "Okinawa"
 
-#: kw/forms.py:25
+#: kw/forms.py:27
 msgid "Enter a valid Kuwaiti Civil ID number"
 msgstr "Unesi ispravan kuvajtski Civil ID broj."
 
@@ -1887,352 +1914,354 @@ msgid ""
 "Identity card numbers must contain either 4 to 7 digits or an uppercase "
 "letter and 7 digits."
 msgstr ""
+"Broj osobne iskaznice mora sadržavati od 4 do 7 znamenki ili veliko slovo i "
+"7 znamenaka."
 
 #: mk/forms.py:57 si/forms.py:24
 msgid "This field should contain exactly 13 digits."
-msgstr ""
+msgstr "Ovo polje treba sadržavati točno 13 znamenki."
 
 #: mk/forms.py:58
 msgid "The first 7 digits of the UMCN must represent a valid past date."
-msgstr ""
+msgstr "Prvih sedam UMCN znamenka mora predstavljati valjani prošli datum."
 
 #: mk/forms.py:59
 msgid "The UMCN is not valid."
-msgstr ""
-
-#: mk/mk_choices.py:8
-msgid "Aerodrom"
-msgstr ""
-
-#: mk/mk_choices.py:9
-msgid "Aračinovo"
-msgstr ""
+msgstr "UMCN ne vrijedi."
 
 #: mk/mk_choices.py:10
-msgid "Berovo"
-msgstr ""
+msgid "Aerodrom"
+msgstr "Aerodrom"
 
 #: mk/mk_choices.py:11
-msgid "Bitola"
-msgstr ""
+msgid "Aračinovo"
+msgstr "Aračinovo"
 
 #: mk/mk_choices.py:12
-msgid "Bogdanci"
-msgstr ""
+msgid "Berovo"
+msgstr "Berovo"
 
 #: mk/mk_choices.py:13
-msgid "Bogovinje"
-msgstr ""
+msgid "Bitola"
+msgstr "Bitola"
 
 #: mk/mk_choices.py:14
-msgid "Bosilovo"
-msgstr ""
+msgid "Bogdanci"
+msgstr "Bogdanci"
 
 #: mk/mk_choices.py:15
-msgid "Brvenica"
-msgstr ""
+msgid "Bogovinje"
+msgstr "Bogovinje"
 
 #: mk/mk_choices.py:16
-msgid "Butel"
-msgstr ""
+msgid "Bosilovo"
+msgstr "Bosilovo"
 
 #: mk/mk_choices.py:17
-msgid "Valandovo"
-msgstr ""
+msgid "Brvenica"
+msgstr "Brvenica"
 
 #: mk/mk_choices.py:18
-msgid "Vasilevo"
-msgstr ""
+msgid "Butel"
+msgstr "Butel"
 
 #: mk/mk_choices.py:19
-msgid "Vevčani"
-msgstr ""
+msgid "Valandovo"
+msgstr "Valandovo"
 
 #: mk/mk_choices.py:20
-msgid "Veles"
-msgstr ""
+msgid "Vasilevo"
+msgstr "Vasilevo"
 
 #: mk/mk_choices.py:21
-msgid "Vinica"
-msgstr ""
+msgid "Vevčani"
+msgstr "Vevčani"
 
 #: mk/mk_choices.py:22
-msgid "Vraneštica"
-msgstr ""
+msgid "Veles"
+msgstr "Veles"
 
 #: mk/mk_choices.py:23
-msgid "Vrapčište"
-msgstr ""
+msgid "Vinica"
+msgstr "Vinica"
 
 #: mk/mk_choices.py:24
-msgid "Gazi Baba"
-msgstr ""
+msgid "Vraneštica"
+msgstr "Vraneštica"
 
 #: mk/mk_choices.py:25
-msgid "Gevgelija"
-msgstr ""
+msgid "Vrapčište"
+msgstr "Vrapčište"
 
 #: mk/mk_choices.py:26
-msgid "Gostivar"
-msgstr ""
+msgid "Gazi Baba"
+msgstr "Gazi Baba"
 
 #: mk/mk_choices.py:27
-msgid "Gradsko"
-msgstr ""
+msgid "Gevgelija"
+msgstr "Gevgelija"
 
 #: mk/mk_choices.py:28
-msgid "Debar"
-msgstr ""
+msgid "Gostivar"
+msgstr "Gostivar"
 
 #: mk/mk_choices.py:29
-msgid "Debarca"
-msgstr ""
+msgid "Gradsko"
+msgstr "Gradsko"
 
 #: mk/mk_choices.py:30
-msgid "Delčevo"
-msgstr ""
+msgid "Debar"
+msgstr "Debar"
 
 #: mk/mk_choices.py:31
-msgid "Demir Kapija"
-msgstr ""
+msgid "Debarca"
+msgstr "Debarca"
 
 #: mk/mk_choices.py:32
-msgid "Demir Hisar"
-msgstr ""
+msgid "Delčevo"
+msgstr "Delčevo"
 
 #: mk/mk_choices.py:33
-msgid "Dolneni"
-msgstr ""
+msgid "Demir Kapija"
+msgstr "Demir Kapija"
 
 #: mk/mk_choices.py:34
-msgid "Drugovo"
-msgstr ""
+msgid "Demir Hisar"
+msgstr "Demir Hisar"
 
 #: mk/mk_choices.py:35
-msgid "Gjorče Petrov"
-msgstr ""
+msgid "Dolneni"
+msgstr "Dolneni"
 
 #: mk/mk_choices.py:36
-msgid "Želino"
-msgstr ""
+msgid "Drugovo"
+msgstr "Drugovo"
 
 #: mk/mk_choices.py:37
-msgid "Zajas"
-msgstr ""
+msgid "Gjorče Petrov"
+msgstr "Gjorče Petrov"
 
 #: mk/mk_choices.py:38
-msgid "Zelenikovo"
-msgstr ""
+msgid "Želino"
+msgstr "Želino"
 
 #: mk/mk_choices.py:39
-msgid "Zrnovci"
-msgstr ""
+msgid "Zajas"
+msgstr "Zajas"
 
 #: mk/mk_choices.py:40
-msgid "Ilinden"
-msgstr ""
+msgid "Zelenikovo"
+msgstr "Zelenikovo"
 
 #: mk/mk_choices.py:41
-msgid "Jegunovce"
-msgstr ""
+msgid "Zrnovci"
+msgstr "Zrnovci"
 
 #: mk/mk_choices.py:42
-msgid "Kavadarci"
-msgstr ""
+msgid "Ilinden"
+msgstr "Ilinden"
 
 #: mk/mk_choices.py:43
-msgid "Karbinci"
-msgstr ""
+msgid "Jegunovce"
+msgstr "Jegunovce"
 
 #: mk/mk_choices.py:44
-msgid "Karpoš"
-msgstr ""
+msgid "Kavadarci"
+msgstr "Kavadarci"
 
 #: mk/mk_choices.py:45
-msgid "Kisela Voda"
-msgstr ""
+msgid "Karbinci"
+msgstr "Karbinci"
 
 #: mk/mk_choices.py:46
-msgid "Kičevo"
-msgstr ""
+msgid "Karpoš"
+msgstr "Karpoš"
 
 #: mk/mk_choices.py:47
-msgid "Konče"
-msgstr ""
+msgid "Kisela Voda"
+msgstr "Kisela Voda"
 
 #: mk/mk_choices.py:48
-msgid "Koćani"
-msgstr ""
+msgid "Kičevo"
+msgstr "Kičevo"
 
 #: mk/mk_choices.py:49
-msgid "Kratovo"
-msgstr ""
+msgid "Konče"
+msgstr "Konče"
 
 #: mk/mk_choices.py:50
-msgid "Kriva Palanka"
-msgstr ""
+msgid "Koćani"
+msgstr "Koćani"
 
 #: mk/mk_choices.py:51
-msgid "Krivogaštani"
-msgstr ""
+msgid "Kratovo"
+msgstr "Kratovo"
 
 #: mk/mk_choices.py:52
-msgid "Kruševo"
-msgstr ""
+msgid "Kriva Palanka"
+msgstr "Kriva Palanka"
 
 #: mk/mk_choices.py:53
-msgid "Kumanovo"
-msgstr ""
+msgid "Krivogaštani"
+msgstr "Krivogaštani"
 
 #: mk/mk_choices.py:54
-msgid "Lipkovo"
-msgstr ""
+msgid "Kruševo"
+msgstr "Kruševo"
 
 #: mk/mk_choices.py:55
+msgid "Kumanovo"
+msgstr "Kumanovo"
+
+#: mk/mk_choices.py:56
+msgid "Lipkovo"
+msgstr "Lipkovo"
+
+#: mk/mk_choices.py:57
 msgid "Lozovo"
 msgstr ""
 
-#: mk/mk_choices.py:56
+#: mk/mk_choices.py:58
 msgid "Mavrovo i Rostuša"
 msgstr ""
 
-#: mk/mk_choices.py:57
+#: mk/mk_choices.py:59
 msgid "Makedonska Kamenica"
 msgstr ""
 
-#: mk/mk_choices.py:58
+#: mk/mk_choices.py:60
 msgid "Makedonski Brod"
 msgstr ""
 
-#: mk/mk_choices.py:59
+#: mk/mk_choices.py:61
 msgid "Mogila"
 msgstr ""
 
-#: mk/mk_choices.py:60
+#: mk/mk_choices.py:62
 msgid "Negotino"
 msgstr ""
 
-#: mk/mk_choices.py:61
+#: mk/mk_choices.py:63
 msgid "Novaci"
 msgstr ""
 
-#: mk/mk_choices.py:62
+#: mk/mk_choices.py:64
 msgid "Novo Selo"
 msgstr ""
 
-#: mk/mk_choices.py:63
+#: mk/mk_choices.py:65
 msgid "Oslomej"
 msgstr ""
 
-#: mk/mk_choices.py:64
+#: mk/mk_choices.py:66
 msgid "Ohrid"
 msgstr ""
 
-#: mk/mk_choices.py:65
+#: mk/mk_choices.py:67
 msgid "Petrovec"
 msgstr ""
 
-#: mk/mk_choices.py:66
+#: mk/mk_choices.py:68
 msgid "Pehčevo"
 msgstr ""
 
-#: mk/mk_choices.py:67
+#: mk/mk_choices.py:69
 msgid "Plasnica"
 msgstr ""
 
-#: mk/mk_choices.py:68
+#: mk/mk_choices.py:70
 msgid "Prilep"
 msgstr ""
 
-#: mk/mk_choices.py:69
+#: mk/mk_choices.py:71
 msgid "Probištip"
 msgstr ""
 
-#: mk/mk_choices.py:70
+#: mk/mk_choices.py:72
 msgid "Radoviš"
 msgstr ""
 
-#: mk/mk_choices.py:71
+#: mk/mk_choices.py:73
 msgid "Rankovce"
 msgstr ""
 
-#: mk/mk_choices.py:72
+#: mk/mk_choices.py:74
 msgid "Resen"
 msgstr ""
 
-#: mk/mk_choices.py:73
+#: mk/mk_choices.py:75
 msgid "Rosoman"
 msgstr ""
 
-#: mk/mk_choices.py:74
+#: mk/mk_choices.py:76
 msgid "Saraj"
 msgstr ""
 
-#: mk/mk_choices.py:75
+#: mk/mk_choices.py:77
 msgid "Sveti Nikole"
 msgstr ""
 
-#: mk/mk_choices.py:76
+#: mk/mk_choices.py:78
 msgid "Sopište"
 msgstr ""
 
-#: mk/mk_choices.py:77
+#: mk/mk_choices.py:79
 msgid "Star Dojran"
 msgstr ""
 
-#: mk/mk_choices.py:78
+#: mk/mk_choices.py:80
 msgid "Staro Nagoričane"
 msgstr ""
 
-#: mk/mk_choices.py:79
+#: mk/mk_choices.py:81
 msgid "Struga"
 msgstr ""
 
-#: mk/mk_choices.py:80
+#: mk/mk_choices.py:82
 msgid "Strumica"
 msgstr ""
 
-#: mk/mk_choices.py:81
+#: mk/mk_choices.py:83
 msgid "Studeničani"
 msgstr ""
 
-#: mk/mk_choices.py:82
+#: mk/mk_choices.py:84
 msgid "Tearce"
 msgstr ""
 
-#: mk/mk_choices.py:83
+#: mk/mk_choices.py:85
 msgid "Tetovo"
 msgstr ""
 
-#: mk/mk_choices.py:84
+#: mk/mk_choices.py:86
 msgid "Centar"
 msgstr ""
 
-#: mk/mk_choices.py:85
+#: mk/mk_choices.py:87
 msgid "Centar-Župa"
 msgstr ""
 
-#: mk/mk_choices.py:86
+#: mk/mk_choices.py:88
 msgid "Čair"
 msgstr ""
 
-#: mk/mk_choices.py:87
+#: mk/mk_choices.py:89
 msgid "Čaška"
 msgstr ""
 
-#: mk/mk_choices.py:88
+#: mk/mk_choices.py:90
 msgid "Češinovo-Obleševo"
 msgstr ""
 
-#: mk/mk_choices.py:89
+#: mk/mk_choices.py:91
 msgid "Čučer-Sandevo"
 msgstr ""
 
-#: mk/mk_choices.py:90
+#: mk/mk_choices.py:92
 msgid "Štip"
 msgstr ""
 
-#: mk/mk_choices.py:91
+#: mk/mk_choices.py:93
 msgid "Šuto Orizari"
 msgstr ""
 
@@ -2248,23 +2277,23 @@ msgstr ""
 msgid "Unique master citizen number (13 digits)"
 msgstr ""
 
-#: mx/forms.py:65
+#: mx/forms.py:67
 msgid "Enter a valid zip code in the format XXXXX."
 msgstr ""
 
-#: mx/forms.py:108
+#: mx/forms.py:110
 msgid "Enter a valid RFC."
 msgstr ""
 
-#: mx/forms.py:109
+#: mx/forms.py:111
 msgid "Invalid checksum for RFC."
 msgstr ""
 
-#: mx/forms.py:189
+#: mx/forms.py:191
 msgid "Enter a valid CURP."
 msgstr ""
 
-#: mx/forms.py:190
+#: mx/forms.py:192
 msgid "Invalid checksum for CURP."
 msgstr ""
 
@@ -2284,131 +2313,131 @@ msgstr ""
 msgid "Mexican CURP"
 msgstr ""
 
-#: mx/mx_states.py:13
+#: mx/mx_states.py:14
 msgid "Aguascalientes"
 msgstr "Aguascalientes"
 
-#: mx/mx_states.py:14
+#: mx/mx_states.py:15
 msgid "Baja California"
 msgstr "Baja California"
 
-#: mx/mx_states.py:15
+#: mx/mx_states.py:16
 msgid "Baja California Sur"
 msgstr "Baja California Sur"
 
-#: mx/mx_states.py:16
+#: mx/mx_states.py:17
 msgid "Campeche"
 msgstr "Campeche"
 
-#: mx/mx_states.py:17
+#: mx/mx_states.py:18
 msgid "Chihuahua"
 msgstr "Chihuahua"
 
-#: mx/mx_states.py:18
+#: mx/mx_states.py:19
 msgid "Chiapas"
 msgstr "Chiapas"
 
-#: mx/mx_states.py:19
+#: mx/mx_states.py:20
 msgid "Coahuila"
 msgstr "Coahuila"
 
-#: mx/mx_states.py:20
+#: mx/mx_states.py:21
 msgid "Colima"
 msgstr "Colima"
 
-#: mx/mx_states.py:21
+#: mx/mx_states.py:22
 msgid "Distrito Federal"
 msgstr "Distrito Federal"
 
-#: mx/mx_states.py:22
+#: mx/mx_states.py:23
 msgid "Durango"
 msgstr "Durango"
 
-#: mx/mx_states.py:23
+#: mx/mx_states.py:24
 msgid "Guerrero"
 msgstr "Guerrero"
 
-#: mx/mx_states.py:24
+#: mx/mx_states.py:25
 msgid "Guanajuato"
 msgstr "Guanajuato"
 
-#: mx/mx_states.py:25
+#: mx/mx_states.py:26
 msgid "Hidalgo"
 msgstr "Hidalgo"
 
-#: mx/mx_states.py:26
+#: mx/mx_states.py:27
 msgid "Jalisco"
 msgstr "Jalisco"
 
-#: mx/mx_states.py:27
+#: mx/mx_states.py:28
 msgid "Estado de México"
 msgstr "Država Meksiko"
 
-#: mx/mx_states.py:28
+#: mx/mx_states.py:29
 msgid "Michoacán"
 msgstr "Michoacán"
 
-#: mx/mx_states.py:29
+#: mx/mx_states.py:30
 msgid "Morelos"
 msgstr "Morelos"
 
-#: mx/mx_states.py:30
+#: mx/mx_states.py:31
 msgid "Nayarit"
 msgstr "Nayarit"
 
-#: mx/mx_states.py:31
+#: mx/mx_states.py:32
 msgid "Nuevo León"
 msgstr "Nuevo León"
 
-#: mx/mx_states.py:32
+#: mx/mx_states.py:33
 msgid "Oaxaca"
 msgstr "Oaxaca"
 
-#: mx/mx_states.py:33
+#: mx/mx_states.py:34
 msgid "Puebla"
 msgstr "Puebla"
 
-#: mx/mx_states.py:34
+#: mx/mx_states.py:35
 msgid "Querétaro"
 msgstr "Querétaro"
 
-#: mx/mx_states.py:35
+#: mx/mx_states.py:36
 msgid "Quintana Roo"
 msgstr "Quintana Roo"
 
-#: mx/mx_states.py:36
+#: mx/mx_states.py:37
 msgid "Sinaloa"
 msgstr "Sinaloa"
 
-#: mx/mx_states.py:37
+#: mx/mx_states.py:38
 msgid "San Luis Potosí"
 msgstr "San Luis Potosí"
 
-#: mx/mx_states.py:38
+#: mx/mx_states.py:39
 msgid "Sonora"
 msgstr "Sonora"
 
-#: mx/mx_states.py:39
+#: mx/mx_states.py:40
 msgid "Tabasco"
 msgstr "Tabasco"
 
-#: mx/mx_states.py:40
+#: mx/mx_states.py:41
 msgid "Tamaulipas"
 msgstr "Tamaulipas"
 
-#: mx/mx_states.py:41
+#: mx/mx_states.py:42
 msgid "Tlaxcala"
 msgstr "Tlaxcala"
 
-#: mx/mx_states.py:42
+#: mx/mx_states.py:43
 msgid "Veracruz"
 msgstr "Veracruz"
 
-#: mx/mx_states.py:43
+#: mx/mx_states.py:44
 msgid "Yucatán"
 msgstr "Yucatán"
 
-#: mx/mx_states.py:44
+#: mx/mx_states.py:45
 msgid "Zacatecas"
 msgstr "Zacatecas"
 
@@ -2580,31 +2609,31 @@ msgstr "Greater Poland"
 msgid "West Pomerania"
 msgstr "West Pomerania"
 
-#: pt/forms.py:17
+#: pt/forms.py:19
 msgid "Enter a zip code in the format XXXX-XXX."
 msgstr "Unesite poštanski broj u formatu XXX-XXXX."
 
-#: pt/forms.py:37
+#: pt/forms.py:39
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr "Telefonski brojevi moraju imati 9 brojeva, ili početi sa + ili 00."
 
-#: ro/forms.py:20
+#: ro/forms.py:22
 msgid "Enter a valid CIF."
 msgstr "Unesite ispravan CIF."
 
-#: ro/forms.py:57
+#: ro/forms.py:59
 msgid "Enter a valid CNP."
 msgstr "Unesite ispravan CNP."
 
-#: ro/forms.py:142
+#: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr "Unesite ispravan IBAN formata ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
 
-#: ro/forms.py:174
+#: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
 msgstr "Telefonski brojevi moraju biti formata XXXX-XXXXXX."
 
-#: ro/forms.py:199
+#: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Unesite ispravan poštanski broj formata XXXXXX"
 
@@ -2654,15 +2683,15 @@ msgstr ""
 
 #: ru/ru_regions.py:21
 msgid "Moskva"
-msgstr ""
+msgstr "Moskva"
 
 #: ru/ru_regions.py:22
 msgid "Saint-Peterburg"
-msgstr ""
+msgstr "Saint-Peterburg"
 
 #: ru/ru_regions.py:23
 msgid "Moskovskaya oblast'"
-msgstr ""
+msgstr "Moskovska oblast"
 
 #: ru/ru_regions.py:24
 msgid "Adygeya, Respublika"
@@ -3000,87 +3029,87 @@ msgstr "Koordinacijski brojevi nisu dozvoljeni."
 msgid "Enter a Swedish postal code in the format XXXXX."
 msgstr "Unesite švedski poštanski broj formata XXXXX."
 
-#: se/se_counties.py:15
+#: se/se_counties.py:16
 msgid "Stockholm"
 msgstr "Stockholm"
 
-#: se/se_counties.py:16
+#: se/se_counties.py:17
 msgid "Västerbotten"
 msgstr "Västerbotten"
 
-#: se/se_counties.py:17
+#: se/se_counties.py:18
 msgid "Norrbotten"
 msgstr "Norrbotten"
 
-#: se/se_counties.py:18
+#: se/se_counties.py:19
 msgid "Uppsala"
 msgstr "Uppsala"
 
-#: se/se_counties.py:19
+#: se/se_counties.py:20
 msgid "Södermanland"
 msgstr "Södermanland"
 
-#: se/se_counties.py:20
+#: se/se_counties.py:21
 msgid "Östergötland"
 msgstr "Östergötland"
 
-#: se/se_counties.py:21
+#: se/se_counties.py:22
 msgid "Jönköping"
 msgstr "Jönköping"
 
-#: se/se_counties.py:22
+#: se/se_counties.py:23
 msgid "Kronoberg"
 msgstr "Kronoberg"
 
-#: se/se_counties.py:23
+#: se/se_counties.py:24
 msgid "Kalmar"
 msgstr "Kalmar"
 
-#: se/se_counties.py:24
+#: se/se_counties.py:25
 msgid "Gotland"
 msgstr "Gotland"
 
-#: se/se_counties.py:25
+#: se/se_counties.py:26
 msgid "Blekinge"
 msgstr "Blekinge"
 
-#: se/se_counties.py:26
+#: se/se_counties.py:27
 msgid "Skåne"
 msgstr "Skåne"
 
-#: se/se_counties.py:27
+#: se/se_counties.py:28
 msgid "Halland"
 msgstr "Halland"
 
-#: se/se_counties.py:28
+#: se/se_counties.py:29
 msgid "Västra Götaland"
 msgstr "Västra Götaland"
 
-#: se/se_counties.py:29
+#: se/se_counties.py:30
 msgid "Värmland"
 msgstr "Värmland"
 
-#: se/se_counties.py:30
+#: se/se_counties.py:31
 msgid "Örebro"
 msgstr "Örebro"
 
-#: se/se_counties.py:31
+#: se/se_counties.py:32
 msgid "Västmanland"
 msgstr "Västmanland"
 
-#: se/se_counties.py:32
+#: se/se_counties.py:33
 msgid "Dalarna"
 msgstr "Dalarna"
 
-#: se/se_counties.py:33
+#: se/se_counties.py:34
 msgid "Gävleborg"
 msgstr "Gävleborg"
 
-#: se/se_counties.py:34
+#: se/se_counties.py:35
 msgid "Västernorrland"
 msgstr "Västernorrland"
 
-#: se/se_counties.py:35
+#: se/se_counties.py:36
 msgid "Jämtland"
 msgstr "Jämtland"
 
@@ -3468,10 +3497,6 @@ msgstr "Turski Identifikacioni broj mora biti 11 znamenki."
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Unesite zip kod formata XXXXX or XXXXX-XXXX."
 
-#: us/forms.py:30
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Telefonski brojevi moraju biti u XXX-XXX-XXXX formatu."
-
 #: us/forms.py:59
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
@@ -3501,11 +3526,11 @@ msgstr "Unesite valjani CI broj u X.XXX.XXX-X, XXXXXXX-X ili XXXXXXXX formatu."
 msgid "Enter a valid CI number."
 msgstr "Unesite ispravan CI broj."
 
-#: za/forms.py:21
+#: za/forms.py:22
 msgid "Enter a valid South African ID number"
 msgstr "Unesi ispravan južnoafrički ID broj."
 
-#: za/forms.py:55
+#: za/forms.py:56
 msgid "Enter a valid South African postal code"
 msgstr "Unesite ispravan južnoafrički poštanski broj."
 

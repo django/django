@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+#   <alok.kumar@gmail.com>, 2013.
 # chandankumar(ciypro) <chandankumar.093047@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Sandeep Satavlekar <sandysat@gmail.com>, 2011.
@@ -8,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:41+0100\n"
-"PO-Revision-Date: 2012-03-15 13:28+0000\n"
-"Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
-"Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2013-01-06 13:43+0000\n"
+"Last-Translator: alkuma <alok.kumar@gmail.com>\n"
+"Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
 "hi/)\n"
-"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -38,6 +39,10 @@ msgstr "मान्य CUIT XX-XXXXXXXX-X अथवा XXXXXXXXXXXX प्र�
 #: ar/forms.py:83
 msgid "Invalid CUIT."
 msgstr "अमान्य CUIT"
+
+#: ar/forms.py:84
+msgid "Invalid legal type. Type must be 27, 20, 23 or 30."
+msgstr " अवैध क़ानूनी प्रकार। प्रकार 27, 20, 23 या 30 होना चाहिए।"
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -203,6 +208,14 @@ msgstr "इस क्षेत्र में कम से कम 14 अंक
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "डाक संहिता के XXX XXX प्रतिरूप में भरें ।"
 
+#: ca/forms.py:47 us/forms.py:30
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "टेलिफोन संख्या को -XXX XXX -XXXX- प्रतिरूप में भरें ।"
+
+#: ca/forms.py:69
+msgid "Enter a Canadian province or territory."
+msgstr "कनाडा का कोई प्रांत या प्रदेश प्रविष्ट करें।"
+
 #: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr "मान्य कनेडियन सोशल सेक्यूरिटी संख्या को XXX-XXX-XXX प्रतिरूप में भरें ।"
@@ -310,6 +323,10 @@ msgstr "जुग"
 #: ch/ch_states.py:30
 msgid "Zurich"
 msgstr "जूरिच"
+
+#: ch/forms.py:37
+msgid "Phone numbers must be in 0XX XXX XX XX format."
+msgstr "दूरभाषों का प्रारूप 0XX XXX XX XX होना चाहिए।"
 
 #: ch/forms.py:68
 msgid ""
@@ -424,14 +441,10 @@ msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr "XXXXXX/XXXXयाXXXXXXXXXX प्रारूप में जन्म संख्या दर्ज करें."
 
 #: cz/forms.py:53
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "अवैध वैकल्पिक पैरामीटर लिंग, वैध मान 'f' और 'm'"
-
-#: cz/forms.py:54
 msgid "Enter a valid birth number."
 msgstr "वैध जन्म संख्या दर्ज करें."
 
-#: cz/forms.py:115
+#: cz/forms.py:102
 msgid "Enter a valid IC number."
 msgstr "वैध आईसी संख्या दर्ज करें."
 
@@ -511,8 +524,8 @@ msgstr ""
 "मान्य जर्मन पहचान पत्र संख्या को XXXXXXXXXXX-XXXXXXX-XXXXXXX-X प्ततिरूप में भरें ।"
 
 #: es/es_provinces.py:5
-msgid "Arava"
-msgstr "अरवा"
+msgid "Araba"
+msgstr "अरबा"
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -1107,11 +1120,26 @@ msgstr "स्काटलान्ड"
 msgid "Wales"
 msgstr "वेल्स"
 
-#: hr/forms.py:75
+#: hk/forms.py:37
+#, python-format
+msgid "Phone number should not start with one of the followings: %s."
+msgstr "दूरभाष इनमें से किसी से शुरू नहीं हो सकता - %s।"
+
+#: hk/forms.py:40
+#, python-format
+msgid "Phone number must be in one of the following formats: %s."
+msgstr "दूरभाष इनमें से किसी एक प्रारूप में होना चाहिए - %s।"
+
+#: hk/forms.py:42
+#, python-format
+msgid "Phone number should start with one of the followings: %s."
+msgstr "दूरभाष इनमें से किसी एक से शुरू होना चाहिए - %s।"
+
+#: hr/forms.py:76
 msgid "Enter a valid 13 digit JMBG"
 msgstr "वैध 13 अंक JMBG दर्ज करें"
 
-#: hr/forms.py:76
+#: hr/forms.py:77
 msgid "Error in date segment"
 msgstr "तारीख खंड में त्रुटि"
 
@@ -1155,87 +1183,87 @@ msgstr "मान्य 19 अंकीय JMBAG जो 601,983 के साथ
 msgid "Card issue number cannot be zero"
 msgstr "कार्ड जारी संख्या शून्य नहीं हो सकते है"
 
-#: hr/hr_choices.py:12
+#: hr/hr_choices.py:14
 msgid "Grad Zagreb"
 msgstr "ग्रद ज़ाग्रेब"
 
-#: hr/hr_choices.py:13
+#: hr/hr_choices.py:15
 msgid "Bjelovarsko-bilogorska županija"
 msgstr "ब्जेलोवार्सको-बिलोगोर्सका जुपानिजा "
 
-#: hr/hr_choices.py:14
+#: hr/hr_choices.py:16
 msgid "Brodsko-posavska županija"
 msgstr "ब्रोद्सको-पोसव्सका जुपानिजा"
 
-#: hr/hr_choices.py:15
+#: hr/hr_choices.py:17
 msgid "Dubrovačko-neretvanska županija"
 msgstr "दुब्रोवाच्को-नेरेत्वन्सका जुपानिजा"
 
-#: hr/hr_choices.py:16
+#: hr/hr_choices.py:18
 msgid "Istarska županija"
 msgstr "इस्तार्सका जुपानिजा"
 
-#: hr/hr_choices.py:17
+#: hr/hr_choices.py:19
 msgid "Karlovačka županija"
 msgstr "कर्लोवाच्का जुपानिजा"
 
-#: hr/hr_choices.py:18
+#: hr/hr_choices.py:20
 msgid "Koprivničko-križevačka županija"
 msgstr "कोप्रिव्निच्को-क्रिज़ेवाच्का जुपानिजा"
 
-#: hr/hr_choices.py:19
+#: hr/hr_choices.py:21
 msgid "Krapinsko-zagorska županija"
 msgstr "क्रपिन्सको-ज़गोर्सका जुपानिजा"
 
-#: hr/hr_choices.py:20
+#: hr/hr_choices.py:22
 msgid "Ličko-senjska županija"
 msgstr "लिच्को-सेंज्सका जुपानिजा"
 
-#: hr/hr_choices.py:21
+#: hr/hr_choices.py:23
 msgid "Međimurska županija"
 msgstr "मेदिमुर्सका जुपानिजा"
 
-#: hr/hr_choices.py:22
+#: hr/hr_choices.py:24
 msgid "Osječko-baranjska županija"
 msgstr "ओस्जेच्को-बरंज्सका जुपानिजा"
 
-#: hr/hr_choices.py:23
+#: hr/hr_choices.py:25
 msgid "Požeško-slavonska županija"
 msgstr "पोज़ेसको-स्लावोंसका जुपानिजा"
 
-#: hr/hr_choices.py:24
+#: hr/hr_choices.py:26
 msgid "Primorsko-goranska županija"
 msgstr "प्रिमोर्सको-गोरंसका जुपानिजा "
 
-#: hr/hr_choices.py:25
+#: hr/hr_choices.py:27
 msgid "Sisačko-moslavačka županija"
 msgstr "सिसच्को-मोस्लावाच्का जुपानिजा"
 
-#: hr/hr_choices.py:26
+#: hr/hr_choices.py:28
 msgid "Splitsko-dalmatinska županija"
 msgstr "स्प्लित्सको-दल्मातिन्सका जुपानिजा"
 
-#: hr/hr_choices.py:27
+#: hr/hr_choices.py:29
 msgid "Šibensko-kninska županija"
 msgstr "सिबेंसको-क्निन्सका जुपानिजा"
 
-#: hr/hr_choices.py:28
+#: hr/hr_choices.py:30
 msgid "Varaždinska županija"
 msgstr "वरज्दिन्सका जुपानिजा"
 
-#: hr/hr_choices.py:29
+#: hr/hr_choices.py:31
 msgid "Virovitičko-podravska županija"
 msgstr "विरोवितिच्को-पोद्रव्सका जुपानिजा"
 
-#: hr/hr_choices.py:30
+#: hr/hr_choices.py:32
 msgid "Vukovarsko-srijemska županija"
 msgstr "वुकोवार्सको-सृजेम्सका जुपानिजा "
 
-#: hr/hr_choices.py:31
+#: hr/hr_choices.py:33
 msgid "Zadarska županija"
 msgstr "ज़दार्सका जुपानिजा"
 
-#: hr/hr_choices.py:32
+#: hr/hr_choices.py:34
 msgid "Zagrebačka županija"
 msgstr "ज़ग्रेबच्का जुपानिजा"
 
@@ -1639,11 +1667,11 @@ msgstr "वेक्सफोर्ड "
 msgid "Wicklow"
 msgstr "विच्क्लो "
 
-#: il/forms.py:31
+#: il/forms.py:32
 msgid "Enter a postal code in the format XXXXX"
 msgstr "डाक संहिता को XXX XX प्रतिरूप में भरें"
 
-#: il/forms.py:50
+#: il/forms.py:51
 msgid "Enter a valid ID number."
 msgstr " वैध आइ.डि संख्या भरें."
 
@@ -1872,7 +1900,7 @@ msgstr "कागोशीमा"
 msgid "Okinawa"
 msgstr "ओकिनावा"
 
-#: kw/forms.py:25
+#: kw/forms.py:27
 msgid "Enter a valid Kuwaiti Civil ID number"
 msgstr "मान्य कुवैती नागरिक ID संख्या दर्ज करें"
 
@@ -1895,339 +1923,339 @@ msgstr "UMCN के पहले 7 अंकों एक मान्य पि
 msgid "The UMCN is not valid."
 msgstr "UMCN मान्य नहीं है."
 
-#: mk/mk_choices.py:8
+#: mk/mk_choices.py:10
 msgid "Aerodrom"
 msgstr "एरोड्रोम"
 
-#: mk/mk_choices.py:9
+#: mk/mk_choices.py:11
 msgid "Aračinovo"
 msgstr "अरसिनोवो  "
 
-#: mk/mk_choices.py:10
+#: mk/mk_choices.py:12
 msgid "Berovo"
 msgstr "बेरोवो "
 
-#: mk/mk_choices.py:11
+#: mk/mk_choices.py:13
 msgid "Bitola"
 msgstr "बितोला "
 
-#: mk/mk_choices.py:12
+#: mk/mk_choices.py:14
 msgid "Bogdanci"
 msgstr "बोग्दंची "
 
-#: mk/mk_choices.py:13
+#: mk/mk_choices.py:15
 msgid "Bogovinje"
 msgstr "बोगोविन्जे "
 
-#: mk/mk_choices.py:14
+#: mk/mk_choices.py:16
 msgid "Bosilovo"
 msgstr "बोसिलोवो "
 
-#: mk/mk_choices.py:15
+#: mk/mk_choices.py:17
 msgid "Brvenica"
 msgstr "ब्र्वेनिचा "
 
-#: mk/mk_choices.py:16
+#: mk/mk_choices.py:18
 msgid "Butel"
 msgstr "बुटेल "
 
-#: mk/mk_choices.py:17
+#: mk/mk_choices.py:19
 msgid "Valandovo"
 msgstr "वलान्दोवो "
 
-#: mk/mk_choices.py:18
+#: mk/mk_choices.py:20
 msgid "Vasilevo"
 msgstr "वसिलेवो "
 
-#: mk/mk_choices.py:19
+#: mk/mk_choices.py:21
 msgid "Vevčani"
 msgstr "वेव्कानी "
 
-#: mk/mk_choices.py:20
+#: mk/mk_choices.py:22
 msgid "Veles"
 msgstr "वेल्स "
 
-#: mk/mk_choices.py:21
+#: mk/mk_choices.py:23
 msgid "Vinica"
 msgstr "विनिचा "
 
-#: mk/mk_choices.py:22
+#: mk/mk_choices.py:24
 msgid "Vraneštica"
 msgstr "व्रनेस्तिचा  "
 
-#: mk/mk_choices.py:23
+#: mk/mk_choices.py:25
 msgid "Vrapčište"
 msgstr "व्रप्सिस्ते "
 
-#: mk/mk_choices.py:24
+#: mk/mk_choices.py:26
 msgid "Gazi Baba"
 msgstr "गाजी बाबा "
 
-#: mk/mk_choices.py:25
+#: mk/mk_choices.py:27
 msgid "Gevgelija"
 msgstr "गेव्गेलिजा "
 
-#: mk/mk_choices.py:26
+#: mk/mk_choices.py:28
 msgid "Gostivar"
 msgstr "गोस्तिवर "
 
-#: mk/mk_choices.py:27
+#: mk/mk_choices.py:29
 msgid "Gradsko"
 msgstr "ग्राद्सको "
 
-#: mk/mk_choices.py:28
+#: mk/mk_choices.py:30
 msgid "Debar"
 msgstr "देबर "
 
-#: mk/mk_choices.py:29
+#: mk/mk_choices.py:31
 msgid "Debarca"
 msgstr "देबर्चा "
 
-#: mk/mk_choices.py:30
+#: mk/mk_choices.py:32
 msgid "Delčevo"
 msgstr "देल्सवो "
 
-#: mk/mk_choices.py:31
+#: mk/mk_choices.py:33
 msgid "Demir Kapija"
 msgstr "देमिर कपिजा  "
 
-#: mk/mk_choices.py:32
+#: mk/mk_choices.py:34
 msgid "Demir Hisar"
 msgstr "देमिर हिसार "
 
-#: mk/mk_choices.py:33
+#: mk/mk_choices.py:35
 msgid "Dolneni"
 msgstr "दोल्नेनी "
 
-#: mk/mk_choices.py:34
+#: mk/mk_choices.py:36
 msgid "Drugovo"
 msgstr "दृगोवो "
 
-#: mk/mk_choices.py:35
+#: mk/mk_choices.py:37
 msgid "Gjorče Petrov"
 msgstr "ग्जोर्चे पेत्रोव "
 
-#: mk/mk_choices.py:36
+#: mk/mk_choices.py:38
 msgid "Želino"
 msgstr "ज़ेलिनो "
 
-#: mk/mk_choices.py:37
+#: mk/mk_choices.py:39
 msgid "Zajas"
 msgstr "ज़जास  "
 
-#: mk/mk_choices.py:38
+#: mk/mk_choices.py:40
 msgid "Zelenikovo"
 msgstr "ज़ेलेनिकोवो "
 
-#: mk/mk_choices.py:39
+#: mk/mk_choices.py:41
 msgid "Zrnovci"
 msgstr "ज्र्नोव्ची "
 
-#: mk/mk_choices.py:40
+#: mk/mk_choices.py:42
 msgid "Ilinden"
 msgstr "इलिंदें "
 
-#: mk/mk_choices.py:41
+#: mk/mk_choices.py:43
 msgid "Jegunovce"
 msgstr "जेगुनोव्स "
 
-#: mk/mk_choices.py:42
+#: mk/mk_choices.py:44
 msgid "Kavadarci"
 msgstr "कवदर्ची "
 
-#: mk/mk_choices.py:43
+#: mk/mk_choices.py:45
 msgid "Karbinci"
 msgstr "कर्बिंची "
 
-#: mk/mk_choices.py:44
+#: mk/mk_choices.py:46
 msgid "Karpoš"
 msgstr "कर्पोस "
 
-#: mk/mk_choices.py:45
+#: mk/mk_choices.py:47
 msgid "Kisela Voda"
 msgstr "किसेला वोडा "
 
-#: mk/mk_choices.py:46
+#: mk/mk_choices.py:48
 msgid "Kičevo"
 msgstr "किसवो "
 
-#: mk/mk_choices.py:47
+#: mk/mk_choices.py:49
 msgid "Konče"
 msgstr " कोंचे "
 
-#: mk/mk_choices.py:48
+#: mk/mk_choices.py:50
 msgid "Koćani"
 msgstr "कोकानी "
 
-#: mk/mk_choices.py:49
+#: mk/mk_choices.py:51
 msgid "Kratovo"
 msgstr "क्रतोवो "
 
-#: mk/mk_choices.py:50
+#: mk/mk_choices.py:52
 msgid "Kriva Palanka"
 msgstr "करिव पलंका "
 
-#: mk/mk_choices.py:51
+#: mk/mk_choices.py:53
 msgid "Krivogaštani"
 msgstr "क्रिवोगास्तानी "
 
-#: mk/mk_choices.py:52
+#: mk/mk_choices.py:54
 msgid "Kruševo"
 msgstr "कृसेवो "
 
-#: mk/mk_choices.py:53
+#: mk/mk_choices.py:55
 msgid "Kumanovo"
 msgstr "कुमनोवो "
 
-#: mk/mk_choices.py:54
+#: mk/mk_choices.py:56
 msgid "Lipkovo"
 msgstr "लिप्कोवो "
 
-#: mk/mk_choices.py:55
+#: mk/mk_choices.py:57
 msgid "Lozovo"
 msgstr "लोज़ोवो "
 
-#: mk/mk_choices.py:56
+#: mk/mk_choices.py:58
 msgid "Mavrovo i Rostuša"
 msgstr "मव्रोवो  इ  रोस्तुसा "
 
-#: mk/mk_choices.py:57
+#: mk/mk_choices.py:59
 msgid "Makedonska Kamenica"
 msgstr "मकेदोंसका कामेनीका  "
 
-#: mk/mk_choices.py:58
+#: mk/mk_choices.py:60
 msgid "Makedonski Brod"
 msgstr "मकेदोंसकी ब्रोड "
 
-#: mk/mk_choices.py:59
+#: mk/mk_choices.py:61
 msgid "Mogila"
 msgstr "मोगिला "
 
-#: mk/mk_choices.py:60
+#: mk/mk_choices.py:62
 msgid "Negotino"
 msgstr "नेगोतिनो "
 
-#: mk/mk_choices.py:61
+#: mk/mk_choices.py:63
 msgid "Novaci"
 msgstr "नोवाची "
 
-#: mk/mk_choices.py:62
+#: mk/mk_choices.py:64
 msgid "Novo Selo"
 msgstr "नोवो सेलो "
 
-#: mk/mk_choices.py:63
+#: mk/mk_choices.py:65
 msgid "Oslomej"
 msgstr "ओस्लोमेज "
 
-#: mk/mk_choices.py:64
+#: mk/mk_choices.py:66
 msgid "Ohrid"
 msgstr "ओहरिड"
 
-#: mk/mk_choices.py:65
+#: mk/mk_choices.py:67
 msgid "Petrovec"
 msgstr "पेट्रोवेक "
 
-#: mk/mk_choices.py:66
+#: mk/mk_choices.py:68
 msgid "Pehčevo"
 msgstr "पह्सवो "
 
-#: mk/mk_choices.py:67
+#: mk/mk_choices.py:69
 msgid "Plasnica"
 msgstr "प्लास्निचा "
 
-#: mk/mk_choices.py:68
+#: mk/mk_choices.py:70
 msgid "Prilep"
 msgstr "प्रिलेप "
 
-#: mk/mk_choices.py:69
+#: mk/mk_choices.py:71
 msgid "Probištip"
 msgstr "प्रोबिस्तिप "
 
-#: mk/mk_choices.py:70
+#: mk/mk_choices.py:72
 msgid "Radoviš"
 msgstr "रादोविस "
 
-#: mk/mk_choices.py:71
+#: mk/mk_choices.py:73
 msgid "Rankovce"
 msgstr "रंकोव्स "
 
-#: mk/mk_choices.py:72
+#: mk/mk_choices.py:74
 msgid "Resen"
 msgstr "रेसें "
 
-#: mk/mk_choices.py:73
+#: mk/mk_choices.py:75
 msgid "Rosoman"
 msgstr "रोसोमन "
 
-#: mk/mk_choices.py:74
+#: mk/mk_choices.py:76
 msgid "Saraj"
 msgstr "सरज  "
 
-#: mk/mk_choices.py:75
+#: mk/mk_choices.py:77
 msgid "Sveti Nikole"
 msgstr "स्वेती निकोले "
 
-#: mk/mk_choices.py:76
+#: mk/mk_choices.py:78
 msgid "Sopište"
 msgstr "सोपिस्ते "
 
-#: mk/mk_choices.py:77
+#: mk/mk_choices.py:79
 msgid "Star Dojran"
 msgstr "स्टार दोज्रण "
 
-#: mk/mk_choices.py:78
+#: mk/mk_choices.py:80
 msgid "Staro Nagoričane"
 msgstr "स्तरों नागोरिकाने "
 
-#: mk/mk_choices.py:79
+#: mk/mk_choices.py:81
 msgid "Struga"
 msgstr "स्त्रुगा "
 
-#: mk/mk_choices.py:80
+#: mk/mk_choices.py:82
 msgid "Strumica"
 msgstr "स्त्रुमिचा "
 
-#: mk/mk_choices.py:81
+#: mk/mk_choices.py:83
 msgid "Studeničani"
 msgstr "स्तुदेनिकानी "
 
-#: mk/mk_choices.py:82
+#: mk/mk_choices.py:84
 msgid "Tearce"
 msgstr "टारस "
 
-#: mk/mk_choices.py:83
+#: mk/mk_choices.py:85
 msgid "Tetovo"
 msgstr "तेतोवो "
 
-#: mk/mk_choices.py:84
+#: mk/mk_choices.py:86
 msgid "Centar"
 msgstr "सेंटर "
 
-#: mk/mk_choices.py:85
+#: mk/mk_choices.py:87
 msgid "Centar-Župa"
 msgstr "सेंटर-जुप "
 
-#: mk/mk_choices.py:86
+#: mk/mk_choices.py:88
 msgid "Čair"
 msgstr "सैर "
 
-#: mk/mk_choices.py:87
+#: mk/mk_choices.py:89
 msgid "Čaška"
 msgstr "केसका"
 
-#: mk/mk_choices.py:88
+#: mk/mk_choices.py:90
 msgid "Češinovo-Obleševo"
 msgstr "ससिनोवो-ओब्लेसेवो "
 
-#: mk/mk_choices.py:89
+#: mk/mk_choices.py:91
 msgid "Čučer-Sandevo"
 msgstr "कसर-संदेवो "
 
-#: mk/mk_choices.py:90
+#: mk/mk_choices.py:92
 msgid "Štip"
 msgstr "स्टिप "
 
-#: mk/mk_choices.py:91
+#: mk/mk_choices.py:93
 msgid "Šuto Orizari"
 msgstr "सुतो ओरिज़री "
 
@@ -2243,23 +2271,23 @@ msgstr "मैसेडोनिया नगर पालिका (2 वर्
 msgid "Unique master citizen number (13 digits)"
 msgstr "अनोखी मास्टर नागरिक संख्या (13 अंक)"
 
-#: mx/forms.py:65
+#: mx/forms.py:67
 msgid "Enter a valid zip code in the format XXXXX."
 msgstr "प्रारूप XXXXX में एक मान्य ज़िप कोड दर्ज करें."
 
-#: mx/forms.py:108
+#: mx/forms.py:110
 msgid "Enter a valid RFC."
 msgstr "मान्य RFC दर्ज करें."
 
-#: mx/forms.py:109
+#: mx/forms.py:111
 msgid "Invalid checksum for RFC."
 msgstr "RFC के लिए अमान्य जाँचयोग."
 
-#: mx/forms.py:189
+#: mx/forms.py:191
 msgid "Enter a valid CURP."
 msgstr "मान्य CURP दर्ज करें."
 
-#: mx/forms.py:190
+#: mx/forms.py:192
 msgid "Invalid checksum for CURP."
 msgstr "CURP के लिए अमान्य जाँचयोग."
 
@@ -2279,131 +2307,131 @@ msgstr "मेक्सिकन RFC"
 msgid "Mexican CURP"
 msgstr "मेक्सिकन CURP"
 
-#: mx/mx_states.py:13
+#: mx/mx_states.py:14
 msgid "Aguascalientes"
 msgstr "अगुवास्कालियेन्टेस"
 
-#: mx/mx_states.py:14
+#: mx/mx_states.py:15
 msgid "Baja California"
 msgstr "बाहा कालिफोर्निया"
 
-#: mx/mx_states.py:15
+#: mx/mx_states.py:16
 msgid "Baja California Sur"
 msgstr "बाहा कालिफोर्निया सर"
 
-#: mx/mx_states.py:16
+#: mx/mx_states.py:17
 msgid "Campeche"
 msgstr "कम्पीची"
 
-#: mx/mx_states.py:17
+#: mx/mx_states.py:18
 msgid "Chihuahua"
 msgstr "चिहुआहुआ"
 
-#: mx/mx_states.py:18
+#: mx/mx_states.py:19
 msgid "Chiapas"
 msgstr "चियापास"
 
-#: mx/mx_states.py:19
+#: mx/mx_states.py:20
 msgid "Coahuila"
 msgstr "कोहुइला"
 
-#: mx/mx_states.py:20
+#: mx/mx_states.py:21
 msgid "Colima"
 msgstr "कोलिमा"
 
-#: mx/mx_states.py:21
+#: mx/mx_states.py:22
 msgid "Distrito Federal"
 msgstr "डिस्ट्रिटो फेड्रल"
 
-#: mx/mx_states.py:22
+#: mx/mx_states.py:23
 msgid "Durango"
 msgstr "डुरान्गो"
 
-#: mx/mx_states.py:23
+#: mx/mx_states.py:24
 msgid "Guerrero"
 msgstr "गुवेरेर्रो"
 
-#: mx/mx_states.py:24
+#: mx/mx_states.py:25
 msgid "Guanajuato"
 msgstr "गुवानाजुवाटो"
 
-#: mx/mx_states.py:25
+#: mx/mx_states.py:26
 msgid "Hidalgo"
 msgstr "हिडाल्गो"
 
-#: mx/mx_states.py:26
+#: mx/mx_states.py:27
 msgid "Jalisco"
 msgstr "जलिस्को"
 
-#: mx/mx_states.py:27
+#: mx/mx_states.py:28
 msgid "Estado de México"
 msgstr "एस्टादो द मेक्सिको"
 
-#: mx/mx_states.py:28
+#: mx/mx_states.py:29
 msgid "Michoacán"
 msgstr "मिचोवाकान"
 
-#: mx/mx_states.py:29
+#: mx/mx_states.py:30
 msgid "Morelos"
 msgstr "मोरेलोस"
 
-#: mx/mx_states.py:30
+#: mx/mx_states.py:31
 msgid "Nayarit"
 msgstr "नायारिट"
 
-#: mx/mx_states.py:31
+#: mx/mx_states.py:32
 msgid "Nuevo León"
 msgstr "नुवेवो लियोन"
 
-#: mx/mx_states.py:32
+#: mx/mx_states.py:33
 msgid "Oaxaca"
 msgstr "ओक्साका"
 
-#: mx/mx_states.py:33
+#: mx/mx_states.py:34
 msgid "Puebla"
 msgstr "पुवेब्ला"
 
-#: mx/mx_states.py:34
+#: mx/mx_states.py:35
 msgid "Querétaro"
 msgstr "क्वेरेतारो"
 
-#: mx/mx_states.py:35
+#: mx/mx_states.py:36
 msgid "Quintana Roo"
 msgstr "क्विन्ताना रू"
 
-#: mx/mx_states.py:36
+#: mx/mx_states.py:37
 msgid "Sinaloa"
 msgstr "सिनालोवा"
 
-#: mx/mx_states.py:37
+#: mx/mx_states.py:38
 msgid "San Luis Potosí"
 msgstr "सेन लुविस पोटोसि"
 
-#: mx/mx_states.py:38
+#: mx/mx_states.py:39
 msgid "Sonora"
 msgstr "सोनोरा"
 
-#: mx/mx_states.py:39
+#: mx/mx_states.py:40
 msgid "Tabasco"
 msgstr "टबास्को"
 
-#: mx/mx_states.py:40
+#: mx/mx_states.py:41
 msgid "Tamaulipas"
 msgstr "टमौलिपास"
 
-#: mx/mx_states.py:41
+#: mx/mx_states.py:42
 msgid "Tlaxcala"
 msgstr "लाक्सकाला"
 
-#: mx/mx_states.py:42
+#: mx/mx_states.py:43
 msgid "Veracruz"
 msgstr "वेराक्रूज"
 
-#: mx/mx_states.py:43
+#: mx/mx_states.py:44
 msgid "Yucatán"
 msgstr "युकाटान"
 
-#: mx/mx_states.py:44
+#: mx/mx_states.py:45
 msgid "Zacatecas"
 msgstr "जकाटेकास"
 
@@ -2575,31 +2603,31 @@ msgstr "ग्रेटर पोलान्ड"
 msgid "West Pomerania"
 msgstr "पश्चिम पोमेरानिया"
 
-#: pt/forms.py:17
+#: pt/forms.py:19
 msgid "Enter a zip code in the format XXXX-XXX."
 msgstr "XXXX-XXX प्रारूप में ज़िप कोड दर्ज करें."
 
-#: pt/forms.py:37
+#: pt/forms.py:39
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr "फ़ोन नंबर 9 अंक के होते है, या + या 00 से शुरू करते हैं."
 
-#: ro/forms.py:20
+#: ro/forms.py:22
 msgid "Enter a valid CIF."
 msgstr "मान्य CIF भरें ।"
 
-#: ro/forms.py:57
+#: ro/forms.py:59
 msgid "Enter a valid CNP."
 msgstr "मान्य CNP भरें ।"
 
-#: ro/forms.py:142
+#: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr "मान्य IBAN को ROXX-XXXX-XXXX-XXXX-XXXX-XXXX प्रतिरूप में भरें ।"
 
-#: ro/forms.py:174
+#: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
 msgstr "टेलिफोन संख्या को XXXX-XXXXXX प्रतिरूप में भरें ।"
 
-#: ro/forms.py:199
+#: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "मान्य डाक संहिता को XXXXXX प्रतिरूप में भरें ।"
 
@@ -2995,87 +3023,87 @@ msgstr "समन्वय नंबर स्वीकार्य नहीं
 msgid "Enter a Swedish postal code in the format XXXXX."
 msgstr "XXXXX प्रारूप में स्वीडिश डाक कोड दर्ज करें."
 
-#: se/se_counties.py:15
+#: se/se_counties.py:16
 msgid "Stockholm"
 msgstr "स्टॉकहॉम"
 
-#: se/se_counties.py:16
+#: se/se_counties.py:17
 msgid "Västerbotten"
 msgstr "वास्तेबोतेन "
 
-#: se/se_counties.py:17
+#: se/se_counties.py:18
 msgid "Norrbotten"
 msgstr "नारबोटेन "
 
-#: se/se_counties.py:18
+#: se/se_counties.py:19
 msgid "Uppsala"
 msgstr "उपासला"
 
-#: se/se_counties.py:19
+#: se/se_counties.py:20
 msgid "Södermanland"
 msgstr "सोदेरमानलैंड "
 
-#: se/se_counties.py:20
+#: se/se_counties.py:21
 msgid "Östergötland"
 msgstr "ओस्टेरगोटलैंड "
 
-#: se/se_counties.py:21
+#: se/se_counties.py:22
 msgid "Jönköping"
 msgstr "जोंकोपिंग"
 
-#: se/se_counties.py:22
+#: se/se_counties.py:23
 msgid "Kronoberg"
 msgstr "क्रोनोबर्ग "
 
-#: se/se_counties.py:23
+#: se/se_counties.py:24
 msgid "Kalmar"
 msgstr "कालमार"
 
-#: se/se_counties.py:24
+#: se/se_counties.py:25
 msgid "Gotland"
 msgstr "गोटलैंड "
 
-#: se/se_counties.py:25
+#: se/se_counties.py:26
 msgid "Blekinge"
 msgstr "ब्लेकिंगे "
 
-#: se/se_counties.py:26
+#: se/se_counties.py:27
 msgid "Skåne"
 msgstr "स्काने "
 
-#: se/se_counties.py:27
+#: se/se_counties.py:28
 msgid "Halland"
 msgstr "हालैंड "
 
-#: se/se_counties.py:28
+#: se/se_counties.py:29
 msgid "Västra Götaland"
 msgstr "वस्त्रा गाटलैंड "
 
-#: se/se_counties.py:29
+#: se/se_counties.py:30
 msgid "Värmland"
 msgstr "वार्मलैंड "
 
-#: se/se_counties.py:30
+#: se/se_counties.py:31
 msgid "Örebro"
 msgstr "ओरेब्रो"
 
-#: se/se_counties.py:31
+#: se/se_counties.py:32
 msgid "Västmanland"
 msgstr "वास्टमैनलैंड  "
 
-#: se/se_counties.py:32
+#: se/se_counties.py:33
 msgid "Dalarna"
 msgstr "डालार्ना "
 
-#: se/se_counties.py:33
+#: se/se_counties.py:34
 msgid "Gävleborg"
 msgstr "गावलेबार्ग "
 
-#: se/se_counties.py:34
+#: se/se_counties.py:35
 msgid "Västernorrland"
 msgstr "वास्तरनारलैंड "
 
-#: se/se_counties.py:35
+#: se/se_counties.py:36
 msgid "Jämtland"
 msgstr "जामलैंड "
 
@@ -3463,10 +3491,6 @@ msgstr "तुर्की पहचान संख्या 11 अंकों
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "डाक संहिता को XXXXX अथवा XXXXX-XXXX प्रतिरूप में भरें ।"
 
-#: us/forms.py:30
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "टेलिफोन संख्या को -XXX XXX -XXXX- प्रतिरूप में भरें ।"
-
 #: us/forms.py:59
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "मान्य U.S सोशल सेक्यूरिटी संख्या को XXX-XX-XXXX प्रतिरूप में भरें ।"
@@ -3495,11 +3519,11 @@ msgstr "X.XXX.XXX - X, xxxxxxx - X या XXXXXXXX प्रारूप मे�
 msgid "Enter a valid CI number."
 msgstr "वैध आईसी संख्या दर्ज करें."
 
-#: za/forms.py:21
+#: za/forms.py:22
 msgid "Enter a valid South African ID number"
 msgstr "मान्य दक्षिणि आफ्रिकी आइ.डि संख्या भरें"
 
-#: za/forms.py:55
+#: za/forms.py:56
 msgid "Enter a valid South African postal code"
 msgstr "मान्य दक्षिणि आफ्रिकी डाक संहिता संख्या भरें"
 

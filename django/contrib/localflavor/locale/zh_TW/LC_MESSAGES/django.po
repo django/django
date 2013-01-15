@@ -5,20 +5,21 @@
 # ming hsien tzang <tzangms@gmail.com>, 2011.
 # quantum9876 <quantum9876@gmail.com>, 2011.
 # tcc <tcchou@tcchou.org>, 2011.
+#   <yyc1217@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
-"PO-Revision-Date: 2012-03-08 12:24+0000\n"
-"Last-Translator: tcc <tcchou@tcchou.org>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-11-27 01:24+0000\n"
+"Last-Translator: yyc1217 <yyc1217@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
 "language/zh_TW/)\n"
-"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -39,6 +40,10 @@ msgstr "以 XX-XXXXXXXX-X 或 XXXXXXXXXXXX 的格式輸入CUIT 。"
 #: ar/forms.py:83
 msgid "Invalid CUIT."
 msgstr "無效的 CUIT"
+
+#: ar/forms.py:84
+msgid "Invalid legal type. Type must be 27, 20, 23 or 30."
+msgstr "無效的格式. 格式必須為27, 20, 23 或 30."
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -86,19 +91,19 @@ msgstr "以  XXXX XXXXXX 的格式輸入奧地利社會安全號碼。"
 
 #: au/forms.py:26
 msgid "Enter a 4 digit postcode."
-msgstr ""
+msgstr "輸入一個4碼的郵遞區號"
 
 #: au/models.py:9
 msgid "Australian State"
-msgstr ""
+msgstr "澳洲"
 
 #: au/models.py:19
 msgid "Australian Postcode"
-msgstr ""
+msgstr "澳洲郵遞區號"
 
 #: au/models.py:33
 msgid "Australian Phone number"
-msgstr ""
+msgstr "澳洲電話號碼"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
@@ -203,6 +208,14 @@ msgstr "此欄必須至少有 14 位數。"
 #: ca/forms.py:29
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "以 XXX XXX 為格式輸入郵遞區號。"
+
+#: ca/forms.py:47 us/forms.py:30
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "電話號碼必須是 XX-XXXX-XXXX 格式。"
+
+#: ca/forms.py:69
+msgid "Enter a Canadian province or territory."
+msgstr ""
 
 #: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
@@ -312,6 +325,10 @@ msgstr "楚格"
 msgid "Zurich"
 msgstr "蘇黎世"
 
+#: ch/forms.py:37
+msgid "Phone numbers must be in 0XX XXX XX XX format."
+msgstr "電話號碼必須為格式0XX XXX XX XX."
+
 #: ch/forms.py:68
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
@@ -334,31 +351,31 @@ msgstr "輸入的智利 RUT 無效。"
 
 #: cn/forms.py:84
 msgid "Enter a post code in the format XXXXXX."
-msgstr ""
+msgstr "輸入一個XXXXXX格式的郵遞區號"
 
 #: cn/forms.py:105
 msgid "ID Card Number consists of 15 or 18 digits."
-msgstr ""
+msgstr "包含15或18碼的ID卡號"
 
 #: cn/forms.py:106
 msgid "Invalid ID Card Number: Wrong checksum"
-msgstr ""
+msgstr "驗證ID卡號: 錯誤的校驗碼"
 
 #: cn/forms.py:107
 msgid "Invalid ID Card Number: Wrong birthdate"
-msgstr ""
+msgstr "驗證ID卡號: 錯誤的出生日"
 
 #: cn/forms.py:108
 msgid "Invalid ID Card Number: Wrong location code"
-msgstr ""
+msgstr "驗證ID卡號: 錯誤的區域碼"
 
 #: cn/forms.py:193
 msgid "Enter a valid phone number."
-msgstr ""
+msgstr "輸入有效的電話號碼"
 
 #: cn/forms.py:210
 msgid "Enter a valid cell number."
-msgstr ""
+msgstr "輸入有效的手機號碼"
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -425,14 +442,10 @@ msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr "以 XXXXXX/XXXX 或 XXXXXXXXXX 輸入出生日期。"
 
 #: cz/forms.py:53
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "您輸入錯誤的性別參數，應輸入 'f' 或 'm'。"
-
-#: cz/forms.py:54
 msgid "Enter a valid birth number."
 msgstr "請輸入正確的出生日期。"
 
-#: cz/forms.py:115
+#: cz/forms.py:102
 msgid "Enter a valid IC number."
 msgstr "請輸入正確的 IC 號碼。"
 
@@ -511,8 +524,8 @@ msgid ""
 msgstr "以 XXXXXXXXXXX-XXXXXXX-XXXXXXX-X 的格式輸入德國身份證字號。"
 
 #: es/es_provinces.py:5
-msgid "Arava"
-msgstr "阿拉瓦"
+msgid "Araba"
+msgstr ""
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -1105,17 +1118,32 @@ msgstr "蘇格蘭"
 msgid "Wales"
 msgstr "威爾斯"
 
-#: hr/forms.py:75
-msgid "Enter a valid 13 digit JMBG"
-msgstr ""
+#: hk/forms.py:37
+#, python-format
+msgid "Phone number should not start with one of the followings: %s."
+msgstr "電話號碼開頭不應為下列任一項： %s"
+
+#: hk/forms.py:40
+#, python-format
+msgid "Phone number must be in one of the following formats: %s."
+msgstr "電話號碼的格式必須為下列任一項： %s"
+
+#: hk/forms.py:42
+#, python-format
+msgid "Phone number should start with one of the followings: %s."
+msgstr "電話號碼開頭應為下列任一項： %s"
 
 #: hr/forms.py:76
+msgid "Enter a valid 13 digit JMBG"
+msgstr "輸入一個有效的13碼JMBG"
+
+#: hr/forms.py:77
 msgid "Error in date segment"
-msgstr ""
+msgstr "日期區間錯誤"
 
 #: hr/forms.py:123
 msgid "Enter a valid 11 digit OIB"
-msgstr ""
+msgstr "輸入一個有效的11碼OIB"
 
 #: hr/forms.py:152 id/forms.py:112
 msgid "Enter a valid vehicle license plate number"
@@ -1123,15 +1151,15 @@ msgstr "輸入正確的居住許可號碼。"
 
 #: hr/forms.py:153
 msgid "Enter a valid location code"
-msgstr ""
+msgstr "輸入有效的位置碼"
 
 #: hr/forms.py:154
 msgid "Number part cannot be zero"
-msgstr ""
+msgstr "不可含0"
 
 #: hr/forms.py:190
 msgid "Enter a valid 5 digit postal code"
-msgstr ""
+msgstr "輸入有效的5碼郵遞區號"
 
 #: hr/forms.py:218 id/forms.py:72 nl/forms.py:56
 msgid "Enter a valid phone number"
@@ -1139,103 +1167,103 @@ msgstr "輸入正確的電話號碼。"
 
 #: hr/forms.py:219
 msgid "Enter a valid area or mobile network code"
-msgstr ""
+msgstr "輸入有效的區域或行動網路碼"
 
 #: hr/forms.py:220
 msgid "The phone nubmer is too long"
-msgstr ""
+msgstr "電話號碼太長"
 
 #: hr/forms.py:258
 msgid "Enter a valid 19 digit JMBAG starting with 601983"
-msgstr ""
+msgstr "輸入一個從601983開始的有效19碼JMBAG"
 
 #: hr/forms.py:259
 msgid "Card issue number cannot be zero"
-msgstr ""
-
-#: hr/hr_choices.py:12
-msgid "Grad Zagreb"
-msgstr ""
-
-#: hr/hr_choices.py:13
-msgid "Bjelovarsko-bilogorska županija"
-msgstr ""
+msgstr "卡片的 issue 碼不得為0"
 
 #: hr/hr_choices.py:14
-msgid "Brodsko-posavska županija"
-msgstr ""
+msgid "Grad Zagreb"
+msgstr "Grad Zagreb"
 
 #: hr/hr_choices.py:15
-msgid "Dubrovačko-neretvanska županija"
-msgstr ""
+msgid "Bjelovarsko-bilogorska županija"
+msgstr "Bjelovarsko-bilogorska županija"
 
 #: hr/hr_choices.py:16
-msgid "Istarska županija"
-msgstr ""
+msgid "Brodsko-posavska županija"
+msgstr "Brodsko-posavska županija"
 
 #: hr/hr_choices.py:17
-msgid "Karlovačka županija"
-msgstr ""
+msgid "Dubrovačko-neretvanska županija"
+msgstr "Dubrovačko-neretvanska županija"
 
 #: hr/hr_choices.py:18
-msgid "Koprivničko-križevačka županija"
-msgstr ""
+msgid "Istarska županija"
+msgstr "Istarska županija"
 
 #: hr/hr_choices.py:19
-msgid "Krapinsko-zagorska županija"
-msgstr ""
+msgid "Karlovačka županija"
+msgstr "Karlovačka županija"
 
 #: hr/hr_choices.py:20
-msgid "Ličko-senjska županija"
-msgstr ""
+msgid "Koprivničko-križevačka županija"
+msgstr "Koprivničko-križevačka županija"
 
 #: hr/hr_choices.py:21
-msgid "Međimurska županija"
-msgstr ""
+msgid "Krapinsko-zagorska županija"
+msgstr "Krapinsko-zagorska županija"
 
 #: hr/hr_choices.py:22
-msgid "Osječko-baranjska županija"
-msgstr ""
+msgid "Ličko-senjska županija"
+msgstr "Ličko-senjska županija"
 
 #: hr/hr_choices.py:23
-msgid "Požeško-slavonska županija"
-msgstr ""
+msgid "Međimurska županija"
+msgstr "Međimurska županija"
 
 #: hr/hr_choices.py:24
-msgid "Primorsko-goranska županija"
-msgstr ""
+msgid "Osječko-baranjska županija"
+msgstr "Osječko-baranjska županija"
 
 #: hr/hr_choices.py:25
-msgid "Sisačko-moslavačka županija"
-msgstr ""
+msgid "Požeško-slavonska županija"
+msgstr "Požeško-slavonska županija"
 
 #: hr/hr_choices.py:26
-msgid "Splitsko-dalmatinska županija"
-msgstr ""
+msgid "Primorsko-goranska županija"
+msgstr "Primorsko-goranska županija"
 
 #: hr/hr_choices.py:27
-msgid "Šibensko-kninska županija"
-msgstr ""
+msgid "Sisačko-moslavačka županija"
+msgstr "Sisačko-moslavačka županija"
 
 #: hr/hr_choices.py:28
-msgid "Varaždinska županija"
-msgstr ""
+msgid "Splitsko-dalmatinska županija"
+msgstr "Splitsko-dalmatinska županija"
 
 #: hr/hr_choices.py:29
-msgid "Virovitičko-podravska županija"
-msgstr ""
+msgid "Šibensko-kninska županija"
+msgstr "Šibensko-kninska županija"
 
 #: hr/hr_choices.py:30
-msgid "Vukovarsko-srijemska županija"
-msgstr ""
+msgid "Varaždinska županija"
+msgstr "Varaždinska županija"
 
 #: hr/hr_choices.py:31
-msgid "Zadarska županija"
-msgstr ""
+msgid "Virovitičko-podravska županija"
+msgstr "Virovitičko-podravska županija"
 
 #: hr/hr_choices.py:32
+msgid "Vukovarsko-srijemska županija"
+msgstr "Vukovarsko-srijemska županija"
+
+#: hr/hr_choices.py:33
+msgid "Zadarska županija"
+msgstr "Zadarska županija"
+
+#: hr/hr_choices.py:34
 msgid "Zagrebačka županija"
-msgstr ""
+msgstr "Zagrebačka županija"
 
 #: id/forms.py:31
 msgid "Enter a valid post code"
@@ -1637,25 +1665,25 @@ msgstr "韋克斯福德"
 msgid "Wicklow"
 msgstr "威克洛郡"
 
-#: il/forms.py:31
+#: il/forms.py:32
 msgid "Enter a postal code in the format XXXXX"
 msgstr "以 XXXXX 的格式輸入郵遞區號。"
 
-#: il/forms.py:50
+#: il/forms.py:51
 msgid "Enter a valid ID number."
 msgstr "請輸入正確的 ID 號碼。"
 
 #: in_/forms.py:41
 msgid "Enter a zip code in the format XXXXXX or XXX XXX."
-msgstr ""
+msgstr "以XXXXXX或XXX XXX的格式輸入郵遞區號"
 
 #: in_/forms.py:64
 msgid "Enter an Indian state or territory."
-msgstr ""
+msgstr "輸入印度的州或區域"
 
 #: in_/forms.py:103
 msgid "Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format."
-msgstr ""
+msgstr "電話號碼需為 02X-8X 或 03X-7X 或 04X-6X 格式"
 
 #: is_/forms.py:22
 msgid ""
@@ -1870,7 +1898,7 @@ msgstr "鹿兒島"
 msgid "Okinawa"
 msgstr "琉球"
 
-#: kw/forms.py:25
+#: kw/forms.py:27
 msgid "Enter a valid Kuwaiti Civil ID number"
 msgstr "請輸入一個正確的科威特身分證號碼。"
 
@@ -1878,359 +1906,359 @@ msgstr "請輸入一個正確的科威特身分證號碼。"
 msgid ""
 "Identity card numbers must contain either 4 to 7 digits or an uppercase "
 "letter and 7 digits."
-msgstr ""
+msgstr "識別卡號不是包含4到7碼，就是1個大寫字母和7碼"
 
 #: mk/forms.py:57 si/forms.py:24
 msgid "This field should contain exactly 13 digits."
-msgstr ""
+msgstr "此欄位應包含13碼。"
 
 #: mk/forms.py:58
 msgid "The first 7 digits of the UMCN must represent a valid past date."
-msgstr ""
+msgstr "UMCN開頭7碼必須為一個有效的過去日期"
 
 #: mk/forms.py:59
 msgid "The UMCN is not valid."
-msgstr ""
-
-#: mk/mk_choices.py:8
-msgid "Aerodrom"
-msgstr ""
-
-#: mk/mk_choices.py:9
-msgid "Aračinovo"
-msgstr ""
+msgstr "UMCN 無效"
 
 #: mk/mk_choices.py:10
-msgid "Berovo"
-msgstr ""
+msgid "Aerodrom"
+msgstr "Aerodrom"
 
 #: mk/mk_choices.py:11
-msgid "Bitola"
-msgstr ""
+msgid "Aračinovo"
+msgstr "Aračinovo"
 
 #: mk/mk_choices.py:12
-msgid "Bogdanci"
-msgstr ""
+msgid "Berovo"
+msgstr "Berovo"
 
 #: mk/mk_choices.py:13
-msgid "Bogovinje"
-msgstr ""
+msgid "Bitola"
+msgstr "Bitola"
 
 #: mk/mk_choices.py:14
-msgid "Bosilovo"
-msgstr ""
+msgid "Bogdanci"
+msgstr "Bogdanci"
 
 #: mk/mk_choices.py:15
-msgid "Brvenica"
-msgstr ""
+msgid "Bogovinje"
+msgstr "Bogovinje"
 
 #: mk/mk_choices.py:16
-msgid "Butel"
-msgstr ""
+msgid "Bosilovo"
+msgstr "Bosilovo"
 
 #: mk/mk_choices.py:17
-msgid "Valandovo"
-msgstr ""
+msgid "Brvenica"
+msgstr "Brvenica"
 
 #: mk/mk_choices.py:18
-msgid "Vasilevo"
-msgstr ""
+msgid "Butel"
+msgstr "Butel"
 
 #: mk/mk_choices.py:19
-msgid "Vevčani"
-msgstr ""
+msgid "Valandovo"
+msgstr "Valandovo"
 
 #: mk/mk_choices.py:20
-msgid "Veles"
-msgstr ""
+msgid "Vasilevo"
+msgstr "Vasilevo"
 
 #: mk/mk_choices.py:21
-msgid "Vinica"
-msgstr ""
+msgid "Vevčani"
+msgstr "Vevčani"
 
 #: mk/mk_choices.py:22
-msgid "Vraneštica"
-msgstr ""
+msgid "Veles"
+msgstr "Veles"
 
 #: mk/mk_choices.py:23
-msgid "Vrapčište"
-msgstr ""
+msgid "Vinica"
+msgstr "Vinica"
 
 #: mk/mk_choices.py:24
-msgid "Gazi Baba"
-msgstr ""
+msgid "Vraneštica"
+msgstr "Vraneštica"
 
 #: mk/mk_choices.py:25
-msgid "Gevgelija"
-msgstr ""
+msgid "Vrapčište"
+msgstr "Vrapčište"
 
 #: mk/mk_choices.py:26
-msgid "Gostivar"
-msgstr ""
+msgid "Gazi Baba"
+msgstr "Gazi Baba"
 
 #: mk/mk_choices.py:27
-msgid "Gradsko"
-msgstr ""
+msgid "Gevgelija"
+msgstr "Gevgelija"
 
 #: mk/mk_choices.py:28
-msgid "Debar"
-msgstr ""
+msgid "Gostivar"
+msgstr "Gostivar"
 
 #: mk/mk_choices.py:29
-msgid "Debarca"
-msgstr ""
+msgid "Gradsko"
+msgstr "Gradsko"
 
 #: mk/mk_choices.py:30
-msgid "Delčevo"
-msgstr ""
+msgid "Debar"
+msgstr "Debar"
 
 #: mk/mk_choices.py:31
-msgid "Demir Kapija"
-msgstr ""
+msgid "Debarca"
+msgstr "Debarca"
 
 #: mk/mk_choices.py:32
-msgid "Demir Hisar"
-msgstr ""
+msgid "Delčevo"
+msgstr "Delčevo"
 
 #: mk/mk_choices.py:33
-msgid "Dolneni"
-msgstr ""
+msgid "Demir Kapija"
+msgstr "Demir Kapija"
 
 #: mk/mk_choices.py:34
-msgid "Drugovo"
-msgstr ""
+msgid "Demir Hisar"
+msgstr "Demir Hisar"
 
 #: mk/mk_choices.py:35
-msgid "Gjorče Petrov"
-msgstr ""
+msgid "Dolneni"
+msgstr "Dolneni"
 
 #: mk/mk_choices.py:36
-msgid "Želino"
-msgstr ""
+msgid "Drugovo"
+msgstr "Drugovo"
 
 #: mk/mk_choices.py:37
-msgid "Zajas"
-msgstr ""
+msgid "Gjorče Petrov"
+msgstr "Gjorče Petrov"
 
 #: mk/mk_choices.py:38
-msgid "Zelenikovo"
-msgstr ""
+msgid "Želino"
+msgstr "Želino"
 
 #: mk/mk_choices.py:39
-msgid "Zrnovci"
-msgstr ""
+msgid "Zajas"
+msgstr "Zajas"
 
 #: mk/mk_choices.py:40
-msgid "Ilinden"
-msgstr ""
+msgid "Zelenikovo"
+msgstr "Zelenikovo"
 
 #: mk/mk_choices.py:41
-msgid "Jegunovce"
-msgstr ""
+msgid "Zrnovci"
+msgstr "Zrnovci"
 
 #: mk/mk_choices.py:42
-msgid "Kavadarci"
-msgstr ""
+msgid "Ilinden"
+msgstr "Ilinden"
 
 #: mk/mk_choices.py:43
-msgid "Karbinci"
-msgstr ""
+msgid "Jegunovce"
+msgstr "Jegunovce"
 
 #: mk/mk_choices.py:44
-msgid "Karpoš"
-msgstr ""
+msgid "Kavadarci"
+msgstr "Kavadarci"
 
 #: mk/mk_choices.py:45
-msgid "Kisela Voda"
-msgstr ""
+msgid "Karbinci"
+msgstr "Karbinci"
 
 #: mk/mk_choices.py:46
-msgid "Kičevo"
-msgstr ""
+msgid "Karpoš"
+msgstr "Karpoš"
 
 #: mk/mk_choices.py:47
-msgid "Konče"
-msgstr ""
+msgid "Kisela Voda"
+msgstr "Kisela Voda"
 
 #: mk/mk_choices.py:48
-msgid "Koćani"
-msgstr ""
+msgid "Kičevo"
+msgstr "Kičevo"
 
 #: mk/mk_choices.py:49
-msgid "Kratovo"
-msgstr ""
+msgid "Konče"
+msgstr "Konče"
 
 #: mk/mk_choices.py:50
-msgid "Kriva Palanka"
-msgstr ""
+msgid "Koćani"
+msgstr "Koćani"
 
 #: mk/mk_choices.py:51
-msgid "Krivogaštani"
-msgstr ""
+msgid "Kratovo"
+msgstr "Kratovo"
 
 #: mk/mk_choices.py:52
-msgid "Kruševo"
-msgstr ""
+msgid "Kriva Palanka"
+msgstr "Kriva Palanka"
 
 #: mk/mk_choices.py:53
-msgid "Kumanovo"
-msgstr ""
+msgid "Krivogaštani"
+msgstr "Krivogaštani"
 
 #: mk/mk_choices.py:54
-msgid "Lipkovo"
-msgstr ""
+msgid "Kruševo"
+msgstr "Kruševo"
 
 #: mk/mk_choices.py:55
-msgid "Lozovo"
-msgstr ""
+msgid "Kumanovo"
+msgstr "Kumanovo"
 
 #: mk/mk_choices.py:56
-msgid "Mavrovo i Rostuša"
-msgstr ""
+msgid "Lipkovo"
+msgstr "Lipkovo"
 
 #: mk/mk_choices.py:57
-msgid "Makedonska Kamenica"
-msgstr ""
+msgid "Lozovo"
+msgstr "Lozovo"
 
 #: mk/mk_choices.py:58
-msgid "Makedonski Brod"
-msgstr ""
+msgid "Mavrovo i Rostuša"
+msgstr "Mavrovo i Rostuša"
 
 #: mk/mk_choices.py:59
-msgid "Mogila"
-msgstr ""
+msgid "Makedonska Kamenica"
+msgstr "Makedonska Kamenica"
 
 #: mk/mk_choices.py:60
-msgid "Negotino"
-msgstr ""
+msgid "Makedonski Brod"
+msgstr "Makedonski Brod"
 
 #: mk/mk_choices.py:61
-msgid "Novaci"
-msgstr ""
+msgid "Mogila"
+msgstr "Mogila"
 
 #: mk/mk_choices.py:62
-msgid "Novo Selo"
-msgstr ""
+msgid "Negotino"
+msgstr "Negotino"
 
 #: mk/mk_choices.py:63
-msgid "Oslomej"
-msgstr ""
+msgid "Novaci"
+msgstr "Novaci"
 
 #: mk/mk_choices.py:64
-msgid "Ohrid"
-msgstr ""
+msgid "Novo Selo"
+msgstr "Novo Selo"
 
 #: mk/mk_choices.py:65
-msgid "Petrovec"
-msgstr ""
+msgid "Oslomej"
+msgstr "Oslomej"
 
 #: mk/mk_choices.py:66
-msgid "Pehčevo"
-msgstr ""
+msgid "Ohrid"
+msgstr "Ohrid"
 
 #: mk/mk_choices.py:67
-msgid "Plasnica"
-msgstr ""
+msgid "Petrovec"
+msgstr "Petrovec"
 
 #: mk/mk_choices.py:68
-msgid "Prilep"
-msgstr ""
+msgid "Pehčevo"
+msgstr "Pehčevo"
 
 #: mk/mk_choices.py:69
-msgid "Probištip"
-msgstr ""
+msgid "Plasnica"
+msgstr "Plasnica"
 
 #: mk/mk_choices.py:70
-msgid "Radoviš"
-msgstr ""
+msgid "Prilep"
+msgstr "Prilep"
 
 #: mk/mk_choices.py:71
-msgid "Rankovce"
-msgstr ""
+msgid "Probištip"
+msgstr "Probištip"
 
 #: mk/mk_choices.py:72
-msgid "Resen"
-msgstr ""
+msgid "Radoviš"
+msgstr "Radoviš"
 
 #: mk/mk_choices.py:73
-msgid "Rosoman"
-msgstr ""
+msgid "Rankovce"
+msgstr "Rankovce"
 
 #: mk/mk_choices.py:74
-msgid "Saraj"
-msgstr ""
+msgid "Resen"
+msgstr "Resen"
 
 #: mk/mk_choices.py:75
-msgid "Sveti Nikole"
-msgstr ""
+msgid "Rosoman"
+msgstr "Rosoman"
 
 #: mk/mk_choices.py:76
-msgid "Sopište"
-msgstr ""
+msgid "Saraj"
+msgstr "Saraj"
 
 #: mk/mk_choices.py:77
-msgid "Star Dojran"
-msgstr ""
+msgid "Sveti Nikole"
+msgstr "Sveti Nikole"
 
 #: mk/mk_choices.py:78
-msgid "Staro Nagoričane"
-msgstr ""
+msgid "Sopište"
+msgstr "Sopište"
 
 #: mk/mk_choices.py:79
-msgid "Struga"
-msgstr ""
+msgid "Star Dojran"
+msgstr "Star Dojran"
 
 #: mk/mk_choices.py:80
-msgid "Strumica"
-msgstr ""
+msgid "Staro Nagoričane"
+msgstr "Staro Nagoričane"
 
 #: mk/mk_choices.py:81
-msgid "Studeničani"
-msgstr ""
+msgid "Struga"
+msgstr "Struga"
 
 #: mk/mk_choices.py:82
-msgid "Tearce"
-msgstr ""
+msgid "Strumica"
+msgstr "Strumica"
 
 #: mk/mk_choices.py:83
-msgid "Tetovo"
-msgstr ""
+msgid "Studeničani"
+msgstr "Studeničani"
 
 #: mk/mk_choices.py:84
-msgid "Centar"
-msgstr ""
+msgid "Tearce"
+msgstr "Tearce"
 
 #: mk/mk_choices.py:85
-msgid "Centar-Župa"
-msgstr ""
+msgid "Tetovo"
+msgstr "Tetovo"
 
 #: mk/mk_choices.py:86
-msgid "Čair"
-msgstr ""
+msgid "Centar"
+msgstr "Centar"
 
 #: mk/mk_choices.py:87
-msgid "Čaška"
-msgstr ""
+msgid "Centar-Župa"
+msgstr "Centar-Župa"
 
 #: mk/mk_choices.py:88
-msgid "Češinovo-Obleševo"
-msgstr ""
+msgid "Čair"
+msgstr "Čair"
 
 #: mk/mk_choices.py:89
-msgid "Čučer-Sandevo"
-msgstr ""
+msgid "Čaška"
+msgstr "Čaška"
 
 #: mk/mk_choices.py:90
-msgid "Štip"
-msgstr ""
+msgid "Češinovo-Obleševo"
+msgstr "Češinovo-Obleševo"
 
 #: mk/mk_choices.py:91
+msgid "Čučer-Sandevo"
+msgstr "Čučer-Sandevo"
+
+#: mk/mk_choices.py:92
+msgid "Štip"
+msgstr "Štip"
+
+#: mk/mk_choices.py:93
 msgid "Šuto Orizari"
-msgstr ""
+msgstr "Šuto Orizari"
 
 #: mk/models.py:11
 msgid "Macedonian identity card number"
-msgstr ""
+msgstr "馬其頓識別卡號"
 
 #: mk/models.py:25
 msgid "A Macedonian municipality (2 character code)"
@@ -2238,169 +2266,169 @@ msgstr ""
 
 #: mk/models.py:35
 msgid "Unique master citizen number (13 digits)"
-msgstr ""
+msgstr "Unique master citizen number (13 碼)"
 
-#: mx/forms.py:65
+#: mx/forms.py:67
 msgid "Enter a valid zip code in the format XXXXX."
-msgstr ""
+msgstr "輸入格式為 XXXXX 的有效郵遞區號"
 
-#: mx/forms.py:108
+#: mx/forms.py:110
 msgid "Enter a valid RFC."
-msgstr ""
+msgstr "輸入有效的 RFC"
 
-#: mx/forms.py:109
+#: mx/forms.py:111
 msgid "Invalid checksum for RFC."
-msgstr ""
+msgstr "無效的 RFC 校驗碼"
 
-#: mx/forms.py:189
+#: mx/forms.py:191
 msgid "Enter a valid CURP."
-msgstr ""
+msgstr "輸入有效的CURP"
 
-#: mx/forms.py:190
+#: mx/forms.py:192
 msgid "Invalid checksum for CURP."
-msgstr ""
+msgstr "無效的 CURP 校驗碼"
 
 #: mx/models.py:14
 msgid "Mexico state (three uppercase letters)"
-msgstr ""
+msgstr "墨西哥州 (3個大寫字母)"
 
 #: mx/models.py:27
 msgid "Mexico zip code"
-msgstr ""
+msgstr "墨西哥的郵遞區號"
 
 #: mx/models.py:44
 msgid "Mexican RFC"
-msgstr ""
+msgstr "墨西哥的 RFC"
 
 #: mx/models.py:61
 msgid "Mexican CURP"
-msgstr ""
+msgstr "墨西哥的 CURP"
 
-#: mx/mx_states.py:13
+#: mx/mx_states.py:14
 msgid "Aguascalientes"
 msgstr "阿瓜斯卡連特斯"
 
-#: mx/mx_states.py:14
+#: mx/mx_states.py:15
 msgid "Baja California"
 msgstr "下加利福尼亞州"
 
-#: mx/mx_states.py:15
+#: mx/mx_states.py:16
 msgid "Baja California Sur"
 msgstr "南下加利福尼亞州"
 
-#: mx/mx_states.py:16
+#: mx/mx_states.py:17
 msgid "Campeche"
 msgstr "坎佩切州"
 
-#: mx/mx_states.py:17
+#: mx/mx_states.py:18
 msgid "Chihuahua"
 msgstr "奇瓦瓦"
 
-#: mx/mx_states.py:18
+#: mx/mx_states.py:19
 msgid "Chiapas"
 msgstr "恰帕斯州"
 
-#: mx/mx_states.py:19
+#: mx/mx_states.py:20
 msgid "Coahuila"
 msgstr "科阿韋拉州"
 
-#: mx/mx_states.py:20
+#: mx/mx_states.py:21
 msgid "Colima"
 msgstr "科利馬"
 
-#: mx/mx_states.py:21
+#: mx/mx_states.py:22
 msgid "Distrito Federal"
 msgstr "聯邦區"
 
-#: mx/mx_states.py:22
+#: mx/mx_states.py:23
 msgid "Durango"
 msgstr "杜蘭戈"
 
-#: mx/mx_states.py:23
+#: mx/mx_states.py:24
 msgid "Guerrero"
 msgstr "格雷羅州"
 
-#: mx/mx_states.py:24
+#: mx/mx_states.py:25
 msgid "Guanajuato"
 msgstr "瓜納華托"
 
-#: mx/mx_states.py:25
+#: mx/mx_states.py:26
 msgid "Hidalgo"
 msgstr "伊達爾戈"
 
-#: mx/mx_states.py:26
+#: mx/mx_states.py:27
 msgid "Jalisco"
 msgstr "哈利斯科"
 
-#: mx/mx_states.py:27
+#: mx/mx_states.py:28
 msgid "Estado de México"
 msgstr "Estado de México"
 
-#: mx/mx_states.py:28
+#: mx/mx_states.py:29
 msgid "Michoacán"
 msgstr "米却肯"
 
-#: mx/mx_states.py:29
+#: mx/mx_states.py:30
 msgid "Morelos"
 msgstr "莫雷洛斯"
 
-#: mx/mx_states.py:30
+#: mx/mx_states.py:31
 msgid "Nayarit"
 msgstr "納亞里特"
 
-#: mx/mx_states.py:31
+#: mx/mx_states.py:32
 msgid "Nuevo León"
 msgstr "新萊昂"
 
-#: mx/mx_states.py:32
+#: mx/mx_states.py:33
 msgid "Oaxaca"
 msgstr "瓦哈卡州"
 
-#: mx/mx_states.py:33
+#: mx/mx_states.py:34
 msgid "Puebla"
 msgstr "普埃布拉"
 
-#: mx/mx_states.py:34
+#: mx/mx_states.py:35
 msgid "Querétaro"
 msgstr "克雷塔羅"
 
-#: mx/mx_states.py:35
+#: mx/mx_states.py:36
 msgid "Quintana Roo"
 msgstr "金塔納羅奧"
 
-#: mx/mx_states.py:36
+#: mx/mx_states.py:37
 msgid "Sinaloa"
 msgstr "錫那羅亞州"
 
-#: mx/mx_states.py:37
+#: mx/mx_states.py:38
 msgid "San Luis Potosí"
 msgstr "聖路易斯波托西"
 
-#: mx/mx_states.py:38
+#: mx/mx_states.py:39
 msgid "Sonora"
 msgstr "索諾拉"
 
-#: mx/mx_states.py:39
+#: mx/mx_states.py:40
 msgid "Tabasco"
 msgstr "塔巴斯科"
 
-#: mx/mx_states.py:40
+#: mx/mx_states.py:41
 msgid "Tamaulipas"
 msgstr "塔毛利帕斯"
 
-#: mx/mx_states.py:41
+#: mx/mx_states.py:42
 msgid "Tlaxcala"
 msgstr "特拉斯卡拉"
 
-#: mx/mx_states.py:42
+#: mx/mx_states.py:43
 msgid "Veracruz"
 msgstr "韋拉克魯斯"
 
-#: mx/mx_states.py:43
+#: mx/mx_states.py:44
 msgid "Yucatán"
 msgstr "尤卡坦"
 
-#: mx/mx_states.py:44
+#: mx/mx_states.py:45
 msgid "Zacatecas"
 msgstr "薩卡特卡斯"
 
@@ -2482,13 +2510,14 @@ msgstr ""
 
 #: pl/forms.py:80
 msgid "Wrong checksum for the National ID Card Number."
-msgstr ""
+msgstr "錯誤的國家ID卡號校驗碼"
 
 #: pl/forms.py:131
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or "
 "XXXXXXXXXX."
 msgstr ""
+"輸入格式為 XXX-XXX-XX-XX, XXX-XX-XX-XXX 或 XXXXXXXXXX 的傳真號碼區域(NIP)"
 
 #: pl/forms.py:132
 msgid "Wrong checksum for the Tax Number (NIP)."
@@ -2570,45 +2599,45 @@ msgstr "大波蘭"
 msgid "West Pomerania"
 msgstr "西波美拉尼亞省"
 
-#: pt/forms.py:17
+#: pt/forms.py:19
 msgid "Enter a zip code in the format XXXX-XXX."
 msgstr "用 XXXXX-XXX 的格式輸入郵遞區號。"
 
-#: pt/forms.py:37
+#: pt/forms.py:39
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr "電話號碼必須有 9 位數，或以 + 或 00 開頭。"
 
-#: ro/forms.py:20
+#: ro/forms.py:22
 msgid "Enter a valid CIF."
 msgstr "輸入有效的 CIF。"
 
-#: ro/forms.py:57
+#: ro/forms.py:59
 msgid "Enter a valid CNP."
 msgstr "輸入有效的 CNP。"
 
-#: ro/forms.py:142
+#: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr "以 ROXX-XXXX-XXXX-XXXX-XXXX-XXXX 的格式輸入一個有效的 IBAN。"
 
-#: ro/forms.py:174
+#: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
 msgstr "電話號碼必須是 XXXX-XXXXXX 格式。"
 
-#: ro/forms.py:199
+#: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "用 XXXXXX 的格式輸入郵遞區號。"
 
 #: ru/forms.py:37
 msgid "Enter a postal code in the format XXXXXX."
-msgstr ""
+msgstr "輸入格式為 XXXXXX 有效郵遞區號。"
 
 #: ru/forms.py:50
 msgid "Enter a passport number in the format XXXX XXXXXX."
-msgstr ""
+msgstr "輸入格式為 XXXX XXXXXX 的護照號碼。"
 
 #: ru/forms.py:63
 msgid "Enter a passport number in the format XX XXXXXXX."
-msgstr ""
+msgstr "輸入格式為 XX XXXXXXX 的護照號碼。"
 
 #: ru/ru_regions.py:10
 msgid "Central Federal County"
@@ -2644,335 +2673,335 @@ msgstr ""
 
 #: ru/ru_regions.py:21
 msgid "Moskva"
-msgstr ""
+msgstr "莫斯科"
 
 #: ru/ru_regions.py:22
 msgid "Saint-Peterburg"
-msgstr ""
+msgstr "聖彼德斯堡"
 
 #: ru/ru_regions.py:23
 msgid "Moskovskaya oblast'"
-msgstr ""
+msgstr "Moskovskaya 區"
 
 #: ru/ru_regions.py:24
 msgid "Adygeya, Respublika"
-msgstr ""
+msgstr "Adygeya, Respublika"
 
 #: ru/ru_regions.py:25
 msgid "Bashkortostan, Respublika"
-msgstr ""
+msgstr "Bashkortostan, Respublika"
 
 #: ru/ru_regions.py:26
 msgid "Buryatia, Respublika"
-msgstr ""
+msgstr "Buryatia, Respublika"
 
 #: ru/ru_regions.py:27
 msgid "Altay, Respublika"
-msgstr ""
+msgstr "Altay, Respublika"
 
 #: ru/ru_regions.py:28
 msgid "Dagestan, Respublika"
-msgstr ""
+msgstr "Dagestan, Respublika"
 
 #: ru/ru_regions.py:29
 msgid "Ingushskaya Respublika"
-msgstr ""
+msgstr "Ingushskaya Respublika"
 
 #: ru/ru_regions.py:30
 msgid "Kabardino-Balkarskaya Respublika"
-msgstr ""
+msgstr "Kabardino-Balkarskaya Respublika"
 
 #: ru/ru_regions.py:31
 msgid "Kalmykia, Respublika"
-msgstr ""
+msgstr "Kalmykia, Respublika"
 
 #: ru/ru_regions.py:32
 msgid "Karachaevo-Cherkesskaya Respublika"
-msgstr ""
+msgstr "Karachaevo-Cherkesskaya Respublika"
 
 #: ru/ru_regions.py:33
 msgid "Karelia, Respublika"
-msgstr ""
+msgstr "Karelia, Respublika"
 
 #: ru/ru_regions.py:34
 msgid "Komi, Respublika"
-msgstr ""
+msgstr "Komi, Respublika"
 
 #: ru/ru_regions.py:35
 msgid "Mariy Ehl, Respublika"
-msgstr ""
+msgstr "Mariy Ehl, Respublika"
 
 #: ru/ru_regions.py:36
 msgid "Mordovia, Respublika"
-msgstr ""
+msgstr "Mordovia, Respublika"
 
 #: ru/ru_regions.py:37
 msgid "Sakha, Respublika (Yakutiya)"
-msgstr ""
+msgstr "Sakha, Respublika (Yakutiya)"
 
 #: ru/ru_regions.py:38
 msgid "Severnaya Osetia, Respublika (Alania)"
-msgstr ""
+msgstr "Severnaya Osetia, Respublika (Alania)"
 
 #: ru/ru_regions.py:39
 msgid "Tatarstan, Respublika"
-msgstr ""
+msgstr "Tatarstan, Respublika"
 
 #: ru/ru_regions.py:40
 msgid "Tyva, Respublika (Tuva)"
-msgstr ""
+msgstr "Tyva, Respublika (Tuva)"
 
 #: ru/ru_regions.py:41
 msgid "Udmurtskaya Respublika"
-msgstr ""
+msgstr "Udmurtskaya Respublika"
 
 #: ru/ru_regions.py:42
 msgid "Khakassiya, Respublika"
-msgstr ""
+msgstr "Khakassiya, Respublika"
 
 #: ru/ru_regions.py:43
 msgid "Chechenskaya Respublika"
-msgstr ""
+msgstr "Chechenskaya Respublika"
 
 #: ru/ru_regions.py:44
 msgid "Chuvashskaya Respublika"
-msgstr ""
+msgstr "Chuvashskaya Respublika"
 
 #: ru/ru_regions.py:45
 msgid "Altayskiy Kray"
-msgstr ""
+msgstr "Altayskiy Kray"
 
 #: ru/ru_regions.py:46
 msgid "Zabaykalskiy Kray"
-msgstr ""
+msgstr "Zabaykalskiy Kray"
 
 #: ru/ru_regions.py:47
 msgid "Kamchatskiy Kray"
-msgstr ""
+msgstr "Kamchatskiy Kray"
 
 #: ru/ru_regions.py:48
 msgid "Krasnodarskiy Kray"
-msgstr ""
+msgstr "Krasnodarskiy Kray"
 
 #: ru/ru_regions.py:49
 msgid "Krasnoyarskiy Kray"
-msgstr ""
+msgstr "Krasnoyarskiy Kray"
 
 #: ru/ru_regions.py:50
 msgid "Permskiy Kray"
-msgstr ""
+msgstr "Permskiy Kray"
 
 #: ru/ru_regions.py:51
 msgid "Primorskiy Kray"
-msgstr ""
+msgstr "Primorskiy Kray"
 
 #: ru/ru_regions.py:52
 msgid "Stavropol'siyy Kray"
-msgstr ""
+msgstr "Stavropol'siyy Kray"
 
 #: ru/ru_regions.py:53
 msgid "Khabarovskiy Kray"
-msgstr ""
+msgstr "Khabarovskiy Kray"
 
 #: ru/ru_regions.py:54
 msgid "Amurskaya oblast'"
-msgstr ""
+msgstr "Amurskaya 區"
 
 #: ru/ru_regions.py:55
 msgid "Arkhangel'skaya oblast'"
-msgstr ""
+msgstr "Arkhangel'skaya 區"
 
 #: ru/ru_regions.py:56
 msgid "Astrakhanskaya oblast'"
-msgstr ""
+msgstr "Astrakhanskaya 區"
 
 #: ru/ru_regions.py:57
 msgid "Belgorodskaya oblast'"
-msgstr ""
+msgstr "Belgorodskaya 區"
 
 #: ru/ru_regions.py:58
 msgid "Bryanskaya oblast'"
-msgstr ""
+msgstr "Bryanskaya 區"
 
 #: ru/ru_regions.py:59
 msgid "Vladimirskaya oblast'"
-msgstr ""
+msgstr "Vladimirskaya 區"
 
 #: ru/ru_regions.py:60
 msgid "Volgogradskaya oblast'"
-msgstr ""
+msgstr "Volgogradskaya 區"
 
 #: ru/ru_regions.py:61
 msgid "Vologodskaya oblast'"
-msgstr ""
+msgstr "Vologodskaya 區"
 
 #: ru/ru_regions.py:62
 msgid "Voronezhskaya oblast'"
-msgstr ""
+msgstr "Voronezhskaya 區"
 
 #: ru/ru_regions.py:63
 msgid "Ivanovskaya oblast'"
-msgstr ""
+msgstr "Ivanovskaya 區"
 
 #: ru/ru_regions.py:64
 msgid "Irkutskaya oblast'"
-msgstr ""
+msgstr "Irkutskaya 區"
 
 #: ru/ru_regions.py:65
 msgid "Kaliningradskaya oblast'"
-msgstr ""
+msgstr "Kaliningradskaya 區"
 
 #: ru/ru_regions.py:66
 msgid "Kaluzhskaya oblast'"
-msgstr ""
+msgstr "Kaluzhskaya 區"
 
 #: ru/ru_regions.py:67
 msgid "Kemerovskaya oblast'"
-msgstr ""
+msgstr "Kemerovskaya 區"
 
 #: ru/ru_regions.py:68
 msgid "Kirovskaya oblast'"
-msgstr ""
+msgstr "Kirovskaya 區"
 
 #: ru/ru_regions.py:69
 msgid "Kostromskaya oblast'"
-msgstr ""
+msgstr "Kostromskaya 區"
 
 #: ru/ru_regions.py:70
 msgid "Kurganskaya oblast'"
-msgstr ""
+msgstr "Kurganskaya 區"
 
 #: ru/ru_regions.py:71
 msgid "Kurskaya oblast'"
-msgstr ""
+msgstr "Kurskaya 區"
 
 #: ru/ru_regions.py:72
 msgid "Leningradskaya oblast'"
-msgstr ""
+msgstr "Leningradskaya 區"
 
 #: ru/ru_regions.py:73
 msgid "Lipeckaya oblast'"
-msgstr ""
+msgstr "Lipeckaya 區"
 
 #: ru/ru_regions.py:74
 msgid "Magadanskaya oblast'"
-msgstr ""
+msgstr "Magadanskaya 區"
 
 #: ru/ru_regions.py:75
 msgid "Murmanskaya oblast'"
-msgstr ""
+msgstr "Murmanskaya 區"
 
 #: ru/ru_regions.py:76
 msgid "Nizhegorodskaja oblast'"
-msgstr ""
+msgstr "Nizhegorodskaja 區"
 
 #: ru/ru_regions.py:77
 msgid "Novgorodskaya oblast'"
-msgstr ""
+msgstr "Novgorodskaya 區"
 
 #: ru/ru_regions.py:78
 msgid "Novosibirskaya oblast'"
-msgstr ""
+msgstr "Novosibirskaya 區"
 
 #: ru/ru_regions.py:79
 msgid "Omskaya oblast'"
-msgstr ""
+msgstr "Omskaya 區"
 
 #: ru/ru_regions.py:80
 msgid "Orenburgskaya oblast'"
-msgstr ""
+msgstr "Orenburgskaya 區"
 
 #: ru/ru_regions.py:81
 msgid "Orlovskaya oblast'"
-msgstr ""
+msgstr "Orlovskaya 區"
 
 #: ru/ru_regions.py:82
 msgid "Penzenskaya oblast'"
-msgstr ""
+msgstr "Penzenskaya 區"
 
 #: ru/ru_regions.py:83
 msgid "Pskovskaya oblast'"
-msgstr ""
+msgstr "Pskovskaya 區"
 
 #: ru/ru_regions.py:84
 msgid "Rostovskaya oblast'"
-msgstr ""
+msgstr "Rostovskaya 區"
 
 #: ru/ru_regions.py:85
 msgid "Rjazanskaya oblast'"
-msgstr ""
+msgstr "Rjazanskaya 區"
 
 #: ru/ru_regions.py:86
 msgid "Samarskaya oblast'"
-msgstr ""
+msgstr "Samarskaya 區"
 
 #: ru/ru_regions.py:87
 msgid "Saratovskaya oblast'"
-msgstr ""
+msgstr "Saratovskaya 區"
 
 #: ru/ru_regions.py:88
 msgid "Sakhalinskaya oblast'"
-msgstr ""
+msgstr "Sakhalinskaya 區"
 
 #: ru/ru_regions.py:89
 msgid "Sverdlovskaya oblast'"
-msgstr ""
+msgstr "Sverdlovskaya 區"
 
 #: ru/ru_regions.py:90
 msgid "Smolenskaya oblast'"
-msgstr ""
+msgstr "Smolenskaya 區"
 
 #: ru/ru_regions.py:91
 msgid "Tambovskaya oblast'"
-msgstr ""
+msgstr "Tambovskaya 區"
 
 #: ru/ru_regions.py:92
 msgid "Tverskaya oblast'"
-msgstr ""
+msgstr "Tverskaya 區"
 
 #: ru/ru_regions.py:93
 msgid "Tomskaya oblast'"
-msgstr ""
+msgstr "Tomskaya 區"
 
 #: ru/ru_regions.py:94
 msgid "Tul'skaya oblast'"
-msgstr ""
+msgstr "Tul'skaya 區"
 
 #: ru/ru_regions.py:95
 msgid "Tyumenskaya oblast'"
-msgstr ""
+msgstr "Tyumenskaya 區"
 
 #: ru/ru_regions.py:96
 msgid "Ul'ianovskaya oblast'"
-msgstr ""
+msgstr "Ul'ianovskaya 區"
 
 #: ru/ru_regions.py:97
 msgid "Chelyabinskaya oblast'"
-msgstr ""
+msgstr "Chelyabinskaya 區"
 
 #: ru/ru_regions.py:98
 msgid "Yaroslavskaya oblast'"
-msgstr ""
+msgstr "Yaroslavskaya 區"
 
 #: ru/ru_regions.py:99
 msgid "Evreyskaya avtonomnaja oblast'"
-msgstr ""
+msgstr "Evreyskaya avtonomnaja 區"
 
 #: ru/ru_regions.py:100
 msgid "Neneckiy autonomnyy okrug"
-msgstr ""
+msgstr "Neneckiy autonomnyy okrug"
 
 #: ru/ru_regions.py:101
 msgid "Khanty-Mansiyskiy avtonomnyy okrug - Yugra"
-msgstr ""
+msgstr "Khanty-Mansiyskiy avtonomnyy okrug - Yugra"
 
 #: ru/ru_regions.py:102
 msgid "Chukotskiy avtonomnyy okrug"
-msgstr ""
+msgstr "Chukotskiy avtonomnyy okrug"
 
 #: ru/ru_regions.py:103
 msgid "Yamalo-Neneckiy avtonomnyy okrug"
-msgstr ""
+msgstr "Yamalo-Neneckiy avtonomnyy okrug"
 
 #: se/forms.py:54
 msgid "Enter a valid Swedish organisation number."
@@ -2990,105 +3019,105 @@ msgstr "請勿輸入配位數。"
 msgid "Enter a Swedish postal code in the format XXXXX."
 msgstr "用 XX-XXX 的格式輸入郵遞區號。"
 
-#: se/se_counties.py:15
+#: se/se_counties.py:16
 msgid "Stockholm"
 msgstr "斯德哥爾摩省"
 
-#: se/se_counties.py:16
+#: se/se_counties.py:17
 msgid "Västerbotten"
 msgstr "西博滕省"
 
-#: se/se_counties.py:17
+#: se/se_counties.py:18
 msgid "Norrbotten"
 msgstr "北博滕省"
 
-#: se/se_counties.py:18
+#: se/se_counties.py:19
 msgid "Uppsala"
 msgstr "烏普薩拉省"
 
-#: se/se_counties.py:19
+#: se/se_counties.py:20
 msgid "Södermanland"
 msgstr "南曼蘭省"
 
-#: se/se_counties.py:20
+#: se/se_counties.py:21
 msgid "Östergötland"
 msgstr "東約特蘭省"
 
-#: se/se_counties.py:21
+#: se/se_counties.py:22
 msgid "Jönköping"
 msgstr "延雪平省"
 
-#: se/se_counties.py:22
+#: se/se_counties.py:23
 msgid "Kronoberg"
 msgstr "克魯努貝里省"
 
-#: se/se_counties.py:23
+#: se/se_counties.py:24
 msgid "Kalmar"
 msgstr "卡爾馬"
 
-#: se/se_counties.py:24
+#: se/se_counties.py:25
 msgid "Gotland"
 msgstr "哥德蘭省"
 
-#: se/se_counties.py:25
+#: se/se_counties.py:26
 msgid "Blekinge"
 msgstr "布萊金厄省"
 
-#: se/se_counties.py:26
+#: se/se_counties.py:27
 msgid "Skåne"
 msgstr "斯科訥省"
 
-#: se/se_counties.py:27
+#: se/se_counties.py:28
 msgid "Halland"
 msgstr "哈蘭省"
 
-#: se/se_counties.py:28
+#: se/se_counties.py:29
 msgid "Västra Götaland"
 msgstr "西約塔蘭省"
 
-#: se/se_counties.py:29
+#: se/se_counties.py:30
 msgid "Värmland"
 msgstr "韋姆蘭省"
 
-#: se/se_counties.py:30
+#: se/se_counties.py:31
 msgid "Örebro"
 msgstr "厄勒布魯"
 
-#: se/se_counties.py:31
+#: se/se_counties.py:32
 msgid "Västmanland"
 msgstr "西曼蘭省"
 
-#: se/se_counties.py:32
+#: se/se_counties.py:33
 msgid "Dalarna"
 msgstr "達拉納省"
 
-#: se/se_counties.py:33
+#: se/se_counties.py:34
 msgid "Gävleborg"
 msgstr "耶夫勒堡省"
 
-#: se/se_counties.py:34
+#: se/se_counties.py:35
 msgid "Västernorrland"
 msgstr "西諾爾蘭省"
 
-#: se/se_counties.py:35
+#: se/se_counties.py:36
 msgid "Jämtland"
 msgstr "耶姆特蘭省"
 
 #: si/forms.py:25
 msgid "The first 7 digits of the EMSO must represent a valid past date."
-msgstr ""
+msgstr "EMSO的前7碼必須代表一個有效的過去日期"
 
 #: si/forms.py:26
 msgid "The EMSO is not valid."
-msgstr ""
+msgstr "EMSO 無效。"
 
 #: si/forms.py:86
 msgid "Enter a valid tax number in form SIXXXXXXXX"
-msgstr ""
+msgstr "輸入有效的傳真號碼如SIXXXXXXXX"
 
 #: si/forms.py:151
 msgid "Enter phone number in form +386XXXXXXXX or 0XXXXXXXX."
-msgstr ""
+msgstr "輸入電話號碼如 +386XXXXXXXX 或 0XXXXXXXX。"
 
 #: sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3458,10 +3487,6 @@ msgstr "國家身份證號碼必須由 11 位數字值組成。"
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "以 XXXXX 或 XXXXX-XXXX 的格式輸入一個郵遞區號。"
 
-#: us/forms.py:30
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "電話號碼必須是 XX-XXXX-XXXX 格式。"
-
 #: us/forms.py:59
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "以 XXX-XX-XXXX 的格式輸入一有效的美国身份證字號。"
@@ -3490,11 +3515,11 @@ msgstr "以 XX-XXXXXXXX-X 或 XXXXXXXXXXXX 的格式输入一個有效的 CUIT�
 msgid "Enter a valid CI number."
 msgstr "輸入有效的 CI 號碼。"
 
-#: za/forms.py:21
+#: za/forms.py:22
 msgid "Enter a valid South African ID number"
 msgstr "請輸入一個有效的南非身份證號碼。"
 
-#: za/forms.py:55
+#: za/forms.py:56
 msgid "Enter a valid South African postal code"
 msgstr "輸入一個有效的南非郵遞區號。"
 
