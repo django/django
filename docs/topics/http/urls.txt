@@ -66,7 +66,7 @@ Example
 
 Here's a sample URLconf::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -255,7 +255,7 @@ code duplication.
 
 Here's the example URLconf from the :doc:`Django overview </intro/overview>`::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('',
         (r'^articles/(\d{4})/$', 'news.views.year_archive'),
@@ -270,7 +270,7 @@ each view function.
 
 With this in mind, the above example can be written more concisely as::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
@@ -291,7 +291,7 @@ Just add multiple ``patterns()`` objects together, like this:
 
 Old::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('',
         (r'^$', 'myapp.views.app_index'),
@@ -301,7 +301,7 @@ Old::
 
 New::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('myapp.views',
         (r'^$', 'app_index'),
