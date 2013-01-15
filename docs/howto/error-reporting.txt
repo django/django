@@ -157,7 +157,7 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 
         If the variable you want to hide is also a function argument (e.g.
         '``user``' in the following example), and if the decorated function has
-        mutiple decorators, then make sure to place ``@sensible_variables`` at
+        mutiple decorators, then make sure to place ``@sensitive_variables`` at
         the top of the decorator chain. This way it will also hide the function
         argument as it gets passed through the other decorators::
 
