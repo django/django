@@ -372,7 +372,7 @@ login page::
 
     def my_view(request):
         if not request.user.is_authenticated():
-            return render('myapp/login_error.html')
+            return render(request, 'myapp/login_error.html')
         # ...
 
 .. currentmodule:: django.contrib.auth.decorators
