@@ -439,11 +439,6 @@ class BoundaryIter(six.Iterator):
         if not unused_char:
             raise InputStreamExhausted()
         self._stream.unget(unused_char)
-        try:
-            from mx.TextTools import FS
-            self._fs = FS(boundary).find
-        except ImportError:
-            self._fs = lambda data: data.find(boundary)
 
     def __iter__(self):
         return self
@@ -499,7 +494,7 @@ class BoundaryIter(six.Iterator):
          * the end of current encapsulation
          * the start of the next encapsulation
         """
-        index = self._fs(data)
+        index = data.find(self._boundary)
         if index < 0:
             return None
         else:
