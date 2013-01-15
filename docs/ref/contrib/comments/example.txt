@@ -141,7 +141,7 @@ enable it in your project's ``urls.py``:
 
 .. code-block:: python
 
-  from django.conf.urls import patterns, url, include
+  from django.conf.urls import patterns
   from django.contrib.comments.feeds import LatestCommentFeed
 
   urlpatterns = patterns('',
