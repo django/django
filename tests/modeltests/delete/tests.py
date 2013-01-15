@@ -234,7 +234,7 @@ class DeletionTests(TestCase):
 
         def log_post_delete(instance, **kwargs):
             self.assertTrue(R.objects.filter(pk=instance.r_id))
-            self.assertEquals(type(instance), S)
+            self.assertIs(type(instance), S)
             deletions.append(instance.id)
 
         r = R.objects.create(pk=1)
@@ -247,8 +247,8 @@ class DeletionTests(TestCase):
         finally:
             models.signals.post_delete.disconnect(log_post_delete)
 
-        self.assertEquals(len(deletions), 1)
-        self.assertEquals(deletions[0], 1)
+        self.assertEqual(len(deletions), 1)
+        self.assertEqual(deletions[0], 1)
 
     @skipUnlessDBFeature("can_defer_constraint_checks")
     def test_can_defer_constraint_checks(self):
