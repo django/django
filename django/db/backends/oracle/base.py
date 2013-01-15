@@ -58,10 +58,11 @@ from django.utils import timezone
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
-
-# Check whether cx_Oracle was compiled with the WITH_UNICODE option.  This will
-# also be True in Python 3.0.
-if int(Database.version.split('.', 1)[0]) >= 5 and not hasattr(Database, 'UNICODE'):
+# Check whether cx_Oracle was compiled with the WITH_UNICODE option if cx_Oracle is pre-5.1. This will
+# also be True for cx_Oracle 5.1 and in Python 3.0. See #19606
+if int(Database.version.split('.', 1)[0]) >= 5 and \
+        (int(Database.version.split('.', 2)[1]) >= 1 or
+         not hasattr(Database, 'UNICODE')):
     convert_unicode = force_text
 else:
     convert_unicode = force_bytes
