@@ -37,7 +37,7 @@ URLconf. If you're only changing a few simple attributes on a class-based view,
 you can simply pass them into the
 :meth:`~django.views.generic.base.View.as_view` method call itself::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
     from django.views.generic import TemplateView
 
     urlpatterns = patterns('',
@@ -73,7 +73,7 @@ point the URL to the :meth:`~django.views.generic.base.View.as_view` class
 method instead, which provides a function-like entry to class-based views::
 
     # urls.py
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
     from some_app.views import AboutView
 
     urlpatterns = patterns('',

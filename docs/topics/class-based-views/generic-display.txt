@@ -110,7 +110,7 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns, url
     from books.views import PublisherList
 
     urlpatterns = patterns('',
