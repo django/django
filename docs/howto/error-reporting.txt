@@ -54,17 +54,23 @@ setting.
 Django can also be configured to email errors about broken links (404 "page
 not found" errors). Django sends emails about 404 errors when:
 
-* :setting:`DEBUG` is ``False``
+* :setting:`DEBUG` is ``False``;
 
-* :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``
-
-* Your :setting:`MIDDLEWARE_CLASSES` setting includes ``CommonMiddleware``
-  (which it does by default).
+* Your :setting:`MIDDLEWARE_CLASSES` setting includes
+  :class:`django.middleware.common.BrokenLinkEmailsMiddleware`.
 
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
 a referer. (It doesn't bother to email for 404s that don't have a referer --
 those are usually just people typing in broken URLs or broken Web 'bots).
+
+.. note::
+
+    :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` must appear
+    before other middleware that intercepts 404 errors, such as
+    :class:`~django.middleware.locale.LocaleMiddleware` or
+    :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
+    Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
@@ -91,9 +97,6 @@ crawlers often request::
 
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
-
-The best way to disable this behavior is to set
-:setting:`SEND_BROKEN_LINK_EMAILS` to ``False``.
 
 .. seealso::
 
