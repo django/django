@@ -38,6 +38,10 @@ class Command(BaseCommand):
         use_natural_keys = options.get('use_natural_keys')
         use_base_manager = options.get('use_base_manager')
 
+        # if supplying kwargs directly to call_command
+        use_natural_keys = options.get('natural', use_natural_keys)
+        use_base_manager = options.get('all', use_base_manager)
+
         excluded_apps = set()
         excluded_models = set()
         for exclude in excludes:

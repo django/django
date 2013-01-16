@@ -30,6 +30,10 @@ class Command(NoArgsCommand):
         show_traceback = options.get('traceback')
         load_initial_data = options.get('load_initial_data')
 
+        # if supplying kwargs directly to call_command
+        interactive = not options.get('noinput', not interactive)
+        load_initial_data = not options.get('no_initial_data', not load_initial_data)
+
         self.style = no_style()
 
         # Import the 'management' module within each installed app, to register

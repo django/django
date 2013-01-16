@@ -95,10 +95,18 @@ class TemplateCommand(BaseCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
+        extensions_provided = options.get('extensions')
+        files = options.get('files')
+
+        # if supplying kwargs directly to call_command
+        extensions_provided = options.get('extension', extensions_provided)
+        files = options.get('name', files)
+
         extensions = tuple(
-            handle_extensions(options.get('extensions'), ignored=()))
+            handle_extensions(extensions_provided, ignored=()))
         extra_files = []
-        for file in options.get('files'):
+
+        for file in files:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
         if self.verbosity >= 2:
             self.stdout.write("Rendering %s template files with "

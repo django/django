@@ -43,6 +43,9 @@ class Command(BaseCommand):
 
         connection = connections[self.using]
 
+        # if supplying kwargs directly to call_command
+        self.ignore = options.get('ignorenonexistent', self.ignore)
+
         if not len(fixture_labels):
             raise CommandError(
                 "No database fixture specified. Please provide the path of at "
