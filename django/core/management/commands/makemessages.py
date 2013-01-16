@@ -126,7 +126,7 @@ def write_pot_file(potfile, msgs, file, work_file, is_templatized):
         fp.write(msgs)
 
 def process_file(file, dirpath, potfile, domain, verbosity,
-                 extensions, wrap, location, stdout=sys.stdout):
+                 extensions, wrap, location, keep_pot, stdout=sys.stdout):
     """
     Extract translatable literals from :param file: for :param domain:
     creating or updating the :param potfile: POT file.
@@ -183,7 +183,7 @@ def process_file(file, dirpath, potfile, domain, verbosity,
         if status != STATUS_OK:
             if is_templatized:
                 os.unlink(work_file)
-            if os.path.exists(potfile):
+            if not keep_pot and os.path.exists(potfile):
                 os.unlink(potfile)
             raise CommandError(
                 "errors happened while running xgettext on %s\n%s" %
@@ -197,7 +197,7 @@ def process_file(file, dirpath, potfile, domain, verbosity,
         os.unlink(work_file)
 
 def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
-                  copy_pforms, wrap, location, no_obsolete):
+                  copy_pforms, wrap, location, no_obsolete, keep_pot):
     """
     Creates of updates the :param pofile: PO file for :param domain: and :param
     locale:.  Uses contents of the existing :param potfile:.
@@ -208,7 +208,8 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
                                     (wrap, location, potfile))
     if errors:
         if status != STATUS_OK:
-            os.unlink(potfile)
+            if not keep_pot:
+                os.unlink(potfile)
             raise CommandError(
                 "errors happened while running msguniq\n%s" % errors)
         elif verbosity > 0:
@@ -221,7 +222,8 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
                                         (wrap, location, pofile, potfile))
         if errors:
             if status != STATUS_OK:
-                os.unlink(potfile)
+                if not keep_pot:
+                    os.unlink(potfile)
                 raise CommandError(
                     "errors happened while running msgmerge\n%s" % errors)
             elif verbosity > 0:
@@ -232,7 +234,8 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
     with open(pofile, 'w') as fp:
         fp.write(msgs)
-    os.unlink(potfile)
+    if not keep_pot:
+        os.unlink(potfile)
     if no_obsolete:
         msgs, errors, status = _popen(
             'msgattrib %s %s -o "%s" --no-obsolete "%s"' %
@@ -246,7 +249,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
 
 def make_messages(locale=None, domain='django', verbosity=1, all=False,
         extensions=None, symlinks=False, ignore_patterns=None, no_wrap=False,
-        no_location=False, no_obsolete=False, stdout=sys.stdout):
+        no_location=False, no_obsolete=False, stdout=sys.stdout, keep_pot=False):
     """
     Uses the ``locale/`` directory from the Django Git tree or an
     application/project to process all files with translatable literals for
@@ -280,10 +283,12 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
                 "if you want to enable i18n for your project or application.")
 
     if domain not in ('django', 'djangojs'):
-        raise CommandError("currently makemessages only supports domains 'django' and 'djangojs'")
+        raise CommandError("currently makemessages only supports domains "
+                           "'django' and 'djangojs'")
 
     if (locale is None and not all) or domain is None:
-        message = "Type '%s help %s' for usage information." % (os.path.basename(sys.argv[0]), sys.argv[1])
+        message = "Type '%s help %s' for usage information." % (
+                  os.path.basename(sys.argv[0]), sys.argv[1])
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
@@ -325,11 +330,11 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         for dirpath, file in find_files(".", ignore_patterns, verbosity,
                 stdout, symlinks=symlinks):
             process_file(file, dirpath, potfile, domain, verbosity, extensions,
-                    wrap, location, stdout)
+                    wrap, location, keep_pot, stdout)
 
         if os.path.exists(potfile):
             write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
-                    not invoked_for_django, wrap, location, no_obsolete)
+                    not invoked_for_django, wrap, location, no_obsolete, keep_pot)
 
 
 class Command(NoArgsCommand):
@@ -355,6 +360,8 @@ class Command(NoArgsCommand):
             default=False, help="Don't write '#: filename:line' lines"),
         make_option('--no-obsolete', action='store_true', dest='no_obsolete',
             default=False, help="Remove obsolete message strings"),
+        make_option('--keep-pot', action='store_true', dest='keep_pot',
+            default=False, help="Keep .pot file after making messages. Useful when debugging."),
     )
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
@@ -379,6 +386,7 @@ class Command(NoArgsCommand):
         no_wrap = options.get('no_wrap')
         no_location = options.get('no_location')
         no_obsolete = options.get('no_obsolete')
+        keep_pot = options.get('keep_pot')
         if domain == 'djangojs':
             exts = extensions if extensions else ['js']
         else:
@@ -390,4 +398,5 @@ class Command(NoArgsCommand):
                              % get_text_list(list(extensions), 'and'))
 
         make_messages(locale, domain, verbosity, process_all, extensions,
-            symlinks, ignore_patterns, no_wrap, no_location, no_obsolete, self.stdout)
+                      symlinks, ignore_patterns, no_wrap, no_location,
+                      no_obsolete, self.stdout, keep_pot)

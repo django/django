@@ -32,7 +32,7 @@ if can_run_extraction_tests:
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
-        NoLocationExtractorTests)
+        NoLocationExtractorTests, KeepPotFileExtractorTests)
 if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests)
