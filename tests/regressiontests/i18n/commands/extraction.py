@@ -297,8 +297,9 @@ class NoLocationExtractorTests(ExtractorTests):
 
 class KeepPotFileExtractorTests(ExtractorTests):
 
+    POT_FILE='locale/django.pot'
+
     def setUp(self):
-        self.POT_FILE = self.PO_FILE + 't'
         super(KeepPotFileExtractorTests, self).setUp()
 
     def tearDown(self):
