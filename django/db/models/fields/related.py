@@ -129,94 +129,6 @@ class RelatedField(object):
         if not cls._meta.abstract:
             self.contribute_to_related_class(other, self.related)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if hasattr(value, 'prepare'):
-            return value.prepare()
-        if hasattr(value, '_prepare'):
-            return value._prepare()
-        # FIXME: lt and gt are explicitly allowed to make
-        # get_(next/prev)_by_date work; other lookups are not allowed since that
-        # gets messy pretty quick. This is a good candidate for some refactoring
-        # in the future.
-        if lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
-            return self._pk_trace(value, 'get_prep_lookup', lookup_type)
-        if lookup_type in ('range', 'in'):
-            return [self._pk_trace(v, 'get_prep_lookup', lookup_type) for v in value]
-        elif lookup_type == 'isnull':
-            return []
-        raise TypeError("Related Field has invalid lookup: %s" % lookup_type)
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_lookup(lookup_type, value)
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
-        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabel_aliases method, it will need to
-            # be invoked before the final SQL is evaluated
-            if hasattr(value, 'relabel_aliases'):
-                return value
-            if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
-            else:
-                sql, params = value._as_sql(connection=connection)
-            return QueryWrapper(('(%s)' % sql), params)
-
-        # FIXME: lt and gt are explicitly allowed to make
-        # get_(next/prev)_by_date work; other lookups are not allowed since that
-        # gets messy pretty quick. This is a good candidate for some refactoring
-        # in the future.
-        if lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
-            return [self._pk_trace(value, 'get_db_prep_lookup', lookup_type,
-                            connection=connection, prepared=prepared)]
-        if lookup_type in ('range', 'in'):
-            return [self._pk_trace(v, 'get_db_prep_lookup', lookup_type,
-                            connection=connection, prepared=prepared)
-                    for v in value]
-        elif lookup_type == 'isnull':
-            return []
-        raise TypeError("Related Field has invalid lookup: %s" % lookup_type)
-
-    def _pk_trace(self, value, prep_func, lookup_type, **kwargs):
-        # Value may be a primary key, or an object held in a relation.
-        # If it is an object, then we need to get the primary key value for
-        # that object. In certain conditions (especially one-to-one relations),
-        # the primary key may itself be an object - so we need to keep drilling
-        # down until we hit a value that can be used for a comparison.
-        v = value
-
-        # In the case of an FK to 'self', this check allows to_field to be used
-        # for both forwards and reverse lookups across the FK. (For normal FKs,
-        # it's only relevant for forward lookups).
-        if isinstance(v, self.rel.to):
-            field_name = getattr(self.rel, "field_name", None)
-        else:
-            field_name = None
-        try:
-            while True:
-                if field_name is None:
-                    field_name = v._meta.pk.name
-                v = getattr(v, field_name)
-                field_name = None
-        except AttributeError:
-            pass
-        except exceptions.ObjectDoesNotExist:
-            v = None
-
-        field = self
-        while field.rel:
-            if hasattr(field.rel, 'field_name'):
-                field = field.rel.to._meta.get_field(field.rel.field_name)
-            else:
-                field = field.rel.to._meta.pk
-
-        if lookup_type in ('range', 'in'):
-            v = [v]
-        v = getattr(field, prep_func)(lookup_type, v, **kwargs)
-        if isinstance(v, list):
-            v = v[0]
-        return v
-
     def related_query_name(self):
         # This method defines the name that can be used to identify this
         # related object in a table-spanning query. It uses the lower-cased
@@ -1088,10 +1000,17 @@ class ForeignKey(RelatedField, Field):
         root_constraint = constraint_class()
 
         def get_normalized_value(value):
-            target_model = targets[0].model
 
-            if isinstance(value, target_model):
-                return tuple([getattr(value, field.attname) for field in targets])
+            from django.db.models import Model
+            if isinstance(value, Model):
+                value_list = []
+                for target in targets:
+                    field = target
+                    # Account for one-to-one relations when sent a different model
+                    while not isinstance(value, field.model):
+                        field = field.rel.to._meta.get_field(field.rel.field_name)
+                    value_list.append(getattr(value, field.attname))
+                return tuple(value_list)
             elif not isinstance(value, tuple):
                 return (value,)
             return value
