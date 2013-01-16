@@ -293,3 +293,36 @@ class NoLocationExtractorTests(ExtractorTests):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             self.assertTrue('#: templates/test.html:55' in po_contents)
+
+
+class KeepPotFileExtractorTests(ExtractorTests):
+
+    def setUp(self):
+        self.POT_FILE = self.PO_FILE + 't'
+        super(KeepPotFileExtractorTests, self).setUp()
+
+    def tearDown(self):
+        super(KeepPotFileExtractorTests, self).tearDown()
+        os.chdir(self.test_dir)
+        try:
+            os.unlink(self.POT_FILE)
+        except OSError:
+            pass
+        os.chdir(self._cwd)
+
+    def test_keep_pot_disabled_by_default(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assertFalse(os.path.exists(self.POT_FILE))
+
+    def test_keep_pot_explicitly_disabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+                                keep_pot=False)
+        self.assertFalse(os.path.exists(self.POT_FILE))
+
+    def test_keep_pot_enabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+                                keep_pot=True)
+        self.assertTrue(os.path.exists(self.POT_FILE))

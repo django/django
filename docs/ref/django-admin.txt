@@ -472,6 +472,14 @@ Use the ``--no-location`` option to not write '``#: filename:line``'
 comment lines in language files. Note that using this option makes it harder
 for technically skilled translators to understand each message's context.
 
+.. django-admin-option:: --keep-pot
+
+.. versionadded:: 1.6
+
+Use the ``--keep-pot`` option to prevent django from deleting the temporary
+.pot file it generates before creating the .po file. This is useful for
+debugging errors which may prevent the final language files from being created.
+
 runfcgi [options]
 -----------------
 
