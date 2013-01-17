@@ -308,40 +308,67 @@
                     var date_sel = null;
                     var date_show = new Date();
                     if (field.val().length > 0) {
-                        // only support specific date formats here for
-                        // simplicity
-                        // (jQueryUI.datepicker.dateParse could help here)
-                        var regex = null, y, m, d;
-                        if (o.date_input_format == '%Y-%m-%d') {
-                            regex = /^(\d{4})-(\d{2})-(\d{2})$/;
-                            y=1; m=2; d=3;
-                        }
-                        else if (o.date_input_format == '%m/%d/%Y') {
-                            regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-                            y=3; m=1; d=2;
-                        }
-                        else if (o.date_input_format == '%m/%d/%y') {
-                            regex = /^(\d{2})\/(\d{2})\/(\d{2})$/;
-                            y=3; m=1; d=2;
-                        }
-                        else if (o.date_input_format == '%d.%m.%Y') {
-                            regex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
-                            y=3; m=2; d=1;
-                        }
-                        else if (o.date_input_format == '%d.%m.%y') {
-                            regex = /^(\d{2})\.(\d{2})\.(\d{2})$/;
-                            y=3; m=2; d=1;
+                        // Poor and incomplete port of python's _strptime
+                        // module.
+                        // We only look for %Y, %y, %m, %d formats.
+                        // That should be enough for every locale included with
+                        // django, but still may not work with custom format
+                        // files.
+                        var format = o.date_input_format;
+                        var regexes = {
+                            'Y' : '(\\d{4})',
+                            'y' : '(\\d{2})',
+                            'm' : '(\\d{2})',
+                            'd' : '(\\d{2})',
+                            '%' : '%'
+                        };
+                        var directives = '';
+                        var processed_format = '';
+                        var directive_index;
+
+                        // Escape those symbols in format that are special for
+                        // regular expressions syntax
+                        format = format.replace(new RegExp(
+                            "([.^$*+?(){}[]|])", 'g'), '$&');
+
+                        while (format.indexOf('%') !== -1){
+                            directive_index = format.indexOf('%') + 1;
+                            processed_format = processed_format +
+                                format.substr(0, directive_index-1) +
+                                regexes[format[directive_index]];
+                            directives += format[directive_index];
+                            format = format.substr(directive_index+1);
                         }
 
-                        if (regex !== null) {
-                            var match = regex.exec(field.val());
-                            if (match !== null) {
-                                year = match[y];
-                                month = match[m];
-                                day = match[d];
-                                if (y.length == 2) {
-                                    year = '20'+year;
+                        var format_regexp = new RegExp(
+                            '^'+processed_format+'$');
+
+                        if ((directives.toLowerCase().indexOf('y') !== -1) &&
+                            (directives.indexOf('m') !== -1)) {
+                            var groups = format_regexp.exec(field.val());
+                            var year;
+                            var year_index = directives.indexOf('Y');
+                            if (year_index !== -1){
+                                year = parseInt(groups[year_index+1], 10);
+                            }
+                            else {
+                                year_index = directives.indexOf('y');
+                                year = parseInt(groups[year_index+1], 10);
+                                if (year <= 68){
+                                    year += 2000;
                                 }
+                                else {
+                                    year += 1900;
+                                }
+                            }
+                            var month = parseInt(
+                                groups[directives.indexOf('m')+1], 10);
+                            if ((month < 1) || (month > 12)){
+                                month = undefined;
+                            }
+                            var day = parseInt(
+                                groups[directives.indexOf('d')+1], 10);
+                            if (year && month && day){
                                 date_sel = new Date(year, month-1, day);
                                 date_show = new Date(year, month-1, day);
                             }
