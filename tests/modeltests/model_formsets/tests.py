@@ -582,15 +582,15 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet3(instance=author)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_alternatebook_set-0-title">Title:</label> <input id="id_alternatebook_set-0-title" type="text" name="alternatebook_set-0-title" maxlength="100" /></p>\n'
-            '<p><label for="id_alternatebook_set-0-notes">Notes:</label> <input id="id_alternatebook_set-0-notes" type="text" name="alternatebook_set-0-notes" maxlength="100" /><input type="hidden" name="alternatebook_set-0-author" value="1" id="id_alternatebook_set-0-author" /><input type="hidden" name="alternatebook_set-0-book_ptr" id="id_alternatebook_set-0-book_ptr" /></p>')
+            '<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" maxlength="100" /></p>\n'
+            '<p><label for="id_book_set-0-notes">Notes:</label> <input id="id_book_set-0-notes" type="text" name="book_set-0-notes" maxlength="100" /><input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-book_ptr" id="id_book_set-0-book_ptr" /></p>')
 
         data = {
-            'alternatebook_set-TOTAL_FORMS': '1', # the number of forms rendered
-            'alternatebook_set-INITIAL_FORMS': '0', # the number of forms with initial data
-            'alternatebook_set-MAX_NUM_FORMS': '', # the max number of forms
-            'alternatebook_set-0-title': 'Flowers of Evil',
-            'alternatebook_set-0-notes': 'English translation of Les Fleurs du Mal'
+            'book_set-TOTAL_FORMS': '1', # the number of forms rendered
+            'book_set-INITIAL_FORMS': '0', # the number of forms with initial data
+            'book_set-MAX_NUM_FORMS': '', # the max number of forms
+            'book_set-0-title': 'Flowers of Evil',
+            'book_set-0-notes': 'English translation of Les Fleurs du Mal'
         }
 
         formset = AuthorBooksFormSet3(data, instance=author)
