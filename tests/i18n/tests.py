@@ -646,7 +646,7 @@ class FormattingTests(TestCase):
             with translation.override('de-at', deactivate=True):
                 self.assertEqual('66.666,666', Template('{{ n }}').render(self.ctxt))
             with translation.override('es-us', deactivate=True):
-                self.assertEqual('31 de diciembre de 2009', date_format(self.d))
+                self.assertEqual('31 de Diciembre de 2009', date_format(self.d))
 
     def test_localized_input(self):
         """
