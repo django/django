@@ -6,7 +6,7 @@ import re
 import shutil
 
 from django.core import management
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -14,7 +14,7 @@ from django.utils.six import StringIO
 
 LOCALE='de'
 
-class ExtractorTests(TestCase):
+class ExtractorTests(SimpleTestCase):
 
     PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
 
