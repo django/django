@@ -92,7 +92,12 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 #HACK
-class RelatedField(object):
+class RelatedField(Field):
+    def db_type(self, connection):
+        '''By default related field will not have a column
+           as it relates columns to another table'''
+        return None
+
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
 
@@ -891,7 +896,7 @@ class ManyToManyRel(object):
         return self.to._meta.pk
 
 
-class ForeignKey(RelatedField, Field):
+class ForeignKey(RelatedField):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
@@ -920,7 +925,7 @@ class ForeignKey(RelatedField, Field):
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
-        Field.__init__(self, **kwargs)
+        super(ForeignKey, self).__init__(**kwargs)
 
     def get_related_fields(self):
         '''Returns a list of tuples containing that fields that should match in the foriegn key relationship'''
@@ -1057,7 +1062,7 @@ class ForeignKey(RelatedField, Field):
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
                     return smart_text(choice_list[1][0])
-        return Field.value_to_string(self, obj)
+        return super(ForeignKey, self).value_to_string(obj)
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
@@ -1176,7 +1181,7 @@ def create_many_to_many_intermediary_model(field, klass):
     })
 
 
-class ManyToManyField(RelatedField, Field):
+class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
     def __init__(self, to, **kwargs):
@@ -1200,7 +1205,7 @@ class ManyToManyField(RelatedField, Field):
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
-        Field.__init__(self, **kwargs)
+        super(ManyToManyField, self).__init__(**kwargs)
 
         msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)

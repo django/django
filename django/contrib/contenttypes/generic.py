@@ -141,7 +141,7 @@ class GenericForeignKey(object):
         setattr(instance, self.fk_field, fk)
         setattr(instance, self.cache_attr, value)
 
-class GenericRelation(RelatedField, Field):
+class GenericRelation(RelatedField):
     """Provides an accessor to generic related objects (e.g. comments)"""
 
     def __init__(self, to, **kwargs):
@@ -159,7 +159,7 @@ class GenericRelation(RelatedField, Field):
         kwargs['blank'] = True
         kwargs['editable'] = False
         kwargs['serialize'] = False
-        Field.__init__(self, **kwargs)
+        super(GenericRelation, self).__init__(**kwargs)
 
     def get_path_info(self):
         from_field = self.model._meta.pk
@@ -171,7 +171,7 @@ class GenericRelation(RelatedField, Field):
         return [PathInfo(self.model._meta, opts, (target,), self, True, False)]
 
     def get_choices_default(self):
-        return Field.get_choices(self, include_blank=False)
+        return super(GenericRelation, self).get_choices(include_blank=False)
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
