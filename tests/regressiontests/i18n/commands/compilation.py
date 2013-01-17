@@ -1,16 +1,16 @@
 import os
 
 from django.core.management import call_command, CommandError
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils import translation, six
+from django.utils import translation
 from django.utils._os import upath
 from django.utils.six import StringIO
 
 test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
 
 
-class MessageCompilationTests(TestCase):
+class MessageCompilationTests(SimpleTestCase):
 
     def setUp(self):
         self._cwd = os.getcwd()
