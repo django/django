@@ -466,7 +466,7 @@ checks to make sure the user has an email in the desired domain::
         from django.contrib.auth.decorators import user_passes_test
 
         def email_check(user):
-            return '@example.com' in request.user.email
+            return '@example.com' in user.email
 
         @user_passes_test(email_check)
         def my_view(request):
