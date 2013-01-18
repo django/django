@@ -27,7 +27,6 @@ def get_validation_errors(outfile, app=None):
     """
     from django.db import models, connection
     from django.db.models.loading import get_app_errors
-    from django.db.models.fields.related import RelatedObject
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
     e = ModelErrorCollection(outfile)
@@ -154,7 +153,7 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
 
                 rel_opts = f.rel.to._meta
-                rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                rel_name = f.related.get_accessor_name()
                 rel_query_name = f.related_query_name()
                 if not f.rel.is_hidden():
                     for r in rel_opts.fields:
@@ -278,7 +277,7 @@ def get_validation_errors(outfile, app=None):
                 )
 
             rel_opts = f.rel.to._meta
-            rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
             # If rel_name is none, there is no reverse accessor (this only
             # occurs for symmetrical m2m relations to self). If this is the
