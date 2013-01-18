@@ -392,17 +392,15 @@ class HttpResponseRedirectBase(HttpResponse):
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
 
+    url = property(lambda self: self['Location'])
+
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
 
-    url = property(lambda self: self['Location'])
-
 
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
-
-    url = property(lambda self: self['Location'])
 
 
 class HttpResponseNotModified(HttpResponse):
