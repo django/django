@@ -396,9 +396,13 @@ class HttpResponseRedirectBase(HttpResponse):
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
 
+    url = property(lambda self: self['Location'])
+
 
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
+
+    url = property(lambda self: self['Location'])
 
 
 class HttpResponseNotModified(HttpResponse):
