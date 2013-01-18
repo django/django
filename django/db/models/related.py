@@ -10,17 +10,6 @@ PathInfo = namedtuple('PathInfo',
                       'from_field to_field from_opts to_opts join_field '
                       'm2m direct')
 
-class BoundRelatedObject(object):
-    def __init__(self, related_object, field_mapping, original):
-        self.relation = related_object
-        self.field_mappings = field_mapping[related_object.name]
-
-    def template_name(self):
-        raise NotImplementedError
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
 class RelatedObject(object):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
@@ -57,9 +46,6 @@ class RelatedObject(object):
 
     def __repr__(self):
         return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)
-
-    def bind(self, field_mapping, original, bound_related_object_class=BoundRelatedObject):
-        return bound_related_object_class(self, field_mapping, original)
 
     def get_accessor_name(self):
         # This method encapsulates the logic that decides what name to give an
