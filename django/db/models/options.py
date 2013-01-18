@@ -4,7 +4,6 @@ import re
 from bisect import bisect
 
 from django.conf import settings
-from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
@@ -424,10 +423,10 @@ class Options(object):
                 for f in klass._meta.local_fields:
                     if f.rel and not isinstance(f.rel.to, six.string_types):
                         if self == f.rel.to._meta:
-                            cache[RelatedObject(f.rel.to, klass, f)] = None
-                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+                            cache[f.related] = None
+                            proxy_cache[f.related] = None
                         elif self.concrete_model == f.rel.to._meta.concrete_model:
-                            proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+                            proxy_cache[f.related] = None
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
@@ -468,7 +467,7 @@ class Options(object):
                     if (f.rel
                             and not isinstance(f.rel.to, six.string_types)
                             and self == f.rel.to._meta):
-                        cache[RelatedObject(f.rel.to, klass, f)] = None
+                        cache[f.related] = None
         if app_cache_ready():
             self._related_many_to_many_cache = cache
         return cache
