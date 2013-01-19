@@ -407,6 +407,13 @@ class Model(six.with_metaclass(ModelBase)):
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
+    def __setattr__(self, name, value):
+        if name in self._meta.get_all_field_names():
+            field = self._meta.get_field_by_name(name)
+            if hasattr(field[0], 'setter'):
+                value = field[0].setter(value)
+        return super(Model, self).__setattr__(name, value)
+
     def __repr__(self):
         try:
             u = six.text_type(self)

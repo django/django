@@ -4,7 +4,7 @@ from django.core import serializers
 from django.test import TestCase
 
 from .fields import Small
-from .models import DataModel, MyModel, OtherModel
+from .models import DataModel, MyModel, OtherModel, LowercaseModel
 
 
 class CustomField(TestCase):
@@ -90,3 +90,7 @@ class CustomField(TestCase):
         o = OtherModel.objects.get()
         self.assertEqual(o.data.first, "a")
         self.assertEqual(o.data.second, "b")
+
+    def test_setter_override(self):
+        o = LowercaseModel(data="SaMe TeXt")
+        self.assertEqual(o.data, "same text")
