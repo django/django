@@ -747,7 +747,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     constructor arguments. Note that this returns an HTTP status code 302.
 
     .. attribute:: HttpResponseRedirect.url
-    
+
        This attribute represents a path to redirect.
 
 .. class:: HttpResponsePermanentRedirect
