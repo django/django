@@ -10,6 +10,7 @@ from base64 import b64decode, b64encode
 from itertools import tee
 
 from django.db import connection
+from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -24,12 +25,18 @@ from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 
+class Empty(object):
+    pass
+
 class NOT_PROVIDED:
     pass
 
 # The values to use for "blank" in SelectFields. Will be appended to the start
 # of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
+
+def _load_field(app_label, model_name, field_name):
+    return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
 class FieldDoesNotExist(Exception):
     pass
@@ -48,6 +55,11 @@ class FieldDoesNotExist(Exception):
 # attname. For example, this gets the primary key value of object "obj":
 #
 #     getattr(obj, opts.pk.attname)
+
+def _empty(of_cls):
+    new = Empty()
+    new.__class__ = of_cls
+    return new
 
 @total_ordering
 class Field(object):
@@ -147,6 +159,34 @@ class Field(object):
             obj.rel = copy.copy(self.rel)
         memodict[id(self)] = obj
         return obj
+
+    def __copy__(self):
+        # We need to avoid hitting __reduce__, so define this
+        # slightly weird copy construct.
+        obj = Empty()
+        obj.__class__ = self.__class__
+        obj.__dict__ = self.__dict__.copy()
+        return obj
+
+    def __reduce__(self):
+        """
+        Pickling should return the model._meta.fields instance of the field,
+        not a new copy of that field. So, we use the app cache to load the
+        model and then the field back.
+        """
+        if not hasattr(self, 'model'):
+            # Fields are sometimes used without attaching them to models (for
+            # example in aggregation). In this case give back a plain field
+            # instance. The code below will create a new empty instance of
+            # class self.__class__, then update its dict with self.__dict__
+            # values - so, this is very close to normal pickle.
+            return _empty, (self.__class__,), self.__dict__
+        if self.model._deferred:
+            # Deferred model will not be found from the app cache. This could
+            # be fixed by reconstructing the deferred model on unpickle.
+            raise RuntimeError("Fields of deferred models can't be reduced")
+        return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
+                             self.name)
 
     def to_python(self, value):
         """

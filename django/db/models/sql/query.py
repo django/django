@@ -189,54 +189,6 @@ class Query(object):
         memo[id(self)] = result
         return result
 
-    def __getstate__(self):
-        """
-        Pickling support.
-        """
-        obj_dict = self.__dict__.copy()
-        obj_dict['related_select_cols'] = []
-
-        # Fields can't be pickled, so if a field list has been
-        # specified, we pickle the list of field names instead.
-        # None is also a possible value; that can pass as-is
-        obj_dict['select'] = [
-            (s.col, s.field is not None and s.field.name or None)
-            for s in obj_dict['select']
-        ]
-        # alias_map can also contain references to fields.
-        new_alias_map = {}
-        for alias, join_info in obj_dict['alias_map'].items():
-            if join_info.join_field is None:
-                new_alias_map[alias] = join_info
-            else:
-                model = join_info.join_field.model._meta
-                field_id = (model.app_label, model.object_name, join_info.join_field.name)
-                new_alias_map[alias] = join_info._replace(join_field=field_id)
-        obj_dict['alias_map'] = new_alias_map
-        return obj_dict
-
-    def __setstate__(self, obj_dict):
-        """
-        Unpickling support.
-        """
-        # Rebuild list of field instances
-        opts = obj_dict['model']._meta
-        obj_dict['select'] = [
-            SelectInfo(tpl[0], tpl[1] is not None and opts.get_field(tpl[1]) or None)
-            for tpl in obj_dict['select']
-        ]
-        new_alias_map = {}
-        for alias, join_info in obj_dict['alias_map'].items():
-            if join_info.join_field is None:
-                new_alias_map[alias] = join_info
-            else:
-                field_id = join_info.join_field
-                new_alias_map[alias] = join_info._replace(
-                    join_field=get_model(field_id[0], field_id[1])._meta.get_field(field_id[2]))
-        obj_dict['alias_map'] = new_alias_map
-
-        self.__dict__.update(obj_dict)
-
     def prepare(self):
         return self
 
