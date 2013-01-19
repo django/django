@@ -411,7 +411,7 @@ class HttpResponseSubclassesTests(TestCase):
             content_type='text/html')
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
         # Test that url attribute is right
-        self.assertEqual(response.url, response.url)
+        self.assertEqual(response.url, response['Location'])
 
     def test_not_modified(self):
         response = HttpResponseNotModified()
