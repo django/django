@@ -746,10 +746,18 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
     constructor arguments. Note that this returns an HTTP status code 302.
 
+    .. attribute:: HttpResponseRedirect.url
+    
+       This attribute represents a path to redirect.
+
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
+
+    .. attribute:: HttpResponsePermanentRedirect.url
+
+       This attribute represents a path to redirect.
 
 .. class:: HttpResponseNotModified
 
