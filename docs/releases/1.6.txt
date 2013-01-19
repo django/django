@@ -28,6 +28,9 @@ Minor features
   undefined if the given ``QuerySet`` isn't ordered and there are more than
   one ordered values to compare against.
 
+* :class:`HttpResponseRedirect` and :class:`HttpResponsePermanentRedirect` now
+  provides ``url`` attribute. This attribute represents a path to redirect.
+
 Backwards incompatible changes in 1.6
 =====================================
 
