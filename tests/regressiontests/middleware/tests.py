@@ -62,7 +62,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'], 'http://testserver/middleware/slash/')
+        self.assertEqual(r.url, 'http://testserver/middleware/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
@@ -94,7 +94,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
-            r['Location'],
+            r.url,
             'http://testserver/middleware/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
@@ -103,7 +103,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
-            r['Location'],
+            r.url,
             'http://www.testserver/middleware/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
@@ -111,7 +111,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('slash/')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'],
+        self.assertEqual(r.url,
                           'http://www.testserver/middleware/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
@@ -119,7 +119,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'],
+        self.assertEqual(r.url,
                           'http://www.testserver/middleware/slash/')
 
 
@@ -164,7 +164,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertFalse(r is None,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'], 'http://testserver/middleware/customurlconf/slash/')
+        self.assertEqual(r.url, 'http://testserver/middleware/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG_custom_urlconf(self):
@@ -201,7 +201,7 @@ class CommonMiddlewareTest(TestCase):
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
-            r['Location'],
+            r.url,
             'http://testserver/middleware/customurlconf/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
@@ -211,7 +211,7 @@ class CommonMiddlewareTest(TestCase):
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
-            r['Location'],
+            r.url,
             'http://www.testserver/middleware/customurlconf/path/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
@@ -220,7 +220,7 @@ class CommonMiddlewareTest(TestCase):
         request.urlconf = 'regressiontests.middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'],
+        self.assertEqual(r.url,
                           'http://www.testserver/middleware/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, PREPEND_WWW=True)
@@ -229,7 +229,7 @@ class CommonMiddlewareTest(TestCase):
         request.urlconf = 'regressiontests.middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r['Location'],
+        self.assertEqual(r.url,
                           'http://www.testserver/middleware/customurlconf/slash/')
 
     # Tests for the 404 error reporting via email
