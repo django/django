@@ -748,7 +748,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     .. attribute:: HttpResponseRedirect.url
 
-       This attribute represents a path to redirect.
+        .. versionadded:: 1.6
+
+        This attribute represents a path to redirect.
 
 .. class:: HttpResponsePermanentRedirect
 
@@ -757,7 +759,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     .. attribute:: HttpResponsePermanentRedirect.url
 
-       This attribute represents a path to redirect.
+        .. versionadded:: 1.6
+
+        This attribute represents a path to redirect.
 
 .. class:: HttpResponseNotModified
 
