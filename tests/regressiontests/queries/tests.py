@@ -1719,6 +1719,27 @@ class Queries6Tests(TestCase):
         # But querying beyond the end of the result set will fail.
         self.assertRaises(IndexError, lambda: qs[100])
 
+    def test_slicing_and_cache_interaction_2(self):
+        # We can do slicing beyond what is currently in the result cache,
+        # too.
+
+        # We need to mess with the implementation internals a bit here
+        # to decrease the cache fill size so that we don't read all
+        # the results at once.
+        from django.db.models import query
+        query.ITER_CHUNK_SIZE = 2
+        qs = Tag.objects.all()
+
+        # Fill the cache with the first chunk.
+        self.assertEqual(repr(next(qs.__iter__())), '<Tag: t1>')
+        self.assertTrue(qs._iter is not None)
+        self.assertEqual(len(qs._result_cache), 2)
+
+        # Slice without stop and check for completeness.
+        slice_ = qs[1:]
+        self.assertTrue(isinstance(slice_, list))
+        self.assertEqual(len(slice_), len(Tag.objects.all()) - 1)
+
     def test_parallel_iterators(self):
         # Test that parallel iterators work.
         qs = Tag.objects.all()
