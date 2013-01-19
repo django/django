@@ -174,11 +174,11 @@ class Command(NoArgsCommand):
         make_option('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
             default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'."),
         make_option('--no-wrap', action='store_true', dest='no_wrap',
-            default=False, help="Don't break long message lines into several lines"),
+            default=False, help="Don't break long message lines into several lines."),
         make_option('--no-location', action='store_true', dest='no_location',
-            default=False, help="Don't write '#: filename:line' lines"),
+            default=False, help="Don't write '#: filename:line' lines."),
         make_option('--no-obsolete', action='store_true', dest='no_obsolete',
-            default=False, help="Remove obsolete message strings"),
+            default=False, help="Remove obsolete message strings."),
         make_option('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging."),
     )
@@ -274,7 +274,7 @@ class Command(NoArgsCommand):
         try:
             for locale in locales:
                 if self.verbosity > 0:
-                    self.stdout.write("processing language %s\n" % locale)
+                    self.stdout.write("processing locale %s\n" % locale)
                 self.write_po_file(potfile, locale)
         finally:
             if not self.keep_pot and os.path.exists(potfile):
@@ -365,7 +365,7 @@ class Command(NoArgsCommand):
         if self.no_obsolete:
             msgs, errors, status = _popen(
                 'msgattrib %s %s -o "%s" --no-obsolete "%s"' %
-                (wrap, location, pofile, pofile))
+                (self.wrap, self.location, pofile, pofile))
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
