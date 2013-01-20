@@ -78,6 +78,7 @@ Django quotes column and table names behind the scenes.
     setting, if set. If the backend doesn't support tablespaces, this option is
     ignored.
 
+
 ``get_latest_by``
 -----------------
 
