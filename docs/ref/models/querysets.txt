@@ -1492,6 +1492,8 @@ earliest
 
 .. method:: earliest(field_name=None)
 
+.. versionadded:: 1.6
+
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
