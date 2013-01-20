@@ -106,3 +106,131 @@ class DecoratorFromMiddlewareTests(TestCase):
         self.assertTrue(getattr(request, 'process_response_reached', False))
         # Check that process_response saw the rendered content
         self.assertEqual(request.process_response_content, b"Hello world")
+
+
+class OutsideFullMiddleware(object):
+    def process_request(self, request):
+        request.outside_process_request_reached = True
+
+    def process_view(sef, request, view_func, view_args, view_kwargs):
+        request.outside_process_view_reached = True
+
+    def process_template_response(self, request, response):
+        request.process_template_was_right_order = request.inside_process_template_response_reached
+        request.outside_process_template_response_reached = True
+        return response
+
+    def process_response(self, request, response):
+        # This should never receive unrendered content.
+        request.process_response_was_right_order = request.inside_process_template_response_reached
+        request.outside_process_response_content = response.content
+        request.outside_process_response_reached = True
+        return response
+
+class InsideFullMiddleware(object):
+    def process_request(self, request):
+        request.process_request_was_right_order = request.inside_process_template_response_reached
+        request.inside_process_request_reached = True
+
+    def process_view(sef, request, view_func, view_args, view_kwargs):
+        request.process_view_was_right_order = request.inside_process_template_response_reached
+        request.inside_process_request_reached = True
+
+    def process_template_response(self, request, response):
+        request.inside_process_template_response_reached = True
+        return response
+
+    def process_response(self, request, response):
+        # This should never receive unrendered content.
+        request.inside_process_response_content = response.content
+        request.inside_process_response_reached = True
+        return response
+
+multi_dec = decorator_from_middleware(OutsideFullMiddleware, InsideFullMiddleware)
+
+
+class MultipleDecoratorFromMiddlewareTests(TestCase):
+    """
+    Tests for view decorators created using
+    ``django.utils.decorators.decorator_from_middleware``.
+    """
+    rf = RequestFactory()
+
+    def test_process_view_middleware(self):
+        """
+        Test a middleware that implements process_view.
+        """
+        process_view(self.rf.get('/'))
+
+    def test_callable_process_view_middleware(self):
+        """
+        Test a middleware that implements process_view, operating on a callable class.
+        """
+        class_process_view(self.rf.get('/'))
+
+    def test_multi_dec_normal(self):
+        """
+        Test that all methods of middleware are called for normal HttpResponses
+        """
+
+        @full_dec
+        def normal_view(request):
+            t = Template("Hello world")
+            return HttpResponse(t.render(Context({})))
+
+        request = self.rf.get('/')
+        response = normal_view(request)
+        self.assertTrue(getattr(request, 'outside_process_request_reached', False))
+        self.assertTrue(getattr(request, 'inside_process_request_reached', False))
+        self.assertTrue(getattr(request, 'process_request_was_right_order', False))
+        self.assertTrue(getattr(request, 'outside_process_view_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_view_reached', False))
+        self.assertTrue(getattr(request, 'process_view_was_right_order', False))
+        # process_template_response must not be called for HttpResponse
+        self.assertFalse(getattr(request, 'outside_process_template_response_reached', False))
+        self.assertFalse(getattr(request, 'insideprocess_template_response_reached', False))
+        self.assertFalse(getattr(request, 'process_template_response_was_right_order', False))
+        self.assertTrue(getattr(request, 'outside_process_response_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_response_reached', False))
+        self.assertTrue(getattr(request, 'process_response_was_right_order', False))
+        self.assertTrue(getattr(request, 'outside_process_request_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_request_reached', False))
+        self.assertTrue(getattr(request, 'process_request_was_right_order', False))
+
+    def test_multi_dec_templateresponse(self):
+        """
+        Test that all methods of middleware are called for TemplateResponses in
+        the right sequence.
+        """
+
+        @full_dec
+        def template_response_view(request):
+            t = Template("Hello world")
+            return TemplateResponse(request, t, {})
+
+        request = self.rf.get('/')
+        response = template_response_view(request)
+        self.assertTrue(getattr(request, 'outside_process_request_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_request_reached', False))
+        self.assertTrue(getattr(request, 'process_request_was_right_order', False))
+        self.assertTrue(getattr(request, 'outside_process_view_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_view_reached', False))
+        self.assertTrue(getattr(request, 'process_view_was_right_order', False))
+        self.assertTrue(getattr(request, 'outside_process_template_response_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_template_response_reached', False))
+        self.assertTrue(getattr(request, 'process_template_response_was_right_order', False))
+        # response must not be rendered yet.
+        self.assertFalse(response._is_rendered)
+        # process_response must not be called until after response is rendered,
+        # otherwise some decorators like csrf_protect and gzip_page will not
+        # work correctly. See #16004
+        self.assertFalse(getattr(request, 'outside_process_response_reached', False))
+        self.assertFalse(getattr(request, 'insideprocess_response_reached', False))
+        self.assertFalse(getattr(request, 'process_response_was_right_order', False))
+        response.render()
+        self.assertTrue(getattr(request, 'outside_process_response_reached', False))
+        self.assertTrue(getattr(request, 'insideprocess_response_reached', False))
+        self.assertTrue(getattr(request, 'process_response_was_right_order', False))
+        # Check that process_response saw the rendered content
+        self.assertEqual(request.inside_process_response_content, b"Hello world")
+        self.assertEqual(request.outside_process_response_content, b"Hello world")
