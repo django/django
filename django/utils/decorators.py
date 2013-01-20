@@ -40,7 +40,7 @@ def method_decorator(decorator):
     return _dec
 
 
-def decorator_from_middleware_with_args(middleware_class):
+def decorator_from_middleware_with_args(*middleware_classes):
     """
     Like decorator_from_middleware, but returns a function
     that accepts the arguments to be passed to the middleware_class.
@@ -53,16 +53,16 @@ def decorator_from_middleware_with_args(middleware_class):
          def my_view(request):
              # ...
     """
-    return make_middleware_decorator(middleware_class)
+    return make_middleware_decorator(*middleware_classes)
 
 
-def decorator_from_middleware(middleware_class):
+def decorator_from_middleware(*middleware_classes):
     """
     Given a middleware class (not an instance), returns a view decorator. This
     lets you use middleware functionality on a per-view basis. The middleware
     is created with no params passed.
     """
-    return make_middleware_decorator(middleware_class)()
+    return make_middleware_decorator(*middleware_classes)()
 
 
 def available_attrs(fn):
@@ -73,39 +73,45 @@ def available_attrs(fn):
     return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
 
 
-def make_middleware_decorator(middleware_class):
+def make_middleware_decorator(*middleware_classes):
     def _make_decorator(*m_args, **m_kwargs):
-        middleware = middleware_class(*m_args, **m_kwargs)
+        middlewares = [m(*m_args, **m_kwargs) for m in middleware_classes]
         def _decorator(view_func):
             @wraps(view_func, assigned=available_attrs(view_func))
             def _wrapped_view(request, *args, **kwargs):
-                if hasattr(middleware, 'process_request'):
-                    result = middleware.process_request(request)
-                    if result is not None:
-                        return result
-                if hasattr(middleware, 'process_view'):
-                    result = middleware.process_view(request, view_func, args, kwargs)
-                    if result is not None:
-                        return result
+                for middleware in middlewares:
+                    if hasattr(middleware, 'process_request'):
+                        result = middleware.process_request(request)
+                        if result is not None:
+                            return result
+                for middleware in middlewares:
+                    if hasattr(middleware, 'process_view'):
+                        result = middleware.process_view(request, view_func, args, kwargs)
+                        if result is not None:
+                            return result
                 try:
                     response = view_func(request, *args, **kwargs)
                 except Exception as e:
-                    if hasattr(middleware, 'process_exception'):
-                        result = middleware.process_exception(request, e)
-                        if result is not None:
-                            return result
+                    for middleware in reversed(middlewares):
+                        if hasattr(middleware, 'process_exception'):
+                            result = middleware.process_exception(request, e)
+                            if result is not None:
+                                return result
                     raise
                 if hasattr(response, 'render') and callable(response.render):
-                    if hasattr(middleware, 'process_template_response'):
-                        response = middleware.process_template_response(request, response)
+                    for middleware in reversed(middlewares):
+                        if hasattr(middleware, 'process_template_response'):
+                            response = middleware.process_template_response(request, response)
                     # Defer running of process_response until after the template
                     # has been rendered:
-                    if hasattr(middleware, 'process_response'):
-                        callback = lambda response: middleware.process_response(request, response)
-                        response.add_post_render_callback(callback)
+                    for middleware in reversed(middlewares):
+                        if hasattr(middleware, 'process_response'):
+                            callback = lambda response: middleware.process_response(request, response)
+                            response.add_post_render_callback(callback)
                 else:
-                    if hasattr(middleware, 'process_response'):
-                        return middleware.process_response(request, response)
+                    for middleware in reversed(middlewares):
+                        if hasattr(middleware, 'process_response'):
+                            return middleware.process_response(request, response)
                 return response
             return _wrapped_view
         return _decorator
