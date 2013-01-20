@@ -142,14 +142,22 @@ preceding the string, e.g.::
         # Translators: This message appears on the home page only
         output = ugettext("Welcome to my site.")
 
-This also works in templates with the :ttag:`comment` tag:
+The comment will then appear in the resulting ``.po`` file associated with the
+translatable contruct located below it and should also be displayed by most
+translation tools.
 
-.. code-block:: html+django
+.. note:: Just for completeness, this is the corresponding fragment of the
+    resulting ``.po`` file:
 
-    {% comment %}Translators: This is a text of the base template {% endcomment %}
+    .. code-block:: po
 
-The comment will then appear in the resulting ``.po`` file and should also be
-displayed by most translation tools.
+        #. Translators: This message appears on the home page only
+        # path/to/python/file.py:123
+        msgid "Welcome to my site."
+        msgstr ""
+
+This also works in templates. See :ref:`translator-comments-in-templates` for
+more details.
 
 Marking strings as no-op
 ------------------------
@@ -619,6 +627,63 @@ markers<contextual-markers>` using the ``context`` keyword:
 .. code-block:: html+django
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
+
+.. _translator-comments-in-templates:
+
+Comments for translators in templates
+-------------------------------------
+
+Just like with :ref:`Python code <translator-comments>`, these notes for
+translators can be specified using comments, either with the :ttag:`comment`
+tag:
+
+.. code-block:: html+django
+
+    {% comment %}Translators: View verb{% endcomment %}
+    {% trans "View" %}
+
+    {% comment %}Translators: Short intro blurb{% endcomment %}
+    <p>{% blocktrans %}A multiline translatable
+    literal.{% endblocktrans %}</p>
+
+or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
+
+.. code-block:: html+django
+
+    {# Translators: Label of a button that triggers search{% endcomment #}
+    <button type="submit">{% trans "Go" %}</button>
+
+    {# Translators: This is a text of the base template #}
+    {% blocktrans %}Ambiguous translatable block of text{% endtransblock %}
+
+.. note:: Just for completeness, these are the corresponding fragments of the
+    resulting ``.po`` file:
+
+    .. code-block:: po
+
+        #. Translators: View verb
+        # path/to/template/file.html:10
+        msgid "View"
+        msgstr ""
+
+        #. Translators: Short intro blurb
+        # path/to/template/file.html:13
+        msgid ""
+        "A multiline translatable"
+        "literal."
+        msgstr ""
+
+        # ...
+
+        #. Translators: Label of a button that triggers search
+        # path/to/template/file.html:100
+        msgid "Go"
+        msgstr ""
+
+        #. Translators:
+        # path/to/template/file.html:103
+        msgid "Ambiguous translatable block of text"
+        msgstr ""
 
 .. _template-translation-vars:
 

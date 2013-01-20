@@ -7,6 +7,7 @@ import re
 import sys
 import gettext as gettext_module
 from threading import local
+import warnings
 
 from django.utils.importlib import import_module
 from django.utils.encoding import force_str, force_text
@@ -14,6 +15,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.translation import TranslatorCommentWarning
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -40,6 +42,7 @@ accept_language_re = re.compile(r'''
         ''', re.VERBOSE)
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+
 
 def to_locale(language, to_lower=False):
     """
@@ -468,6 +471,9 @@ def templatize(src, origin=None):
     plural = []
     incomment = False
     comment = []
+    lineno_comment_map = {}
+    comment_lineno_cache = None
+
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
@@ -529,7 +535,27 @@ def templatize(src, origin=None):
                     plural.append(contents)
                 else:
                     singular.append(contents)
+
         else:
+            # Handle comment tokens (`{# ... #}`) plus other constructs on
+            # the same line:
+            if comment_lineno_cache is not None:
+                cur_lineno = t.lineno + t.contents.count('\n')
+                if comment_lineno_cache == cur_lineno:
+                    if t.token_type != TOKEN_COMMENT:
+                        for c in lineno_comment_map[comment_lineno_cache]:
+                            filemsg = ''
+                            if origin:
+                                filemsg = 'file %s, ' % origin
+                            warn_msg = ("The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't the last item "
+                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warnings.warn(warn_msg, TranslatorCommentWarning)
+                        lineno_comment_map[comment_lineno_cache] = []
+                else:
+                    out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
+                comment_lineno_cache = None
+
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
@@ -586,7 +612,10 @@ def templatize(src, origin=None):
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(' # %s' % t.contents)
+                if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                    lineno_comment_map.setdefault(t.lineno,
+                                                  []).append(t.contents)
+                    comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
     return force_str(out.getvalue())

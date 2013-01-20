@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import os
 import re
 import shutil
+import warnings
 
 from django.core import management
 from django.test import SimpleTestCase
@@ -11,6 +12,7 @@ from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.translation import TranslatorCommentWarning
 
 
 LOCALE='de'
@@ -120,6 +122,7 @@ class BasicExtractorTests(ExtractorTests):
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
     def test_extraction_warning(self):
+        """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
         stdout = StringIO()
@@ -171,6 +174,63 @@ class BasicExtractorTests(ExtractorTests):
             # {% blocktrans %}
             self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+
+    def test_template_comments(self):
+        """Template comment tags on the same line of other constructs (#19552)"""
+        os.chdir(self.test_dir)
+        # Test detection/end user reporting of old, incorrect templates
+        # translator comments syntax
+        with warnings.catch_warnings(record=True) as ws:
+            warnings.simplefilter('always')
+            management.call_command('makemessages', locale=LOCALE, extensions=['thtml'], verbosity=0)
+            self.assertEqual(len(ws), 3)
+            for w in ws:
+                self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
+            six.assertRegex(self, str(ws[0].message),
+                r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates/comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
+            )
+            six.assertRegex(self, str(ws[1].message),
+                r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates/comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
+            )
+            six.assertRegex(self, str(ws[2].message),
+                r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates/comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
+            )
+        # Now test .po file contents
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+
+            self.assertMsgId('Translatable literal #9a', po_contents)
+            self.assertFalse('ignored comment #1' in po_contents)
+
+            self.assertFalse('Translators: ignored i18n comment #1' in po_contents)
+            self.assertMsgId("Translatable literal #9b", po_contents)
+
+            self.assertFalse('ignored i18n comment #2' in po_contents)
+            self.assertFalse('ignored comment #2' in po_contents)
+            self.assertMsgId('Translatable literal #9c', po_contents)
+
+            self.assertFalse('ignored comment #3' in po_contents)
+            self.assertFalse('ignored i18n comment #3' in po_contents)
+            self.assertMsgId('Translatable literal #9d', po_contents)
+
+            self.assertFalse('ignored comment #4' in po_contents)
+            self.assertMsgId('Translatable literal #9e', po_contents)
+            self.assertFalse('ignored comment #5' in po_contents)
+
+            self.assertFalse('ignored i18n comment #4' in po_contents)
+            self.assertMsgId('Translatable literal #9f', po_contents)
+            self.assertTrue('#. Translators: valid i18n comment #5' in po_contents)
+
+            self.assertMsgId('Translatable literal #9g', po_contents)
+            self.assertTrue('#. Translators: valid i18n comment #6' in po_contents)
+            self.assertMsgId('Translatable literal #9h', po_contents)
+            self.assertTrue('#. Translators: valid i18n comment #7' in po_contents)
+            self.assertMsgId('Translatable literal #9i', po_contents)
+
+            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
+            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
+            self.assertMsgId("Translatable literal #9j", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):

@@ -250,6 +250,8 @@ You can also create your own custom template tags; see
     tags and filters available for a given site. See
     :doc:`/ref/contrib/admin/admindocs`.
 
+.. _template-comments:
+
 Comments
 ========
 
