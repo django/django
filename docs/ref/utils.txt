@@ -179,16 +179,20 @@ The functions defined in this module share the following properties:
     Converts a function decorator into a method decorator. See :ref:`decorating
     class based views<decorating-class-based-views>` for example usage.
 
-.. function:: decorator_from_middleware(middleware_class)
+.. function:: decorator_from_middleware(*middleware_classes)
 
-    Given a middleware class, returns a view decorator. This lets you use
+    .. versionchanged:: 1.6
+
+    Given a middleware classes, returns a view decorator. This lets you use
     middleware functionality on a per-view basis. The middleware is created
     with no params passed.
 
-.. function:: decorator_from_middleware_with_args(middleware_class)
+.. function:: decorator_from_middleware_with_args(*middleware_classes)
+
+    .. versionchanged:: 1.6
 
     Like ``decorator_from_middleware``, but returns a function
-    that accepts the arguments to be passed to the middleware_class.
+    that accepts the arguments to be passed to the middleware_classes.
     For example, the :func:`~django.views.decorators.cache.cache_page`
     decorator is created from the ``CacheMiddleware`` like this::
 
@@ -197,6 +201,9 @@ The functions defined in this module share the following properties:
          @cache_page(3600)
          def my_view(request):
              pass
+
+    When this function is called with multiple arguments, each middleware
+    takes same arguments.
 
 ``django.utils.encoding``
 =========================

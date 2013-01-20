@@ -28,6 +28,10 @@ Minor features
   undefined if the given ``QuerySet`` isn't ordered and there are more than
   one ordered values to compare against.
 
+* :func:`~django.utils.decorators.decorator_from_middleware` and
+  :func:`~django.utils.decorators.decorator_from_middleware_with_args` can take
+  multiple middleware classes.
+
 Backwards incompatible changes in 1.6
 =====================================
 
