@@ -139,23 +139,23 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = force_text(fp.read())
             # {% trans %}
             self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
-            self.assertTrue("Translatable literal #7a" in po_contents)
+            self.assertMsgId("Translatable literal #7a", po_contents)
             self.assertTrue('msgctxt "Special trans context #2"' in po_contents)
-            self.assertTrue("Translatable literal #7b" in po_contents)
+            self.assertMsgId("Translatable literal #7b", po_contents)
             self.assertTrue('msgctxt "Special trans context #3"' in po_contents)
-            self.assertTrue("Translatable literal #7c" in po_contents)
+            self.assertMsgId("Translatable literal #7c", po_contents)
 
             # {% blocktrans %}
             self.assertTrue('msgctxt "Special blocktrans context #1"' in po_contents)
-            self.assertTrue("Translatable literal #8a" in po_contents)
+            self.assertMsgId("Translatable literal #8a", po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #2"' in po_contents)
-            self.assertTrue("Translatable literal #8b-singular" in po_contents)
+            self.assertMsgId("Translatable literal #8b-singular", po_contents)
             self.assertTrue("Translatable literal #8b-plural" in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #3"' in po_contents)
-            self.assertTrue("Translatable literal #8c-singular" in po_contents)
+            self.assertMsgId("Translatable literal #8c-singular", po_contents)
             self.assertTrue("Translatable literal #8c-plural" in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
-            self.assertTrue("Translatable literal #8d" in po_contents)
+            self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
     def test_context_in_single_quotes(self):
         os.chdir(self.test_dir)
@@ -170,6 +170,42 @@ class BasicExtractorTests(ExtractorTests):
             # {% blocktrans %}
             self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+
+    def test_template_comments(self):
+        """Template comment tags on the same line of other constructs (#19552)"""
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, extensions=['thtml'], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+
+            self.assertMsgId("Translatable literal #9a", po_contents)
+            self.assertFalse('ignored comment #1' in po_contents)
+
+            self.assertFalse('Translators: ignored i18n comment #1' in po_contents)
+            self.assertMsgId("Translatable literal #9b", po_contents)
+
+            self.assertFalse('ignored 18n comment #2' in po_contents)
+            self.assertFalse('ignored comment #2' in po_contents)
+            self.assertMsgId("Translatable literal #9c", po_contents)
+
+            self.assertFalse('ignored comment #3' in po_contents)
+            self.assertFalse('ignored 18n comment #3' in po_contents)
+            self.assertMsgId("Translatable literal #9d", po_contents)
+
+            self.assertFalse('ignored comment #4' in po_contents)
+            self.assertMsgId("Translatable literal #9e", po_contents)
+            self.assertFalse('ignored comment #5' in po_contents)
+
+            self.assertFalse('ignored 18n comment #4' in po_contents)
+            self.assertMsgId("Translatable literal #9f", po_contents)
+            #self.assertTrue('#. Translators: valid 18n comment #5' in po_contents)
+
+            self.assertMsgId("Translatable literal #9g", po_contents)
+            #self.assertTrue('#. Translators: valid 18n comment #6' in po_contents)
+            self.assertMsgId("Translatable literal #9h", po_contents)
+            #self.assertTrue('#. Translators: valid 18n comment #7' in po_contents)
+            self.assertMsgId("Translatable literal #9i", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):

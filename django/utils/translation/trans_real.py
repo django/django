@@ -41,6 +41,11 @@ accept_language_re = re.compile(r'''
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
+
+class IgnoredI18nComment(Exception):
+    pass
+
+
 def to_locale(language, to_lower=False):
     """
     Turns a language name (en-us) into a locale name (en_US). If 'to_lower' is
@@ -468,6 +473,9 @@ def templatize(src, origin=None):
     plural = []
     incomment = False
     comment = []
+    lineno_comment_map = {}
+    comment_lineno_cache = None
+
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
@@ -530,6 +538,26 @@ def templatize(src, origin=None):
                 else:
                     singular.append(contents)
         else:
+
+            # To handle comment tokens (`{# ... #}`) and literals on the same line:
+            cur_lineno = t.lineno + t.contents.count('\n')
+            if (comment_lineno_cache is not None and
+                    comment_lineno_cache == cur_lineno and
+                    t.token_type != TOKEN_COMMENT):
+                for c in lineno_comment_map[comment_lineno_cache]:
+                    filemsg = ''
+                    if origin:
+                        filemsg = 'file %s, ' % origin
+                    #print("Warning: Translator-targeted comment '%s' "
+                    #    "(%sline %d) ignored. That kind of comments should be "
+                    #    "on a line on their own." % (c, filemsg,
+                    #        comment_lineno_cache))
+                    print("Warning: Translator-targeted comment '%s' "
+                        "(%sline %d) ignored. That kind of comments should be "
+                        "on a line on their own." % (c, filemsg,
+                            comment_lineno_cache))
+                    comment_lineno_cache = None
+
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
@@ -586,7 +614,10 @@ def templatize(src, origin=None):
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(' # %s' % t.contents)
+                if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                    lineno_comment_map.setdefault(t.lineno,
+                                                  []).append(t.contents)
+                    comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
     return force_str(out.getvalue())
