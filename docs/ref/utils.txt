@@ -203,7 +203,7 @@ The functions defined in this module share the following properties:
              pass
 
     When this function is called with multiple arguments, each middleware
-    takes same arguments.
+    takes the same arguments.
 
 ``django.utils.encoding``
 =========================
