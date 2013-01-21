@@ -283,6 +283,13 @@ class DeleteViewTests(TestCase):
         self.assertRedirects(res, 'http://testserver/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
+    def test_delete_with_redirect_access_object(self):
+        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+        res = self.client.post('/edit/author/%d/delete/redirect-extra/' % a.pk)
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, 'http://testserver/edit/authors/create/?slug=randall-munroe')
+        self.assertQuerysetEqual(Author.objects.all(), [])
+
     def test_delete_with_special_properties(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.get('/edit/author/%d/delete/special/' % a.pk)
@@ -295,6 +302,13 @@ class DeleteViewTests(TestCase):
         res = self.client.post('/edit/author/%d/delete/special/' % a.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertQuerysetEqual(Author.objects.all(), [])
+
+    def test_delete_with_success_url_extra(self):
+        a = Author.objects.create(**{'name': 'Herman Melville', 'slug': 'herman-melville'})
+        res = self.client.post('/edit/author/%d/delete/special/' % a.pk)
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res['Location'], 'http://testserver/stuck/in/a/whale/factory/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_without_redirect(self):

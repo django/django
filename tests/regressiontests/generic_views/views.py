@@ -136,7 +136,7 @@ class SpecializedAuthorUpdate(generic.UpdateView):
     context_object_name = 'thingy'
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id,])
+        return reverse('author_detail', args=[self.object.id])
 
 
 class NaiveAuthorDelete(generic.DeleteView):
@@ -154,6 +154,8 @@ class SpecializedAuthorDelete(generic.DeleteView):
     context_object_name = 'thingy'
 
     def get_success_url(self):
+        if self.object.name == 'Herman Melville':
+            return '/stuck/in/a/whale/factory/'
         return reverse('authors_list')
 
 
