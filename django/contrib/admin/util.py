@@ -88,8 +88,7 @@ def flatten_fieldsets(fieldsets):
     field_names = []
     for name, opts in fieldsets:
         for field in opts['fields']:
-            # type checking feels dirty, but it seems like the best way here
-            if type(field) == tuple:
+            if isinstance(field, (list, tuple)):
                 field_names.extend(field)
             else:
                 field_names.append(field)
