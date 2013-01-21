@@ -314,7 +314,7 @@ class UtilTests(unittest.TestCase):
 
         fieldsets = (
             (None, {
-                'fields': ['url', 'title', ['content', 'sites'])
+                'fields': ('url', 'title', ['content', 'sites'])
             }),
         )
         self.assertEqual(flatten_fieldsets(fieldsets), ['url', 'title', 'content', 'sites'])
