@@ -154,6 +154,10 @@ class AdminEmailHandlerTest(TestCase):
             ][0]
         return admin_email_handler
 
+    def test_fail_silently(self):
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        self.assertTrue(admin_email_handler.connection().fail_silently)
+
     @override_settings(
             ADMINS=(('whatever admin', 'admin@example.com'),),
             EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
