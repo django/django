@@ -8,16 +8,21 @@ import warnings
 
 from django.conf import settings
 from django.core import mail
+from django.db import transaction
 from django.http import HttpRequest
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
-from django.test import TestCase, RequestFactory
+from django.middleware.transaction import TransactionMiddleware
+from django.test import TransactionTestCase, TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.six.moves import xrange
+from django.utils.timezone import now
+
+from .models import Band
 
 
 class CommonMiddlewareTest(TestCase):
@@ -662,3 +667,48 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
+
+
+class TransactionMiddlewareTest(TransactionTestCase):
+    """
+    Test the transaction middleware.
+    """
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        self.request.path = self.request.path_info = "/"
+        self.response = HttpResponse()
+        self.response.status_code = 200
+
+    def test_request(self):
+        TransactionMiddleware().process_request(self.request)
+        self.assertTrue(transaction.is_managed())
+
+    def test_managed_response(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        Band.objects.create(name='The Beatles', bio='Test bio',
+                            sign_date=now().date())
+        self.assertTrue(transaction.is_dirty())
+        TransactionMiddleware().process_response(self.request, self.response)
+        self.assertFalse(transaction.is_dirty())
+        self.assertEqual(Band.objects.count(), 1)
+
+    def test_unmanaged_response(self):
+        transaction.managed(False)
+        TransactionMiddleware().process_response(self.request, self.response)
+        self.assertFalse(transaction.is_managed())
+        self.assertFalse(transaction.is_dirty())
+
+    def test_exception(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        Band.objects.create(name='The Beatles', bio='Test bio',
+                            sign_date=now().date())
+        self.assertTrue(transaction.is_dirty())
+        TransactionMiddleware().process_exception(self.request, None)
+        self.assertEqual(Band.objects.count(), 0)
+        self.assertFalse(transaction.is_dirty())
