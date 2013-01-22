@@ -109,14 +109,12 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
-        shutil.copyfile('./templates/template_with_error.tpl', './templates/template_with_error.html')
-        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, verbosity=0)
+        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
-            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+            management.call_command('makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
         self.assertRegexpMatches(str(context_manager.exception),
-                r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.html, line 3\)'
+                r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
             )
-        os.remove('./templates/template_with_error.html')
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
 
