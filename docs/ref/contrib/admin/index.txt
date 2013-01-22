@@ -1520,8 +1520,8 @@ The ``InlineModelAdmin`` class adds:
 .. attribute:: InlineModelAdmin.form
 
     The value for ``form`` defaults to ``ModelForm``. This is what is passed
-    through to ``inlineformset_factory`` when creating the formset for this
-    inline.
+    through to :func:`~django.forms.models.inlineformset_factory` when
+    creating the formset for this inline.
 
 .. attribute:: InlineModelAdmin.extra
 
