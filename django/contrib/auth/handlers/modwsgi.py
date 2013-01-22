@@ -18,7 +18,7 @@ def check_password(environ, username, password):
 
     try:
         try:
-            user = UserModel.objects.get_by_natural_key(username)
+            user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return None
         if not user.is_active:
@@ -37,7 +37,7 @@ def groups_for_user(environ, username):
 
     try:
         try:
-            user = UserModel.objects.get_by_natural_key(username)
+            user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return []
         try:

@@ -137,6 +137,6 @@ class IsActiveTestCase(TestCase):
         user.is_active = False
         # there should be no problem saving - but the attribute is not saved
         user.save()
-        user_fetched = UserModel.objects.get(pk=user.pk)
+        user_fetched = UserModel._default_manager.get(pk=user.pk)
         # the attribute is always true for newly retrieved instance
         self.assertEqual(user_fetched.is_active, True)

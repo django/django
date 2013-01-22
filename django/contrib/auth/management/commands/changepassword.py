@@ -33,7 +33,7 @@ class Command(BaseCommand):
         UserModel = get_user_model()
 
         try:
-            u = UserModel.objects.using(options.get('database')).get(**{
+            u = UserModel._default_manager.using(options.get('database')).get(**{
                     UserModel.USERNAME_FIELD: username
                 })
         except UserModel.DoesNotExist:
