@@ -2,8 +2,6 @@ from django.db import models
 
 class ForeignKeyEx(models.ForeignKey):
 
-    include_related = [] 
-
     def __init__(self, *args, **kwargs):
         self.include_related = kwargs.pop('include_related', [])
         super(ForeignKeyEx, self).__init__(*args, **kwargs)

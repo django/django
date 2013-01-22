@@ -7,7 +7,6 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.query_utils import Q, QueryWrapper
 from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_text
 from django.utils import six

@@ -109,7 +109,7 @@ class MultiColumnFKTests(TestCase):
         # Creating a to valid memberships
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.bob.id, group_id=self.cia.id)
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.jim.id, group_id=self.cia.id)
-        
+
         # Creating an invalid membership
         Membership.objects.create(membership_country_id=self.soviet_union.id, person_id=self.george.id, group_id=self.cia.id)
 
@@ -128,7 +128,7 @@ class MultiColumnFKTests(TestCase):
         # Creating a to valid memberships
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.bob.id, group_id=self.cia.id, date_joined=timemark - timedelta)
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.jim.id, group_id=self.cia.id, date_joined=timemark + timedelta)
-        
+
         # Creating an invalid membership
         Membership.objects.create(membership_country_id=self.soviet_union.id, person_id=self.george.id, group_id=self.cia.id, date_joined=timemark + timedelta)
 
@@ -142,7 +142,7 @@ class MultiColumnFKTests(TestCase):
     def test_forward_in_lookup_filters_correctly(self):
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.bob.id, group_id=self.cia.id)
         Membership.objects.create(membership_country_id=self.usa.id, person_id=self.jim.id, group_id=self.cia.id)
-        
+
         # Creating an invalid membership
         Membership.objects.create(membership_country_id=self.soviet_union.id, person_id=self.george.id, group_id=self.cia.id)
 

@@ -1462,7 +1462,7 @@ class Query(object):
             join = self.alias_map[joins[-1]]
             lhs_cols, rhs_cols = zip(*[(lhs_col, rhs_col) for lhs_col, rhs_col in join.join_cols])
             if len(joins) == 1 or not info.direct or set(target_cols) != set(rhs_cols):
-                break 
+                break
             target_cols = [lhs_cols[rhs_cols.index(col)] for col in target_cols]
             self.unref_alias(joins.pop())
         return target_cols, joins[-1], joins

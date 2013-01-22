@@ -9,7 +9,6 @@ import datetime
 from itertools import repeat
 
 from django.utils import tree
-from django.db import connections
 from django.db.models.fields import Field
 from django.db.models.query_utils import QueryWrapper
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
