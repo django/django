@@ -13,7 +13,7 @@ class ModelBackend(object):
     def authenticate(self, username=None, password=None):
         try:
             UserModel = get_user_model()
-            user = UserModel.objects.get_by_natural_key(username)
+            user = UserModel._default_manager.get_by_natural_key(username)
             if user.check_password(password):
                 return user
         except UserModel.DoesNotExist:
@@ -64,7 +64,7 @@ class ModelBackend(object):
     def get_user(self, user_id):
         try:
             UserModel = get_user_model()
-            return UserModel.objects.get(pk=user_id)
+            return UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
 

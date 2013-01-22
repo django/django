@@ -42,7 +42,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         with custom user installed
         """
 
-        CustomUser.objects.create_user('test@example.com', '1990-01-01', 'test')
+        CustomUser._default_manager.create_user('test@example.com', '1990-01-01', 'test')
 
         # User not in database
         self.assertTrue(check_password({}, 'unknown', '') is None)

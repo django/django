@@ -95,7 +95,7 @@ class Command(BaseCommand):
                         username = None
                         continue
                     try:
-                        self.UserModel.objects.db_manager(database).get_by_natural_key(username)
+                        self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
                     except self.UserModel.DoesNotExist:
                         pass
                     else:
@@ -134,6 +134,6 @@ class Command(BaseCommand):
 
         user_data[self.UserModel.USERNAME_FIELD] = username
         user_data['password'] = password
-        self.UserModel.objects.db_manager(database).create_superuser(**user_data)
+        self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
         if verbosity >= 1:
             self.stdout.write("Superuser created successfully.")
