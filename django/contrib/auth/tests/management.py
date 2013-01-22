@@ -125,7 +125,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email="joe@somewhere.org",
             stdout=new_io
         )
-        u = User.objects.get(username="joe+admin@somewhere.org")
+        u = User._default_manager.get(username="joe+admin@somewhere.org")
         self.assertEqual(u.email, 'joe@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
@@ -145,7 +145,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
-        u = CustomUser.objects.get(email="joe@somewhere.org")
+        u = CustomUser._default_manager.get(email="joe@somewhere.org")
         self.assertEqual(u.date_of_birth, date(1976, 4, 1))
 
         # created password should be unusable
@@ -167,7 +167,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 skip_validation=True
             )
 
-        self.assertEqual(CustomUser.objects.count(), 0)
+        self.assertEqual(CustomUser._default_manager.count(), 0)
 
 
 class PermissionDuplicationTestCase(TestCase):

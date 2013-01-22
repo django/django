@@ -42,7 +42,7 @@ class CustomUser(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField()
 
-    objects = CustomUserManager()
+    custom_objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['date_of_birth']
@@ -88,7 +88,7 @@ class CustomUser(AbstractBaseUser):
 class ExtensionUser(AbstractUser):
     date_of_birth = models.DateField()
 
-    objects = UserManager()
+    custom_objects = UserManager()
 
     REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
 
@@ -112,7 +112,7 @@ class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     date_of_birth = models.DateField()
 
-    objects = CustomPermissionsUserManager()
+    custom_objects = CustomPermissionsUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['date_of_birth']
@@ -136,7 +136,7 @@ class IsActiveTestUser1(AbstractBaseUser):
     """
     username = models.CharField(max_length=30, unique=True)
 
-    objects = BaseUserManager()
+    custom_objects = BaseUserManager()
 
     USERNAME_FIELD = 'username'
 

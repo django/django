@@ -89,7 +89,7 @@ class UserCreationForm(forms.ModelForm):
         # but it sets a nicer error message than the ORM. See #13147.
         username = self.cleaned_data["username"]
         try:
-            User.objects.get(username=username)
+            User._default_manager.get(username=username)
         except User.DoesNotExist:
             return username
         raise forms.ValidationError(self.error_messages['duplicate_username'])
@@ -217,7 +217,7 @@ class PasswordResetForm(forms.Form):
         """
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        self.users_cache = UserModel.objects.filter(email__iexact=email)
+        self.users_cache = UserModel._default_manager.filter(email__iexact=email)
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
         if not any(user.is_active for user in self.users_cache):
