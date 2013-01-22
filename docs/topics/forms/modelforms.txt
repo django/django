@@ -550,7 +550,7 @@ ModelForm factory function
 --------------------------
 
 You can create forms from a given model using the standalone function
-:class:`~django.forms.models.modelform_factory`, instead of using a class
+:func:`~django.forms.models.modelform_factory`, instead of using a class
 definition. This may be more convenient if you do not have many customizations
 to make::
 
@@ -857,6 +857,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 
 .. highlight:: python
 
+.. _inline-formsets:
+
 Inline formsets
 ===============
 
@@ -881,7 +883,7 @@ a particular author, you could do this::
 
 .. note::
 
-    ``inlineformset_factory`` uses
+    :func:`~django.forms.models.inlineformset_factory` uses
     :func:`~django.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
@@ -901,7 +903,8 @@ the following model::
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
+To resolve this, you can use ``fk_name`` to
+:func:`~django.forms.models.inlineformset_factory`::
 
     >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
