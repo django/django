@@ -650,6 +650,19 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Specifying widgets to use in the form with ``widgets``
+------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``widgets`` parameter, you can specify a dictionary of values to
+customize the ``ModelForm``'s widget class for a particular field. This
+works the same way as the ``widgets`` dictionary on the inner ``Meta``
+class of a ``ModelForm`` works::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
+
 Providing initial values
 ------------------------
 
@@ -930,3 +943,13 @@ of a model. Here's how you can do that::
         })
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
+
+Specifying widgets to use in the inline form
+--------------------------------------------
+
+.. versionadded:: 1.6
+
+``inlineformset_factory`` uses ``modelformset_factory`` and passes most
+of its arguments to ``modelformset_factory``. This means you can use
+the ``widgets`` parameter in much the same way as passing it to
+``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.
