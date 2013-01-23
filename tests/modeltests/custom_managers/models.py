@@ -63,3 +63,24 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Bug #19652
+class ObjectQuerySet(models.query.QuerySet):
+    pass
+
+class ObjectManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return ObjectQuerySet(self.model, using=self._db)
+
+
+class RelatedObject(models.Model):
+    pass
+
+
+class Object(models.Model):
+    related = models.ForeignKey(RelatedObject, related_name='objs')
+
+    objects = ObjectManager()

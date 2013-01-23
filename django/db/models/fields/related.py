@@ -498,7 +498,8 @@ class ForeignRelatedObjectsDescriptor(object):
                     db = self._db or router.db_for_read(self.model, instance=self.instance)
                     qs = super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
                     if getattr(self.instance, attname) is None:
-                        return qs.none()
+                        # We don't want to use qs.none() here, see #19652
+                        return qs.filter(pk__in=[])
                     qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
                     return qs
 

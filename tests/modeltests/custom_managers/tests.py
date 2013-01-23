@@ -3,7 +3,8 @@ from __future__ import absolute_import
 from django.test import TestCase
 from django.utils import six
 
-from .models import Person, Book, Car, PersonManager, PublishedBookManager
+from .models import (ObjectQuerySet, RelatedObject, Person, Book, Car, PersonManager,
+    PublishedBookManager)
 
 
 class CustomManagerTests(TestCase):
@@ -72,3 +73,13 @@ class CustomManagerTests(TestCase):
             ],
             lambda c: c.name
         )
+
+    def test_related_manager(self):
+        """
+        Make sure un-saved object's related managers always return an instance
+        of the same class the manager's `get_query_set` returns. Refs #19652.
+        """
+        rel_qs = RelatedObject().objs.all()
+        self.assertIsInstance(rel_qs, ObjectQuerySet)
+        with self.assertNumQueries(0):
+            self.assertFalse(rel_qs.exists())
