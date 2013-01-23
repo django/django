@@ -359,6 +359,78 @@ class NoLocationExtractorTests(ExtractorTests):
             self.assertTrue('#: templates/test.html:55' in po_contents)
 
 
+class NoPreviousExtractorTests(ExtractorTests):
+
+    def setUp(self):
+        super(NoPreviousExtractorTests, self).setUp()
+        # Write original file
+        self.TEST_PY_FILE = 'test_previous.py'
+        self.write_file()
+        # Generate starting PO file for tests
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        # Change source file
+        self.change_file()
+        # Make message translated
+        self.translate_message()
+
+    def tearDown(self):
+        super(NoPreviousExtractorTests, self).tearDown()
+        os.chdir(self.test_dir)
+        try:
+            os.unlink(self.TEST_PY_FILE)
+        except OSError:
+            pass
+
+    def translate_message(self):
+        po_contents = ''
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            po_contents = po_contents.replace(
+                'msgid "Default message"\nmsgstr ""',
+                'msgid "Default message"\nmsgstr "Translated"'
+            )
+        with open(self.PO_FILE, 'w') as fw:
+            fw.write(po_contents.encode('utf-8'))
+
+    def write_file(self, text='Default message'):
+        os.chdir(self.test_dir)
+        # Write test python file
+        with open(self.TEST_PY_FILE, 'w') as fp:
+            fp.write('from django.utils.translation import ugettext\n')
+            fp.write('\n')
+            fp.write('my_string = ugettext("%s")\n' % text)
+
+    def change_file(self):
+        self.write_file('Default second message')
+
+    def test_no_previous_disabled_by_default(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertTrue('| msgid "Default message"' in po_contents)
+
+    def test_no_previous_explicitly_disabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.change_file()
+        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+                                no_previous=False)
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertTrue('| msgid "Default message"' in po_contents)
+
+    def test_no_previous_enabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.change_file()
+        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+                                no_previous=True)
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertFalse('| msgid "Default message"' in po_contents)
+
+
 class KeepPotFileExtractorTests(ExtractorTests):
 
     POT_FILE='locale/django.pot'
