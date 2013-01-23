@@ -93,7 +93,7 @@ The following approach may be used to close files automatically::
 Closing files is especially important when accessing file fields in a loop
 over a large number of objects:: If files are not manually closed after
 accessing them, the risk of running out of file descriptors may arise. This
-may lead to the following error:
+may lead to the following error::
 
     IOError: [Errno 24] Too many open files
 
