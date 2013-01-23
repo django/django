@@ -716,6 +716,8 @@ form data *and* file data::
 Testing for multipart forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. method:: Form.is_multipart
+
 If you're writing reusable views or templates, you may not know ahead of time
 whether your form is a multipart form or not. The ``is_multipart()`` method
 tells you whether the form requires multipart encoding for submission::
