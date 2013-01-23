@@ -179,6 +179,8 @@ class Command(NoArgsCommand):
             default=False, help="Don't write '#: filename:line' lines."),
         make_option('--no-obsolete', action='store_true', dest='no_obsolete',
             default=False, help="Remove obsolete message strings."),
+        make_option('--no-previous', action='store_true', dest='no_previous',
+            default=False, help="Don't write '#| previous id' lines."),
         make_option('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging."),
     )
@@ -205,6 +207,7 @@ class Command(NoArgsCommand):
         self.wrap = '--no-wrap' if options.get('no_wrap') else ''
         self.location = '--no-location' if options.get('no_location') else ''
         self.no_obsolete = options.get('no_obsolete')
+        self.no_previous = options.get('no_previous')
         self.keep_pot = options.get('keep_pot')
 
         if self.domain not in ('django', 'djangojs'):
@@ -347,8 +350,9 @@ class Command(NoArgsCommand):
         if os.path.exists(pofile):
             with open(potfile, 'w') as fp:
                 fp.write(msgs)
-            msgs, errors, status = _popen('msgmerge %s %s -q "%s" "%s"' %
-                                            (self.wrap, self.location, pofile, potfile))
+            previous = '' if self.no_previous else '--previous'
+            msgs, errors, status = _popen('msgmerge %s %s %s -q "%s" "%s"' %
+                                            (previous, self.wrap, self.location, pofile, potfile))
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
