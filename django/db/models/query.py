@@ -755,13 +755,6 @@ class QuerySet(object):
             clone._prefetch_related_lookups.extend(lookups)
         return clone
 
-    def dup_select_related(self, other):
-        """
-        Copies the related selection status from the QuerySet 'other' to the
-        current QuerySet.
-        """
-        self.query.select_related = other.query.select_related
-
     def annotate(self, *args, **kwargs):
         """
         Return a query set in which the returned objects have been annotated
