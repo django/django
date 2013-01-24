@@ -199,13 +199,17 @@ class BasicExtractorTests(ExtractorTests):
 
             self.assertFalse('ignored 18n comment #4' in po_contents)
             self.assertMsgId("Translatable literal #9f", po_contents)
-            #self.assertTrue('#. Translators: valid 18n comment #5' in po_contents)
+            self.assertRegexpMatches(po_contents, "#\..+Translators\: valid i18n comment #5$")
 
             self.assertMsgId("Translatable literal #9g", po_contents)
-            #self.assertTrue('#. Translators: valid 18n comment #6' in po_contents)
+            self.assertTrue('#. Translators: valid i18n comment #6' in po_contents)
             self.assertMsgId("Translatable literal #9h", po_contents)
-            #self.assertTrue('#. Translators: valid 18n comment #7' in po_contents)
+            self.assertTrue('#. Translators: valid i18n comment #7' in po_contents)
             self.assertMsgId("Translatable literal #9i", po_contents)
+
+            self.assertRegexpMatches(po_contents, "#\..+Translators\: valid i18n comment #8")
+            self.assertRegexpMatches(po_contents, "#\..+Translators\: valid i18n comment #9")
+            self.assertMsgId("Translatable literal #9j", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):

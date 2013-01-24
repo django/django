@@ -9,3 +9,5 @@
 {% trans "Translatable literal #9g" %}{# Translators: valid i18n comment #6 #}
 {# ignored comment #6 #}{% trans "Translatable literal #9h" %}{# Translators: valid i18n comment #7 #}
 {% trans "Translatable literal #9i" %}
+{# Translators: valid i18n comment #8 #}{# Translators: valid i18n comment #9 #}
+{% trans "Translatable literal #9j" %}

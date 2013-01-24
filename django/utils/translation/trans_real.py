@@ -42,10 +42,6 @@ accept_language_re = re.compile(r'''
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 
-class IgnoredI18nComment(Exception):
-    pass
-
-
 def to_locale(language, to_lower=False):
     """
     Turns a language name (en-us) into a locale name (en_US). If 'to_lower' is
@@ -537,26 +533,25 @@ def templatize(src, origin=None):
                     plural.append(contents)
                 else:
                     singular.append(contents)
-        else:
 
-            # To handle comment tokens (`{# ... #}`) and literals on the same line:
-            cur_lineno = t.lineno + t.contents.count('\n')
-            if (comment_lineno_cache is not None and
-                    comment_lineno_cache == cur_lineno and
-                    t.token_type != TOKEN_COMMENT):
-                for c in lineno_comment_map[comment_lineno_cache]:
-                    filemsg = ''
-                    if origin:
-                        filemsg = 'file %s, ' % origin
-                    #print("Warning: Translator-targeted comment '%s' "
-                    #    "(%sline %d) ignored. That kind of comments should be "
-                    #    "on a line on their own." % (c, filemsg,
-                    #        comment_lineno_cache))
-                    print("Warning: Translator-targeted comment '%s' "
-                        "(%sline %d) ignored. That kind of comments should be "
-                        "on a line on their own." % (c, filemsg,
-                            comment_lineno_cache))
-                    comment_lineno_cache = None
+        else:
+            # Handle comment tokens (`{# ... #}`) plus other constructs on
+            # the same line:
+            if comment_lineno_cache is not None:
+                cur_lineno = t.lineno + t.contents.count('\n')
+                if comment_lineno_cache == cur_lineno:
+                    if t.token_type != TOKEN_COMMENT:
+                        for c in lineno_comment_map[comment_lineno_cache]:
+                            filemsg = ''
+                            if origin:
+                                filemsg = 'file %s, ' % origin
+                            print("Warning: Translator-targeted comment '%s' "
+                                "(%sline %d) ignored. That kind of comments should be "
+                                "the located last on their lines." % (c, filemsg,
+                                    comment_lineno_cache))
+                else:
+                    out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
+                comment_lineno_cache = None
 
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
