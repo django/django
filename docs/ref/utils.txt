@@ -529,7 +529,7 @@ escaping HTML.
 
     .. code-block:: python
 
-        format_html(u"%{0} <b>{1}</b> {2}",
+        format_html(u"{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
