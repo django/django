@@ -411,7 +411,7 @@ span.clearable-file-input label {
     display: block;
 }
 
-ul.timelist, .timelist li {
+.clockbox ul.timelist, .clockbox .timelist li {
     list-style-type: none;
     margin: 0;
     padding: 0;
