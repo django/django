@@ -715,7 +715,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         if self.instance.pk:
             qs = queryset.filter(**{self.fk.name: self.instance})
         else:
-            qs = queryset.none()
+            qs = queryset.filter(pk__in=[])
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                                                 queryset=qs, **kwargs)
 
