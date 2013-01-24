@@ -58,12 +58,13 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
-    mimetype, encoding = mimetypes.guess_type(fullpath)
-    mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
-    response = CompatibleStreamingHttpResponse(open(fullpath, 'rb'), content_type=mimetype)
+    content_type, encoding = mimetypes.guess_type(fullpath)
+    content_type = content_type or 'application/octet-stream'
+    response = CompatibleStreamingHttpResponse(open(fullpath, 'rb'),
+                                               content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
