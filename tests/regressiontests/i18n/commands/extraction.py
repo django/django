@@ -116,7 +116,7 @@ class BasicExtractorTests(ExtractorTests):
                 r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
             )
         # Check that the temporary file was cleaned up
-        self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
+        self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
     def test_extraction_warning(self):
         os.chdir(self.test_dir)
@@ -139,23 +139,23 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = force_text(fp.read())
             # {% trans %}
             self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
-            self.assertTrue("Translatable literal #7a" in po_contents)
+            self.assertMsgId("Translatable literal #7a", po_contents)
             self.assertTrue('msgctxt "Special trans context #2"' in po_contents)
-            self.assertTrue("Translatable literal #7b" in po_contents)
+            self.assertMsgId("Translatable literal #7b", po_contents)
             self.assertTrue('msgctxt "Special trans context #3"' in po_contents)
-            self.assertTrue("Translatable literal #7c" in po_contents)
+            self.assertMsgId("Translatable literal #7c", po_contents)
 
             # {% blocktrans %}
             self.assertTrue('msgctxt "Special blocktrans context #1"' in po_contents)
-            self.assertTrue("Translatable literal #8a" in po_contents)
+            self.assertMsgId("Translatable literal #8a", po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #2"' in po_contents)
-            self.assertTrue("Translatable literal #8b-singular" in po_contents)
+            self.assertMsgId("Translatable literal #8b-singular", po_contents)
             self.assertTrue("Translatable literal #8b-plural" in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #3"' in po_contents)
-            self.assertTrue("Translatable literal #8c-singular" in po_contents)
+            self.assertMsgId("Translatable literal #8c-singular", po_contents)
             self.assertTrue("Translatable literal #8c-plural" in po_contents)
             self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
-            self.assertTrue("Translatable literal #8d" in po_contents)
+            self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
     def test_context_in_single_quotes(self):
         os.chdir(self.test_dir)
