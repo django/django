@@ -1430,13 +1430,15 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"
-        args = ['startproject', '7testproject']
-        testproject_dir = os.path.join(test_dir, '7testproject')
-        self.addCleanup(shutil.rmtree, testproject_dir, True)
+        for bad_name in ('7testproject', '../testproject'):
+            args = ['startproject', bad_name]
+            testproject_dir = os.path.join(test_dir, bad_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
-        self.assertOutput(err, "Error: '7testproject' is not a valid project name. Please make sure the name begins with a letter or underscore.")
-        self.assertFalse(os.path.exists(testproject_dir))
+            out, err = self.run_django_admin(args)
+            self.assertOutput(err, "Error: '%s' is not a valid project name. "
+                "Please make sure the name begins with a letter or underscore." % bad_name)
+            self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):
         "Make sure the startproject management command creates a project in a specific directory"

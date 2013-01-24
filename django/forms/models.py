@@ -682,14 +682,15 @@ class BaseModelFormSet(BaseFormSet):
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
-                         formset=BaseModelFormSet,
-                         extra=1, can_delete=False, can_order=False,
-                         max_num=None, fields=None, exclude=None):
+                         formset=BaseModelFormSet, extra=1, can_delete=False,
+                         can_order=False, max_num=None, fields=None,
+                         exclude=None, widgets=None):
     """
     Returns a FormSet class for the given Django model class.
     """
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
-                             formfield_callback=formfield_callback)
+                             formfield_callback=formfield_callback,
+                             widgets=widgets)
     FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
                               can_order=can_order, can_delete=can_delete)
     FormSet.model = model
@@ -827,7 +828,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None,
                           extra=3, can_order=False, can_delete=True, max_num=None,
-                          formfield_callback=None):
+                          formfield_callback=None, widgets=None):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 
@@ -848,6 +849,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'fields': fields,
         'exclude': exclude,
         'max_num': max_num,
+        'widgets': widgets,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk

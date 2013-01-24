@@ -116,7 +116,7 @@ class BasicExtractorTests(ExtractorTests):
                 r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
             )
         # Check that the temporary file was cleaned up
-        self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
+        self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
     def test_extraction_warning(self):
         os.chdir(self.test_dir)

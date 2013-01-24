@@ -197,6 +197,14 @@ context variable ``form``. Here's a simple example template::
 The form only outputs its own fields; it is up to you to provide the surrounding
 ``<form>`` tags and the submit button.
 
+If your form includes uploaded files, be sure to include
+``enctype="multipart/form-data"`` in the ``form`` element. If you wish to write
+a generic template that will work whether or not the form has files, you can
+use the :meth:`~django.forms.Form.is_multipart` attribute on the form::
+
+    <form action="/contact/" method="post"
+        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+
 .. admonition:: Forms and Cross Site Request Forgery protection
 
    Django ships with an easy-to-use :doc:`protection against Cross Site Request

@@ -550,7 +550,7 @@ ModelForm factory function
 --------------------------
 
 You can create forms from a given model using the standalone function
-:class:`~django.forms.models.modelform_factory`, instead of using a class
+:func:`~django.forms.models.modelform_factory`, instead of using a class
 definition. This may be more convenient if you do not have many customizations
 to make::
 
@@ -649,6 +649,19 @@ Alternatively, you can take an "opt-out" approach, specifying which fields to
 exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
+
+Specifying widgets to use in the form with ``widgets``
+------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``widgets`` parameter, you can specify a dictionary of values to
+customize the ``ModelForm``'s widget class for a particular field. This
+works the same way as the ``widgets`` dictionary on the inner ``Meta``
+class of a ``ModelForm`` works::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
 
 Providing initial values
 ------------------------
@@ -857,6 +870,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 
 .. highlight:: python
 
+.. _inline-formsets:
+
 Inline formsets
 ===============
 
@@ -881,7 +896,7 @@ a particular author, you could do this::
 
 .. note::
 
-    ``inlineformset_factory`` uses
+    :func:`~django.forms.models.inlineformset_factory` uses
     :func:`~django.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
@@ -901,7 +916,8 @@ the following model::
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
+To resolve this, you can use ``fk_name`` to
+:func:`~django.forms.models.inlineformset_factory`::
 
     >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
@@ -927,3 +943,13 @@ of a model. Here's how you can do that::
         })
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
+
+Specifying widgets to use in the inline form
+--------------------------------------------
+
+.. versionadded:: 1.6
+
+``inlineformset_factory`` uses ``modelformset_factory`` and passes most
+of its arguments to ``modelformset_factory``. This means you can use
+the ``widgets`` parameter in much the same way as passing it to
+``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.
