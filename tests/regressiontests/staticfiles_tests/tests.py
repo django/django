@@ -585,8 +585,10 @@ class TestErrorCachedStorage(BaseStaticFilesTestCase, TestCase):
         Test that post_processing raise a ValueError when file is missing.
         """
         sys.stderr, old_stderr = six.StringIO(), sys.stderr
-        self.assertRaises(ValueError, call_command, 'collectstatic',
-                          interactive=False, verbosity=0)
+        with self.assertRaises(ValueError) as cm:
+            call_command('collectstatic', interactive=False, verbosity=0)
+        self.assertIn("The file 'img/does_not_exists.png' could not be found",
+                      cm.exception.args[0])
         self.assertIn('FAIL', sys.stderr.getvalue())
         sys.stderr = old_stderr
 
