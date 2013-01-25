@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import select_related_descend
+from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
         GET_ITERATOR_CHUNK_SIZE, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet
@@ -30,7 +30,7 @@ class SQLCompiler(object):
         # cleaned. We are not using a clone() of the query here.
         """
         if not self.query.tables:
-            self.query.join((None, self.query.model._meta.db_table, None, None))
+            self.query.join((None, self.query.model._meta.db_table, None))
         if (not self.query.select and self.query.default_cols and not
                 self.query.included_inherited_models):
             self.query.setup_inherited_models()
@@ -302,9 +302,10 @@ class SQLCompiler(object):
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            field, col, alias, _, _ = self._setup_joins(parts, opts, None)
-            col, alias = self._final_join_removal(col, alias)
-            result.append("%s.%s" % (qn(alias), qn2(col)))
+            field, cols, alias, _, _ = self._setup_joins(parts, opts, None)
+            cols, alias = self._final_join_removal(cols, alias)
+            for col in cols:
+                result.append("%s.%s" % (qn(alias), qn2(col)))
         return result
 
 
@@ -375,15 +376,16 @@ class SQLCompiler(object):
             elif get_order_dir(field)[0] not in self.query.extra_select:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
-                for table, col, order in self.find_ordering_name(field,
+                for table, cols, order in self.find_ordering_name(field,
                         self.query.model._meta, default_order=asc):
-                    if (table, col) not in processed_pairs:
-                        elt = '%s.%s' % (qn(table), qn2(col))
-                        processed_pairs.add((table, col))
-                        if distinct and elt not in select_aliases:
-                            ordering_aliases.append(elt)
-                        result.append('%s %s' % (elt, order))
-                        group_by.append((elt, []))
+                    for col in cols:
+                        if (table, col) not in processed_pairs:
+                            elt = '%s.%s' % (qn(table), qn2(col))
+                            processed_pairs.add((table, col))
+                            if distinct and elt not in select_aliases:
+                                ordering_aliases.append(elt)
+                            result.append('%s %s' % (elt, order))
+                            group_by.append((elt, []))
             else:
                 elt = qn2(col)
                 if distinct and col not in select_aliases:
@@ -402,7 +404,7 @@ class SQLCompiler(object):
         """
         name, order = get_order_dir(name, default_order)
         pieces = name.split(LOOKUP_SEP)
-        field, col, alias, joins, opts = self._setup_joins(pieces, opts, alias)
+        field, cols, alias, joins, opts = self._setup_joins(pieces, opts, alias)
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
@@ -420,8 +422,8 @@ class SQLCompiler(object):
                 results.extend(self.find_ordering_name(item, opts, alias,
                         order, already_seen))
             return results
-        col, alias = self._final_join_removal(col, alias)
-        return [(alias, col, order)]
+        cols, alias = self._final_join_removal(cols, alias)
+        return [(alias, cols, order)]
 
     def _setup_joins(self, pieces, opts, alias):
         """
@@ -434,13 +436,13 @@ class SQLCompiler(object):
         """
         if not alias:
             alias = self.query.get_initial_alias()
-        field, target, opts, joins, _ = self.query.setup_joins(
+        field, targets, opts, joins, _ = self.query.setup_joins(
             pieces, opts, alias)
         # We will later on need to promote those joins that were added to the
         # query afresh above.
         joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
-        col = target.column
+        cols = [target.column for target in targets]
         if not field.rel:
             # To avoid inadvertent trimming of a necessary alias, use the
             # refcount to show that we are referencing a non-relation field on
@@ -451,9 +453,9 @@ class SQLCompiler(object):
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
         self.query.promote_joins(joins_to_promote)
-        return field, col, alias, joins, opts
+        return field, cols, alias, joins, opts
 
-    def _final_join_removal(self, col, alias):
+    def _final_join_removal(self, cols, alias):
         """
         A helper method for get_distinct and get_ordering. This method will
         trim extra not-needed joins from the tail of the join chain.
@@ -465,12 +467,14 @@ class SQLCompiler(object):
         if alias:
             while 1:
                 join = self.query.alias_map[alias]
-                if col != join.rhs_join_col:
+                lhs_cols, rhs_cols = zip(*[(lhs_col, rhs_col) for lhs_col, rhs_col in join.join_cols])
+                if set(cols) != set(rhs_cols):
                     break
+
+                cols = [lhs_cols[rhs_cols.index(col)] for col in cols]
                 self.query.unref_alias(alias)
                 alias = join.lhs_alias
-                col = join.lhs_join_col
-        return col, alias
+        return cols, alias
 
     def get_from_clause(self):
         """
@@ -492,7 +496,7 @@ class SQLCompiler(object):
             if not self.query.alias_refcount[alias]:
                 continue
             try:
-                name, alias, join_type, lhs, lhs_col, col, _, join_field = self.query.alias_map[alias]
+                name, alias, join_type, lhs, join_cols, _, join_field = self.query.alias_map[alias]
             except KeyError:
                 # Extra tables can end up in self.tables, but not in the
                 # alias_map if they aren't in a join. That's OK. We skip them.
@@ -505,9 +509,14 @@ class SQLCompiler(object):
                     from_params.extend(extra_params)
                 else:
                     extra_cond = ""
-                result.append('%s %s%s ON (%s.%s = %s.%s%s)' %
-                              (join_type, qn(name), alias_str, qn(lhs),
-                               qn2(lhs_col), qn(alias), qn2(col), extra_cond))
+                result.append('%s %s%s ON ('
+                        % (join_type, qn(name), alias_str))
+                for index, (lhs_col, rhs_col) in enumerate(join_cols):
+                    if index != 0:
+                        result.append(' AND ')
+                    result.append('%s.%s = %s.%s' %
+                    (qn(lhs), qn2(lhs_col), qn(alias), qn2(rhs_col)))
+                result.append('%s)' % extra_cond)
             else:
                 connector = not first and ', ' or ''
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
@@ -609,9 +618,8 @@ class SQLCompiler(object):
             table = f.rel.to._meta.db_table
             promote = nullable or f.null
             alias = self.query.join_parent_model(opts, model, root_alias, {})
-
-            alias = self.query.join((alias, table, f.column,
-                    f.rel.get_related_field().column),
+            join_cols = f.get_joining_columns()
+            alias = self.query.join((alias, table, join_cols),
                     promote=promote, join_field=f)
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
@@ -639,7 +647,7 @@ class SQLCompiler(object):
                 alias = self.query.join_parent_model(opts, f.rel.to, root_alias, {})
                 table = model._meta.db_table
                 alias = self.query.join(
-                    (alias, table, f.rel.get_related_field().column, f.column),
+                    (alias, table, f.get_joining_columns(reverse_join=True)),
                     promote=True, join_field=f
                 )
                 from_parent = (opts.model if issubclass(model, opts.model)
@@ -766,6 +774,22 @@ class SQLCompiler(object):
             # before going any further.
             return list(result)
         return result
+
+    def as_subquery_condition(self, alias, columns):
+        qn = self.quote_name_unless_alias
+        qn2 = self.connection.ops.quote_name
+        if len(columns) == 1:
+            sql, params = self.as_sql()
+            return '%s.%s IN (%s)' % (qn(alias), qn2(columns[0]), sql), params
+
+        for index, select_col in enumerate(self.query.select):
+            lhs = '%s.%s' % (qn(select_col.col[0]), qn2(select_col.col[1]))
+            rhs = '%s.%s' % (qn(alias), qn2(columns[index]))
+            self.query.where.add(
+                QueryWrapper('%s = %s' % (lhs, rhs), []), 'AND')
+
+        sql, params = self.as_sql()
+        return 'EXISTS (%s)' % sql, params
 
 
 class SQLInsertCompiler(SQLCompiler):

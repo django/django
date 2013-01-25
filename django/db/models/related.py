@@ -7,7 +7,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
 PathInfo = namedtuple('PathInfo',
-                      'from_field to_field from_opts to_opts join_field '
+                      'from_opts to_opts target_fields join_field '
                       'm2m direct')
 
 class RelatedObject(object):

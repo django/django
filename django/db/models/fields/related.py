@@ -7,7 +7,6 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.query_utils import QueryWrapper
 from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -92,7 +91,12 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 #HACK
-class RelatedField(object):
+class RelatedField(Field):
+    def db_type(self, connection):
+        '''By default related field will not have a column
+           as it relates columns to another table'''
+        return None
+
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
 
@@ -129,94 +133,6 @@ class RelatedField(object):
         if not cls._meta.abstract:
             self.contribute_to_related_class(other, self.related)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if hasattr(value, 'prepare'):
-            return value.prepare()
-        if hasattr(value, '_prepare'):
-            return value._prepare()
-        # FIXME: lt and gt are explicitly allowed to make
-        # get_(next/prev)_by_date work; other lookups are not allowed since that
-        # gets messy pretty quick. This is a good candidate for some refactoring
-        # in the future.
-        if lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
-            return self._pk_trace(value, 'get_prep_lookup', lookup_type)
-        if lookup_type in ('range', 'in'):
-            return [self._pk_trace(v, 'get_prep_lookup', lookup_type) for v in value]
-        elif lookup_type == 'isnull':
-            return []
-        raise TypeError("Related Field has invalid lookup: %s" % lookup_type)
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_lookup(lookup_type, value)
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
-        if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabel_aliases method, it will need to
-            # be invoked before the final SQL is evaluated
-            if hasattr(value, 'relabel_aliases'):
-                return value
-            if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql()
-            else:
-                sql, params = value._as_sql(connection=connection)
-            return QueryWrapper(('(%s)' % sql), params)
-
-        # FIXME: lt and gt are explicitly allowed to make
-        # get_(next/prev)_by_date work; other lookups are not allowed since that
-        # gets messy pretty quick. This is a good candidate for some refactoring
-        # in the future.
-        if lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
-            return [self._pk_trace(value, 'get_db_prep_lookup', lookup_type,
-                            connection=connection, prepared=prepared)]
-        if lookup_type in ('range', 'in'):
-            return [self._pk_trace(v, 'get_db_prep_lookup', lookup_type,
-                            connection=connection, prepared=prepared)
-                    for v in value]
-        elif lookup_type == 'isnull':
-            return []
-        raise TypeError("Related Field has invalid lookup: %s" % lookup_type)
-
-    def _pk_trace(self, value, prep_func, lookup_type, **kwargs):
-        # Value may be a primary key, or an object held in a relation.
-        # If it is an object, then we need to get the primary key value for
-        # that object. In certain conditions (especially one-to-one relations),
-        # the primary key may itself be an object - so we need to keep drilling
-        # down until we hit a value that can be used for a comparison.
-        v = value
-
-        # In the case of an FK to 'self', this check allows to_field to be used
-        # for both forwards and reverse lookups across the FK. (For normal FKs,
-        # it's only relevant for forward lookups).
-        if isinstance(v, self.rel.to):
-            field_name = getattr(self.rel, "field_name", None)
-        else:
-            field_name = None
-        try:
-            while True:
-                if field_name is None:
-                    field_name = v._meta.pk.name
-                v = getattr(v, field_name)
-                field_name = None
-        except AttributeError:
-            pass
-        except exceptions.ObjectDoesNotExist:
-            v = None
-
-        field = self
-        while field.rel:
-            if hasattr(field.rel, 'field_name'):
-                field = field.rel.to._meta.get_field(field.rel.field_name)
-            else:
-                field = field.rel.to._meta.pk
-
-        if lookup_type in ('range', 'in'):
-            v = [v]
-        v = getattr(field, prep_func)(lookup_type, v, **kwargs)
-        if isinstance(v, list):
-            v = v[0]
-        return v
-
     def related_query_name(self):
         # This method defines the name that can be used to identify this
         # related object in a table-spanning query. It uses the lower-cased
@@ -246,8 +162,8 @@ class SingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        params = {'%s__pk__in' % self.related.field.name: list(instances_dict)}
-        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        query = {'%s__in' % self.related.field.name: instances}
+        qs = self.get_query_set(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = self.related.field.get_cache_name()
@@ -266,7 +182,9 @@ class SingleRelatedObjectDescriptor(object):
             if related_pk is None:
                 rel_obj = None
             else:
-                params = {'%s__pk' % self.related.field.name: related_pk}
+                params = {}
+                for lh_field, rh_field in self.related.field.related_fields:
+                    params['%s__%s' % (self.related.field.name, rh_field.name)] = getattr(instance, rh_field.attname)
                 try:
                     rel_obj = self.get_query_set(instance=instance).get(**params)
                 except self.related.model.DoesNotExist:
@@ -349,11 +267,8 @@ class ReverseSingleRelatedObjectDescriptor(object):
         rel_obj_attr = attrgetter(other_field.attname)
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: list(instances_dict)}
-        else:
-            params = {'%s__in' % self.field.rel.field_name: list(instances_dict)}
-        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        query = {'%s__in' % self.field.related_query_name(): instances}
+        qs = self.get_query_set(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         if not self.field.rel.multiple:
@@ -373,11 +288,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
             if val is None:
                 rel_obj = None
             else:
-                other_field = self.field.rel.get_related_field()
-                if other_field.rel:
-                    params = {'%s__%s' % (self.field.rel.field_name, other_field.rel.field_name): val}
-                else:
-                    params = {'%s__exact' % self.field.rel.field_name: val}
+                params = {}
+                for lh_field, rh_field in self.field.related_fields:
+                    params[rh_field.attname] = getattr(instance, lh_field.attname)
                 qs = self.get_query_set(instance=instance)
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get(**params)
@@ -485,9 +398,10 @@ class ForeignRelatedObjectsDescriptor(object):
             def __init__(self, instance):
                 super(RelatedManager, self).__init__()
                 self.instance = instance
-                self.core_filters = {
-                    '%s__%s' % (rel_field.name, attname): getattr(instance, attname)
-                }
+                self.core_filters = {}
+                for lh_field, rh_field in rel_field.related_fields:
+                    self.core_filters['%s__%s' % (rel_field.name, rh_field.attname)] = getattr(instance, rh_field.attname)
+
                 self.model = rel_model
 
             def get_query_set(self):
@@ -506,7 +420,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname): list(instances_dict)}
+                query = {'%s__in' % rel_field.name: instances}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 # Since we just bypassed this class' get_query_set(), we must manage
                 # the reverse relation manually.
@@ -568,9 +482,17 @@ def create_many_related_manager(superclass, rel):
             super(ManyRelatedManager, self).__init__()
             self.model = model
             self.query_field_name = query_field_name
-            self.core_filters = {'%s__pk' % query_field_name: instance._get_pk_val()}
+
+            source_field = through._meta.get_field(source_field_name)
+            source_related_fields = source_field.related_fields
+
+            self.core_filters = {}
+            for lh_field, rh_field in source_related_fields:
+                self.core_filters['%s__%s' % (query_field_name, rh_field.name)] = getattr(instance, rh_field.attname)
+
             self.instance = instance
             self.symmetrical = symmetrical
+            self.source_field = source_field
             self.source_field_name = source_field_name
             self.target_field_name = target_field_name
             self.reverse = reverse
@@ -613,8 +535,7 @@ def create_many_related_manager(superclass, rel):
             instance = instances[0]
             from django.db import connections
             db = self._db or router.db_for_read(instance.__class__, instance=instance)
-            query = {'%s__pk__in' % self.query_field_name:
-                         set(obj._get_pk_val() for obj in instances)}
+            query = {'%s__in' % self.query_field_name: instances}
             qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
@@ -974,7 +895,7 @@ class ManyToManyRel(object):
         return self.to._meta.pk
 
 
-class ForeignKey(RelatedField, Field):
+class ForeignKey(RelatedField):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
@@ -1003,7 +924,27 @@ class ForeignKey(RelatedField, Field):
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
-        Field.__init__(self, **kwargs)
+        super(ForeignKey, self).__init__(**kwargs)
+
+    def get_related_fields(self):
+        '''Returns a list of tuples containing that fields that should match in the foriegn key relationship'''
+        return [(self, self.rel.get_related_field())]
+
+    @property
+    def related_fields(self):
+        return self.get_related_fields()
+
+    @property
+    def reverse_related_fields(self):
+        return [(rhs_field, lhs_field) for lhs_field, rhs_field in self.related_fields]
+
+    @property
+    def foreign_related_fields(self):
+        return tuple([rhs_field for lhs_field, rhs_field in self.related_fields])
+
+    def get_joining_columns(self, reverse_join=False):
+        source = self.reverse_related_fields if reverse_join else self.related_fields
+        return tuple([(lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source])
 
     def get_path_info(self):
         """
@@ -1012,7 +953,8 @@ class ForeignKey(RelatedField, Field):
         opts = self.rel.to._meta
         target = self.rel.get_related_field()
         from_opts = self.model._meta
-        return [PathInfo(self, target, from_opts, opts, self, False, True)], opts, target, self
+        from_field, target = self.related_fields[0]
+        return [PathInfo(from_opts, opts, self.foreign_related_fields,  self, False, True)]
 
     def get_reverse_path_info(self):
         """
@@ -1021,14 +963,14 @@ class ForeignKey(RelatedField, Field):
         opts = self.model._meta
         from_field = self.rel.get_related_field()
         from_opts = from_field.model._meta
-        pathinfos = [PathInfo(from_field, self, from_opts, opts, self, not self.unique, False)]
         if from_field.model is self.model:
             # Recursive foreign key to self.
             target = opts.get_field_by_name(
                 self.rel.field_name)[0]
         else:
             target = opts.pk
-        return pathinfos, opts, target, self
+        pathinfos = [PathInfo(from_opts, opts, (target,),  self, not self.unique, False)]
+        return pathinfos
 
     def validate(self, value, model_instance):
         if self.rel.parent_link:
@@ -1059,6 +1001,58 @@ class ForeignKey(RelatedField, Field):
             return getattr(field_default, self.rel.get_related_field().attname)
         return field_default
 
+    def get_prep_lookup(self, lookup_type, value):
+        return self.foreign_related_fields[0].get_prep_lookup(lookup_type, value)
+
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+        return self.foreign_related_fields[0].get_db_prep_lookup(lookup_type, value, connection, prepared)
+
+    def get_lookup_constraint(self, constraint_class, alias, columns, targets, lookup_type, raw_value):
+        from django.db.models.sql.where import SubqueryConstraint, Constraint, AND, OR
+        root_constraint = constraint_class()
+
+        def get_normalized_value(value):
+
+            from django.db.models import Model
+            if isinstance(value, Model):
+                value_list = []
+                for target in targets:
+                    field = target
+                    # Account for one-to-one relations when sent a different model
+                    while not isinstance(value, field.model):
+                        field = field.rel.to._meta.get_field(field.rel.field_name)
+                    value_list.append(getattr(value, field.attname))
+                return tuple(value_list)
+            elif not isinstance(value, tuple):
+                return (value,)
+            return value
+
+        is_multicolumn = len(self.related_fields) > 1
+        if hasattr(raw_value, '_as_sql') or \
+           hasattr(raw_value, 'get_compiler'):
+            root_constraint.add(SubqueryConstraint(alias, columns, [target.name for target in targets], raw_value), AND)
+        elif lookup_type == 'isnull':
+            root_constraint.add((Constraint(alias, columns[0], None), lookup_type, raw_value), AND)
+        elif lookup_type == 'exact' or lookup_type in ['gt', 'lt', 'gte', 'lte'] and not is_multicolumn:
+            value = get_normalized_value(raw_value)
+            for index, field in enumerate(targets):
+                root_constraint.add((Constraint(alias, columns[index], field), lookup_type, value[index]), AND)
+        elif lookup_type in ['range', 'in'] and not is_multicolumn:
+            values = [get_normalized_value(value) for value in raw_value]
+            value = [val[0] for val in values]
+            root_constraint.add((Constraint(alias, columns[0], targets[0]), lookup_type, value), AND)
+        elif lookup_type == 'in':
+            values = [get_normalized_value(value) for value in raw_value]
+            for value in values:
+                value_constraint = constraint_class()
+                for index, field in enumerate(targets):
+                    value_constraint.add((Constraint(alias, columns[index], field), 'exact', value[index]), AND)
+                root_constraint.add(value_constraint, OR)
+        else:
+            raise TypeError('Related Field has invalid lookup: %s' % lookup_type)
+
+        return root_constraint
+
     def get_db_prep_save(self, value, connection):
         if value == '' or value == None:
             return None
@@ -1076,7 +1070,7 @@ class ForeignKey(RelatedField, Field):
                 choice_list = self.get_choices_default()
                 if len(choice_list) == 2:
                     return smart_text(choice_list[1][0])
-        return Field.value_to_string(self, obj)
+        return super(ForeignKey, self).value_to_string(obj)
 
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
@@ -1195,7 +1189,7 @@ def create_many_to_many_intermediary_model(field, klass):
     })
 
 
-class ManyToManyField(RelatedField, Field):
+class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
     def __init__(self, to, **kwargs):
@@ -1219,7 +1213,7 @@ class ManyToManyField(RelatedField, Field):
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
-        Field.__init__(self, **kwargs)
+        super(ManyToManyField, self).__init__(**kwargs)
 
         msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
@@ -1233,14 +1227,14 @@ class ManyToManyField(RelatedField, Field):
         linkfield1 = int_model._meta.get_field_by_name(self.m2m_field_name())[0]
         linkfield2 = int_model._meta.get_field_by_name(self.m2m_reverse_field_name())[0]
         if direct:
-            join1infos, _, _, _ = linkfield1.get_reverse_path_info()
-            join2infos, opts, target, final_field = linkfield2.get_path_info()
+            join1infos = linkfield1.get_reverse_path_info()
+            join2infos = linkfield2.get_path_info()
         else:
-            join1infos, _, _, _ = linkfield2.get_reverse_path_info()
-            join2infos, opts, target, final_field = linkfield1.get_path_info()
+            join1infos = linkfield2.get_reverse_path_info()
+            join2infos = linkfield1.get_path_info()
         pathinfos.extend(join1infos)
         pathinfos.extend(join2infos)
-        return pathinfos, opts, target, final_field
+        return pathinfos
 
     def get_path_info(self):
         return self._get_path_info(direct=True)
