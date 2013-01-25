@@ -77,9 +77,9 @@ class BaseForm(object):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False):
-        self.is_bound = data is not None or files is not None
-        self.data = data or {}
-        self.files = files or {}
+        self.data = {}
+        self.files = {}
+        self.set_data(data, files)
         self.auto_id = auto_id
         self.prefix = prefix
         self.initial = initial or {}
@@ -117,6 +117,15 @@ class BaseForm(object):
             self.full_clean()
         return self._errors
     errors = property(_get_errors)
+
+    def set_data(self, data=None, files=None):
+        """
+        Sets the form data and files. This enables setting form data after
+        initialization.
+        """
+        self.data = data or self.data
+        self.files = files or self.files
+        self.is_bound = self.data or self.files
 
     def is_valid(self):
         """
