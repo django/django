@@ -3,6 +3,7 @@ import hashlib
 import os
 import posixpath
 import re
+import sys
 try:
     from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
 except ImportError:     # Python 2
@@ -233,7 +234,6 @@ class CachedFilesMixin(object):
             # file, which might be somewhere far away, like S3
             storage, path = paths[name]
             with storage.open(path) as original_file:
-
                 # generate the hash with the original content, even for
                 # adjustable files.
                 hashed_name = self.hashed_name(name, original_file)
@@ -251,7 +251,11 @@ class CachedFilesMixin(object):
                     for patterns in self._patterns.values():
                         for pattern, template in patterns:
                             converter = self.url_converter(name, template)
-                            content = pattern.sub(converter, content)
+                            try:
+                                content = pattern.sub(converter, content)
+                            except ValueError:
+                                sys.stderr.write('Processing file %s... FAIL\n' % name)
+                                raise
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
