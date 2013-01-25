@@ -111,12 +111,12 @@ class BaseForm(object):
             raise KeyError('Key %r not found in Form' % name)
         return BoundField(self, field, name)
 
-    def _get_errors(self):
+    @property
+    def errors(self):
         "Returns an ErrorDict for the data provided for the form"
         if self._errors is None:
             self.full_clean()
         return self._errors
-    errors = property(_get_errors)
 
     def is_valid(self):
         """
@@ -322,7 +322,8 @@ class BaseForm(object):
         """
         return bool(self.changed_data)
 
-    def _get_changed_data(self):
+    @property
+    def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
             # XXX: For now we're asking the individual widgets whether or not the
@@ -350,9 +351,9 @@ class BaseForm(object):
                 elif field._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
-    changed_data = property(_get_changed_data)
 
-    def _get_media(self):
+    @property
+    def media(self):
         """
         Provide a description of all media required to render the widgets on this form
         """
@@ -360,7 +361,6 @@ class BaseForm(object):
         for field in self.fields.values():
             media = media + field.widget.media
         return media
-    media = property(_get_media)
 
     def is_multipart(self):
         """
@@ -432,13 +432,13 @@ class BoundField(object):
     def __getitem__(self, idx):
         return list(self.__iter__())[idx]
 
-    def _errors(self):
+    @property
+    def errors(self):
         """
         Returns an ErrorList for this field. Returns an empty ErrorList
         if there are none.
         """
         return self.form.errors.get(self.name, self.form.error_class())
-    errors = property(_errors)
 
     def as_widget(self, widget=None, attrs=None, only_initial=False):
         """
@@ -479,12 +479,12 @@ class BoundField(object):
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
-    def _data(self):
+    @property
+    def data(self):
         """
         Returns the data for this BoundField, or None if it wasn't given.
         """
         return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
-    data = property(_data)
 
     def value(self):
         """
@@ -532,12 +532,13 @@ class BoundField(object):
             extra_classes.add(self.form.required_css_class)
         return ' '.join(extra_classes)
 
-    def _is_hidden(self):
+    @property
+    def is_hidden(self):
         "Returns True if this BoundField's widget is hidden."
         return self.field.widget.is_hidden
-    is_hidden = property(_is_hidden)
 
-    def _auto_id(self):
+    @property
+    def auto_id(self):
         """
         Calculates and returns the ID attribute for this BoundField, if the
         associated Form has specified auto_id. Returns an empty string otherwise.
@@ -548,9 +549,9 @@ class BoundField(object):
         elif auto_id:
             return self.html_name
         return ''
-    auto_id = property(_auto_id)
 
-    def _id_for_label(self):
+    @property
+    def id_for_label(self):
         """
         Wrapper around the field widget's `id_for_label` method.
         Useful, for example, for focusing on this field regardless of whether
@@ -559,4 +560,3 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
-    id_for_label = property(_id_for_label)
