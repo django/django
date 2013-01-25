@@ -10,7 +10,6 @@ from itertools import repeat
 
 from django.utils import tree
 from django.db.models.fields import Field
-from django.db.models.query_utils import QueryWrapper
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.db.models.sql.aggregates import Aggregate
 from django.utils.six.moves import xrange
@@ -426,19 +425,7 @@ class SubqueryConstraint(object):
             query = query.values(*self.targets).query
 
         query_compiler = query.get_compiler(connection=connection)
-        if len(self.columns) == 1:
-            sql, params = query_compiler.as_sql()
-            return '%s.%s IN (%s)' % (qn(self.alias), qn(self.columns[0]), sql), params
-
-        query_compiler.query.where
-        for index, select_col in enumerate(query_compiler.query.select):
-            lhs = '%s.%s' % (select_col.col[0], select_col.col[1])
-            rhs = '%s.%s' % (self.alias, self.columns[index])
-            query_compiler.query.where.add(
-                QueryWrapper('%s = %s' % (lhs, rhs), []), AND)
-
-        sql, params = query_compiler.as_sql()
-        return 'EXISTS (%s)' % sql, params
+        return query_compiler.as_subquery_condition(self.alias, self.columns)
 
     def clone(self):
         return SubqueryConstraint(self.alias, self.columns, self.targets, self.query_object)

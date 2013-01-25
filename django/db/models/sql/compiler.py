@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import select_related_descend
+from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
         GET_ITERATOR_CHUNK_SIZE, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet
@@ -774,6 +774,22 @@ class SQLCompiler(object):
             # before going any further.
             return list(result)
         return result
+
+    def as_subquery_condition(self, alias, columns):
+        qn = self.quote_name_unless_alias
+        qn2 = self.connection.ops.quote_name
+        if len(columns) == 1:
+            sql, params = self.as_sql()
+            return '%s.%s IN (%s)' % (qn(alias), qn2(columns[0]), sql), params
+
+        for index, select_col in enumerate(self.query.select):
+            lhs = '%s.%s' % (qn(select_col.col[0]), qn2(select_col.col[1]))
+            rhs = '%s.%s' % (qn(alias), qn2(columns[index]))
+            self.query.where.add(
+                QueryWrapper('%s = %s' % (lhs, rhs), []), 'AND')
+
+        sql, params = self.as_sql()
+        return 'EXISTS (%s)' % sql, params
 
 
 class SQLInsertCompiler(SQLCompiler):

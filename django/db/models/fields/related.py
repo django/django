@@ -939,10 +939,6 @@ class ForeignKey(RelatedField):
         return [(rhs_field, lhs_field) for lhs_field, rhs_field in self.related_fields]
 
     @property
-    def native_related_fields(self):
-        return tuple([lhs_field for lhs_field, rhs_field in self.related_fields])
-
-    @property
     def foreign_related_fields(self):
         return tuple([rhs_field for lhs_field, rhs_field in self.related_fields])
 
@@ -967,7 +963,13 @@ class ForeignKey(RelatedField):
         opts = self.model._meta
         from_field = self.rel.get_related_field()
         from_opts = from_field.model._meta
-        pathinfos = [PathInfo(from_opts, opts, (opts.pk,),  self, not self.unique, False)]
+        if from_field.model is self.model:
+            # Recursive foreign key to self.
+            target = opts.get_field_by_name(
+                self.rel.field_name)[0]
+        else:
+            target = opts.pk
+        pathinfos = [PathInfo(from_opts, opts, (target,),  self, not self.unique, False)]
         return pathinfos
 
     def validate(self, value, model_instance):
@@ -1019,16 +1021,17 @@ class ForeignKey(RelatedField):
                 return (value,)
             return value
 
+        is_multicolumn = len(self.related_fields) > 1
         if hasattr(raw_value, '_as_sql') or \
            hasattr(raw_value, 'get_compiler'):
             root_constraint.add(SubqueryConstraint(alias, columns, [target.name for target in targets], raw_value), AND)
         elif lookup_type == 'isnull':
             root_constraint.add((Constraint(alias, columns[0], None), lookup_type, raw_value), AND)
-        elif lookup_type in ['exact', 'gt', 'lt', 'gte', 'lte']:
+        elif lookup_type == 'exact' or lookup_type in ['gt', 'lt', 'gte', 'lte'] and not is_multicolumn:
             value = get_normalized_value(raw_value)
             for index, field in enumerate(targets):
                 root_constraint.add((Constraint(alias, columns[index], field), lookup_type, value[index]), AND)
-        elif lookup_type in ['range', 'in'] and len(self.related_fields) == 1:
+        elif lookup_type in ['range', 'in'] and not is_multicolumn:
             values = [get_normalized_value(value) for value in raw_value]
             value = [val[0] for val in values]
             root_constraint.add((Constraint(alias, columns[0], targets[0]), lookup_type, value), AND)
