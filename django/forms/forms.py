@@ -341,7 +341,13 @@ class BaseForm(object):
                     hidden_widget = field.hidden_widget()
                     initial_value = hidden_widget.value_from_datadict(
                         self.data, self.files, initial_prefixed_name)
-                if field.widget._has_changed(initial_value, data_value):
+                if hasattr(field.widget, '_has_changed'):
+                    warnings.warn("The _has_changed method on widgets is deprecated,"
+                        " define it at field level instead.",
+                        PendingDeprecationWarning, stacklevel=2)
+                    if field.widget._has_changed(initial_value, data_value):
+                        self._changed_data.append(name)
+                elif field._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
     changed_data = property(_get_changed_data)

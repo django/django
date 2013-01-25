@@ -67,3 +67,9 @@ If you're relying on this feature, you should add
 ``'django.middleware.common.BrokenLinkEmailsMiddleware'`` to your
 :setting:`MIDDLEWARE_CLASSES` setting and remove ``SEND_BROKEN_LINK_EMAILS``
 from your settings.
+
+``_has_changed`` method on widgets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you defined your own form widgets and defined the ``_has_changed`` method
+on a widget, you should now define this method on the form field itself.

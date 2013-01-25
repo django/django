@@ -35,6 +35,7 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
+from django.utils import formats
 from django.utils import six
 from django.utils._os import upath
 
@@ -362,6 +363,13 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
+    def test_datefield_changed(self):
+        format = '%d/%m/%Y'
+        f = DateField(input_formats=[format])
+        d = datetime.date(2007, 9, 17)
+        self.assertFalse(f._has_changed(d, '17/09/2007'))
+        self.assertFalse(f._has_changed(d.strftime(format), '17/09/2007'))
+
     # TimeField ###################################################################
 
     def test_timefield_1(self):
@@ -387,6 +395,18 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(datetime.time(14, 25), f.clean(' 14:25 '))
         self.assertEqual(datetime.time(14, 25, 59), f.clean(' 14:25:59 '))
         self.assertRaisesMessage(ValidationError, "'Enter a valid time.'", f.clean, '   ')
+
+    def test_timefield_changed(self):
+        t1 = datetime.time(12, 51, 34, 482548)
+        t2 = datetime.time(12, 51)
+        format = '%H:%M'
+        f = TimeField(input_formats=[format])
+        self.assertTrue(f._has_changed(t1, '12:51'))
+        self.assertFalse(f._has_changed(t2, '12:51'))
+
+        format = '%I:%M %p'
+        f = TimeField(input_formats=[format])
+        self.assertFalse(f._has_changed(t2.strftime(format), '12:51 PM'))
 
     # DateTimeField ###############################################################
 
@@ -446,6 +466,15 @@ class FieldsTests(SimpleTestCase):
     def test_datetimefield_5(self):
         f = DateTimeField(input_formats=['%Y.%m.%d %H:%M:%S.%f'])
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30, 45, 200), f.clean('2006.10.25 14:30:45.0002'))
+
+    def test_datetimefield_changed(self):
+        format = '%Y %m %d %I:%M %p'
+        f = DateTimeField(input_formats=[format])
+        d = datetime.datetime(2006, 9, 17, 14, 30, 0)
+        self.assertFalse(f._has_changed(d, '2006 09 17 2:30 PM'))
+        # Initial value may be a string from a hidden input
+        self.assertFalse(f._has_changed(d.strftime(format), '2006 09 17 2:30 PM'))
+
     # RegexField ##################################################################
 
     def test_regexfield_1(self):
@@ -565,6 +594,29 @@ class FieldsTests(SimpleTestCase):
         f = FileField(allow_empty_file=True)
         self.assertEqual(SimpleUploadedFile,
                          type(f.clean(SimpleUploadedFile('name', b''))))
+
+    def test_filefield_changed(self):
+        '''
+        Test for the behavior of _has_changed for FileField. The value of data will
+        more than likely come from request.FILES. The value of initial data will
+        likely be a filename stored in the database. Since its value is of no use to
+        a FileField it is ignored.
+        '''
+        f = FileField()
+
+        # No file was uploaded and no initial data.
+        self.assertFalse(f._has_changed('', None))
+
+        # A file was uploaded and no initial data.
+        self.assertTrue(f._has_changed('', {'filename': 'resume.txt', 'content': 'My resume'}))
+
+        # A file was not uploaded, but there is initial data
+        self.assertFalse(f._has_changed('resume.txt', None))
+
+        # A file was uploaded and there is initial data (file identity is not dealt
+        # with here)
+        self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
+
 
     # URLField ##################################################################
 
@@ -709,6 +761,18 @@ class FieldsTests(SimpleTestCase):
     def test_boolean_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(BooleanField())), BooleanField)
 
+    def test_booleanfield_changed(self):
+        f = BooleanField()
+        self.assertFalse(f._has_changed(None, None))
+        self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f._has_changed('', None))
+        self.assertFalse(f._has_changed('', ''))
+        self.assertTrue(f._has_changed(False, 'on'))
+        self.assertFalse(f._has_changed(True, 'on'))
+        self.assertTrue(f._has_changed(True, ''))
+        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
+        self.assertTrue(f._has_changed('False', 'on'))
+
     # ChoiceField #################################################################
 
     def test_choicefield_1(self):
@@ -825,6 +889,16 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(False, f.cleaned_data['nullbool1'])
         self.assertEqual(None, f.cleaned_data['nullbool2'])
 
+    def test_nullbooleanfield_changed(self):
+        f = NullBooleanField()
+        self.assertTrue(f._has_changed(False, None))
+        self.assertTrue(f._has_changed(None, False))
+        self.assertFalse(f._has_changed(None, None))
+        self.assertFalse(f._has_changed(False, False))
+        self.assertTrue(f._has_changed(True, False))
+        self.assertTrue(f._has_changed(True, None))
+        self.assertTrue(f._has_changed(True, False))
+
     # MultipleChoiceField #########################################################
 
     def test_multiplechoicefield_1(self):
@@ -865,6 +939,16 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['6'])
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1','6'])
+
+    def test_multiplechoicefield_changed(self):
+        f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
+        self.assertFalse(f._has_changed(None, None))
+        self.assertFalse(f._has_changed([], None))
+        self.assertTrue(f._has_changed(None, ['1']))
+        self.assertFalse(f._has_changed([1, 2], ['1', '2']))
+        self.assertFalse(f._has_changed([2, 1], ['1', '2']))
+        self.assertTrue(f._has_changed([1, 2], ['1']))
+        self.assertTrue(f._has_changed([1, 2], ['1', '3']))
 
     # TypedMultipleChoiceField ############################################################
     # TypedMultipleChoiceField is just like MultipleChoiceField, except that coerced types
@@ -1048,3 +1132,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid time.'", f.clean, ['2006-01-10', ''])
         self.assertRaisesMessage(ValidationError, "'Enter a valid time.'", f.clean, ['2006-01-10'])
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, ['', '07:30'])
+
+    def test_splitdatetimefield_changed(self):
+        f = SplitDateTimeField(input_date_formats=['%d/%m/%Y'])
+        self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
+        self.assertFalse(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
+        self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))

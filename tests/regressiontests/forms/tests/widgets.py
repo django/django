@@ -148,25 +148,6 @@ class FormsWidgetTestCase(TestCase):
 
         self.assertHTMLEqual(w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'}), '<input type="file" class="fun" name="email" />')
 
-        # Test for the behavior of _has_changed for FileInput. The value of data will
-        # more than likely come from request.FILES. The value of initial data will
-        # likely be a filename stored in the database. Since its value is of no use to
-        # a FileInput it is ignored.
-        w = FileInput()
-
-        # No file was uploaded and no initial data.
-        self.assertFalse(w._has_changed('', None))
-
-        # A file was uploaded and no initial data.
-        self.assertTrue(w._has_changed('', {'filename': 'resume.txt', 'content': 'My resume'}))
-
-        # A file was not uploaded, but there is initial data
-        self.assertFalse(w._has_changed('resume.txt', None))
-
-        # A file was uploaded and there is initial data (file identity is not dealt
-        # with here)
-        self.assertTrue(w._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
-
     def test_textarea(self):
         w = Textarea()
         self.assertHTMLEqual(w.render('msg', ''), '<textarea rows="10" cols="40" name="msg"></textarea>')
@@ -232,16 +213,6 @@ class FormsWidgetTestCase(TestCase):
         value = w.value_from_datadict({'testing': '0'}, {}, 'testing')
         self.assertIsInstance(value, bool)
         self.assertTrue(value)
-
-        self.assertFalse(w._has_changed(None, None))
-        self.assertFalse(w._has_changed(None, ''))
-        self.assertFalse(w._has_changed('', None))
-        self.assertFalse(w._has_changed('', ''))
-        self.assertTrue(w._has_changed(False, 'on'))
-        self.assertFalse(w._has_changed(True, 'on'))
-        self.assertTrue(w._has_changed(True, ''))
-        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
-        self.assertTrue(w._has_changed('False', 'on'))
 
     def test_select(self):
         w = Select()
@@ -415,13 +386,6 @@ class FormsWidgetTestCase(TestCase):
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
 </select>""")
-        self.assertTrue(w._has_changed(False, None))
-        self.assertTrue(w._has_changed(None, False))
-        self.assertFalse(w._has_changed(None, None))
-        self.assertFalse(w._has_changed(False, False))
-        self.assertTrue(w._has_changed(True, False))
-        self.assertTrue(w._has_changed(True, None))
-        self.assertTrue(w._has_changed(True, False))
 
     def test_selectmultiple(self):
         w = SelectMultiple()
@@ -534,14 +498,6 @@ class FormsWidgetTestCase(TestCase):
 
         # Unicode choices are correctly rendered as HTML
         self.assertHTMLEqual(w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]), '<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>')
-
-        # Test the usage of _has_changed
-        self.assertFalse(w._has_changed(None, None))
-        self.assertFalse(w._has_changed([], None))
-        self.assertTrue(w._has_changed(None, ['1']))
-        self.assertFalse(w._has_changed([1, 2], ['1', '2']))
-        self.assertTrue(w._has_changed([1, 2], ['1']))
-        self.assertTrue(w._has_changed([1, 2], ['1', '3']))
 
         # Choices can be nested one level in order to create HTML optgroups:
         w.choices = (('outer1', 'Outer 1'), ('Group "1"', (('inner1', 'Inner 1'), ('inner2', 'Inner 2'))))
@@ -844,15 +800,6 @@ beatle J R Ringo False""")
 <li><label><input type="checkbox" name="escape" value="good" /> you &gt; me</label></li>
 </ul>""")
 
-        # Test the usage of _has_changed
-        self.assertFalse(w._has_changed(None, None))
-        self.assertFalse(w._has_changed([], None))
-        self.assertTrue(w._has_changed(None, ['1']))
-        self.assertFalse(w._has_changed([1, 2], ['1', '2']))
-        self.assertTrue(w._has_changed([1, 2], ['1']))
-        self.assertTrue(w._has_changed([1, 2], ['1', '3']))
-        self.assertFalse(w._has_changed([2, 1], ['1', '2']))
-
         # Unicode choices are correctly rendered as HTML
         self.assertHTMLEqual(w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]), '<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>')
 
@@ -886,21 +833,6 @@ beatle J R Ringo False""")
         w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
         self.assertHTMLEqual(w.render('name', ['john', 'lennon']), '<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />')
 
-        w = MyMultiWidget(widgets=(TextInput(), TextInput()))
-
-        # test with no initial data
-        self.assertTrue(w._has_changed(None, ['john', 'lennon']))
-
-        # test when the data is the same as initial
-        self.assertFalse(w._has_changed('john__lennon', ['john', 'lennon']))
-
-        # test when the first widget's data has changed
-        self.assertTrue(w._has_changed('john__lennon', ['alfred', 'lennon']))
-
-        # test when the last widget's data has changed. this ensures that it is not
-        # short circuiting while testing the widgets.
-        self.assertTrue(w._has_changed('john__lennon', ['john', 'denver']))
-
     def test_splitdatetime(self):
         w = SplitDateTimeWidget()
         self.assertHTMLEqual(w.render('date', ''), '<input type="text" name="date_0" /><input type="text" name="date_1" />')
@@ -916,10 +848,6 @@ beatle J R Ringo False""")
         w = SplitDateTimeWidget(date_format='%d/%m/%Y', time_format='%H:%M')
         self.assertHTMLEqual(w.render('date', datetime.datetime(2006, 1, 10, 7, 30)), '<input type="text" name="date_0" value="10/01/2006" /><input type="text" name="date_1" value="07:30" />')
 
-        self.assertTrue(w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
-        self.assertFalse(w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
-        self.assertTrue(w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
-
     def test_datetimeinput(self):
         w = DateTimeInput()
         self.assertHTMLEqual(w.render('date', None), '<input type="text" name="date" />')
@@ -934,13 +862,6 @@ beatle J R Ringo False""")
         # Use 'format' to change the way a value is displayed.
         w = DateTimeInput(format='%d/%m/%Y %H:%M', attrs={'type': 'datetime'})
         self.assertHTMLEqual(w.render('date', d), '<input type="datetime" name="date" value="17/09/2007 12:51" />')
-        self.assertFalse(w._has_changed(d, '17/09/2007 12:51'))
-
-        # Make sure a custom format works with _has_changed. The hidden input will use
-        data = datetime.datetime(2010, 3, 6, 12, 0, 0)
-        custom_format = '%d.%m.%Y %H:%M'
-        w = DateTimeInput(format=custom_format)
-        self.assertFalse(w._has_changed(formats.localize_input(data), data.strftime(custom_format)))
 
     def test_dateinput(self):
         w = DateInput()
@@ -957,13 +878,6 @@ beatle J R Ringo False""")
         # Use 'format' to change the way a value is displayed.
         w = DateInput(format='%d/%m/%Y', attrs={'type': 'date'})
         self.assertHTMLEqual(w.render('date', d), '<input type="date" name="date" value="17/09/2007" />')
-        self.assertFalse(w._has_changed(d, '17/09/2007'))
-
-        # Make sure a custom format works with _has_changed. The hidden input will use
-        data = datetime.date(2010, 3, 6)
-        custom_format = '%d.%m.%Y'
-        w = DateInput(format=custom_format)
-        self.assertFalse(w._has_changed(formats.localize_input(data), data.strftime(custom_format)))
 
     def test_timeinput(self):
         w = TimeInput()
@@ -982,13 +896,6 @@ beatle J R Ringo False""")
         # Use 'format' to change the way a value is displayed.
         w = TimeInput(format='%H:%M', attrs={'type': 'time'})
         self.assertHTMLEqual(w.render('time', t), '<input type="time" name="time" value="12:51" />')
-        self.assertFalse(w._has_changed(t, '12:51'))
-
-        # Make sure a custom format works with _has_changed. The hidden input will use
-        data = datetime.time(13, 0)
-        custom_format = '%I:%M %p'
-        w = TimeInput(format=custom_format)
-        self.assertFalse(w._has_changed(formats.localize_input(data), data.strftime(custom_format)))
 
     def test_splithiddendatetime(self):
         from django.forms.widgets import SplitHiddenDateTimeWidget
@@ -1015,10 +922,6 @@ class FormsI18NWidgetsTestCase(TestCase):
     def tearDown(self):
         deactivate()
         super(FormsI18NWidgetsTestCase, self).tearDown()
-
-    def test_splitdatetime(self):
-        w = SplitDateTimeWidget(date_format='%d/%m/%Y', time_format='%H:%M')
-        self.assertTrue(w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06.05.2008', '12:41']))
 
     def test_datetimeinput(self):
         w = DateTimeInput()

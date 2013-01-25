@@ -38,7 +38,7 @@ class GeoAdminTest(TestCase):
         """ Check that changes are accurately noticed by OpenLayersWidget. """
         geoadmin = admin.site._registry[City]
         form = geoadmin.get_changelist_form(None)()
-        has_changed = form.fields['point'].widget._has_changed
+        has_changed = form.fields['point']._has_changed
 
         initial = Point(13.4197458572965953, 52.5194108501149799, srid=4326)
         data_same = "SRID=3857;POINT(1493879.2754093995 6894592.019687599)"
