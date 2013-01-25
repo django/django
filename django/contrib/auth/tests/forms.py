@@ -392,3 +392,7 @@ class ReadOnlyPasswordHashWidgetTest(TestCase):
         widget = ReadOnlyPasswordHashWidget()
         html = widget.render(name='password', value=None, attrs={})
         self.assertIn(_("No password set."), html)
+
+    def test_bug_18460_readonly_widget(self):
+        widget = ReadOnlyPasswordHashWidget()
+        self.assertFalse(widget._has_changed('password1', 'password2'))

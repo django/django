@@ -44,6 +44,10 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
         return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
 
+    def _has_changed(self, initial, data):
+        # Always return False because the widget readonly
+        return False
+
 
 class ReadOnlyPasswordHashField(forms.Field):
     widget = ReadOnlyPasswordHashWidget
