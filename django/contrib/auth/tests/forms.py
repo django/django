@@ -4,7 +4,7 @@ import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
-    ReadOnlyPasswordHashWidget)
+    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, EmailField, CharField
@@ -384,7 +384,7 @@ class PasswordResetFormTest(TestCase):
                          [_("The user account associated with this email address cannot reset the password.")])
 
 
-class ReadOnlyPasswordHashWidgetTest(TestCase):
+class ReadOnlyPasswordHashTest(TestCase):
 
     def test_bug_19349_render_with_none_value(self):
         # Rendering the widget with value set to None
@@ -392,3 +392,7 @@ class ReadOnlyPasswordHashWidgetTest(TestCase):
         widget = ReadOnlyPasswordHashWidget()
         html = widget.render(name='password', value=None, attrs={})
         self.assertIn(_("No password set."), html)
+
+    def test_readonly_field_has_changed(self):
+        field = ReadOnlyPasswordHashField()
+        self.assertFalse(field._has_changed('aaa', 'bbb'))
