@@ -87,8 +87,8 @@ def format_html(format_string, *args, **kwargs):
 
 def format_html_join(sep, format_string, args_generator):
     """
-    A wrapper format_html, for the common case of a group of arguments that need
-    to be formatted using the same format string, and then joined using
+    A wrapper of format_html, for the common case of a group of arguments that
+    need to be formatted using the same format string, and then joined using
     'sep'. 'sep' is also passed through conditional_escape.
 
     'args_generator' should be an iterator that returns the sequence of 'args'
