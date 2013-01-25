@@ -33,7 +33,7 @@ if can_run_extraction_tests:
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
         NoLocationExtractorTests, KeepPotFileExtractorTests,
-        MultipleLocaleExtractionTests)
+        MultipleLocaleExtractionTests, CustomLayoutExtractionTests)
 if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests)
