@@ -1001,6 +1001,12 @@ class ForeignKey(RelatedField):
             return getattr(field_default, self.rel.get_related_field().attname)
         return field_default
 
+    def get_prep_lookup(self, lookup_type, value):
+        return self.foreign_related_fields[0].get_prep_lookup(lookup_type, value)
+
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+        return self.foreign_related_fields[0].get_db_prep_lookup(lookup_type, value, connection, prepared)
+
     def get_lookup_constraint(self, constraint_class, alias, columns, targets, lookup_type, raw_value):
         from django.db.models.sql.where import SubqueryConstraint, Constraint, AND, OR
         root_constraint = constraint_class()
