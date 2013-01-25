@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.contrib.gis.geos import GEOSException, GEOSGeometry, fromstr
+
 
 class GeometryField(forms.Field):
     """
@@ -73,3 +75,25 @@ class GeometryField(forms.Field):
                     raise forms.ValidationError(self.error_messages['transform_error'])
 
         return geom
+
+    def _has_changed(self, initial, data):
+        """ Compare geographic value of data with its initial value. """
+
+        # Ensure we are dealing with a geographic object
+        if isinstance(initial, six.string_types):
+            try:
+                initial = GEOSGeometry(initial)
+            except (GEOSException, ValueError):
+                initial = None
+
+        # Only do a geographic comparison if both values are available
+        if initial and data:
+            data = fromstr(data)
+            data.transform(initial.srid)
+            # If the initial value was not added by the browser, the geometry
+            # provided may be slightly different, the first time it is saved.
+            # The comparison is done with a very low tolerance.
+            return not initial.equals_exact(data, tolerance=0.000001)
+        else:
+            # Check for change of state of existence
+            return bool(initial) != bool(data)

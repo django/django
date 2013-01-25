@@ -858,15 +858,12 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
 
 # Fields #####################################################################
 
-class InlineForeignKeyHiddenInput(HiddenInput):
-    def _has_changed(self, initial, data):
-        return False
-
 class InlineForeignKeyField(Field):
     """
     A basic integer field that deals with validating the given value to a
     given parent instance in an inline.
     """
+    widget = HiddenInput
     default_error_messages = {
         'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
     }
@@ -881,7 +878,6 @@ class InlineForeignKeyField(Field):
             else:
                 kwargs["initial"] = self.parent_instance.pk
         kwargs["required"] = False
-        kwargs["widget"] = InlineForeignKeyHiddenInput
         super(InlineForeignKeyField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
@@ -898,6 +894,9 @@ class InlineForeignKeyField(Field):
         if force_text(value) != force_text(orig):
             raise ValidationError(self.error_messages['invalid_choice'])
         return self.parent_instance
+
+    def _has_changed(self, initial, data):
+        return False
 
 class ModelChoiceIterator(object):
     def __init__(self, field):
