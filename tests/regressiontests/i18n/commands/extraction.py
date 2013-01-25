@@ -5,13 +5,10 @@ import os
 import re
 import shutil
 
-from django.conf import settings
 from django.core import management
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
-from django.utils import six
 from django.utils.six import StringIO
 
 
@@ -355,44 +352,3 @@ class MultipleLocaleExtractionTests(ExtractorTests):
         management.call_command('makemessages', locale='pt,de,ch', verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
-
-
-class CustomLayoutExtractionTests(ExtractorTests):
-    def setUp(self):
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.join(os.path.dirname(upath(__file__)), 'project_dir')
-
-    def test_no_locale_raises(self):
-        os.chdir(self.test_dir)
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Unable to find a locale path to store translations for file"):
-            management.call_command('makemessages', locale=LOCALE, verbosity=0)
-
-    @override_settings(
-        LOCALE_PATHS=(os.path.join(os.path.dirname(upath(__file__)), 'project_dir/project_locale'),)
-    )
-    def test_project_locale_paths(self):
-        """
-        Test that:
-          * translations for app containing locale folder are stored in that folder
-          * translations outside of that app are in LOCALE_PATHS[0]
-        """
-        os.chdir(self.test_dir)
-        self.addCleanup(shutil.rmtree, os.path.join(settings.LOCALE_PATHS[0], LOCALE))
-        self.addCleanup(shutil.rmtree, os.path.join(self.test_dir, 'app_with_locale/locale', LOCALE))
-
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
-        project_de_locale = os.path.join(
-            self.test_dir, 'project_locale/de/LC_MESSAGES/django.po',)
-        app_de_locale = os.path.join(
-            self.test_dir, 'app_with_locale/locale/de/LC_MESSAGES/django.po',)
-        self.assertTrue(os.path.exists(project_de_locale))
-        self.assertTrue(os.path.exists(app_de_locale))
-
-        with open(project_de_locale, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('This app has no locale directory', po_contents)
-            self.assertMsgId('This is a project-level string', po_contents)
-        with open(app_de_locale, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('This app has a locale directory', po_contents)
