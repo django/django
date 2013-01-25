@@ -584,20 +584,11 @@ class TestErrorCachedStorage(BaseStaticFilesTestCase, TestCase):
         """
         Test that post_processing raise a ValueError when file is missing.
         """
-        collectstatic_args = {
-            'interactive': False,
-            'verbosity': '0',
-            'link': False,
-            'clear': False,
-            'dry_run': False,
-            'post_process': True,
-            'use_default_ignore_patterns': True,
-            'ignore_patterns': ['*.ignoreme'],
-        }
-
-        collectstatic_cmd = CollectstaticCommand()
-        collectstatic_cmd.set_options(**collectstatic_args)
-        self.assertRaises(ValueError, collectstatic_cmd.collect)
+        sys.stderr, old_stderr = six.StringIO(), sys.stderr
+        self.assertRaises(ValueError, call_command, 'collectstatic',
+                          interactive=False, verbosity=0)
+        self.assertIn('FAIL', sys.stderr.getvalue())
+        sys.stderr = old_stderr
 
 
 if sys.platform != 'win32':
