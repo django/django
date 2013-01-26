@@ -665,10 +665,11 @@ class BooleanField(Field):
             value = False
         else:
             value = bool(value)
-        value = super(BooleanField, self).to_python(value)
+        return super(BooleanField, self).to_python(value)
+
+    def validate(self, value):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'])
-        return value
 
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
