@@ -106,6 +106,32 @@ You should also audit your existing code for any instances of this behavior
 before enabling this feature. It's faster, but it provides less automatic
 protection for multi-call operations.
 
+Custom isolation level
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionchanged:: 1.6
+
+Django by default uses "read commited" as default isolation_level. This in
+most cases is more than enough. But there are cases where it takes a higher
+isolation level, such as "serialized".
+Under the "serializable" isolation level, the application should be prepared
+to handle transaction failures (and possibly retry) on every database query.
+Django does nothing to respect, and leaves everything to the user.
+
+.. admonition::
+
+    This should only be used if you really need it and know what you do.
+
+To set custom isolation level, put ``isolation_level`` key in the :settings:`OPTIONS`
+part of yout database configuration in :setting:`DATABASES`::
+
+    import psycopg2.extensions
+
+    'OPTIONS': {
+        'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+    }
+
+
 Indexes for ``varchar`` and ``text`` columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
