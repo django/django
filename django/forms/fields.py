@@ -23,7 +23,7 @@ from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 from django.utils import formats
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -395,7 +395,7 @@ class DateField(BaseTemporalField):
         return super(DateField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(value, format).date()
+        return datetime.datetime.strptime(force_str(value), format).date()
 
 
 class TimeField(BaseTemporalField):
@@ -417,7 +417,7 @@ class TimeField(BaseTemporalField):
         return super(TimeField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(value, format).time()
+        return datetime.datetime.strptime(force_str(value), format).time()
 
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
@@ -455,7 +455,7 @@ class DateTimeField(BaseTemporalField):
         return from_current_timezone(result)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(value, format)
+        return datetime.datetime.strptime(force_str(value), format)
 
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
