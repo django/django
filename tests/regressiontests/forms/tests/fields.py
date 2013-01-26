@@ -370,6 +370,16 @@ class FieldsTests(SimpleTestCase):
         self.assertFalse(f._has_changed(d, '17/09/2007'))
         self.assertFalse(f._has_changed(d.strftime(format), '17/09/2007'))
 
+    def test_datefield_strptime(self):
+        """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
+        f = DateField()
+        try:
+            f.strptime('31 мая 2011', '%d-%b-%y')
+        except Exception as e:
+            # assertIsInstance or assertRaises cannot be used because UnicodeEncodeError
+            # is a subclass of ValueError
+            self.assertEqual(e.__class__, ValueError)
+
     # TimeField ###################################################################
 
     def test_timefield_1(self):

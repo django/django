@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -673,7 +673,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
     try:
-        return datetime.datetime.strptime(datestr, format).date()
+        return datetime.datetime.strptime(force_str(datestr), format).date()
     except ValueError:
         raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
             'datestr': datestr,

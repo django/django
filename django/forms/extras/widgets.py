@@ -9,6 +9,7 @@ import re
 from django.forms.widgets import Widget, Select
 from django.utils import datetime_safe
 from django.utils.dates import MONTHS
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
 from django.utils import six
@@ -69,7 +70,7 @@ class SelectDateWidget(Widget):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]
-                        v = datetime.datetime.strptime(value, input_format)
+                        v = datetime.datetime.strptime(force_str(value), input_format)
                         year_val, month_val, day_val = v.year, v.month, v.day
                     except ValueError:
                         pass
