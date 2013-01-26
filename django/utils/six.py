@@ -393,9 +393,11 @@ def with_metaclass(meta, base=object):
 if PY3:
     _iterlists = "lists"
     _assertRaisesRegex = "assertRaisesRegex"
+    _assertRegex = "assertRegex"
 else:
     _iterlists = "iterlists"
     _assertRaisesRegex = "assertRaisesRegexp"
+    _assertRegex = "assertRegexpMatches"
 
 
 def iterlists(d):
@@ -405,6 +407,10 @@ def iterlists(d):
 
 def assertRaisesRegex(self, *args, **kwargs):
     return getattr(self, _assertRaisesRegex)(*args, **kwargs)
+
+
+def assertRegex(self, *args, **kwargs):
+    return getattr(self, _assertRegex)(*args, **kwargs)
 
 
 add_move(MovedModule("_dummy_thread", "dummy_thread"))

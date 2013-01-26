@@ -1263,7 +1263,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         pattern = re.compile(br"""<li>Plot: <a href=".+/admin_views/plot/1/">World Domination</a>\s*<ul>\s*<li>Plot details: <a href=".+/admin_views/plotdetails/1/">almost finished</a>""")
         response = self.client.get('/test_admin/admin/admin_views/villain/%s/delete/' % quote(1))
-        self.assertRegexpMatches(response.content, pattern)
+        six.assertRegex(self, response.content, pattern)
 
     def test_cyclic(self):
         """
