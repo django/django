@@ -34,15 +34,12 @@ class TranslatableFile(object):
             return self.file < other.file
         return self.dirpath < other.dirpath
 
-    def process(self, command, potfile, domain, keep_pot=False, debug=False):
+    def process(self, command, potfile, domain, keep_pot=False):
         """
         Extract translatable literals from self.file for :param domain:
         creating or updating the :param potfile: POT file.
 
         Uses the xgettext GNU gettext utility.
-
-        :param debug: is for internal use, it skips the deletion of the
-        Python-syntax file result of templatize() that gets passed to xgettext.
         """
 
         from django.utils.translation import templatize
@@ -71,14 +68,13 @@ class TranslatableFile(object):
             orig_file = os.path.join(self.dirpath, self.file)
             is_templatized = file_ext in command.extensions
             if is_templatized:
-                thefile = '%s.py' % self.file
-            work_file = os.path.join(self.dirpath, thefile)
-            if is_templatized:
                 with open(orig_file, "rU") as fp:
                     src_data = fp.read()
+                thefile = '%s.py' % self.file
                 content = templatize(src_data, orig_file[2:])
-                with open(work_file, "w") as fp:
+                with open(os.path.join(self.dirpath, thefile), "w") as fp:
                     fp.write(content)
+            work_file = os.path.join(self.dirpath, thefile)
             cmd = (
                 'xgettext -d %s -L Python %s %s --keyword=gettext_noop '
                 '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
@@ -93,7 +89,7 @@ class TranslatableFile(object):
         msgs, errors, status = _popen(cmd)
         if errors:
             if status != STATUS_OK:
-                if is_templatized and not debug:
+                if is_templatized:
                     os.unlink(work_file)
                 if not keep_pot and os.path.exists(potfile):
                     os.unlink(potfile)
@@ -109,7 +105,7 @@ class TranslatableFile(object):
                 new = '#: ' + orig_file[2:]
                 msgs = msgs.replace(old, new)
             write_pot_file(potfile, msgs)
-        if is_templatized and not debug:
+        if is_templatized:
             os.unlink(work_file)
 
 
