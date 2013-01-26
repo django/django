@@ -60,9 +60,6 @@ class Command(NoArgsCommand):
             self.local = False
         else:
             self.local = True
-        # Use ints for file times (ticket #14665), if supported
-        if hasattr(os, 'stat_float_times'):
-            os.stat_float_times(False)
 
     def set_options(self, **options):
         """
@@ -231,7 +228,9 @@ Type 'yes' to continue, or 'no' to cancel: """
                     else:
                         full_path = None
                     # Skip the file if the source file is younger
-                    if target_last_modified >= source_last_modified:
+                    # Avoid sub-second precision (see #14665, #19540)
+                    if (target_last_modified.replace(microsecond=0)
+                            >= source_last_modified.replace(microsecond=0)):
                         if not ((self.symlink and full_path
                                  and not os.path.islink(full_path)) or
                                 (not self.symlink and full_path
