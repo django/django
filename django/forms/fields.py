@@ -184,17 +184,13 @@ class Field(object):
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ ''.
-        if data is None:
-            data_value = ''
-        else:
-            data_value = data
-        if initial is None:
-            initial_value = ''
-        else:
-            initial_value = initial
-        if force_text(initial_value) != force_text(data_value):
+        initial_value = initial if initial is not None else ''
+        try:
+            data = self.to_python(data)
+        except ValidationError:
             return True
-        return False
+        data_value = data if data is not None else ''
+        return initial_value != data_value
 
     def __deepcopy__(self, memo):
         result = copy.copy(self)
@@ -392,12 +388,6 @@ class BaseTemporalField(Field):
     def strptime(self, value, format):
         raise NotImplementedError('Subclasses must define this method.')
 
-    def _has_changed(self, initial, data):
-        try:
-            data = self.to_python(data)
-        except ValidationError:
-            return True
-        return self.to_python(initial) != data
 
 class DateField(BaseTemporalField):
     widget = DateInput
