@@ -35,7 +35,9 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
+from django.utils import formats
 from django.utils import six
+from django.utils import translation
 from django.utils._os import upath
 
 
@@ -256,6 +258,17 @@ class FieldsTests(SimpleTestCase):
         f = FloatField(localize=True)
         self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
 
+    def test_floatfield_changed(self):
+        f = FloatField()
+        n = 4.35
+        self.assertFalse(f._has_changed(n, '4.3500'))
+
+        with translation.override('fr'):
+            with self.settings(USE_L10N=True):
+                f = FloatField(localize=True)
+                localized_n = formats.localize_input(n)  # -> '4,35' in French
+                self.assertFalse(f._has_changed(n, localized_n))
+
     # DecimalField ################################################################
 
     def test_decimalfield_1(self):
@@ -346,6 +359,18 @@ class FieldsTests(SimpleTestCase):
         f = DecimalField(localize=True)
         self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
 
+    def test_decimalfield_changed(self):
+        f = DecimalField(max_digits=2, decimal_places=2)
+        d = Decimal("0.1")
+        self.assertFalse(f._has_changed(d, '0.10'))
+        self.assertTrue(f._has_changed(d, '0.101'))
+
+        with translation.override('fr'):
+            with self.settings(USE_L10N=True):
+                f = DecimalField(max_digits=2, decimal_places=2, localize=True)
+                localized_d = formats.localize_input(d)  # -> '0,1' in French
+                self.assertFalse(f._has_changed(d, localized_d))
+
     # DateField ###################################################################
 
     def test_datefield_1(self):
@@ -404,7 +429,6 @@ class FieldsTests(SimpleTestCase):
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
         self.assertFalse(f._has_changed(d, '17/09/2007'))
-        self.assertFalse(f._has_changed(d.strftime(format), '17/09/2007'))
 
     def test_datefield_strptime(self):
         """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
@@ -445,14 +469,10 @@ class FieldsTests(SimpleTestCase):
     def test_timefield_changed(self):
         t1 = datetime.time(12, 51, 34, 482548)
         t2 = datetime.time(12, 51)
-        format = '%H:%M'
-        f = TimeField(input_formats=[format])
+        f = TimeField(input_formats=['%H:%M', '%H:%M %p'])
         self.assertTrue(f._has_changed(t1, '12:51'))
         self.assertFalse(f._has_changed(t2, '12:51'))
-
-        format = '%I:%M %p'
-        f = TimeField(input_formats=[format])
-        self.assertFalse(f._has_changed(t2.strftime(format), '12:51 PM'))
+        self.assertFalse(f._has_changed(t2, '12:51 PM'))
 
     # DateTimeField ###############################################################
 
@@ -518,8 +538,6 @@ class FieldsTests(SimpleTestCase):
         f = DateTimeField(input_formats=[format])
         d = datetime.datetime(2006, 9, 17, 14, 30, 0)
         self.assertFalse(f._has_changed(d, '2006 09 17 2:30 PM'))
-        # Initial value may be a string from a hidden input
-        self.assertFalse(f._has_changed(d.strftime(format), '2006 09 17 2:30 PM'))
 
     # RegexField ##################################################################
 
