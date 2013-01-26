@@ -186,21 +186,21 @@ class BasicExtractorTests(ExtractorTests):
             self.assertFalse('Translators: ignored i18n comment #1' in po_contents)
             self.assertMsgId("Translatable literal #9b", po_contents)
 
-            self.assertFalse('ignored 18n comment #2' in po_contents)
+            self.assertFalse('ignored i18n comment #2' in po_contents)
             self.assertFalse('ignored comment #2' in po_contents)
             self.assertMsgId('Translatable literal #9c', po_contents)
 
             self.assertFalse('ignored comment #3' in po_contents)
-            self.assertFalse('ignored 18n comment #3' in po_contents)
+            self.assertFalse('ignored i18n comment #3' in po_contents)
             self.assertMsgId('Translatable literal #9d', po_contents)
 
             self.assertFalse('ignored comment #4' in po_contents)
             self.assertMsgId('Translatable literal #9e', po_contents)
             self.assertFalse('ignored comment #5' in po_contents)
 
-            self.assertFalse('ignored 18n comment #4' in po_contents)
+            self.assertFalse('ignored i18n comment #4' in po_contents)
             self.assertMsgId('Translatable literal #9f', po_contents)
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #5')
+            self.assertTrue('#. Translators: valid i18n comment #5' in po_contents)
 
             self.assertMsgId('Translatable literal #9g', po_contents)
             self.assertTrue('#. Translators: valid i18n comment #6' in po_contents)
