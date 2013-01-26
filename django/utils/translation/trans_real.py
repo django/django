@@ -7,6 +7,7 @@ import re
 import sys
 import gettext as gettext_module
 from threading import local
+import warnings
 
 from django.utils.importlib import import_module
 from django.utils.encoding import force_str, force_text
@@ -14,6 +15,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.translation import TranslatorCommentWarning
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -545,10 +547,11 @@ def templatize(src, origin=None):
                             filemsg = ''
                             if origin:
                                 filemsg = 'file %s, ' % origin
-                            print("Warning: Translator-targeted comment '%s' "
-                                "(%sline %d) ignored. That kind of comments should be "
-                                "the located last on their lines." % (c, filemsg,
-                                    comment_lineno_cache))
+                            warn_msg = ("The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't the last item "
+                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warnings.warn(warn_msg, TranslatorCommentWarning)
+                        lineno_comment_map[comment_lineno_cache] = []
                 else:
                     out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
                 comment_lineno_cache = None
