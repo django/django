@@ -11,6 +11,8 @@ from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
 from django.utils.http import is_safe_url
 from django.utils import six
+from django.views.generic import View
+
 
 def set_language(request):
     """
@@ -38,6 +40,7 @@ def set_language(request):
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
 
+
 def get_formats():
     """
     Returns all formats strings required for i18n to work
@@ -56,13 +59,14 @@ def get_formats():
     src = []
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
-            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_text(v))))
+            src.append("    formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_text(v))))
         elif isinstance(v, (tuple, list)):
             v = [javascript_quote(smart_text(value)) for value in v]
-            src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
+            src.append("    formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
     return ''.join(src)
 
-NullSource = """
+
+null_source = """
 /* gettext identity library */
 
 function gettext(msgid) { return msgid; }
@@ -72,93 +76,231 @@ function pgettext(context, msgid) { return msgid; }
 function npgettext(context, singular, plural, count) { return (count == 1) ? singular : plural; }
 """
 
-LibHead = """
-/* gettext library */
 
-var catalog = new Array();
+template_head = """(function() {
+    var catalog = {};
+    var formats = {};
 """
 
-LibFoot = """
+template_body = """
+    var gettext = function(msgid) {
+        var value = catalog[msgid];
+        if (typeof(value) == 'undefined') {
+            return msgid;
+        } else {
+            return (typeof(value) == 'string') ? value : value[0];
+        }
+    };
 
-function gettext(msgid) {
-  var value = catalog[msgid];
-  if (typeof(value) == 'undefined') {
-    return msgid;
-  } else {
-    return (typeof(value) == 'string') ? value : value[0];
-  }
-}
+    var ngettext =(singular, plural, count) {
+        value = catalog[singular];
+        if (typeof(value) == 'undefined') {
+            return (count == 1) ? singular : plural;
+        } else {
+            return value[pluralidx(count)];
+        }
+    };
 
-function ngettext(singular, plural, count) {
-  value = catalog[singular];
-  if (typeof(value) == 'undefined') {
-    return (count == 1) ? singular : plural;
-  } else {
-    return value[pluralidx(count)];
-  }
-}
+    var pgettext = function(context, msgid) {
+        var value = gettext(context + '\\x04' + msgid);
+        if (value.indexOf('\\x04') != -1) {
+            value = msgid;
+        }
+        return value;
+    };
 
-function gettext_noop(msgid) { return msgid; }
+    var npgettext = function(context, singular, plural, count) {
+        var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
+        if (value.indexOf('\\x04') != -1) {
+            value = ngettext(singular, plural, count);
+        }
+        return value;
+    };
 
-function pgettext(context, msgid) {
-  var value = gettext(context + '\\x04' + msgid);
-  if (value.indexOf('\\x04') != -1) {
-    value = msgid;
-  }
-  return value;
-}
+    var interpolate = function(fmt, obj, named) {
+        if (named) {
+            return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+        } else {
+            return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+        }
+    };
 
-function npgettext(context, singular, plural, count) {
-  var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
-  if (value.indexOf('\\x04') != -1) {
-    value = ngettext(singular, plural, count);
-  }
-  return value;
-}
-"""
-
-LibFormatHead = """
-/* formatting library */
-
-var formats = new Array();
-
-"""
-
-LibFormatFoot = """
-function get_format(format_type) {
-    var value = formats[format_type];
-    if (typeof(value) == 'undefined') {
-      return format_type;
-    } else {
-      return value;
+    var get_format = function(format_type) {
+        var value = formats[format_type];
+        if (typeof(value) == 'undefined') {
+          return format_type;
+        } else {
+          return value;
+        }
     }
-}
 """
 
-SimplePlural = """
-function pluralidx(count) { return (count == 1) ? 0 : 1; }
+template_footer = """
+    this.gettext = gettext;
+    this.ngettext = ngettext;
+    this.pgettext = pgettext;
+    this.npgettext = npgettext;
+    this.interpolate = interpolate;
+    this.pluralidx = pluralidx;
+    this.get_format = get_format;
+}).call(this);
 """
 
-InterPolate = r"""
-function interpolate(fmt, obj, named) {
-  if (named) {
-    return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
-  } else {
-    return fmt.replace(/%s/g, function(match){return String(obj.shift())});
-  }
-}
+plural_idx_template = """
+    var pluralidx = function(n) {
+        var v=%s;
+        if (typeof(v) == 'boolean') {
+            return v ? 1 : 0;
+        } else {
+            return v;
+        }
+    };
 """
 
-PluralIdx = r"""
-function pluralidx(n) {
-  var v=%s;
-  if (typeof(v) == 'boolean') {
-    return v ? 1 : 0;
-  } else {
-    return v;
-  }
-}
+plural_simple_template = """
+    var pluralidx function(count) { return (count == 1) ? 0 : 1; };
 """
+
+
+class I18n(View):
+    domain = ['djangojs']
+    packages = []
+
+    def dispatch(self, request, domain=None, packages=None):
+        if packages:
+            if isinstance(packages, six.string_types):
+                self.packages = packages.split('+')
+            elif isinstance(packages, (list, tuple)):
+                self.packages = packages
+            else:
+                raise ValueError("wrong packages parameter")
+
+        if domain:
+            if isinstance(domain, six.string_types):
+                self.domain = [domain]
+            elif isinstance(domain, (list, tuple)):
+                self.domain = domain
+            else:
+                raise ValueError("wrong domain parameter")
+
+        return super(I18n, self).dispatch(request)
+
+    def get_paths(self, packages):
+        paths = []
+
+        for package in packages:
+            p = importlib.import_module(package)
+            path = os.path.join(os.path.dirname(p.__file__), 'locale')
+            paths.append(path)
+
+        paths.extend(list(reversed(settings.LOCALE_PATHS)))
+        return paths
+
+    def get_catalog(self, paths):
+        default_locale = to_locale(settings.LANGUAGE_CODE)
+        locale = to_locale(get_language())
+
+        en_selected = locale.startswith('en')
+        en_catalog_missing = True
+
+        t = {}
+        for domain in self.domain:
+            for path in paths:
+                try:
+                    catalog = gettext_module.translation(domain, path, ['en'])
+                except IOError:
+                    continue
+                else:
+                    if en_selected:
+                        en_catalog_missing = False
+
+            if default_locale != 'en':
+                for path in paths:
+                    try:
+                        catalog = gettext_module.translation(domain, path, [default_locale])
+                    except IOError:
+                        catalog = None
+
+                    if catalog is not None:
+                        t.update(catalog._catalog)
+
+            if locale != default_locale:
+                if en_selected and en_catalog_missing:
+                    t = {}
+                else:
+                    locale_t = {}
+                    for path in paths:
+                        try:
+                            catalog = gettext_module.translation(domain, path, [locale])
+                        except IOError:
+                            catalog = None
+
+                        if catalog is not None:
+                            locale_t.update(catalog._catalog)
+
+                    if locale_t:
+                        t.update(locale_t)
+        return t
+
+    def make_js_catalog(self, t):
+        items, pitems = [], []
+        pdict = {}
+
+        for k, v in t.items():
+            if k == '':
+                continue
+            if isinstance(k, six.string_types):
+                items.append("    catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
+            elif isinstance(k, tuple):
+                if k[0] not in pdict:
+                    pdict[k[0]] = k[1]
+                else:
+                    pdict[k[0]] = max(k[1], pdict[k[0]])
+                items.append("    catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
+            else:
+                raise TypeError(k)
+        items.sort()
+
+        for k, v in pdict.items():
+            pitems.append("    catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
+
+        return "".join(items), "".join(pitems)
+
+    def get(self, request):
+        if 'language' in request.GET:
+            if check_for_language(request.GET['language']):
+                activate(request.GET['language'])
+
+        packages = self.packages
+        if not packages:
+            packages = ['django.conf']
+
+        paths = self.get_paths(packages)
+        t = self.get_catalog(paths)
+
+        # Plural methods discovery
+        plural = None
+        plural_template = plural_simple_template
+
+        if '' in t:
+            for l in t[''].split('\n'):
+                if l.startswith('Plural-Forms:'):
+                    plural = l.split(':',1)[1].strip()
+
+        if plural is not None:
+            # this should actually be a compiled function of a typical plural-form:
+            # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
+            plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=',1)[1]
+            plural_template = plural_idx_template % (plural)
+
+        catalog, maincatalog = self.make_js_catalog(t)
+
+        src = [template_head, maincatalog, catalog, get_formats(),
+            template_body, plural_template, template_footer]
+
+        data = "".join(src)
+        return http.HttpResponse(data, content_type="text/javascript")
+
 
 def null_javascript_catalog(request, domain=None, packages=None):
     """
@@ -168,117 +310,4 @@ def null_javascript_catalog(request, domain=None, packages=None):
     src = [NullSource, InterPolate, LibFormatHead, get_formats(), LibFormatFoot]
     return http.HttpResponse(''.join(src), 'text/javascript')
 
-def javascript_catalog(request, domain='djangojs', packages=None):
-    """
-    Returns the selected language catalog as a javascript library.
-
-    Receives the list of packages to check for translations in the
-    packages parameter either from an infodict or as a +-delimited
-    string from the request. Default is 'django.conf'.
-
-    Additionally you can override the gettext domain for this view,
-    but usually you don't want to do that, as JavaScript messages
-    go to the djangojs domain. But this might be needed if you
-    deliver your JavaScript source from Django templates.
-    """
-    if request.GET:
-        if 'language' in request.GET:
-            if check_for_language(request.GET['language']):
-                activate(request.GET['language'])
-    if packages is None:
-        packages = ['django.conf']
-    if isinstance(packages, six.string_types):
-        packages = packages.split('+')
-    packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
-    default_locale = to_locale(settings.LANGUAGE_CODE)
-    locale = to_locale(get_language())
-    t = {}
-    paths = []
-    en_selected = locale.startswith('en')
-    en_catalog_missing = True
-    # paths of requested packages
-    for package in packages:
-        p = importlib.import_module(package)
-        path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
-        paths.append(path)
-    # add the filesystem paths listed in the LOCALE_PATHS setting
-    paths.extend(list(reversed(settings.LOCALE_PATHS)))
-    # first load all english languages files for defaults
-    for path in paths:
-        try:
-            catalog = gettext_module.translation(domain, path, ['en'])
-            t.update(catalog._catalog)
-        except IOError:
-            pass
-        else:
-            # 'en' is the selected language and at least one of the packages
-            # listed in `packages` has an 'en' catalog
-            if en_selected:
-                en_catalog_missing = False
-    # next load the settings.LANGUAGE_CODE translations if it isn't english
-    if default_locale != 'en':
-        for path in paths:
-            try:
-                catalog = gettext_module.translation(domain, path, [default_locale])
-            except IOError:
-                catalog = None
-            if catalog is not None:
-                t.update(catalog._catalog)
-    # last load the currently selected language, if it isn't identical to the default.
-    if locale != default_locale:
-        # If the currently selected language is English but it doesn't have a
-        # translation catalog (presumably due to being the language translated
-        # from) then a wrong language catalog might have been loaded in the
-        # previous step. It needs to be discarded.
-        if en_selected and en_catalog_missing:
-            t = {}
-        else:
-            locale_t = {}
-            for path in paths:
-                try:
-                    catalog = gettext_module.translation(domain, path, [locale])
-                except IOError:
-                    catalog = None
-                if catalog is not None:
-                    locale_t.update(catalog._catalog)
-            if locale_t:
-                t = locale_t
-    src = [LibHead]
-    plural = None
-    if '' in t:
-        for l in t[''].split('\n'):
-            if l.startswith('Plural-Forms:'):
-                plural = l.split(':',1)[1].strip()
-    if plural is not None:
-        # this should actually be a compiled function of a typical plural-form:
-        # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;
-        plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=',1)[1]
-        src.append(PluralIdx % plural)
-    else:
-        src.append(SimplePlural)
-    csrc = []
-    pdict = {}
-    for k, v in t.items():
-        if k == '':
-            continue
-        if isinstance(k, six.string_types):
-            csrc.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
-        elif isinstance(k, tuple):
-            if k[0] not in pdict:
-                pdict[k[0]] = k[1]
-            else:
-                pdict[k[0]] = max(k[1], pdict[k[0]])
-            csrc.append("catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
-        else:
-            raise TypeError(k)
-    csrc.sort()
-    for k, v in pdict.items():
-        src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
-    src.extend(csrc)
-    src.append(LibFoot)
-    src.append(InterPolate)
-    src.append(LibFormatHead)
-    src.append(get_formats())
-    src.append(LibFormatFoot)
-    src = ''.join(src)
-    return http.HttpResponse(src, 'text/javascript')
+javascript_catalog = I18n.as_view()
