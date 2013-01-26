@@ -1072,6 +1072,6 @@ class ModelMultipleChoiceField(ModelChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set([force_text(value) for value in initial])
+        initial_set = set([force_text(value) for value in self.prepare_value(initial)])
         data_set = set([force_text(value) for value in data])
         return data_set != initial_set
