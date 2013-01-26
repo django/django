@@ -106,7 +106,7 @@ class EmailValidator(object):
         if not value or '@' not in value:
             raise ValidationError(self.message, code=self.code)
 
-        user_part, domain_part = value.split('@', 1)
+        user_part, domain_part = value.rsplit('@', 1)
 
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
