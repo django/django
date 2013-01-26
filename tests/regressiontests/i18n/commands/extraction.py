@@ -9,6 +9,7 @@ from django.core import management
 from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 from django.utils._os import upath
+from django.utils import six
 from django.utils.six import StringIO
 
 
@@ -112,7 +113,7 @@ class BasicExtractorTests(ExtractorTests):
         self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
             management.call_command('makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
-        self.assertRegexpMatches(str(context_manager.exception),
+        six.assertRegex(self, str(context_manager.exception),
                 r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
             )
         # Check that the temporary file was cleaned up

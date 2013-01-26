@@ -221,8 +221,11 @@ Django offers a robust internationalization and localization framework to
 assist you in the development of applications for multiple languages and world
 regions:
 
-* :doc:`Internationalization <topics/i18n/index>`
+* :doc:`Overview <topics/i18n/index>` |
+  :doc:`Internationalization <topics/i18n/translation>` |
+  :ref:`Localization <how-to-create-language-files>`
 * :doc:`"Local flavor" <topics/localflavor>`
+* :doc:`Time zones </topics/i18n/timezones>`
 
 Python compatibility
 ====================

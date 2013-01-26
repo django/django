@@ -779,6 +779,18 @@ bpython::
 .. _IPython: http://ipython.scipy.org/
 .. _bpython: http://bpython-interpreter.org/
 
+When the "plain" Python interactive interpreter starts (be it because
+``--plain`` was specified or because no other interactive interface is
+available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
+environment variable and the ``~/.pythonrc.py`` script. If you don't wish this
+behavior you can use the ``--no-startup`` option. e.g.::
+
+    django-admin.py shell --plain --no-startup
+
+.. versionadded:: 1.6
+
+The ``--no-startup`` option was added in Django 1.6.
+
 sql <appname appname ...>
 -------------------------
 

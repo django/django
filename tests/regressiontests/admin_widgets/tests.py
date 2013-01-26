@@ -425,13 +425,6 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
             '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
-        self.assertEqual(w._has_changed(None, None), False)
-        self.assertEqual(w._has_changed([], None), False)
-        self.assertEqual(w._has_changed(None, ['1']), True)
-        self.assertEqual(w._has_changed([1, 2], ['1', '2']), False)
-        self.assertEqual(w._has_changed([1, 2], ['1']), True)
-        self.assertEqual(w._has_changed([1, 2], ['1', '3']), True)
-
     def test_m2m_related_model_not_in_admin(self):
         # M2M relationship with model not registered with admin site. Raw ID
         # widget should have no magnifying glass link. See #16542

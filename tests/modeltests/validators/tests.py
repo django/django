@@ -31,6 +31,7 @@ TEST_DATA = (
     (validate_email, 'test@domain.with.idn.tld.उदाहरण.परीक्षा', None),
     (validate_email, 'email@localhost', None),
     (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
+    (validate_email, '"test@test"@example.com', None),
 
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),

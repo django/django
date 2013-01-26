@@ -402,7 +402,13 @@ The version of six bundled with Django includes one extra function:
 
     This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
     ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
-    exists in current Python3 versions, but issues a warning.
+    exists in current Python 3 versions, but issues a warning.
+
+.. function:: assertRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRegexpMatches`` on Python 2, and
+    ``testcase.assertRegex`` on Python 3. ``assertRegexpMatches`` still
+    exists in current Python 3 versions, but issues a warning.
 
 
 In addition to six' defaults moves, Django's version provides ``thread`` as

@@ -175,6 +175,25 @@ class Field(object):
         """
         return {}
 
+    def _has_changed(self, initial, data):
+        """
+        Return True if data differs from initial.
+        """
+        # For purposes of seeing whether something has changed, None is
+        # the same as an empty string, if the data or inital value we get
+        # is None, replace it w/ ''.
+        if data is None:
+            data_value = ''
+        else:
+            data_value = data
+        if initial is None:
+            initial_value = ''
+        else:
+            initial_value = initial
+        if force_text(initial_value) != force_text(data_value):
+            return True
+        return False
+
     def __deepcopy__(self, memo):
         result = copy.copy(self)
         memo[id(self)] = result
@@ -348,6 +367,13 @@ class BaseTemporalField(Field):
     def strptime(self, value, format):
         raise NotImplementedError('Subclasses must define this method.')
 
+    def _has_changed(self, initial, data):
+        try:
+            data = self.to_python(data)
+        except ValidationError:
+            return True
+        return self.to_python(initial) != data
+
 class DateField(BaseTemporalField):
     widget = DateInput
     input_formats = formats.get_format_lazy('DATE_INPUT_FORMATS')
@@ -370,6 +396,7 @@ class DateField(BaseTemporalField):
 
     def strptime(self, value, format):
         return datetime.datetime.strptime(value, format).date()
+
 
 class TimeField(BaseTemporalField):
     widget = TimeInput
@@ -529,6 +556,12 @@ class FileField(Field):
             return initial
         return data
 
+    def _has_changed(self, initial, data):
+        if data is None:
+            return False
+        return True
+
+
 class ImageField(FileField):
     default_error_messages = {
         'invalid_image': _("Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
@@ -618,6 +651,7 @@ class URLField(CharField):
             value = urlunsplit(url_fields)
         return value
 
+
 class BooleanField(Field):
     widget = CheckboxInput
 
@@ -635,6 +669,15 @@ class BooleanField(Field):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'])
         return value
+
+    def _has_changed(self, initial, data):
+        # Sometimes data or initial could be None or '' which should be the
+        # same thing as False.
+        if initial == 'False':
+            # show_hidden_initial may have transformed False to 'False'
+            initial = False
+        return bool(initial) != bool(data)
+
 
 class NullBooleanField(BooleanField):
     """
@@ -659,6 +702,15 @@ class NullBooleanField(BooleanField):
 
     def validate(self, value):
         pass
+
+    def _has_changed(self, initial, data):
+        # None (unknown) and False (No) are not the same
+        if initial is not None:
+            initial = bool(initial)
+        if data is not None:
+            data = bool(data)
+        return initial != data
+
 
 class ChoiceField(Field):
     widget = Select
@@ -739,6 +791,7 @@ class TypedChoiceField(ChoiceField):
     def validate(self, value):
         pass
 
+
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple
@@ -764,6 +817,18 @@ class MultipleChoiceField(ChoiceField):
         for val in value:
             if not self.valid_value(val):
                 raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
+
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = []
+        if data is None:
+            data = []
+        if len(initial) != len(data):
+            return True
+        initial_set = set([force_text(value) for value in initial])
+        data_set = set([force_text(value) for value in data])
+        return data_set != initial_set
+
 
 class TypedMultipleChoiceField(MultipleChoiceField):
     def __init__(self, *args, **kwargs):
@@ -898,6 +963,18 @@ class MultiValueField(Field):
         object created by combining the date and time in data_list.
         """
         raise NotImplementedError('Subclasses must implement this method.')
+
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = ['' for x in range(0, len(data))]
+        else:
+            if not isinstance(initial, list):
+                initial = self.widget.decompress(initial)
+        for field, initial, data in zip(self.fields, initial, data):
+            if field._has_changed(initial, data):
+                return True
+        return False
+
 
 class FilePathField(ChoiceField):
     def __init__(self, path, match=None, recursive=False, allow_files=True,
