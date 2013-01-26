@@ -614,11 +614,11 @@ class BaseDatabaseOperations(object):
         # Convert params to contain Unicode values.
         to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
-            u_params = tuple([to_unicode(val) for val in params])
+            u_params = tuple(to_unicode(val) for val in params)
         else:
-            u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
+            u_params = dict((to_unicode(k), to_unicode(v)) for k, v in params.items())
 
-        return force_text(sql) % u_params
+        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
