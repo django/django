@@ -1012,6 +1012,11 @@ class ModelChoiceField(ChoiceField):
     def validate(self, value):
         return Field.validate(self, value)
 
+    def _has_changed(self, initial, data):
+        initial_value = initial if initial is not None else ''
+        data_value = data if data is not None else ''
+        return force_text(self.prepare_value(initial_value)) != force_text(data_value)
+
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
     widget = SelectMultiple
@@ -1059,3 +1064,14 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
+
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = []
+        if data is None:
+            data = []
+        if len(initial) != len(data):
+            return True
+        initial_set = set([force_text(value) for value in initial])
+        data_set = set([force_text(value) for value in data])
+        return data_set != initial_set
