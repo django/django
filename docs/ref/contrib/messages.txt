@@ -78,7 +78,7 @@ Django provides three built-in storage classes:
 
 :class:`~django.contrib.messages.storage.fallback.FallbackStorage` is the
 default storage class. If it isn't suitable to your needs, you can select
-another storage class by setting setting:`MESSAGE_STORAGE` to its full import
+another storage class by setting :setting:`MESSAGE_STORAGE` to its full import
 path, for example::
 
     MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
