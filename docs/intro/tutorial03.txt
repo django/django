@@ -277,7 +277,7 @@ you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python.
 
 First, create a directory ``polls`` in your template directory you specified
-in setting:`TEMPLATE_DIRS`. Within that, create a file called ``index.html``.
+in :setting:`TEMPLATE_DIRS`. Within that, create a file called ``index.html``.
 Put the following code in that template:
 
 .. code-block:: html+django
