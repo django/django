@@ -11,7 +11,7 @@ from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import (ManyToOneRel,
+from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
@@ -325,7 +325,7 @@ class Model(six.with_metaclass(ModelBase)):
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and instantiation for iteration is 33% faster.
         args_len = len(args)
-        if args_len > len(self._meta.fields):
+        if args_len > len(self._meta.column_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
@@ -355,11 +355,12 @@ class Model(six.with_metaclass(ModelBase)):
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
             if (field.attname not in kwargs and
-                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
+                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
+                    or field.attname not in kwargs and field.column is None):
                 # This field will be populated on request.
                 continue
             if kwargs:
-                if isinstance(field.rel, ManyToOneRel):
+                if isinstance(field.rel, ForeignObjectRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
@@ -386,6 +387,7 @@ class Model(six.with_metaclass(ModelBase)):
                         val = field.get_default()
             else:
                 val = field.get_default()
+
             if is_related_object:
                 # If we are passed a related instance, set it using the
                 # field.name instead of field.attname (e.g. "user" instead of
@@ -520,7 +522,7 @@ class Model(six.with_metaclass(ModelBase)):
         # automatically do a "update_fields" save on the loaded fields.
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set()
-            for field in self._meta.fields:
+            for field in self._meta.column_fields:
                 if not field.primary_key and not hasattr(field, 'through'):
                     field_names.add(field.attname)
             deferred_fields = [
@@ -629,7 +631,7 @@ class Model(six.with_metaclass(ModelBase)):
                     order_value = manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()
                     self._order = order_value
 
-                fields = meta.local_fields
+                fields = meta.local_column_fields
                 if not pk_set:
                     if force_update or update_fields:
                         raise ValueError("Cannot force an update in save() with no primary key.")

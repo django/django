@@ -250,6 +250,14 @@ class Options(object):
         return self._field_name_cache
     fields = property(_fields)
 
+    @property
+    def column_fields(self):
+        return [f for f in self.fields if f.column is not None]
+
+    @property
+    def local_column_fields(self):
+        return [f for f in self.local_fields if f.column is not None]
+
     def get_fields_with_model(self):
         """
         Returns a sequence of (field, model) pairs for all fields. The "model"
@@ -261,6 +269,9 @@ class Options(object):
         except AttributeError:
             self._fill_fields_cache()
         return self._field_cache
+
+    def get_column_fields_with_model(self):
+        return [(field, model) for field, model in self.get_fields_with_model() if field.column is not None]
 
     def _fill_fields_cache(self):
         cache = []

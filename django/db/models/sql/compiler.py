@@ -262,7 +262,7 @@ class SQLCompiler(object):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field, model in opts.get_fields_with_model():
+        for field, model in opts.get_column_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -542,7 +542,7 @@ class SQLCompiler(object):
             select_cols = self.query.select + self.query.related_select_cols
             # Just the column, not the fields.
             select_cols = [s[0] for s in select_cols]
-            if (len(self.query.model._meta.fields) == len(self.query.select)
+            if (len(self.query.model._meta.column_fields) == len(self.query.select)
                     and self.connection.features.allows_group_by_pk):
                 self.query.group_by = [
                     (self.query.model._meta.db_table, self.query.model._meta.pk.column)
@@ -624,7 +624,7 @@ class SQLCompiler(object):
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
-                SelectInfo(col, field) for col, field in zip(columns, f.rel.to._meta.fields))
+                SelectInfo(col, field) for col, field in zip(columns, f.rel.to._meta.column_fields))
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -656,7 +656,7 @@ class SQLCompiler(object):
                     opts=model._meta, as_pairs=True, from_parent=from_parent)
                 self.query.related_select_cols.extend(
                     SelectInfo(col, field) for col, field
-                    in zip(columns, model._meta.fields))
+                    in zip(columns, model._meta.column_fields))
                 next = requested.get(f.related_query_name(), {})
                 # Use True here because we are looking at the _reverse_ side of
                 # the relation, which is always nullable.
@@ -705,7 +705,7 @@ class SQLCompiler(object):
                         if self.query.select:
                             fields = [f.field for f in self.query.select]
                         else:
-                            fields = self.query.model._meta.fields
+                            fields = self.query.model._meta.column_fields
                         fields = fields + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed

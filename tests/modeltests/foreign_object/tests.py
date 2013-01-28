@@ -1,69 +1,20 @@
 import datetime
 from operator import attrgetter
 
-from django.db import models
-from django.contrib.multicolumn.models import ForeignKeyEx
+from .models import Country, Person, Group, Membership, Friendship
 from django.test import TestCase
-
-class Country(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __unicode__(self):
-        return self.name
-
-
-class Person(models.Model):
-    name = models.CharField(max_length=128)
-    person_country = ForeignKeyEx(Country)
-    friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
-
-    class Meta:
-        ordering = ('name',)
-
-    def __unicode__(self):
-        return self.name
-
-class Group(models.Model):
-    name = models.CharField(max_length=128)
-    group_country = ForeignKeyEx(Country)
-    members = models.ManyToManyField(Person, related_name='groups', through='Membership')
-
-    class Meta:
-        ordering = ('name',)
-
-    def __unicode__(self):
-        return self.name
-
-
-class Membership(models.Model):
-    membership_country = ForeignKeyEx(Country)
-    person = ForeignKeyEx(Person, include_related=[('membership_country', 'person_country')])
-    group = ForeignKeyEx(Group, include_related=[('membership_country', 'group_country')])
-    date_joined = models.DateTimeField(default=datetime.datetime.now)
-    invite_reason = models.CharField(max_length=64, null=True)
-
-    class Meta:
-        ordering = ('date_joined', 'invite_reason')
-
-    def __unicode__(self):
-        return "%s is a member of %s" % (self.person.name, self.group.name)
-
-
-class Friendship(models.Model):
-    from_friend_country = ForeignKeyEx(Country, related_name="from_friend_country")
-    from_friend = ForeignKeyEx(Person, include_related=[('from_friend_country', 'person_country')], related_name="from_friend")
-    to_friend_country = ForeignKeyEx(Country, related_name="to_friend_country")
-    to_friend = ForeignKeyEx(Person, include_related=[('to_friend_country', 'person_country')], related_name="to_friend")
-
 
 class MultiColumnFKTests(TestCase):
     def setUp(self):
         # Creating countries
         self.usa = Country.objects.create(name="United States of America")
         self.soviet_union = Country.objects.create(name="Soviet Union")
-
+        Person()
         # Creating People
-        self.bob = Person.objects.create(name='Bob', person_country=self.usa)
+        self.bob = Person()
+        self.bob.name='Bob'
+        self.bob.person_country=self.usa
+        self.bob.save()
         self.jim = Person.objects.create(name='Jim', person_country=self.usa)
         self.george = Person.objects.create(name='George', person_country=self.usa)
 
@@ -282,8 +233,10 @@ class MultiColumnFKTests(TestCase):
             []
         )
 
-        Friendship.objects.create(to_friend_country=self.jane.person_country, from_friend=self.jane,
-            from_friend_country=self.george.person_country, to_friend=self.george)
+        # Note that we use ids instead of instances. This is because instances on ForeignObject properties
+        # will set all related field off of the given instance
+        q = Friendship.objects.create(from_friend_id=self.jane.id, to_friend_id=self.george.id,
+            to_friend_country_id=self.jane.person_country_id, from_friend_country_id=self.george.person_country_id)
 
         self.assertQuerysetEqual(
             self.jane.friends.all(),
