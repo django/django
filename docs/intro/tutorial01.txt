@@ -182,40 +182,40 @@ Database setup
 --------------
 
 Now, edit :file:`mysite/settings.py`. It's a normal Python module with
-module-level variables representing Django settings. Change the
-following keys in the :setting:`DATABASES` ``'default'`` item to match
-your database connection settings.
+module-level variables representing Django settings.
+
+By default, the configuration uses SQLite. If you're new to databases, or
+you're just interested in trying Django, this is the easiest choice. SQLite is
+included in Python, so you won't need to install anything else to support your
+database.
+
+If you wish to use another database, install the appropriate :ref:`database
+bindings <database-installation>`, and change the following keys in the
+:setting:`DATABASES` ``'default'`` item to match your database connection
+settings:
 
 * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
+  ``'django.db.backends.sqlite3'``,
   ``'django.db.backends.postgresql_psycopg2'``,
-  ``'django.db.backends.mysql'``, ``'django.db.backends.sqlite3'`` or
+  ``'django.db.backends.mysql'``, or
   ``'django.db.backends.oracle'``. Other backends are :setting:`also available
   <DATABASE-ENGINE>`.
 
-* :setting:`NAME` -- The name of your database. If you're using
-  SQLite, the database will be a file on your computer; in that
-  case, :setting:`NAME` should be the full absolute path,
-  including filename, of that file. If the file doesn't exist, it
-  will automatically be created when you synchronize the database
-  for the first time (see below).
-
-  When specifying the path, always use forward slashes, even on
-  Windows (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+* :setting:`NAME` -- The name of your database. If you're using SQLite, the
+  database will be a file on your computer; in that case, :setting:`NAME`
+  should be the full absolute path, including filename, of that file. When
+  specifying the path, always use forward slashes, even on Windows (e.g.
+  ``C:/homes/user/mysite/sqlite3.db``).
 
 * :setting:`USER` -- Your database username (not used for SQLite).
 
-* :setting:`PASSWORD` -- Your database password (not used for
-  SQLite).
+* :setting:`PASSWORD` -- Your database password (not used for SQLite).
 
-* :setting:`HOST` -- The host your database is on. Leave this as
-  an empty string (or possibly ``127.0.0.1``) if your database server is on the
-  same physical machine (not used for SQLite). See :setting:`HOST` for details.
+* :setting:`HOST` -- The host your database is on (not used for SQLite).
+  Leave this as an empty string (or possibly ``127.0.0.1``) if your
+  database server is on the same physical machine .
 
-If you're new to databases, we recommend simply using SQLite by setting
-:setting:`ENGINE <DATABASE-ENGINE>` to ``'django.db.backends.sqlite3'`` and
-:setting:`NAME` to the place where you'd like to store the database. SQLite is
-included in Python, so you won't need to install anything else to support your
-database.
+For more details, see the reference documentation for :setting:`DATABASES`.
 
 .. note::
 
@@ -226,16 +226,19 @@ database.
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
 
-While you're editing :file:`settings.py`, set :setting:`TIME_ZONE` to your
-time zone. The default value is the Central time zone in the U.S. (Chicago).
+While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
+your time zone.
 
-Also, note the :setting:`INSTALLED_APPS` setting toward the bottom of
-the file. That holds the names of all Django applications that are
-activated in this Django instance. Apps can be used in multiple projects, and
-you can package and distribute them for use by others in their projects.
+Also, note the :setting:`INSTALLED_APPS` setting at the top of the file. That
+holds the names of all Django applications that are activated in this Django
+instance. Apps can be used in multiple projects, and you can package and
+distribute them for use by others in their projects.
 
 By default, :setting:`INSTALLED_APPS` contains the following apps, all of which
 come with Django:
+
+* :mod:`django.contrib.admin` -- The admin site. You'll use it in :doc:`part 2
+  of this tutorial </intro/tutorial02>`.
 
 * :mod:`django.contrib.auth` -- An authentication system.
 
@@ -261,11 +264,12 @@ that, run the following command:
 
     python manage.py syncdb
 
-The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting and
-creates any necessary database tables according to the database settings in your
-:file:`settings.py` file. You'll see a message for each database table it
-creates, and you'll get a prompt asking you if you'd like to create a superuser
-account for the authentication system. Go ahead and do that.
+The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
+and creates any necessary database tables according to the database settings
+in your :file:`mysqlite/settings.py` file. You'll see a message for each
+database table it creates, and you'll get a prompt asking you if you'd like to
+create a superuser account for the authentication system. Go ahead and do
+that.
 
 If you're interested, run the command-line client for your database and type
 ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or ``.schema`` (SQLite) to
@@ -288,10 +292,10 @@ Creating models
 Now that your environment -- a "project" -- is set up, you're set to start
 doing work.
 
-Each application you write in Django consists of a Python package, somewhere
-on your `Python path`_, that follows a certain convention. Django comes with a
-utility that automatically generates the basic directory structure of an app,
-so you can focus on writing code rather than creating directories.
+Each application you write in Django consists of a Python package that follows
+a certain convention. Django comes with a utility that automatically generates
+the basic directory structure of an app, so you can focus on writing code
+rather than creating directories.
 
 .. admonition:: Projects vs. apps
 
@@ -316,6 +320,7 @@ That'll create a directory :file:`polls`, which is laid out like this::
 
     polls/
         __init__.py
+        admin.py
         models.py
         tests.py
         views.py
@@ -401,26 +406,21 @@ But first we need to tell our project that the ``polls`` app is installed.
     you can distribute apps, because they don't have to be tied to a given
     Django installation.
 
-Edit the :file:`settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So
-it'll look like this::
+Edit the :file:`mysite/settings.py` file again, and change the
+:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
+look like this::
 
     INSTALLED_APPS = (
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        # Uncomment the next line to enable the admin:
-        # 'django.contrib.admin',
-        # Uncomment the next line to enable admin documentation:
-        # 'django.contrib.admindocs',
         'polls',
     )
 
-Now Django knows to include the ``polls`` app. Let's run another
-command:
+Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. code-block:: bash
 
@@ -433,13 +433,13 @@ statements for the polls app):
 
     BEGIN;
     CREATE TABLE "polls_poll" (
-        "id" serial NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY,
         "question" varchar(200) NOT NULL,
-        "pub_date" timestamp with time zone NOT NULL
+        "pub_date" datetime NOT NULL
     );
     CREATE TABLE "polls_choice" (
-        "id" serial NOT NULL PRIMARY KEY,
-        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id") DEFERRABLE INITIALLY DEFERRED,
+        "id" integer NOT NULL PRIMARY KEY,
+        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
@@ -447,7 +447,8 @@ statements for the polls app):
 
 Note the following:
 
-* The exact output will vary depending on the database you are using.
+* The exact output will vary depending on the database you are using. The
+  example above is generated for SQLite.
 
 * Table names are automatically generated by combining the name of the app
   (``polls``) and the lowercase name of the model -- ``poll`` and
@@ -465,8 +466,7 @@ Note the following:
   types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
   ``integer primary key`` (SQLite) are handled for you automatically. Same
   goes for quoting of field names -- e.g., using double quotes or single
-  quotes. The author of this tutorial runs PostgreSQL, so the example
-  output is in PostgreSQL syntax.
+  quotes.
 
 * The :djadmin:`sql` command doesn't actually run the SQL in your database -
   it just prints it to the screen so that you can see what SQL Django thinks
