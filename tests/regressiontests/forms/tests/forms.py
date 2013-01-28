@@ -245,11 +245,11 @@ class FormsTestCase(TestCase):
             get_spam = BooleanField()
 
         f = SignupForm(auto_id=False)
-        self.assertHTMLEqual(str(f['email']), '<input type="text" name="email" />')
+        self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" />')
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': True}, auto_id=False)
-        self.assertHTMLEqual(str(f['email']), '<input type="text" name="email" value="test@example.com" />')
+        self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" />')
         self.assertHTMLEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
 
         # 'True' or 'true' should be rendered without a value attribute
@@ -1739,7 +1739,7 @@ class FormsTestCase(TestCase):
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></li>
-<li><label for="id_email">Email:</label> <input type="text" name="email" id="id_email" /></li>
+<li><label for="id_email">Email:</label> <input type="email" name="email" id="id_email" /></li>
 <li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></li>""")
 
         self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
@@ -1749,7 +1749,7 @@ class FormsTestCase(TestCase):
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></p>
-<p><label for="id_email">Email:</label> <input type="text" name="email" id="id_email" /></p>
+<p><label for="id_email">Email:</label> <input type="email" name="email" id="id_email" /></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
 <p class="required error"><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>""")
 
@@ -1759,7 +1759,7 @@ class FormsTestCase(TestCase):
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></td></tr>
-<tr><th><label for="id_email">Email:</label></th><td><input type="text" name="email" id="id_email" /></td></tr>
+<tr><th><label for="id_email">Email:</label></th><td><input type="email" name="email" id="id_email" /></td></tr>
 <tr class="required error"><th><label for="id_age">Age:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="age" id="id_age" /></td></tr>""")
 
     def test_label_split_datetime_not_displayed(self):

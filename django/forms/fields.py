@@ -18,10 +18,12 @@ from io import BytesIO
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
-from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
+from django.forms.widgets import (
+    TextInput, PasswordInput, EmailInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
-    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
+    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION
+)
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
@@ -487,6 +489,7 @@ class RegexField(CharField):
     regex = property(_get_regex, _set_regex)
 
 class EmailField(CharField):
+    widget = EmailInput
     default_error_messages = {
         'invalid': _('Enter a valid email address.'),
     }

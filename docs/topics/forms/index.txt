@@ -223,7 +223,7 @@ wrapped in a paragraph. Here's the output for our example template::
    <p><label for="id_message">Message:</label>
        <input type="text" name="message" id="id_message" /></p>
    <p><label for="id_sender">Sender:</label>
-       <input type="text" name="sender" id="id_sender" /></p>
+       <input type="email" name="sender" id="id_sender" /></p>
    <p><label for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit" />
