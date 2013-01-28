@@ -112,7 +112,7 @@ We've specified ``auto_id=False`` to simplify the output::
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Your Web site:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``initial``
@@ -135,7 +135,7 @@ field is initialized to a particular value. For example::
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 You may be thinking, why not just pass a dictionary of the initial values as
@@ -150,7 +150,7 @@ and the HTML output will include any validation errors::
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
-    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="url" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
 
 This is why ``initial`` values are only displayed for unbound forms. For bound
@@ -212,17 +212,17 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
-    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid email address, please.</td></tr>
+    <tr><th>Sender:</th><td><input type="email" name="sender" /><br />A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print(f.as_ul()))
     <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="text" name="sender" /> A valid email address, please.</li>
+    <li>Sender: <input type="email" name="sender" /> A valid email address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print(f.as_p())
     <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
-    <p>Sender: <input type="text" name="sender" /> A valid email address, please.</p>
+    <p>Sender: <input type="email" name="sender" /> A valid email address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 ``error_messages``
@@ -454,7 +454,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: DecimalField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput`
     * Empty value: ``None``
     * Normalizes to: A Python ``decimal``.
     * Validates that the given value is a decimal. Leading and trailing
@@ -489,7 +489,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: EmailField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`EmailInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid email address, using a
@@ -580,7 +580,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: FloatField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput`
     * Empty value: ``None``
     * Normalizes to: A Python float.
     * Validates that the given value is an float. Leading and trailing
@@ -621,7 +621,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: IntegerField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput`
     * Empty value: ``None``
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing
@@ -805,7 +805,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: URLField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`URLInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid URL.

@@ -22,7 +22,8 @@ from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
 
 __all__ = (
-    'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
+    'Media', 'MediaDefiningClass', 'Widget', 'TextInput',
+    'EmailInput', 'URLInput', 'NumberInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput', 'ClearableFileInput',
     'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
@@ -249,6 +250,18 @@ class TextInput(Input):
         if attrs is not None:
             self.input_type = attrs.pop('type', self.input_type)
         super(TextInput, self).__init__(attrs)
+
+
+class NumberInput(TextInput):
+    input_type = 'number'
+
+
+class EmailInput(TextInput):
+    input_type = 'email'
+
+
+class URLInput(TextInput):
+    input_type = 'url'
 
 
 class PasswordInput(TextInput):
