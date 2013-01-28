@@ -212,17 +212,17 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
-    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid email address, please.</td></tr>
+    <tr><th>Sender:</th><td><input type="email" name="sender" /><br />A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print(f.as_ul()))
     <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="text" name="sender" /> A valid email address, please.</li>
+    <li>Sender: <input type="email" name="sender" /> A valid email address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print(f.as_p())
     <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
-    <p>Sender: <input type="text" name="sender" /> A valid email address, please.</p>
+    <p>Sender: <input type="email" name="sender" /> A valid email address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 ``error_messages``
@@ -489,7 +489,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: EmailField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`EmailInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid email address, using a

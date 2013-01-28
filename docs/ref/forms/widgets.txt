@@ -392,7 +392,16 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: TextInput
 
-    Text input: ``<input type='text' ...>``
+    Text input: ``<input type="text" ...>``
+
+``EmailInput``
+~~~~~~~~~~~~~~
+
+.. class:: EmailInput
+
+    .. versionadded:: 1.6
+
+    Text input: ``<input type="email" ...>``
 
 ``PasswordInput``
 ~~~~~~~~~~~~~~~~~
