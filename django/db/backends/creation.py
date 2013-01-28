@@ -77,7 +77,7 @@ class BaseDatabaseCreation(object):
                     field_output.append(tablespace_sql)
             if f.rel:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(
-                    f, known_models, style)
+                    model, f, known_models, style)
                 if pending:
                     pending_references.setdefault(f.rel.to, []).append(
                         (model, f))
@@ -116,15 +116,16 @@ class BaseDatabaseCreation(object):
 
         return final_output, pending_references
 
-    def sql_for_inline_foreign_key_references(self, field, known_models, style):
+    def sql_for_inline_foreign_key_references(self, model, field, known_models, style):
         """
         Return the SQL snippet defining the foreign key reference for a field.
         """
         qn = self.connection.ops.quote_name
-        if field.rel.to in known_models:
+        rel_to = field.rel.to
+        if rel_to in known_models or rel_to == model:
             output = [style.SQL_KEYWORD('REFERENCES') + ' ' +
-                style.SQL_TABLE(qn(field.rel.to._meta.db_table)) + ' (' +
-                style.SQL_FIELD(qn(field.rel.to._meta.get_field(
+                style.SQL_TABLE(qn(rel_to._meta.db_table)) + ' (' +
+                style.SQL_FIELD(qn(rel_to._meta.get_field(
                     field.rel.field_name).column)) + ')' +
                 self.connection.ops.deferrable_sql()
             ]

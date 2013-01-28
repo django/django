@@ -23,6 +23,7 @@ class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
+    response_to = models.ForeignKey('self', null=True)
 
     def __str__(self):
         return self.headline

@@ -106,13 +106,17 @@ class IntrospectionTests(TestCase):
         # should test that the response is correct.
         if relations:
             # That's {field_index: (field_index_other_table, other_table)}
-            self.assertEqual(relations, {3: (0, Reporter._meta.db_table)})
+            self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
+                                         4: (0, Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
         cursor = connection.cursor()
         key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(key_columns, [('reporter_id', Reporter._meta.db_table, 'id')])
+        self.assertEqual(
+            set(key_columns),
+            set([('reporter_id', Reporter._meta.db_table, 'id'),
+                 ('response_to_id', Article._meta.db_table, 'id')]))
 
     def test_get_primary_key_column(self):
         cursor = connection.cursor()
