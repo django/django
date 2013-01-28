@@ -53,6 +53,11 @@ def fix_os_paths(x):
 
 class FieldsTests(SimpleTestCase):
 
+    def assertWidgetRendersTo(self, field, to):
+        class _Form(Form):
+            f = field
+        self.assertHTMLEqual(str(_Form()['f']), to)
+
     def test_field_sets_widget_is_required(self):
         self.assertTrue(Field(required=True).widget.is_required)
         self.assertFalse(Field(required=False).widget.is_required)
@@ -545,6 +550,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_emailfield_1(self):
         f = EmailField()
+        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual('person@example.com', f.clean('person@example.com'))
@@ -569,6 +575,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_emailfield_min_max_length(self):
         f = EmailField(min_length=10, max_length=15)
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="email" name="f" maxlength="15" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'", f.clean, 'a@foo.com')
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 15 characters (it has 20).'", f.clean, 'alf123456788@foo.com')

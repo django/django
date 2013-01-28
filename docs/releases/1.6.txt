@@ -31,6 +31,9 @@ Minor features
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
 
+* The default widgets for :class:`~django.forms.EmailField` use
+  the new type attribute available in HTML5 (type='email').
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -38,6 +41,10 @@ Backwards incompatible changes in 1.6
   it is only usable as a marker class for checking if
   :meth:`~django.db.models.query.QuerySet.none` has been called:
   ``isinstance(qs.none(), EmptyQuerySet)``
+
+* If your CSS/Javascript code used to access HTML input widgets by type, you
+  should review it as ``type='text'`` widgets might be now output as
+  ``type='email'`` depending on their corresponding field type.
 
 .. warning::
 
