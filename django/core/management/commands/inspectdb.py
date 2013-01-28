@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
-from django.utils import six
+
 
 class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
@@ -34,7 +34,7 @@ class Command(NoArgsCommand):
         table_name_filter = options.get('table_name_filter')
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
-        strip_prefix = lambda s: s.startswith("u'") and s[1:] or s
+        strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
@@ -86,7 +86,7 @@ class Command(NoArgsCommand):
                         extra_params['unique'] = True
 
                 if is_relation:
-                    rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
+                    rel_to = "self" if relations[i][1] == table_name else table2model(relations[i][1])
                     if rel_to in known_models:
                         field_type = 'ForeignKey(%s' % rel_to
                     else:
