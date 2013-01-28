@@ -639,6 +639,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_urlfield_1(self):
         f = URLField()
+        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual('http://localhost/', f.clean('http://localhost'))
@@ -690,6 +691,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 13).'", f.clean, 'http://f.com')
         self.assertEqual('http://example.com/', f.clean('http://example.com'))
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 38).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')

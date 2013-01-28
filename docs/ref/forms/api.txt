@@ -161,7 +161,7 @@ precedence::
     >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 Accessing "clean" data
