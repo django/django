@@ -38,7 +38,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             suffix.append('COLLATE %s' % self.connection.settings_dict['TEST_COLLATION'])
         return ' '.join(suffix)
 
-    def sql_for_inline_foreign_key_references(self, field, known_models, style):
+    def sql_for_inline_foreign_key_references(self, model, field, known_models, style):
         "All inline references are pending under MySQL"
         return [], True
 
