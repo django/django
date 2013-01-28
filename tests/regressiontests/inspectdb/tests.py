@@ -31,6 +31,8 @@ class InspectDBTestCase(TestCase):
                      stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
+        # Recursive foreign keys should be set to 'self'
+        self.assertIn("parent = models.ForeignKey('self')", output)
         self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", output, msg=error_message)
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
         self.assertIn("from_field = models.ForeignKey('InspectdbPeople', db_column='from_id')",
