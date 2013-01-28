@@ -63,8 +63,8 @@ After the previous tutorials, our project should look like this::
             urls.py
             wsgi.py
         polls/
-            admin.py
             __init__.py
+            admin.py
             models.py
             tests.py
             urls.py

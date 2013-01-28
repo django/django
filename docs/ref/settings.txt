@@ -1134,9 +1134,12 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be in
-standard :term:`language format<language code>`. For example, U.S. English is
-``"en-us"``. See :doc:`/topics/i18n/index`.
+A string representing the language code for this installation. This should be
+in standard :term:`language format<language code>`. For example, U.S. English
+is ``"en-us"``. See also the `list of language identifiers`_ and
+:doc:`/topics/i18n/index`.
+
+.. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -1668,12 +1671,8 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation, or
-``None``. `See available choices`_. (Note that list of available
-choices lists more than one on the same line; you'll want to use just
-one of the choices for a given time zone. For instance, one line says
-``'Europe/London GB GB-Eire'``, but you should use the first bit of
-that -- ``'Europe/London'`` -- as your :setting:`TIME_ZONE` setting.)
+A string representing the time zone for this installation, or ``None``. See
+the `list of time zones`_.
 
 Note that this isn't necessarily the time zone of the server. For example, one
 server may serve multiple Django-powered sites, each with a separate time zone
@@ -1706,7 +1705,7 @@ to ensure your processes are running in the correct environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. _pytz: http://pytz.sourceforge.net/
 
