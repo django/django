@@ -31,9 +31,11 @@ Minor features
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
 
-* The default widgets for :class:`~django.forms.EmailField` and
-  :class:`~django.forms.URLField` use the new type attributes available in
-  HTML5 (type='email', type='url').
+* The default widgets for :class:`~django.forms.EmailField`,
+  :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.FloatField and :class:`~django.forms.DecimalField` use
+  the new type attributes available in HTML5 (type='email', type='url',
+  type='number').
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -45,7 +47,8 @@ Backwards incompatible changes in 1.6
 
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as
-  ``type='email'`` or ``type='url'`` depending on their corresponding field type.
+  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
+  corresponding field type.
 
 .. warning::
 

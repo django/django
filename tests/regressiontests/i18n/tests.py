@@ -629,13 +629,13 @@ class FormattingTests(TestCase):
             self.assertEqual(True, form6.is_valid())
             self.assertHTMLEqual(
                 form6.as_ul(),
-                '<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_paid">Cents paid:</label> <input type="text" name="cents_paid" value="59,47" id="id_cents_paid" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="text" name="products_delivered" value="12000" id="id_products_delivered" /></li>'
+                '<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_paid">Cents paid:</label> <input type="number" name="cents_paid" value="59,47" maxlength="5" step="0.01" id="id_cents_paid" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="number" name="products_delivered" value="12000" id="id_products_delivered" /></li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 # Checking for the localized "products_delivered" field
-                self.assertInHTML('<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />', form6.as_ul())
+                self.assertInHTML('<input type="number" name="products_delivered" value="12.000" id="id_products_delivered" />', form6.as_ul())
 
     def test_iter_format_modules(self):
         """
