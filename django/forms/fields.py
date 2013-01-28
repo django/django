@@ -19,7 +19,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
 from django.forms.widgets import (
-    TextInput, PasswordInput, EmailInput, HiddenInput,
+    TextInput, PasswordInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION
@@ -612,6 +612,7 @@ class ImageField(FileField):
         return f
 
 class URLField(CharField):
+    widget = URLInput
     default_error_messages = {
         'invalid': _('Enter a valid URL.'),
     }

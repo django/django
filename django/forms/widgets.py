@@ -22,7 +22,8 @@ from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
 
 __all__ = (
-    'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'EmailInput', 'PasswordInput',
+    'Media', 'MediaDefiningClass', 'Widget', 'TextInput',
+    'EmailInput', 'URLInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput', 'ClearableFileInput',
     'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
@@ -253,6 +254,10 @@ class TextInput(Input):
 
 class EmailInput(TextInput):
     input_type = 'email'
+
+
+class URLInput(TextInput):
+    input_type = 'url'
 
 
 class PasswordInput(TextInput):
