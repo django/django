@@ -6,7 +6,7 @@ from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Person, Place, Location, Traveler, Salesman
+from .models import Person, Place, Location, Traveler
 
 
 class NameAdmin(admin.ModelAdmin):
@@ -108,12 +108,6 @@ class TestRegistrationDecorator(TestCase):
                           register(Person, model=Location),
                           NameAdmin)
 
-    def test_prevent_double_registration(self):
-        register(Salesman)(NameAdmin)
-        self.assertRaises(admin.sites.AlreadyRegistered,
-                          register(Salesman),
-                          NameAdmin)
-
     def test_multiple_registration(self):
         register(Traveler, Place)(NameAdmin)
         self.assertTrue(
@@ -124,13 +118,6 @@ class TestRegistrationDecorator(TestCase):
             isinstance(self.default_site._registry[Place],
                        admin.options.ModelAdmin)
         )
-
-    def test_abstract_model_registration(self):
-        self.assertRaises(ImproperlyConfigured, register(Location), NameAdmin)
-
-    def test_non_model_class_registration(self):
-        p = Person()
-        self.assertRaises(ValueError, register(p), NameAdmin)
 
     def test_wrapped_class_not_a_model_admin(self):
         self.assertRaises(ValueError, register(Person), CustomSite)
