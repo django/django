@@ -82,7 +82,7 @@ Changing passwords
 Django does not store raw (clear text) passwords on the user model, but only
 a hash (see :doc:`documentation of how passwords are managed
 </topics/auth/passwords>` for full details). Because of this, do not attempt to
-manipulate the password attribute of the user directly. This is why a a helper
+manipulate the password attribute of the user directly. This is why a helper
 function is used when creating a user.
 
 To change a user's password, you have several options:

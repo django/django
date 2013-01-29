@@ -824,7 +824,7 @@ subclass::
     added last after all editable fields.
 
     A read-only field can not only display data from a model's field, it can
-    also display the output of a a model's method or a method of the
+    also display the output of a model's method or a method of the
     ``ModelAdmin`` class itself. This is very similar to the way
     :attr:`ModelAdmin.list_display` behaves. This provides an easy way to use
     the admin interface to provide feedback on the status of the objects being

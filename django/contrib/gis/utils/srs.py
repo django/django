@@ -24,7 +24,7 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
        Defaults to the SRID determined by GDAL.
 
      ref_sys_name:
-       For SpatiaLite users only, sets the value of the the `ref_sys_name` field.
+       For SpatiaLite users only, sets the value of the `ref_sys_name` field.
        Defaults to the name determined by GDAL.
 
      database:

@@ -2454,7 +2454,7 @@ class TestCustomChangeList(TestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
         # Hit the page once to get messages out of the queue message list
         response = self.client.get('/test_admin/%s/admin_views/gadget/' % self.urlbit)
-        # Ensure that that data is still not visible on the page
+        # Ensure that data is still not visible on the page
         response = self.client.get('/test_admin/%s/admin_views/gadget/' % self.urlbit)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'First Gadget')

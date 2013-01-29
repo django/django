@@ -330,7 +330,7 @@ described above, ``psycopg2`` may be installed using the following command::
 
 .. note::
 
-    If you don't have ``pip``, follow the the :ref:`installation instructions
+    If you don't have ``pip``, follow the :ref:`installation instructions
     <installing-official-release>` to install it.
 
 .. _fink:

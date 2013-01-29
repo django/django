@@ -1587,7 +1587,7 @@ def prefetch_related_objects(result_cache, related_lookups):
             continue
         done_lookups.add(lookup)
 
-        # Top level, the list of objects to decorate is the the result cache
+        # Top level, the list of objects to decorate is the result cache
         # from the primary QuerySet. It won't be for deeper levels.
         obj_list = result_cache
 
