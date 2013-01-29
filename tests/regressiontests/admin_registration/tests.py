@@ -103,11 +103,6 @@ class TestRegistrationDecorator(TestCase):
                        admin.options.ModelAdmin)
         )
 
-    def test_unsupported_kwargs(self):
-        self.assertRaises(TypeError,
-                          register(Person, model=Location),
-                          NameAdmin)
-
     def test_multiple_registration(self):
         register(Traveler, Place)(NameAdmin)
         self.assertTrue(

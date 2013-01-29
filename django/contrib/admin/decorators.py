@@ -16,9 +16,6 @@ def register(*models, **kwargs):
     """
     def _model_admin_wrapper(admin_class):
         admin_site = kwargs.pop('site', site)
-        # If there are any kwargs left after `site` is popped, they are invalid
-        if kwargs:
-            raise TypeError('Unsupported arguments: %s' % kwargs.keys())
 
         if not isinstance(admin_site, AdminSite):
             raise ValueError('Site must derive from AdminSite')
