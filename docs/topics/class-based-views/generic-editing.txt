@@ -225,7 +225,6 @@ works for AJAX requests as well as 'normal' form POSTs::
 
     from django.http import HttpResponse
     from django.views.generic.edit import CreateView
-    from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
     class AjaxableResponseMixin(object):
         """
