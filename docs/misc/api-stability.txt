@@ -118,7 +118,8 @@ Security fixes
 
 If we become aware of a security problem -- hopefully by someone following our
 :ref:`security reporting policy <reporting-security-issues>` -- we'll do
-everything necessary to fix it. This might mean breaking backwards compatibility; security trumps the compatibility guarantee.
+everything necessary to fix it. This might mean breaking backwards
+compatibility; security trumps the compatibility guarantee.
 
 Contributed applications (``django.contrib``)
 ---------------------------------------------

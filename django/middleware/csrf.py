@@ -41,10 +41,10 @@ def _get_new_csrf_key():
 
 def get_token(request):
     """
-    Returns the the CSRF token required for a POST form. The token is an
+    Returns the CSRF token required for a POST form. The token is an
     alphanumeric value.
 
-    A side effect of calling this function is to make the the csrf_protect
+    A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.

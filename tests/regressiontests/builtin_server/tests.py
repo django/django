@@ -7,7 +7,7 @@ from django.utils.unittest import TestCase
 
 #
 # Tests for #9659: wsgi.file_wrapper in the builtin server.
-# We need to mock a couple of of handlers and keep track of what
+# We need to mock a couple of handlers and keep track of what
 # gets called when using a couple kinds of WSGI apps.
 #
 

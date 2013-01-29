@@ -32,7 +32,7 @@ def serve(request, path, document_root=None, insecure=False, **kwargs):
     """
     if not settings.DEBUG and not insecure:
         raise ImproperlyConfigured("The staticfiles view can only be used in "
-                                   "debug mode or if the the --insecure "
+                                   "debug mode or if the --insecure "
                                    "option of 'runserver' is used")
     normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
     absolute_path = finders.find(normalized_path)
