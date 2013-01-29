@@ -414,6 +414,33 @@ convert them to strings, because they should be converted as late as possible
 (so that the correct locale is in effect). This necessitates the use of the
 helper function described next.
 
+Lazy translations and plural
+----------------------------
+
+.. versionadded:: 1.6
+
+When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
+generally don't know the ``number`` argument at the time of the string
+definition. Therefore, you are authorized to pass a dictionary key name in place
+of an integer as the ``number`` argument. Then, when the string is effectively
+translated with a placeholders dictionary, the ``number`` argument will get
+substituted by the value of the key in the dictionary. Alternatively, if the
+string contains only one unnamed placeholder, you can also omit passing the
+``number`` argument at all. For example::
+
+    class MyForm(forms.Form):
+        error1_message = ungettext_lazy("You only provided %(num)d argument",
+            "You only provided %(num)d arguments", 'num')
+        error2_message = ungettext_lazy("You provided %d argument",
+            "You provided %d arguments")
+
+        def clean(self):
+            if err_1:
+                raise forms.ValidationError(self.error1_message % {'num': number})
+            if err_2:
+                raise forms.ValidationError(self.error2_message % number)
+
+
 Joining strings: string_concat()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

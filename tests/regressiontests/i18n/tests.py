@@ -23,7 +23,7 @@ from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
 from django.utils import six
 from django.utils.six import PY3
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
-    deactivate, gettext_lazy, pgettext, npgettext, to_locale,
+    deactivate, gettext_lazy, ungettext_lazy, ngettext_lazy, npgettext_lazy, pgettext, npgettext, to_locale,
     get_language_info, get_language, get_language_from_request, trans_real)
 
 
@@ -94,6 +94,42 @@ class TranslationTests(TestCase):
         self.assertEqual(six.text_type(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
         self.assertEqual(six.text_type(s2), "test")
+
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
+    def test_ungettext_lazy(self):
+        s0 = ungettext_lazy("%d good result", "%d good results")
+        s1 = ngettext_lazy(str("%d good result"), str("%d good results"))
+        s2 = npgettext_lazy('Exclamation', '%d good result', '%d good results')
+        with translation.override('de'):
+            self.assertEqual(s0 % 1, "1 gutes Resultat")
+            self.assertEqual(s0 % 4, "4 guten Resultate")
+            self.assertEqual(s1 % 1, str("1 gutes Resultat"))
+            self.assertEqual(s1 % 4, str("4 guten Resultate"))
+            self.assertEqual(s2 % 1, "1 gutes Resultat!")
+            self.assertEqual(s2 % 4, "4 guten Resultate!")
+
+        s3 = ungettext_lazy("Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 4)
+        s4 = ungettext_lazy("Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 'num')
+        s5 = ngettext_lazy(str("Hi %(name)s, %(num)d good result"), str("Hi %(name)s, %(num)d good results"), 4)
+        s6 = ngettext_lazy(str("Hi %(name)s, %(num)d good result"), str("Hi %(name)s, %(num)d good results"), 'num')
+        s7 = npgettext_lazy('Greeting', "Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 4)
+        s8 = npgettext_lazy('Greeting', "Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 'num')
+        with translation.override('de'):
+            self.assertEqual(s3 % {'num': 4, 'name': 'Jim'}, "Hallo Jim, 4 guten Resultate")
+            self.assertEqual(s4 % {'name': 'Jim', 'num': 1}, "Hallo Jim, 1 gutes Resultat")
+            self.assertEqual(s4 % {'name': 'Jim', 'num': 5}, "Hallo Jim, 5 guten Resultate")
+            with self.assertRaisesRegexp(KeyError, 'Your dictionary lacks key.*'):
+                s4 % {'name': 'Jim'}
+            self.assertEqual(s5 % {'num': 4, 'name': 'Jim'}, str("Hallo Jim, 4 guten Resultate"))
+            self.assertEqual(s6 % {'name': 'Jim', 'num': 1}, str("Hallo Jim, 1 gutes Resultat"))
+            self.assertEqual(s6 % {'name': 'Jim', 'num': 5}, str("Hallo Jim, 5 guten Resultate"))
+            with self.assertRaisesRegexp(KeyError, 'Your dictionary lacks key.*'):
+                s6 % {'name': 'Jim'}
+            self.assertEqual(s7 % {'num': 4, 'name': 'Jim'}, "Willkommen Jim, 4 guten Resultate")
+            self.assertEqual(s8 % {'name': 'Jim', 'num': 1}, "Willkommen Jim, 1 gutes Resultat")
+            self.assertEqual(s8 % {'name': 'Jim', 'num': 5}, "Willkommen Jim, 5 guten Resultate")
+            with self.assertRaisesRegexp(KeyError, 'Your dictionary lacks key.*'):
+                s8 % {'name': 'Jim'}
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):

@@ -41,6 +41,32 @@ msgid_plural "%d results"
 msgstr[0] "%d Resultat"
 msgstr[1] "%d Resultate"
 
+#: models.py:11
+msgid "%d good result"
+msgid_plural "%d good results"
+msgstr[0] "%d gutes Resultat"
+msgstr[1] "%d guten Resultate"
+
+#: models.py:11
+msgctxt "Exclamation"
+msgid "%d good result"
+msgid_plural "%d good results"
+msgstr[0] "%d gutes Resultat!"
+msgstr[1] "%d guten Resultate!"
+
+#: models.py:11
+msgid "Hi %(name)s, %(num)d good result"
+msgid_plural "Hi %(name)s, %(num)d good results"
+msgstr[0] "Hallo %(name)s, %(num)d gutes Resultat"
+msgstr[1] "Hallo %(name)s, %(num)d guten Resultate"
+
+#: models.py:11
+msgctxt "Greeting"
+msgid "Hi %(name)s, %(num)d good result"
+msgid_plural "Hi %(name)s, %(num)d good results"
+msgstr[0] "Willkommen %(name)s, %(num)d gutes Resultat"
+msgstr[1] "Willkommen %(name)s, %(num)d guten Resultate"
+
 #: models.py:13
 #, python-format
 msgid "The result was %(percent)s%%"
