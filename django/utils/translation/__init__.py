@@ -84,23 +84,23 @@ ugettext_lazy = lazy(ugettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    class NumberAwareString(resultclass):
-        def __mod__(self, rhs):
-            if isinstance(rhs, dict) and number:
-                try:
-                    number_value = rhs[number]
-                except KeyError:
-                    raise KeyError('Your dictionary lacks key \'%s\'. Please provide it, because '
-                                   'it is required to determine whether string is singular or plural.' % number)
-            else:
-                number_value = rhs
-            kwargs['number'] = number_value
-            return func(**kwargs) % rhs
-
     if isinstance(number, int):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
+        class NumberAwareString(resultclass):
+            def __mod__(self, rhs):
+                if isinstance(rhs, dict) and number:
+                    try:
+                        number_value = rhs[number]
+                    except KeyError:
+                        raise KeyError('Your dictionary lacks key \'%s\'. Please provide it, because '
+                                       'it is required to determine whether string is singular or plural.' % number)
+                else:
+                    number_value = rhs
+                kwargs['number'] = number_value
+                return func(**kwargs) % rhs
+
         proxy = lazy(lambda **kwargs:NumberAwareString(), NumberAwareString)(**kwargs)
     return proxy
 
