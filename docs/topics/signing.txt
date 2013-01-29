@@ -58,6 +58,7 @@ You can retrieve the original value using the ``unsign`` method::
 If the signature or value have been altered in any way, a
 ``django.core.signing.BadSignature`` exception will be raised::
 
+    >>> from django.core import signing
     >>> value += 'm'
     >>> try:
     ...    original = signer.unsign(value)
