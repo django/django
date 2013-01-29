@@ -373,7 +373,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
 
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')
-        return constant_time_compare(encoded, encoded_2)
+        return constant_time_compare(encoded[5:], encoded_2)
 
     def safe_summary(self, encoded):
         return SortedDict([
