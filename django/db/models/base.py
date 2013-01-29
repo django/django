@@ -58,12 +58,21 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
+
         # six.with_metaclass() inserts an extra class called 'NewBase' in the
-        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        # inheritance tree: Model -> NewBase -> object. But the initialization
+        # should be executed only once for a given model class.
+
+        # attrs will never be empty for classes declared in the standard way
+        # (ie. with the `class` keyword). This is quite robust.
+        if name == 'NewBase' and attrs == {}:
+            return super_new(cls, name, bases, attrs)
+
+        # Also ensure initialization is only performed for subclasses of Model
+        # (excluding Model class itself).
         parents = [b for b in bases if isinstance(b, ModelBase) and
                 not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
-            # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
 
         # Create the class.
