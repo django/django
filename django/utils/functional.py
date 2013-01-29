@@ -157,8 +157,7 @@ def lazy(func, *resultclasses):
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs
-            else:
-                raise AssertionError('__mod__ not supported for non-string types')
+            return self.__cast() % rhs
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a
