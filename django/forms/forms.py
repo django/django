@@ -32,12 +32,12 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     """
     Create a list of form field instances from the passed in 'attrs', plus any
     similar fields on the base classes (in 'bases'). This is used by both the
-    Form and ModelForm metclasses.
+    Form and ModelForm metaclasses.
 
     If 'with_base_fields' is True, all fields from the bases are used.
     Otherwise, only fields in the 'declared_fields' attribute on the bases are
     used. The distinction is useful in ModelForm subclassing.
-    Also integrates any additional media definitions
+    Also integrates any additional media definitions.
     """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)]
     fields.sort(key=lambda x: x[1].creation_counter)
