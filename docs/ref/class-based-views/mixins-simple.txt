@@ -64,6 +64,11 @@ TemplateResponseMixin
         instantiation, create a ``TemplateResponse`` subclass and assign it to
         ``response_class``.
 
+    .. attribute:: content_type
+
+        The content type to use for the response. ``content_type`` is passed as
+        an argument to ``response_class``.
+
     **Methods**
 
     .. method:: render_to_response(context, **response_kwargs)
