@@ -20,6 +20,8 @@ urlpatterns = patterns('',
         TemplateView.as_view(template_name='generic_views/about.html')),
     (r'^template/custom/(?P<foo>\w+)/$',
         views.CustomTemplateView.as_view(template_name='generic_views/about.html')),
+    (r'^template/content_type/$',
+        TemplateView.as_view(template_name='generic_views/robots.txt', content_type='text/plain')),
 
     (r'^template/cached/(?P<foo>\w+)/$',
         cache_page(2.0)(TemplateView.as_view(template_name='generic_views/about.html'))),

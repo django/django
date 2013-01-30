@@ -64,6 +64,15 @@ TemplateResponseMixin
         instantiation, create a ``TemplateResponse`` subclass and assign it to
         ``response_class``.
 
+    .. attribute:: content_type
+
+        .. versionadded:: 1.5
+            The ``content_type`` attribute was added.
+
+        The content type to use for the response. ``content_type`` is passed
+        as a keyword argument to ``response_class``. Default is ``None`` --
+        meaning that Django uses :setting:`DEFAULT_CONTENT_TYPE`.
+
     **Methods**
 
     .. method:: render_to_response(context, **response_kwargs)
