@@ -7,7 +7,7 @@ except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils import six
@@ -209,12 +209,18 @@ class MinValueValidator(BaseValidator):
 class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
-    message = _('Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).')
+    message = ungettext_lazy(
+        'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
+        'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
+        'limit_value')
     code = 'min_length'
 
 
 class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)
-    message = _('Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).')
+    message = ungettext_lazy(
+        'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
+        'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
+        'limit_value')
     code = 'max_length'
