@@ -35,6 +35,10 @@ Minor features
   :class:`~django.forms.URLField` use the new type attributes available in
   HTML5 (type='email', type='url').
 
+* The ``number`` argument for :ref:`lazy plural translations
+  <lazy-plural-translations>` can be provided at translation time rather than
+  at definition time.
+
 Backwards incompatible changes in 1.6
 =====================================
 
