@@ -85,11 +85,40 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 gettext_lazy = lazy(gettext, str)
-ngettext_lazy = lazy(ngettext, str)
 ugettext_lazy = lazy(ugettext, six.text_type)
-ungettext_lazy = lazy(ungettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
-npgettext_lazy = lazy(npgettext, six.text_type)
+
+def lazy_number(func, resultclass, number=None, **kwargs):
+    if isinstance(number, int):
+        kwargs['number'] = number
+        proxy = lazy(func, resultclass)(**kwargs)
+    else:
+        class NumberAwareString(resultclass):
+            def __mod__(self, rhs):
+                if isinstance(rhs, dict) and number:
+                    try:
+                        number_value = rhs[number]
+                    except KeyError:
+                        raise KeyError('Your dictionary lacks key \'%s\'. '
+                            'Please provide it, because it is required to '
+                            'determine whether string is singular or plural.'
+                            % number)
+                else:
+                    number_value = rhs
+                kwargs['number'] = number_value
+                return func(**kwargs) % rhs
+
+        proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+    return proxy
+
+def ngettext_lazy(singular, plural, number=None):
+    return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
+
+def ungettext_lazy(singular, plural, number=None):
+    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+
+def npgettext_lazy(context, singular, plural, number=None):
+    return lazy_number(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
 
 def activate(language):
     return _trans.activate(language)
