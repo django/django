@@ -454,6 +454,17 @@ Advanced ``WizardView`` methods
         def process_step_files(self, form):
             return self.get_form_step_files(form)
 
+.. method:: WizardView.render_goto_step(step, goto_step, **kwargs)
+
+    .. versionchanged:: 1.6
+
+    This method is called when the step should be changed to something else
+    than the next step. By default, this method just stores the requested
+    step ``goto_step`` in the storage and then renders the new step.
+
+    If you want to store the entered data of the current step before rendering
+    the next step, you can overwrite this method.
+
 .. method:: WizardView.render_revalidation_failure(step, form, **kwargs)
 
     When the wizard thinks all steps have passed it revalidates all forms with
