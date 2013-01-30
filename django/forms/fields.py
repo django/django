@@ -28,7 +28,7 @@ from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES
@@ -505,7 +505,10 @@ class FileField(Field):
         'invalid': _("No file was submitted. Check the encoding type on the form."),
         'missing': _("No file was submitted."),
         'empty': _("The submitted file is empty."),
-        'max_length': _('Ensure this filename has at most %(max)d characters (it has %(length)d).'),
+        'max_length': ungettext_lazy(
+            'Ensure this filename has at most %(max)d character (it has %(length)d).',
+            'Ensure this filename has at most %(max)d characters (it has %(length)d).',
+            'max'),
         'contradiction': _('Please either submit a file or check the clear checkbox, not both.')
     }
 
