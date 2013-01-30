@@ -32,6 +32,7 @@ TemplateView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
@@ -79,6 +80,7 @@ DetailView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.context_object_name` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
@@ -112,6 +114,7 @@ ListView
 **Attributes** (with optional accessor):
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.model`
@@ -144,6 +147,7 @@ FormView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.edit.FormMixin.form_class` [:meth:`~django.views.generic.edit.FormMixin.get_form_class`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.edit.FormMixin.initial` [:meth:`~django.views.generic.edit.FormMixin.get_initial`]
@@ -173,6 +177,7 @@ CreateView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.context_object_name` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.edit.FormMixin.form_class` [:meth:`~django.views.generic.edit.FormMixin.get_form_class`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -211,6 +216,7 @@ UpdateView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.context_object_name` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.edit.FormMixin.form_class` [:meth:`~django.views.generic.edit.FormMixin.get_form_class`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -249,6 +255,7 @@ DeleteView
 
 **Attributes** (with optional accessor):
 
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.context_object_name` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
@@ -286,6 +293,7 @@ ArchiveIndexView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -321,6 +329,7 @@ YearArchiveView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -359,6 +368,7 @@ MonthArchiveView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -400,6 +410,7 @@ WeekArchiveView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.base.View.http_method_names`
@@ -439,6 +450,7 @@ DayArchiveView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.dates.DayMixin.day` [:meth:`~django.views.generic.dates.DayMixin.get_day`]
@@ -484,6 +496,7 @@ TodayArchiveView
 
 * :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_allow_empty`]
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.context_object_name` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.dates.DayMixin.day` [:meth:`~django.views.generic.dates.DayMixin.get_day`]
@@ -528,6 +541,7 @@ DateDetailView
 **Attributes** (with optional accessor):
 
 * :attr:`~django.views.generic.dates.DateMixin.allow_future` [:meth:`~django.views.generic.dates.DateMixin.get_allow_future`]
+* :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.context_object_name` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name`]
 * :attr:`~django.views.generic.dates.DateMixin.date_field` [:meth:`~django.views.generic.dates.DateMixin.get_date_field`]
 * :attr:`~django.views.generic.dates.DayMixin.day` [:meth:`~django.views.generic.dates.DayMixin.get_day`]
