@@ -312,6 +312,11 @@ class TemplateViewTest(TestCase):
 
         self.assertNotEqual(response.content, response2.content)
 
+    def test_content_type(self):
+        response = self.client.get('/template/content_type/')
+        self.assertEqual(response['Content-Type'], 'text/plain')
+
+
 class RedirectViewTest(unittest.TestCase):
     rf = RequestFactory()
 
