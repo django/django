@@ -39,8 +39,10 @@ class InspectDBTestCase(TestCase):
         if connection.vendor == 'mysql':
             # No native boolean type on MySQL
             assertFieldType('field2', "models.IntegerField()")
+            assertFieldType('field2b', "models.IntegerField(null=True, blank=True)")
         else:
             assertFieldType('field2', "models.BooleanField()")
+            assertFieldType('field2b', "models.NullBooleanField()")
         assertFieldType('field3', "models.CharField(max_length=10)")
         # CommaSeparatedIntegerField
         assertFieldType('field4', "models.CharField(max_length=99)")
@@ -68,8 +70,6 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('field13', "models.CharField(max_length=15)")
             assertFieldType('field14', "models.CharField(max_length=39)")
-        # Ticket #19341
-        #assertFieldType('field15', "models.NullBooleanField()")
         if connection.vendor == 'sqlite':
             assertFieldType('field16', "models.PositiveIntegerField()")
             assertFieldType('field17', "models.PositiveSmallIntegerField()")
