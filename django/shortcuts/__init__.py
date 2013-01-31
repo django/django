@@ -3,6 +3,7 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
+import warnings
 
 from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
@@ -17,7 +18,14 @@ def render_to_response(*args, **kwargs):
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    httpresponse_kwargs = {'content_type': kwargs.pop('mimetype', None)}
+    httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
+
+    mimetype = kwargs.pop('mimetype', None)
+    if mimetype:
+        warnings.warn("The mimetype keyword argument is deprecated, use "
+            "content_type instead", PendingDeprecationWarning, stacklevel=2)
+        httpresponse_kwargs['content_type'] = mimetype
+
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
 
 def render(request, *args, **kwargs):
