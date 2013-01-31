@@ -201,7 +201,7 @@ class override(object):
         if self.old_timezone is not None:
             _active.value = self.old_timezone
         else:
-            del _active.value
+            deactivate()
 
 
 # Templates
