@@ -21,6 +21,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.LONGLONG: 'BigIntegerField',
         FIELD_TYPE.SHORT: 'IntegerField',
         FIELD_TYPE.STRING: 'CharField',
+        FIELD_TYPE.TIME: 'TimeField',
         FIELD_TYPE.TIMESTAMP: 'DateTimeField',
         FIELD_TYPE.TINY: 'IntegerField',
         FIELD_TYPE.TINY_BLOB: 'TextField',

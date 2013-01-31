@@ -87,11 +87,7 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('field19', "models.IntegerField()")
         assertFieldType('field20', "models.TextField()")
-        if connection.vendor == 'mysql':
-            # Ticket #19709
-            assertFieldType('field21', "models.TextField() # This field type is a guess.")
-        else:
-            assertFieldType('field21', "models.TimeField()")
+        assertFieldType('field21', "models.TimeField()")
         # URLField
         assertFieldType('field22', "models.CharField(max_length=200)")
 
