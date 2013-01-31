@@ -205,7 +205,7 @@ class Command(NoArgsCommand):
 
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row[3]:
-            field_params['max_length'] = row[3]
+            field_params['max_length'] = int(row[3])
 
         if field_type == 'DecimalField':
             field_params['max_digits'] = row[4]

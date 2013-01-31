@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import re
+
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
@@ -20,6 +22,78 @@ class InspectDBTestCase(TestCase):
         # the Django test suite, check that one of its tables hasn't been
         # inspected
         self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
+
+    def test_field_types(self):
+        """Test introspection of various Django field types"""
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     stdout=out)
+        output = out.getvalue()
+        def assertFieldType(name, definition):
+            out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
+            self.assertEqual(definition, out_def)
+
+        assertFieldType('id', "models.IntegerField(primary_key=True)")
+        assertFieldType('field1', "models.BigIntegerField()")
+        if connection.vendor == 'mysql':
+            # No native boolean type on MySQL
+            assertFieldType('field2', "models.IntegerField()")
+        else:
+            assertFieldType('field2', "models.BooleanField()")
+        assertFieldType('field3', "models.CharField(max_length=10)")
+        # CommaSeparatedIntegerField
+        assertFieldType('field4', "models.CharField(max_length=99)")
+        assertFieldType('field5', "models.DateField()")
+        assertFieldType('field6', "models.DateTimeField()")
+        if connection.vendor == 'sqlite':
+            # Ticket #5014
+            assertFieldType('field7', "models.DecimalField(max_digits=None, decimal_places=None)")
+        elif connection.vendor == 'mysql':
+            pass # Ticket #5014
+        else:
+            assertFieldType('field7', "models.DecimalField(max_digits=6, decimal_places=1)")
+        # EmailField
+        assertFieldType('field8', "models.CharField(max_length=75)")
+        # FileField
+        assertFieldType('field9', "models.CharField(max_length=100)")
+        # FilePathField
+        assertFieldType('field10', "models.CharField(max_length=100)")
+        assertFieldType('field11', "models.FloatField()")
+        assertFieldType('field12', "models.IntegerField()")
+        if connection.vendor == 'postgresql':
+            # Only PostgreSQL has a specific type
+            assertFieldType('field13', "models.GenericIPAddressField()")
+            assertFieldType('field14', "models.GenericIPAddressField()")
+        else:
+            assertFieldType('field13', "models.CharField(max_length=15)")
+            assertFieldType('field14', "models.CharField(max_length=39)")
+        # Ticket #19341
+        #assertFieldType('field15', "models.NullBooleanField()")
+        if connection.vendor == 'sqlite':
+            assertFieldType('field16', "models.PositiveIntegerField()")
+            assertFieldType('field17', "models.PositiveSmallIntegerField()")
+        else:
+            # 'unsigned' property undetected on other backends
+            assertFieldType('field16', "models.IntegerField()")
+            if connection.vendor == 'postgresql':
+                assertFieldType('field17', "models.SmallIntegerField()")
+            else:
+                assertFieldType('field17', "models.IntegerField()")
+        # SlugField
+        assertFieldType('field18', "models.CharField(max_length=50)")
+        if connection.vendor in ('sqlite', 'postgresql'):
+            assertFieldType('field19', "models.SmallIntegerField()")
+        else:
+            assertFieldType('field19', "models.IntegerField()")
+        assertFieldType('field20', "models.TextField()")
+        if connection.vendor == 'mysql':
+            # Ticket #19709
+            assertFieldType('field21', "models.TextField() # This field type is a guess.")
+        else:
+            assertFieldType('field21', "models.TimeField()")
+        # URLField
+        assertFieldType('field22', "models.CharField(max_length=200)")
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):
