@@ -111,6 +111,7 @@ def get_default_timezone():
         if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
             _localtime = pytz.timezone(settings.TIME_ZONE)
         else:
+            # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
             _localtime = LocalTimezone()
     return _localtime
 
@@ -198,10 +199,10 @@ class override(object):
             activate(self.timezone)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.old_timezone is not None:
-            _active.value = self.old_timezone
+        if self.old_timezone is None:
+            deactivate()
         else:
-            del _active.value
+            _active.value = self.old_timezone
 
 
 # Templates
