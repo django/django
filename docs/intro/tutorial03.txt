@@ -300,8 +300,9 @@ Django will look for templates in there.
 	choose the first template it finds whose name matches. If you had a template
 	with the same name in a *different* application, it could choose the wrong 
 	one. We need to be able to point Django at the right one, and the easiest 
-	way to help ensure this is by putting those templates inside *another* 
-	directory, named for the application itself, and letting Django know.
+	way to help ensure this is by *namespacing* them. That is, by putting those 
+	templates inside *another*  directory, named for the application itself, and 
+	letting Django know.
 
 Within the ``templates`` directory you have just created, create another called
 ``polls``, and within that, create a file called ``index.html``. In other words,
