@@ -835,6 +835,8 @@ The following is a simple unit test using the test client::
 
     :class:`django.test.client.RequestFactory`
 
+.. _django-testcase-subclasses:
+
 Provided test case classes
 --------------------------
 

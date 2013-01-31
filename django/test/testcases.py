@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 
+from copy import copy
 import difflib
+import errno
+from functools import wraps
 import json
 import os
 import re
 import sys
-from copy import copy
-from functools import wraps
 try:
     from urllib.parse import urlsplit, urlunsplit
 except ImportError:     # Python 2
@@ -14,7 +15,7 @@ except ImportError:     # Python 2
 import select
 import socket
 import threading
-import errno
+import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
@@ -36,8 +37,7 @@ from django.test import _doctest as doctest
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
-from django.test.utils import (get_warnings_state, restore_warnings_state,
-    override_settings, compare_xml, strip_quotes)
+from django.test.utils import (override_settings, compare_xml, strip_quotes)
 from django.test.utils import ContextList
 from django.utils import unittest as ut2
 from django.utils.encoding import force_text
@@ -241,6 +241,11 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
 
 
 class SimpleTestCase(ut2.TestCase):
+
+    _warn_txt = ("save_warnings_state/restore_warnings_state "
+        "django.test.*TestCase methods are deprecated. Use Python's "
+        "warnings.catch_warnings context manager instead.")
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
@@ -279,14 +284,16 @@ class SimpleTestCase(ut2.TestCase):
         """
         Saves the state of the warnings module
         """
-        self._warnings_state = get_warnings_state()
+        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
+        self._warnings_state = warnings.filters[:]
 
     def restore_warnings_state(self):
         """
         Restores the state of the warnings module to the state
         saved by save_warnings_state()
         """
-        restore_warnings_state(self._warnings_state)
+        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
+        warnings.filters = self._warnings_state[:]
 
     def settings(self, **kwargs):
         """

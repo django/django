@@ -267,7 +267,6 @@ these changes.
   in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
 
-
 * The value for the ``post_url_continue`` parameter in
   ``ModelAdmin.response_add()`` will have to be either ``None`` (to redirect
   to the newly created object's edit page) or a pre-formatted url. String
@@ -313,6 +312,13 @@ these changes.
 
 * The ``depth`` keyword argument will be removed from
   :meth:`~django.db.models.query.QuerySet.select_related`.
+
+* The undocumented ``get_warnings_state()``/``restore_warnings_state()``
+  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  ``restore_warnings_state()``
+  :ref:`django.test.*TestCase <django-testcase-subclasses>` methods are
+  deprecated. Use the :class:`warnings.catch_warnings` context manager
+  available starting with Python 2.6 instead.
 
 1.8
 ---
