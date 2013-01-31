@@ -220,24 +220,27 @@ class SaveRestoreWarningState(TestCase):
         # of save_warnings_state/restore_warnings_state (e.g. just
         # warnings.resetwarnings()) , but it is difficult to test more.
         import warnings
-        self.save_warnings_state()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
 
-        class MyWarning(Warning):
-            pass
+            self.save_warnings_state()
 
-        # Add a filter that causes an exception to be thrown, so we can catch it
-        warnings.simplefilter("error", MyWarning)
-        self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
+            class MyWarning(Warning):
+                pass
 
-        # Now restore.
-        self.restore_warnings_state()
-        # After restoring, we shouldn't get an exception. But we don't want a
-        # warning printed either, so we have to silence the warning.
-        warnings.simplefilter("ignore", MyWarning)
-        warnings.warn("warn", MyWarning)
+            # Add a filter that causes an exception to be thrown, so we can catch it
+            warnings.simplefilter("error", MyWarning)
+            self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
 
-        # Remove the filter we just added.
-        self.restore_warnings_state()
+            # Now restore.
+            self.restore_warnings_state()
+            # After restoring, we shouldn't get an exception. But we don't want a
+            # warning printed either, so we have to silence the warning.
+            warnings.simplefilter("ignore", MyWarning)
+            warnings.warn("warn", MyWarning)
+
+            # Remove the filter we just added.
+            self.restore_warnings_state()
 
 
 class HTMLEqualTests(TestCase):
