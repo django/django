@@ -3,7 +3,12 @@ import datetime
 import pickle
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.tzinfo import FixedOffset
 from django.utils import unittest
+
+
+EAT = FixedOffset(180)      # Africa/Nairobi
+ICT = FixedOffset(420)      # Asia/Bangkok
 
 
 class TimezoneTests(unittest.TestCase):
@@ -19,6 +24,31 @@ class TimezoneTests(unittest.TestCase):
             self.assertTrue(timezone.is_aware(timezone.now()))
         with override_settings(USE_TZ=False):
             self.assertTrue(timezone.is_naive(timezone.now()))
+
+    def test_override(self):
+        default = timezone.get_default_timezone()
+        try:
+            timezone.activate(ICT)
+
+            with timezone.override(EAT):
+                self.assertIs(EAT, timezone.get_current_timezone())
+            self.assertIs(ICT, timezone.get_current_timezone())
+
+            with timezone.override(None):
+                self.assertIs(default, timezone.get_current_timezone())
+            self.assertIs(ICT, timezone.get_current_timezone())
+
+            timezone.deactivate()
+
+            with timezone.override(EAT):
+                self.assertIs(EAT, timezone.get_current_timezone())
+            self.assertIs(default, timezone.get_current_timezone())
+
+            with timezone.override(None):
+                self.assertIs(default, timezone.get_current_timezone())
+            self.assertIs(default, timezone.get_current_timezone())
+        finally:
+            timezone.deactivate()
 
     def test_copy(self):
         self.assertIsInstance(copy.copy(timezone.UTC()), timezone.UTC)
