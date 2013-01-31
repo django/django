@@ -56,11 +56,11 @@ Attributes
 Methods
 -------
 
-.. method:: SimpleTemplateResponse.__init__(template, context=None, mimetype=None, status=None, content_type=None)
+.. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None)
 
     Instantiates a
     :class:`~django.template.response.SimpleTemplateResponse` object
-    with the given template, context, MIME type and HTTP status.
+    with the given template, context, content type, and HTTP status.
 
     ``template``
         The full name of a template, or a sequence of template names.
@@ -75,12 +75,15 @@ Methods
         The HTTP Status code for the response.
 
     ``content_type``
-        An alias for ``mimetype``. Historically, this parameter was only called
-        ``mimetype``, but since this is actually the value included in the HTTP
-        ``Content-Type`` header, it can also include the character set encoding,
-        which makes it more than just a MIME type specification. If ``mimetype``
-        is specified (not ``None``), that value is used. Otherwise,
-        ``content_type`` is used. If neither is given,
+
+        .. versionchanged:: 1.5
+
+        Historically, this parameter was only called ``mimetype`` (now
+        deprecated), but since this is actually the value included in the HTTP
+        ``Content-Type`` header, it can also include the character set
+        encoding, which makes it more than just a MIME type specification. If
+        ``mimetype`` is specified (not ``None``), that value is used.
+        Otherwise, ``content_type`` is used. If neither is given,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
 
 
@@ -144,7 +147,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, mimetype=None, status=None, content_type=None, current_app=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None)
 
     Instantiates an ``TemplateResponse`` object with the given
     template, context, MIME type and HTTP status.
@@ -165,12 +168,15 @@ Methods
         The HTTP Status code for the response.
 
     ``content_type``
-        An alias for ``mimetype``. Historically, this parameter was only called
-        ``mimetype``, but since this is actually the value included in the HTTP
-        ``Content-Type`` header, it can also include the character set encoding,
-        which makes it more than just a MIME type specification. If ``mimetype``
-        is specified (not ``None``), that value is used. Otherwise,
-        ``content_type`` is used. If neither is given,
+
+        .. versionchanged:: 1.5
+
+        Historically, this parameter was only called ``mimetype`` (now
+        deprecated), but since this is actually the value included in the HTTP
+        ``Content-Type`` header, it can also include the character set
+        encoding, which makes it more than just a MIME type specification. If
+        ``mimetype`` is specified (not ``None``), that value is used.
+        Otherwise, ``content_type`` is used. If neither is given,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
 
     ``current_app``

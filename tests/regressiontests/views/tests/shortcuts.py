@@ -21,8 +21,8 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
-    def test_render_to_response_with_mimetype(self):
-        response = self.client.get('/shortcuts/render_to_response/mimetype/')
+    def test_render_to_response_with_content_type(self):
+        response = self.client.get('/shortcuts/render_to_response/content_type/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'application/x-rendertest')

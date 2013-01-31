@@ -290,8 +290,14 @@ these changes.
   specified as a plain string instead of a tuple will be removed and raise an
   exception.
 
-* The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
-  will be removed (``content_type`` should be used instead).
+* The ``mimetype`` argument to the ``__init__`` methods of
+  :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`, and
+  :class:`~django.template.response.TemplateResponse`, will be removed.
+  ``content_type`` should be used instead. This also applies to the
+  :func:`~django.shortcuts.render_to_response` shortcut and
+  the sitemamp views, :func:`~django.contrib.sitemaps.views.index` and
+  :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
   or when :attr:`~django.http.HttpResponse.content` is set to an iterator,

@@ -68,11 +68,11 @@ def render_to_response_view_with_request_context(request):
         'bar': 'BAR',
     }, context_instance=RequestContext(request))
 
-def render_to_response_view_with_mimetype(request):
+def render_to_response_view_with_content_type(request):
     return render_to_response('debug/render_test.html', {
         'foo': 'FOO',
         'bar': 'BAR',
-    }, mimetype='application/x-rendertest')
+    }, content_type='application/x-rendertest')
 
 def render_view(request):
     return render(request, 'debug/render_test.html', {
