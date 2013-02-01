@@ -1,9 +1,10 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User, Permission
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.contenttypes.models import ContentType
+from django.utils import translation
 
 from . import CommentTestCase
 
@@ -281,3 +282,28 @@ class AdminActionsTests(CommentTestCase):
         response = self.client.get('/admin2/comments/comment/')
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, '<option value="delete_selected">')
+
+    def performActionAndCheckMessage(self, action, action_params, expected_message):
+        response = self.client.post('/admin/comments/comment/',
+                                    data={'_selected_action': action_params,
+                                          'action': action,
+                                          'index': 0},
+                                    follow=True)
+        self.assertContains(response, expected_message)
+
+    def testActionsMessageTranslations(self):
+        c1, c2, c3, c4 = self.createSomeComments()
+        one_comment = c1.pk
+        many_comments = [c2.pk, c3.pk, c4.pk]
+        makeModerator("normaluser")
+        self.client.login(username="normaluser", password="normaluser")
+        with translation.override('en'):
+            #Test approving
+            self.performActionAndCheckMessage('approve_comments', one_comment, '1 comment was successfully approved')
+            self.performActionAndCheckMessage('approve_comments', many_comments, '3 comments were successfully approved')
+            #Test flagging
+            self.performActionAndCheckMessage('flag_comments', one_comment, '1 comment was successfully flagged')
+            self.performActionAndCheckMessage('flag_comments', many_comments, '3 comments were successfully flagged')
+            #Test removing
+            self.performActionAndCheckMessage('remove_comments', one_comment, '1 comment was successfully removed')
+            self.performActionAndCheckMessage('remove_comments', many_comments, '3 comments were successfully removed')
