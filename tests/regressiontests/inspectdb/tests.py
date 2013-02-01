@@ -35,61 +35,55 @@ class InspectDBTestCase(TestCase):
             self.assertEqual(definition, out_def)
 
         assertFieldType('id', "models.IntegerField(primary_key=True)")
-        assertFieldType('field1', "models.BigIntegerField()")
+        assertFieldType('big_int_field', "models.BigIntegerField()")
         if connection.vendor == 'mysql':
             # No native boolean type on MySQL
-            assertFieldType('field2', "models.IntegerField()")
-            assertFieldType('field2b', "models.IntegerField(null=True, blank=True)")
+            assertFieldType('bool_field', "models.IntegerField()")
+            assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
         else:
-            assertFieldType('field2', "models.BooleanField()")
-            assertFieldType('field2b', "models.NullBooleanField()")
-        assertFieldType('field3', "models.CharField(max_length=10)")
-        # CommaSeparatedIntegerField
-        assertFieldType('field4', "models.CharField(max_length=99)")
-        assertFieldType('field5', "models.DateField()")
-        assertFieldType('field6', "models.DateTimeField()")
+            assertFieldType('bool_field', "models.BooleanField()")
+            assertFieldType('null_bool_field', "models.NullBooleanField()")
+        assertFieldType('char_field', "models.CharField(max_length=10)")
+        assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
+        assertFieldType('date_field', "models.DateField()")
+        assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.vendor == 'sqlite':
             # Ticket #5014
-            assertFieldType('field7', "models.DecimalField(max_digits=None, decimal_places=None)")
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=None, decimal_places=None)")
         elif connection.vendor == 'mysql':
             pass # Ticket #5014
         else:
-            assertFieldType('field7', "models.DecimalField(max_digits=6, decimal_places=1)")
-        # EmailField
-        assertFieldType('field8', "models.CharField(max_length=75)")
-        # FileField
-        assertFieldType('field9', "models.CharField(max_length=100)")
-        # FilePathField
-        assertFieldType('field10', "models.CharField(max_length=100)")
-        assertFieldType('field11', "models.FloatField()")
-        assertFieldType('field12', "models.IntegerField()")
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
+        assertFieldType('email_field', "models.CharField(max_length=75)")
+        assertFieldType('file_field', "models.CharField(max_length=100)")
+        assertFieldType('file_path_field', "models.CharField(max_length=100)")
+        assertFieldType('float_field', "models.FloatField()")
+        assertFieldType('int_field', "models.IntegerField()")
         if connection.vendor == 'postgresql':
             # Only PostgreSQL has a specific type
-            assertFieldType('field13', "models.GenericIPAddressField()")
-            assertFieldType('field14', "models.GenericIPAddressField()")
+            assertFieldType('ip_address_field', "models.GenericIPAddressField()")
+            assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
         else:
-            assertFieldType('field13', "models.CharField(max_length=15)")
-            assertFieldType('field14', "models.CharField(max_length=39)")
+            assertFieldType('ip_address_field', "models.CharField(max_length=15)")
+            assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
         if connection.vendor == 'sqlite':
-            assertFieldType('field16', "models.PositiveIntegerField()")
-            assertFieldType('field17', "models.PositiveSmallIntegerField()")
+            assertFieldType('pos_int_field', "models.PositiveIntegerField()")
+            assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
         else:
             # 'unsigned' property undetected on other backends
-            assertFieldType('field16', "models.IntegerField()")
+            assertFieldType('pos_int_field', "models.IntegerField()")
             if connection.vendor == 'postgresql':
-                assertFieldType('field17', "models.SmallIntegerField()")
+                assertFieldType('pos_small_int_field', "models.SmallIntegerField()")
             else:
-                assertFieldType('field17', "models.IntegerField()")
-        # SlugField
-        assertFieldType('field18', "models.CharField(max_length=50)")
+                assertFieldType('pos_small_int_field', "models.IntegerField()")
+        assertFieldType('slug_field', "models.CharField(max_length=50)")
         if connection.vendor in ('sqlite', 'postgresql'):
-            assertFieldType('field19', "models.SmallIntegerField()")
+            assertFieldType('small_int_field', "models.SmallIntegerField()")
         else:
-            assertFieldType('field19', "models.IntegerField()")
-        assertFieldType('field20', "models.TextField()")
-        assertFieldType('field21', "models.TimeField()")
-        # URLField
-        assertFieldType('field22', "models.CharField(max_length=200)")
+            assertFieldType('small_int_field', "models.IntegerField()")
+        assertFieldType('text_field', "models.TextField()")
+        assertFieldType('time_field', "models.TimeField()")
+        assertFieldType('url_field', "models.CharField(max_length=200)")
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):
