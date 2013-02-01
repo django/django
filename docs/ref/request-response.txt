@@ -55,12 +55,12 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.path_info
 
-    Under some Web server configurations, the portion of the URL after the host
-    name is split up into a script prefix portion and a path info portion.
-    The ``path_info`` attribute always contains the path info portion of the
-    path, no matter what Web server is being used. Using this instead of
-    attr:`~HttpRequest.path` can make your code much easier to move between test
-    and deployment servers.
+    Under some Web server configurations, the portion of the URL after the
+    host name is split up into a script prefix portion and a path info
+    portion. The ``path_info`` attribute always contains the path info portion
+    of the path, no matter what Web server is being used. Using this instead
+    of :attr:`~HttpRequest.path` can make your code easier to move between
+    test and deployment servers.
 
     For example, if the ``WSGIScriptAlias`` for your application is set to
     ``"/minfo"``, then ``path`` might be ``"/minfo/music/bands/the_beatles/"``
