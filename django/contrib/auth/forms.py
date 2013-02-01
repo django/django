@@ -44,6 +44,9 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
         return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
 
+    def _has_changed(self, initial, data):
+        return False
+
 
 class ReadOnlyPasswordHashField(forms.Field):
     widget = ReadOnlyPasswordHashWidget
@@ -358,3 +361,11 @@ class AdminPasswordChangeForm(forms.Form):
         if commit:
             self.user.save()
         return self.user
+
+    def _get_changed_data(self):
+        data = super(AdminPasswordChangeForm, self).changed_data
+        for name in self.fields.keys():
+            if name not in data:
+                return []
+        return ['password']
+    changed_data = property(_get_changed_data)
