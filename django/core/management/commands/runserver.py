@@ -26,6 +26,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT use threading.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
+        make_option('--nopersistsock', action='store_false', dest='use_persist_sock', default=True,
+            help='Tells Django to NOT use a persistent socket.'),
     )
     help = "Starts a lightweight Web server for development."
     args = '[optional port number, or ipaddr:port]'
@@ -74,6 +76,16 @@ class Command(BaseCommand):
         Runs the server, using the autoreloader if needed
         """
         use_reloader = options.get('use_reloader')
+
+        # test if socket.fromfd is supported on this platform as it's needed
+        # later for this code to work
+        if options.get('use_persist_sock') and getattr(socket, 'fromfd', False):
+            address_family = socket.AF_INET
+            if self.use_ipv6:
+                address_family = socket.AF_INET6
+            if not os.environ.get('DJANGO_SERVER_FD'):
+                sock = socket.socket(address_family, socket.SOCK_STREAM)
+                os.environ['DJANGO_SERVER_FD'] = str(sock.fileno())
 
         if use_reloader:
             autoreload.main(self.inner_run, args, options)
