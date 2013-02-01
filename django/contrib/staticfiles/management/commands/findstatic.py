@@ -23,9 +23,12 @@ class Command(LabelCommand):
         if result:
             if not isinstance(result, (list, tuple)):
                 result = [result]
-            output = '\n  '.join(
-                (smart_text(os.path.realpath(path)) for path in result))
-            self.stdout.write("Found '%s' here:\n  %s" % (path, output))
+            result = (smart_text(os.path.realpath(path)) for path in result)
+            if verbosity >= 1:
+                output = '\n  '.join(result)
+                return "Found '%s' here:\n  %s" % (path, output)
+            else:
+                return '\n'.join(result)
         else:
             if verbosity >= 1:
                 self.stderr.write("No matching file found for '%s'." % path)
