@@ -112,18 +112,28 @@ Searches for one or more relative paths with the enabled finders.
 For example::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
-   /home/special.polls.com/core/static/css/base.css
-   /home/polls.com/core/static/css/base.css
-   /home/polls.com/src/django/contrib/admin/media/js/core.js
+   Found 'css/base.css' here:
+     /home/special.polls.com/core/static/css/base.css
+     /home/polls.com/core/static/css/base.css
+   Found 'admin/js/core.js' here:
+     /home/polls.com/src/django/contrib/admin/media/js/core.js
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
 
    $ python manage.py findstatic css/base.css --first
-   /home/special.polls.com/core/static/css/base.css
+   Found 'css/base.css' here:
+     /home/special.polls.com/core/static/css/base.css
 
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
+
+By setting the :djadminopt:`--verbosity` flag to 0, you can suppress the extra
+output and just get the path names::
+
+   $ python manage.py findstatic css/base.css --verbosity 0
+   /home/special.polls.com/core/static/css/base.css
+   /home/polls.com/core/static/css/base.css
 
 .. _staticfiles-runserver:
 
