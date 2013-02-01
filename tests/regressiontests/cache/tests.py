@@ -44,6 +44,18 @@ class C:
         return 24
 
 
+class PicklingSideEffect(object):
+
+    def __init__(self, cache):
+        self.cache = cache
+        self.locked = False
+
+    def __getstate__(self):
+        if self.cache._lock.active_writers:
+            self.locked = True
+        return {}
+
+
 class DummyCacheTests(unittest.TestCase):
     # The Dummy cache backend doesn't really behave like a test backend,
     # so it has different test requirements.
@@ -926,6 +938,12 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.cache.set('value1', 42)
         self.assertEqual(mirror_cache.get('value1'), 42)
         self.assertEqual(other_cache.get('value1'), None)
+
+    def test_locking_on_pickle(self):
+        cache = self.cache
+        bad_obj = PicklingSideEffect(cache)
+        cache.set('bar', bad_obj)
+        assert bad_obj.locked == False, "Cache was locked during pickling"
 
     def test_incr_decr_timeout(self):
         """incr/decr does not modify expiry time (matches memcached behavior)"""
