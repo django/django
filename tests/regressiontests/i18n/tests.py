@@ -102,39 +102,42 @@ class TranslationTests(TestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_ungettext_lazy(self):
-        s0 = ungettext_lazy("%d good result", "%d good results")
-        s1 = ngettext_lazy(str("%d good result"), str("%d good results"))
-        s2 = npgettext_lazy('Exclamation', '%d good result', '%d good results')
+        simple_with_format = ungettext_lazy('%d good result', '%d good results')
+        simple_str_with_format = ngettext_lazy(str('%d good result'), str('%d good results'))
+        simple_context_with_format = npgettext_lazy('Exclamation', '%d good result', '%d good results')
+        simple_without_format = ungettext_lazy('good result', 'good results')
         with translation.override('de'):
-            self.assertEqual(s0 % 1, "1 gutes Resultat")
-            self.assertEqual(s0 % 4, "4 guten Resultate")
-            self.assertEqual(s1 % 1, str("1 gutes Resultat"))
-            self.assertEqual(s1 % 4, str("4 guten Resultate"))
-            self.assertEqual(s2 % 1, "1 gutes Resultat!")
-            self.assertEqual(s2 % 4, "4 guten Resultate!")
+            self.assertEqual(simple_with_format % 1, '1 gutes Resultat')
+            self.assertEqual(simple_with_format % 4, '4 guten Resultate')
+            self.assertEqual(simple_str_with_format % 1, str('1 gutes Resultat'))
+            self.assertEqual(simple_str_with_format % 4, str('4 guten Resultate'))
+            self.assertEqual(simple_context_with_format % 1, '1 gutes Resultat!')
+            self.assertEqual(simple_context_with_format % 4, '4 guten Resultate!')
+            self.assertEqual(simple_without_format % 1, 'gutes Resultat')
+            self.assertEqual(simple_without_format % 4, 'guten Resultate')
 
-        s3 = ungettext_lazy("Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 4)
-        s4 = ungettext_lazy("Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 'num')
-        s5 = ngettext_lazy(str("Hi %(name)s, %(num)d good result"), str("Hi %(name)s, %(num)d good results"), 4)
-        s6 = ngettext_lazy(str("Hi %(name)s, %(num)d good result"), str("Hi %(name)s, %(num)d good results"), 'num')
-        s7 = npgettext_lazy('Greeting', "Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 4)
-        s8 = npgettext_lazy('Greeting', "Hi %(name)s, %(num)d good result", "Hi %(name)s, %(num)d good results", 'num')
+        complex_nonlazy = ungettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4)
+        complex_deferred = ungettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 'num')
+        complex_str_nonlazy = ngettext_lazy(str('Hi %(name)s, %(num)d good result'), str('Hi %(name)s, %(num)d good results'), 4)
+        complex_str_deferred = ngettext_lazy(str('Hi %(name)s, %(num)d good result'), str('Hi %(name)s, %(num)d good results'), 'num')
+        complex_context_nonlazy = npgettext_lazy('Greeting', 'Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4)
+        complex_context_deferred = npgettext_lazy('Greeting', 'Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 'num')
         with translation.override('de'):
-            self.assertEqual(s3 % {'num': 4, 'name': 'Jim'}, "Hallo Jim, 4 guten Resultate")
-            self.assertEqual(s4 % {'name': 'Jim', 'num': 1}, "Hallo Jim, 1 gutes Resultat")
-            self.assertEqual(s4 % {'name': 'Jim', 'num': 5}, "Hallo Jim, 5 guten Resultate")
+            self.assertEqual(complex_nonlazy % {'num': 4, 'name': 'Jim'}, 'Hallo Jim, 4 guten Resultate')
+            self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 1}, 'Hallo Jim, 1 gutes Resultat')
+            self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 5}, 'Hallo Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
-                s4 % {'name': 'Jim'}
-            self.assertEqual(s5 % {'num': 4, 'name': 'Jim'}, str("Hallo Jim, 4 guten Resultate"))
-            self.assertEqual(s6 % {'name': 'Jim', 'num': 1}, str("Hallo Jim, 1 gutes Resultat"))
-            self.assertEqual(s6 % {'name': 'Jim', 'num': 5}, str("Hallo Jim, 5 guten Resultate"))
+                complex_deferred % {'name': 'Jim'}
+            self.assertEqual(complex_str_nonlazy % {'num': 4, 'name': 'Jim'}, str('Hallo Jim, 4 guten Resultate'))
+            self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 1}, str('Hallo Jim, 1 gutes Resultat'))
+            self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 5}, str('Hallo Jim, 5 guten Resultate'))
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
-                s6 % {'name': 'Jim'}
-            self.assertEqual(s7 % {'num': 4, 'name': 'Jim'}, "Willkommen Jim, 4 guten Resultate")
-            self.assertEqual(s8 % {'name': 'Jim', 'num': 1}, "Willkommen Jim, 1 gutes Resultat")
-            self.assertEqual(s8 % {'name': 'Jim', 'num': 5}, "Willkommen Jim, 5 guten Resultate")
+                complex_str_deferred % {'name': 'Jim'}
+            self.assertEqual(complex_context_nonlazy % {'num': 4, 'name': 'Jim'}, 'Willkommen Jim, 4 guten Resultate')
+            self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 1}, 'Willkommen Jim, 1 gutes Resultat')
+            self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
-                s8 % {'name': 'Jim'}
+                complex_context_deferred % {'name': 'Jim'}
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
