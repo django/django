@@ -138,7 +138,7 @@ see the following output on the command line:
     0 errors found
     |today| - 15:50:53
     Django version |version|, using settings 'mysite.settings'
-    Development server is running at http://127.0.0.1:8000/
+    Starting development server at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
 You've started the Django development server, a lightweight Web server written
