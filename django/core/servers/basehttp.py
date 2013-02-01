@@ -26,6 +26,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.importlib import import_module
+from django.utils.six.moves import xrange
 
 __all__ = ['WSGIServer', 'WSGIRequestHandler']
 
@@ -93,14 +94,12 @@ class ServerHandler(simple_server.ServerHandler, object):
 
         # If data is too large, socket will choke, so write chunks no larger
         # than 32MB at a time.
+        max_chunk_size = 33554432
         length = len(data)
-        if length > 33554432:
-            offset = 0
-            while offset < length:
-                chunk_size = min(33554432, length)
-                self._write(data[offset:offset+chunk_size])
+        if length > max_chunk_size:
+            for offset in xrange(0, length, max_chunk_size):
+                self._write(data[offset:offset+max_chunk_size])
                 self._flush()
-                offset += chunk_size
         else:
             self._write(data)
             self._flush()
