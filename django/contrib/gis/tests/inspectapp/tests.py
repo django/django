@@ -12,6 +12,8 @@ from .models import AllOGRFields
 
 
 class OGRInspectTest(TestCase):
+    maxDiff = 1024
+
     def test_poly(self):
         shp_file = os.path.join(TEST_DATA, 'test_poly', 'test_poly.shp')
         model_def = ogrinspect(shp_file, 'MyModel')
