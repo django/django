@@ -93,7 +93,7 @@ class Command(BaseCommand):
         self.stdout.write((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
-            "Development server is running at http://%(addr)s:%(port)s/\n"
+            "Starting development server at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "started_at": datetime.now().strftime('%B %d, %Y - %X'),
