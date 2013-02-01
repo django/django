@@ -1,5 +1,7 @@
 from django.utils import unittest
-from django.utils.termcolors import parse_color_setting, PALETTES, DEFAULT_PALETTE, LIGHT_PALETTE, DARK_PALETTE, NOCOLOR_PALETTE
+from django.utils.termcolors import (parse_color_setting, PALETTES,
+    DEFAULT_PALETTE, LIGHT_PALETTE, DARK_PALETTE, NOCOLOR_PALETTE, colorize)
+
 
 class TermColorTests(unittest.TestCase):
 
@@ -146,3 +148,10 @@ class TermColorTests(unittest.TestCase):
         self.assertEqual(parse_color_setting('error=green,bLiNk'),
                           dict(PALETTES[NOCOLOR_PALETTE],
                             ERROR={'fg':'green', 'opts': ('blink',)}))
+
+    def test_colorize_empty_text(self):
+        self.assertEqual(colorize(text=None), '\x1b[m\x1b[0m')
+        self.assertEqual(colorize(text=''), '\x1b[m\x1b[0m')
+
+        self.assertEqual(colorize(text=None, opts=('noreset')), '\x1b[m')
+        self.assertEqual(colorize(text='', opts=('noreset')), '\x1b[m')
