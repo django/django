@@ -419,6 +419,22 @@ Jeremy Dunck
 
 .. _Preston Holmes: http://www.ptone.com/
 
+`Simon Charette`_
+    Simon is a mathematic student who discovered Django while searching for a
+    replacement framework to an in-house PHP entity. Since that faithful day
+    Django has been a big part of his life. So far, he's been involved in some
+    ORM and forms API fixes.
+
+    Apart from contributing to multiple open source projects he spends most of
+    his spare-time playing `Ultimate Frisbee`_ and working part-time
+    at this awesome place called `Reptiletech`_.
+
+    Simon lives in Montréal, Québec, Canada.
+
+.. _Simon Charette: https://github.com/charettes
+.. _Ultimate Frisbee: http://www.montrealultimate.ca
+.. _Reptiletech: http://www.reptiletech.com
+
 Specialists
 -----------
 

@@ -34,6 +34,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Jeremy Dunck
     * Bryan Veloso
     * Preston Holmes
+    * Simon Charette
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -127,7 +128,6 @@ answer newbie questions, and generally made Django that much better:
     Chris Chamberlin <dja@cdc.msbx.net>
     Amit Chakradeo <http://amit.chakradeo.net/>
     ChaosKCW
-    Simon Charette <charette.s@gmail.com>
     Kowito Charoenratchatabhan <kowito@felspar.com>
     Sengtha Chay <sengtha@e-khmer.com>
     ivan.chelubeev@gmail.com
