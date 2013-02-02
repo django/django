@@ -93,7 +93,7 @@ class GenericRelationTests(TestCase):
 
         places = list(Place.objects.order_by('links__id'))
         def count_places(place):
-            return len(filter(lambda p: p.id == place.id, places))
+            return len([p for p in places if p.id == place.id])
 
         self.assertEqual(len(places), 2)
         self.assertEqual(count_places(p1), 1)
