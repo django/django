@@ -132,7 +132,8 @@ def identify_hasher(encoded):
     get_hasher() to return hasher. Raises ValueError if
     algorithm cannot be identified, or if hasher is not loaded.
     """
-    if len(encoded) == 32 and '$' not in encoded:
+    if ((len(encoded) == 32 and '$' not in encoded) or
+            len(encoded) == 37 and encoded.startswith('md5$$')):
         algorithm = 'unsalted_md5'
     else:
         algorithm = encoded.split('$', 1)[0]
@@ -372,6 +373,8 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return hashlib.md5(force_bytes(password)).hexdigest()
 
     def verify(self, password, encoded):
+        if len(encoded) == 37 and encoded.startswith('md5$$'):
+            encoded = encoded[5:]
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
 
