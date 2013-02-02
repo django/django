@@ -15,6 +15,7 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
 from django.utils import importlib
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -68,9 +69,7 @@ class LazySettings(LazyObject):
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING
             # First find the logging configuration function ...
-            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
-            logging_config_module = importlib.import_module(logging_config_path)
-            logging_config_func = getattr(logging_config_module, logging_config_func_name)
+            logging_config_func = import_by_path(self.LOGGING_CONFIG)
 
             logging_config_func(DEFAULT_LOGGING)
 

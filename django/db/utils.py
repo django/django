@@ -5,6 +5,7 @@ from threading import local
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 from django.utils._os import upath
 from django.utils import six
 
@@ -110,17 +111,7 @@ class ConnectionRouter(object):
         self.routers = []
         for r in routers:
             if isinstance(r, six.string_types):
-                try:
-                    module_name, klass_name = r.rsplit('.', 1)
-                    module = import_module(module_name)
-                except ImportError as e:
-                    raise ImproperlyConfigured('Error importing database router %s: "%s"' % (klass_name, e))
-                try:
-                    router_class = getattr(module, klass_name)
-                except AttributeError:
-                    raise ImproperlyConfigured('Module "%s" does not define a database router name "%s"' % (module, klass_name))
-                else:
-                    router = router_class()
+                router = import_by_path(r)()
             else:
                 router = r
             self.routers.append(router)

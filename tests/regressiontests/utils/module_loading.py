@@ -3,9 +3,10 @@ import sys
 import imp
 from zipimport import zipimporter
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import unittest
 from django.utils.importlib import import_module
-from django.utils.module_loading import module_has_submodule
+from django.utils.module_loading import import_by_path, module_has_submodule
 from django.utils._os import upath
 
 
@@ -102,6 +103,23 @@ class EggLoader(unittest.TestCase):
         # A child that doesn't exist
         self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
+
+
+class ModuleImportTestCase(unittest.TestCase):
+    def test_import_by_path(self):
+        cls = import_by_path(
+            'django.utils.module_loading.import_by_path')
+        self.assertEqual(cls, import_by_path)
+
+        # Test exceptions raised
+        for path in ('no_dots_in_path', 'unexistent.path',
+                'tests.regressiontests.utils.unexistent'):
+            self.assertRaises(ImproperlyConfigured, import_by_path, path)
+
+        with self.assertRaises(ImproperlyConfigured) as cm:
+            import_by_path('unexistent.module.path', error_prefix="Foo")
+        self.assertTrue(str(cm.exception).startswith('Foo'))
+
 
 class ProxyFinder(object):
     def __init__(self):
