@@ -345,6 +345,12 @@ attributes, which can be useful in your templates:
            {# Do something special #}
         {% endif %}
 
+``field.field``
+    The original forms.Field instance, as added to the form class, that 
+    this BoundField wraps. You can use it to gain access to additional 
+    attributes programatically added to the Field when creating the form,
+    e.g. ``{{ field.field.my_custom_attribute }}``
+
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
