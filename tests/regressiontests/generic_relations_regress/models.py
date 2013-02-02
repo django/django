@@ -6,7 +6,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',
-           'Contact', 'Organization', 'Note')
+           'Contact', 'Organization', 'Note', 'Company')
 
 @python_2_unicode_compatible
 class Link(models.Model):
@@ -84,3 +84,10 @@ class Organization(models.Model):
     name = models.CharField(max_length=255)
     contacts = models.ManyToManyField(Contact, related_name='organizations')
 
+@python_2_unicode_compatible
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    links = generic.GenericRelation(Link)
+
+    def __str__(self):
+        return "Company: %s" % self.name
