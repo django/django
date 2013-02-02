@@ -4,7 +4,7 @@ import os
 
 from django.db import connections
 from django.test import TestCase
-from django.contrib.gis.gdal import Driver, GDAL_VERSION
+from django.contrib.gis.gdal import Driver
 from django.contrib.gis.geometry.test_data import TEST_DATA
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 
@@ -68,41 +68,27 @@ class OGRInspectTest(TestCase):
                                layer_key=AllOGRFields._meta.db_table,
                                decimal=['f_decimal'])
 
-        expected = [
-            '# This is an auto-generated Django model module created by ogrinspect.',
-            'from django.contrib.gis.db import models',
-            '',
-            'class Measurement(models.Model):',
-            '    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)',
-        ]
+        self.assertTrue(model_def.startswith(
+            '# This is an auto-generated Django model module created by ogrinspect.\n'
+            'from django.contrib.gis.db import models\n'
+            '\n'
+            'class Measurement(models.Model):\n'
+        ))
 
-        if GDAL_VERSION < (1, 9, 0):
-            # Prior to GDAL 1.9, the order of the model fields was not
-            # the same as the columns in the database.
-            expected.extend([
-            '    f_int = models.IntegerField()',
-            '    f_datetime = models.DateTimeField()',
-            '    f_time = models.TimeField()',
-            '    f_float = models.FloatField()',
-            '    f_char = models.CharField(max_length=10)',
-            '    f_date = models.DateField()',
-            ])
-        else:
-            expected.extend([
-            '    f_float = models.FloatField()',
-            '    f_int = models.IntegerField()',
-            '    f_char = models.CharField(max_length=10)',
-            '    f_date = models.DateField()',
-            '    f_datetime = models.DateTimeField()',
-            '    f_time = models.TimeField()',
-            ])
+        # The ordering of model fields might vary depending on several factors (version of GDAL, etc.)
+        self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
+        self.assertIn('    f_int = models.IntegerField()', model_def)
+        self.assertIn('    f_datetime = models.DateTimeField()', model_def)
+        self.assertIn('    f_time = models.TimeField()', model_def)
+        self.assertIn('    f_float = models.FloatField()', model_def)
+        self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
+        self.assertIn('    f_date = models.DateField()', model_def)
 
-        expected.extend([
-            '    geom = models.PolygonField()',
-            '    objects = models.GeoManager()',
-        ])
+        self.assertTrue(model_def.endswith(
+            '    geom = models.PolygonField()\n'
+            '    objects = models.GeoManager()'
+        ))
 
-        self.assertEqual(model_def, '\n'.join(expected))
 
 def get_ogr_db_string():
     # Construct the DB string that GDAL will use to inspect the database.
