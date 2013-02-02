@@ -133,7 +133,7 @@ def identify_hasher(encoded):
     algorithm cannot be identified, or if hasher is not loaded.
     """
     if ((len(encoded) == 32 and '$' not in encoded) or
-            len(encoded) == 37 and encoded.startswith('md5$$')):
+            (len(encoded) == 37 and encoded.startswith('md5$$'))):
         algorithm = 'unsalted_md5'
     else:
         algorithm = encoded.split('$', 1)[0]
