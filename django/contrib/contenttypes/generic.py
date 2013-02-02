@@ -371,9 +371,11 @@ def create_generic_related_manager(superclass):
     return GenericRelatedObjectManager
 
 class GenericRel(ManyToManyRel):
-    def __init__(self, to, related_name=None, limit_choices_to=None, symmetrical=True):
+    def __init__(self, to, related_name=None, related_query_name=None,
+            limit_choices_to=None, symmetrical=True):
         self.to = to
         self.related_name = related_name
+        self.related_query_name = related_query_name
         self.limit_choices_to = limit_choices_to or {}
         self.symmetrical = symmetrical
         self.multiple = True

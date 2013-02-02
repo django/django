@@ -222,7 +222,9 @@ class RelatedField(object):
         # related object in a table-spanning query. It uses the lower-cased
         # object_name by default, but this can be overridden with the
         # "related_name" option.
-        return self.rel.related_name or self.opts.object_name.lower()
+        return (self.rel.related_query_name or
+                    self.rel.related_name or
+                    self.opts.object_name.lower())
 
 
 class SingleRelatedObjectDescriptor(object):
@@ -908,14 +910,15 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 
 class ManyToOneRel(object):
-    def __init__(self, to, field_name, related_name=None, limit_choices_to=None,
-        parent_link=False, on_delete=None):
+    def __init__(self, to, field_name, related_name=None, related_query_name=None,
+        limit_choices_to=None, parent_link=False, on_delete=None):
         try:
             to._meta
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
         self.related_name = related_name
+        self.related_query_name = related_query_name
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
@@ -940,20 +943,21 @@ class ManyToOneRel(object):
 
 
 class OneToOneRel(ManyToOneRel):
-    def __init__(self, to, field_name, related_name=None, limit_choices_to=None,
-        parent_link=False, on_delete=None):
+    def __init__(self, to, field_name, related_name=None, related_query_name=None,
+        limit_choices_to=None, parent_link=False, on_delete=None):
         super(OneToOneRel, self).__init__(to, field_name,
-                related_name=related_name, limit_choices_to=limit_choices_to,
-                parent_link=parent_link, on_delete=on_delete
+                related_name=related_name, related_query_name=related_query_name,
+                limit_choices_to=limit_choices_to, parent_link=parent_link, on_delete=on_delete
         )
         self.multiple = False
 
 
 class ManyToManyRel(object):
-    def __init__(self, to, related_name=None, limit_choices_to=None,
-            symmetrical=True, through=None):
+    def __init__(self, to, related_name=None, related_query_name=None,
+        limit_choices_to=None, symmetrical=True, through=None):
         self.to = to
         self.related_name = related_name
+        self.related_query_name = related_query_name
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
@@ -999,6 +1003,7 @@ class ForeignKey(RelatedField, Field):
 
         kwargs['rel'] = rel_class(to, to_field,
             related_name=kwargs.pop('related_name', None),
+            related_query_name=kwargs.pop('related_query_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
@@ -1211,6 +1216,7 @@ class ManyToManyField(RelatedField, Field):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
             related_name=kwargs.pop('related_name', None),
+            related_query_name=kwargs.pop('related_query_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
             through=kwargs.pop('through', None))
