@@ -35,7 +35,8 @@ def check_password(password, encoded, setter=None, preferred='default'):
     password = smart_str(password)
     encoded = smart_str(encoded)
 
-    if len(encoded) == 32 and '$' not in encoded:
+    if ((len(encoded) == 32 and '$' not in encoded) or
+            (len(encoded) == 37 and encoded.startswith('md5$$'))):
         hasher = get_hasher('unsalted_md5')
     else:
         algorithm = encoded.split('$', 1)[0]
@@ -347,6 +348,8 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return hashlib.md5(password).hexdigest()
 
     def verify(self, password, encoded):
+        if len(encoded) == 37 and encoded.startswith('md5$$'):
+            encoded = encoded[5:]
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
 

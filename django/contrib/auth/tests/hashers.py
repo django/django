@@ -59,6 +59,11 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password(u'letmein', encoded))
         self.assertFalse(check_password('letmeinz', encoded))
+        # Alternate unsalted syntax
+        alt_encoded = "md5$$%s" % encoded
+        self.assertTrue(is_password_usable(alt_encoded))
+        self.assertTrue(check_password(u'letmein', alt_encoded))
+        self.assertFalse(check_password('letmeinz', alt_encoded))
 
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
