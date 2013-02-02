@@ -4,7 +4,7 @@ import optparse
 import subprocess
 import sys
 
-here = os.path.dirname(__file__)
+js_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'admin', 'js')
 
 def main():
     usage = "usage: %prog [file1..fileN]"
@@ -27,7 +27,7 @@ Compiler library and Java version 6 or later."""
     if not args:
         if options.verbose:
             sys.stdout.write("No filenames given; defaulting to admin scripts\n")
-        args = [os.path.join(here, f) for f in [
+        args = [os.path.join(js_path, f) for f in [
             "actions.js", "collapse.js", "inlines.js", "prepopulate.js"]]
 
     for arg in args:
