@@ -101,7 +101,8 @@ class CsrfViewMiddlewareTest(TestCase):
         with self.settings(CSRF_COOKIE_NAME='myname',
                            CSRF_COOKIE_DOMAIN='.example.com',
                            CSRF_COOKIE_PATH='/test/',
-                           CSRF_COOKIE_SECURE=True):
+                           CSRF_COOKIE_SECURE=True,
+                           CSRF_COOKIE_HTTPONLY=True):
             # token_view calls get_token() indirectly
             CsrfViewMiddleware().process_view(req, token_view, (), {})
             resp = token_view(req)
@@ -110,6 +111,7 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertNotEqual(csrf_cookie, False)
         self.assertEqual(csrf_cookie['domain'], '.example.com')
         self.assertEqual(csrf_cookie['secure'], True)
+        self.assertEqual(csrf_cookie['httponly'], True)
         self.assertEqual(csrf_cookie['path'], '/test/')
         self.assertTrue('Cookie' in resp2.get('Vary',''))
 
