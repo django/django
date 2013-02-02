@@ -277,7 +277,7 @@ A normal :class:`~django.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
 :class:`~django.db.models.ForeignKey` it would have to
 choose one and only one model to store tags for. The contenttypes
-application provides a special field type which
+application provides a special field type (``GenericForeignKey``) which
 works around this and allows the relationship to be with any
 model:
 
@@ -287,7 +287,8 @@ model:
     :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
 
     1. Give your model a :class:`~django.db.models.ForeignKey`
-       to :class:`~django.contrib.contenttypes.models.ContentType`.
+       to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
+       name for this field is "content_type".
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
