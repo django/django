@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-    Vegetable, Mineral, Gecko)
+    Vegetable, Mineral, Gecko, Rock)
 
 
 class GenericRelationsTests(TestCase):
@@ -230,6 +230,16 @@ class GenericRelationsTests(TestCase):
         tailless = Gecko.objects.create(has_tail=False)
         tag = TaggedItem.objects.create(content_object=tailless, tag="lizard")
         self.assertEqual(tag.content_object, tailless)
+
+    def test_subclasses_with_gen_rel(self):
+        """
+        Test that concrete model subclasses with generic relations work
+        correctly (ticket 11263).
+        """
+        granite = Rock.objects.create(name='granite', hardness=5)
+        TaggedItem.objects.create(content_object=granite, tag="countertop")
+        self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
+
 
 class CustomWidget(forms.TextInput):
     pass
