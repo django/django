@@ -182,7 +182,7 @@ The ``ContentTypeManager``
 
         Clears an internal cache used by
         :class:`~django.contrib.contenttypes.models.ContentType` to keep track
-        of which models for which it has created
+        of models for which it has created
         :class:`~django.contrib.contenttypes.models.ContentType` instances. You
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
@@ -239,11 +239,11 @@ Prior to Django 1.5,
 :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
 always returned the :class:`~django.contrib.contenttypes.models.ContentType`
 associated with the concrete model of the specified one(s). That means there
-was no way to retreive the
+was no way to retrieve the
 :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
 using those methods. As of Django 1.5 you can now pass a boolean flag –
 ``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
-wether or not you want to retreive the
+wether or not you want to retrieve the
 :class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
 direct model.
 
