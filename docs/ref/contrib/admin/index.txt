@@ -1070,6 +1070,13 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_fieldsets(self, request, obj=None)
+
+    The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
+    being edited (or ``None`` on an add form) and is expected to return a list
+    of two-tuples, in which each two-tuple represents a ``<fieldset>`` on the
+    admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
+
 .. method:: ModelAdmin.get_list_filter(self, request)
 
     .. versionadded:: 1.5
