@@ -27,8 +27,8 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
-from django.utils.importlib import import_module
 from django.conf import settings
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 template_source_loaders = None
@@ -91,15 +91,7 @@ def find_template_loader(loader):
     else:
         args = []
     if isinstance(loader, six.string_types):
-        module, attr = loader.rsplit('.', 1)
-        try:
-            mod = import_module(module)
-        except ImportError as e:
-            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
-        try:
-            TemplateLoader = getattr(mod, attr)
-        except AttributeError as e:
-            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
+        TemplateLoader = import_by_path(loader)
 
         if hasattr(TemplateLoader, 'load_template_source'):
             func = TemplateLoader(*args)

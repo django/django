@@ -7,10 +7,9 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
-from django.utils import importlib
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.module_loading import import_by_path
 
 __all__ = ['UploadFileException','StopUpload', 'SkipFile', 'FileUploadHandler',
            'TemporaryFileUploadHandler', 'MemoryFileUploadHandler',
@@ -201,17 +200,4 @@ def load_handler(path, *args, **kwargs):
         <TemporaryFileUploadHandler object at 0x...>
 
     """
-    i = path.rfind('.')
-    module, attr = path[:i], path[i+1:]
-    try:
-        mod = importlib.import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured('Error importing upload handler module %s: "%s"' % (module, e))
-    except ValueError:
-        raise ImproperlyConfigured('Error importing upload handler module.'
-            'Is FILE_UPLOAD_HANDLERS a correctly defined list or tuple?')
-    try:
-        cls = getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured('Module "%s" does not define a "%s" upload handler backend' % (module, attr))
-    return cls(*args, **kwargs)
+    return import_by_path(path)(*args, **kwargs)

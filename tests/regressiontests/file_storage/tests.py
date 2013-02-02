@@ -57,9 +57,9 @@ class GetStorageClassTests(SimpleTestCase):
         """
         self.assertRaisesMessage(
             ImproperlyConfigured,
-            "NonExistingStorage isn't a storage module.",
+            "Error importing module storage: \"No module named storage\"",
             get_storage_class,
-            'NonExistingStorage')
+            'storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_class(self):
         """
@@ -67,8 +67,8 @@ class GetStorageClassTests(SimpleTestCase):
         """
         self.assertRaisesMessage(
             ImproperlyConfigured,
-            'Storage module "django.core.files.storage" does not define a '\
-                '"NonExistingStorage" class.',
+            'Module "django.core.files.storage" does not define a '
+            '"NonExistingStorage" attribute/class',
             get_storage_class,
             'django.core.files.storage.NonExistingStorage')
 
@@ -79,8 +79,8 @@ class GetStorageClassTests(SimpleTestCase):
         # Error message may or may not be the fully qualified path.
         six.assertRaisesRegex(self,
             ImproperlyConfigured,
-            ('Error importing storage module django.core.files.non_existing_'
-                'storage: "No module named .*non_existing_storage'),
+            'Error importing module django.core.files.non_existing_storage: '
+            '"No module named non_existing_storage"',
             get_storage_class,
             'django.core.files.non_existing_storage.NonExistingStorage'
         )

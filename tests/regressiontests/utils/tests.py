@@ -20,7 +20,8 @@ from .html import TestUtilsHtml
 from .http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
 from .ipv6 import TestUtilsIPv6
 from .jslex import JsToCForGettextTest, JsTokensTest
-from .module_loading import CustomLoader, DefaultLoader, EggLoader
+from .module_loading import (CustomLoader, DefaultLoader, EggLoader,
+    ModuleImportTestCase)
 from .numberformat import TestNumberFormat
 from .os_utils import SafeJoinTests
 from .regex_helper import NormalizeTests

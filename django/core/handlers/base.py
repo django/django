@@ -9,8 +9,9 @@ from django.conf import settings
 from django.core import exceptions
 from django.core import urlresolvers
 from django.core import signals
+from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
 from django.utils.encoding import force_text
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 from django.utils import six
 from django.views import debug
 
@@ -43,21 +44,10 @@ class BaseHandler(object):
 
         request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
-            try:
-                mw_module, mw_classname = middleware_path.rsplit('.', 1)
-            except ValueError:
-                raise exceptions.ImproperlyConfigured('%s isn\'t a middleware module' % middleware_path)
-            try:
-                mod = import_module(mw_module)
-            except ImportError as e:
-                raise exceptions.ImproperlyConfigured('Error importing middleware %s: "%s"' % (mw_module, e))
-            try:
-                mw_class = getattr(mod, mw_classname)
-            except AttributeError:
-                raise exceptions.ImproperlyConfigured('Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname))
+            mw_class = import_by_path(middleware_path)
             try:
                 mw_instance = mw_class()
-            except exceptions.MiddlewareNotUsed:
+            except MiddlewareNotUsed:
                 continue
 
             if hasattr(mw_instance, 'process_request'):
@@ -154,7 +144,7 @@ class BaseHandler(object):
                     except:
                         signals.got_request_exception.send(sender=self.__class__, request=request)
                         response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-            except exceptions.PermissionDenied:
+            except PermissionDenied:
                 logger.warning(
                     'Forbidden (Permission denied): %s', request.path,
                     extra={

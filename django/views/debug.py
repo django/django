@@ -13,8 +13,8 @@ from django.http import (HttpResponse, HttpResponseServerError,
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
-from django.utils.importlib import import_module
 from django.utils.encoding import force_bytes, smart_text
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
@@ -76,17 +76,8 @@ def get_exception_reporter_filter(request):
     global default_exception_reporter_filter
     if default_exception_reporter_filter is None:
         # Load the default filter for the first time and cache it.
-        modpath = settings.DEFAULT_EXCEPTION_REPORTER_FILTER
-        modname, classname = modpath.rsplit('.', 1)
-        try:
-            mod = import_module(modname)
-        except ImportError as e:
-            raise ImproperlyConfigured(
-            'Error importing default exception reporter filter %s: "%s"' % (modpath, e))
-        try:
-            default_exception_reporter_filter = getattr(mod, classname)()
-        except AttributeError:
-            raise ImproperlyConfigured('Default exception reporter filter module "%s" does not define a "%s" class' % (modname, classname))
+        default_exception_reporter_filter = import_by_path(
+            settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
     if request:
         return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)
     else:

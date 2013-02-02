@@ -85,7 +85,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
     def test_bad_module(self):
         with six.assertRaisesRegex(self,
             ImproperlyConfigured,
-            r"^WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; could not import module 'regressiontests.wsgi.noexist':"):
+            r"^WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; Error importing.*"):
 
             get_internal_wsgi_application()
 
@@ -94,6 +94,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
     def test_bad_name(self):
         with six.assertRaisesRegex(self,
             ImproperlyConfigured,
-            r"^WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; can't find 'noexist' in module 'regressiontests.wsgi.wsgi':"):
+            r"^WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; Module.*"):
 
             get_internal_wsgi_application()
