@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 import gzip
 import re
@@ -7,16 +8,21 @@ from io import BytesIO
 
 from django.conf import settings
 from django.core import mail
+from django.db import transaction
 from django.http import HttpRequest
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
-from django.test import TestCase, RequestFactory
+from django.middleware.transaction import TransactionMiddleware
+from django.test import TransactionTestCase, TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
+
+from .models import Band
 
 
 class CommonMiddlewareTest(TestCase):
@@ -299,7 +305,7 @@ class CommonMiddlewareTest(TestCase):
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
         request = self._get_request('slash')
-        request.META['QUERY_STRING'] = 'drink=café'
+        request.META['QUERY_STRING'] = force_str('drink=café')
         response = CommonMiddleware().process_request(request)
         self.assertEqual(response.status_code, 301)
 
@@ -664,3 +670,45 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
+
+class TransactionMiddlewareTest(TransactionTestCase):
+    """
+    Test the transaction middleware.
+    """
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        self.request.path = self.request.path_info = "/"
+        self.response = HttpResponse()
+        self.response.status_code = 200
+
+    def test_request(self):
+        TransactionMiddleware().process_request(self.request)
+        self.assertTrue(transaction.is_managed())
+
+    def test_managed_response(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        Band.objects.create(name='The Beatles')
+        self.assertTrue(transaction.is_dirty())
+        TransactionMiddleware().process_response(self.request, self.response)
+        self.assertFalse(transaction.is_dirty())
+        self.assertEqual(Band.objects.count(), 1)
+
+    def test_unmanaged_response(self):
+        transaction.managed(False)
+        TransactionMiddleware().process_response(self.request, self.response)
+        self.assertFalse(transaction.is_managed())
+        self.assertFalse(transaction.is_dirty())
+
+    def test_exception(self):
+        transaction.enter_transaction_management()
+        transaction.managed(True)
+        Band.objects.create(name='The Beatles')
+        self.assertTrue(transaction.is_dirty())
+        TransactionMiddleware().process_exception(self.request, None)
+        self.assertEqual(Band.objects.count(), 0)
+        self.assertFalse(transaction.is_dirty())
