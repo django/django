@@ -94,3 +94,7 @@ class GeckoManager(models.Manager):
 class Gecko(models.Model):
     has_tail = models.BooleanField()
     objects = GeckoManager()
+
+# To test fix for #11263
+class Rock(Mineral):
+    tags = generic.GenericRelation(TaggedItem)
