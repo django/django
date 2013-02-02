@@ -68,23 +68,27 @@ class OGRInspectTest(TestCase):
                                layer_key=AllOGRFields._meta.db_table,
                                decimal=['f_decimal'])
 
-        expected = [
-            '# This is an auto-generated Django model module created by ogrinspect.',
-            'from django.contrib.gis.db import models',
-            '',
-            'class Measurement(models.Model):',
-            '    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)',
-            '    f_int = models.IntegerField()',
-            '    f_datetime = models.DateTimeField()',
-            '    f_time = models.TimeField()',
-            '    f_float = models.FloatField()',
-            '    f_char = models.CharField(max_length=10)',
-            '    f_date = models.DateField()',
-            '    geom = models.PolygonField()',
-            '    objects = models.GeoManager()',
-        ]
+        self.assertTrue(model_def.startswith(
+            '# This is an auto-generated Django model module created by ogrinspect.\n'
+            'from django.contrib.gis.db import models\n'
+            '\n'
+            'class Measurement(models.Model):\n'
+        ))
 
-        self.assertEqual(model_def, '\n'.join(expected))
+        # The ordering of model fields might vary depending on several factors (version of GDAL, etc.)
+        self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
+        self.assertIn('    f_int = models.IntegerField()', model_def)
+        self.assertIn('    f_datetime = models.DateTimeField()', model_def)
+        self.assertIn('    f_time = models.TimeField()', model_def)
+        self.assertIn('    f_float = models.FloatField()', model_def)
+        self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
+        self.assertIn('    f_date = models.DateField()', model_def)
+
+        self.assertTrue(model_def.endswith(
+            '    geom = models.PolygonField()\n'
+            '    objects = models.GeoManager()'
+        ))
+
 
 def get_ogr_db_string():
     # Construct the DB string that GDAL will use to inspect the database.
