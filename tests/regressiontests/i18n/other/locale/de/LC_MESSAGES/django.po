@@ -48,6 +48,12 @@ msgstr[0] "%d gutes Resultat"
 msgstr[1] "%d guten Resultate"
 
 #: models.py:11
+msgid "good result"
+msgid_plural "good results"
+msgstr[0] "gutes Resultat"
+msgstr[1] "guten Resultate"
+
+#: models.py:11
 msgctxt "Exclamation"
 msgid "%d good result"
 msgid_plural "%d good results"
