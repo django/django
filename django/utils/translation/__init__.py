@@ -106,7 +106,13 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 else:
                     number_value = rhs
                 kwargs['number'] = number_value
-                return func(**kwargs) % rhs
+                translated = func(**kwargs)
+                try:
+                    translated = translated % rhs
+                except TypeError:
+                    # String doesn't contain a placeholder for the number
+                    pass
+                return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
     return proxy
