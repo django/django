@@ -336,7 +336,7 @@ attributes, which can be useful in your templates:
     case, each object in the loop is a simple string containing the error
     message.
 
-``field.is_hidden``
+``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
     ``False`` otherwise. It's not particularly useful as a template
     variable, but could be useful in conditional tests such as::
@@ -344,6 +344,12 @@ attributes, which can be useful in your templates:
         {% if field.is_hidden %}
            {# Do something special #}
         {% endif %}
+
+``{{ field.field }}``
+    The :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps. You can use it to access
+    :class:`~django.forms.Field` attributes , e.g.
+    ``{{ char_field.field.max_length }}``.
 
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
