@@ -39,6 +39,14 @@ Minor features
   <lazy-plural-translations>` can be provided at translation time rather than
   at definition time.
 
+* For custom managemente commands: Validation of the presence of valid settings
+  in managements commands that ask for it by using the
+  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  option is now performed independently from handling of the locale that should
+  active during the execution of the command. The latter can now be influenced
+  by the new :attr:`~django.core.management.BaseCommand.leave_locale_alone`
+  internal option. See :ref:`management-commands-and-locales` for more details.
+
 Backwards incompatible changes in 1.6
 =====================================
 
