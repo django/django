@@ -140,3 +140,13 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
+
+    def test_managed_models(self):
+        """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn:tn.startswith('inspectdb_columntypes'),
+                     stdout=out)
+        output = out.getvalue()
+        self.longMessage = False
+        self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
