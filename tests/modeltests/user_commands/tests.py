@@ -44,3 +44,17 @@ class CommandTests(TestCase):
         finally:
             sys.stderr = old_stderr
         self.assertIn("CommandError", err.getvalue())
+
+    def test_default_en_us_locale_set(self):
+        # Forces en_us when set to true
+        out = StringIO()
+        with translation.override('pl'):
+            management.call_command('leave_locale_alone_false', stdout=out)
+            self.assertEqual(out.getvalue(), "en-us\n")
+
+    def test_configured_locale_preserved(self):
+        # Leaves locale from settings when set to false
+        out = StringIO()
+        with translation.override('pl'):
+            management.call_command('leave_locale_alone_true', stdout=out)
+            self.assertEqual(out.getvalue(), "pl\n")

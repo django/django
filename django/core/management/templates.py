@@ -61,6 +61,9 @@ class TemplateCommand(BaseCommand):
     can_import_settings = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
+    # Can't perform any active locale changes during this command, because
+    # setting might not be available at all.
+    leave_locale_alone = True
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
