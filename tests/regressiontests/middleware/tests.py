@@ -268,6 +268,34 @@ class CommonMiddlewareTest(TestCase):
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
 
+    # Tests for the ETag header
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_was_existed(self):
+        """Using ETags test when the ETag is still in the header""" 
+        request = HttpRequest()
+        response = HttpResponse('content')
+        existed_etag = 'still in the header'
+        response['ETag'] = existed_etag
+        response = CommonMiddleware().process_response(request, response)
+        self.assertEqual(response['ETag'], existed_etag)
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_with_streaming_response(self):
+        """Using ETags test with a streaming resonse"""
+        request = HttpRequest()
+        response = StreamingHttpResponse('content')
+        response = CommonMiddleware().process_response(request, response)
+        self.assertFalse(response.has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_caculating_etag(self):
+        """Caculating ETag test"""
+        request = HttpRequest()
+        response = HttpResponse('content')
+        response = CommonMiddleware().process_response(request, response)
+        self.assertTrue(response['ETag'])
+
     # Other tests
 
     def test_non_ascii_query_string_does_not_crash(self):
