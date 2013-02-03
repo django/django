@@ -444,11 +444,10 @@ different User model.
     you should specify the custom model using the :setting:`AUTH_USER_MODEL`
     setting. For example::
 
-
         from django.conf import settings
         from django.db import models
 
-        class Article(models.Model)
+        class Article(models.Model):
             author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
 Specifying a custom User model
