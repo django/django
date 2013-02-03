@@ -319,6 +319,11 @@ class RequestFactory(object):
         "Construct a PUT request."
         return self.generic('PUT', path, data, content_type, **extra)
 
+    def patch(self, path, data='', content_type='application/octet-stream',
+            **extra):
+        "Construct a PATCH request."
+        return self.generic('PATCH', path, data, content_type, **extra)
+
     def delete(self, path, data='', content_type='application/octet-stream',
             **extra):
         "Construct a DELETE request."
@@ -492,6 +497,17 @@ class Client(RequestFactory):
         """
         response = super(Client, self).put(path,
                 data=data, content_type=content_type, **extra)
+        if follow:
+            response = self._handle_redirects(response, **extra)
+        return response
+
+    def patch(self, path, data='', content_type='application/octet-stream',
+            follow=False, **extra):
+        """
+        Send a resource to the server using PATCH.
+        """
+        response = super(Client, self).patch(
+            path, data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
