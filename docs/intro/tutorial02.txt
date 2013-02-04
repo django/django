@@ -435,7 +435,7 @@ That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
 system.
 
-Customising your *project's* templates
+Customizing your *project's* templates
 --------------------------------------
 
 Open your settings file (``mysite/settings.py``, remember) and look at the
@@ -501,10 +501,7 @@ default, Django automatically looks for a ``templates/`` subdirectory within
 each application package, for use as a fallback (don't forget that
 ``django.contrib.admin`` is an application).
 
-Django can use these templates both for its 'front end', and its admin
-site.
-
-Our Polls application is not very complex, and doesn't need custom admin
+Our poll application is not very complex, and doesn't need custom admin
 templates. But if it grew more sophisticated and required modification of
 Django's standard admin templates for some of its functionality, it would be
 more sensible to modify the *application's* templates, rather than those in the

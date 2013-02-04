@@ -54,9 +54,7 @@ A URL pattern is simply the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
 To get from a URL to a view, Django uses what are known as 'URLconfs'. A URLconf
-matches the URL against a URL pattern, and from this derives the appropriate
-view. That is, it maps URL patterns (described as regular expressions) to Python
-functions.
+maps URL patterns (described as regular expressions) to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
 refer to :mod:`django.core.urlresolvers` for more information.
@@ -286,23 +284,36 @@ you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python, by
 creating a template that the view can use.
 
-This template belongs to your *application*, so unlike the template we created
-in the previous tutorial, we'll put this one in the application's rather than
-the project's templates.
+.. admonition:: Organizing templates
+
+We *could* have all our templates together, in one big templates directory, and
+it would work perfectly well. However, this template belongs to your
+*application*, so unlike the template we created in the previous tutorial, we'll
+put this one in the application's rather than the project's templates. We'll
+discuss in more detail in the :doc:`reusable apps
+tutorial</intro/reusable-apps>` *why* we do this.
 
 First, create a directory called ``templates`` in your ``polls`` directory.
 Django will look for templates in there. 
+
+Django's :setting:`TEMPLATE_LOADERS` setting contains a list of callables that
+know how to import templates from various sources. One of the defaults is
+:class:`django.template.loaders.app_directories.Loader` which looks for a
+"templates" subdirectory in each of the :setting:`INSTALLED_APPS` - this is why
+it knows how to find the polls templates even though we didn't modify
+:setting:`TEMPLATE_DIRS`, as we did in :doc:`Tutorial 2 </intro/tutorial02>` for
+``/mysite/mytemplates``.
 
 .. admonition:: Referring to templates
 
 	Now we *might* be able to get away with putting our templates directly in
 	there, but it would actually be a bad idea. This is because Django will 
-	choose the first template it finds whose name matches. If you had a template
-	with the same name in a *different* application, it could choose the wrong 
-	one. We need to be able to point Django at the right one, and the easiest 
-	way to help ensure this is by *namespacing* them. That is, by putting those 
-	templates inside *another*  directory, named for the application itself, and 
-	letting Django know.
+	choose the first template it finds whose name matches. If you had a template 
+	with the same name in a *different* application, it would be unable to 
+	distinguish between them. We need to be able to point Django at the right 
+	one, and the easiest way to help ensure this is by *namespacing* them. That 
+	is, by putting those templates inside *another* directory, named for the 
+	application itself, and letting Django know.
 
 Within the ``templates`` directory you have just created, create another called
 ``polls``, and within that, create a file called ``index.html``. In other words,
@@ -345,12 +356,6 @@ objects.
 Load the page in your Web browser - point your browser at "/polls/" on your site
 - and you should see a bulleted-list containing the "What's up" poll from
 Tutorial 1. The link points to the poll's detail page.
-
-.. admonition:: Organizing Templates
-
-    Rather than one big templates directory, you can also store templates
-    within each app. We'll discuss this in more detail in the :doc:`reusable
-    apps tutorial</intro/reusable-apps>`.
 
 A shortcut: :func:`~django.shortcuts.render`
 --------------------------------------------
