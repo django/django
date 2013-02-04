@@ -20,6 +20,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
+from django.forms.fields import FileField
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
@@ -958,7 +959,7 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     @transaction.commit_on_success
-    def add_view(self, request, form_url='', extra_context=None):
+    def add_view(self, request, form_url='', extra_context=None, original=None):
         "The 'add' admin view for this model."
         model = self.model
         opts = model._meta
@@ -971,6 +972,16 @@ class ModelAdmin(BaseModelAdmin):
         inline_instances = self.get_inline_instances(request, None)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
+
+            # if original is set, set initial file fields
+            if original:
+                for field_name, field in form.fields.items():
+                    if field_name in form.initial:
+                        continue
+                    if not isinstance(field, FileField):
+                        continue
+                    form.initial[field_name] = getattr(original, field_name)
+
             if form.is_valid():
                 new_object = self.save_form(request, form, change=False)
                 form_validated = True
@@ -1061,7 +1072,8 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST' and "_saveasnew" in request.POST:
             return self.add_view(request, form_url=reverse('admin:%s_%s_add' %
                                     (opts.app_label, opts.module_name),
-                                    current_app=self.admin_site.name))
+                                    current_app=self.admin_site.name),
+                                    original=obj)
 
         ModelForm = self.get_form(request, obj)
         formsets = []
