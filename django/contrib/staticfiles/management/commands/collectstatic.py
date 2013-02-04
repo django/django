@@ -116,6 +116,9 @@ class Command(NoArgsCommand):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
             for original_path, processed_path, processed in processor:
+                if isinstance(processed, ValueError):
+                    self.stderr.write("Failed post-processing '%s'" % original_path)
+                    raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
                              (original_path, processed_path), level=1)

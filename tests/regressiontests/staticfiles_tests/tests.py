@@ -244,7 +244,7 @@ class TestCollection(CollectionTestCase, TestDefaults):
 
 class TestCollectionClear(CollectionTestCase):
     """
-    Test the ``--clear`` option of the ``collectstatic`` managemenet command.
+    Test the ``--clear`` option of the ``collectstatic`` management command.
     """
     def run_collectstatic(self, **kwargs):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
@@ -580,6 +580,30 @@ class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.deploy12345.css", content)
+
+
+# we set DEBUG to False here since the template tag wouldn't work otherwise
+@override_settings(**dict(TEST_SETTINGS,
+    STATICFILES_DIRS=(os.path.join(TEST_ROOT, 'project', 'faulty'),),
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    DEBUG=False,
+))
+class TestErrorCachedStorage(BaseStaticFilesTestCase, TestCase):
+    """
+    Tests for the Cache busting storage
+    """
+    def test_post_processing_fail(self):
+        """
+        Test that post_processing raise a ValueError when file is missing.
+        """
+        sys.stderr, old_stderr = six.StringIO(), sys.stderr
+        with self.assertRaises(ValueError) as cm:
+            call_command('collectstatic', interactive=False, verbosity=0)
+        self.assertIn("The file 'img/does_not_exists.png' could not be found",
+                      cm.exception.args[0])
+        self.assertIn("Failed post-processing", sys.stderr.getvalue())
+        sys.stderr = old_stderr
+
 
 if sys.platform != 'win32':
 
