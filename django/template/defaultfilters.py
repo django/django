@@ -888,3 +888,13 @@ def pprint(value):
         return pformat(value)
     except Exception as e:
         return "Error in formatting: %s" % force_text(e, errors="replace")
+
+@register.filter
+def interpolate(value, arg):
+    """Interpolates argument with value"""
+    try:
+        return value % arg
+    except (ValueError, TypeError):
+        return ''
+
+
