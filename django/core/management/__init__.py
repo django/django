@@ -107,10 +107,13 @@ def get_commands():
         from django.conf import settings
         try:
             apps = settings.INSTALLED_APPS
-        except ImproperlyConfigured:
+        except ImproperlyConfigured as e:
             # Still useful for commands that do not require functional settings,
             # like startproject or help
             apps = []
+            sys.stderr.write(color_style().ERROR(
+                "Project settings contain errors: %s\n"
+                "As a result, only the core Django commands are available.\n" % e))
 
         # Find and load the management module for each installed app.
         for app_name in apps:
