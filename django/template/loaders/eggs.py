@@ -31,5 +31,3 @@ class Loader(BaseLoader):
                     resource = resource.decode(settings.FILE_CHARSET)
                 return (resource, 'egg:%s:%s' % (app, pkg_name))
         raise TemplateDoesNotExist(template_name)
-
-_loader = Loader()
