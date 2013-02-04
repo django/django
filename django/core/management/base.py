@@ -73,6 +73,21 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
+def no_translations(handle_func):
+    """Decorator that forces a command to run with translations deactivated."""
+    def wrapped(*args, **kwargs):
+        from django.utils import translation
+        saved_locale = translation.get_language()
+        translation.deactivate_all()
+        try:
+            res = handle_func(*args, **kwargs)
+        finally:
+            if saved_locale is not None:
+                translation.activate(saved_locale)
+        return res
+    return wrapped
+
+
 class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
@@ -171,19 +186,6 @@ class BaseCommand:
         is the list of application's configuration provided by the
         app registry.
 
-    ``leave_locale_alone``
-        A boolean indicating whether the locale set in settings should be
-        preserved during the execution of the command instead of translations
-        being deactivated.
-
-        Default value is ``False``.
-
-        Make sure you know what you are doing if you decide to change the value
-        of this option in your custom command if it creates database content
-        that is locale-sensitive and such content shouldn't contain any
-        translations (like it happens e.g. with django.contrib.auth
-        permissions) as activating any locale might cause unintended effects.
-
     ``stealth_options``
         A tuple of any options the command uses which aren't defined by the
         argument parser.
@@ -194,7 +196,6 @@ class BaseCommand:
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
-    leave_locale_alone = False
     requires_migrations_checks = False
     requires_system_checks = True
     # Arguments, common to all commands, which aren't defined by the argument
@@ -323,33 +324,20 @@ class BaseCommand:
         if options.get('stderr'):
             self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
 
-        saved_locale = None
-        if not self.leave_locale_alone:
-            # Deactivate translations, because django-admin creates database
-            # content like permissions, and those shouldn't contain any
-            # translations.
-            from django.utils import translation
-            saved_locale = translation.get_language()
-            translation.deactivate_all()
-
-        try:
-            if self.requires_system_checks and not options.get('skip_checks'):
-                self.check()
-            if self.requires_migrations_checks:
-                self.check_migrations()
-            output = self.handle(*args, **options)
-            if output:
-                if self.output_transaction:
-                    connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
-                    output = '%s\n%s\n%s' % (
-                        self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
-                        output,
-                        self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
-                    )
-                self.stdout.write(output)
-        finally:
-            if saved_locale is not None:
-                translation.activate(saved_locale)
+        if self.requires_system_checks and not options.get('skip_checks'):
+            self.check()
+        if self.requires_migrations_checks:
+            self.check_migrations()
+        output = self.handle(*args, **options)
+        if output:
+            if self.output_transaction:
+                connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
+                output = '%s\n%s\n%s' % (
+                    self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
+                    output,
+                    self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
+                )
+            self.stdout.write(output)
         return output
 
     def _run_checks(self, **kwargs):

@@ -4,7 +4,9 @@ from importlib import import_module
 
 from django.apps import apps
 from django.core.checks import Tags, run_checks
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
@@ -58,6 +60,7 @@ class Command(BaseCommand):
         issues.extend(super()._run_checks(**kwargs))
         return issues
 
+    @no_translations
     def handle(self, *args, **options):
 
         self.verbosity = options['verbosity']

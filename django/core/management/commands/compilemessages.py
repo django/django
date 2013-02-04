@@ -27,7 +27,6 @@ class Command(BaseCommand):
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
     requires_system_checks = False
-    leave_locale_alone = True
 
     program = 'msgfmt'
     program_options = ['--check-format']

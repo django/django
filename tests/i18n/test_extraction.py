@@ -194,10 +194,6 @@ class BasicExtractorTests(ExtractorTests):
         self.assertMsgId("Get my line number", po_contents)
         self.assertLocationCommentPresent(self.PO_FILE, 'Get my line number', 'templates', 'test.html')
 
-    def test_force_en_us_locale(self):
-        """Value of locale-munging option used by the command is the right one"""
-        self.assertTrue(MakeMessagesCommand.leave_locale_alone)
-
     def test_extraction_error(self):
         msg = (
             'Translation blocks must not include other block tags: blocktrans '

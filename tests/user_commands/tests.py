@@ -63,17 +63,16 @@ class CommandTests(SimpleTestCase):
             dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_deactivate_locale_set(self):
-        # Deactivate translation when set to true
+    def test_no_translations_deactivate_translations(self):
+        """
+        When the Command handle method is decorated with @no_translations,
+        translations are deactivated inside the command.
+        """
+        current_locale = translation.get_language()
         with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_false', stdout=StringIO())
+            result = management.call_command('no_translations', stdout=StringIO())
             self.assertIsNone(result)
-
-    def test_configured_locale_preserved(self):
-        # Leaves locale from settings when set to false
-        with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_true', stdout=StringIO())
-            self.assertEqual(result, "pl")
+        self.assertEqual(translation.get_language(), current_locale)
 
     def test_find_command_without_PATH(self):
         """

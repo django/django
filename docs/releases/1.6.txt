@@ -193,7 +193,7 @@ Minor features
   option is now performed independently from handling of the locale that
   should be active during the execution of the command. The latter can now be
   influenced by the new
-  :attr:`~django.core.management.BaseCommand.leave_locale_alone` internal
+  ``BaseCommand.leave_locale_alone`` internal
   option. See :ref:`management-commands-and-locales` for more details.
 
 * The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
