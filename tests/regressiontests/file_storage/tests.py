@@ -55,11 +55,9 @@ class GetStorageClassTests(SimpleTestCase):
         """
         get_storage_class raises an error if the requested import don't exist.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
-            "Error importing module storage: \"No module named storage\"",
-            get_storage_class,
-            'storage.NonExistingStorage')
+        with six.assertRaisesRegex(self, ImproperlyConfigured,
+                "Error importing module storage: \"No module named '?storage'?\""):
+            get_storage_class('storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_class(self):
         """
@@ -77,13 +75,11 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            'Error importing module django.core.files.non_existing_storage: '
-            '"No module named non_existing_storage"',
-            get_storage_class,
-            'django.core.files.non_existing_storage.NonExistingStorage'
-        )
+        with six.assertRaisesRegex(self, ImproperlyConfigured,
+                "Error importing module django.core.files.non_existing_storage: "
+                "\"No module named '?(django.core.files.)?non_existing_storage'?\""):
+            get_storage_class(
+                'django.core.files.non_existing_storage.NonExistingStorage')
 
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
