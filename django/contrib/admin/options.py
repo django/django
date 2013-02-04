@@ -1317,15 +1317,21 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+        # First check if the user can see this history.
         model = self.model
+        obj = get_object_or_404(model, pk=unquote(object_id))
+
+        if not self.has_change_permission(request, obj):
+            raise PermissionDenied
+
+        # Then get the history for this object.
         opts = model._meta
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
             object_id = object_id,
             content_type__id__exact = ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
-        # If no history was found, see whether this object even exists.
-        obj = get_object_or_404(model, pk=unquote(object_id))
+
         context = {
             'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,
