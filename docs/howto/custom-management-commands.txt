@@ -118,7 +118,7 @@ Management commands and locales
 ===============================
 
 By default, the :meth:`BaseCommand.execute` method sets the hardcoded 'en-us'
-locale because most of the commands shipped with Django perform several tasks
+locale because some commands shipped with Django perform several tasks
 (for example, user-facing content rendering and database population) that
 require a system-neutral string language (for which we use 'en-us').
 
@@ -237,11 +237,11 @@ All attributes can be set in your derived class and can be used in
   Default value is ``False``.
 
   Make sure you know what you are doing if you decide to change the value of
-  this option in your custom command because many of them create database
-  content that is locale-sensitive (like permissions) and that content
-  shouldn't contain any translations so making the locale differ from the de
-  facto default 'en-us' can cause unintended effects. See the `Management
-  commands and locales`_ section above for further details.
+  this option in your custom command if it creates database content that
+  is locale-sensitive and such content shouldn't contain any translations (like
+  it happens e.g. with django.contrim.auth permissions) as making the locale
+  differ from the de facto default 'en-us' might cause unintended effects. See
+  the `Management commands and locales`_ section above for further details.
 
   This option can't be ``False`` when the
   :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
@@ -250,7 +250,7 @@ All attributes can be set in your derived class and can be used in
 
 .. versionadded:: 1.6
 
-    The ``leave_locale_alone`` option was added in Django 1.6.
+The ``leave_locale_alone`` option was added in Django 1.6.
 
 Methods
 -------

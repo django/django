@@ -151,10 +151,11 @@ class BaseCommand(object):
         Default value is ``False``.
 
         Make sure you know what you are doing if you decide to change the value
-        of this option in your custom command because many of them create
-        database content that is locale-sensitive (like permissions) and that
-        content shouldn't contain any translations so making the locale differ
-        from the de facto default 'en-us' can cause unintended effects.
+        of this option in your custom command if it creates database content
+        that is locale-sensitive and such content shouldn't contain any
+        translations (like it happens e.g. with django.contrim.auth
+        permissions) as making the locale differ from the de facto default
+        'en-us' might cause unintended effects.
 
         This option can't be False when the can_import_settings option is set
         to False too because attempting to set the locale needs access to
