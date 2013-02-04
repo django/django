@@ -112,9 +112,6 @@ class Manager(object):
     # PROXIES TO QUERYSET #
     #######################
 
-    def get_empty_query_set(self):
-        return QuerySet(self.model, using=self._db).none()
-
     def get_query_set(self):
         """Returns a new QuerySet object.  Subclasses can override this method
         to easily customize the behavior of the Manager.
@@ -122,7 +119,7 @@ class Manager(object):
         return QuerySet(self.model, using=self._db)
 
     def none(self):
-        return self.get_empty_query_set()
+        return self.get_query_set().none()
 
     def all(self):
         return self.get_query_set()
@@ -266,4 +263,4 @@ class EmptyManager(Manager):
         self.model = model
 
     def get_query_set(self):
-        return self.get_empty_query_set()
+        return super(EmptyManager, self).get_query_set().none()
