@@ -11,6 +11,7 @@ from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.encoding import force_str
 from django.utils.six.moves import input
 from django.utils.text import capfirst
 
@@ -83,8 +84,9 @@ class Command(BaseCommand):
                     if not username:
                         input_msg = capfirst(self.username_field.verbose_name)
                         if default_username:
-                            input_msg += " (leave blank to use '%s')" % default_username
-                        raw_value = input(input_msg + ': ')
+                            input_msg = "%s (leave blank to use '%s')" % (
+                                input_msg, default_username)
+                        raw_value = input(force_str('%s: ' % input_msg))
 
                     if default_username and raw_value == '':
                         raw_value = default_username
@@ -107,7 +109,7 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        raw_value = input(capfirst(field.verbose_name + ': '))
+                        raw_value = input(force_str('%s: ' % capfirst(field.verbose_name)))
                         try:
                             user_data[field_name] = field.clean(raw_value, None)
                         except exceptions.ValidationError as e:
