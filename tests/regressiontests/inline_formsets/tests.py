@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import inlineformset_factory
 from django.test import TestCase
 from django.utils import six
@@ -157,3 +158,61 @@ class InlineFormsetFactoryTest(TestCase):
         inlineformset_factory(
             Parent, Child, exclude=('school',), fk_name='mother'
         )
+
+
+class InlineSaveAsNewTest(TestCase):
+
+    def setUp(self):
+        self.poet = Poet.objects.create(name='test')
+        self.poem = self.poet.poem_set.create(name='test poem',
+                testfile="poem.mp3")
+
+        self.poet_copy = self.poet
+        self.poet_copy.id = None
+        self.poet_copy.save()
+
+        self.PoemFormSet = inlineformset_factory(Poet, Poem)
+
+    def test_filefield_copy(self):
+        data = {
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': str(self.poem.pk),
+            'poem_set-0-poet': str(self.poet_copy.pk),
+            'poem_set-0-name': 'test',
+        }
+        files = {
+            'poem_set-0-testfile': '',
+            }
+        formset = self.PoemFormSet(data, files=files,
+                instance=self.poet, save_as_new=True)
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertEqual(self.poet_copy.poem_set.count(), 1)
+        poem_copy = self.poet_copy.poem_set.all()[0]
+        self.assertEqual(poem_copy.testfile, self.poem.testfile)
+
+    def test_override_fields(self):
+        uploaded_file = SimpleUploadedFile('test1.txt', b'hello world')
+        data = {
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '1',
+            'poem_set-MAX_NUM_FORMS': '0',
+            'poem_set-0-id': str(self.poem.pk),
+            'poem_set-0-poet': str(self.poet_copy.pk),
+            'poem_set-0-name': 'foo',
+        }
+        files = {
+            'poem_set-0-testfile': uploaded_file,
+            }
+        formset = self.PoemFormSet(data, files=files,
+                instance=self.poet, save_as_new=True)
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertEqual(self.poet_copy.poem_set.count(), 1)
+        poem_copy = self.poet_copy.poem_set.all()[0]
+        self.assertEqual(poem_copy.name, 'foo')
+        self.assertNotEqual(poem_copy.testfile, self.poem.testfile)
+        self.assertEqual(poem_copy.testfile.name, 'test_upload/test1.txt')
+        poem_copy.testfile.delete(save=False)

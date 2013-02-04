@@ -26,6 +26,7 @@ class Poet(models.Model):
 class Poem(models.Model):
     poet = models.ForeignKey(Poet)
     name = models.CharField(max_length=100)
+    testfile = models.FileField(upload_to='test_upload', blank=True)
 
     def __str__(self):
         return self.name

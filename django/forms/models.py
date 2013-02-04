@@ -7,7 +7,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.core.validators import EMPTY_VALUES
-from django.forms.fields import Field, ChoiceField
+from django.forms.fields import Field, ChoiceField, FileField
 from django.forms.forms import BaseForm, get_declared_fields
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
@@ -726,6 +726,20 @@ class BaseInlineFormSet(BaseModelFormSet):
     def _construct_form(self, i, **kwargs):
         form = super(BaseInlineFormSet, self)._construct_form(i, **kwargs)
         if self.save_as_new:
+            # Set initial values for filetype fields
+            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+            pk_value = self.data[pk_key]
+            if pk_value:
+                original = None
+                for field_name, field in form.fields.items():
+                    if field_name in form.initial:
+                        continue
+                    if not isinstance(field, FileField):
+                        continue
+                    if not original:
+                        original = self.model.objects.get(pk=pk_value)
+                    form.initial[field_name] = getattr(original, field_name)
+
             # Remove the primary key from the form's data, we are only
             # creating new instances
             form.data[form.add_prefix(self._pk_field.name)] = None
