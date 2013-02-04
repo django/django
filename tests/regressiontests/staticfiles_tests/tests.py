@@ -589,7 +589,7 @@ class TestErrorCachedStorage(BaseStaticFilesTestCase, TestCase):
             call_command('collectstatic', interactive=False, verbosity=0)
         self.assertIn("The file 'img/does_not_exists.png' could not be found",
                       cm.exception.args[0])
-        self.assertIn('FAIL', sys.stderr.getvalue())
+        self.assertIn("Failed post-processing", sys.stderr.getvalue())
         sys.stderr = old_stderr
 
 
