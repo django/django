@@ -406,7 +406,8 @@ class Client(RequestFactory):
         # callback function.
         data = {}
         on_template_render = curry(store_rendered_templates, data)
-        signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
+        signal_uid = "template-render-%s" % id(request)
+        signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
         got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
         try:
@@ -452,7 +453,7 @@ class Client(RequestFactory):
 
             return response
         finally:
-            signals.template_rendered.disconnect(dispatch_uid="template-render")
+            signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
     def get(self, path, data={}, follow=False, **extra):
