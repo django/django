@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # jargalan <jargalanch@gmail.com>, 2011.
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2013.
@@ -10,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-04 03:04+0000\n"
+"PO-Revision-Date: 2013-02-04 07:00+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
@@ -312,7 +313,7 @@ msgstr "Одоогийнх:"
 
 #: widgets.py:317
 msgid "Change:"
-msgstr "Өөрчил:"
+msgstr "Өөрчилөлт:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"

@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+#  <sim0n@trypill.org>, 2013.
 #   <sim0n@trypill.org>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"PO-Revision-Date: 2013-01-26 12:36+0000\n"
 "Last-Translator: sim0n <sim0n@trypill.org>\n"
 "Language-Team: Luxembourgish (http://www.transifex.com/projects/p/django/"
 "language/lb/)\n"
@@ -545,7 +546,7 @@ msgstr ""
 
 #: db/models/fields/__init__.py:1187
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #: db/models/fields/__init__.py:1205
 #, python-format
@@ -562,11 +563,11 @@ msgstr ""
 
 #: db/models/fields/__init__.py:1210
 msgid "Time"
-msgstr ""
+msgstr "Zäit"
 
 #: db/models/fields/__init__.py:1272
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: db/models/fields/files.py:216
 msgid "File"

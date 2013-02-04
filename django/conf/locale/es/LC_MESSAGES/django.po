@@ -10,13 +10,14 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011.
 # Marc Garcia <garcia.marc@gmail.com>, 2011.
 #   <monobot.soft@gmail.com>, 2012.
+#  <ntrrgc@gmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"PO-Revision-Date: 2013-01-17 21:09+0000\n"
+"Last-Translator: ntrrgc <ntrrgc@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -1250,7 +1251,7 @@ msgstr "Fecha '%(datestr)s' no válida, el formato válido es '%(format)s'"
 #: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "No %(verbose_name)s encontrado coincide con la consulta"
+msgstr "No se encontró ningún %(verbose_name)s coincidente con la consulta"
 
 #: views/generic/list.py:51
 msgid "Page is not 'last', nor can it be converted to an int."

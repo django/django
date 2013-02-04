@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#  <nasim.haque@gmail.com>, 2013.
 #   <rafi.tahmid@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: tahmidrafi <rafi.tahmid@gmail.com>\n"
+"PO-Revision-Date: 2013-01-24 00:04+0000\n"
+"Last-Translator: nsmgr8 <nasim.haque@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "আফ্রিকার অন্যতম সরকারি ভাষা"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -36,7 +37,7 @@ msgstr "বুলগেরিয়ান"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "বেলারুশীয়"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -44,7 +45,7 @@ msgstr "বাংলা"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "ব্রেটন"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -84,7 +85,7 @@ msgstr "বৃটিশ ইংলিশ"
 
 #: conf/global_settings.py:64
 msgid "Esperanto"
-msgstr ""
+msgstr "আন্তর্জাতিক ভাষা"
 
 #: conf/global_settings.py:65
 msgid "Spanish"
@@ -104,7 +105,7 @@ msgstr "নিকারাগুয়ান স্প্যানিশ"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "ভেনেজুয়েলার স্প্যানিশ"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -128,7 +129,7 @@ msgstr "ফ্রেঞ্চ"
 
 #: conf/global_settings.py:75
 msgid "Frisian"
-msgstr ""
+msgstr "ফ্রিজ্ল্যানডের ভাষা"
 
 #: conf/global_settings.py:76
 msgid "Irish"
@@ -212,7 +213,7 @@ msgstr "ম্যাসাডোনিয়ান"
 
 #: conf/global_settings.py:96
 msgid "Malayalam"
-msgstr ""
+msgstr "মালায়ালম"
 
 #: conf/global_settings.py:97
 msgid "Mongolian"
@@ -220,11 +221,11 @@ msgstr "মঙ্গোলিয়ান"
 
 #: conf/global_settings.py:98
 msgid "Norwegian Bokmal"
-msgstr ""
+msgstr "নরওয়েজীয় বোকমাল"
 
 #: conf/global_settings.py:99
 msgid "Nepali"
-msgstr ""
+msgstr "নেপালি"
 
 #: conf/global_settings.py:100
 msgid "Dutch"
@@ -232,7 +233,7 @@ msgstr "ডাচ"
 
 #: conf/global_settings.py:101
 msgid "Norwegian Nynorsk"
-msgstr ""
+msgstr "নরওয়েজীয়ান নিনর্স্ক"
 
 #: conf/global_settings.py:102
 msgid "Punjabi"
@@ -284,7 +285,7 @@ msgstr "সুইডিশ"
 
 #: conf/global_settings.py:114
 msgid "Swahili"
-msgstr ""
+msgstr "সোয়াহিলি"
 
 #: conf/global_settings.py:115
 msgid "Tamil"
@@ -304,7 +305,7 @@ msgstr "তুর্কি"
 
 #: conf/global_settings.py:119
 msgid "Tatar"
-msgstr ""
+msgstr "তাতারদেশীয়"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
@@ -336,7 +337,7 @@ msgstr "একটি বৈধ মান দিন।"
 
 #: core/validators.py:104 forms/fields.py:464
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "একটি বৈধ ইমেইল ঠিকানা লিখুন."
 
 #: core/validators.py:107 forms/fields.py:1013
 msgid ""

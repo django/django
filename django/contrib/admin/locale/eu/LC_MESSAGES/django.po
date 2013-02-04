@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#  <julenx@gmail.com>, 2013.
 #   <julenx@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-06 17:59+0000\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
+"PO-Revision-Date: 2013-01-16 11:21+0000\n"
+"Last-Translator: julen <julenx@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
 "MIME-Version: 1.0\n"
@@ -85,9 +87,7 @@ msgstr ""
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
-msgstr ""
-"Zure sesioa iraungitu da. Mesedez sartu berriro.\n"
-"."
+msgstr "Hasi saioa berriro, zure sesioa iraungitu egin da."
 
 #: helpers.py:23
 msgid "Action:"
