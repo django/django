@@ -4,7 +4,9 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -51,6 +53,7 @@ class Command(BaseCommand):
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
 
+    @no_translations
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']

@@ -418,6 +418,11 @@ Miscellaneous
 * The database router :meth:`allow_relation` method is called in more cases.
   Improperly written routers may need to be updated accordingly.
 
+* Translations are no longer deactivated before running management commands.
+  If your custom command requires translations to be deactivated (for example,
+  to insert untranslated content into the database), use the new
+  :ref:`@no_translations decorator <management-commands-and-locales>`.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
