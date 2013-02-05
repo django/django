@@ -1976,13 +1976,62 @@ class EmptyQuerySetTests(TestCase):
 
 
 class ValuesQuerysetTests(BaseQuerysetTest):
-    def test_flat_values_lits(self):
+    def setUp(self):
         Number.objects.create(num=72)
+        self.identity = lambda x: x
+
+    def test_flat_values_list(self):
         qs = Number.objects.values_list("num")
         qs = qs.values_list("num", flat=True)
-        self.assertValueQuerysetEqual(
-            qs, [72]
-        )
+        self.assertValueQuerysetEqual(qs, [72])
+
+    def test_extra_values(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select=SortedDict([('value_plus_x', 'num+%s'),
+                                                     ('value_minus_x', 'num-%s')]),
+                                  select_params=(1, 2))
+        qs = qs.order_by('value_minus_x')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_twice(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'})
+        qs = qs.order_by('value_minus_one').order_by('value_plus_one')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_multiple(self):
+        # Postgres doesn't allow constants in order by, so check for that.
+        qs = Number.objects.extra(select={
+            'value_plus_one': 'num+1',
+            'value_minus_one': 'num-1',
+            'constant_value': '1'
+        })
+        qs = qs.order_by('value_plus_one', 'value_minus_one', 'constant_value')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_in_extra(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(
+            select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'},
+            order_by=['value_minus_one'])
+        qs = qs.values('num')
+
+    def test_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num')
+        self.assertQuerysetEqual(qs, [(72,)], self.identity)
+
+    def test_flat_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num', flat=True)
+        self.assertQuerysetEqual(qs, [72], self.identity)
 
 
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):

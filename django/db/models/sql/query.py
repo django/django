@@ -115,7 +115,6 @@ class Query(object):
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
-        self.ordering_aliases = []
         self.used_aliases = set()
         self.filter_is_sticky = False
         self.included_inherited_models = {}
@@ -227,7 +226,6 @@ class Query(object):
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
         obj.included_inherited_models = self.included_inherited_models.copy()
-        obj.ordering_aliases = []
         obj.select = self.select[:]
         obj.related_select_cols = []
         obj.tables = self.tables[:]
