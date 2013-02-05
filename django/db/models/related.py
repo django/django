@@ -16,8 +16,8 @@ class RelatedObject(object):
         self.model = model
         self.opts = model._meta
         self.field = field
-        self.name = '%s:%s' % (self.opts.app_label, self.opts.module_name)
-        self.var_name = self.opts.object_name.lower()
+        self.name = '%s:%s' % (self.opts.app_label, self.opts.model_name)
+        self.var_name = self.opts.model_name
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):
@@ -31,7 +31,7 @@ class RelatedObject(object):
         queryset = self.model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(
-                {'%s__isnull' % self.parent_model._meta.module_name: False})
+                {'%s__isnull' % self.parent_model._meta.model_name: False})
         lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
         return first_choice + lst
 
@@ -56,9 +56,9 @@ class RelatedObject(object):
             # If this is a symmetrical m2m relation on self, there is no reverse accessor.
             if getattr(self.field.rel, 'symmetrical', False) and self.model == self.parent_model:
                 return None
-            return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
+            return self.field.rel.related_name or (self.opts.model_name + '_set')
         else:
-            return self.field.rel.related_name or (self.opts.object_name.lower())
+            return self.field.rel.related_name or (self.opts.model_name)
 
     def get_cache_name(self):
         return "_%s_cache" % self.get_accessor_name()

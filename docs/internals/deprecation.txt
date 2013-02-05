@@ -327,6 +327,8 @@ these changes.
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
 
+* ``Model._meta.module_name`` was renamed to ``model_name``.
+
 2.0
 ---
 

@@ -173,8 +173,8 @@ def custom_sql_for_model(model, style, connection):
 
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
-                 os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
+    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)),
+                 os.path.join(app_dir, "%s.sql" % opts.model_name)]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:

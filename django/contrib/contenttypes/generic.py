@@ -389,7 +389,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         opts = self.model._meta
         self.instance = instance
         self.rel_name = '-'.join((
-            opts.app_label, opts.object_name.lower(),
+            opts.app_label, opts.model_name,
             self.ct_field.name, self.ct_fk_field.name,
         ))
         if self.instance is None or self.instance.pk is None:
@@ -409,7 +409,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     @classmethod
     def get_default_prefix(cls):
         opts = cls.model._meta
-        return '-'.join((opts.app_label, opts.object_name.lower(),
+        return '-'.join((opts.app_label, opts.model_name,
                         cls.ct_field.name, cls.ct_fk_field.name,
         ))
 

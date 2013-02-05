@@ -17,7 +17,7 @@ from django.utils.six.moves import input
 
 
 def _get_permission_codename(action, opts):
-    return '%s_%s' % (action, opts.object_name.lower())
+    return '%s_%s' % (action, opts.model_name)
 
 
 def _get_all_permissions(opts, ctype):

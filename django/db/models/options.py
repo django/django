@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import re
 from bisect import bisect
+import warnings
 
 from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
@@ -28,7 +29,7 @@ class Options(object):
     def __init__(self, meta, app_label=None):
         self.local_fields, self.local_many_to_many = [], []
         self.virtual_fields = []
-        self.module_name, self.verbose_name = None, None
+        self.model_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
         self.ordering = []
@@ -78,7 +79,7 @@ class Options(object):
         self.installed = re.sub('\.models$', '', cls.__module__) in settings.INSTALLED_APPS
         # First, construct the default values for these options.
         self.object_name = cls.__name__
-        self.module_name = self.object_name.lower()
+        self.model_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
 
         # Next, apply any overridden values from 'class Meta'.
@@ -116,10 +117,20 @@ class Options(object):
             self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
-        # If the db_table wasn't provided, use the app_label + module_name.
+        # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+    @property
+    def module_name(self):
+        """
+        This property has been deprecated in favor of `model_name`. refs #19689
+        """
+        warnings.warn(
+            "Options.module_name has been deprecated in favor of model_name",
+            PendingDeprecationWarning, stacklevel=2)
+        return self.model_name
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -193,7 +204,7 @@ class Options(object):
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (smart_text(self.app_label), smart_text(self.module_name))
+        return "%s.%s" % (smart_text(self.app_label), smart_text(self.model_name))
 
     def verbose_name_raw(self):
         """
@@ -217,7 +228,7 @@ class Options(object):
         case insensitive, so we make sure we are case insensitive here.
         """
         if self.swappable:
-            model_label = '%s.%s' % (self.app_label, self.object_name.lower())
+            model_label = '%s.%s' % (self.app_label, self.model_name)
             swapped_for = getattr(settings, self.swappable, None)
             if swapped_for:
                 try:
@@ -371,13 +382,13 @@ class Options(object):
         return cache
 
     def get_add_permission(self):
-        return 'add_%s' % self.object_name.lower()
+        return 'add_%s' % self.model_name
 
     def get_change_permission(self):
-        return 'change_%s' % self.object_name.lower()
+        return 'change_%s' % self.model_name
 
     def get_delete_permission(self):
-        return 'delete_%s' % self.object_name.lower()
+        return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
