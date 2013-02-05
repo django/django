@@ -42,8 +42,17 @@ backend = load_backend(connection.settings_dict['ENGINE'])
 # Register an event that closes the database connection
 # when a Django request is finished.
 def close_connection(**kwargs):
-    for conn in connections.all():
-        conn.close()
+    # Avoid circular imports
+    from django.db import transaction
+    for conn in connections:
+        try:
+            transaction.abort(conn)
+            connections[conn].close()
+        except Exception:
+            # The connection's state is unknown, so it has to be
+            # abandoned. This could happen for example if the network
+            # connection has a failure.
+            del connections[conn]
 signals.request_finished.connect(close_connection)
 
 # Register an event that resets connection.queries
