@@ -9,9 +9,9 @@ import warnings
 
 from django.conf import settings
 from django.core import mail
-from django.db import transaction
-from django.http import HttpRequest
-from django.http import HttpResponse, StreamingHttpResponse
+from django.db import (transaction, connections, DEFAULT_DB_ALIAS,
+                       IntegrityError)
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
@@ -710,3 +710,22 @@ class TransactionMiddlewareTest(TransactionTestCase):
         TransactionMiddleware().process_exception(self.request, None)
         self.assertEqual(Band.objects.count(), 0)
         self.assertFalse(transaction.is_dirty())
+
+    def test_failing_commit(self):
+        # It is possible that connection.commit() fails. Check that
+        # TransactionMiddleware handles such cases correctly.
+        try:
+            def raise_exception():
+                raise IntegrityError()
+            connections[DEFAULT_DB_ALIAS].commit = raise_exception
+            transaction.enter_transaction_management()
+            transaction.managed(True)
+            Band.objects.create(name='The Beatles')
+            self.assertTrue(transaction.is_dirty())
+            with self.assertRaises(IntegrityError):
+                TransactionMiddleware().process_response(self.request, None)
+            self.assertEqual(Band.objects.count(), 0)
+            self.assertFalse(transaction.is_dirty())
+            self.assertFalse(transaction.is_managed())
+        finally:
+            del connections[DEFAULT_DB_ALIAS].commit
