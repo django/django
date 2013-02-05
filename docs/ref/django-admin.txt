@@ -517,6 +517,14 @@ Use the ``--keep-pot`` option to prevent django from deleting the temporary
 .pot file it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
+.. django-admin-option:: --no-previous
+
+.. versionadded:: 1.6
+
+Use the ``--no-previous`` option to not write '``#| previous id``'
+comment lines in language files. Note that using this option makes it harder
+for translators to understand, why message is marked fuzzy.
+
 runfcgi [options]
 -----------------
 
