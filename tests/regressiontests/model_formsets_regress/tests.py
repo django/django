@@ -261,14 +261,17 @@ class FormsetTests(TestCase):
             formset.save()
 
 
-class CustomWidget(forms.CharField):
+class CustomWidget(forms.widgets.TextInput):
     pass
 
 
 class UserSiteForm(forms.ModelForm):
     class Meta:
         model = UserSite
-        widgets = {'data': CustomWidget}
+        widgets = {
+            'id': CustomWidget,
+            'data': CustomWidget,
+        }
 
 
 class Callback(object):
@@ -283,24 +286,27 @@ class Callback(object):
 
 class FormfieldCallbackTests(TestCase):
     """
-    Regression for #13095: Using base forms with widgets
-    defined in Meta should not raise errors.
+    Regression for #13095 and #17683: Using base forms with widgets
+    defined in Meta should not raise errors and BaseModelForm should respect
+    the specified pk widget.
     """
 
     def test_inlineformset_factory_default(self):
         Formset = inlineformset_factory(User, UserSite, form=UserSiteForm)
         form = Formset().forms[0]
+        self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
 
     def test_modelformset_factory_default(self):
         Formset = modelformset_factory(UserSite, form=UserSiteForm)
         form = Formset().forms[0]
+        self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
 
     def assertCallbackCalled(self, callback):
         id_field, user_field, data_field = UserSite._meta.fields
         expected_log = [
-            (id_field, {}),
+            (id_field, {'widget': CustomWidget}),
             (user_field, {}),
             (data_field, {'widget': CustomWidget}),
         ]
@@ -317,7 +323,6 @@ class FormfieldCallbackTests(TestCase):
         modelformset_factory(UserSite, form=UserSiteForm,
                              formfield_callback=callback)
         self.assertCallbackCalled(callback)
-
 
 class BaseCustomDeleteFormSet(BaseFormSet):
     """

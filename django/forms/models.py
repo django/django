@@ -678,7 +678,11 @@ class BaseModelFormSet(BaseFormSet):
             else:
                 qs = self.model._default_manager.get_query_set()
             qs = qs.using(form.instance._state.db)
-            form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=HiddenInput)
+            if form._meta.widgets:
+                widget = form._meta.widgets.get(self._pk_field.name, HiddenInput)
+            else:
+                widget = HiddenInput
+            form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=widget)
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
