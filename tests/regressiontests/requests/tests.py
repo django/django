@@ -6,11 +6,14 @@ import warnings
 from datetime import datetime, timedelta
 from StringIO import StringIO
 
+from django.db import connection, connections, DEFAULT_DB_ALIAS
+from django.core import signals
 from django.conf import settings
 from django.core.handlers.modpython import ModPythonRequest
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
+from django.test import TransactionTestCase
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.http import cookie_date
@@ -530,3 +533,35 @@ class RequestsTests(unittest.TestCase):
 
         with self.assertRaises(UnreadablePostError):
             request.raw_post_data
+
+class TransactionRequestTests(TransactionTestCase):
+    def test_request_finished_db_state(self):
+        # Make sure there is an open connection
+        connection.cursor()
+        connection.enter_transaction_management()
+        connection.managed(True)
+        signals.request_finished.send(sender=self.__class__)
+        # In-memory sqlite doesn't actually close connections.
+        if connection.vendor != 'sqlite':
+            self.assertIs(connection.connection, None)
+        self.assertEqual(len(connection.transaction_state), 0)
+
+    @unittest.skipIf(connection.vendor == 'sqlite',
+                     'This test will close the connection, in-memory '
+                     'sqlite connections must not be closed.')
+    def test_request_finished_failed_connection(self):
+        conn = connections[DEFAULT_DB_ALIAS]
+        conn.enter_transaction_management()
+        conn.managed(True)
+        conn.set_dirty()
+        # Test that the rollback doesn't succeed (for example network failure
+        # could cause this).
+        def fail_horribly():
+            raise Exception("Horrible failure!")
+        conn._rollback = fail_horribly
+        signals.request_finished.send(sender=self.__class__)
+        # As even rollback wasn't possible the connection wrapper itself was
+        # abandoned. Accessing the connections[alias] will create a new
+        # connection wrapper, whch must be different than the original one.
+        self.assertIsNot(conn, connections[DEFAULT_DB_ALIAS])
+        self.assertEqual(len(connection.transaction_state), 0)

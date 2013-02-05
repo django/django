@@ -83,6 +83,17 @@ class BaseDatabaseWrapper(object):
             return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
+    def abort(self):
+        """
+        Roll back any ongoing transaction and clean the transaction state
+        stack.
+        """
+        if self._dirty:
+            self._rollback()
+            self._dirty = False
+        while self.transaction_state:
+            self.leave_transaction_management()
+
     def enter_transaction_management(self, managed=True):
         """
         Enters transaction management for a running thread. It must be balanced with
