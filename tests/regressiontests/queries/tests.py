@@ -1531,7 +1531,8 @@ class Queries5Tests(TestCase):
         # An empty values() call includes all aliases, including those from an
         # extra()
         qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
-        dicts = qs.values().order_by('id')
+        dicts = qs.values()
+        dicts = dicts.order_by('id')
         for d in dicts: del d['id']; del d['author_id']
         self.assertEqual(
             [sorted(d.items()) for d in dicts],
@@ -1995,13 +1996,57 @@ class EmptyQuerySetTests(TestCase):
 
 
 class ValuesQuerysetTests(BaseQuerysetTest):
-    def test_flat_values_lits(self):
+    def setUp(self):
         Number.objects.create(num=72)
+
+    def test_flat_values_list(self):
         qs = Number.objects.values_list("num")
         qs = qs.values_list("num", flat=True)
         self.assertValueQuerysetEqual(
             qs, [72]
         )
+
+    def test_extra_values(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1' })
+        qs = qs.order_by('value_minus_one')
+        qs = qs.values('num')
+        identity = lambda x:x
+        self.assertQuerysetEqual(qs, [{'num': 72}], identity)
+
+    def test_extra_values_order_twice(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1' })
+        qs = qs.order_by('value_minus_one').order_by('value_plus_one')
+        qs = qs.values('num')
+        identity = lambda x:x
+        self.assertQuerysetEqual(qs, [{'num': 72}], identity)
+
+    def test_extra_values_order_in_extra(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(
+                select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1' },
+                order_by=['value_minus_one'])
+        qs = qs.values('num')
+        identity = lambda x:x
+        self.assertQuerysetEqual(qs, [{'num': 72}], identity)
+
+    def test_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num')
+        identity = lambda x:x
+        self.assertQuerysetEqual(qs, [(72,)], identity)
+
+    def test_flat_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num', flat=True)
+        identity = lambda x:x
+        self.assertQuerysetEqual(qs, [72], identity)
+
 
 
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):
