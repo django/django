@@ -143,7 +143,7 @@ def Deserializer(object_list, **options):
 
 def _get_model(model_identifier):
     """
-    Helper to look up a model from an "app_label.module_name" string.
+    Helper to look up a model from an "app_label.model_name" string.
     """
     try:
         Model = models.get_model(*model_identifier.split("."))

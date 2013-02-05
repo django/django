@@ -371,7 +371,7 @@ class ModelAdmin(BaseModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        info = self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.model_name
 
         urlpatterns = patterns('',
             url(r'^$',
@@ -783,7 +783,7 @@ class ModelAdmin(BaseModelAdmin):
             form_template = self.change_form_template
 
         return TemplateResponse(request, form_template or [
-            "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
         ], context, current_app=self.admin_site.name)
@@ -803,7 +803,7 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg)
             if post_url_continue is None:
                 post_url_continue = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(pk_value,),
                                             current_app=self.admin_site.name)
             if "_popup" in request.POST:
@@ -845,14 +845,14 @@ class ModelAdmin(BaseModelAdmin):
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
             self.message_user(request, msg)
             return HttpResponseRedirect(reverse('admin:%s_%s_change' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         args=(pk_value,),
                                         current_app=self.admin_site.name))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
             self.message_user(request, msg)
             return HttpResponseRedirect(reverse('admin:%s_%s_add' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
         else:
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
@@ -867,7 +867,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.module_name),
+                               (opts.app_label, opts.model_name),
                                current_app=self.admin_site.name)
         else:
             post_url = reverse('admin:index',
@@ -882,7 +882,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.module_name),
+                               (opts.app_label, opts.model_name),
                                current_app=self.admin_site.name)
         else:
             post_url = reverse('admin:index',
@@ -1060,7 +1060,7 @@ class ModelAdmin(BaseModelAdmin):
 
         if request.method == 'POST' and "_saveasnew" in request.POST:
             return self.add_view(request, form_url=reverse('admin:%s_%s_add' %
-                                    (opts.app_label, opts.module_name),
+                                    (opts.app_label, opts.model_name),
                                     current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
@@ -1283,7 +1283,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.change_list_template or [
-            'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
+            'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
         ], context, current_app=self.admin_site.name)
@@ -1323,7 +1323,7 @@ class ModelAdmin(BaseModelAdmin):
                 return HttpResponseRedirect(reverse('admin:index',
                                                     current_app=self.admin_site.name))
             return HttpResponseRedirect(reverse('admin:%s_%s_changelist' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
 
         object_name = force_text(opts.verbose_name)
@@ -1346,7 +1346,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.model_name),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, current_app=self.admin_site.name)
@@ -1373,7 +1373,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)

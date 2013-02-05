@@ -118,7 +118,7 @@ class RelatedField(object):
             self.do_related_class(other, cls)
 
     def set_attributes_from_rel(self):
-        self.name = self.name or (self.rel.to._meta.object_name.lower() + '_' + self.rel.to._meta.pk.name)
+        self.name = self.name or (self.rel.to._meta.model_name + '_' + self.rel.to._meta.pk.name)
         if self.verbose_name is None:
             self.verbose_name = self.rel.to._meta.verbose_name
         self.rel.field_name = self.rel.field_name or self.rel.to._meta.pk.name
@@ -222,7 +222,7 @@ class RelatedField(object):
         # related object in a table-spanning query. It uses the lower-cased
         # object_name by default, but this can be overridden with the
         # "related_name" option.
-        return self.rel.related_name or self.opts.object_name.lower()
+        return self.rel.related_name or self.opts.model_name
 
 
 class SingleRelatedObjectDescriptor(object):
@@ -983,7 +983,7 @@ class ForeignKey(RelatedField, Field):
 
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
-            to_name = to._meta.object_name.lower()
+            to_name = to._meta.model_name
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
@@ -1174,7 +1174,7 @@ def create_many_to_many_intermediary_model(field, klass):
         from_ = 'from_%s' % to.lower()
         to = 'to_%s' % to.lower()
     else:
-        from_ = klass._meta.object_name.lower()
+        from_ = klass._meta.model_name
         to = to.lower()
     meta = type('Meta', (object,), {
         'db_table': field._get_m2m_db_table(klass._meta),
