@@ -64,7 +64,7 @@ Adds a few conveniences for perfectionists:
 * Handles ETags based on the :setting:`USE_ETAGS` setting. If
   :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
   for each request by MD5-hashing the page content. This middleware only
-  contracts "ETag generation". Checking ETag and handling 304 response are
+  contracts "ETag generation". Checking ETags and handling a 304 response are
   depends on :class:`~django.middleware.http.ConditionalGetMiddleware`.
 
 .. class:: BrokenLinkEmailsMiddleware
