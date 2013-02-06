@@ -184,6 +184,8 @@ class Feed(object):
                 link = link,
                 description = description,
                 unique_id = self.__get_dynamic_attr('item_guid', item, link),
+                unique_id_is_permalink = self.__get_dynamic_attr(
+                    'item_guid_is_permalink', item),
                 enclosure = enc,
                 pubdate = pubdate,
                 author_name = author_name,
