@@ -91,3 +91,34 @@ class Company(models.Model):
 
     def __str__(self):
         return "Company: %s" % self.name
+
+# For testing #13085 fix, we also use Note model defined above
+class Developer(models.Model):
+    name = models.CharField(max_length=15)
+
+@python_2_unicode_compatible
+class Team(models.Model):
+    name = models.CharField(max_length=15)
+    members = models.ManyToManyField(Developer)
+
+    def __str__(self):
+        return "%s team" % self.name
+
+    def __len__(self):
+        return self.members.count()
+
+class Guild(models.Model):
+    name = models.CharField(max_length=15)
+    members = models.ManyToManyField(Developer)
+
+    def __nonzero__(self):
+        return self.members.count()
+
+class Tag(models.Model):
+    content_type = models.ForeignKey(ContentType, related_name='g_r_r_tags')
+    object_id = models.CharField(max_length=15)
+    content_object = generic.GenericForeignKey()
+    label = models.CharField(max_length=15)
+
+class Board(models.Model):
+    name = models.CharField(primary_key=True, max_length=15)
