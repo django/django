@@ -42,6 +42,19 @@ class TestRss2Feed(views.Feed):
     item_copyright = 'Copyright (c) 2007, Sally Smith'
 
 
+class TestRss2FeedWithGuidIsPermaLinkTrue(TestRss2Feed):
+    def item_guid_is_permalink(self, item):
+        return True
+
+
+class TestRss2FeedWithGuidIsPermaLinkFalse(TestRss2Feed):
+    def item_guid(self, item):
+        return str(item.pk)
+
+    def item_guid_is_permalink(self, item):
+        return False
+
+
 class TestRss091Feed(TestRss2Feed):
     feed_type = feedgenerator.RssUserland091Feed
 
