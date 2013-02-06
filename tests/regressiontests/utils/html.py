@@ -68,6 +68,7 @@ class TestUtilsHtml(unittest.TestCase):
             ('a<p onclick="alert(\'<test>\')">b</p>c', 'abc'),
             ('a<p a >b</p>c', 'abc'),
             ('d<a:b c:d>e</p>f', 'def'),
+            ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
         )
         for value, output in items:
             self.check_output(f, value, output)
