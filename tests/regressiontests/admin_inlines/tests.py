@@ -197,12 +197,13 @@ class TestInline(TestCase):
         bt_child = BinaryTree(name="First Child", parent=bt_head)
         bt_child.save()
 
-        inline_form = '<input type="hidden" name="binarytree_set-2-id" id="id_binarytree_set-2-id" />'
+        # The total number of forms will remain the same in any case
+        total_forms_hidden = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
         response = self.client.get('/admin/admin_inlines/binarytree/add/')
-        self.assertNotContains(response, inline_form)
+        self.assertContains(response, total_forms_hidden)
 
-        response = self.client.get("/admin/admin_inlines/binarytree/%d/" %(bt_head.id))
-        self.assertNotContains(response, inline_form)
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, total_forms_hidden)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
