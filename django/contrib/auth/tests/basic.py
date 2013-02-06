@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_str
 from django.utils.six import StringIO
 
 
@@ -30,8 +31,13 @@ def mock_inputs(inputs):
                 # prompt should be encoded in Python 2. This line will raise an
                 # Exception if prompt contains unencoded non-ascii on Python 2.
                 prompt = str(prompt)
-                if str('leave blank to use') in prompt:
-                    return inputs['username']
+                assert str('__proxy__') not in prompt
+                response = ''
+                for key, val in inputs.items():
+                    if force_str(key) in prompt.lower():
+                        response = val
+                        break
+                return response
 
             old_getpass = createsuperuser.getpass
             old_input = createsuperuser.input
@@ -178,16 +184,20 @@ class BasicTestCase(TestCase):
         u = User.objects.get(username="nolocale@somewhere.org")
         self.assertEqual(u.email, 'nolocale@somewhere.org')
 
-    @mock_inputs({'password': "nopasswd", 'username': 'foo'})
+    @mock_inputs({
+        'password': "nopasswd",
+        'uživatel': 'foo',  # username (cz)
+        'email': 'nolocale@somewhere.org'})
     def test_createsuperuser_non_ascii_verbose_name(self):
+        # Aliased so the string doesn't get extracted
+        from django.utils.translation import ugettext_lazy as ulazy
         username_field = User._meta.get_field('username')
         old_verbose_name = username_field.verbose_name
-        username_field.verbose_name = 'uživatel'
+        username_field.verbose_name = ulazy('uživatel')
         new_io = StringIO()
         try:
             call_command("createsuperuser",
                 interactive=True,
-                email="nolocale@somewhere.org",
                 stdout=new_io
             )
         finally:
