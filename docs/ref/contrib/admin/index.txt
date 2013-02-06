@@ -1640,6 +1640,8 @@ The ``InlineModelAdmin`` class adds:
                   return extra - obj.binarytree_set.count()
                 return extra
 
+.. versionadded:: 1.6
+
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
 
