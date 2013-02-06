@@ -1452,7 +1452,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "fields": fields,
             "exclude": exclude,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "extra": self.get_extra(request, obj, *kwargs),
+            "extra": self.get_extra(request, obj, **kwargs),
             "max_num": self.max_num,
             "can_delete": can_delete,
         }
