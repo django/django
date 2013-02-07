@@ -33,7 +33,7 @@ A quick rundown:
   ``value`` of each radio button is the associated poll choice's ID. The
   ``name`` of each radio button is ``"choice"``. That means, when somebody
   selects one of the radio buttons and submits the form, it'll send the
-  POST data ``choice=3``. This is HTML Forms 101.
+  POST data ``choice=3``. This is the basic concept of HTML forms.
 
 * We set the form's ``action`` to ``{% url 'polls:vote' poll.id %}``, and we
   set ``method="post"``. Using ``method="post"`` (as opposed to
@@ -199,6 +199,9 @@ Read on for details.
 
     You should know basic math before you start using a calculator.
 
+Amend URLconf
+-------------
+
 First, open the ``polls/urls.py`` URLconf and change it like so::
 
     from django.conf.urls import patterns, url
@@ -224,6 +227,9 @@ First, open the ``polls/urls.py`` URLconf and change it like so::
             name='results'),
         url(r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote', name='vote'),
     )
+
+Amend views
+-----------
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and
@@ -267,9 +273,10 @@ As an alternative approach, you could change your templates to match
 the new default context variables -- but it's a lot easier to just
 tell Django to use the variable you want.
 
-You can now delete the ``index()``, ``detail()`` and ``results()``
-views from ``polls/views.py``. We don't need them anymore -- they have
-been replaced by generic views.
+You can now delete the ``index()``, ``detail()`` and ``results()`` views from
+``polls/views.py``. We don't need them anymore -- they have been replaced by
+generic views. You can also delete the import for ``HttpResponse``, which is no
+longer required.
 
 Run the server, and use your new polling app based on generic views.
 
