@@ -227,7 +227,7 @@ class DeletionTests(TestCase):
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
-        models.signals.post_delete.disconnect(log_pre_delete)
+        models.signals.pre_delete.disconnect(log_pre_delete)
 
     @skipUnlessDBFeature("can_defer_constraint_checks")
     def test_can_defer_constraint_checks(self):
