@@ -399,6 +399,11 @@ That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
 system.
 
+.. _ref-customizing-your-projects-templates:
+
+Customizing your *project's* templates
+--------------------------------------
+
 Create a ``mytemplates`` directory in your project directory. Templates can
 live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
@@ -446,11 +451,24 @@ override a template, just do the same thing you did with ``base_site.html`` --
 copy it from the default directory into your custom directory, and make
 changes.
 
+Customizing your *application's* templates
+------------------------------------------
+
 Astute readers will ask: But if :setting:`TEMPLATE_DIRS` was empty by default,
 how was Django finding the default admin templates? The answer is that, by
 default, Django automatically looks for a ``templates/`` subdirectory within
-each app package, for use as a fallback. See the :ref:`template loader
-documentation <template-loaders>` for full information.
+each application package, for use as a fallback (don't forget that
+``django.contrib.admin`` is an application).
+
+Our poll application is not very complex and doesn't need custom admin
+templates. But if it grew more sophisticated and required modification of
+Django's standard admin templates for some of its functionality, it would be
+more sensible to modify the *application's* templates, rather than those in the
+*project*. That way, you could include the polls application in any new project
+and be assured that it would find the custom templates it needed.
+
+See the :ref:`template loader documentation <template-loaders>` for more
+information about how Django finds its templates.
 
 Customize the admin index page
 ==============================
