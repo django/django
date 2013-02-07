@@ -144,7 +144,7 @@ purely in Python. We've included this with Django so you can develop things
 rapidly, without having to deal with configuring a production server -- such as
 Apache -- until you're ready for production.
 
-Now's a good time to note: DON'T use this server in anything resembling a
+Now's a good time to note: **Don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making Web frameworks, not Web servers.)
 
@@ -347,7 +347,7 @@ These concepts are represented by simple Python classes. Edit the
     class Choice(models.Model):
         poll = models.ForeignKey(Poll)
         choice_text = models.CharField(max_length=200)
-        votes = models.IntegerField()
+        votes = models.IntegerField(default=0)
 
 The code is straightforward. Each model is represented by a class that
 subclasses :class:`django.db.models.Model`. Each model has a number of class
@@ -370,10 +370,14 @@ example, we've only defined a human-readable name for ``Poll.pub_date``. For all
 other fields in this model, the field's machine-readable name will suffice as
 its human-readable name.
 
-Some :class:`~django.db.models.Field` classes have required elements.
+Some :class:`~django.db.models.Field` classes have required arguments.
 :class:`~django.db.models.CharField`, for example, requires that you give it a
 :attr:`~django.db.models.CharField.max_length`. That's used not only in the
 database schema, but in validation, as we'll soon see.
+
+A :class:`~django.db.models.Field` can also have various optional arguments; in
+this case, we've set the :attr:`~django.db.models.Field.default` value of
+``votes`` to 0.
 
 Finally, note a relationship is defined, using
 :class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is related
