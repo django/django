@@ -105,6 +105,27 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
 
+    def test_email_found_not_found_equivalent(self):
+        "The response to a password reset is the same whether or not the email is enrolled."
+        not_a_real_email = 'not_a_real_email@email.com'
+        real_email = 'staffmember@example.com'
+        
+        response = self.client.get('/password_reset/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post('/password_reset/', {'email': not_a_real_email})
+        not_found_status_code = response.status_code
+        not_found_content = response.content
+
+        response = self.client.get('/password_reset/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post('/password_reset_from_email/', {'email': real_email})
+        found_status_code = response.status_code
+        found_content = response.content
+
+        self.assertEqual(not_found_status_code, found_status_code)
+        self.assertEqual(not_found_content.replace(not_a_real_email, ''), 
+                         found_content.replace(real_email, ''))
+        
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
         response = self.client.post('/admin_password_reset/',
