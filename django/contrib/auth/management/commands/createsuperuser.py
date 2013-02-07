@@ -1,6 +1,7 @@
 """
 Management utility to create superusers.
 """
+from __future__ import unicode_literals
 
 import getpass
 import sys
@@ -11,7 +12,7 @@ from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_str
 from django.utils.six.moves import input
 from django.utils.text import capfirst
 
@@ -80,7 +81,7 @@ class Command(BaseCommand):
             try:
 
                 # Get a username
-                verbose_field_name = force_text(self.username_field.verbose_name)
+                verbose_field_name = self.username_field.verbose_name
                 while username is None:
                     if not username:
                         input_msg = capfirst(verbose_field_name)
@@ -110,7 +111,7 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        raw_value = input(force_str('%s: ' % capfirst(force_text(field.verbose_name))))
+                        raw_value = input(force_str('%s: ' % capfirst(field.verbose_name)))
                         try:
                             user_data[field_name] = field.clean(raw_value, None)
                         except exceptions.ValidationError as e:
