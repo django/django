@@ -227,7 +227,7 @@ class DeletionTests(TestCase):
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
-        models.signals.post_delete.disconnect(log_pre_delete)
+        models.signals.pre_delete.disconnect(log_pre_delete)
 
     def test_relational_post_delete_signals_happen_before_parent_object(self):
         deletions = []
