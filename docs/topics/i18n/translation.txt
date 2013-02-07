@@ -353,7 +353,7 @@ It is recommended to always provide explicit
 :attr:`~django.db.models.Options.verbose_name` and
 :attr:`~django.db.models.Options.verbose_name_plural` options rather than
 relying on the fallback English-centric and somewhat naïve determination of
-verbose names Django performs bu looking at the model's class name::
+verbose names Django performs by looking at the model's class name::
 
     from django.utils.translation import ugettext_lazy as _
 
