@@ -36,6 +36,9 @@ Minor features
 * Authentication backends can raise ``PermissionDenied`` to immediately fail
   the authentication chain.
 
+* The HttpOnly flag can be set on the CSRF cookie with
+  :setting:`CSRF_COOKIE_HTTPONLY`.
+
 * The ``assertQuerysetEqual()`` now checks for undefined order and raises
   ``ValueError`` if undefined order is spotted. The order is seen as
   undefined if the given ``QuerySet`` isn't ordered and there are more than

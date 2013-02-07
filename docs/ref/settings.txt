@@ -281,6 +281,19 @@ Please note that the presence of this setting does not imply that Django's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
 :ref:`CSRF limitations <csrf-limitations>` section.
 
+.. setting:: CSRF_COOKIE_HTTPONLY
+
+CSRF_COOKIE_HTTPONLY
+--------------------
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Whether to use HttpOnly flag on the CSRF cookie. If this is set to ``True``,
+client-side JavaScript will not to be able to access the CSRF cookie. See
+:setting:`SESSION_COOKIE_HTTPONLY` for details on HttpOnly.
+
 .. setting:: CSRF_COOKIE_NAME
 
 CSRF_COOKIE_NAME
