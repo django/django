@@ -226,7 +226,9 @@ def same_origin(url1, url2):
     Checks if two URLs are 'same-origin'
     """
     p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
-    return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+    p1_port = p1.port or { 'http': 80, 'https': 443 }[p1.scheme]
+    p2_port = p2.port or { 'http': 80, 'https': 443 }[p2.scheme]
+    return (p1.scheme, p1.hostname, p1_port) == (p2.scheme, p2.hostname, p2_port)
 
 def is_safe_url(url, host=None):
     """
