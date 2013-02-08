@@ -259,13 +259,13 @@ class QuerySet(object):
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
-            fields = self.model._meta.fields
+            fields = self.model._meta.column_fields
 
         load_fields = []
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_fields_with_model():
+            for field, model in self.model._meta.get_column_fields_with_model():
                 if model is None:
                     model = self.model
                 try:
@@ -967,7 +967,7 @@ class QuerySet(object):
         """
         opts = self.model._meta
         if self.query.group_by is None:
-            field_names = [f.attname for f in opts.fields]
+            field_names = [f.attname for f in opts.column_fields]
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
@@ -1245,7 +1245,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_fields_with_model():
+        for field, model in klass._meta.get_column_fields_with_model():
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1264,22 +1264,22 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     else:
         # Load all fields on klass
 
-        field_count = len(klass._meta.fields)
+        field_count = len(klass._meta.column_fields)
         # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_fields) != len(klass._meta.fields):
+        if from_parent and len(klass._meta.local_column_fields) != len(klass._meta.column_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
                                if not issubclass(from_parent, p)]
             # Load local fields, too...
             non_seen_models.append(klass)
-            field_names = [f.attname for f in klass._meta.fields
+            field_names = [f.attname for f in klass._meta.column_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
         # Try to avoid populating field_names variable for perfomance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
-        if field_count == len(klass._meta.fields):
+        if field_count == len(klass._meta.column_fields):
             field_names = ()
 
     restricted = requested is not None
