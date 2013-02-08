@@ -309,6 +309,7 @@ class SimpleLazyObject(LazyObject):
     __hash__ = new_method_proxy(hash)
     __bool__ = new_method_proxy(bool)       # Python 3
     __nonzero__ = __bool__                  # Python 2
+    __int__ = new_method_proxy(int)
 
 
 class lazy_property(property):
