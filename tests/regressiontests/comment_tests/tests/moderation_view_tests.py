@@ -93,6 +93,8 @@ class FlagViewTests(CommentTestCase):
         self.testFlagPost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
 
+        signals.comment_was_flagged.disconnect(receive)
+
 def makeModerator(username):
     u = User.objects.get(username=username)
     ct = ContentType.objects.get_for_model(Comment)
@@ -163,6 +165,8 @@ class DeleteViewTests(CommentTestCase):
         # Post a comment and check the signals
         self.testDeletePost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
+
+        signals.comment_was_flagged.disconnect(receive)
 
     def testDeletedView(self):
         comments = self.createSomeComments()
@@ -238,6 +242,8 @@ class ApproveViewTests(CommentTestCase):
         # Post a comment and check the signals
         self.testApprovePost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
+
+        signals.comment_was_flagged.disconnect(receive)
 
     def testApprovedView(self):
         comments = self.createSomeComments()
