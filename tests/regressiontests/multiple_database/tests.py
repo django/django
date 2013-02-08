@@ -1758,6 +1758,11 @@ class SignalTests(TestCase):
         self.assertEqual(pre_delete_receiver._database, "other")
         self.assertEqual(post_delete_receiver._database, "other")
 
+        signals.pre_save.disconnect(sender=Person, receiver=pre_save_receiver)
+        signals.post_save.disconnect(sender=Person, receiver=post_save_receiver)
+        signals.pre_delete.disconnect(sender=Person, receiver=pre_delete_receiver)
+        signals.post_delete.disconnect(sender=Person, receiver=post_delete_receiver)
+
     def test_database_arg_m2m(self):
         """
         Test that the m2m_changed signal has a correct database arg (#13552)

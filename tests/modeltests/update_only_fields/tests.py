@@ -207,6 +207,9 @@ class UpdateOnlyFieldsTests(TestCase):
         self.assertEqual(len(post_save_data[0]), 1)
         self.assertTrue('name' in post_save_data[0])
 
+        pre_save.disconnect(pre_save_receiver)
+        post_save.disconnect(post_save_receiver)
+
     def test_update_fields_incorrect_params(self):
         s = Person.objects.create(name='Sara', gender='F')
 
@@ -232,6 +235,9 @@ class UpdateOnlyFieldsTests(TestCase):
         # Signals were skipped, too...
         self.assertEqual(len(pre_save_data), 0)
         self.assertEqual(len(post_save_data), 0)
+
+        pre_save.disconnect(pre_save_receiver)
+        post_save.disconnect(post_save_receiver)
 
     def test_num_queries_inheritance(self):
         s = Employee.objects.create(name='Sara', gender='F')
