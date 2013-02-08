@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
 
+from .middleware import RedirectFallbackMiddleware
 from .models import Redirect
 
 
@@ -52,3 +54,10 @@ class RedirectTests(TestCase):
             site=self.site, old_path='/initial', new_path='')
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
+
+    @override_settings(
+        INSTALLED_APPS=[app for app in settings.INSTALLED_APPS
+                        if app != 'django.contrib.sites'])
+    def test_sites_not_installed(self):
+        with self.assertRaises(ImproperlyConfigured):
+            RedirectFallbackMiddleware()
