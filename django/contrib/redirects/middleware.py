@@ -1,11 +1,20 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from django import http
-from django.conf import settings
+
 
 class RedirectFallbackMiddleware(object):
+    def __init__(self):
+        if 'django.contrib.sites' not in settings.INSTALLED_APPS:
+            raise ImproperlyConfigured(
+                "You cannot use RedirectFallbackMiddleware when "
+                "django.contrib.sites is not installed."
+            )
+
     def process_response(self, request, response):
         if response.status_code != 404:
             return response # No need to check for a redirect for non-404 responses.
