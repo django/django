@@ -1,5 +1,5 @@
 from django.utils import unittest
-from django.utils.functional import lazy, lazy_property
+from django.utils.functional import lazy, lazy_property, SimpleLazyObject
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -37,3 +37,9 @@ class FunctionalTestCase(unittest.TestCase):
 
         self.assertRaises(NotImplementedError, lambda: A().do)
         self.assertEqual(B().do, 'DO IT')
+
+    def test_lazy_int(self):
+        class A(object):
+            __int__ = lambda self: 1
+
+        self.assertEqual(int(SimpleLazyObject(A)), 1)
