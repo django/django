@@ -7,6 +7,8 @@ from django.db.utils import load_backend
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 
+from .util import truncate_name
+
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
@@ -142,8 +144,6 @@ class BaseDatabaseCreation(object):
         """
         Returns any ALTER TABLE statements to add constraints after the fact.
         """
-        from django.db.backends.util import truncate_name
-
         opts = model._meta
         if not opts.managed or opts.proxy or opts.swapped:
             return []
@@ -193,8 +193,6 @@ class BaseDatabaseCreation(object):
             return []
 
     def sql_indexes_for_fields(self, model, fields, style):
-        from django.db.backends.util import truncate_name
-
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -241,7 +239,6 @@ class BaseDatabaseCreation(object):
         return output
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
-        from django.db.backends.util import truncate_name
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
