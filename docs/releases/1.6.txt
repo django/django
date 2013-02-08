@@ -283,6 +283,10 @@ Minor features
 * The :meth:`~django.db.models.query.QuerySet.get_or_create` method no longer
   requires at least one keyword argument.
 
+* The :class:`~django.test.SimpleTestCase` class includes a new assertion
+  helper for testing formset errors:
+  :meth:`~django.test.SimpleTestCase.assertFormsetError`.
+
 Backwards incompatible changes in 1.6
 =====================================
 

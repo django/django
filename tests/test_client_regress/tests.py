@@ -543,6 +543,197 @@ class AssertFormErrorTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )", str(e))
 
+class AssertFormsetErrorTests(TestCase):
+    msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
+    def setUp(self):
+        """Makes response object for testing field and non-field errors"""
+        # For testing field and non-field errors
+        self.response_form_errors = self.getResponse({
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '2',
+            'form-0-text': 'Raise non-field error',
+            'form-0-email': 'not an email address',
+            'form-0-value': 37,
+            'form-0-single': 'b',
+            'form-0-multi': ('b','c','e'),
+            'form-1-text': 'Hello World',
+            'form-1-email': 'email@domain.com',
+            'form-1-value': 37,
+            'form-1-single': 'b',
+            'form-1-multi': ('b','c','e'),
+        })
+        # For testing non-form errors
+        self.response_nonform_errors = self.getResponse({
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '2',
+            'form-0-text': 'Hello World',
+            'form-0-email': 'email@domain.com',
+            'form-0-value': 37,
+            'form-0-single': 'b',
+            'form-0-multi': ('b','c','e'),
+            'form-1-text': 'Hello World',
+            'form-1-email': 'email@domain.com',
+            'form-1-value': 37,
+            'form-1-single': 'b',
+            'form-1-multi': ('b','c','e'),
+        })
+
+    def getResponse(self, post_data):
+        response = self.client.post('/test_client/formset_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Invalid POST Template")
+        return response
+
+    def test_unknown_formset(self):
+        "An assertion is raised if the formset name is unknown"
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'wrong_formset',
+                                        0,
+                                        'Some_field',
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(prefix + "The formset 'wrong_formset' was not "
+                                   "used to render the response",
+                          str(cm.exception))
+
+    def test_unknown_field(self):
+        "An assertion is raised if the field name is unknown"
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        0,
+                                        'Some_field',
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(prefix + "The formset 'my_formset', "
+                                   "form 0 in context 0 "
+                                   "does not contain the field 'Some_field'",
+                          str(cm.exception))
+
+    def test_no_error_field(self):
+        "An assertion is raised if the field doesn't have any errors"
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        1,
+                                        'value',
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(prefix + "The field 'value' "
+                                   "on formset 'my_formset', form 1 "
+                                   "in context 0 contains no errors",
+                          str(cm.exception))
+
+    def test_unknown_error(self):
+        "An assertion is raised if the field doesn't contain the specified error"
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        0,
+                                        'email',
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(str_prefix(prefix + "The field 'email' "
+                "on formset 'my_formset', form 0 in context 0 does not "
+                "contain the error 'Some error.' (actual errors: "
+                "[%(_)s'Enter a valid email address.'])"),
+                str(cm.exception))
+
+    def test_field_error(self):
+        "No assertion is raised if the field contains the provided error"
+        for prefix, kwargs in self.msg_prefixes:
+            self.assertFormsetError(self.response_form_errors,
+                                    'my_formset',
+                                    0,
+                                    'email',
+                                    ['Enter a valid email address.'],
+                                    **kwargs)
+
+    def test_no_nonfield_error(self):
+        "An assertion is raised if the formsets non-field errors doesn't contain any errors."
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        1,
+                                        None,
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(prefix + "The formset 'my_formset', form 1 in "
+                                   "context 0 does not contain any "
+                                   "non-field errors.",
+                          str(cm.exception))
+
+    def test_unknown_nonfield_error(self):
+        "An assertion is raised if the formsets non-field errors doesn't contain the provided error."
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        0,
+                                        None,
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(str_prefix(prefix +
+                "The formset 'my_formset', form 0 in context 0 does not "
+                "contain the non-field error 'Some error.' (actual errors: "
+                "[%(_)s'Non-field error.'])"), str(cm.exception))
+
+    def test_nonfield_error(self):
+        "No assertion is raised if the formsets non-field errors contains the provided error."
+        for prefix, kwargs in self.msg_prefixes:
+            self.assertFormsetError(self.response_form_errors,
+                                    'my_formset',
+                                    0,
+                                    None,
+                                    'Non-field error.',
+                                    **kwargs)
+
+    def test_no_nonform_error(self):
+        "An assertion is raised if the formsets non-form errors doesn't contain any errors."
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_form_errors,
+                                        'my_formset',
+                                        None,
+                                        None,
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(prefix + "The formset 'my_formset' in context 0 "
+                                   "does not contain any non-form errors.",
+                          str(cm.exception))
+
+    def test_unknown_nonform_error(self):
+        "An assertion is raised if the formsets non-form errors doesn't contain the provided error."
+        for prefix, kwargs in self.msg_prefixes:
+            with self.assertRaises(AssertionError) as cm:
+                self.assertFormsetError(self.response_nonform_errors,
+                                        'my_formset',
+                                        None,
+                                        None,
+                                        'Some error.',
+                                        **kwargs)
+            self.assertIn(str_prefix(prefix +
+                "The formset 'my_formset' in context 0 does not contain the "
+                "non-form error 'Some error.' (actual errors: [%(_)s'Forms "
+                "in a set must have distinct email addresses.'])"), str(cm.exception))
+
+    def test_nonform_error(self):
+        "No assertion is raised if the formsets non-form errors contains the provided error."
+        for prefix, kwargs in self.msg_prefixes:
+            self.assertFormsetError(self.response_nonform_errors,
+                                    'my_formset',
+                                    None,
+                                    None,
+                                    'Forms in a set must have distinct email '
+                                    'addresses.',
+                                    **kwargs)
+
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class LoginTests(TestCase):
     fixtures = ['testdata']
