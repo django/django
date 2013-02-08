@@ -509,6 +509,83 @@ class SimpleTestCase(ut2.TestCase):
             self.fail(msg_prefix + "The form '%s' was not used to render the"
                       " response" % form)
 
+    def assertFormsetError(self, response, formset, form_index, field, errors,
+                           msg_prefix=''):
+        """
+        Asserts that a formset used to render the response has a specific error.
+
+        For field errors, specify the ``form_index`` and the ``field``.
+        For non-field errors, specify the ``form_index`` and the ``field`` as
+        None.
+        For non-form errors, specify ``form_index`` as None and the ``field``
+        as None.
+        """
+        # Add punctuation to msg_prefix
+        if msg_prefix:
+            msg_prefix += ": "
+
+        # Put context(s) into a list to simplify processing.
+        contexts = to_list(response.context)
+        if not contexts:
+            self.fail(msg_prefix + 'Response did not use any contexts to '
+                      'render the response')
+
+        # Put error(s) into a list to simplify processing.
+        errors = to_list(errors)
+
+        # Search all contexts for the error.
+        found_formset = False
+        for i, context in enumerate(contexts):
+            if formset not in context:
+                continue
+            found_formset = True
+            for err in errors:
+                if field is not None:
+                    if field in context[formset].forms[form_index].errors:
+                        field_errors = context[formset].forms[form_index].errors[field]
+                        self.assertTrue(err in field_errors,
+                                msg_prefix + "The field '%s' on formset '%s', "
+                                "form %d in context %d does not contain the "
+                                "error '%s' (actual errors: %s)" %
+                                        (field, formset, form_index, i, err,
+                                        repr(field_errors)))
+                    elif field in context[formset].forms[form_index].fields:
+                        self.fail(msg_prefix + "The field '%s' "
+                                  "on formset '%s', form %d in "
+                                  "context %d contains no errors" %
+                                        (field, formset, form_index, i))
+                    else:
+                        self.fail(msg_prefix + "The formset '%s', form %d in "
+                                 "context %d does not contain the field '%s'" %
+                                        (formset, form_index, i, field))
+                elif form_index is not None:
+                    non_field_errors = context[formset].forms[form_index].non_field_errors()
+                    self.assertFalse(len(non_field_errors) == 0,
+                                msg_prefix + "The formset '%s', form %d in "
+                                "context %d does not contain any non-field "
+                                "errors." % (formset, form_index, i))
+                    self.assertTrue(err in non_field_errors,
+                                    msg_prefix + "The formset '%s', form %d "
+                                    "in context %d does not contain the "
+                                    "non-field error '%s' "
+                                    "(actual errors: %s)" %
+                                        (formset, form_index, i, err,
+                                         repr(non_field_errors)))
+                else:
+                    non_form_errors = context[formset].non_form_errors()
+                    self.assertFalse(len(non_form_errors) == 0,
+                                     msg_prefix + "The formset '%s' in "
+                                     "context %d does not contain any "
+                                     "non-form errors." % (formset, i))
+                    self.assertTrue(err in non_form_errors,
+                                    msg_prefix + "The formset '%s' in context "
+                                    "%d does not contain the "
+                                    "non-form error '%s' (actual errors: %s)" %
+                                      (formset, i, err, repr(non_form_errors)))
+        if not found_formset:
+            self.fail(msg_prefix + "The formset '%s' was not used to render "
+                      "the response" % formset)
+
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Asserts that the template with the provided name was used in rendering

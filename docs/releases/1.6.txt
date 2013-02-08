@@ -261,6 +261,10 @@ Minor features
 * :class:`~django.views.generic.base.View` and
   :class:`~django.views.generic.base.RedirectView` now support HTTP PATCH method.
 
+* The :class:`~django.test.SimpleTestCase` class includes a new assertion
+  helper for testing formset errors:
+  :meth:`~django.test.SimpleTestCase.assertFormsetError`.
+
 Backwards incompatible changes in 1.6
 =====================================
 
