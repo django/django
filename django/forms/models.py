@@ -520,9 +520,9 @@ class BaseModelFormSet(BaseFormSet):
         # Collect unique_checks and date_checks to run from all the forms.
         all_unique_checks = set()
         all_date_checks = set()
-        for form in self.forms:
-            if not form.is_valid():
-                continue
+        forms_to_delete = self.deleted_forms
+        valid_forms = [form for form in self.forms if form.is_valid() and form not in forms_to_delete]
+        for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
             all_unique_checks = all_unique_checks.union(set(unique_checks))
@@ -532,9 +532,7 @@ class BaseModelFormSet(BaseFormSet):
         # Do each of the unique checks (unique and unique_together)
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
-            for form in self.forms:
-                if not form.is_valid():
-                    continue
+            for form in valid_forms:
                 # get data for each field of each of unique_check
                 row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
                 if row_data and not None in row_data:
@@ -554,9 +552,7 @@ class BaseModelFormSet(BaseFormSet):
         for date_check in all_date_checks:
             seen_data = set()
             uclass, lookup, field, unique_for = date_check
-            for form in self.forms:
-                if not form.is_valid():
-                    continue
+            for form in valid_forms:
                 # see if we have data for both fields
                 if (form.cleaned_data and form.cleaned_data[field] is not None
                     and form.cleaned_data[unique_for] is not None):
@@ -611,10 +607,7 @@ class BaseModelFormSet(BaseFormSet):
             return []
 
         saved_instances = []
-        try:
-            forms_to_delete = self.deleted_forms
-        except AttributeError:
-            forms_to_delete = []
+        forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)

@@ -179,11 +179,10 @@ class BaseFormSet(object):
     @property
     def deleted_forms(self):
         """
-        Returns a list of forms that have been marked for deletion. Raises an
-        AttributeError if deletion is not allowed.
+        Returns a list of forms that have been marked for deletion.
         """
         if not self.is_valid() or not self.can_delete:
-            raise AttributeError("'%s' object has no attribute 'deleted_forms'" % self.__class__.__name__)
+            return []
         # construct _deleted_form_indexes which is just a list of form indexes
         # that have had their deletion widget set to True
         if not hasattr(self, '_deleted_form_indexes'):
