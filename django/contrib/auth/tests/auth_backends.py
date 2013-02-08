@@ -7,6 +7,7 @@ from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth import authenticate
 from django.test import TestCase
 from django.test.utils import override_settings
 
