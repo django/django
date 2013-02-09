@@ -305,10 +305,18 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
 
-    def test_https_good_referer_with_port(self):
+    def test_https_good_referer_with_port_443(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com:443'
+        req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    def test_https_good_referer_with_port_80(self):
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com:80'
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
