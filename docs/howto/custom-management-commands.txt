@@ -65,12 +65,18 @@ look like this:
 
                 self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
+.. _management-commands-output:
+
 .. note::
     When you are using management commands and wish to provide console
     output, you should write to ``self.stdout`` and ``self.stderr``,
     instead of printing to ``stdout`` and ``stderr`` directly. By
     using these proxies, it becomes much easier to test your custom
-    command.
+    command. Note also that you don't need to end messages with a newline
+    character, it will be added automatically, unless you specify the ``ending``
+    parameter::
+
+        self.stdout.write("Unterminated line", ending='')
 
 The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
