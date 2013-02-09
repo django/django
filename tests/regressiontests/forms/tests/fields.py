@@ -131,6 +131,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_1(self):
         f = IntegerField()
+        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1, f.clean('1'))
@@ -165,6 +166,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_3(self):
         f = IntegerField(max_value=10)
+        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1, f.clean(1))
         self.assertEqual(10, f.clean(10))
@@ -176,6 +178,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_4(self):
         f = IntegerField(min_value=10)
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'", f.clean, 1)
         self.assertEqual(10, f.clean(10))
@@ -187,6 +190,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
+        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'", f.clean, 1)
         self.assertEqual(10, f.clean(10))
@@ -202,6 +206,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_1(self):
         f = FloatField()
+        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1.0, f.clean('1'))
@@ -228,6 +233,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_3(self):
         f = FloatField(max_value=1.5, min_value=0.5)
+        self.assertWidgetRendersTo(f, '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(1.5, f.clean('1.5'))
@@ -239,6 +245,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" maxlength="5" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(f.clean('1'), Decimal("1"))
@@ -284,6 +291,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" maxlength="5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(f.clean('1.5'), Decimal("1.5"))

@@ -392,7 +392,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></p>\n'
-            '<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" id="id_form-0-author_ptr" /></p>')
+            '<p><label for="id_form-0-write_speed">Write speed:</label> <input type="number" name="form-0-write_speed" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" id="id_form-0-author_ptr" /></p>')
 
         data = {
             'form-TOTAL_FORMS': '1', # the number of forms rendered
@@ -415,10 +415,10 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(len(formset.forms), 2)
         self.assertHTMLEqual(formset.forms[0].as_p(),
             '<p><label for="id_form-0-name">Name:</label> <input id="id_form-0-name" type="text" name="form-0-name" value="Ernest Hemingway" maxlength="100" /></p>\n'
-            '<p><label for="id_form-0-write_speed">Write speed:</label> <input type="text" name="form-0-write_speed" value="10" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" value="%d" id="id_form-0-author_ptr" /></p>' % hemingway_id)
+            '<p><label for="id_form-0-write_speed">Write speed:</label> <input type="number" name="form-0-write_speed" value="10" id="id_form-0-write_speed" /><input type="hidden" name="form-0-author_ptr" value="%d" id="id_form-0-author_ptr" /></p>' % hemingway_id)
         self.assertHTMLEqual(formset.forms[1].as_p(),
             '<p><label for="id_form-1-name">Name:</label> <input id="id_form-1-name" type="text" name="form-1-name" maxlength="100" /></p>\n'
-            '<p><label for="id_form-1-write_speed">Write speed:</label> <input type="text" name="form-1-write_speed" id="id_form-1-write_speed" /><input type="hidden" name="form-1-author_ptr" id="id_form-1-author_ptr" /></p>')
+            '<p><label for="id_form-1-write_speed">Write speed:</label> <input type="number" name="form-1-write_speed" id="id_form-1-write_speed" /><input type="hidden" name="form-1-author_ptr" id="id_form-1-author_ptr" /></p>')
 
         data = {
             'form-TOTAL_FORMS': '2', # the number of forms rendered
@@ -551,6 +551,7 @@ class ModelFormsetTest(TestCase):
     def test_inline_formsets_with_custom_pk(self):
         # Test inline formsets where the inline-edited object has a custom
         # primary key that is not the fk to the parent object.
+        self.maxDiff = 1024
 
         AuthorBooksFormSet2 = inlineformset_factory(Author, BookWithCustomPK, can_delete=False, extra=1)
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
@@ -558,7 +559,7 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet2(instance=author)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label> <input type="text" name="bookwithcustompk_set-0-my_pk" id="id_bookwithcustompk_set-0-my_pk" /></p>\n'
+            '<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label> <input id="id_bookwithcustompk_set-0-my_pk" type="number" name="bookwithcustompk_set-0-my_pk" maxlength="6" /></p>\n'
             '<p><label for="id_bookwithcustompk_set-0-title">Title:</label> <input id="id_bookwithcustompk_set-0-title" type="text" name="bookwithcustompk_set-0-title" maxlength="100" /><input type="hidden" name="bookwithcustompk_set-0-author" value="1" id="id_bookwithcustompk_set-0-author" /></p>')
 
         data = {
@@ -806,7 +807,7 @@ class ModelFormsetTest(TestCase):
             '<option value="%d">Joe Perry at Giordanos</option>\n'
             '<option value="%d">Jack Berry at Giordanos</option>\n'
             '</select></p>\n'
-            '<p><label for="id_form-0-age">Age:</label> <input type="text" name="form-0-age" id="id_form-0-age" /></p>'
+            '<p><label for="id_form-0-age">Age:</label> <input type="number" name="form-0-age" id="id_form-0-age" min="0" /></p>'
             % (owner1.auto_id, owner2.auto_id))
 
         owner1 = Owner.objects.get(name='Joe Perry')
@@ -816,7 +817,7 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(instance=owner1)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
+            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="number" name="ownerprofile-0-age" id="id_ownerprofile-0-age" min="0" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
             % owner1.auto_id)
 
         data = {
@@ -837,7 +838,7 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(instance=owner1)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
+            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="number" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" min="0" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
             % owner1.auto_id)
 
         data = {
@@ -993,7 +994,7 @@ class ModelFormsetTest(TestCase):
         result = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?', '__DATETIME__', result)
         self.assertHTMLEqual(result,
             '<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="__DATETIME__" id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="__DATETIME__" id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>\n'
-            '<p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="%d" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>'
+            '<p><label for="id_membership_set-0-karma">Karma:</label> <input type="number" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="%d" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>'
             % person.id)
 
         # test for validation with callable defaults. Validations rely on hidden fields

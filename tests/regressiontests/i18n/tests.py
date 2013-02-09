@@ -662,6 +662,7 @@ class FormattingTests(TestCase):
         """
         Tests if form input is correctly localized
         """
+        self.maxDiff = 1200
         settings.USE_L10N = True
         with translation.override('de-at', deactivate=True):
             form6 = CompanyForm({
