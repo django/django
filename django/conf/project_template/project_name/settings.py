@@ -25,6 +25,10 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+# Hosts/domain names that are valid for this site; required if DEBUG is False
+# See https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = []
+
 
 # Application definition
 
