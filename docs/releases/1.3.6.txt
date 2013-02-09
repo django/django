@@ -1,0 +1,31 @@
+==========================
+Django 1.3.6 release notes
+==========================
+
+*February 19, 2013*
+
+This is the sixth bugfix/security release in the Django 1.3 series.
+
+Host header poisoning
+---------------------
+
+Some parts of Django -- independent of end-user-written applications -- make
+use of full URLs, including domain name, which are generated from the HTTP Host
+header. Django's documentation has for some time contained notes advising users
+on how to configure webservers to ensure that only valid Host headers can reach
+the Django application. However, it has been reported to us that even with the
+recommended webserver configurations there are still techniques available for
+tricking many common webservers into supplying the application with an
+incorrect and possibly malicious Host header.
+
+For this reason, Django 1.3.6 adds a new setting, ``ALLOWED_HOSTS``, which
+should contain an explicit list of valid host/domain names for this site. A
+request with a Host header not matching an entry in this list will raise
+``SuspiciousOperation`` if ``request.get_host()`` is called. For full details
+see the documentation for the :setting:`ALLOWED_HOSTS` setting.
+
+The default value for this setting in Django 1.3.6 is `['*']` (matching any
+host), for backwards-compatibility, but we strongly encourage all sites to set
+a more restrictive value.
+
+This host validation is disabled when ``DEBUG`` is ``True`` or when running tests.
