@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.encoding import smart_str
+from django.test.utils import override_settings
 
 
 class FooWithoutUrl(models.Model):
@@ -114,6 +115,7 @@ class ContentTypesTests(TestCase):
             FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
         })
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
         """
         Check that the shortcut view (used for the admin "view on site"

@@ -149,48 +149,40 @@ server, there are some additional steps you may need:
 
 .. _additional-security-topics:
 
-Host headers and virtual hosting
-================================
+Host header validation
+======================
 
-Django uses the ``Host`` header provided by the client to construct URLs
-in certain cases. While these values are sanitized to prevent Cross
-Site Scripting attacks, they can be used for Cross-Site Request
-Forgery and cache poisoning attacks in some circumstances. We
-recommend you ensure your Web server is configured such that:
+Django uses the ``Host`` header provided by the client to construct URLs in
+certain cases. While these values are sanitized to prevent Cross Site Scripting
+attacks, a fake ``Host`` value can be used for Cross-Site Request Forgery,
+cache poisoning attacks, and poisoning links in emails.
 
-    * It always validates incoming HTTP ``Host`` headers against the expected
-      host name.
-    * Disallows requests with no ``Host`` header.
-    * Is *not* configured with a catch-all virtual host that forwards requests
-      to a Django application.
+Because even seemingly-secure webserver configurations are susceptible to fake
+``Host`` headers, Django validates ``Host`` headers against the
+:setting:`ALLOWED_HOSTS` setting in the
+:meth:`django.http.HttpRequest.get_host()` method.
+
+This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+if your code accesses the ``Host`` header directly from ``request.META`` you
+are bypassing this security protection.
+
+For more details see the full :setting:`ALLOWED_HOSTS` documentation.
+
+.. warning::
+
+   Previous versions of this document recommended configuring your webserver to
+   ensure it validates incoming HTTP ``Host`` headers. While this is still
+   recommended, in many common webservers a configuration that seems to
+   validate the ``Host`` header may not in fact do so. For instance, even if
+   Apache is configured such that your Django site is served from a non-default
+   virtual host with the ``ServerName`` set, it is still possible for an HTTP
+   request to match this virtual host and supply a fake ``Host`` header. Thus,
+   Django now requires that you set :setting:`ALLOWED_HOSTS` explicitly rather
+   than relying on webserver configuration.
 
 Additionally, as of 1.3.1, Django requires you to explicitly enable support for
-the ``X-Forwarded-Host`` header if your configuration requires it.
-
-Configuration for Apache
-------------------------
-
-The easiest way to get the described behavior in Apache is as follows. Create
-a `virtual host`_ using the ServerName_ and ServerAlias_ directives to restrict
-the domains Apache reacts to. Please keep in mind that while the directives do
-support ports the match is only performed against the hostname. This means that
-the ``Host`` header could still contain a port pointing to another webserver on
-the same machine. The next step is to make sure that your newly created virtual
-host is not also the default virtual host. Apache uses the first virtual host
-found in the configuration file as default virtual host.  As such you have to
-ensure that you have another virtual host which will act as catch-all virtual
-host. Just add one if you do not have one already, there is nothing special
-about it aside from ensuring it is the first virtual host in the configuration
-file. Debian/Ubuntu users usually don't have to take any action, since Apache
-ships with a default virtual host in ``sites-available`` which is linked into
-``sites-enabled`` as ``000-default`` and included from ``apache2.conf``. Just
-make sure not to name your site ``000-abc``, since files are included in
-alphabetical order.
-
-.. _virtual host: http://httpd.apache.org/docs/2.2/vhosts/
-.. _ServerName: http://httpd.apache.org/docs/2.2/mod/core.html#servername
-.. _ServerAlias: http://httpd.apache.org/docs/2.2/mod/core.html#serveralias
-
+the ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST`
+setting) if your configuration requires it.
 
 
 

@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site, RequestSite, get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.utils import override_settings
 
 
 class SitesFrameworkTests(TestCase):
@@ -39,6 +40,7 @@ class SitesFrameworkTests(TestCase):
         site = Site.objects.get_current()
         self.assertEqual(u"Example site", site.name)
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_get_current_site(self):
         # Test that the correct Site object is returned
         request = HttpRequest()

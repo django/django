@@ -215,11 +215,12 @@ class HttpRequest(object):
             if server_port != (self.is_secure() and '443' or '80'):
                 host = '%s:%s' % (host, server_port)
 
-        # Disallow potentially poisoned hostnames.
-        if not host_validation_re.match(host.lower()):
-            raise SuspiciousOperation('Invalid HTTP_HOST header: %s' % host)
-
-        return host
+        allowed_hosts = ['*'] if settings.DEBUG else settings.ALLOWED_HOSTS
+        if validate_host(host, allowed_hosts):
+            return host
+        else:
+            raise SuspiciousOperation(
+                "Invalid HTTP_HOST header (you may need to set ALLOWED_HOSTS): %s" % host)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -799,3 +800,43 @@ def str_to_unicode(s, encoding):
     else:
         return s
 
+def validate_host(host, allowed_hosts):
+    """
+    Validate the given host header value for this site.
+
+    Check that the host looks valid and matches a host or host pattern in the
+    given list of ``allowed_hosts``. Any pattern beginning with a period
+    matches a domain and all its subdomains (e.g. ``.example.com`` matches
+    ``example.com`` and any subdomain), ``*`` matches anything, and anything
+    else must match exactly.
+
+    Return ``True`` for a valid host, ``False`` otherwise.
+
+    """
+    # All validation is case-insensitive
+    host = host.lower()
+
+    # Basic sanity check
+    if not host_validation_re.match(host):
+        return False
+
+    # Validate only the domain part.
+    if host[-1] == ']':
+        # It's an IPv6 address without a port.
+        domain = host
+    else:
+        domain = host.rsplit(':', 1)[0]
+
+    for pattern in allowed_hosts:
+        pattern = pattern.lower()
+        match = (
+            pattern == '*' or
+            pattern.startswith('.') and (
+                domain.endswith(pattern) or domain == pattern[1:]
+                ) or
+            pattern == domain
+            )
+        if match:
+            return True
+
+    return False

@@ -75,6 +75,9 @@ def setup_test_environment():
     mail.original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
+    settings._original_allowed_hosts = settings.ALLOWED_HOSTS
+    settings.ALLOWED_HOSTS = ['*']
+
     mail.outbox = []
 
     deactivate()
@@ -92,6 +95,9 @@ def teardown_test_environment():
 
     settings.EMAIL_BACKEND = mail.original_email_backend
     del mail.original_email_backend
+
+    settings.ALLOWED_HOSTS = settings._original_allowed_hosts
+    del settings._original_allowed_hosts
 
     del mail.outbox
 

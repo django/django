@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
 
 
@@ -267,6 +268,7 @@ class CsrfViewMiddlewareTest(TestCase):
         csrf_cookie = resp2.cookies[settings.CSRF_COOKIE_NAME]
         self._check_token_present(resp, csrf_id=csrf_cookie.value)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_bad_referer(self):
         """
         Test that a POST HTTPS request with a bad referer is rejected
@@ -279,6 +281,7 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertNotEqual(None, req2)
         self.assertEqual(403, req2.status_code)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
         """
         Test that a POST HTTPS request with a good referer is accepted
@@ -290,6 +293,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer_2(self):
         """
         Test that a POST HTTPS request with a good referer is accepted
