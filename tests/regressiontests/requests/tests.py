@@ -84,7 +84,13 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.build_absolute_uri(location="/path/with:colons"),
             'http://www.example.com/path/with:colons')
 
-    @override_settings(USE_X_FORWARDED_HOST=False)
+    @override_settings(
+        USE_X_FORWARDED_HOST=False,
+        ALLOWED_HOSTS=[
+            'forward.com', 'example.com', 'internal.com', '12.34.56.78',
+            '[2001:19f0:feee::dead:beef:cafe]', 'xn--4ca9at.com',
+            '.multitenant.com', 'INSENSITIVE.com',
+            ])
     def test_http_get_host(self):
         # Check if X_FORWARDED_HOST is provided.
         request = HttpRequest()
@@ -131,6 +137,9 @@ class RequestsTests(unittest.TestCase):
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
             'xn--4ca9at.com', # Punnycode for öäü.com
+            'anything.multitenant.com',
+            'multitenant.com',
+            'insensitive.com',
         ]
 
         poisoned_hosts = [
@@ -139,6 +148,7 @@ class RequestsTests(unittest.TestCase):
             'example.com:dr.frankenstein@evil.tld:80',
             'example.com:80/badpath',
             'example.com: recovermypassword.com',
+            'other.com', # not in ALLOWED_HOSTS
         ]
 
         for host in legit_hosts:
@@ -156,7 +166,7 @@ class RequestsTests(unittest.TestCase):
                 }
                 request.get_host()
 
-    @override_settings(USE_X_FORWARDED_HOST=True)
+    @override_settings(USE_X_FORWARDED_HOST=True, ALLOWED_HOSTS=['*'])
     def test_http_get_host_with_x_forwarded_host(self):
         # Check if X_FORWARDED_HOST is provided.
         request = HttpRequest()
@@ -227,6 +237,16 @@ class RequestsTests(unittest.TestCase):
                     'HTTP_HOST': host,
                 }
                 request.get_host()
+
+
+    @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
+    def test_host_validation_disabled_in_debug_mode(self):
+        """If ALLOWED_HOSTS is empty and DEBUG is True, all hosts pass."""
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': 'example.com',
+        }
+        self.assertEqual(request.get_host(), 'example.com')
 
 
     def test_near_expiration(self):

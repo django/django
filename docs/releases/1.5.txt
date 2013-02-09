@@ -354,6 +354,16 @@ Backwards incompatible changes in 1.5
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+``ALLOWED_HOSTS`` required in production
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new :setting:`ALLOWED_HOSTS` setting validates the request's ``Host``
+header and protects against host-poisoning attacks. This setting is now
+required whenever :setting:`DEBUG` is ``False``, or else
+:meth:`django.http.HttpRequest.get_host()` will raise
+:exc:`~django.core.exceptions.SuspiciousOperation`. For more details see the
+:setting:`full documentation<ALLOWED_HOSTS>` for the new setting.
+
 Managers on abstract models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -6,6 +6,7 @@ from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site, get_current_site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.http import urlquote
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -203,6 +204,7 @@ class ContentTypesTests(TestCase):
         })
 
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
         """
         Check that the shortcut view (used for the admin "view on site"
