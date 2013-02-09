@@ -1627,9 +1627,10 @@ The ``InlineModelAdmin`` class adds:
 
     Returns the number of extra inline forms needed. By default, returns the
     :attr:`InlineModelAdmin.extra` attribute.
-    Useful when you want to programmatically determine, the number of extra
-    inline forms should be shown in the interface, probably based on the
-    object passed as the keyword argument ``obj``. For example::
+
+    Here, you can programmatically determine the number of extra inline forms
+    which should be shown on the interface. This may be based on the object
+    passed as the keyword argument ``obj``. For example::
 
         class BinaryTreeAdmin(admin.TabularInline):
             model = BinaryTree
