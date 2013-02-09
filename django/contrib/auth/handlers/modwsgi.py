@@ -40,11 +40,7 @@ def groups_for_user(environ, username):
             user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return []
-        try:
-            if not user.is_active:
-                return []
-        except AttributeError as e:
-            # a custom user may not support is_active
+        if not user.is_active:
             return []
         return [force_bytes(group.name) for group in user.groups.all()]
     finally:
