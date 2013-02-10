@@ -57,6 +57,9 @@ Minor features
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
 
+* In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
+  now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
+
 * The default widgets for :class:`~django.forms.EmailField` and
   :class:`~django.forms.URLField` use the new type attributes available in
   HTML5 (type='email', type='url').
@@ -98,6 +101,9 @@ Backwards incompatible changes in 1.6
 * :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` returns a
   list of :class:`~datetime.date`. It used to return a list of
   :class:`~datetime.datetime`.
+
+* Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
+  lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
 
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as

@@ -2062,7 +2062,7 @@ numbers and even characters.
 year
 ~~~~
 
-For date/datetime fields, exact year match. Takes a four-digit year.
+For date and datetime fields, an exact year match. Takes an integer year.
 
 Example::
 
@@ -2073,6 +2073,9 @@ SQL equivalent::
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';
 
 (The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
 .. fieldlookup:: month
 
@@ -2092,12 +2095,15 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
+
 .. fieldlookup:: day
 
 day
 ~~~
 
-For date and datetime fields, an exact day match.
+For date and datetime fields, an exact day match. Takes an integer day.
 
 Example::
 
@@ -2111,6 +2117,9 @@ SQL equivalent::
 
 Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
 .. fieldlookup:: week_day
 
@@ -2133,12 +2142,74 @@ Note this will match any record with a ``pub_date`` that falls on a Monday (day
 2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
-.. warning::
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the ``year``, ``month``,
-    ``day`` and ``week_day`` lookups are performed in UTC. This is a known
-    limitation of the current implementation.
+.. fieldlookup:: hour
+
+hour
+~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact hour match. Takes an integer between 0 and 23.
+
+Example::
+
+    Event.objects.filter(timestamp__hour=23)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('hour' FROM timestamp) = '23';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: minute
+
+minute
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact minute match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__minute=29)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('minute' FROM timestamp) = '29';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: second
+
+second
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact second match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__second=31)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('second' FROM timestamp) = '31';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
 
 .. fieldlookup:: isnull
 
