@@ -99,3 +99,13 @@ class OrgUnit(models.Model):
 class Login(models.Model):
     description = models.CharField(max_length=32)
     orgunit = models.ForeignKey(OrgUnit)
+
+class House(models.Model):
+    address = models.CharField(max_length=32)
+
+class OrderedPerson(models.Model):
+    name = models.CharField(max_length=32)
+    lives_in = models.ForeignKey(House)
+
+    class Meta:
+        ordering = ['name']
