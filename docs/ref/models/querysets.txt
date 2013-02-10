@@ -550,14 +550,19 @@ dates
 .. method:: dates(field, kind, order='ASC')
 
 Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
-``datetime.datetime`` objects representing all available dates of a particular
-kind within the contents of the ``QuerySet``.
+:class:`datetime.date` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
 
-``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
-model.
+.. versionchanged:: 1.6
+    ``dates`` used to return a list of :class:`datetime.datetime` objects.
+
+``field`` should be the name of a ``DateField`` of your model.
+
+.. versionchanged:: 1.6
+    ``dates`` used to accept operating on a ``DateTimeField``.
 
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.datetime`` object in the result list is "truncated" to the given
+``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
 
 * ``"year"`` returns a list of all distinct year values for the field.
@@ -572,21 +577,58 @@ model.
 Examples::
 
     >>> Entry.objects.dates('pub_date', 'year')
-    [datetime.datetime(2005, 1, 1)]
+    [datetime.date(2005, 1, 1)]
     >>> Entry.objects.dates('pub_date', 'month')
-    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
+    [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
     >>> Entry.objects.dates('pub_date', 'day')
-    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
     >>> Entry.objects.dates('pub_date', 'day', order='DESC')
-    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
+    [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
-    [datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 3, 20)]
 
-.. warning::
+datetimes
+~~~~~~~~~
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the aggregation is
-    performed in UTC. This is a known limitation of the current implementation.
+.. versionadded:: 1.6
+
+.. method:: datetimes(field, kind, order='ASC', tzinfo=None)
+
+Returns a ``DateTimeQuerySet`` — a ``QuerySet`` that evaluates to a list of
+:class:`datetime.datetime` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
+
+``field`` should be the name of a ``DateTimeField`` of your model.
+
+``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
+``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
+list is "truncated" to the given ``type``.
+
+``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
+``'DESC'``. This specifies how to order the results.
+
+``tzinfo`` defines the time zone to which datetimes are converted prior to
+truncation. Indeed, a given datetime has different representations depending
+on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
+object. If it's ``None``, Django uses the :ref:`current time zone
+<default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
+``False``.
+
+.. note::
+
+    This function performs time zone conversions directly in the database.
+    As a consequence, your database must be able to interpret the value of
+    ``tzinfo.tzname(None)``. This translates into the following requirements:
+
+    - SQLite: install pytz_ — conversions are actually performed in Python.
+    - PostgreSQL: no requirements (see `Time Zones`_).
+    - Oracle: no requirements (see `Choosing a Time Zone File`_).
+    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
+
+    .. _pytz: http://pytz.sourceforge.net/
+    .. _Time Zones: http://www.postgresql.org/docs/9.2/static/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
+    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
