@@ -1,14 +1,16 @@
+import datetime
 try:
     from itertools import zip_longest
 except ImportError:
     from itertools import izip_longest as zip_longest
 
-from django.utils.six.moves import zip
-
-from django.db.backends.util import truncate_name, typecast_timestamp
+from django.conf import settings
+from django.db.backends.util import truncate_name, typecast_date, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six
+from django.utils.six.moves import zip
+from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -280,5 +282,35 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
                 if self.connection.ops.oracle:
                     date = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
-                    date = typecast_timestamp(str(date))
+                    date = typecast_date(str(date))
+                if isinstance(date, datetime.datetime):
+                    date = date.date()
                 yield date
+
+class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
+    """
+    This is overridden for GeoDjango to properly cast date columns, since
+    `GeoQuery.resolve_columns` is used for spatial values.
+    See #14648, #16757.
+    """
+    def results_iter(self):
+        if self.connection.ops.oracle:
+            from django.db.models.fields import DateTimeField
+            fields = [DateTimeField()]
+        else:
+            needs_string_cast = self.connection.features.needs_datetime_string_cast
+
+        offset = len(self.query.extra_select)
+        for rows in self.execute_sql(MULTI):
+            for row in rows:
+                datetime = row[offset]
+                if self.connection.ops.oracle:
+                    datetime = self.resolve_columns(row, fields)[offset]
+                elif needs_string_cast:
+                    datetime = typecast_timestamp(str(datetime))
+                # Datetimes are artifically returned in UTC on databases that
+                # don't support time zone. Restore the zone used in the query.
+                if settings.USE_TZ:
+                    datetime = datetime.replace(tzinfo=None)
+                    datetime = timezone.make_aware(datetime, self.query.tzinfo)
+                yield datetime

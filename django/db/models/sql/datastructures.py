@@ -26,6 +26,8 @@ class Date(object):
     """
     Add a date selection column.
     """
+    trunc_func = 'date_trunc_sql'
+
     def __init__(self, col, lookup_type):
         self.col = col
         self.lookup_type = lookup_type
@@ -40,4 +42,10 @@ class Date(object):
             col = '%s.%s' % tuple([qn(c) for c in self.col])
         else:
             col = self.col
-        return connection.ops.date_trunc_sql(self.lookup_type, col)
+        return getattr(connection.ops, self.trunc_func)(self.lookup_type, col)
+
+class DateTime(Date):
+    """
+    Add a datetime selection column.
+    """
+    trunc_func = 'datetime_trunc_sql'

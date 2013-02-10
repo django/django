@@ -8,11 +8,13 @@ import collections
 import datetime
 from itertools import repeat
 
-from django.utils import tree
-from django.db.models.fields import Field
+from django.conf import settings
+from django.db.models.fields import DateTimeField, Field
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.db.models.sql.aggregates import Aggregate
 from django.utils.six.moves import xrange
+from django.utils import timezone
+from django.utils import tree
 
 # Connection types
 AND = 'AND'
@@ -60,7 +62,8 @@ class WhereNode(tree.Node):
         # about the value(s) to the query construction. Specifically, datetime
         # and empty values need special handling. Other types could be used
         # here in the future (using Python types is suggested for consistency).
-        if isinstance(value, datetime.datetime):
+        if (isinstance(value, datetime.datetime)
+            or (isinstance(obj.field, DateTimeField) and lookup_type != 'isnull')):
             value_annotation = datetime.datetime
         elif hasattr(value, 'value_annotation'):
             value_annotation = value.value_annotation
@@ -174,10 +177,8 @@ class WhereNode(tree.Node):
             # A smart object with an as_sql() method.
             field_sql = lvalue.as_sql(qn, connection)
 
-        if value_annotation is datetime.datetime:
-            cast_sql = connection.ops.datetime_cast_sql()
-        else:
-            cast_sql = '%s'
+        is_datetime_field = value_annotation is datetime.datetime
+        cast_sql = connection.ops.datetime_cast_sql() if is_datetime_field else '%s'
 
         if hasattr(params, 'as_sql'):
             extra, params = params.as_sql(qn, connection)
@@ -221,9 +222,15 @@ class WhereNode(tree.Node):
                         params)
         elif lookup_type in ('range', 'year'):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
+        elif is_datetime_field and lookup_type in ('month', 'day', 'week_day',
+                                                   'hour', 'minute', 'second'):
+            if settings.USE_TZ:
+                params = [timezone.get_current_timezone_name()] + params
+            return ('%s = %%s'
+                    % connection.ops.datetime_extract_sql(lookup_type, field_sql), params)
         elif lookup_type in ('month', 'day', 'week_day'):
-            return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type, field_sql),
-                    params)
+            return ('%s = %%s'
+                    % connection.ops.date_extract_sql(lookup_type, field_sql), params)
         elif lookup_type == 'isnull':
             assert value_annotation in (True, False), "Invalid value_annotation for isnull"
             return ('%s IS %sNULL' % (field_sql, ('' if value_annotation else 'NOT ')), ())

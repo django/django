@@ -7,6 +7,7 @@ import itertools
 import sys
 import warnings
 
+from django.conf import settings
 from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
@@ -17,6 +18,7 @@ from django.db.models.deletion import Collector
 from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
+from django.utils import timezone
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -629,15 +631,32 @@ class QuerySet(object):
 
     def dates(self, field_name, kind, order='ASC'):
         """
-        Returns a list of datetime objects representing all available dates for
+        Returns a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ("month", "year", "day"), \
+        assert kind in ("year", "month", "day"), \
                 "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
                 "'order' must be either 'ASC' or 'DESC'."
         return self._clone(klass=DateQuerySet, setup=True,
                 _field_name=field_name, _kind=kind, _order=order)
+
+    def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
+        """
+        Returns a list of datetime objects representing all available
+        datetimes for the given field_name, scoped to 'kind'.
+        """
+        assert kind in ("year", "month", "day", "hour", "minute", "second"), \
+                "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
+        assert order in ('ASC', 'DESC'), \
+                "'order' must be either 'ASC' or 'DESC'."
+        if settings.USE_TZ:
+            if tzinfo is None:
+                tzinfo = timezone.get_current_timezone()
+        else:
+            tzinfo = None
+        return self._clone(klass=DateTimeQuerySet, setup=True,
+                _field_name=field_name, _kind=kind, _order=order, _tzinfo=tzinfo)
 
     def none(self):
         """
@@ -1187,12 +1206,38 @@ class DateQuerySet(QuerySet):
         self.query.clear_deferred_loading()
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        self.query.add_date_select(self._field_name, self._kind, self._order)
+        self.query.add_select(self._field_name, self._kind, self._order)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
         c._field_name = self._field_name
         c._kind = self._kind
+        if setup and hasattr(c, '_setup_query'):
+            c._setup_query()
+        return c
+
+
+class DateTimeQuerySet(QuerySet):
+    def iterator(self):
+        return self.query.get_compiler(self.db).results_iter()
+
+    def _setup_query(self):
+        """
+        Sets up any special features of the query attribute.
+
+        Called by the _clone() method after initializing the rest of the
+        instance.
+        """
+        self.query.clear_deferred_loading()
+        self.query = self.query.clone(klass=sql.DateTimeQuery, setup=True, tzinfo=self._tzinfo)
+        self.query.select = []
+        self.query.add_select(self._field_name, self._kind, self._order)
+
+    def _clone(self, klass=None, setup=False, **kwargs):
+        c = super(DateTimeQuerySet, self)._clone(klass, False, **kwargs)
+        c._field_name = self._field_name
+        c._kind = self._kind
+        c._tzinfo = self._tzinfo
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c

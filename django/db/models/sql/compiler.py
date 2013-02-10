@@ -1,5 +1,6 @@
-from django.utils.six.moves import zip
+import datetime
 
+from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import transaction
 from django.db.backends.util import truncate_name
@@ -12,6 +13,8 @@ from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
 from django.db.utils import DatabaseError
 from django.utils import six
+from django.utils.six.moves import zip
+from django.utils import timezone
 
 
 class SQLCompiler(object):
@@ -1005,10 +1008,10 @@ class SQLDateCompiler(SQLCompiler):
         """
         resolve_columns = hasattr(self, 'resolve_columns')
         if resolve_columns:
-            from django.db.models.fields import DateTimeField
-            fields = [DateTimeField()]
+            from django.db.models.fields import DateField
+            fields = [DateField()]
         else:
-            from django.db.backends.util import typecast_timestamp
+            from django.db.backends.util import typecast_date
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
         offset = len(self.query.extra_select)
@@ -1018,9 +1021,45 @@ class SQLDateCompiler(SQLCompiler):
                 if resolve_columns:
                     date = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
-                    date = typecast_timestamp(str(date))
+                    date = typecast_date(str(date))
+                if isinstance(date, datetime.datetime):
+                    date = date.date()
                 yield date
 
+class SQLDateTimeCompiler(SQLCompiler):
+    def as_sql(self):
+        sql, params = super(SQLDateTimeCompiler, self).as_sql()
+        if settings.USE_TZ:
+            tzname = timezone._get_timezone_name(self.query.tzinfo)
+            params = (tzname,) + params
+        return sql, params
+
+    def results_iter(self):
+        """
+        Returns an iterator over the results from executing this query.
+        """
+        resolve_columns = hasattr(self, 'resolve_columns')
+        if resolve_columns:
+            from django.db.models.fields import DateTimeField
+            fields = [DateTimeField()]
+        else:
+            from django.db.backends.util import typecast_timestamp
+            needs_string_cast = self.connection.features.needs_datetime_string_cast
+
+        offset = len(self.query.extra_select)
+        for rows in self.execute_sql(MULTI):
+            for row in rows:
+                datetime = row[offset]
+                if resolve_columns:
+                    datetime = self.resolve_columns(row, fields)[offset]
+                elif needs_string_cast:
+                    datetime = typecast_timestamp(str(datetime))
+                # Datetimes are artifically returned in UTC on databases that
+                # don't support time zone. Restore the zone used in the query.
+                if settings.USE_TZ:
+                    datetime = datetime.replace(tzinfo=None)
+                    datetime = timezone.make_aware(datetime, self.query.tzinfo)
+                yield datetime
 
 def order_modified_iter(cursor, trim, sentinel):
     """
