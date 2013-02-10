@@ -2170,7 +2170,7 @@ class ConditionalTests(BaseQuerysetTest):
     def test_ticket14244(self):
         # Test that the "in" lookup works with lists of 1000 items or more.
         Number.objects.all().delete()
-        numbers = range(2500)
+        numbers = range(2001)
         Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
             Number.objects.filter(num__in=numbers[:1000]).count(),
@@ -2184,9 +2184,10 @@ class ConditionalTests(BaseQuerysetTest):
             Number.objects.filter(num__in=numbers[:2000]).count(),
             2000
         )
+        # Test a third 'IN' clause for Oracle
         self.assertEqual(
             Number.objects.filter(num__in=numbers).count(),
-            2500
+            len(numbers)
         )
 
 
