@@ -78,6 +78,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
     supports_subqueries_in_group_by = False
+    supports_transactions = True
     supports_timezones = False
     supports_bitwise_or = False
     can_defer_constraint_checks = True
