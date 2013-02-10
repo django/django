@@ -2169,8 +2169,10 @@ class ConditionalTests(BaseQuerysetTest):
     @skipUnlessDBFeature('supports_1000_query_parameters')
     def test_ticket14244(self):
         # Test that the "in" lookup works with lists of 1000 items or more.
+        # The numbers amount is picked to force three different IN batches
+        # for Oracle, yet to be less than 2100 parameter limit for MSSQL.
+        numbers = range(2050)
         Number.objects.all().delete()
-        numbers = range(2500)
         Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
             Number.objects.filter(num__in=numbers[:1000]).count(),
@@ -2186,7 +2188,7 @@ class ConditionalTests(BaseQuerysetTest):
         )
         self.assertEqual(
             Number.objects.filter(num__in=numbers).count(),
-            2500
+            len(numbers)
         )
 
 
