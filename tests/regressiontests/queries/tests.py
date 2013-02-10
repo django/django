@@ -550,37 +550,37 @@ class Queries1Tests(BaseQuerysetTest):
     def test_tickets_6180_6203(self):
         # Dates with limits and/or counts
         self.assertEqual(Item.objects.count(), 4)
-        self.assertEqual(Item.objects.dates('created', 'month').count(), 1)
-        self.assertEqual(Item.objects.dates('created', 'day').count(), 2)
-        self.assertEqual(len(Item.objects.dates('created', 'day')), 2)
-        self.assertEqual(Item.objects.dates('created', 'day')[0], datetime.datetime(2007, 12, 19, 0, 0))
+        self.assertEqual(Item.objects.datetimes('created', 'month').count(), 1)
+        self.assertEqual(Item.objects.datetimes('created', 'day').count(), 2)
+        self.assertEqual(len(Item.objects.datetimes('created', 'day')), 2)
+        self.assertEqual(Item.objects.datetimes('created', 'day')[0], datetime.datetime(2007, 12, 19, 0, 0))
 
     def test_tickets_7087_12242(self):
         # Dates with extra select columns
         self.assertQuerysetEqual(
-            Item.objects.dates('created', 'day').extra(select={'a': 1}),
+            Item.objects.datetimes('created', 'day').extra(select={'a': 1}),
             ['datetime.datetime(2007, 12, 19, 0, 0)', 'datetime.datetime(2007, 12, 20, 0, 0)']
         )
         self.assertQuerysetEqual(
-            Item.objects.extra(select={'a': 1}).dates('created', 'day'),
+            Item.objects.extra(select={'a': 1}).datetimes('created', 'day'),
             ['datetime.datetime(2007, 12, 19, 0, 0)', 'datetime.datetime(2007, 12, 20, 0, 0)']
         )
 
         name="one"
         self.assertQuerysetEqual(
-            Item.objects.dates('created', 'day').extra(where=['name=%s'], params=[name]),
+            Item.objects.datetimes('created', 'day').extra(where=['name=%s'], params=[name]),
             ['datetime.datetime(2007, 12, 19, 0, 0)']
         )
 
         self.assertQuerysetEqual(
-            Item.objects.extra(where=['name=%s'], params=[name]).dates('created', 'day'),
+            Item.objects.extra(where=['name=%s'], params=[name]).datetimes('created', 'day'),
             ['datetime.datetime(2007, 12, 19, 0, 0)']
         )
 
     def test_ticket7155(self):
         # Nullable dates
         self.assertQuerysetEqual(
-            Item.objects.dates('modified', 'day'),
+            Item.objects.datetimes('modified', 'day'),
             ['datetime.datetime(2007, 12, 19, 0, 0)']
         )
 
@@ -699,7 +699,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
         # Pickling of DateQuerySets used to fail
-        qs = Item.objects.dates('created', 'month')
+        qs = Item.objects.datetimes('created', 'month')
         _ = pickle.loads(pickle.dumps(qs))
 
     def test_ticket9997(self):
@@ -1235,8 +1235,8 @@ class Queries3Tests(BaseQuerysetTest):
         # field
         self.assertRaisesMessage(
             AssertionError,
-            "'name' isn't a DateField.",
-            Item.objects.dates, 'name', 'month'
+            "'name' isn't a DateTimeField.",
+            Item.objects.datetimes, 'name', 'month'
         )
 
 class Queries4Tests(BaseQuerysetTest):

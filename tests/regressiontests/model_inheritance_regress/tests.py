@@ -134,8 +134,8 @@ class ModelInheritanceTest(TestCase):
         obj = Child.objects.create(
             name='child',
             created=datetime.datetime(2008, 6, 26, 17, 0, 0))
-        dates = list(Child.objects.dates('created', 'month'))
-        self.assertEqual(dates, [datetime.datetime(2008, 6, 1, 0, 0)])
+        datetimes = list(Child.objects.datetimes('created', 'month'))
+        self.assertEqual(datetimes, [datetime.datetime(2008, 6, 1, 0, 0)])
 
     def test_issue_7276(self):
         # Regression test for #7276: calling delete() on a model with

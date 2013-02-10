@@ -579,9 +579,9 @@ class BaseAggregateTestCase(TestCase):
         dates = Book.objects.annotate(num_authors=Count("authors")).dates('pubdate', 'year')
         self.assertQuerysetEqual(
             dates, [
-                "datetime.datetime(1991, 1, 1, 0, 0)",
-                "datetime.datetime(1995, 1, 1, 0, 0)",
-                "datetime.datetime(2007, 1, 1, 0, 0)",
-                "datetime.datetime(2008, 1, 1, 0, 0)"
+                "datetime.date(1991, 1, 1)",
+                "datetime.date(1995, 1, 1)",
+                "datetime.date(2007, 1, 1)",
+                "datetime.date(2008, 1, 1)"
             ]
         )

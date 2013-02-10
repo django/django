@@ -166,8 +166,9 @@ class ExtraRegressTests(TestCase):
         )
 
         self.assertQuerysetEqual(
-            RevisionableModel.objects.extra(select={"the_answer": 'id'}).dates('when', 'month'),
-            ['datetime.datetime(2008, 9, 1, 0, 0)']
+            RevisionableModel.objects.extra(select={"the_answer": 'id'}).datetimes('when', 'month'),
+            [datetime.datetime(2008, 9, 1, 0, 0)],
+            transform=lambda d: d,
         )
 
     def test_values_with_extra(self):

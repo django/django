@@ -144,7 +144,7 @@ class DateQuotingTest(TestCase):
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
         years = models.SchoolClass.objects.dates('last_updated', 'year')
-        self.assertEqual(list(years), [datetime.datetime(2010, 1, 1, 0, 0)])
+        self.assertEqual(list(years), [datetime.date(2010, 1, 1)])
 
     def test_django_date_extract(self):
         """
