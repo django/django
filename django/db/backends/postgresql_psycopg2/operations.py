@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db.backends import BaseDatabaseOperations
 
 
@@ -33,6 +34,22 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '(%s)' % conn.join([sql, 'interval \'%s\'' % mods])
 
     def date_trunc_sql(self, lookup_type, field_name):
+        # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def datetime_extract_sql(self, lookup_type, field_name):
+        if settings.USE_TZ:
+            field_name = "%s AT TIME ZONE %%s" % field_name
+        # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        if lookup_type == 'week_day':
+            # For consistency across backends, we return Sunday=1, Saturday=7.
+            return "EXTRACT('dow' FROM %s) + 1" % field_name
+        else:
+            return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+
+    def datetime_trunc_sql(self, lookup_type, field_name):
+        if settings.USE_TZ:
+            field_name = "%s AT TIME ZONE %%s" % field_name
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
