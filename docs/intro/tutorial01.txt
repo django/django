@@ -203,18 +203,11 @@ settings:
 
 * :setting:`NAME` -- The name of your database. If you're using SQLite, the
   database will be a file on your computer; in that case, :setting:`NAME`
-  should be the full absolute path, including filename, of that file. When
-  specifying the path, always use forward slashes, even on Windows (e.g.
-  ``C:/homes/user/mysite/sqlite3.db``).
+  should be the full absolute path, including filename, of that file. The
+  default value, ``os.path.join(BASE_DIR, 'db.sqlite3')``, will store the file
+  in your project directory.
 
-* :setting:`USER` -- Your database username (not used for SQLite).
-
-* :setting:`PASSWORD` -- Your database password (not used for SQLite).
-
-* :setting:`HOST` -- The host your database is on (not used for SQLite).
-  Leave this as an empty string (or possibly ``127.0.0.1``) if your
-  database server is on the same physical machine .
-
+If you are not using SQLite as your database, additional settings such as :setting:`USER`, :setting:`PASSWORD`, :setting:`HOST` must be added.
 For more details, see the reference documentation for :setting:`DATABASES`.
 
 .. note::
