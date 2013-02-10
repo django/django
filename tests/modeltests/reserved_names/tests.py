@@ -42,8 +42,8 @@ class ReservedNameTests(TestCase):
         self.generate()
         resp = Thing.objects.dates('where', 'year')
         self.assertEqual(list(resp), [
-            datetime.datetime(2005, 1, 1, 0, 0),
-            datetime.datetime(2006, 1, 1, 0, 0),
+            datetime.date(2005, 1, 1),
+            datetime.date(2006, 1, 1),
         ])
 
     def test_month_filter(self):

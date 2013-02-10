@@ -546,8 +546,8 @@ class AggregationTests(TestCase):
         qs = Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
         self.assertQuerysetEqual(
             qs, [
-                datetime.datetime(1995, 1, 15, 0, 0),
-                datetime.datetime(2007, 12, 6, 0, 0)
+                datetime.date(1995, 1, 15),
+                datetime.date(2007, 12, 6),
             ],
             lambda b: b
         )

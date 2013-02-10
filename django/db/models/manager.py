@@ -130,6 +130,9 @@ class Manager(object):
     def dates(self, *args, **kwargs):
         return self.get_query_set().dates(*args, **kwargs)
 
+    def datetimes(self, *args, **kwargs):
+        return self.get_query_set().datetimes(*args, **kwargs)
+
     def distinct(self, *args, **kwargs):
         return self.get_query_set().distinct(*args, **kwargs)
 

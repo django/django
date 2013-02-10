@@ -49,7 +49,7 @@ class GeoRegressionTests(TestCase):
         founded = datetime(1857, 5, 23)
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
-        self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
+        self.assertEqual(founded, PennsylvaniaCity.objects.datetimes('founded', 'day')[0])
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):

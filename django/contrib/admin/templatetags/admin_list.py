@@ -292,6 +292,8 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
+        field = cl.opts.get_field_by_name(field_name)[0]
+        dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -323,7 +325,8 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
+            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup})
+            days = getattr(days, dates_or_datetimes)(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -336,11 +339,12 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.query_set.filter(**{year_field: year_lookup}).dates(field_name, 'month')
+            months = cl.query_set.filter(**{year_field: year_lookup})
+            months = getattr(months, dates_or_datetimes)(field_name, 'month')
             return {
-                'show' : True,
+                'show': True,
                 'back': {
-                    'link' : link({}),
+                    'link': link({}),
                     'title': _('All dates')
                 },
                 'choices': [{
@@ -349,7 +353,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = cl.query_set.dates(field_name, 'year')
+            years = getattr(cl.query_set, dates_or_datetimes)(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{
