@@ -544,12 +544,14 @@ def create_many_related_manager(superclass, rel):
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
 
-
         def _get_fk_val(self, obj, field_name):
             """
             Returns the correct value for this relationship's foreign key. This
             might be something else than pk value when to_field is used.
             """
+            if not self.through:
+                # Make custom m2m fields with no through model defined usable.
+                return obj.pk
             fk = self.through._meta.get_field(field_name)
             if fk.rel.field_name and fk.rel.field_name != fk.rel.to._meta.pk.attname:
                 attname = fk.rel.get_related_field().get_attname()
