@@ -595,6 +595,9 @@ def create_many_related_manager(superclass, rel):
             Returns the correct value for this relationship's foreign key. This
             might be something else than pk value when to_field is used.
             """
+            if not self.through:
+                # Simply use the obj.pk if there isn't an explicit through
+                return obj.pk
             fk = self.through._meta.get_field(field_name)
             if fk.rel.field_name and fk.rel.field_name != fk.rel.to._meta.pk.attname:
                 attname = fk.rel.get_related_field().get_attname()
