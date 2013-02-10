@@ -4,7 +4,7 @@ import time
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.unittest import skipUnless
@@ -119,6 +119,7 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
     @requires_tz_support
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -204,6 +205,7 @@ class YearArchiveViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/')
         self.assertEqual(res.status_code, 200)
 
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_year_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -328,6 +330,7 @@ class MonthArchiveViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/')
         self.assertEqual(res.status_code, 200)
 
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_month_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 2, 1, 12, 0, tzinfo=timezone.utc))

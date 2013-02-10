@@ -397,6 +397,9 @@ class BaseDatabaseFeatures(object):
     # Can datetimes with timezones be used?
     supports_timezones = True
 
+    # Does the database have a copy of the zoneinfo database?
+    has_zoneinfo_database = True
+
     # When performing a GROUP BY, is an ORDER BY NULL required
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
