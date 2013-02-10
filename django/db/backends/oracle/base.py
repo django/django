@@ -128,12 +128,11 @@ WHEN (new.%(col_name)s IS NULL)
         """
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
         if lookup_type == 'week_day':
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
             return "TO_CHAR(%s, 'D')" % field_name
-        else:
-            return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
+        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_interval_sql(self, sql, connector, timedelta):
         """
@@ -150,13 +149,35 @@ WHEN (new.%(col_name)s IS NULL)
                 timedelta.microseconds, day_precision)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # Oracle uses TRUNC() for both dates and numbers.
-        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151
-        if lookup_type == 'day':
-            sql = 'TRUNC(%s)' % field_name
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        if lookup_type in ('year', 'month'):
+            return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         else:
-            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
-        return sql
+            return "TRUNC(%s)" % field_name
+
+    def datetime_extract_sql(self, lookup_type, field_name):
+        if settings.USE_TZ:
+            field_name = "CAST((FROM_TZ(%s, 'UTC') AT TIME ZONE (%%s)) AS DATE)" % field_name
+        if lookup_type == 'week_day':
+            # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
+            return "TO_CHAR(%s, 'D')" % field_name
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
+        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+
+    def datetime_trunc_sql(self, lookup_type, field_name):
+        if settings.USE_TZ:
+            field_name = "CAST((FROM_TZ(%s, 'UTC') AT TIME ZONE (%%s)) AS DATE)" % field_name
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        if lookup_type in ('year', 'month'):
+            return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+        elif lookup_type == 'day':
+            return "TRUNC(%s)" % field_name
+        elif lookup_type == 'hour':
+            return "TRUNC(%s, 'HH24')" % field_name
+        elif lookup_type == 'minute':
+            return "TRUNC(%s, 'MI')" % field_name
+        else:
+            return field_name
 
     def convert_values(self, value, field):
         if isinstance(value, Database.LOB):
