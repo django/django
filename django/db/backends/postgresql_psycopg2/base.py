@@ -84,6 +84,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_nowait = True
     has_bulk_insert = True
     supports_tablespaces = True
+    supports_transactions = True
     can_distinct_on_fields = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
