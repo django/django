@@ -1707,6 +1707,12 @@ Default: ``'America/Chicago'``
 A string representing the time zone for this installation, or ``None``. See
 the `list of time zones`_.
 
+.. note::
+    Since Django was first released with the :setting:`TIME_ZONE` set to
+    ``'America/Chicago'``, the global setting (used if nothing is defined in
+    your project's ``settings.py``) remains ``'America/Chicago'`` for backwards
+    compatibility. New project templates default to ``'UTC'``.
+
 Note that this isn't necessarily the time zone of the server. For example, one
 server may serve multiple Django-powered sites, each with a separate time zone
 setting.
