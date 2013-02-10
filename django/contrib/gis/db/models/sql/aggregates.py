@@ -22,13 +22,15 @@ class GeoAggregate(Aggregate):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
 
     def as_sql(self, qn, connection):
-        "Return the aggregate, rendered as SQL."
+        "Return the aggregate, rendered as SQL with parameters."
 
         if connection.ops.oracle:
             self.extra['tolerance'] = self.tolerance
 
+        params = []
+
         if hasattr(self.col, 'as_sql'):
-            field_name = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
             field_name = '.'.join([qn(c) for c in self.col])
         else:
@@ -36,13 +38,13 @@ class GeoAggregate(Aggregate):
 
         sql_template, sql_function = connection.ops.spatial_aggregate_sql(self)
 
-        params = {
+        substitutions = {
             'function': sql_function,
             'field': field_name
         }
-        params.update(self.extra)
+        substitutions.update(self.extra)
 
-        return sql_template % params
+        return sql_template % substitutions, params
 
 class Collect(GeoAggregate):
     pass

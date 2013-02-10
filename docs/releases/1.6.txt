@@ -30,6 +30,16 @@ prevention <clickjacking-prevention>` are turned on.
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
 
+Time zone aware aggregation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The support for :doc:`time zones </topics/i18n/timezones>` introduced in
+Django 1.4 didn't work well with :meth:`QuerySet.dates()
+<django.db.models.query.QuerySet.dates>`: aggregation was always performed in
+UTC. This limitation was lifted in Django 1.6. Use :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` to perform time zone aware
+aggregation on a :class:`~django.db.models.DateTimeField`.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -46,6 +56,9 @@ Minor features
 
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
+
+* In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
+  now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
 
 * The default widgets for :class:`~django.forms.EmailField` and
   :class:`~django.forms.URLField` use the new type attributes available in
@@ -79,6 +92,28 @@ Backwards incompatible changes in 1.6
   it is only usable as a marker class for checking if
   :meth:`~django.db.models.query.QuerySet.none` has been called:
   ``isinstance(qs.none(), EmptyQuerySet)``
+
+* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` raises an
+  error if it's used on :class:`~django.db.models.DateTimeField` when time
+  zone support is active. Use :meth:`QuerySet.datetimes()
+  <django.db.models.query.QuerySet.datetimes>` instead.
+
+* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` returns a
+  list of :class:`~datetime.date`. It used to return a list of
+  :class:`~datetime.datetime`.
+
+* The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
+  admin on a :class:`~django.db.models.DateTimeField` requires time zone
+  definitions in the database when :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
+* Accessing ``date_list`` in the context of a date-based generic view requires
+  time zone definitions in the database when the view is based on a
+  :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
+* Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
+  lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
 
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as

@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import re
 import sys
 import warnings
 
@@ -128,12 +129,12 @@ WHEN (new.%(col_name)s IS NULL)
         """
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
         if lookup_type == 'week_day':
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
             return "TO_CHAR(%s, 'D')" % field_name
         else:
-            return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+            # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
+            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_interval_sql(self, sql, connector, timedelta):
         """
@@ -150,13 +151,58 @@ WHEN (new.%(col_name)s IS NULL)
                 timedelta.microseconds, day_precision)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # Oracle uses TRUNC() for both dates and numbers.
-        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151
-        if lookup_type == 'day':
-            sql = 'TRUNC(%s)' % field_name
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        if lookup_type in ('year', 'month'):
+            return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         else:
-            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
-        return sql
+            return "TRUNC(%s)" % field_name
+
+    # Oracle crashes with "ORA-03113: end-of-file on communication channel"
+    # if the time zone name is passed in parameter. Use interpolation instead.
+    # https://groups.google.com/forum/#!msg/django-developers/zwQju7hbG78/9l934yelwfsJ
+    # This regexp matches all time zone names from the zoneinfo database.
+    _tzname_re = re.compile(r'^[\w/:+-]+$')
+
+    def _convert_field_to_tz(self, field_name, tzname):
+        if not self._tzname_re.match(tzname):
+            raise ValueError("Invalid time zone name: %s" % tzname)
+        # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
+        result = "(FROM_TZ(%s, '0:00') AT TIME ZONE '%s')" % (field_name, tzname)
+        # Extracting from a TIMESTAMP WITH TIME ZONE ignore the time zone.
+        # Convert to a DATETIME, which is called DATE by Oracle. There's no
+        # built-in function to do that; the easiest is to go through a string.
+        result = "TO_CHAR(%s, 'YYYY-MM-DD HH24:MI:SS')" % result
+        result = "TO_DATE(%s, 'YYYY-MM-DD HH24:MI:SS')" % result
+        # Re-convert to a TIMESTAMP because EXTRACT only handles the date part
+        # on DATE values, even though they actually store the time part.
+        return "CAST(%s AS TIMESTAMP)" % result
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = self._convert_field_to_tz(field_name, tzname)
+        if lookup_type == 'week_day':
+            # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
+            sql = "TO_CHAR(%s, 'D')" % field_name
+        else:
+            # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
+            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        return sql, []
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = self._convert_field_to_tz(field_name, tzname)
+        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        if lookup_type in ('year', 'month'):
+            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+        elif lookup_type == 'day':
+            sql = "TRUNC(%s)" % field_name
+        elif lookup_type == 'hour':
+            sql = "TRUNC(%s, 'HH24')" % field_name
+        elif lookup_type == 'minute':
+            sql = "TRUNC(%s, 'MI')" % field_name
+        else:
+            sql = field_name    # Cast to DATE removes sub-second precision.
+        return sql, []
 
     def convert_values(self, value, field):
         if isinstance(value, Database.LOB):

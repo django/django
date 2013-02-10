@@ -312,9 +312,10 @@ class Field(object):
             return value._prepare()
 
         if lookup_type in (
-                'regex', 'iregex', 'month', 'day', 'week_day', 'search',
-                'contains', 'icontains', 'iexact', 'startswith', 'istartswith',
-                'endswith', 'iendswith', 'isnull'
+                'iexact', 'contains', 'icontains',
+                'startswith', 'istartswith', 'endswith', 'iendswith',
+                'month', 'day', 'week_day', 'hour', 'minute', 'second',
+                'isnull', 'search', 'regex', 'iregex',
             ):
             return value
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
@@ -350,8 +351,8 @@ class Field(object):
                 sql, params = value._as_sql(connection=connection)
             return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day',
-                           'search'):
+        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute',
+                           'second', 'search', 'regex', 'iregex'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
@@ -370,10 +371,12 @@ class Field(object):
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':
-            if self.get_internal_type() == 'DateField':
+            if isinstance(self, DateTimeField):
+                return connection.ops.year_lookup_bounds_for_datetime_field(value)
+            elif isinstance(self, DateField):
                 return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
-                return connection.ops.year_lookup_bounds(value)
+                return [value]          # this isn't supposed to happen
 
     def has_default(self):
         """
@@ -722,9 +725,9 @@ class DateField(Field):
                       is_next=False))
 
     def get_prep_lookup(self, lookup_type, value):
-        # For "__month", "__day", and "__week_day" lookups, convert the value
-        # to an int so the database backend always sees a consistent type.
-        if lookup_type in ('month', 'day', 'week_day'):
+        # For dates lookups, convert the value to an int
+        # so the database backend always sees a consistent type.
+        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute', 'second'):
             return int(value)
         return super(DateField, self).get_prep_lookup(lookup_type, value)
 

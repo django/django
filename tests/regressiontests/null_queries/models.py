@@ -28,4 +28,5 @@ class OuterB(models.Model):
 
 class Inner(models.Model):
     first = models.ForeignKey(OuterA)
-    second = models.ForeignKey(OuterB, null=True)
+    # second would clash with the __second lookup.
+    third = models.ForeignKey(OuterB, null=True)

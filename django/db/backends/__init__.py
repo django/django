@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.utils import DatabaseError
 
 try:
@@ -14,7 +16,7 @@ from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils import six
-from django.utils.timezone import is_aware
+from django.utils import timezone
 
 
 class BaseDatabaseWrapper(object):
@@ -397,6 +399,9 @@ class BaseDatabaseFeatures(object):
     # Can datetimes with timezones be used?
     supports_timezones = True
 
+    # Does the database have a copy of the zoneinfo database?
+    has_zoneinfo_database = True
+
     # When performing a GROUP BY, is an ORDER BY NULL required
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
@@ -523,7 +528,7 @@ class BaseDatabaseOperations(object):
     def date_trunc_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
-        truncates the given date field field_name to a DATE object with only
+        truncates the given date field field_name to a date object with only
         the given specificity.
         """
         raise NotImplementedError()
@@ -536,6 +541,23 @@ class BaseDatabaseOperations(object):
         This SQL should include a '%s' in place of the field's name.
         """
         return "%s"
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that extracts a value from the given
+        datetime field field_name, and a tuple of parameters.
+        """
+        raise NotImplementedError()
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that truncates the given datetime field
+        field_name to a datetime object with only the given specificity, and
+        a tuple of parameters.
+        """
+        raise NotImplementedError()
 
     def deferrable_sql(self):
         """
@@ -853,7 +875,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        if is_aware(value):
+        if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return six.text_type(value)
 
@@ -866,29 +888,33 @@ class BaseDatabaseOperations(object):
             return None
         return util.format_number(value, max_digits, decimal_places)
 
-    def year_lookup_bounds(self, value):
-        """
-        Returns a two-elements list with the lower and upper bound to be used
-        with a BETWEEN operator to query a field value using a year lookup
-
-        `value` is an int, containing the looked-up year.
-        """
-        first = '%s-01-01 00:00:00'
-        second = '%s-12-31 23:59:59.999999'
-        return [first % value, second % value]
-
     def year_lookup_bounds_for_date_field(self, value):
         """
         Returns a two-elements list with the lower and upper bound to be used
-        with a BETWEEN operator to query a DateField value using a year lookup
+        with a BETWEEN operator to query a DateField value using a year
+        lookup.
 
         `value` is an int, containing the looked-up year.
-
-        By default, it just calls `self.year_lookup_bounds`. Some backends need
-        this hook because on their DB date fields can't be compared to values
-        which include a time part.
         """
-        return self.year_lookup_bounds(value)
+        first = datetime.date(value, 1, 1)
+        second = datetime.date(value, 12, 31)
+        return [first, second]
+
+    def year_lookup_bounds_for_datetime_field(self, value):
+        """
+        Returns a two-elements list with the lower and upper bound to be used
+        with a BETWEEN operator to query a DateTimeField value using a year
+        lookup.
+
+        `value` is an int, containing the looked-up year.
+        """
+        first = datetime.datetime(value, 1, 1)
+        second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
+        if settings.USE_TZ:
+            tz = timezone.get_current_timezone()
+            first = timezone.make_aware(first, tz)
+            second = timezone.make_aware(second, tz)
+        return [first, second]
 
     def convert_values(self, value, field):
         """

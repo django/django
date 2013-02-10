@@ -4,7 +4,7 @@ import time
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.unittest import skipUnless
@@ -119,6 +119,7 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
     @requires_tz_support
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -140,7 +141,7 @@ class YearArchiveViewTests(TestCase):
     def test_year_view(self):
         res = self.client.get('/dates/books/2008/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['date_list']), [datetime.datetime(2008, 10, 1)])
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2008, 10, 1)])
         self.assertEqual(res.context['year'], datetime.date(2008, 1, 1))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
@@ -151,7 +152,7 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_make_object_list(self):
         res = self.client.get('/dates/books/2006/make_object_list/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['date_list']), [datetime.datetime(2006, 5, 1)])
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 5, 1)])
         self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006)))
         self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006)))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
@@ -181,7 +182,7 @@ class YearArchiveViewTests(TestCase):
 
         res = self.client.get('/dates/books/%s/allow_future/' % year)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['date_list']), [datetime.datetime(year, 1, 1)])
+        self.assertEqual(list(res.context['date_list']), [datetime.date(year, 1, 1)])
 
     def test_year_view_paginated(self):
         res = self.client.get('/dates/books/2006/paginated/')
@@ -204,6 +205,7 @@ class YearArchiveViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/')
         self.assertEqual(res.status_code, 200)
 
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_year_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
@@ -225,7 +227,7 @@ class MonthArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/2008/oct/')
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/book_archive_month.html')
-        self.assertEqual(list(res.context['date_list']), [datetime.datetime(2008, 10, 1)])
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2008, 10, 1)])
         self.assertEqual(list(res.context['book_list']),
                          list(Book.objects.filter(pubdate=datetime.date(2008, 10, 1))))
         self.assertEqual(res.context['month'], datetime.date(2008, 10, 1))
@@ -268,7 +270,7 @@ class MonthArchiveViewTests(TestCase):
         # allow_future = True, valid future month
         res = self.client.get('/dates/books/%s/allow_future/' % urlbit)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['date_list'][0].date(), b.pubdate)
+        self.assertEqual(res.context['date_list'][0], b.pubdate)
         self.assertEqual(list(res.context['book_list']), [b])
         self.assertEqual(res.context['month'], future)
 
@@ -328,6 +330,7 @@ class MonthArchiveViewTests(TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/')
         self.assertEqual(res.status_code, 200)
 
+    @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_month_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 2, 1, 12, 0, tzinfo=timezone.utc))
