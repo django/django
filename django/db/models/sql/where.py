@@ -225,8 +225,8 @@ class WhereNode(tree.Node):
             return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type, field_sql),
                     params)
         elif lookup_type == 'isnull':
-            return ('%s IS %sNULL' % (field_sql,
-                (not value_annotation and 'NOT ' or '')), ())
+            assert value_annotation in (True, False), "Invalid value_annotation for isnull"
+            return ('%s IS %sNULL' % (field_sql, ('' if value_annotation else 'NOT ')), ())
         elif lookup_type == 'search':
             return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
