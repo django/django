@@ -219,11 +219,10 @@ total book stock counters (note how we use `'book'` to specify the
 Publisher->Book reverse foreign key hop)::
 
     >>> from django.db.models import Count, Min, Sum, Max, Avg
-    >>> Publisher.objects.annotate(book_cnt=Count('book'))
+    >>> Publisher.objects.annotate(Count('book'))
 
-(Every Publisher in the resulting QuerySet will have an extra ``book_cnt``
-attribute, its name would have been ``book__count`` if no alias had been
-specified.)
+(Every Publisher in the resulting QuerySet will have an extra ``book__count``
+attribute.)
 
 We can also ask for the oldest book of any of those managed by every publisher::
 
