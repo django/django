@@ -13,12 +13,12 @@ from .models import Artist, Author
 
 
 class FormMixinTests(TestCase):
-     def test_initial_data(self):
-         """ Test instance independence of initial data dict (see #16138) """
-         initial_1 = FormMixin().get_initial()
-         initial_1['foo'] = 'bar'
-         initial_2 = FormMixin().get_initial()
-         self.assertNotEqual(initial_1, initial_2)
+    def test_initial_data(self):
+        """ Test instance independence of initial data dict (see #16138) """
+        initial_1 = FormMixin().get_initial()
+        initial_1['foo'] = 'bar'
+        initial_2 = FormMixin().get_initial()
+        self.assertNotEqual(initial_1, initial_2)
 
 
 class BasicFormTests(TestCase):
@@ -281,6 +281,13 @@ class DeleteViewTests(TestCase):
         res = self.client.post('/edit/author/%d/delete/redirect/' % a.pk)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertQuerysetEqual(Author.objects.all(), [])
+
+    def test_delete_with_interpolated_redirect(self):
+        a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+        res = self.client.post('/edit/author/%d/delete/interpolate_redirect/' % a.pk)
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, 'http://testserver/edit/authors/create/?deleted=%d' % a.pk)
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_special_properties(self):

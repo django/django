@@ -64,6 +64,10 @@ Minor features
   :attr:`~django.core.management.BaseCommand.leave_locale_alone` internal
   option. See :ref:`management-commands-and-locales` for more details.
 
+* The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
+  :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
+  its ``object``\'s ``__dict__``.
+
 Backwards incompatible changes in 1.6
 =====================================
 
