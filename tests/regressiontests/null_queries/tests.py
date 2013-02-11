@@ -55,17 +55,17 @@ class NullQueriesTests(TestCase):
         """
         obj = OuterA.objects.create()
         self.assertQuerysetEqual(
-            OuterA.objects.filter(inner__second=None),
+            OuterA.objects.filter(inner__third=None),
             ['<OuterA: OuterA object>']
         )
         self.assertQuerysetEqual(
-            OuterA.objects.filter(inner__second__data=None),
+            OuterA.objects.filter(inner__third__data=None),
             ['<OuterA: OuterA object>']
         )
 
         inner_obj = Inner.objects.create(first=obj)
         self.assertQuerysetEqual(
-            Inner.objects.filter(first__inner__second=None),
+            Inner.objects.filter(first__inner__third=None),
             ['<Inner: Inner object>']
         )
 
