@@ -614,6 +614,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
 
+.. _database-time-zone-definitions:
+
 .. note::
 
     This function performs time zone conversions directly in the database.

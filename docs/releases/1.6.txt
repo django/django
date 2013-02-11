@@ -102,6 +102,16 @@ Backwards incompatible changes in 1.6
   list of :class:`~datetime.date`. It used to return a list of
   :class:`~datetime.datetime`.
 
+* The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
+  admin on a :class:`~django.db.models.DateTimeField` requires time zone
+  definitions in the database when :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
+* Accessing ``date_list`` in the context of a date-based generic view requires
+  time zone definitions in the database when the view is based on a
+  :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
 * Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
   lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
 
