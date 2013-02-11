@@ -605,12 +605,15 @@ Good rules-of-thumb include having:
 * a separate test method for each set of conditions you want to test
 * test method names that describe their function
 
-Further testing
-===============
+More ways of testing
+====================
 
 This tutorial only introduces some of the basics of testing. There's a great
 deal more you can do, and a number of very useful tools at your disposal to
 achieve some very clever things.
+
+Browser testing
+---------------
 
 For example, while our tests here have covered some of the internal logic of a
 model and the way our views publish information, you can use an "in-browser"
@@ -620,6 +623,25 @@ code, but also, for example, of your JavaScript. It's quite something to see
 the tests launch a browser, and start interacting with your site, as if a human
 being were driving it! Django includes :class:`~django.test.LiveServerTestCase`
 to facilitate integration with tools like Selenium.
+
+.. _Selenium: http://seleniumhq.org/
+
+A standalone test-suite
+-----------------------
+
+In this tutorial we've run all the tests from *within* a project. The project
+supplies something that such tests need; in this case, the tests require a
+Django settings module that defines the database to use, and that's going to be
+so for any application with tests that need to use a database.
+
+It doesn't seem very convenient however to go to the trouble of setting up a
+project just so an application can be tested. A good solution is to include a
+``tests/runtests.py`` file in your application that provides the settings it
+needs. This is what Django itself does (Django's example is rather complex one),
+as well as many other applications.
+
+Continuous integration
+----------------------
 
 If you have a complex application, you may want to run tests automatically
 with every commit for the purposes of `continuous integration`_, so that
@@ -634,7 +656,6 @@ Coverage will help to identify dead code. See
 :doc:`Testing Django applications </topics/testing/index>` has comprehensive
 information about testing.
 
-.. _Selenium: http://seleniumhq.org/
 .. _continuous integration: http://en.wikipedia.org/wiki/Continuous_integration
 
 What's next?
