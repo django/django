@@ -228,7 +228,7 @@ We can also ask for the oldest book of any of those managed by every publisher::
 
     >>> Publisher.objects.aggregate(Min('book__pubdate'))
 
-(The resulting dictionary wil have a `'book__pubdate__min'` key.)
+(The resulting dictionary will have a `'book__pubdate__min'` key.)
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
@@ -244,7 +244,7 @@ Or ask for the author(s) of the best-ranked book::
 
     >>> Author.objects.aggregate(Max('book__rating'))
 
-(The resulting dictionary wil have a `'book__rating__max'` key.)
+(The resulting dictionary will have a `'book__rating__max'` key.)
 
 Of course we can follow relationships as deep as we need::
 
@@ -257,7 +257,7 @@ And traverse a mix of forward and backwards relationships::
 
     >>> Publisher.objects.annotate(Avg('book__authors__age'))
 
-(Every Author in the resulting QuerySet will have an extra
+(Every Publisher in the resulting QuerySet will have an extra
 ``book__authors__age__avg`` attribute.)
 
 Aggregations and other QuerySet clauses
