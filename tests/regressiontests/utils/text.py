@@ -70,6 +70,16 @@ class TestUtilsText(SimpleTestCase):
             'id="mylink">brown fox</a> jumped over the lazy dog.</p>')
         self.assertEqual('<p>The quick <a href="xyz.html"\n'
             'id="mylink">brown...</a></p>', truncator.words(3, '...', html=True))
+        # Test self closing tags
+        truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
+            ' the lazy dog.')
+        self.assertEqual('<br/>The <hr />quick brown...', 
+            truncator.words(3, '...', html=True ))
+        truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
+            'jumped over the lazy dog.')
+        self.assertEqual('<br>The <hr/>quick <em>brown...</em>', 
+            truncator.words(3, '...', html=True ))
+        
 
     def test_wrap(self):
         digits = '1234 67 9'
