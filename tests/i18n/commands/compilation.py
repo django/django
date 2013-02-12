@@ -99,3 +99,22 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
         self.assertTrue(os.path.exists(self.MO_FILE_HR))
         self.assertTrue(os.path.exists(self.MO_FILE_FR))
+
+
+class CompilationErrorHandling(MessageCompilationTests):
+
+    LOCALE='ja'
+    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+
+    def setUp(self):
+        super(CompilationErrorHandling, self).setUp()
+        self.addCleanup(self._rmfile, os.path.join(test_dir, self.MO_FILE))
+
+    def _rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+    def test_error_reported_by_msgfmt(self):
+        os.chdir(test_dir)
+        with self.assertRaises(CommandError):
+            call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
