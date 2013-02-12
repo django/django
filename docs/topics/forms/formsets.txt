@@ -88,7 +88,7 @@ The ``max_num`` parameter to ``formset_factory`` gives you the ability to
 limit the maximum number of empty forms the formset will display::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
-    >>> formset = ArticleFormset()
+    >>> formset = ArticleFormSet()
     >>> for form in formset:
     ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
