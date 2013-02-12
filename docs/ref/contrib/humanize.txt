@@ -67,6 +67,11 @@ Examples:
 
 Values up to 10^100 (Googol) are supported.
 
+**Argument:** intword can take a precision argument. Default is a precision
+of 1, for example a precision of 2:
+
+* ``1234000`` becomes ``1.23 million``.
+
 :ref:`Format localization <format-localization>` will be respected if enabled,
 e.g. with the ``'de'`` language:
 
@@ -75,6 +80,48 @@ e.g. with the ``'de'`` language:
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
 
 You can pass in either an integer or a string representation of an integer.
+
+.. templatefilter:: intabr
+
+intabr
+-------
+
+Similar in nature to :tfilter:`intword` above, except returns common abbreviation
+forms for large numbers:
+
+Examples:
+
+* ``1000000`` becomes ``1.0M``.
+
+and with a precision of 2:
+
+* ``1200000000`` becomes ``1.20B``.
+
+Large Number Conversion
+=======================
+
+
+``intword_internal(precision=1, max_num=1000000, word_abr_symbol=0, converter=Converter)``
+
+You can create other custom large number tags by using the function intword_internal.
+For example, you can pass intword_internal a custom converter class if the built in
+converter does not meet your needs.
+
+The argument precision defines the rounding precision.
+
+The argument max_num defines the number at which to apply the conversion. Numbers large than
+max_num will be converted.
+
+The argument word_abr_symbol in the function intword_internal can take 0, 1 or 2.
+
+* ``0 returns a space with the full word not capitalized``.
+* ``1 returns a capitalized common abbreviation of the large number``.
+* ``2 returns the standardized metric prefix symbol for numbers up to 10^24 (Y)``.
+
+For reference, see the `standardized metric prefix symbol <http://en.wikipedia.org/wiki/SI_prefix/>`_ guide.
+
+To create a custom converter, view the code in contrib.humanize. Inhereting from Converter should solve
+most problems.
 
 .. templatefilter:: naturalday
 
