@@ -45,14 +45,11 @@ def close_connection(**kwargs):
     # Avoid circular imports
     from django.db import transaction
     for conn in connections:
-        try:
-            transaction.abort(conn)
-            connections[conn].close()
-        except Exception:
-            # The connection's state is unknown, so it has to be
-            # abandoned. This could happen for example if the network
-            # connection has a failure.
-            del connections[conn]
+        # If an error happens here the connection will be left in broken
+        # state. Once a good db connection is again available, the
+        # connection state will be cleaned up.
+        transaction.abort(conn)
+        connections[conn].close()
 signals.request_finished.connect(close_connection)
 
 # Register an event that resets connection.queries
