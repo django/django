@@ -237,6 +237,12 @@ LANG_INFO = {
         'code': 'ko',
         'name': 'Korean',
         'name_local': '\ud55c\uad6d\uc5b4',
+    }, 
+    'lo': {
+        'bidi': False,
+        'code': 'lo',
+        'name': 'Lao',
+        'name_local': u'\u0ea5\u0eb2\u0ea7',
     },
     'lt': {
         'bidi': False,
