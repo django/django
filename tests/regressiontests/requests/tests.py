@@ -559,9 +559,14 @@ class TransactionRequestTests(TransactionTestCase):
         def fail_horribly():
             raise Exception("Horrible failure!")
         conn._rollback = fail_horribly
+        try:
+            with self.assertRaises(Exception):
+                signals.request_finished.send(sender=self.__class__)
+            # The connection's state wasn't cleaned up
+            self.assertTrue(len(connection.transaction_state), 1)
+        finally:
+            del conn._rollback
+        # The connection will be cleaned on next request where the conn
+        # works again.
         signals.request_finished.send(sender=self.__class__)
-        # As even rollback wasn't possible the connection wrapper itself was
-        # abandoned. Accessing the connections[alias] will create a new
-        # connection wrapper, whch must be different than the original one.
-        self.assertIsNot(conn, connections[DEFAULT_DB_ALIAS])
         self.assertEqual(len(connection.transaction_state), 0)
