@@ -228,8 +228,8 @@ We can also ask for the oldest book of any of those managed by every publisher::
 
     >>> Publisher.objects.aggregate(oldest_pubdate=Min('book__pubdate'))
 
-(The resulting dictionary will have a ``'oldest_pubdate'`` key, its name would
-be ``'book__pubdate__min'`` if no alias had been specified.)
+(The resulting dictionary will have an ``'oldest_pubdate'`` key. If no such
+alias is specified, it would be the rather long ``'book__pubdate__min'``.)
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
@@ -239,14 +239,16 @@ use `'book'` to specify the Author->Book reverse many-to-many hop)::
     >>> Author.objects.annotate(total_pages=Sum('book__pages'))
 
 (Every Author in the resulting QuerySet will have an extra ``total_pages``
-attribute, its name would be ``book__pages__sum`` if no alias had been
-specified.)
+attribute. If no such alias is specified, it would be the rather long
+``book__pages__sum``.)
 
-Or ask for the author(s) of the best-ranked book::
+Or ask for the average rating of all the books written by author(s) we have on
+file::
 
-    >>> Author.objects.aggregate(Max('book__rating'))
+    >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
 
-(The resulting dictionary will have a `'book__rating__max'` key.)
+(The resulting dictionary will have a ``'average__rating'`` key. If no such
+alias is specified, it would be the rather long ``'book__rating__avg'``.)
 
 Aggregations and other QuerySet clauses
 =======================================
