@@ -131,8 +131,13 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
         stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
-        os.remove('./code_sample.py')
+        try:
+            management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        finally:
+            try:
+                os.remove('./code_sample.py')
+            except OSError:
+                pass
         self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
 
     def test_template_message_context_extractor(self):

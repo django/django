@@ -2,34 +2,10 @@ import os
 import re
 from subprocess import Popen, PIPE
 
-from django.utils import six
+from django.core.management.utils import find_command
 
 can_run_extraction_tests = False
 can_run_compilation_tests = False
-
-def find_command(cmd, path=None, pathext=None):
-    if path is None:
-        path = os.environ.get('PATH', []).split(os.pathsep)
-    if isinstance(path, six.string_types):
-        path = [path]
-    # check if there are funny path extensions for executables, e.g. Windows
-    if pathext is None:
-        pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD').split(os.pathsep)
-    # don't use extensions if the command ends with one of them
-    for ext in pathext:
-        if cmd.endswith(ext):
-            pathext = ['']
-            break
-    # check if we find the command on PATH
-    for p in path:
-        f = os.path.join(p, cmd)
-        if os.path.isfile(f):
-            return f
-        for ext in pathext:
-            fext = f + ext
-            if os.path.isfile(fext):
-                return fext
-    return None
 
 # checks if it can find xgettext on the PATH and
 # imports the extraction tests if yes
