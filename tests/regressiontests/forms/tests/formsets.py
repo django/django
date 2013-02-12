@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.forms import (CharField, DateField, FileField, Form, IntegerField,
-    ValidationError)
+    ValidationError, formsets)
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.test import TestCase
@@ -51,7 +51,7 @@ class FormsFormsetTestCase(TestCase):
         # for adding data. By default, it displays 1 blank form. It can display more,
         # but we'll look at how to do so later.
         formset = ChoiceFormSet(auto_id=False, prefix='choices')
-        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" />
+        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="text" name="choices-0-votes" /></td></tr>""")
 
@@ -654,8 +654,8 @@ class FormsFormsetTestCase(TestCase):
         # Limiting the maximum number of forms ########################################
         # Base case for max_num.
 
-        # When not passed, max_num will take its default value of None, i.e. unlimited
-        # number of forms, only controlled by the value of the extra parameter.
+        # When not passed, max_num will take a high default value, leaving the
+        # number of forms only controlled by the value of the extra parameter.
 
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=3)
         formset = LimitedFavoriteDrinkFormSet()
@@ -702,8 +702,8 @@ class FormsFormsetTestCase(TestCase):
     def test_max_num_with_initial_data(self):
         # max_num with initial data
 
-        # When not passed, max_num will take its default value of None, i.e. unlimited
-        # number of forms, only controlled by the values of the initial and extra
+        # When not passed, max_num will take a high default value, leaving the
+        # number of forms only controlled by the value of the initial and extra
         # parameters.
 
         initial = [
@@ -877,6 +877,64 @@ class FormsFormsetTestCase(TestCase):
         formset = AnotherChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
         self.assertTrue(all([form.is_valid_called for form in formset.forms]))
+
+    def test_hard_limit_on_instantiated_forms(self):
+        """A formset has a hard limit on the number of forms instantiated."""
+        # reduce the default limit of 1000 temporarily for testing
+        _old_DEFAULT_MAX_NUM = formsets.DEFAULT_MAX_NUM
+        try:
+            formsets.DEFAULT_MAX_NUM = 3
+            ChoiceFormSet = formset_factory(Choice)
+            # someone fiddles with the mgmt form data...
+            formset = ChoiceFormSet(
+                {
+                    'choices-TOTAL_FORMS': '4',
+                    'choices-INITIAL_FORMS': '0',
+                    'choices-MAX_NUM_FORMS': '4',
+                    'choices-0-choice': 'Zero',
+                    'choices-0-votes': '0',
+                    'choices-1-choice': 'One',
+                    'choices-1-votes': '1',
+                    'choices-2-choice': 'Two',
+                    'choices-2-votes': '2',
+                    'choices-3-choice': 'Three',
+                    'choices-3-votes': '3',
+                    },
+                prefix='choices',
+                )
+            # But we still only instantiate 3 forms
+            self.assertEqual(len(formset.forms), 3)
+        finally:
+            formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
+
+    def test_increase_hard_limit(self):
+        """Can increase the built-in forms limit via a higher max_num."""
+        # reduce the default limit of 1000 temporarily for testing
+        _old_DEFAULT_MAX_NUM = formsets.DEFAULT_MAX_NUM
+        try:
+            formsets.DEFAULT_MAX_NUM = 3
+            # for this form, we want a limit of 4
+            ChoiceFormSet = formset_factory(Choice, max_num=4)
+            formset = ChoiceFormSet(
+                {
+                    'choices-TOTAL_FORMS': '4',
+                    'choices-INITIAL_FORMS': '0',
+                    'choices-MAX_NUM_FORMS': '4',
+                    'choices-0-choice': 'Zero',
+                    'choices-0-votes': '0',
+                    'choices-1-choice': 'One',
+                    'choices-1-votes': '1',
+                    'choices-2-choice': 'Two',
+                    'choices-2-votes': '2',
+                    'choices-3-choice': 'Three',
+                    'choices-3-votes': '3',
+                    },
+                prefix='choices',
+                )
+            # This time four forms are instantiated
+            self.assertEqual(len(formset.forms), 4)
+        finally:
+            formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
 
 data = {

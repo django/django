@@ -738,8 +738,8 @@ so long as the total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
 
 Using a model formset in a view
 -------------------------------
