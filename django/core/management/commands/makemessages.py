@@ -5,17 +5,24 @@ import re
 import sys
 from itertools import dropwhile
 from optparse import make_option
-from subprocess import PIPE, Popen
 
 import django
 from django.core.management.base import CommandError, NoArgsCommand
-from django.core.management.utils import handle_extensions
+from django.core.management.utils import (handle_extensions, find_command,
+    popen_wrapper)
 from django.utils.functional import total_ordering
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
+
+
+def check_programs(*programs):
+    for program in programs:
+        if find_command(program) is None:
+            raise CommandError("Can't find %s. Make sure you have GNU "
+                    "gettext tools 0.15 or newer installed." % program)
 
 
 @total_ordering
@@ -58,12 +65,24 @@ class TranslatableFile(object):
             work_file = os.path.join(self.dirpath, thefile)
             with open(work_file, "w") as fp:
                 fp.write(src_data)
-            cmd = (
-                'xgettext -d %s -L C %s %s --keyword=gettext_noop '
-                '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
-                '--keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 '
-                '--from-code UTF-8 --add-comments=Translators -o - "%s"' %
-                (domain, command.wrap, command.location, work_file))
+            args = [
+                'xgettext',
+                '-d', domain,
+                '--language=C',
+                '--keyword=gettext_noop',
+                '--keyword=gettext_lazy',
+                '--keyword=ngettext_lazy:1,2',
+                '--keyword=pgettext:1c,2',
+                '--keyword=npgettext:1c,2,3',
+                '--from-code=UTF-8',
+                '--add-comments=Translators',
+                '--output=-'
+            ]
+            if command.wrap:
+                args.append(command.wrap)
+            if command.location:
+                args.append(command.location)
+            args.append(work_file)
         elif domain == 'django' and (file_ext == '.py' or file_ext in command.extensions):
             thefile = self.file
             orig_file = os.path.join(self.dirpath, self.file)
@@ -76,18 +95,32 @@ class TranslatableFile(object):
                 with open(os.path.join(self.dirpath, thefile), "w") as fp:
                     fp.write(content)
             work_file = os.path.join(self.dirpath, thefile)
-            cmd = (
-                'xgettext -d %s -L Python %s %s --keyword=gettext_noop '
-                '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
-                '--keyword=ugettext_noop --keyword=ugettext_lazy '
-                '--keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 '
-                '--keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 '
-                '--keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 '
-                '--add-comments=Translators -o - "%s"' %
-                (domain, command.wrap, command.location, work_file))
+            args = [
+                'xgettext',
+                '-d', domain,
+                '--language=Python',
+                '--keyword=gettext_noop',
+                '--keyword=gettext_lazy',
+                '--keyword=ngettext_lazy:1,2',
+                '--keyword=ugettext_noop',
+                '--keyword=ugettext_lazy',
+                '--keyword=ungettext_lazy:1,2',
+                '--keyword=pgettext:1c,2',
+                '--keyword=npgettext:1c,2,3',
+                '--keyword=pgettext_lazy:1c,2',
+                '--keyword=npgettext_lazy:1c,2,3',
+                '--from-code=UTF-8',
+                '--add-comments=Translators',
+                '--output=-'
+            ]
+            if command.wrap:
+                args.append(command.wrap)
+            if command.location:
+                args.append(command.location)
+            args.append(work_file)
         else:
             return
-        msgs, errors, status = _popen(cmd)
+        msgs, errors, status = popen_wrapper(args)
         if errors:
             if status != STATUS_OK:
                 if is_templatized:
@@ -108,15 +141,6 @@ class TranslatableFile(object):
             write_pot_file(potfile, msgs)
         if is_templatized:
             os.unlink(work_file)
-
-
-def _popen(cmd):
-    """
-    Friendly wrapper around Popen for Windows
-    """
-    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
-    output, errors = p.communicate()
-    return output, errors, p.returncode
 
 def write_pot_file(potfile, msgs):
     """
@@ -225,8 +249,9 @@ class Command(NoArgsCommand):
                     "is not created automatically, you have to create it by hand "
                     "if you want to enable i18n for your project or application.")
 
+        check_programs('xgettext')
         # We require gettext version 0.15 or newer.
-        output, errors, status = _popen('xgettext --version')
+        output, errors, status = popen_wrapper(['xgettext', '--version'])
         if status != STATUS_OK:
             raise CommandError("Error running xgettext. Note that Django "
                         "internationalization requires GNU gettext 0.15 or newer.")
@@ -247,6 +272,9 @@ class Command(NoArgsCommand):
         elif process_all:
             locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
             locales = [os.path.basename(l) for l in locale_dirs]
+
+        if locales:
+            check_programs('msguniq', 'msgmerge', 'msgattrib')
 
         try:
             for locale in locales:
@@ -307,8 +335,13 @@ class Command(NoArgsCommand):
 
         Uses mguniq, msgmerge, and msgattrib GNU gettext utilities.
         """
-        msgs, errors, status = _popen('msguniq %s %s --to-code=utf-8 "%s"' %
-                                        (self.wrap, self.location, potfile))
+        args = ['msguniq', '--to-code=utf-8']
+        if self.wrap:
+            args.append(self.wrap)
+        if self.location:
+            args.append(self.location)
+        args.append(potfile)
+        msgs, errors, status = popen_wrapper(args)
         if errors:
             if status != STATUS_OK:
                 raise CommandError(
@@ -324,8 +357,13 @@ class Command(NoArgsCommand):
         if os.path.exists(pofile):
             with open(potfile, 'w') as fp:
                 fp.write(msgs)
-            msgs, errors, status = _popen('msgmerge %s %s -q "%s" "%s"' %
-                                            (self.wrap, self.location, pofile, potfile))
+            args = ['msgmerge', '-q']
+            if self.wrap:
+                args.append(self.wrap)
+            if self.location:
+                args.append(self.location)
+            args.extend([pofile, potfile])
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -340,9 +378,13 @@ class Command(NoArgsCommand):
             fp.write(msgs)
 
         if self.no_obsolete:
-            msgs, errors, status = _popen(
-                'msgattrib %s %s -o "%s" --no-obsolete "%s"' %
-                (self.wrap, self.location, pofile, pofile))
+            args = ['msgattrib', '-o', pofile, '--no-obsolete']
+            if self.wrap:
+                args.append(self.wrap)
+            if self.location:
+                args.append(self.location)
+            args.append(pofile)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
