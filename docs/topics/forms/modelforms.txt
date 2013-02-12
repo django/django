@@ -691,8 +691,8 @@ so long as the total number of forms does not exceed ``max_num``::
 
 .. versionchanged:: 1.2
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
 
 Using a model formset in a view
 -------------------------------
