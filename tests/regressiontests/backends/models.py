@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.contrib.comments.models import Comment
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, connection
@@ -49,10 +50,15 @@ class Tag(models.Model):
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
 
+class PossibleSelfComment(Comment):
+    by_author = models.BooleanField(default=False)
+
+
 class Post(models.Model):
     name = models.CharField(max_length=30)
     text = models.TextField()
     tags = generic.GenericRelation('Tag')
+    comments = generic.GenericRelation('PossibleSelfComment')
 
     class Meta:
         db_table = 'CaseSensitive_Post'
