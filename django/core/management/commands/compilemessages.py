@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 
 import codecs
 import os
-import sys
 from optparse import make_option
+
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import popen_wrapper
 from django.utils._os import npath
 
 def has_bom(fn):
@@ -41,18 +42,15 @@ def compile_messages(stderr, locale=None):
                     if has_bom(fn):
                         raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
                     pf = os.path.splitext(fn)[0]
-                    # Store the names of the .mo and .po files in an environment
-                    # variable, rather than doing a string replacement into the
-                    # command, so that we can take advantage of shell quoting, to
-                    # quote any malicious characters/escaping.
-                    # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    os.environ['djangocompilemo'] = npath(pf + '.mo')
-                    os.environ['djangocompilepo'] = npath(pf + '.po')
-                    if sys.platform == 'win32': # Different shell-variable syntax
-                        cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
-                    else:
-                        cmd = 'msgfmt --check-format -o "$djangocompilemo" "$djangocompilepo"'
-                    os.system(cmd)
+                    program = 'msgfmt'
+                    args = [program, '--check-format', '-o', npath(pf + '.mo'), npath(pf + '.po')]
+                    output, errors, status = popen_wrapper(args)
+                    if status:
+                        if errors:
+                            msg = "Execution of %s failed: %s" % (program, errors)
+                        else:
+                            msg = "Execution of %s failed" % program
+                        raise CommandError(msg)
 
 
 class Command(BaseCommand):
