@@ -248,22 +248,6 @@ Or ask for the author(s) of the best-ranked book::
 
 (The resulting dictionary will have a `'book__rating__max'` key.)
 
-Of course we can follow relationships as deep as we need::
-
-    >>> Author.objects.annotate(reg_users=Max('book__store__registered_users'))
-
-(Every Author in the resulting QuerySet will have an extra
-``reg_users`` attribute, its name would be
-``book__store__registered_users__max`` if no alias had been specified.)
-
-And traverse a mix of forward and backwards relationships::
-
-    >>> Publisher.objects.annotate(avg_age=Avg('book__authors__age'))
-
-(Every Publisher in the resulting QuerySet will have an extra ``avg_age``
-attribute, its name would be ``book__authors__age__avg`` if no alias had been
-specified.)
-
 Aggregations and other QuerySet clauses
 =======================================
 
