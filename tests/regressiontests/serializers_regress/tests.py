@@ -16,6 +16,7 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+from django.core.serializers.xml_serializer import DTDForbidden
 
 try:
     import yaml
@@ -523,3 +524,16 @@ for format in serializers.get_serializer_formats():
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 
+
+class XmlDeserializerSecurityTests(TestCase):
+
+    def test_no_dtd(self):
+        """
+        The XML deserializer shouldn't allow a DTD.
+
+        This is the most straightforward way to prevent all entity definitions
+        and avoid both external entities and entity-expansion attacks.
+
+        """
+        xml = '<?xml version="1.0" standalone="no"?><!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
+        self.assertRaises(DTDForbidden, serializers.deserialize('xml', xml).next)
