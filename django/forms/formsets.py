@@ -19,6 +19,9 @@ MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
 
+# default maximum number of forms in a formset, to prevent memory exhaustion
+DEFAULT_MAX_NUM = 1000
+
 class ManagementForm(Form):
     """
     ``ManagementForm`` is used to keep track of how many form instances
@@ -111,7 +114,7 @@ class BaseFormSet(StrAndUnicode):
     def _construct_forms(self):
         # instantiate all the forms and put them in self.forms
         self.forms = []
-        for i in xrange(self.total_form_count()):
+        for i in xrange(min(self.total_form_count(), self.absolute_max)):
             self.forms.append(self._construct_form(i))
 
     def _construct_form(self, i, **kwargs):
@@ -360,9 +363,14 @@ class BaseFormSet(StrAndUnicode):
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
     """Return a FormSet for the given form class."""
+    if max_num is None:
+        max_num = DEFAULT_MAX_NUM
+    # hard limit on forms instantiated, to prevent memory-exhaustion attacks
+    # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
+    absolute_max = max(DEFAULT_MAX_NUM, max_num)
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num}
+             'max_num': max_num, 'absolute_max': absolute_max}
     return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 def all_valid(formsets):

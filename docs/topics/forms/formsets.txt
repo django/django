@@ -108,8 +108,10 @@ If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed. Please note that the default value of ``max_num`` was changed
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
+
+Please note that the default value of ``max_num`` was changed
 from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
 
 Formset validation

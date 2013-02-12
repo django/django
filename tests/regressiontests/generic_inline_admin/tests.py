@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.contenttypes.generic import (
     generic_inlineformset_factory, GenericTabularInline)
+from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import TestCase
 
@@ -241,7 +242,7 @@ class GenericInlineModelAdminTest(TestCase):
 
         # Create a formset with default arguments
         formset = media_inline.get_formset(request)
-        self.assertEqual(formset.max_num, None)
+        self.assertEqual(formset.max_num, DEFAULT_MAX_NUM)
         self.assertEqual(formset.can_order, False)
 
         # Create a formset with custom keyword arguments
