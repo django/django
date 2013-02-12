@@ -628,6 +628,25 @@ your routers allow synchronizing content types and permissions to only one of
 them. See the docs on the :ref:`behavior of contrib apps with multiple
 databases <contrib_app_multiple_databases>` for more information.
 
+XML deserializer will not parse documents with a DTD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to prevent exposure to denial-of-service attacks related to external
+entity references and entity expansion, the XML model deserializer now refuses
+to parse XML documents containing a DTD (DOCTYPE definition). Since the XML
+serializer does not output a DTD, this will not impact typical usage, only
+cases where custom-created XML documents are passed to Django's model
+deserializer.
+
+Formsets default ``max_num``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A (default) value of ``None`` for the ``max_num`` argument to a formset factory
+no longer defaults to allowing any number of forms in the formset. Instead, in
+order to prevent memory-exhaustion attacks, it now defaults to a limit of 1000
+forms. This limit can be raised by explicitly setting a higher value for
+``max_num``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
