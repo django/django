@@ -580,7 +580,7 @@ class Client(RequestFactory):
 
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
-            url = response['Location']
+            url = response.url
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 

@@ -46,7 +46,7 @@ class AuthViewsTestCase(TestCase):
             'password': password,
             })
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
+        self.assertTrue(response.url.endswith(settings.LOGIN_REDIRECT_URL))
         self.assertTrue(SESSION_KEY in self.client.session)
 
     def assertContainsEscaped(self, response, text, **kwargs):
@@ -281,7 +281,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             'new_password2': 'password1',
         })
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/password_change/done/'))
+        self.assertTrue(response.url.endswith('/password_change/done/'))
         self.fail_login()
         self.login(password='password1')
 
@@ -293,13 +293,13 @@ class ChangePasswordTest(AuthViewsTestCase):
             'new_password2': 'password1',
         })
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/password_change/done/'))
+        self.assertTrue(response.url.endswith('/password_change/done/'))
 
     def test_password_change_done_fails(self):
         with self.settings(LOGIN_URL='/login/'):
             response = self.client.get('/password_change/done/')
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(response['Location'].endswith('/login/?next=/password_change/done/'))
+            self.assertTrue(response.url.endswith('/login/?next=/password_change/done/'))
 
 
 @skipIfCustomUser
@@ -336,7 +336,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response['Location'],
+            self.assertFalse(bad_url in response.url,
                              "%s should be blocked" % bad_url)
 
         # These URLs *should* still pass the security check
@@ -357,7 +357,7 @@ class LoginTest(AuthViewsTestCase):
                     'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response['Location'],
+            self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
 
 
@@ -376,7 +376,7 @@ class LoginURLSettings(AuthViewsTestCase):
         settings.LOGIN_URL = login_url
         response = self.client.get('/login_required/')
         self.assertEqual(response.status_code, 302)
-        return response['Location']
+        return response.url
 
     def test_standard_login_url(self):
         login_url = '/login/'
@@ -444,11 +444,11 @@ class LogoutTest(AuthViewsTestCase):
         self.login()
         response = self.client.get('/logout/next_page/')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/somewhere/'))
+        self.assertTrue(response.url.endswith('/somewhere/'))
 
         response = self.client.get('/logout/next_page/?next=/login/')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/login/'))
+        self.assertTrue(response.url.endswith('/login/'))
 
         self.confirm_logged_out()
 
@@ -457,7 +457,7 @@ class LogoutTest(AuthViewsTestCase):
         self.login()
         response = self.client.get('/logout/next_page/')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/somewhere/'))
+        self.assertTrue(response.url.endswith('/somewhere/'))
         self.confirm_logged_out()
 
     def test_logout_with_redirect_argument(self):
@@ -465,7 +465,7 @@ class LogoutTest(AuthViewsTestCase):
         self.login()
         response = self.client.get('/logout/?next=/login/')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/login/'))
+        self.assertTrue(response.url.endswith('/login/'))
         self.confirm_logged_out()
 
     def test_logout_with_custom_redirect_argument(self):
@@ -473,7 +473,7 @@ class LogoutTest(AuthViewsTestCase):
         self.login()
         response = self.client.get('/logout/custom_query/?follow=/somewhere/')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('/somewhere/'))
+        self.assertTrue(response.url.endswith('/somewhere/'))
         self.confirm_logged_out()
 
     def test_security_check(self, password='password'):
@@ -492,7 +492,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(nasty_url)
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response['Location'],
+            self.assertFalse(bad_url in response.url,
                              "%s should be blocked" % bad_url)
             self.confirm_logged_out()
 
@@ -512,6 +512,6 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(safe_url)
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response['Location'],
+            self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
             self.confirm_logged_out()

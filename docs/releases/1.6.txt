@@ -68,6 +68,10 @@ Minor features
   :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
   its ``object``\'s ``__dict__``.
 
+* :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
+  attribute (equivalent to the URL the response will redirect to).
+
 Backwards incompatible changes in 1.6
 =====================================
 

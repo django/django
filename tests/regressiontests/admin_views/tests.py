@@ -1641,7 +1641,7 @@ class SecureViewTests(TestCase):
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://example.com/users/super/')
+        self.assertEqual(response.url, 'http://example.com/users/super/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

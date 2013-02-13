@@ -329,66 +329,66 @@ class RedirectViewTest(unittest.TestCase):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_temporary_redirect(self):
         "Permanent redirects are an option"
         response = RedirectView.as_view(url='/bar/', permanent=False)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_include_args(self):
         "GET arguments can be included in the redirected URL"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
         response = RedirectView.as_view(url='/bar/', query_string=True)(self.rf.get('/foo/?pork=spam'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/?pork=spam')
+        self.assertEqual(response.url, '/bar/?pork=spam')
 
     def test_include_urlencoded_args(self):
         "GET arguments can be URL-encoded when included in the redirected URL"
         response = RedirectView.as_view(url='/bar/', query_string=True)(
             self.rf.get('/foo/?unicode=%E2%9C%93'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/?unicode=%E2%9C%93')
+        self.assertEqual(response.url, '/bar/?unicode=%E2%9C%93')
 
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/42/')
+        self.assertEqual(response.url, '/bar/42/')
 
     def test_redirect_POST(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_redirect_HEAD(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.head('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_redirect_OPTIONS(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.options('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_redirect_PUT(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.put('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_redirect_DELETE(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], '/bar/')
+        self.assertEqual(response.url, '/bar/')
 
     def test_redirect_when_meta_contains_no_query_string(self):
         "regression for #16705"

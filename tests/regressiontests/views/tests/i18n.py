@@ -44,7 +44,7 @@ class I18NTests(TestCase):
         lang_code, lang_name = settings.LANGUAGES[0]
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/views/i18n/setlang/', data=post_data)
-        self.assertEqual(response['Location'], 'http://testserver/')
+        self.assertEqual(response.url, 'http://testserver/')
         self.assertEqual(self.client.session['django_language'], lang_code)
 
     def test_setlang_reversal(self):

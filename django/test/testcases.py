@@ -601,7 +601,7 @@ class TransactionTestCase(SimpleTestCase):
                 " code was %d (expected %d)" %
                     (response.status_code, status_code))
 
-            url = response['Location']
+            url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
 
             redirect_response = response.client.get(path, QueryDict(query))
