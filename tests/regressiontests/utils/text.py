@@ -55,21 +55,32 @@ class TestUtilsText(SimpleTestCase):
             truncator.words(4, '[snip]'))
 
     def test_truncate_html_words(self):
-        truncator = text.Truncator('<p><strong><em>The quick brown fox jumped '
-            'over the lazy dog.</em></strong></p>')
-        self.assertEqual('<p><strong><em>The quick brown fox jumped over the '
-            'lazy dog.</em></strong></p>', truncator.words(10, html=True))
-        self.assertEqual('<p><strong><em>The quick brown fox...</em>'
+        truncator = text.Truncator('<p id="par"><strong><em>The quick brown fox'
+            ' jumped over the lazy dog.</em></strong></p>')
+        self.assertEqual('<p id="par"><strong><em>The quick brown fox jumped over'
+            ' the lazy dog.</em></strong></p>', truncator.words(10, html=True))
+        self.assertEqual('<p id="par"><strong><em>The quick brown fox...</em>'
             '</strong></p>', truncator.words(4, html=True))
-        self.assertEqual('<p><strong><em>The quick brown fox....</em>'
+        self.assertEqual('<p id="par"><strong><em>The quick brown fox....</em>'
             '</strong></p>', truncator.words(4, '....', html=True))
-        self.assertEqual('<p><strong><em>The quick brown fox</em></strong>'
-            '</p>', truncator.words(4, '', html=True))
+        self.assertEqual('<p id="par"><strong><em>The quick brown fox</em>'
+            '</strong></p>', truncator.words(4, '', html=True))
+
         # Test with new line inside tag
         truncator = text.Truncator('<p>The quick <a href="xyz.html"\n'
             'id="mylink">brown fox</a> jumped over the lazy dog.</p>')
         self.assertEqual('<p>The quick <a href="xyz.html"\n'
             'id="mylink">brown...</a></p>', truncator.words(3, '...', html=True))
+
+        # Test self-closing tags
+        truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
+            ' the lazy dog.')
+        self.assertEqual('<br/>The <hr />quick brown...',
+            truncator.words(3, '...', html=True ))
+        truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
+            'jumped over the lazy dog.')
+        self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
+            truncator.words(3, '...', html=True ))
 
     def test_wrap(self):
         digits = '1234 67 9'
