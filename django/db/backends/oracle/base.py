@@ -161,13 +161,13 @@ WHEN (new.%(col_name)s IS NULL)
     # if the time zone name is passed in parameter. Use interpolation instead.
     # https://groups.google.com/forum/#!msg/django-developers/zwQju7hbG78/9l934yelwfsJ
     # This regexp matches all time zone names from the zoneinfo database.
-    _tzname_re = re.compile(r'^[\w/+-]+$')
+    _tzname_re = re.compile(r'^[\w/:+-]+$')
 
     def _convert_field_to_tz(self, field_name, tzname):
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
         # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
-        result = "(FROM_TZ(%s, 'UTC') AT TIME ZONE '%s')" % (field_name, tzname)
+        result = "(FROM_TZ(%s, '0:00') AT TIME ZONE '%s')" % (field_name, tzname)
         # Extracting from a TIMESTAMP WITH TIME ZONE ignore the time zone.
         # Convert to a DATETIME, which is called DATE by Oracle. There's no
         # built-in function to do that; the easiest is to go through a string.
