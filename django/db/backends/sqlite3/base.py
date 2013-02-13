@@ -172,31 +172,25 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def datetime_extract_sql(self, lookup_type, field_name):
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
         if settings.USE_TZ:
             if pytz is None:
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("This query requires pytz, "
                                            "but it isn't installed.")
-            return "django_datetime_extract('%s', %s, %%s)" % (
-                lookup_type.lower(), field_name)
-        else:
-            return "django_datetime_extract('%s', %s, NULL)" % (
-                lookup_type.lower(), field_name)
+        return "django_datetime_extract('%s', %s, %%s)" % (
+            lookup_type.lower(), field_name), [tzname]
 
-    def datetime_trunc_sql(self, lookup_type, field_name):
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_trunc_sql.
         if settings.USE_TZ:
             if pytz is None:
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("This query requires pytz, "
                                            "but it isn't installed.")
-            return "django_datetime_trunc('%s', %s, %%s)" % (
-                lookup_type.lower(), field_name)
-        else:
-            return "django_datetime_trunc('%s', %s, NULL)" % (
-                lookup_type.lower(), field_name)
+        return "django_datetime_trunc('%s', %s, %%s)" % (
+            lookup_type.lower(), field_name), [tzname]
 
     def drop_foreignkey_sql(self):
         return ""

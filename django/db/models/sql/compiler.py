@@ -1034,13 +1034,6 @@ class SQLDateCompiler(SQLCompiler):
                 yield date
 
 class SQLDateTimeCompiler(SQLCompiler):
-    def as_sql(self):
-        sql, params = super(SQLDateTimeCompiler, self).as_sql()
-        if settings.USE_TZ:
-            tzname = timezone._get_timezone_name(self.query.tzinfo)
-            params = (tzname,) + params
-        return sql, params
-
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.

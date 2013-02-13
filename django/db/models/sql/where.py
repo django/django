@@ -226,10 +226,9 @@ class WhereNode(tree.Node):
             return ('%s BETWEEN %%s and %%s' % field_sql, params)
         elif is_datetime_field and lookup_type in ('month', 'day', 'week_day',
                                                    'hour', 'minute', 'second'):
-            if settings.USE_TZ:
-                params = [timezone.get_current_timezone_name()] + params
-            return ('%s = %%s'
-                    % connection.ops.datetime_extract_sql(lookup_type, field_sql), params)
+            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
+            sql, tz_params = connection.ops.datetime_extract_sql(lookup_type, field_sql, tzname)
+            return ('%s = %%s' % sql, tz_params + params)
         elif lookup_type in ('month', 'day', 'week_day'):
             return ('%s = %%s'
                     % connection.ops.date_extract_sql(lookup_type, field_sql), params)

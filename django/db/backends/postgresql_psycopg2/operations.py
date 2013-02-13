@@ -37,21 +37,29 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
-    def datetime_extract_sql(self, lookup_type, field_name):
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
         if settings.USE_TZ:
             field_name = "%s AT TIME ZONE %%s" % field_name
+            params = [tzname]
+        else:
+            params = []
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
-            return "EXTRACT('dow' FROM %s) + 1" % field_name
+            sql = "EXTRACT('dow' FROM %s) + 1" % field_name
         else:
-            return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+            sql = "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+        return sql, params
 
-    def datetime_trunc_sql(self, lookup_type, field_name):
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         if settings.USE_TZ:
             field_name = "%s AT TIME ZONE %%s" % field_name
+            params = [tzname]
+        else:
+            params = []
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+        sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+        return sql, params
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"

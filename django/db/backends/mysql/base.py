@@ -225,20 +225,27 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
-    def datetime_extract_sql(self, lookup_type, field_name):
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
         if settings.USE_TZ:
             field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
+            params = [tzname]
+        else:
+            params = []
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
             # Note: WEEKDAY() returns 0-6, Monday=0.
-            return "DAYOFWEEK(%s)" % field_name
+            sql = "DAYOFWEEK(%s)" % field_name
         else:
-            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        return sql, params
 
-    def datetime_trunc_sql(self, lookup_type, field_name):
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         if settings.USE_TZ:
             field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
+            params = [tzname]
+        else:
+            params = []
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
         format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
@@ -249,7 +256,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-        return sql
+        return sql, params
 
     def date_interval_sql(self, sql, connector, timedelta):
         return "(%s %s INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND)" % (sql, connector,

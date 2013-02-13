@@ -14,6 +14,7 @@ from django.db.models.sql.where import AND, Constraint
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils import timezone
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -222,7 +223,6 @@ class DateQuery(Query):
     """
 
     compiler = 'SQLDateCompiler'
-    select_type = Date
 
     def add_select(self, field_name, lookup_type, order='ASC'):
         """
@@ -241,7 +241,7 @@ class DateQuery(Query):
         field = result[0]
         self._check_field(field)                # overridden in DateTimeQuery
         alias = result[3][-1]
-        select = self.select_type((alias, field.column), lookup_type)
+        select = self._get_select((alias, field.column), lookup_type)
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]
         self.distinct = True
@@ -257,6 +257,9 @@ class DateQuery(Query):
             assert not isinstance(field, DateTimeField), \
                 "%r is a DateTimeField, not a DateField." % field.name
 
+    def _get_select(self, col, lookup_type):
+        return Date(col, lookup_type)
+
 class DateTimeQuery(DateQuery):
     """
     A DateTimeQuery is like a DateQuery but for a datetime field. If time zone
@@ -265,11 +268,17 @@ class DateTimeQuery(DateQuery):
     """
 
     compiler = 'SQLDateTimeCompiler'
-    select_type = DateTime
 
     def _check_field(self, field):
         assert isinstance(field, DateTimeField), \
                 "%r isn't a DateTimeField." % field.name
+
+    def _get_select(self, col, lookup_type):
+        if self.tzinfo is None:
+            tzname = None
+        else:
+            tzname = timezone._get_timezone_name(self.tzinfo)
+        return DateTime(col, lookup_type, tzname)
 
 class AggregateQuery(Query):
     """

@@ -542,25 +542,20 @@ class BaseDatabaseOperations(object):
         """
         return "%s"
 
-    def datetime_extract_sql(self, lookup_type, field_name):
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
         'second', returns the SQL that extracts a value from the given
-        datetime field field_name.
-
-        When time zone support is enabled, the SQL should include a '%s'
-        placeholder for the time zone's name.
+        datetime field field_name, and a tuple of parameters.
         """
         raise NotImplementedError()
 
-    def datetime_trunc_sql(self, lookup_type, field_name):
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
         'second', returns the SQL that truncates the given datetime field
-        field_name to a datetime object with only the given specificity.
-
-        When time zone support is enabled, the SQL should include a '%s'
-        placeholder for the time zone's name.
+        field_name to a datetime object with only the given specificity, and
+        a tuple of parameters.
         """
         raise NotImplementedError()
 
