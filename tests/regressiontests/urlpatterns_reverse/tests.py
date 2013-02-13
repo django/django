@@ -270,31 +270,31 @@ class ReverseShortcutTests(TestCase):
 
         res = redirect(FakeObj())
         self.assertTrue(isinstance(res, HttpResponseRedirect))
-        self.assertEqual(res['Location'], '/hi-there/')
+        self.assertEqual(res.url, '/hi-there/')
 
         res = redirect(FakeObj(), permanent=True)
         self.assertTrue(isinstance(res, HttpResponsePermanentRedirect))
-        self.assertEqual(res['Location'], '/hi-there/')
+        self.assertEqual(res.url, '/hi-there/')
 
     def test_redirect_to_view_name(self):
         res = redirect('hardcoded2')
-        self.assertEqual(res['Location'], '/hardcoded/doc.pdf')
+        self.assertEqual(res.url, '/hardcoded/doc.pdf')
         res = redirect('places', 1)
-        self.assertEqual(res['Location'], '/places/1/')
+        self.assertEqual(res.url, '/places/1/')
         res = redirect('headlines', year='2008', month='02', day='17')
-        self.assertEqual(res['Location'], '/headlines/2008.02.17/')
+        self.assertEqual(res.url, '/headlines/2008.02.17/')
         self.assertRaises(NoReverseMatch, redirect, 'not-a-view')
 
     def test_redirect_to_url(self):
         res = redirect('/foo/')
-        self.assertEqual(res['Location'], '/foo/')
+        self.assertEqual(res.url, '/foo/')
         res = redirect('http://example.com/')
-        self.assertEqual(res['Location'], 'http://example.com/')
+        self.assertEqual(res.url, 'http://example.com/')
 
     def test_redirect_view_object(self):
         from .views import absolute_kwargs_view
         res = redirect(absolute_kwargs_view)
-        self.assertEqual(res['Location'], '/absolute_arg_view/')
+        self.assertEqual(res.url, '/absolute_arg_view/')
         self.assertRaises(NoReverseMatch, redirect, absolute_kwargs_view, wrong_argument=None)
 
 
