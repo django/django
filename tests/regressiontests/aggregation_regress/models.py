@@ -1,4 +1,6 @@
 # coding: utf-8
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -22,6 +24,13 @@ class Publisher(models.Model):
         return self.name
 
 
+class TaggedItem(models.Model):
+    tag = models.CharField(max_length=100)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+
 @python_2_unicode_compatible
 class Book(models.Model):
     isbn = models.CharField(max_length=9)
@@ -33,6 +42,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, related_name='book_contact_set')
     publisher = models.ForeignKey(Publisher)
     pubdate = models.DateField()
+    tags = generic.GenericRelation(TaggedItem)
 
     class Meta:
         ordering = ('name',)
@@ -61,6 +71,14 @@ class Clues(models.Model):
     ID = models.AutoField(primary_key=True)
     EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column = 'Entry ID')
     Clue = models.CharField(max_length=150)
+
+
+class WithManualPK(models.Model):
+    # The generic relations regression test needs two different model
+    # classes with the same PK value, and there are some (external)
+    # DB backends that don't work nicely when assigning integer to AutoField
+    # column (MSSQL at least).
+    id = models.IntegerField(primary_key=True)
 
 
 @python_2_unicode_compatible
