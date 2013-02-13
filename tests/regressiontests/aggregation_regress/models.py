@@ -1,4 +1,6 @@
 # coding: utf-8
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -22,6 +24,13 @@ class Publisher(models.Model):
         return self.name
 
 
+class TaggedItem(models.Model):
+    tag = models.CharField(max_length=100)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+
 @python_2_unicode_compatible
 class Book(models.Model):
     isbn = models.CharField(max_length=9)
@@ -33,6 +42,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, related_name='book_contact_set')
     publisher = models.ForeignKey(Publisher)
     pubdate = models.DateField()
+    tags = generic.GenericRelation(TaggedItem)
 
     class Meta:
         ordering = ('name',)

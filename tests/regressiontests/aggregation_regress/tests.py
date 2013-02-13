@@ -6,11 +6,13 @@ from decimal import Decimal
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
 
-from .models import Author, Book, Publisher, Clues, Entries, HardbackBook
+from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
+        TaggedItem)
 
 
 class AggregationTests(TestCase):
@@ -982,3 +984,29 @@ class AggregationTests(TestCase):
     def test_reverse_join_trimming(self):
         qs = Author.objects.annotate(Count('book_contact_set__contact'))
         self.assertIn(' JOIN ', str(qs.query))
+
+    def test_aggregation_with_generic_reverse_relation(self):
+        """
+        Regression test for #10870:  Aggregates with joins ignore extra
+        filters provided by setup_joins
+
+        tests aggregations with generic reverse relations
+        """
+        b = Book.objects.get(name='Practical Django Projects')
+        TaggedItem.objects.create(object_id=b.id, tag='intermediate',
+                content_type=ContentType.objects.get_for_model(b))
+        TaggedItem.objects.create(object_id=b.id, tag='django',
+                content_type=ContentType.objects.get_for_model(b))
+        b = Book.objects.get(name__startswith='Paradigms of Artificial Intelligence')
+        TaggedItem.objects.create(object_id=b.id, tag='intermediate',
+                content_type=ContentType.objects.get_for_model(b))
+
+        self.assertEqual(Book.objects.aggregate(Count('tags')), {'tags__count': 3})
+        result = Book.objects.annotate(Count('tags')).order_by('-tags__count')[:2]
+        self.assertEqual(
+            [(b.name, b.tags__count) for b in result],
+            [
+                (u'Practical Django Projects', 2),
+                (u'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1)
+            ]
+        )
