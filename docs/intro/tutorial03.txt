@@ -516,7 +516,7 @@ URLconf by removing the leading "polls/" from each line, and removing the
 lines registering the admin site. Your ``polls/urls.py`` file should now look like
 this::
 
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import patterns, url
 
     urlpatterns = patterns('polls.views',
         url(r'^$', 'index'),
