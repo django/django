@@ -62,7 +62,7 @@ def template_tag_index(request):
             for key in metadata:
                 metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
             if library in template.builtins:
-                tag_library = None
+                tag_library = ''
             else:
                 tag_library = module_name.split('.')[-1]
             tags.append({
@@ -97,7 +97,7 @@ def template_filter_index(request):
             for key in metadata:
                 metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
             if library in template.builtins:
-                tag_library = None
+                tag_library = ''
             else:
                 tag_library = module_name.split('.')[-1]
             filters.append({
