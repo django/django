@@ -42,7 +42,7 @@ class Date(object):
             col = '%s.%s' % tuple([qn(c) for c in self.col])
         else:
             col = self.col
-        return getattr(connection.ops, self.trunc_func)(self.lookup_type, col)
+        return getattr(connection.ops, self.trunc_func)(self.lookup_type, col), []
 
 class DateTime(Date):
     """

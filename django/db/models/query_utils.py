@@ -25,7 +25,7 @@ class QueryWrapper(object):
     parameters. Can be used to pass opaque data to a where-clause, for example.
     """
     def __init__(self, sql, params):
-        self.data = sql, params
+        self.data = sql, list(params)
 
     def as_sql(self, qn=None, connection=None):
         return self.data

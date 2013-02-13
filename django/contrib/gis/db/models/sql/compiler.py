@@ -33,6 +33,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
+        params = []
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -63,7 +64,9 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    result.append(col.as_sql(qn, self.connection))
+                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    result.append(col_sql)
+                    params.extend(col_params)
 
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)
@@ -76,15 +79,13 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        result.extend([
-                '%s%s' % (
-                    self.get_extra_select_format(alias) % aggregate.as_sql(qn, self.connection),
-                    alias is not None
-                        and ' AS %s' % qn(truncate_name(alias, max_name_length))
-                        or ''
-                    )
-                for alias, aggregate in self.query.aggregate_select.items()
-        ])
+        for alias, aggregate in self.query.aggregate_select.items():
+            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            if alias is None:
+                result.append(agg_sql)
+            else:
+                result.append('%s AS %s' % (agg_sql, qn(truncate_name(alias, max_name_length))))
+            params.extend(agg_params)
 
         # This loop customized for GeoQuery.
         for (table, col), field in self.query.related_select_cols:
@@ -100,7 +101,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 col_aliases.add(col)
 
         self._select_aliases = aliases
-        return result
+        return result, params
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
             start_alias=None, opts=None, as_pairs=False, from_parent=None):

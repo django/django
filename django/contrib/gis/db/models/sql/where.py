@@ -44,8 +44,9 @@ class GeoWhereNode(WhereNode):
         lvalue, lookup_type, value_annot, params_or_value = child
         if isinstance(lvalue, GeoConstraint):
             data, params = lvalue.process(lookup_type, params_or_value, connection)
-            spatial_sql = connection.ops.spatial_lookup_sql(data, lookup_type, params_or_value, lvalue.field, qn)
-            return spatial_sql, params
+            spatial_sql, spatial_params = connection.ops.spatial_lookup_sql(
+                    data, lookup_type, params_or_value, lvalue.field, qn)
+            return spatial_sql, spatial_params + params
         else:
             return super(GeoWhereNode, self).make_atom(child, qn, connection)
 

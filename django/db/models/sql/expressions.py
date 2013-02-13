@@ -94,9 +94,9 @@ class SQLEvaluator(object):
         if col is None:
             raise ValueError("Given node not found")
         if hasattr(col, 'as_sql'):
-            return col.as_sql(qn, connection), ()
+            return col.as_sql(qn, connection)
         else:
-            return '%s.%s' % (qn(col[0]), qn(col[1])), ()
+            return '%s.%s' % (qn(col[0]), qn(col[1])), []
 
     def evaluate_date_modifier_node(self, node, qn, connection):
         timedelta = node.children.pop()

@@ -172,10 +172,10 @@ class WhereNode(tree.Node):
 
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
-            field_sql = self.sql_for_columns(lvalue, qn, connection)
+            field_sql, field_params = self.sql_for_columns(lvalue, qn, connection), []
         else:
             # A smart object with an as_sql() method.
-            field_sql = lvalue.as_sql(qn, connection)
+            field_sql, field_params = lvalue.as_sql(qn, connection)
 
         is_datetime_field = value_annotation is datetime.datetime
         cast_sql = connection.ops.datetime_cast_sql() if is_datetime_field else '%s'
@@ -185,6 +185,8 @@ class WhereNode(tree.Node):
             cast_sql = ''
         else:
             extra = ''
+
+        params = field_params + params
 
         if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
             and connection.features.interprets_empty_strings_as_nulls):
@@ -245,7 +247,7 @@ class WhereNode(tree.Node):
         """
         Returns the SQL fragment used for the left-hand side of a column
         constraint (for example, the "T1.foo" portion in the clause
-        "WHERE ... T1.foo = 6").
+        "WHERE ... T1.foo = 6") and a list of parameters.
         """
         table_alias, name, db_type = data
         if table_alias:
@@ -338,7 +340,7 @@ class ExtraWhere(object):
 
     def as_sql(self, qn=None, connection=None):
         sqls = ["(%s)" % sql for sql in self.sqls]
-        return " AND ".join(sqls), tuple(self.params or ())
+        return " AND ".join(sqls), list(self.params or ())
 
     def clone(self):
         return self

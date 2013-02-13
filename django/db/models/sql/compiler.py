@@ -74,7 +74,7 @@ class SQLCompiler(object):
         # as the pre_sql_setup will modify query state in a way that forbids
         # another run of it.
         self.refcounts_before = self.query.alias_refcount.copy()
-        out_cols = self.get_columns(with_col_aliases)
+        out_cols, s_params = self.get_columns(with_col_aliases)
         ordering, ordering_group_by = self.get_ordering()
 
         distinct_fields = self.get_distinct()
@@ -97,6 +97,7 @@ class SQLCompiler(object):
             result.append(self.connection.ops.distinct_sql(distinct_fields))
 
         result.append(', '.join(out_cols + self.query.ordering_aliases))
+        params.extend(s_params)
 
         result.append('FROM')
         result.extend(from_)
@@ -164,9 +165,10 @@ class SQLCompiler(object):
 
     def get_columns(self, with_aliases=False):
         """
-        Returns the list of columns to use in the select statement. If no
-        columns have been specified, returns all columns relating to fields in
-        the model.
+        Returns the list of columns to use in the select statement, as well as
+        a list any extra parameters that need to be included. If no columns
+        have been specified, returns all columns relating to fields in the
+        model.
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
@@ -175,6 +177,7 @@ class SQLCompiler(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
+        params = []
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -204,7 +207,9 @@ class SQLCompiler(object):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    result.append(col.as_sql(qn, self.connection))
+                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    result.append(col_sql)
+                    params.extend(col_params)
 
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)
@@ -217,15 +222,13 @@ class SQLCompiler(object):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        result.extend([
-            '%s%s' % (
-                aggregate.as_sql(qn, self.connection),
-                alias is not None
-                    and ' AS %s' % qn(truncate_name(alias, max_name_length))
-                    or ''
-            )
-            for alias, aggregate in self.query.aggregate_select.items()
-        ])
+        for alias, aggregate in self.query.aggregate_select.items():
+            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            if alias is None:
+                result.append(agg_sql)
+            else:
+                result.append('%s AS %s' % (agg_sql, qn(truncate_name(alias, max_name_length))))
+            params.extend(agg_params)
 
         for (table, col), _ in self.query.related_select_cols:
             r = '%s.%s' % (qn(table), qn(col))
@@ -240,7 +243,7 @@ class SQLCompiler(object):
                 col_aliases.add(col)
 
         self._select_aliases = aliases
-        return result
+        return result, params
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
             start_alias=None, opts=None, as_pairs=False, from_parent=None):
@@ -545,14 +548,16 @@ class SQLCompiler(object):
             seen = set()
             cols = self.query.group_by + select_cols
             for col in cols:
+                col_params = ()
                 if isinstance(col, (list, tuple)):
                     sql = '%s.%s' % (qn(col[0]), qn(col[1]))
                 elif hasattr(col, 'as_sql'):
-                    sql = col.as_sql(qn, self.connection)
+                    sql, col_params = col.as_sql(qn, self.connection)
                 else:
                     sql = '(%s)' % str(col)
                 if sql not in seen:
                     result.append(sql)
+                    params.extend(col_params)
                     seen.add(sql)
 
             # Still, we need to add all stuff in ordering (except if the backend can
@@ -991,15 +996,17 @@ class SQLAggregateCompiler(SQLCompiler):
         if qn is None:
             qn = self.quote_name_unless_alias
 
-        sql = ('SELECT %s FROM (%s) subquery' % (
-            ', '.join([
-                aggregate.as_sql(qn, self.connection)
-                for aggregate in self.query.aggregate_select.values()
-            ]),
-            self.query.subquery)
-        )
-        params = self.query.sub_params
-        return (sql, params)
+        sql, params = [], []
+        for aggregate in self.query.aggregate_select.values():
+            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            sql.append(agg_sql)
+            params.extend(agg_params)
+        sql = ', '.join(sql)
+        params = tuple(params)
+
+        sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
+        params = params + self.query.sub_params
+        return sql, params
 
 class SQLDateCompiler(SQLCompiler):
     def results_iter(self):
