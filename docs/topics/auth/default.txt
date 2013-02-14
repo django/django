@@ -560,7 +560,7 @@ Most built-in authentication views provide a URL name for easier reference. See
 patterns.
 
 
-.. function:: login(request, [template_name, redirect_field_name, authentication_form])
+.. function:: login(request, [template_name, redirect_field_name, authentication_form, redirect_hosts])
 
     **URL name:** ``login``
 
@@ -651,6 +651,11 @@ patterns.
     accept a ``request`` keyword argument in its ``__init__`` method, and
     provide a ``get_user`` method which returns the authenticated user object
     (this method is only ever called after successful form validation).
+
+    If you need to redirect the user to an URL on a domain different from the
+    current one, you have to specify which domains are safe to redirect to.
+    You can pass a list of safe domains with to the ``redirect_hosts``
+    parameter. 
 
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
