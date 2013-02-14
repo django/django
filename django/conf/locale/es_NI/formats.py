@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
+from __future__ import unicode_literals
 
 DATE_FORMAT = r'j \d\e F \d\e Y'
 TIME_FORMAT = 'H:i:s'
