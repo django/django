@@ -64,6 +64,10 @@ class DebugParser(Parser):
         msg = "Unclosed tag '%s'. Looking for one of: %s " % (command, ', '.join(parse_until))
         raise self.source_error(source, msg)
 
+    def compile_filter_error(self, token, e):
+        if not hasattr(e, 'django_template_source'):
+            e.django_template_source = token.source
+
     def compile_function_error(self, token, e):
         if not hasattr(e, 'django_template_source'):
             e.django_template_source = token.source
