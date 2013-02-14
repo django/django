@@ -137,7 +137,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
             'LOCATION': [
                 '172.19.26.240:11211',
-                '172.19.26.242:11211',
+                '172.19.26.242:11212',
                 '172.19.26.244:11213',
             ]
         }
