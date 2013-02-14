@@ -571,6 +571,36 @@ class FormattingTests(TestCase):
                     '<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">\u042f\u043d\u0432\u0430\u0440\u044c</option>\n<option value="2">\u0424\u0435\u0432\u0440\u0430\u043b\u044c</option>\n<option value="3">\u041c\u0430\u0440\u0442</option>\n<option value="4">\u0410\u043f\u0440\u0435\u043b\u044c</option>\n<option value="5">\u041c\u0430\u0439</option>\n<option value="6">\u0418\u044e\u043d\u044c</option>\n<option value="7">\u0418\u044e\u043b\u044c</option>\n<option value="8">\u0410\u0432\u0433\u0443\u0441\u0442</option>\n<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>\n<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>\n<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>\n<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                     SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
+            #Russian locale has non-breaking space as thousand separator
+            #Check that usual space is accepted in forms too
+            with self.settings(USE_THOUSAND_SEPARATOR = True):
+                #First, test non-breaking space
+                nbsp = '\xa0'
+                form6 = I18nForm({
+                    'decimal_field': '66%s666,666' % nbsp,
+                    'float_field': '99%s999,999' % nbsp,
+                    'date_field': '31.12.2009',
+                    'datetime_field': '31.12.2009 20:50',
+                    'time_field': '20:50',
+                    'integer_field': '1%s234' % nbsp,
+                })
+                self.assertEqual(True, form6.is_valid())
+                self.assertEqual(decimal.Decimal('66666.666'), form6.cleaned_data['decimal_field'])
+                self.assertEqual(99999.999, form6.cleaned_data['float_field'])
+                self.assertEqual(1234, form6.cleaned_data['integer_field'])
+                #Then test usual space
+                form6 = I18nForm({
+                    'decimal_field': '66 666,666',
+                    'float_field': '99 999,999',
+                    'date_field': '31.12.2009',
+                    'datetime_field': '31.12.2009 20:50',
+                    'time_field': '20:50',
+                    'integer_field': '1 234',
+                })
+                self.assertEqual(True, form6.is_valid())
+                self.assertEqual(decimal.Decimal('66666.666'), form6.cleaned_data['decimal_field'])
+                self.assertEqual(99999.999, form6.cleaned_data['float_field'])
+                self.assertEqual(1234, form6.cleaned_data['integer_field'])
 
         # English locale
         with translation.override('en', deactivate=True):
@@ -609,7 +639,7 @@ class FormattingTests(TestCase):
                 self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
-            form5 = I18nForm({
+            form7 = I18nForm({
                 'decimal_field': '66666.666',
                 'float_field': '99999.999',
                 'date_field': '12/31/2009',
@@ -617,21 +647,21 @@ class FormattingTests(TestCase):
                 'time_field': '20:50',
                 'integer_field': '1234',
             })
-            self.assertEqual(True, form5.is_valid())
-            self.assertEqual(decimal.Decimal('66666.666'), form5.cleaned_data['decimal_field'])
-            self.assertEqual(99999.999, form5.cleaned_data['float_field'])
-            self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
-            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form5.cleaned_data['datetime_field'])
-            self.assertEqual(datetime.time(20, 50), form5.cleaned_data['time_field'])
-            self.assertEqual(1234, form5.cleaned_data['integer_field'])
+            self.assertEqual(True, form7.is_valid())
+            self.assertEqual(decimal.Decimal('66666.666'), form7.cleaned_data['decimal_field'])
+            self.assertEqual(99999.999, form7.cleaned_data['float_field'])
+            self.assertEqual(datetime.date(2009, 12, 31), form7.cleaned_data['date_field'])
+            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form7.cleaned_data['datetime_field'])
+            self.assertEqual(datetime.time(20, 50), form7.cleaned_data['time_field'])
+            self.assertEqual(1234, form7.cleaned_data['integer_field'])
 
-            form6 = SelectDateForm({
+            form8= SelectDateForm({
                 'date_field_month': '12',
                 'date_field_day': '31',
                 'date_field_year': '2009'
             })
-            self.assertEqual(True, form6.is_valid())
-            self.assertEqual(datetime.date(2009, 12, 31), form6.cleaned_data['date_field'])
+            self.assertEqual(True, form8.is_valid())
+            self.assertEqual(datetime.date(2009, 12, 31), form8.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_month" id="id_mydate_month">\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
