@@ -250,7 +250,11 @@ class Parser(object):
             elif token.token_type == 1: # TOKEN_VAR
                 if not token.contents:
                     self.empty_variable(token)
-                filter_expression = self.compile_filter(token.contents)
+                try:
+                    filter_expression = self.compile_filter(token.contents)
+                except TemplateSyntaxError as e:
+                    if not self.compile_filter_error(token, e):
+                        raise
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
             elif token.token_type == 2: # TOKEN_BLOCK
@@ -329,6 +333,9 @@ class Parser(object):
 
     def unclosed_block_tag(self, parse_until):
         raise self.error(None, "Unclosed tags: %s " % ', '.join(parse_until))
+
+    def compile_filter_error(self, token, e):
+        pass
 
     def compile_function_error(self, token, e):
         pass
