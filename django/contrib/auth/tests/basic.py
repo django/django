@@ -13,7 +13,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
-from django.utils.six import binary_type, StringIO
+from django.utils.six import binary_type, PY3, StringIO
 
 
 def mock_inputs(inputs):
@@ -26,8 +26,9 @@ def mock_inputs(inputs):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b'Password: ', stream=None):
-                    # getpass on Windows only supports prompt as bytestring (#19807)
-                    assert isinstance(prompt, binary_type)
+                    if not PY3:
+                        # getpass on Windows only supports prompt as bytestring (#19807)
+                        assert isinstance(prompt, binary_type)
                     return inputs['password']
 
             def mock_input(prompt):
