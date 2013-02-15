@@ -492,7 +492,10 @@ password resets. You must then provide some key implementation details:
         A string describing the name of the field on the User model that is
         used as the unique identifier. This will usually be a username of
         some kind, but it can also be an email address, or any other unique
-        identifier. In the following example, the field `identifier` is used
+        identifier. The field *must* be unique (i.e., have ``unique=True``
+        set in it's definition).
+
+        In the following example, the field `identifier` is used
         as the identifying field::
 
             class MyUser(AbstractBaseUser):
