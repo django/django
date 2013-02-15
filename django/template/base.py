@@ -756,7 +756,7 @@ class Variable(object):
             for bit in self.lookups:
                 try:  # dictionary lookup
                     current = current[bit]
-                except (TypeError, AttributeError, KeyError):
+                except (TypeError, AttributeError, KeyError, ValueError):
                     try:  # attribute lookup
                         current = getattr(current, bit)
                     except (TypeError, AttributeError):
