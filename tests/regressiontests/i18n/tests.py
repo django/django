@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
-    number_format)
+    number_format, sanitize_separators)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils._os import upath
@@ -668,6 +668,24 @@ class FormattingTests(TestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 # Checking for the localized "products_delivered" field
                 self.assertInHTML('<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />', form6.as_ul())
+
+    def test_sanitize_separators(self):
+        """
+        Tests django.utils.formats.sanitize_separators.
+        """
+        # Non-strings are untouched
+        self.assertEqual(sanitize_separators(123), 123)
+
+        with translation.override('ru', deactivate=True):
+            # Russian locale has non-breaking space (\xa0) as thousand separator
+            # Check that usual space is accepted too when sanitizing inputs
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
+                self.assertEqual(sanitize_separators('1\xa0234\xa0567'), '1234567')
+                self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
+                self.assertEqual(sanitize_separators('12 345'), '12345')
+                self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
+            with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
+                self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
     def test_iter_format_modules(self):
         """
