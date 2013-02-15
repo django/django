@@ -122,7 +122,7 @@ class Command(BaseCommand):
                 while password is None:
                     if not password:
                         password = getpass.getpass()
-                        password2 = getpass.getpass('Password (again): ')
+                        password2 = getpass.getpass(force_str('Password (again): '))
                         if password != password2:
                             self.stderr.write("Error: Your passwords didn't match.")
                             password = None
