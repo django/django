@@ -1,5 +1,6 @@
 import decimal
 import datetime
+import unicodedata
 
 from django.conf import settings
 from django.utils import dateformat, numberformat, datetime_safe
@@ -200,7 +201,10 @@ def sanitize_separators(value):
                 value, decimals = value.split(decimal_separator, 1)
                 parts.append(decimals)
             if settings.USE_THOUSAND_SEPARATOR:
-                parts.append(value.replace(get_format('THOUSAND_SEPARATOR'), ''))
+                thousand_format = get_format('THOUSAND_SEPARATOR')
+                for replacement in thousand_format + unicodedata.normalize('NFKD', thousand_format):
+                    value = value.replace(replacement, '')
+                parts.append(value)
             else:
                 parts.append(value)
             value = '.'.join(reversed(parts))
