@@ -662,7 +662,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             for i in range(len(mp)):
                 # Creating a random point.
                 pnt = mp[i]
-                new = Point(random.randint(1, 100), random.randint(1, 100))
+                new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
                 s = str(new) # what was used for the assignment is still accessible
