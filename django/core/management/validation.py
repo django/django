@@ -50,11 +50,15 @@ def get_validation_errors(outfile, app=None):
             # No need to perform any other validation checks on a swapped model.
             continue
 
-        # This is the current User model. Check known validation problems with User models
+        # If this is the current User model, check known validation problems with User models
         if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
                 e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
+
+            # Check that the username field is unique
+            if not opts.get_field(cls.USERNAME_FIELD).unique:
+                e.add(opts, 'The USERNAME_FIELD must be unique. Add unique=True to the field parameters.')
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
