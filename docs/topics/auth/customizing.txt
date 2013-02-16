@@ -466,11 +466,13 @@ Specifying a custom User model
 
 Django expects your custom User model to meet some minimum requirements.
 
-1. Your model must have a single unique field that can be used for
+1. Your model must have an integer primary key.
+
+2. Your model must have a single unique field that can be used for
    identification purposes. This can be a username, an email address,
    or any other unique attribute.
 
-2. Your model must provide a way to address the user in a "short" and
+3. Your model must provide a way to address the user in a "short" and
    "long" form. The most common interpretation of this would be to use
    the user's given name as the "short" identifier, and the user's full
    name as the "long" identifier. However, there are no constraints on
