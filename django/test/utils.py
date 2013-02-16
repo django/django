@@ -4,12 +4,13 @@ from xml.dom.minidom import parseString, Node
 
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
-from django.test.signals import template_rendered, setting_changed
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
-from django.utils.translation import deactivate
+from django.test.signals import template_rendered, setting_changed
+from django.utils.encoding import force_str
 from django.utils.functional import wraps
 from django.utils import six
+from django.utils.translation import deactivate
 
 
 __all__ = (
@@ -133,7 +134,7 @@ def get_runner(settings, test_runner_class=None):
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, {}, {}, test_path[-1])
+    test_module = __import__(test_module_name, {}, {}, force_str(test_path[-1]))
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
 
