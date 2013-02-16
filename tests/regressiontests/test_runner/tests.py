@@ -1,7 +1,7 @@
 """
 Tests for django test runner
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import sys
 from optparse import make_option
@@ -149,6 +149,11 @@ class ManageCommandTests(unittest.TestCase):
                      testrunner='regressiontests.test_runner.tests.MockTestRunner')
         self.assertTrue(MockTestRunner.invoked,
                         "The custom test runner has not been invoked")
+
+    def test_bad_test_runner(self):
+        with self.assertRaises(AttributeError):
+            call_command('test', 'sites',
+                testrunner='regressiontests.test_runner.NonExistentRunner')
 
 
 class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
