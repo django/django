@@ -222,11 +222,6 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
 
-    # Create a form to edit an existing Article.
-    >>> a = Article.objects.get(pk=1)
-    >>> f = ArticleForm(instance=a)
-    >>> f.save()
-
     # Create a form to edit an existing Article, but use
     # POST data to populate the form.
     >>> a = Article.objects.get(pk=1)
