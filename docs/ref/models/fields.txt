@@ -252,8 +252,8 @@ Alternatively you can use plain text and
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any fields in your model, Django
-will automatically add an :class:`IntegerField` to hold the primary key, so you
+If you don't specify ``primary_key=True`` for any field in your model, Django
+will automatically add an :class:`AutoField` to hold the primary key, so you
 don't need to set ``primary_key=True`` on any of your fields unless you want to
 override the default primary-key behavior. For more, see
 :ref:`automatic-primary-key-fields`.
