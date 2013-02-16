@@ -278,15 +278,10 @@ foundation for custom widgets.
         * A single value (e.g., a string) that is the "compressed" representation
           of a ``list`` of values.
 
-        If `value` is a list, output of :meth:`~MultiWidget.render` will be a
-        concatenation of rendered child widgets. If `value` is not a list, it
-        will be first processed by the method :meth:`~MultiWidget.decompress()`
-        to create the list and then processed as above.
-
-        In the second case -- i.e., if the value is *not* a list --
-        ``render()`` will first decompress the value into a ``list`` before
-        rendering it. It does so by calling the ``decompress()`` method, which
-        :class:`MultiWidget`'s subclasses must implement (see above).
+        If ``value`` is a list, the output of :meth:`~MultiWidget.render` will
+        be a concatenation of rendered child widgets. If ``value`` is not a
+        list, it will first be processed by the method
+        :meth:`~MultiWidget.decompress()` to create the list and then rendered.
 
         When ``render()`` executes its HTML rendering, each value in the list
         is rendered with the corresponding widget -- the first value is
