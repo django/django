@@ -439,3 +439,17 @@ class BaseA(models.Model):
     a = models.ForeignKey(FK1, null=True)
     b = models.ForeignKey(FK2, null=True)
     c = models.ForeignKey(FK3, null=True)
+
+@python_2_unicode_compatible
+class Identifier(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Program(models.Model):
+    identifier = models.OneToOneField(Identifier)
+
+class Channel(models.Model):
+    programs = models.ManyToManyField(Program)
+    identifier = models.OneToOneField(Identifier)
