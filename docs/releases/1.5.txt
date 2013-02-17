@@ -662,7 +662,7 @@ Miscellaneous
   :doc:`django.contrib.redirects </ref/contrib/redirects>` without enabling
   :doc:`django.contrib.sites </ref/contrib/sites>`. This isn't allowed any
   longer. If you're using ``django.contrib.redirects``, make sure
-  :setting:``INSTALLED_APPS`` contains ``django.contrib.sites``.
+  :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
 
 Features deprecated in 1.5
 ==========================
