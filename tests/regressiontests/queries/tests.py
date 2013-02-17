@@ -24,7 +24,7 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
     SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
     SingleObject, RelatedObject, ModelA, ModelD, Responsibility, Job,
-    JobResponsibilities, BaseA)
+    JobResponsibilities, BaseA, Identifier, Program, Channel)
 
 
 class BaseQuerysetTest(TestCase):
@@ -2612,3 +2612,22 @@ class DisjunctionPromotionTests(TestCase):
         qs = BaseA.objects.filter(Q(a__f1=F('c__f1')) | (Q(pk=1) & Q(pk=2)))
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
         self.assertEqual(str(qs.query).count('INNER JOIN'), 0)
+
+
+class ManyToManyExcludeTest(TestCase):
+    def test_exclude_many_to_many(self):
+        Identifier.objects.create(name='extra')
+        program = Program.objects.create(identifier=Identifier.objects.create(name='program'))
+        channel = Channel.objects.create(identifier=Identifier.objects.create(name='channel'))
+        channel.programs.add(program)
+
+        # channel contains 'program1', so all Identifiers except that one
+        # should be returned
+        self.assertQuerysetEqual(
+            Identifier.objects.exclude(program__channel=channel).order_by('name'),
+            ['<Identifier: channel>', '<Identifier: extra>']
+        )
+        self.assertQuerysetEqual(
+            Identifier.objects.exclude(program__channel=None).order_by('name'),
+            ['<Identifier: program>']
+        )

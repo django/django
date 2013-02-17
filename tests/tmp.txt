@@ -1,0 +1,1 @@
+SELECT "queries_tag"."id", "queries_tag"."name", "queries_tag"."parent_id", "queries_tag"."category_id" FROM "queries_tag" WHERE NOT (("queries_tag"."id" IN (SELECT U0."id" FROM "queries_tag" U0 LEFT OUTER JOIN "queries_tag" U1 ON (U0."id" = U1."parent_id") WHERE (U1."id" IS NULL AND U0."id" IS NOT NULL)) AND "queries_tag"."id" IS NOT NULL)) ORDER BY "queries_tag"."name" ASC
