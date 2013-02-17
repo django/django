@@ -26,6 +26,7 @@ from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
+from django.db.models.query_utils import QueryWrapper
 from django.core.exceptions import FieldError
 
 __all__ = ['Query', 'RawQuery']
@@ -1087,6 +1088,18 @@ class Query(object):
             if alias in (parts[0], LOOKUP_SEP.join(parts)):
                 clause.add((aggregate, lookup_type, value), AND)
                 return clause
+
+        for alias, extra_select in self.extra_select.items():
+            if alias in (parts[0], LOOKUP_SEP.join(parts)):
+                entry = self.where_class()
+                entry.add((
+                    QueryWrapper('(%s)' % extra_select[0], extra_select[1]),
+                    lookup_type, value), AND
+                )
+                if negate:
+                    entry.negate()
+                self.where.add(entry, connector)
+                return
 
         opts = self.get_meta()
         alias = self.get_initial_alias()

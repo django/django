@@ -1481,6 +1481,22 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertEqual(qs.count(), 2)
         self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
 
+    def test_filter_extra(self):
+        # tests .filter() on a field added using .extra(), related to
+        # ticket #19434
+        qs = Author.objects.extra(select={'num_plus_one': 'num + 1'})
+        self.assertQuerysetEqual(qs.filter(num_plus_one__gte=1000),
+                ['<Author: a1>', '<Author: a3>']
+        )
+
+    def test_values_extra(self):
+        # tests .values() on a field added using .extra(), related to
+        # ticket #19434
+        qs = Author.objects.extra(select={'num_plus_one': 'num + 1'})
+        self.assertEqual(list(qs.values('num_plus_one')),
+                [{'num_plus_one': a.num+1} for a in Author.objects.all()]
+        )
+
 
 class Queries5Tests(TestCase):
     def setUp(self):
