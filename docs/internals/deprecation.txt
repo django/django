@@ -339,6 +339,8 @@ these changes.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 
+* The private API ``django.db.close_connection`` will be removed.
+
 2.0
 ---
 

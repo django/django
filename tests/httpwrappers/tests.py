@@ -8,7 +8,7 @@ import warnings
 
 from django.core.exceptions import SuspiciousOperation
 from django.core.signals import request_finished
-from django.db import close_connection
+from django.db import close_old_connections
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
                          HttpResponseNotModified, StreamingHttpResponse,
@@ -490,10 +490,10 @@ class FileCloseTests(TestCase):
     def setUp(self):
         # Disable the request_finished signal during this test
         # to avoid interfering with the database connection.
-        request_finished.disconnect(close_connection)
+        request_finished.disconnect(close_old_connections)
 
     def tearDown(self):
-        request_finished.connect(close_connection)
+        request_finished.connect(close_old_connections)
 
     def test_response(self):
         filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')

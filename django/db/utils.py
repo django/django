@@ -56,11 +56,13 @@ class DatabaseErrorWrapper(object):
     exceptions using Django's common wrappers.
     """
 
-    def __init__(self, database):
+    def __init__(self, wrapper):
         """
-        database is a module defining PEP-249 exceptions.
+        wrapper is a database wrapper.
+
+        It must have a Database attribute defining PEP-249 exceptions.
         """
-        self.database = database
+        self.wrapper = wrapper
 
     def __enter__(self):
         pass
@@ -79,7 +81,7 @@ class DatabaseErrorWrapper(object):
                 InterfaceError,
                 Error,
             ):
-            db_exc_type = getattr(self.database, dj_exc_type.__name__)
+            db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 # Under Python 2.6, exc_value can still be a string.
                 try:
@@ -89,6 +91,10 @@ class DatabaseErrorWrapper(object):
                 dj_exc_value = dj_exc_type(*args)
                 if six.PY3:
                     dj_exc_value.__cause__ = exc_value
+                # Only set the 'errors_occurred' flag for errors that may make
+                # the connection unusable.
+                if dj_exc_type not in (DataError, IntegrityError):
+                    self.wrapper.errors_occurred = True
                 six.reraise(dj_exc_type, dj_exc_value, traceback)
 
     def __call__(self, func):
@@ -155,6 +161,7 @@ class ConnectionHandler(object):
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'
+        conn.setdefault('CONN_MAX_AGE', 600)
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TIME_ZONE', 'UTC' if settings.USE_TZ else settings.TIME_ZONE)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:

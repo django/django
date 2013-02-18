@@ -464,6 +464,19 @@ The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
+.. setting:: CONN_MAX_AGE
+
+CONN_MAX_AGE
+~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``600``
+
+The lifetime of a database connection, in seconds. Use ``0`` to close database
+connections at the end of each request — Django's historical behavior — and
+``None`` for unlimited persistent connections.
+
 .. setting:: OPTIONS
 
 OPTIONS
