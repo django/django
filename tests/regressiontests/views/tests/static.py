@@ -27,7 +27,6 @@ class StaticTests(TestCase):
         for filename in media_files:
             response = self.client.get('/views/%s/%s' % (self.prefix, filename))
             response_content = b''.join(response)
-            response.close()
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
                 self.assertEqual(fp.read(), response_content)
@@ -36,14 +35,12 @@ class StaticTests(TestCase):
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/%s/file.unknown' % self.prefix)
-        response.close()
         self.assertEqual('application/octet-stream', response['Content-Type'])
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
         response = self.client.get('/views/%s//%s' % (self.prefix, file_name))
         response_content = b''.join(response)
-        response.close()
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
 
@@ -52,7 +49,6 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
         response_content = b''.join(response)
-        response.close()
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
 
@@ -77,7 +73,6 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
-        response.close()
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
         self.assertEqual(len(response_content),
@@ -94,7 +89,6 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
-        response.close()
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
         self.assertEqual(len(response_content),
