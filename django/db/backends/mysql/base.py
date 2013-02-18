@@ -402,15 +402,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation(self)
 
-    def _valid_connection(self):
-        if self.connection is not None:
-            try:
-                self.connection.ping()
-                return True
-            except DatabaseError:
-                self.close()
-        return False
-
     def get_connection_params(self):
         kwargs = {
             'conv': django_conversions,
