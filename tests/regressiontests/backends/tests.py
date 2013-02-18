@@ -123,12 +123,6 @@ class MySQLTests(TestCase):
         else:
             self.assertFalse(found_reset)
 
-    @unittest.skipUnless(connection.vendor == 'mysql',
-                        "Test valid only for MySQL")
-    def test_server_version_connections(self):
-        connection.close()
-        connection.mysql_version
-        self.assertTrue(connection.connection is None)
 
 class DateQuotingTest(TestCase):
 
