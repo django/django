@@ -3799,3 +3799,96 @@ class AdminUserMessageTest(TestCase):
         self.assertContains(response,
                             '<li class="extra_tag info">Test tags</li>',
                             html=True)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class PrePopulateQuerystringAdminTest(TestCase):
+    """
+    Tests the field population using querystrings
+
+    Related #19431
+    """
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_prepopulate_charfield(self):
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?title=foo')
+        form = response.context_data["adminform"].form
+        self.assertIn("title", form.initial)
+        self.assertEqual(form.initial["title"], "foo")
+
+    def test_prepopulate_foreignkey(self):
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?color=1')
+        form = response.context_data["adminform"].form
+        self.assertIn("color", form.initial)
+        self.assertEqual(form.initial["color"], "1")
+
+    def test_prepopulate_m2m(self):
+        response = self.client.get('/test_admin/admin/admin_views/pizza/add/?toppings=1,3,4')
+        form = response.context_data["adminform"].form
+        self.assertIn("toppings", form.initial)
+        self.assertEqual(form.initial["toppings"], ["1", "3", "4"])
+
+    @override_settings(DATE_INPUT_FORMATS=('%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y' ))
+    def test_prepopulate_datefield(self):
+        """
+        Using different formatters
+        """
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?pub_date=2013-01-10')
+        form = response.context_data["adminform"].form
+        self.assertIn("pub_date", form.initial)
+        self.assertEqual(form.initial["pub_date"], datetime.date(2013, 1, 10))
+
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?pub_date=01/10/2013')
+        form = response.context_data["adminform"].form
+        self.assertIn("pub_date", form.initial)
+        self.assertEqual(form.initial["pub_date"], datetime.date(2013, 1, 10))
+
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?pub_date=01/10/13')
+        form = response.context_data["adminform"].form
+        self.assertIn("pub_date", form.initial)
+        self.assertEqual(form.initial["pub_date"], datetime.date(2013, 1, 10))
+
+        # if we use a wrong format, we will get the original string, not the date object
+        response = self.client.get('/test_admin/admin/admin_views/thing/add/?pub_date=13/10/13')
+        form = response.context_data["adminform"].form
+        self.assertIn("pub_date", form.initial)
+        self.assertIsInstance(form.initial["pub_date"], basestring)
+
+    @override_settings(DATETIME_INPUT_FORMATS=('%Y-%m-%d %H:%M', '%m/%d/%Y %H:%M', '%Y-%m-%d'))
+    def test_prepopulate_datetimefield(self):
+        response = self.client.get(
+            '/test_admin/admin/admin_views/reservation/add/?start_date=2013-01-10')
+        form = response.context_data["adminform"].form
+        self.assertIn("start_date", form.initial)
+        self.assertEqual(form.initial["start_date"], datetime.datetime(2013, 1, 10, 0, 0))
+
+        response = self.client.get(
+            '/test_admin/admin/admin_views/reservation/add/?start_date=2013-01-10T10:20')
+        form = response.context_data["adminform"].form
+        self.assertIn("start_date", form.initial)
+        self.assertEqual(form.initial["start_date"], datetime.datetime(2013, 1, 10, 10, 20))
+
+        response = self.client.get(
+            '/test_admin/admin/admin_views/reservation/add/?start_date=2013-01-10T10:59')
+        form = response.context_data["adminform"].form
+        self.assertIn("start_date", form.initial)
+        self.assertEqual(form.initial["start_date"], datetime.datetime(2013, 1, 10, 10, 59))
+
+        response = self.client.get(
+            '/test_admin/admin/admin_views/reservation/add/?start_date=01/10/2013T10:59')
+        form = response.context_data["adminform"].form
+        self.assertIn("start_date", form.initial)
+        self.assertEqual(form.initial["start_date"], datetime.datetime(2013, 1, 10, 10, 59))
+
+        response = self.client.get(
+            '/test_admin/admin/admin_views/reservation/add/?start_date=01/10/2013T10:59:59')
+        form = response.context_data["adminform"].form
+        self.assertIn("start_date", form.initial)
+        self.assertIsInstance(form.initial["start_date"], basestring)
