@@ -30,6 +30,19 @@ prevention <clickjacking-prevention>` are turned on.
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
 
+Persistent database connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now supports reusing the same database connection for several requests.
+This avoids the overhead of re-establishing a connection at the beginning of
+each request.
+
+By default, database connections will kept open for 10 minutes. This behavior
+is controlled by the :setting:`CONN_MAX_AGE` setting. To restore the previous
+behavior of closing the connection at the end of each request, set
+:setting:`CONN_MAX_AGE` to ``0``. See :ref:`persistent-database-connections`
+for details.
+
 Time zone aware aggregation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -135,6 +148,14 @@ Backwards incompatible changes in 1.6
 
 * Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
   lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
+
+* When Django establishes a connection to the database, it sets up appropriate
+  parameters, depending on the backend being used. Since `persistent database
+  connections <persistent-database-connections>`_ are enabled by default in
+  Django 1.6, this setup isn't repeated at every request any more. If you
+  modifiy parameters such as the connection's isolation level or time zone,
+  you should either restore Django's defaults at the end of each request, or
+  force an appropriate value at the beginning of each request.
 
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as

@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from django.db.utils import DatabaseError
 
@@ -49,6 +50,10 @@ class BaseDatabaseWrapper(object):
         self._thread_ident = thread.get_ident()
         self.allow_thread_sharing = allow_thread_sharing
 
+        # Connection termination related attributes
+        self.close_at = None
+        self.errors_occurred = False
+
     def __eq__(self, other):
         return self.alias == other.alias
 
@@ -59,7 +64,7 @@ class BaseDatabaseWrapper(object):
         return hash(self.alias)
 
     def wrap_database_errors(self):
-        return DatabaseErrorWrapper(self.Database)
+        return DatabaseErrorWrapper(self)
 
     def get_connection_params(self):
         raise NotImplementedError
@@ -76,6 +81,11 @@ class BaseDatabaseWrapper(object):
     def _cursor(self):
         with self.wrap_database_errors():
             if self.connection is None:
+                # Reset parameters defining when to close the connection
+                max_age = self.settings_dict['CONN_MAX_AGE']
+                self.close_at = None if max_age is None else time.time() + max_age
+                self.errors_occurred = False
+                # Establish the connection
                 conn_params = self.get_connection_params()
                 self.connection = self.get_new_connection(conn_params)
                 self.init_connection_state()
@@ -350,6 +360,26 @@ class BaseDatabaseWrapper(object):
         finally:
             self.connection = None
         self.set_clean()
+
+    def close_if_unusable_or_obsolete(self):
+        if self.connection is not None:
+            if self.errors_occurred:
+                if self.is_usable():
+                    self.errors_occurred = False
+                else:
+                    self.close()
+                    return
+            if self.close_at is not None and time.time() >= self.close_at:
+                self.close()
+                return
+
+    def is_usable(self):
+        """
+        Test if the database connection is usable.
+
+        This function may assume that self.connection is not None.
+        """
+        raise NotImplementedError
 
     def cursor(self):
         self.validate_thread_sharing()

@@ -598,6 +598,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # stmtcachesize is available only in 4.3.2 and up.
             pass
 
+    def is_usable(self):
+        try:
+            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
+                self.connection.ping()
+            else:
+                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
+                self.connection.cursor().execute("SELECT 1 FROM DUAL")
+        except DatabaseError:
+            return False
+        else:
+            return True
+
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):
         pass

@@ -42,9 +42,10 @@ class DefaultConnectionProxy(object):
 connection = DefaultConnectionProxy()
 backend = load_backend(connection.settings_dict['ENGINE'])
 
-# Register an event that closes the database connection
-# when a Django request is finished.
 def close_connection(**kwargs):
+    warnings.warn(
+        "close_connection is superseded by close_old_connections.",
+        PendingDeprecationWarning, stacklevel=2)
     # Avoid circular imports
     from django.db import transaction
     for conn in connections:
@@ -53,14 +54,24 @@ def close_connection(**kwargs):
         # connection state will be cleaned up.
         transaction.abort(conn)
         connections[conn].close()
-signals.request_finished.connect(close_connection)
 
-# Register an event that resets connection.queries
-# when a Django request is started.
+# Register an event to reset saved queries when a Django request is started.
 def reset_queries(**kwargs):
     for conn in connections.all():
         conn.queries = []
 signals.request_started.connect(reset_queries)
+
+# Register an event to reset transaction state and close connections past
+# their lifetime. NB: abort() doesn't do anything outside of a transaction.
+def close_old_connections(**kwargs):
+    for conn in connections.all():
+        try:
+            conn.abort()
+        except DatabaseError:
+            pass
+        conn.close_if_unusable_or_obsolete()
+signals.request_started.connect(close_old_connections)
+signals.request_finished.connect(close_old_connections)
 
 # Register an event that rolls back the connections
 # when a Django request has an exception.

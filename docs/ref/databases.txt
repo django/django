@@ -11,6 +11,68 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+General notes
+=============
+
+.. _persistent-database-connections:
+
+Persistent connections
+----------------------
+
+.. versionadded:: 1.6
+
+Persistent connections avoid the overhead of re-establishing a connection to
+the database in each request. By default, connections are kept open for up 10
+minutes — if not specified, :setting:`CONN_MAX_AGE` defaults to 600 seconds.
+
+Django 1.5 and earlier didn't have persistent connections. To restore the
+legacy behavior of closing the connection at the end of every request, set
+:setting:`CONN_MAX_AGE` to ``0``.
+
+For unlimited persistent connections, set :setting:`CONN_MAX_AGE` to ``None``.
+
+Connection management
+~~~~~~~~~~~~~~~~~~~~~
+
+Django opens a connection to the database when it first makes a database
+query. It keeps this connection open and reuses it in subsequent requests.
+Django closes the connection once it exceeds the maximum age defined by
+:setting:`CONN_MAX_AGE` or when it isn't usable any longer.
+
+In detail, Django automatically opens a connection to the database whenever it
+needs one and doesn't have one already — either because this is the first
+connection, or because the previous connection was closed.
+
+At the beginning of each request, Django closes the connection if it has
+reached its maximum age. If your database terminates idle connections after
+some time, you should set :setting:`CONN_MAX_AGE` to a lower value, so that
+Django doesn't attempt to use a connection that has been terminated by the
+database server. (This problem may only affect very low traffic sites.)
+
+At the end of each request, Django closes the connection if it has reached its
+maximum age or if it is in an unrecoverable error state. If any database
+errors have occurred while processing the requests, Django checks whether the
+connection still works, and closes it if it doesn't. Thus, database errors
+affect at most one request; if the connection becomes unusable, the next
+request gets a fresh connection.
+
+Caveats
+~~~~~~~
+
+Since each thread maintains its own connection, your database must support at
+least as many simultaneous connections as you have worker threads.
+
+Sometimes a database won't be accessed by the majority of your views, for
+example because it's the database of an external system, or thanks to caching.
+In such cases, you should set :setting:`CONN_MAX_AGE` to a lower value, or
+even ``0``, because it doesn't make sense to maintain a connection that's
+unlikely to be reused. This will help keep the number of simultaneous
+connections to this database small.
+
+
+The development server creates a new thread for each request it handles,
+negating the effect of persistent connections.
+
 .. _postgresql-notes:
 
 PostgreSQL notes
