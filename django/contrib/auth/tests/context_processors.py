@@ -63,9 +63,10 @@ class PermWrapperTests(TestCase):
 
 @skipIfCustomUser
 @override_settings(
+    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
     TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        ),
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+    ),
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
