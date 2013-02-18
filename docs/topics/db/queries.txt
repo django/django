@@ -163,10 +163,9 @@ default. Access it directly via the model class, like so::
     "record-level" operations.
 
 The :class:`~django.db.models.Manager` is the main source of ``QuerySets`` for
-a model. It acts as a "root" :class:`~django.db.models.query.QuerySet` that
-describes all objects in the model's database table. For example,
-``Blog.objects`` is the initial :class:`~django.db.models.query.QuerySet` that
-contains all ``Blog`` objects in the database.
+a model. For example, ``Blog.objects.all()`` returns a
+:class:`~django.db.models.query.QuerySet` that contains all ``Blog`` objects in
+the database.
 
 Retrieving all objects
 ----------------------
@@ -180,20 +179,13 @@ this, use the :meth:`~django.db.models.query.QuerySet.all` method on a
 The :meth:`~django.db.models.query.QuerySet.all` method returns a
 :class:`~django.db.models.query.QuerySet` of all the objects in the database.
 
-(If ``Entry.objects`` is a :class:`~django.db.models.query.QuerySet`, why can't
-we just do ``Entry.objects``?  That's because ``Entry.objects``, the root
-:class:`~django.db.models.query.QuerySet`, is a special case that cannot be
-evaluated. The :meth:`~django.db.models.query.QuerySet.all` method returns a
-:class:`~django.db.models.query.QuerySet` that *can* be evaluated.)
-
-
 Retrieving specific objects with filters
 ----------------------------------------
 
-The root :class:`~django.db.models.query.QuerySet` provided by the
-:class:`~django.db.models.Manager` describes all objects in the database
-table. Usually, though, you'll need to select only a subset of the complete set
-of objects.
+The :class:`~django.db.models.query.QuerySet` returned by
+:meth:`~django.db.models.query.QuerySet.all` describes all objects in the
+database table. Usually, though, you'll need to select only a subset of the
+complete set of objects.
 
 To create such a subset, you refine the initial
 :class:`~django.db.models.query.QuerySet`, adding filter conditions. The two
@@ -216,10 +208,9 @@ so::
 
     Entry.objects.filter(pub_date__year=2006)
 
-We don't have to add an :meth:`~django.db.models.query.QuerySet.all` --
-``Entry.objects.all().filter(...)``. That would still work, but you only need
-:meth:`~django.db.models.query.QuerySet.all` when you want all objects from the
-root :class:`~django.db.models.query.QuerySet`.
+With the default manager class, it is the same as::
+
+    Entry.objects.all().filter(pub_date__year=2006)
 
 .. _chaining-filters:
 
