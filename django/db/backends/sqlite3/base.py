@@ -344,15 +344,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self):
         pass
 
-    def _sqlite_create_connection(self):
-        conn_params = self.get_connection_params()
-        self.connection = self.get_new_connection(conn_params)
-        self.init_connection_state()
-        connection_created.send(sender=self.__class__, connection=self)
-
     def _cursor(self):
         if self.connection is None:
-            self._sqlite_create_connection()
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.init_connection_state()
+            connection_created.send(sender=self.__class__, connection=self)
+
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
     def check_constraints(self, table_names=None):
