@@ -506,7 +506,6 @@ def streamTest(format, self):
             self.assertEqual(string_data, stream.getvalue())
         else:
             self.assertEqual(string_data, stream.content.decode('utf-8'))
-        stream.close()
 
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
