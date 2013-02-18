@@ -394,7 +394,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.server_version = None
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
@@ -454,13 +453,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_version(self):
-        if not self.server_version:
-            server_info = self.connection.get_server_info()
-            m = server_version_re.match(server_info)
-            if not m:
-                raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-            self.server_version = tuple([int(x) for x in m.groups()])
-        return self.server_version
+        server_info = self.connection.get_server_info()
+        match = server_version_re.match(server_info)
+        if not match:
+            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
+        return tuple([int(x) for x in match.groups()])
 
     def disable_constraint_checking(self):
         """
