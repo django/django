@@ -48,7 +48,6 @@ except ImportError as e:
 from django.conf import settings
 from django.db import utils
 from django.db.backends import *
-from django.db.backends.signals import connection_created
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
@@ -521,9 +520,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
         self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
 
-    def _valid_connection(self):
-        return self.connection is not None
-
     def _connect_string(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
@@ -537,8 +533,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return "%s/%s@%s" % (settings_dict['USER'],
                              settings_dict['PASSWORD'], dsn)
 
-    def create_cursor(self, conn):
-        return FormatStylePlaceholderCursor(conn)
+    def create_cursor(self):
+        return FormatStylePlaceholderCursor(self.connection)
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -551,7 +547,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return Database.connect(conn_string, **conn_params)
 
     def init_connection_state(self):
-        cursor = self.create_cursor(self.connection)
+        cursor = self.create_cursor()
         # Set the territory first. The territory overrides NLS_DATE_FORMAT
         # and NLS_TIMESTAMP_FORMAT to the territory default. When all of
         # these are set in single statement it isn't clear what is supposed
@@ -572,7 +568,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # This check is performed only once per DatabaseWrapper
             # instance per thread, since subsequent connections will use
             # the same settings.
-            cursor = self.create_cursor(self.connection)
+            cursor = self.create_cursor()
             try:
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
@@ -601,14 +597,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Django docs specify cx_Oracle version 4.3.1 or higher, but
             # stmtcachesize is available only in 4.3.2 and up.
             pass
-
-    def _cursor(self):
-        if not self._valid_connection():
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
-        return self.create_cursor(self.connection)
 
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):
