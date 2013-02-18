@@ -1,11 +1,18 @@
 from django.core.handlers.wsgi import WSGIHandler
-from django.core import signals
+from django.core.signals import request_started, request_finished
+from django.db import close_old_connections
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils import six
 
 
 class HandlerTests(TestCase):
+
+    def setUp(self):
+        request_started.disconnect(close_old_connections)
+
+    def tearDown(self):
+        request_started.connect(close_old_connections)
 
     # Mangle settings so the handler will fail
     @override_settings(MIDDLEWARE_CLASSES=42)
@@ -35,12 +42,12 @@ class SignalsTests(TestCase):
 
     def setUp(self):
         self.signals = []
-        signals.request_started.connect(self.register_started)
-        signals.request_finished.connect(self.register_finished)
+        request_started.connect(self.register_started)
+        request_finished.connect(self.register_finished)
 
     def tearDown(self):
-        signals.request_started.disconnect(self.register_started)
-        signals.request_finished.disconnect(self.register_finished)
+        request_started.disconnect(self.register_started)
+        request_finished.disconnect(self.register_finished)
 
     def register_started(self, **kwargs):
         self.signals.append('started')

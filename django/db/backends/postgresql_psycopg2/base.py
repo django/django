@@ -177,6 +177,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
+    def is_usable(self):
+        try:
+            # Use a psycopg cursor directly, bypassing Django's utilities.
+            self.connection.cursor().execute("SELECT 1")
+        except DatabaseError:
+            return False
+        else:
+            return True
+
     def _enter_transaction_management(self, managed):
         """
         Switch the isolation level when needing transaction support, so that
