@@ -33,19 +33,16 @@ from MySQLdb.constants import FIELD_TYPE, CLIENT
 from django.conf import settings
 from django.db import utils
 from django.db.backends import *
-from django.db.backends.signals import connection_created
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
 
 # Raise exceptions for database warnings if DEBUG is on
-from django.conf import settings
 if settings.DEBUG:
     warnings.filterwarnings("error", category=Database.Warning)
 
@@ -454,12 +451,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.execute('SET SQL_AUTO_IS_NULL = 0')
         cursor.close()
 
-    def _cursor(self):
-        if not self._valid_connection():
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
+    def create_cursor(self):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
 

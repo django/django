@@ -11,6 +11,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
+from django.db.backends.signals import connection_created
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
@@ -51,6 +52,17 @@ class BaseDatabaseWrapper(object):
         return not self == other
 
     __hash__ = object.__hash__
+
+    def _valid_connection(self):
+        return self.connection is not None
+
+    def _cursor(self):
+        if not self._valid_connection():
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
+            self.init_connection_state()
+            connection_created.send(sender=self.__class__, connection=self)
+        return self.create_cursor()
 
     def _commit(self):
         if self.connection is not None:

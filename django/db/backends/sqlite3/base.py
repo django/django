@@ -14,7 +14,6 @@ import sys
 
 from django.db import utils
 from django.db.backends import *
-from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
@@ -344,13 +343,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self):
         pass
 
-    def _cursor(self):
-        if self.connection is None:
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
-
+    def create_cursor(self):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
     def check_constraints(self, table_names=None):
