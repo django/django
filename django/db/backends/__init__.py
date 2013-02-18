@@ -53,11 +53,8 @@ class BaseDatabaseWrapper(object):
 
     __hash__ = object.__hash__
 
-    def _valid_connection(self):
-        return self.connection is not None
-
     def _cursor(self):
-        if not self._valid_connection():
+        if self.connection is None:
             conn_params = self.get_connection_params()
             self.connection = self.get_new_connection(conn_params)
             self.init_connection_state()
