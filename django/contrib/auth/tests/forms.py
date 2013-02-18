@@ -341,18 +341,22 @@ class PasswordResetFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['email'], email)
 
+    @override_settings(
+        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
+        TEMPLATE_DIRS=(
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+        ),
+    )
     def test_custom_email_subject(self):
-        template_path = os.path.join(os.path.dirname(upath(__file__)), 'templates')
-        with self.settings(TEMPLATE_DIRS=(template_path,)):
-            data = {'email': 'testclient@example.com'}
-            form = PasswordResetForm(data)
-            self.assertTrue(form.is_valid())
-            # Since we're not providing a request object, we must provide a
-            # domain_override to prevent the save operation from failing in the
-            # potential case where contrib.sites is not installed. Refs #16412.
-            form.save(domain_override='example.com')
-            self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
+        data = {'email': 'testclient@example.com'}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        # Since we're not providing a request object, we must provide a
+        # domain_override to prevent the save operation from failing in the
+        # potential case where contrib.sites is not installed. Refs #16412.
+        form.save(domain_override='example.com')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
 
     def test_bug_5605(self):
         # bug #5605, preserve the case of the user name (before the @ in the
