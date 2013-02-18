@@ -9,7 +9,7 @@
 			} else {
 				reset();
 			}
-			$(actionCheckboxes).attr("checked", checked)
+			$(actionCheckboxes).prop("checked", checked)
 				.parent().parent().toggleClass(options.selectedClass, checked);
 		},
 		updateCounter = function() {
@@ -19,7 +19,7 @@
 				sel: sel,
 				cnt: _actions_icnt
 			}, true));
-			$(options.allToggle).attr("checked", function() {
+			$(options.allToggle).prop("checked", function() {
 				if (sel == actionCheckboxes.length) {
 					value = true;
 					showQuestion();
@@ -64,7 +64,7 @@
 			}
 		});
 		$(options.allToggle).show().click(function() {
-			checker($(this).attr("checked"));
+			checker($(this).prop("checked"));
 			updateCounter();
 		});
 		$("div.actions span.question a").click(function(event) {
@@ -74,7 +74,7 @@
 		});
 		$("div.actions span.clear a").click(function(event) {
 			event.preventDefault();
-			$(options.allToggle).attr("checked", false);
+			$(options.allToggle).prop("checked", false);
 			clearAcross();
 			checker(0);
 			updateCounter();
@@ -85,14 +85,14 @@
 			var target = event.target ? event.target : event.srcElement;
 			if (lastChecked && $.data(lastChecked) != $.data(target) && event.shiftKey === true) {
 				var inrange = false;
-				$(lastChecked).attr("checked", target.checked)
+				$(lastChecked).prop("checked", target.checked)
 					.parent().parent().toggleClass(options.selectedClass, target.checked);
 				$(actionCheckboxes).each(function() {
 					if ($.data(this) == $.data(lastChecked) || $.data(this) == $.data(target)) {
 						inrange = (inrange) ? false : true;
 					}
 					if (inrange) {
-						$(this).attr("checked", target.checked)
+						$(this).prop("checked", target.checked)
 							.parent().parent().toggleClass(options.selectedClass, target.checked);
 					}
 				});
