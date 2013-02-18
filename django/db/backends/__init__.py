@@ -53,6 +53,18 @@ class BaseDatabaseWrapper(object):
 
     __hash__ = object.__hash__
 
+    def get_connection_params(self):
+        raise NotImplementedError
+
+    def get_new_connection(self, conn_params):
+        raise NotImplementedError
+
+    def init_connection_state(self):
+        raise NotImplementedError
+
+    def create_cursor(self):
+        raise NotImplementedError
+
     def _cursor(self):
         if self.connection is None:
             conn_params = self.get_connection_params()
