@@ -7,6 +7,8 @@ from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 
 from django.utils import six
 from django.utils.encoding import force_str
+import pickle
+
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
@@ -32,6 +34,7 @@ class BaseMemcachedCache(BaseCache):
         """
         if getattr(self, '_client', None) is None:
             client_options = self._options.get('CLIENT_OPTIONS') if self._options else {}
+            client_options['pickleProtocol'] = client_options.get('pickleProtocol', pickle.HIGHEST_PROTOCOL)
             self._client = self._lib.Client(self._servers, **client_options)
 
         return self._client
