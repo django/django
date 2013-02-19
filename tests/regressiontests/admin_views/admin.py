@@ -71,6 +71,16 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date', 'section')
+    fieldsets=(
+        ('Some fields', {
+            'classes': ('collapse',),
+            'fields': ('title', 'content')
+        }),
+        ('Some other fields', {
+            'classes': ('wide',),
+            'fields': ('date', 'section')
+        })
+    )
 
     def changelist_view(self, request):
         "Test that extra_context works"
