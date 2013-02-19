@@ -352,6 +352,18 @@ class BaseDatabaseWrapper(object):
     def make_debug_cursor(self, cursor):
         return util.CursorDebugWrapper(cursor, self)
 
+    @contextmanager
+    def temporary_connection(self):
+        # Ensure a connection is established, and avoid leaving a dangling
+        # connection, for operations outside of the request-response cycle.
+        must_close = self.connection is None
+        cursor = self.cursor()
+        try:
+            yield
+        finally:
+            cursor.close()
+            if must_close:
+                self.close()
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False

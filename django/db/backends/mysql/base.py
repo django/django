@@ -453,7 +453,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_version(self):
-        server_info = self.connection.get_server_info()
+        with self.temporary_connection():
+            server_info = self.connection.get_server_info()
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)

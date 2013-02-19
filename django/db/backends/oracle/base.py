@@ -623,8 +623,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def oracle_version(self):
+        with self.temporary_connection():
+            version = self.connection.version
         try:
-            return int(self.connection.version.split('.')[0])
+            return int(version.split('.')[0])
         except ValueError:
             return None
 
