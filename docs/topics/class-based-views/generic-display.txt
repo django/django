@@ -172,7 +172,7 @@ context using the lower cased version of the model class' name. This is
 provided in addition to the default ``object_list`` entry, but contains exactly
 the same data, i.e. ``publisher_list``.
 
-If the this still isn't a good match, you can manually set the name of the
+If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
