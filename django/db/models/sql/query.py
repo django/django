@@ -507,9 +507,11 @@ class Query(object):
             # updated alias.
             lhs = change_map.get(lhs, lhs)
             new_alias = self.join(
-                (lhs, table, lhs_col, col), reuse=reuse, promote=promote,
+                (lhs, table, lhs_col, col), reuse=reuse,
                 outer_if_first=not conjunction, nullable=nullable,
                 join_field=join_field)
+            if promote:
+                self.promote_joins([new_alias])
             # We can't reuse the same join again in the query. If we have two
             # distinct joins for the same connection in rhs query, then the
             # combined query must have two joins, too.
@@ -914,8 +916,8 @@ class Query(object):
         """
         return len([1 for count in self.alias_refcount.values() if count])
 
-    def join(self, connection, reuse=None, promote=False,
-             outer_if_first=False, nullable=False, join_field=None):
+    def join(self, connection, reuse=None, outer_if_first=False,
+             nullable=False, join_field=None):
         """
         Returns an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -929,14 +931,8 @@ class Query(object):
         (matching the connection) are reusable, or it can be a set containing
         the aliases that can be reused.
 
-        If 'promote' is True, the join type for the alias will be LOUTER (if
-        the alias previously existed, the join type will be promoted from INNER
-        to LOUTER, if necessary).
-
         If 'outer_if_first' is True and a new join is created, it will have the
-        LOUTER join type. Used for example when adding ORed filters, where we
-        want to use LOUTER joins except if some other join already restricts
-        the join to INNER join.
+        LOUTER join type.
 
         A join is always created as LOUTER if the lhs alias is LOUTER to make
         sure we do not generate chains like t1 LOUTER t2 INNER t3.
@@ -961,8 +957,6 @@ class Query(object):
                 # join_field used for the under work join.
                 continue
             self.ref_alias(alias)
-            if promote or (lhs and self.alias_map[lhs].join_type == self.LOUTER):
-                self.promote_joins([alias])
             return alias
 
         # No reuse is possible, so we need a new alias.
@@ -971,10 +965,9 @@ class Query(object):
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
             join_type = None
-        elif (promote or outer_if_first
-              or self.alias_map[lhs].join_type == self.LOUTER):
-            # We need to use LOUTER join if asked by promote or outer_if_first,
-            # or if the LHS table is left-joined in the query.
+        elif outer_if_first or self.alias_map[lhs].join_type == self.LOUTER:
+            # We need to use LOUTER join if asked by outer_if_first or if the
+            # LHS table is left-joined in the query.
             join_type = self.LOUTER
         else:
             join_type = self.INNER

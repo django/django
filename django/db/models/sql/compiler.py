@@ -620,7 +620,7 @@ class SQLCompiler(object):
 
             alias = self.query.join((alias, table, f.column,
                     f.rel.get_related_field().column),
-                    promote=promote, join_field=f)
+                    outer_if_first=promote, join_field=f)
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
@@ -648,7 +648,7 @@ class SQLCompiler(object):
                 table = model._meta.db_table
                 alias = self.query.join(
                     (alias, table, f.rel.get_related_field().column, f.column),
-                    promote=True, join_field=f
+                    outer_if_first=True, join_field=f
                 )
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
