@@ -152,7 +152,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def pg_version(self):
-        return get_version(self.connection)
+        with self.temporary_connection():
+            return get_version(self.connection)
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
