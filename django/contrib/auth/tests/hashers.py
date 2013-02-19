@@ -65,6 +65,18 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password(u'letmein', alt_encoded))
         self.assertFalse(check_password('letmeinz', alt_encoded))
 
+    def test_unsalted_sha1(self):
+        encoded = make_password('letmein', 'seasalt', 'unsalted_sha1')
+        self.assertEqual(encoded, 'b7a875fc1ea228b9061041b7cec4bd3c52ab3ce3')
+        self.assertTrue(is_password_usable(encoded))
+        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertFalse(check_password('letmeinz', encoded))
+        # Alternate unsalted syntax
+        alt_encoded = "sha1$$%s" % encoded
+        self.assertTrue(is_password_usable(alt_encoded))
+        self.assertTrue(check_password(u'letmein', alt_encoded))
+        self.assertFalse(check_password('letmeinz', alt_encoded))
+        
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
         encoded = make_password('letmein', 'ab', 'crypt')
