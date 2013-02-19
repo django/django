@@ -4,17 +4,19 @@ API stability
 
 :doc:`The release of Django 1.0 </releases/1.0>` comes with a promise of API
 stability and forwards-compatibility. In a nutshell, this means that code you
-develop against Django 1.0 will continue to work against 1.1 unchanged, and you
-should need to make only minor changes for any 1.X release.
+develop against a 1.X version of Django will continue to work with future
+1.X releases. You may need to make minor changes when upgrading the version of
+Django your project uses: see the "Backwards incompatible changes" section of
+the :doc:`release note </releases/index>` for the version or versions to which
+you are upgrading.
 
 What "stable" means
 ===================
 
 In this context, stable means:
 
-- All the public APIs -- everything documented in the linked documents below,
-  and all methods that don't begin with an underscore -- will not be moved or
-  renamed without providing backwards-compatible aliases.
+- All the public APIs (everything in this documentation) will not be moved
+  or renamed without providing backwards-compatible aliases.
 
 - If new features are added to these APIs -- which is quite possible --
   they will not break or change the meaning of existing methods. In other
@@ -35,77 +37,7 @@ Stable APIs
 ===========
 
 In general, everything covered in the documentation -- with the exception of
-anything in the :doc:`internals area </internals/index>` is considered stable as
-of 1.0. This includes these APIs:
-
-- :doc:`Authorization </topics/auth>`
-
-- :doc:`Caching </topics/cache>`.
-
-- :doc:`Model definition, managers, querying and transactions
-  </topics/db/index>`
-
-- :doc:`Sending email </topics/email>`.
-
-- :doc:`File handling and storage </topics/files>`
-
-- :doc:`Forms </topics/forms/index>`
-
-- :doc:`HTTP request/response handling </topics/http/index>`, including file
-  uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
-
-- :doc:`Generic views </topics/http/generic-views>`.
-
-- :doc:`Internationalization </topics/i18n/index>`.
-
-- :doc:`Pagination </topics/pagination>`
-
-- :doc:`Serialization </topics/serialization>`
-
-- :doc:`Signals </topics/signals>`
-
-- :doc:`Templates </topics/templates>`, including the language, Python-level
-  :doc:`template APIs </ref/templates/index>`, and :doc:`custom template tags
-  and libraries </howto/custom-template-tags>`. We may add new template
-  tags in the future and the names may inadvertently clash with
-  external template tags. Before adding any such tags, we'll ensure that
-  Django raises an error if it tries to load tags with duplicate names.
-
-- :doc:`Testing </topics/testing>`
-
-- :doc:`django-admin utility </ref/django-admin>`.
-
-- :doc:`Built-in middleware </ref/middleware>`
-
-- :doc:`Request/response objects </ref/request-response>`.
-
-- :doc:`Settings </ref/settings>`. Note, though that while the :doc:`list of
-  built-in settings </ref/settings>` can be considered complete we may -- and
-  probably will -- add new settings in future versions. This is one of those
-  places where "'stable' does not mean 'complete.'"
-
-- :doc:`Built-in signals </ref/signals>`. Like settings, we'll probably add
-  new signals in the future, but the existing ones won't break.
-
-- :doc:`Unicode handling </ref/unicode>`.
-
-- Everything covered by the :doc:`HOWTO guides </howto/index>`.
-
-``django.utils``
-----------------
-
-Most of the modules in ``django.utils`` are designed for internal use. Only
-the following parts of :doc:`django.utils </ref/utils>` can be considered stable:
-
-- ``django.utils.cache``
-- ``django.utils.datastructures.SortedDict`` -- only this single class; the
-  rest of the module is for internal use.
-- ``django.utils.encoding``
-- ``django.utils.feedgenerator``
-- ``django.utils.http``
-- ``django.utils.safestring``
-- ``django.utils.translation``
-- ``django.utils.tzinfo``
+anything in the :doc:`internals area </internals/index>` is considered stable.
 
 Exceptions
 ==========
@@ -118,24 +50,8 @@ Security fixes
 
 If we become aware of a security problem -- hopefully by someone following our
 :ref:`security reporting policy <reporting-security-issues>` -- we'll do
-everything necessary to fix it. This might mean breaking backwards compatibility; security trumps the compatibility guarantee.
-
-Contributed applications (``django.contrib``)
----------------------------------------------
-
-While we'll make every effort to keep these APIs stable -- and have no plans to
-break any contrib apps -- this is an area that will have more flux between
-releases. As the Web evolves, Django must evolve with it.
-
-However, any changes to contrib apps will come with an important guarantee:
-we'll make sure it's always possible to use an older version of a contrib app if
-we need to make changes. Thus, if Django 1.5 ships with a backwards-incompatible
-``django.contrib.flatpages``, we'll make sure you can still use the Django 1.4
-version alongside Django 1.5. This will continue to allow for easy upgrades.
-
-Historically, apps in ``django.contrib`` have been more stable than the core, so
-in practice we probably won't have to ever make this exception. However, it's
-worth noting if you're building apps that depend on ``django.contrib``.
+everything necessary to fix it. This might mean breaking backwards
+compatibility; security trumps the compatibility guarantee.
 
 APIs marked as internal
 -----------------------
