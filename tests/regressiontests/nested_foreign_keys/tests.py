@@ -71,6 +71,12 @@ class NestedForeignKeysTests(TestCase):
         self.assertEqual(Event.objects.filter(screeningnullfk__movie=self.movie).count(), 1)
         self.assertEqual(Event.objects.exclude(screeningnullfk__movie=self.movie).count(), 2)
 
+    def test_null_exclude(self):
+        screening = ScreeningNullFK.objects.create(movie=None)
+        ScreeningNullFK.objects.create(movie=self.movie)
+        self.assertEqual(
+            list(ScreeningNullFK.objects.exclude(movie__id=self.movie.pk)),
+            [screening])
 
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.

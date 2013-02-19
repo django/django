@@ -1093,14 +1093,14 @@ class Query(object):
                 field_list, opts, self.get_initial_alias())
 
             # Process the join chain to see if it can be trimmed
-            col, _, join_list = self.trim_joins(source, join_list, path)
+            target, _, join_list = self.trim_joins(source, join_list, path)
 
             # If the aggregate references a model or field that requires a join,
             # those joins must be LEFT OUTER - empty join rows must be returned
             # in order for zeros to be returned for those aggregates.
             self.promote_joins(join_list, True)
 
-            col = (join_list[-1], col)
+            col = (join_list[-1], target.column)
         else:
             # The simplest cases. No joins required -
             # just reference the provided column alias.
@@ -1112,7 +1112,7 @@ class Query(object):
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
 
     def add_filter(self, filter_expr, connector=AND, negate=False,
-            can_reuse=None, force_having=False):
+                   can_reuse=None, force_having=False):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -1214,46 +1214,30 @@ class Query(object):
         # the far end (fewer tables in a query is better). Note that join
         # promotion must happen before join trimming to have the join type
         # information available when reusing joins.
-        col, alias, join_list = self.trim_joins(target, join_list, path)
+        target, alias, join_list = self.trim_joins(target, join_list, path)
 
         if having_clause or force_having:
-            if (alias, col) not in self.group_by:
-                self.group_by.append((alias, col))
-            self.having.add((Constraint(alias, col, field), lookup_type, value),
+            if (alias, target.column) not in self.group_by:
+                self.group_by.append((alias, target.column))
+            self.having.add((Constraint(alias, target.column, field), lookup_type, value),
                 connector)
         else:
-            self.where.add((Constraint(alias, col, field), lookup_type, value),
+            self.where.add((Constraint(alias, target.column, field), lookup_type, value),
                 connector)
 
         if negate:
             self.promote_joins(join_list)
-            if lookup_type != 'isnull':
-                if len(join_list) > 1:
-                    for alias in join_list:
-                        if self.alias_map[alias].join_type == self.LOUTER:
-                            j_col = self.alias_map[alias].rhs_join_col
-                            # The join promotion logic should never produce
-                            # a LOUTER join for the base join - assert that.
-                            assert j_col is not None
-                            entry = self.where_class()
-                            entry.add(
-                                (Constraint(alias, j_col, None), 'isnull', True),
-                                AND
-                            )
-                            entry.negate()
-                            self.where.add(entry, AND)
-                            break
-                if self.is_nullable(field):
-                    # In SQL NULL = anyvalue returns unknown, and NOT unknown
-                    # is still unknown. However, in Python None = anyvalue is False
-                    # (and not False is True...), and we want to return this Python's
-                    # view of None handling. So we need to specifically exclude the
-                    # NULL values, and because we are inside NOT branch they will
-                    # be included in the final resultset. We are essentially creating
-                    # SQL like this here: NOT (col IS NOT NULL), where the first NOT
-                    # is added in upper layers of the code.
-                    self.where.add((Constraint(alias, col, None), 'isnull', False), AND)
-
+            if lookup_type != 'isnull' and (self.is_nullable(target) or len(join_list) > 1):
+                # The condition added here will be SQL like this:
+                # NOT (col IS NOT NULL), where the first NOT is added in
+                # upper layers of code. The reason for addition is that if col
+                # is null, then col != someval will result in SQL "unknown"
+                # which isn't the same as in Python. The Python None handling
+                # is wanted, and it can be gotten by
+                # (col IS NULL OR col != someval)
+                #   <=>
+                # NOT (col IS NOT NULL AND col = someval).
+                self.where.add((Constraint(alias, target.column, None), 'isnull', False), AND)
 
     def add_q(self, q_object, used_aliases=None, force_having=False):
         """
@@ -1437,7 +1421,7 @@ class Query(object):
         is the full list of join aliases. The 'path' contain the PathInfos
         used to create the joins.
 
-        Returns the final active column and table alias and the new active
+        Returns the final target field and table alias and the new active
         joins.
 
         We will always trim any direct join if we have the target column
@@ -1451,7 +1435,7 @@ class Query(object):
                 self.unref_alias(joins.pop())
             else:
                 break
-        return target.column, joins[-1], joins
+        return target, joins[-1], joins
 
     def split_exclude(self, filter_expr, prefix, can_reuse, names_with_path):
         """
@@ -1465,8 +1449,8 @@ class Query(object):
         can_reuse is a set of joins usable for filters in the original query.
 
         We will turn this into equivalent of:
-            WHERE pk NOT IN (SELECT parent_id FROM thetable
-                             WHERE name = 'foo' AND parent_id IS NOT NULL)
+            WHERE NOT (pk IN (SELECT parent_id FROM thetable
+                              WHERE name = 'foo' AND parent_id IS NOT NULL))
 
         It might be worth it to consider using WHERE NOT EXISTS as that has
         saner null handling, and is easier for the backend's optimizer to
@@ -1484,8 +1468,9 @@ class Query(object):
         # since we are adding a IN <subquery> clause. This prevents the
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
-        alias, col = query.select[0].col
-        query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
+        if self.is_nullable(query.select[0].field):
+            alias, col = query.select[0].col
+            query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
 
         # Still make sure that the trimmed parts in the inner query and
         # trimmed prefix are in sync. So, use the trimmed_joins to make sure
@@ -1505,15 +1490,6 @@ class Query(object):
         trimmed_prefix = LOOKUP_SEP.join(trimmed_prefix)
         self.add_filter(('%s__in' % trimmed_prefix, query), negate=True,
                         can_reuse=can_reuse)
-
-        # If there's more than one join in the inner query, we need to also
-        # handle the possibility that the earlier joins don't match anything
-        # by adding a comparison to NULL (e.g. in
-        #     Tag.objects.exclude(parent__parent__name='t1')
-        # a tag with no parent would otherwise be overlooked).
-        if trimmed_joins > 1:
-            self.add_filter(('%s__isnull' % trimmed_prefix, False), negate=True,
-                            can_reuse=can_reuse)
 
     def set_empty(self):
         self.where = EmptyWhere()
@@ -1889,13 +1865,13 @@ class Query(object):
                 if self.alias_map[peek].join_type == self.LOUTER:
                     # Back up one level and break
                     select_alias = self.tables[join_pos]
-                    select_col = path.from_field.column
+                    select_field = path.from_field
                     break
                 select_alias = self.tables[join_pos + 1]
-                select_col = path.to_field.column
+                select_field = path.to_field
                 self.unref_alias(self.tables[join_pos])
                 join_pos += 1
-        self.select = [SelectInfo((select_alias, select_col), None)]
+        self.select = [SelectInfo((select_alias, select_field.column), select_field)]
         self.remove_inherited_models()
         return join_pos
 
