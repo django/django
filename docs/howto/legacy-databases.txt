@@ -70,7 +70,7 @@ If you wanted to modify existing data on your ``CENSUS_PERSONS`` SQL table
 with Django you'd need to change the ``managed`` option highlighted above to
 ``True`` (or simply remove it to let it because ``True`` is its default value).
 
-This servers as an explicit opt-in to give your nascent Django project write
+This serves as an explicit opt-in to give your nascent Django project write
 access to your precious data on a model by model basis.
 
 .. versionchanged:: 1.6
