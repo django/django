@@ -319,7 +319,6 @@ class QuerySet(object):
             query.add_aggregate(aggregate_expr, self.model, alias,
                                 is_summary=True)
             aggregate_names.append(alias)
-        query.append_aggregate_mask(aggregate_names)
 
         return query.get_aggregation(using=self.db)
 

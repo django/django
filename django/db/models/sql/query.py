@@ -321,6 +321,7 @@ class Query(object):
         # information but retrieves only the first row. Aggregate
         # over the subquery instead.
         if self.group_by is not None:
+
             from django.db.models.sql.subqueries import AggregateQuery
             query = AggregateQuery(self.model)
 
@@ -996,6 +997,8 @@ class Query(object):
             field_name = field_list[0]
             source = opts.get_field(field_name)
             col = field_name
+        # We want to have the alias in SELECT clause even if mask is set.
+        self.append_aggregate_mask([alias])
 
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)

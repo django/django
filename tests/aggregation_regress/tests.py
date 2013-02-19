@@ -250,6 +250,13 @@ class AggregationTests(TestCase):
             'price__max': Decimal("82.80")
         })
 
+        # Regression for #15624 - Missing SELECT columns when using values, annotate
+        # and aggregate in a single query
+        self.assertEqual(
+            Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
+            {'c__max': 3}
+            )
+
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported
         self.assertRaises(
