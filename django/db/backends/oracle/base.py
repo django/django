@@ -52,6 +52,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import force_bytes, force_text
+from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
 
@@ -502,7 +503,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.oracle_version = None
         self.features = DatabaseFeatures(self)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
@@ -579,18 +579,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.operators = self._standard_operators
             cursor.close()
 
-        try:
-            self.oracle_version = int(self.connection.version.split('.')[0])
-            # There's no way for the DatabaseOperations class to know the
-            # currently active Oracle version, so we do some setups here.
-            # TODO: Multi-db support will need a better solution (a way to
-            # communicate the current version).
-            if self.oracle_version <= 9:
-                self.ops.regex_lookup = self.ops.regex_lookup_9
-            else:
-                self.ops.regex_lookup = self.ops.regex_lookup_10
-        except ValueError:
-            pass
+        # There's no way for the DatabaseOperations class to know the
+        # currently active Oracle version, so we do some setups here.
+        # TODO: Multi-db support will need a better solution (a way to
+        # communicate the current version).
+        if self.oracle_version is not None and self.oracle_version <= 9:
+            self.ops.regex_lookup = self.ops.regex_lookup_9
+        else:
+            self.ops.regex_lookup = self.ops.regex_lookup_10
+
         try:
             self.connection.stmtcachesize = 20
         except:
@@ -623,6 +620,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+
+    @cached_property
+    def oracle_version(self):
+        try:
+            return int(self.connection.version.split('.')[0])
+        except ValueError:
+            return None
 
 
 class OracleParam(object):
