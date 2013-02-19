@@ -24,7 +24,7 @@ class Publisher(models.Model):
         return self.name
 
 
-class TaggedItem(models.Model):
+class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -42,7 +42,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, related_name='book_contact_set')
     publisher = models.ForeignKey(Publisher)
     pubdate = models.DateField()
-    tags = generic.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(ItemTag)
 
     class Meta:
         ordering = ('name',)

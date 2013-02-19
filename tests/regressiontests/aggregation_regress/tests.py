@@ -12,7 +12,7 @@ from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
-        TaggedItem, WithManualPK)
+        ItemTag, WithManualPK)
 
 
 class AggregationTests(TestCase):
@@ -993,18 +993,18 @@ class AggregationTests(TestCase):
         tests aggregations with generic reverse relations
         """
         b = Book.objects.get(name='Practical Django Projects')
-        TaggedItem.objects.create(object_id=b.id, tag='intermediate',
+        ItemTag.objects.create(object_id=b.id, tag='intermediate',
                 content_type=ContentType.objects.get_for_model(b))
-        TaggedItem.objects.create(object_id=b.id, tag='django',
+        ItemTag.objects.create(object_id=b.id, tag='django',
                 content_type=ContentType.objects.get_for_model(b))
         # Assign a tag to model with same PK as the book above. If the JOIN
         # used in aggregation doesn't have content type as part of the
         # condition the annotation will also count the 'hi mom' tag for b.
         wmpk = WithManualPK.objects.create(id=b.pk)
-        TaggedItem.objects.create(object_id=wmpk.id, tag='hi mom',
+        ItemTag.objects.create(object_id=wmpk.id, tag='hi mom',
                 content_type=ContentType.objects.get_for_model(wmpk))
         b = Book.objects.get(name__startswith='Paradigms of Artificial Intelligence')
-        TaggedItem.objects.create(object_id=b.id, tag='intermediate',
+        ItemTag.objects.create(object_id=b.id, tag='intermediate',
                 content_type=ContentType.objects.get_for_model(b))
 
         self.assertEqual(Book.objects.aggregate(Count('tags')), {'tags__count': 3})
