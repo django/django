@@ -323,6 +323,7 @@ class Query(object):
         # information but retrieves only the first row. Aggregate
         # over the subquery instead.
         if self.group_by is not None:
+
             from django.db.models.sql.subqueries import AggregateQuery
             query = AggregateQuery(self.model)
 
@@ -1003,6 +1004,11 @@ class Query(object):
             field_name = field_list[0]
             source = opts.get_field(field_name)
             col = field_name
+
+        # add aggregate alias to aggregate_select_mask if there are other
+        # masked aggregates, see #15624
+        if self.aggregate_select_mask is not None:
+            self.set_aggregate_mask(self.aggregate_select_mask.union([alias]))
 
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
