@@ -3195,12 +3195,12 @@ class PrePopulatedTest(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
+class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
-    def test_basic(self):
+    def test_prepopulated_fields(self):
         """
         Ensure that the JavaScript-automated prepopulated fields work with the
         main form and with stacked and tabular inlines.
@@ -3310,12 +3310,28 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
             slug2='option-one-tabular-inline-ignored-characters',
         )
 
+    def test_collapsible_fieldset(self):
+        """
+        Test that the 'collapse' class in fieldsets definition allows to
+        show/hide the appropriate field section.
+        """
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/article/add/'))
+        self.assertFalse(self.selenium.find_element_by_id('id_title').is_displayed())
+        self.selenium.find_elements_by_link_text('Show')[0].click()
+        self.assertTrue(self.selenium.find_element_by_id('id_title').is_displayed())
+        self.assertEqual(
+            self.selenium.find_element_by_id('fieldsetcollapser0').text,
+            "Hide"
+        )
 
-class SeleniumPrePopulatedChromeTests(SeleniumPrePopulatedFirefoxTests):
+
+class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 
-class SeleniumPrePopulatedIETests(SeleniumPrePopulatedFirefoxTests):
+class SeleniumAdminViewsIETests(SeleniumAdminViewsFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
