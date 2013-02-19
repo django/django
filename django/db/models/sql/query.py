@@ -524,31 +524,15 @@ class Query(object):
                 # the join type for the unused alias.
                 self.unref_alias(new_alias)
 
-        # So that we don't exclude valid results in an "or" query combination,
+        # So that we don't exclude valid results in an OR query combination,
         # all joins exclusive to either the lhs or the rhs must be converted
-        # to an outer join.
+        # to an outer join. RHS joins were already set to outer joins above,
+        # so check which joins were used only in the lhs query.
         if not conjunction:
-            l_tables = set(self.tables)
-            r_tables = set(rhs.tables)
-            # Update r_tables aliases.
-            for alias in change_map:
-                if alias in r_tables:
-                    # r_tables may contain entries that have a refcount of 0
-                    # if the query has references to a table that can be
-                    # trimmed because only the foreign key is used.
-                    # We only need to fix the aliases for the tables that
-                    # actually have aliases.
-                    if rhs.alias_refcount[alias]:
-                        r_tables.remove(alias)
-                        r_tables.add(change_map[alias])
-            # Find aliases that are exclusive to rhs or lhs.
-            # These are promoted to outer joins.
-            outer_tables = (l_tables | r_tables) - (l_tables & r_tables)
-            for alias in outer_tables:
-                # Again, some of the tables won't have aliases due to
-                # the trimming of unnecessary tables.
-                if self.alias_refcount.get(alias) or rhs.alias_refcount.get(alias):
-                    self.promote_joins([alias], True)
+            rhs_used_joins = set(change_map.values())
+            to_promote = [alias for alias in self.tables
+                          if alias not in rhs_used_joins]
+            self.promote_joins(to_promote, True)
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
