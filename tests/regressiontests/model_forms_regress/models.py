@@ -68,6 +68,10 @@ class Homepage(models.Model):
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused', blank=True)
 
+class TitledDocument(models.Model):
+    title = models.CharField(max_length=255)
+    myfile = models.FileField(upload_to='unused', blank=True)
+
 class Edition(models.Model):
     author = models.ForeignKey(Person)
     publication = models.ForeignKey(Publication)

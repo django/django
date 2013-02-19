@@ -12,7 +12,8 @@ from django.utils import unittest
 from django.test import TestCase
 
 from .models import (Person, RealPerson, Triple, FilePathModel, Article,
-    Publication, CustomFF, Author, Author1, Homepage, Document, Edition)
+    Publication, CustomFF, Author, Author1, Homepage, Document, 
+    TitledDocument, Edition)
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -363,6 +364,10 @@ class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
 
+class TitledDocumentForm(forms.ModelForm):
+    class Meta:
+        model = TitledDocument
+
 class FileFieldTests(unittest.TestCase):
     def test_clean_false(self):
         """
@@ -424,6 +429,18 @@ class FileFieldTests(unittest.TestCase):
         rendered = six.text_type(form)
         self.assertTrue('something.txt' in rendered)
         self.assertTrue('myfile-clear' in rendered)
+    def test_bound_render(self):
+        """
+        Test that bound data will be rendered correctly after form errors
+        """
+        form = TitledDocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')}, 
+                                  data={'title':'Title'})
+        self.assertTrue(form.is_valid())
+        doc = form.save(commit=False)
+        form = TitledDocumentForm(instance=doc, data={'myfile-clear': 'true'})
+        rendered = six.text_type(form)
+        self.assertTrue('something.txt' in rendered)
+        
 
 class EditionForm(forms.ModelForm):
     author = forms.ModelChoiceField(queryset=Person.objects.all())
