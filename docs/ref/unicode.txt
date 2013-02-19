@@ -68,7 +68,7 @@ Python 2 with unicode literals or Python 3::
 
 See also :doc:`Python 3 compatibility </topics/python3>`.
 
-.. admonition:: Warning
+.. warning::
 
     A bytestring does not carry any information with it about its encoding.
     For that reason, we have to make an assumption, and Django assumes that all

@@ -408,7 +408,7 @@ This dotted pair describes the name of the Django app (which must be in your
 :setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
 use as your User model.
 
-.. admonition:: Warning
+.. warning::
 
    Changing :setting:`AUTH_USER_MODEL` has a big effect on your database
    structure. It changes the tables that are available, and it will affect the
