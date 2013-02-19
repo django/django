@@ -53,7 +53,7 @@ class AdminDateWidget(forms.DateInput):
 
     @property
     def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        js = ["datetimeshortcuts.min.js"]
         return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, attrs=None, format=None):
@@ -66,7 +66,7 @@ class AdminTimeWidget(forms.TimeInput):
 
     @property
     def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        js = ["datetimeshortcuts.min.js"]
         return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, attrs=None, format=None):

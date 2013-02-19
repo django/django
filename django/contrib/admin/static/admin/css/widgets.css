@@ -393,7 +393,8 @@ span.clearable-file-input label {
     right: 0;
 }
 
-.calendar-cancel {
+.calendar-cancel,
+.clock-cancel {
     margin: 0 !important;
     padding: 0 !important;
     font-size: 10px;
@@ -410,7 +411,7 @@ span.clearable-file-input label {
     display: block;
 }
 
-ul.timelist, .timelist li {
+.clockbox ul.timelist, .clockbox .timelist li {
     list-style-type: none;
     margin: 0;
     padding: 0;
