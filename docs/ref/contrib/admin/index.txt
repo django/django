@@ -271,7 +271,7 @@ subclass::
         Example::
 
             {
-            'classes': ['wide', 'extrapretty'],
+            'classes': ('wide', 'extrapretty'),
             }
 
         Two useful classes defined by the default admin site stylesheet are
