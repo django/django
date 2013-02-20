@@ -118,6 +118,11 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
+The default value of this setting in Django 1.3.6+ is ``['*']`` (accept any
+host) in order to avoid breaking backwards-compatibility in a security update,
+but in Django 1.5+ the default is ``[]`` and explicitly configuring this
+setting is required.
+
 .. setting:: ALLOWED_INCLUDE_ROOTS
 
 ALLOWED_INCLUDE_ROOTS
