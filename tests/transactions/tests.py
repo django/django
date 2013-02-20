@@ -165,7 +165,6 @@ class TransactionRollbackTests(TransactionTestCase):
     def execute_bad_sql(self):
         cursor = connection.cursor()
         cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
-        transaction.set_dirty()
 
     @skipUnlessDBFeature('requires_rollback_on_dirty_transaction')
     def test_bad_sql(self):
@@ -306,5 +305,4 @@ class TransactionContextManagerTests(TransactionTestCase):
             with transaction.commit_on_success():
                 cursor = connection.cursor()
                 cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
-                transaction.set_dirty()
         transaction.rollback()

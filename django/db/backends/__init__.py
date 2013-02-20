@@ -41,7 +41,10 @@ class BaseDatabaseWrapper(object):
         # Transaction related attributes
         self.transaction_state = []
         self.savepoint_state = 0
-        self._dirty = None
+        # Tracks if the connection is believed to be in transaction. This is
+        # set somewhat aggressively, as the DBAPI doesn't make it easy to
+        # deduce if the connection is in transaction or not.
+        self._dirty = False
         self._thread_ident = thread.get_ident()
         self.allow_thread_sharing = allow_thread_sharing
 
@@ -118,8 +121,7 @@ class BaseDatabaseWrapper(object):
         stack.
         """
         if self._dirty:
-            self._rollback()
-            self._dirty = False
+            self.rollback()
         while self.transaction_state:
             self.leave_transaction_management()
 
@@ -137,9 +139,6 @@ class BaseDatabaseWrapper(object):
             self.transaction_state.append(self.transaction_state[-1])
         else:
             self.transaction_state.append(settings.TRANSACTIONS_MANAGED)
-
-        if self._dirty is None:
-            self._dirty = False
         self._enter_transaction_management(managed)
 
     def leave_transaction_management(self):
@@ -153,14 +152,16 @@ class BaseDatabaseWrapper(object):
         else:
             raise TransactionManagementError(
                 "This code isn't under transaction management")
+        # The _leave_transaction_management hook can change the dirty flag,
+        # so memoize it.
+        dirty = self._dirty
         # We will pass the next status (after leaving the previous state
         # behind) to subclass hook.
         self._leave_transaction_management(self.is_managed())
-        if self._dirty:
+        if dirty:
             self.rollback()
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
-        self._dirty = False
 
     def validate_thread_sharing(self):
         """
@@ -190,11 +191,7 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        if self._dirty is not None:
-            self._dirty = True
-        else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+        self._dirty = True
 
     def set_clean(self):
         """
@@ -202,10 +199,7 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether a commit or rollback
         should happen.
         """
-        if self._dirty is not None:
-            self._dirty = False
-        else:
-            raise TransactionManagementError("This code isn't under transaction management")
+        self._dirty = False
         self.clean_savepoints()
 
     def clean_savepoints(self):
@@ -233,8 +227,7 @@ class BaseDatabaseWrapper(object):
         if top:
             top[-1] = flag
             if not flag and self.is_dirty():
-                self._commit()
-                self.set_clean()
+                self.commit()
         else:
             raise TransactionManagementError("This code isn't under transaction "
                 "management")
@@ -245,7 +238,7 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if not self.is_managed():
-            self._commit()
+            self.commit()
             self.clean_savepoints()
         else:
             self.set_dirty()
@@ -256,7 +249,7 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_thread_sharing()
         if not self.is_managed():
-            self._rollback()
+            self.rollback()
         else:
             self.set_dirty()
 
@@ -343,6 +336,7 @@ class BaseDatabaseWrapper(object):
         if self.connection is not None:
             self.connection.close()
             self.connection = None
+        self.set_clean()
 
     def cursor(self):
         self.validate_thread_sharing()
@@ -485,14 +479,13 @@ class BaseDatabaseFeatures(object):
             self.connection.managed(True)
             cursor = self.connection.cursor()
             cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-            self.connection._commit()
+            self.connection.commit()
             cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-            self.connection._rollback()
+            self.connection.rollback()
             cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
             count, = cursor.fetchone()
             cursor.execute('DROP TABLE ROLLBACK_TEST')
-            self.connection._commit()
-            self.connection._dirty = False
+            self.connection.commit()
         finally:
             self.connection.leave_transaction_management()
         return count == 0

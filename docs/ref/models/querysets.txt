@@ -1249,11 +1249,6 @@ make the call non-blocking. If a conflicting lock is already acquired by
 another transaction, :exc:`~django.db.DatabaseError` will be raised when the
 queryset is evaluated.
 
-Note that using ``select_for_update()`` will cause the current transaction to be
-considered dirty, if under transaction management. This is to ensure that
-Django issues a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the
-``SELECT FOR UPDATE``.
-
 Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL has no support for the
 ``nowait`` argument. Obviously, users of external third-party backends should
