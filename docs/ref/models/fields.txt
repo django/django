@@ -1061,6 +1061,9 @@ define the details of how the relation works.
     * You have legacy data that is not valid.
     * You're sharding your database.
 
+    If you use this, accessing a related object that doesn't exist will raise
+    its ``DoesNotExist`` exception.
+
 .. attribute:: ForeignKey.on_delete
 
     When an object referenced by a :class:`ForeignKey` is deleted, Django by
