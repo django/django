@@ -631,12 +631,11 @@ databases <contrib_app_multiple_databases>` for more information.
 XML deserializer will not parse documents with a DTD
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to prevent exposure to denial-of-service attacks related to external
-entity references and entity expansion, the XML model deserializer now refuses
-to parse XML documents containing a DTD (DOCTYPE definition). Since the XML
-serializer does not output a DTD, this will not impact typical usage, only
-cases where custom-created XML documents are passed to Django's model
-deserializer.
+In order to prevent exposure to attacks related to external entity references
+and entity expansion, the XML model deserializer now refuses to parse XML
+documents containing a DTD (DOCTYPE definition). Since the XML serializer does
+not output a DTD, this will not impact typical usage, only cases where
+custom-created XML documents are passed to Django's model deserializer.
 
 Formsets default ``max_num``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
