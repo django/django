@@ -904,7 +904,9 @@ Here is an example of an admin-compliant custom user app. This user model uses
 an email address as the username, and has a required date of birth; it
 provides no permission checking, beyond a simple `admin` flag on the user
 account. This model would be compatible with all the built-in auth forms and
-views, except for the User creation forms.
+views, except for the User creation forms. This example illustrates how most of
+the components work together, but is not intended to be copied directly into
+projects for production use.
 
 This code would all live in a ``models.py`` file for a custom
 authentication app::
