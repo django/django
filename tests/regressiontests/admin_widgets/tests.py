@@ -597,12 +597,14 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
 
+        self.wait_page_loaded()
         self.execute_basic_operations('vertical', 'students')
         self.execute_basic_operations('horizontal', 'alumni')
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.wait_page_loaded()
+        self.school = models.School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.arthur, self.cliff, self.jason, self.john])
         self.assertEqual(list(self.school.alumni.all()),
@@ -681,6 +683,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
         self.school = models.School.objects.get(id=self.school.id) # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.jason, self.peter])

@@ -445,15 +445,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
 
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-
-        try:
-            # Wait for the next page to be loaded.
-            self.wait_loaded_tag('body')
-        except TimeoutException:
-            # IE7 occasionnally returns an error "Internet Explorer cannot
-            # display the webpage" and doesn't load the next page. We just
-            # ignore it.
-            pass
+        self.wait_page_loaded()
 
         # Check that the objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)

@@ -49,6 +49,20 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
             timeout
         )
 
+    def wait_page_loaded(self):
+        """
+        Block until page has started to load.
+        """
+        from selenium.common.exceptions import TimeoutException
+        try:
+            # Wait for the next page to be loaded
+            self.wait_loaded_tag('body')
+        except TimeoutException:
+            # IE7 occasionnally returns an error "Internet Explorer cannot
+            # display the webpage" and doesn't load the next page. We just
+            # ignore it.
+            pass
+
     def admin_login(self, username, password, login_url='/admin/'):
         """
         Helper function to log into the admin.
@@ -61,8 +75,7 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         login_text = _('Log in')
         self.selenium.find_element_by_xpath(
             '//input[@value="%s"]' % login_text).click()
-        # Wait for the next page to be loaded.
-        self.wait_loaded_tag('body')
+        self.wait_page_loaded()
 
     def get_css_value(self, selector, attribute):
         """
