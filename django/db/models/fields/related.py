@@ -981,9 +981,10 @@ class ForeignKey(RelatedField, Field):
     }
     description = _("Foreign Key (type determined by related field)")
 
-    def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
+    def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
+                 db_constraint=True, **kwargs):
         try:
-            to_name = to._meta.model_name
+            to._meta.model_name
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
@@ -997,13 +998,14 @@ class ForeignKey(RelatedField, Field):
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
 
+        self.db_constraint = db_constraint
         kwargs['rel'] = rel_class(to, to_field,
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
-        Field.__init__(self, **kwargs)
+        super(ForeignKey, self).__init__(**kwargs)
 
     def get_path_info(self):
         """
