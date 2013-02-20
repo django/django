@@ -52,8 +52,8 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
-        self.e2 = ExtraInfo.objects.create(info='e2', note=n2)
-        e1 = ExtraInfo.objects.create(info='e1', note=self.n1)
+        self.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
+        e1 = ExtraInfo.objects.create(info='e1', note=self.n1, value=42)
 
         self.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
         self.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
@@ -1105,6 +1105,13 @@ class Queries1Tests(BaseQuerysetTest):
         )
         self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 1)
         self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+
+    def test_ticket19672(self):
+        self.assertQuerysetEqual(
+            Report.objects.filter(Q(creator__isnull=False) &
+                                  ~Q(creator__extra__value=41)),
+            ['<Report: r1>']
+        )
 
 
 class Queries2Tests(TestCase):
