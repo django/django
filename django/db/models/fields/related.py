@@ -998,7 +998,7 @@ class ForeignKey(RelatedField, Field):
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
 
-        self.db_contraint = db_constraint
+        self.db_constraint = db_constraint
         kwargs['rel'] = rel_class(to, to_field,
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),

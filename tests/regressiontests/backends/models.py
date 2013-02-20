@@ -96,3 +96,6 @@ class Object(models.Model):
 @python_2_unicode_compatible
 class ObjectReference(models.Model):
     obj = models.ForeignKey(Object, db_constraint=False)
+
+    def __str__(self):
+        return str(self.obj_id)
