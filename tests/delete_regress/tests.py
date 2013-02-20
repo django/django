@@ -23,11 +23,13 @@ class DeleteLockingTest(TransactionTestCase):
         # Put both DB connections into managed transaction mode
         transaction.enter_transaction_management()
         transaction.managed(True)
-        self.conn2._enter_transaction_management(True)
+        self.conn2.enter_transaction_management()
+        self.conn2.managed(True)
 
     def tearDown(self):
         # Close down the second connection.
         transaction.leave_transaction_management()
+        self.conn2.abort()
         self.conn2.close()
 
     @skipUnlessDBFeature('test_db_allows_multiple_connections')

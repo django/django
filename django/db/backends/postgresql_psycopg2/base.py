@@ -149,6 +149,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 exc_info=sys.exc_info()
             )
             raise
+        finally:
+            self.set_clean()
 
     @cached_property
     def pg_version(self):
@@ -233,9 +235,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             if self.connection is not None:
                 self.connection.set_isolation_level(level)
+            if level == psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT:
+                self.set_clean()
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
+
+    def set_dirty(self):
+        if ((self.transaction_state and self.transaction_state[-1]) or
+                not self.features.uses_autocommit):
+            super(DatabaseWrapper, self).set_dirty()
 
     def _commit(self):
         if self.connection is not None:

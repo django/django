@@ -19,13 +19,9 @@ class CursorWrapper(object):
         self.cursor = cursor
         self.db = db
 
-    def set_dirty(self):
-        if self.db.is_managed():
-            self.db.set_dirty()
-
     def __getattr__(self, attr):
         if attr in ('execute', 'executemany', 'callproc'):
-            self.set_dirty()
+            self.db.set_dirty()
         return getattr(self.cursor, attr)
 
     def __iter__(self):
@@ -35,7 +31,7 @@ class CursorWrapper(object):
 class CursorDebugWrapper(CursorWrapper):
 
     def execute(self, sql, params=()):
-        self.set_dirty()
+        self.db.set_dirty()
         start = time()
         try:
             return self.cursor.execute(sql, params)
@@ -52,7 +48,7 @@ class CursorDebugWrapper(CursorWrapper):
             )
 
     def executemany(self, sql, param_list):
-        self.set_dirty()
+        self.db.set_dirty()
         start = time()
         try:
             return self.cursor.executemany(sql, param_list)

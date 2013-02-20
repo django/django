@@ -24,7 +24,7 @@ requires_threading = unittest.skipUnless(threading, 'requires threading')
 class SelectForUpdateTests(TransactionTestCase):
 
     def setUp(self):
-        transaction.enter_transaction_management(True)
+        transaction.enter_transaction_management()
         transaction.managed(True)
         self.person = Person.objects.create(name='Reinhardt')
 
@@ -48,9 +48,8 @@ class SelectForUpdateTests(TransactionTestCase):
         try:
             # We don't really care if this fails - some of the tests will set
             # this in the course of their run.
-            transaction.managed(False)
-            transaction.leave_transaction_management()
-            self.new_connection.leave_transaction_management()
+            transaction.abort()
+            self.new_connection.abort()
         except transaction.TransactionManagementError:
             pass
         self.new_connection.close()
@@ -73,7 +72,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
     def end_blocking_transaction(self):
         # Roll back the blocking transaction.
-        self.new_connection._rollback()
+        self.new_connection.rollback()
 
     def has_for_update_sql(self, tested_connection, nowait=False):
         # Examine the SQL that was executed to determine whether it
@@ -119,6 +118,7 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         self.start_blocking_transaction()
         status = []
+
         thread = threading.Thread(
             target=self.run_select_for_update,
             args=(status,),
@@ -164,7 +164,7 @@ class SelectForUpdateTests(TransactionTestCase):
         try:
             # We need to enter transaction management again, as this is done on
             # per-thread basis
-            transaction.enter_transaction_management(True)
+            transaction.enter_transaction_management()
             transaction.managed(True)
             people = list(
                 Person.objects.all().select_for_update(nowait=nowait)
@@ -177,6 +177,7 @@ class SelectForUpdateTests(TransactionTestCase):
         finally:
             # This method is run in a separate thread. It uses its own
             # database connection. Close it without waiting for the GC.
+            transaction.abort()
             connection.close()
 
     @requires_threading
@@ -271,13 +272,3 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         people = list(Person.objects.select_for_update())
         self.assertTrue(transaction.is_dirty())
-
-    @skipUnlessDBFeature('has_select_for_update')
-    def test_transaction_not_dirty_unmanaged(self):
-        """ If we're not under txn management, the txn will never be
-        marked as dirty.
-        """
-        transaction.managed(False)
-        transaction.leave_transaction_management()
-        people = list(Person.objects.select_for_update())
-        self.assertFalse(transaction.is_dirty())

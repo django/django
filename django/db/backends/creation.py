@@ -385,8 +385,8 @@ class BaseDatabaseCreation(object):
         # Create the test database and connect to it. We need to autocommit
         # if the database supports it because PostgreSQL doesn't allow
         # CREATE/DROP DATABASE statements within transactions.
-        cursor = self.connection.cursor()
         self._prepare_for_test_db_ddl()
+        cursor = self.connection.cursor()
         try:
             cursor.execute(
                 "CREATE DATABASE %s %s" % (qn(test_database_name), suffix))

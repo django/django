@@ -687,11 +687,6 @@ class SQLCompiler(object):
         resolve_columns = hasattr(self, 'resolve_columns')
         fields = None
         has_aggregate_select = bool(self.query.aggregate_select)
-        # Set transaction dirty if we're using SELECT FOR UPDATE to ensure
-        # a subsequent commit/rollback is executed, so any database locks
-        # are released.
-        if self.query.select_for_update and transaction.is_managed(self.using):
-            transaction.set_dirty(self.using)
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:

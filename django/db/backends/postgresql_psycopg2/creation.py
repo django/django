@@ -82,6 +82,8 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _prepare_for_test_db_ddl(self):
         """Rollback and close the active transaction."""
+        # Make sure there is an open connection.
+        self.connection.cursor()
         self.connection.connection.rollback()
         self.connection.connection.set_isolation_level(
                 psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

@@ -683,6 +683,9 @@ class TransactionMiddlewareTest(TransactionTestCase):
         self.response = HttpResponse()
         self.response.status_code = 200
 
+    def tearDown(self):
+        transaction.abort()
+
     def test_request(self):
         TransactionMiddleware().process_request(self.request)
         self.assertTrue(transaction.is_managed())
@@ -697,10 +700,14 @@ class TransactionMiddlewareTest(TransactionTestCase):
         self.assertEqual(Band.objects.count(), 1)
 
     def test_unmanaged_response(self):
+        transaction.enter_transaction_management()
         transaction.managed(False)
+        self.assertEqual(Band.objects.count(), 0)
         TransactionMiddleware().process_response(self.request, self.response)
         self.assertFalse(transaction.is_managed())
-        self.assertFalse(transaction.is_dirty())
+        # The transaction middleware doesn't commit/rollback if management
+        # has been disabled.
+        self.assertTrue(transaction.is_dirty())
 
     def test_exception(self):
         transaction.enter_transaction_management()
@@ -708,8 +715,8 @@ class TransactionMiddlewareTest(TransactionTestCase):
         Band.objects.create(name='The Beatles')
         self.assertTrue(transaction.is_dirty())
         TransactionMiddleware().process_exception(self.request, None)
-        self.assertEqual(Band.objects.count(), 0)
         self.assertFalse(transaction.is_dirty())
+        self.assertEqual(Band.objects.count(), 0)
 
     def test_failing_commit(self):
         # It is possible that connection.commit() fails. Check that
@@ -724,8 +731,8 @@ class TransactionMiddlewareTest(TransactionTestCase):
             self.assertTrue(transaction.is_dirty())
             with self.assertRaises(IntegrityError):
                 TransactionMiddleware().process_response(self.request, None)
-            self.assertEqual(Band.objects.count(), 0)
             self.assertFalse(transaction.is_dirty())
+            self.assertEqual(Band.objects.count(), 0)
             self.assertFalse(transaction.is_managed())
         finally:
             del connections[DEFAULT_DB_ALIAS].commit
