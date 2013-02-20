@@ -1193,15 +1193,15 @@ class Query(object):
             self.promote_joins(join_list)
             if lookup_type != 'isnull':
                 if len(join_list) > 1:
-                    for alias in join_list:
-                        if self.alias_map[alias].join_type == self.LOUTER:
-                            j_col = self.alias_map[alias].rhs_join_col
+                    for j_alias in join_list:
+                        if self.alias_map[j_alias].join_type == self.LOUTER:
+                            j_col = self.alias_map[j_alias].rhs_join_col
                             # The join promotion logic should never produce
                             # a LOUTER join for the base join - assert that.
                             assert j_col is not None
                             entry = self.where_class()
                             entry.add(
-                                (Constraint(alias, j_col, None), 'isnull', True),
+                                (Constraint(j_alias, j_col, None), 'isnull', True),
                                 AND
                             )
                             entry.negate()
