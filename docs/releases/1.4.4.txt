@@ -40,12 +40,11 @@ XML deserialization
 -------------------
 
 The XML parser in the Python standard library is vulnerable to a number of
-denial-of-service attacks via external entities and entity expansion. Django
-uses this parser for deserializing XML-formatted database fixtures. This
-deserializer is not intended for use with untrusted data, but in order to err
-on the side of safety in Django 1.4.4 the XML deserializer refuses to parse an
-XML document with a DTD (DOCTYPE definition), which closes off these attack
-avenues.
+attacks via external entities and entity expansion. Django uses this parser for
+deserializing XML-formatted database fixtures. This deserializer is not
+intended for use with untrusted data, but in order to err on the side of safety
+in Django 1.4.4 the XML deserializer refuses to parse an XML document with a
+DTD (DOCTYPE definition), which closes off these attack avenues.
 
 These issues in the Python standard library are CVE-2013-1664 and
 CVE-2013-1665. More information available `from the Python security team`_.
