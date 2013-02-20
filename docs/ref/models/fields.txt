@@ -1061,8 +1061,8 @@ define the details of how the relation works.
     * You have legacy data that is not valid.
     * You're sharding your database.
 
-    If you use this, accessing a related object that doesn't exist will raise
-    its ``DoesNotExist`` exception.
+    If this is set to ``False``, accessing a related object that doesn't exist
+    will raise its ``DoesNotExist`` exception.
 
 .. attribute:: ForeignKey.on_delete
 
