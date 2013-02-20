@@ -3262,16 +3262,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Save and check that everything is properly stored in the database
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-
-        try:
-            # Wait for the next page to be loaded.
-            self.wait_loaded_tag('body')
-        except TimeoutException:
-            # IE7 occasionnally returns an error "Internet Explorer cannot
-            # display the webpage" and doesn't load the next page. We just
-            # ignore it.
-            pass
-
+        self.wait_page_loaded()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
             name=' this is the mAin nÀMë and it\'s awεšome',
