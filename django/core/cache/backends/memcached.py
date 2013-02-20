@@ -7,6 +7,8 @@ from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 
 from django.utils import six
 from django.utils.encoding import force_str
+import pickle
+
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
@@ -31,7 +33,9 @@ class BaseMemcachedCache(BaseCache):
         Implements transparent thread-safe access to a memcached client.
         """
         if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers)
+            client_options = self._options.get('CLIENT_OPTIONS') if self._options else {}
+            client_options['pickleProtocol'] = client_options.get('pickleProtocol', pickle.HIGHEST_PROTOCOL)
+            self._client = self._lib.Client(self._servers, **client_options)
 
         return self._client
 
@@ -145,6 +149,18 @@ class MemcachedCache(BaseMemcachedCache):
         super(MemcachedCache, self).__init__(server, params,
                                              library=memcache,
                                              value_not_found_exception=ValueError)
+
+    def set(self, key, value, timeout=0, version=None):
+        key = self.make_key(key, version=version)
+
+        options = self._options.get('MIN_COMPRESS_LEN') if self._options else {}
+        if options:
+            options = {'min_compress_len': options}
+        else:
+            options = {}
+
+        self._cache.set(key, value, self._get_memcache_timeout(timeout))
+
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"

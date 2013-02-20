@@ -152,6 +152,28 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
+Memcached backend OPTIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+``django.core.cache.backends.memcached.MemcachedCache`` supports the following ``OPTIONS``
+
+
+* ``OPTIONS['MIN_COMPRESS_LEN']``: Number of bytes, as integer, which a value to be cached has before be compressed with ``zlib``. Values bigger than this size, will be compressed. 
+  It increases the the memcached range of values that can be stored, specially for HTML text.
+
+* ``OPTIONS['CLIENT_OPTIONS']``: Dict of arguments that are passed direct o ``python-memcached.Client``. 
+
+* ``OPTIONS['CLIENT_OPTIONS']['pickleProtocol']``: Currently it has default to ``pickle.HIGHEST_PROTOCOL``, set to 0 if you want previous protocol
+
+* ``OPTIONS['CLIENT_OPTIONS']['server_max_value_length']``: ``python-memcache`` has ``1024 * 1024  # bytes`` as default, values bigger than this integer value will be ignored. Check your memcached `echo "stats settings" | nc localhost 11211`, look for this output: `STAT maxbytes 67108864`
+
+
+``django.core.cache.backends.memcached.PyLibMCCache`` supports the following ``OPTIONS``
+
+All options are set as `client.behaviors`. It accepts `min_compress_len` option, amongst others, see `pylibmc`_ documentation for more information.
+
+
 Database caching
 ----------------
 
