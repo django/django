@@ -7,13 +7,12 @@ import threading
 
 from django.conf import settings
 from django.core.management.color import no_style
-from django.core.exceptions import ImproperlyConfigured
 from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
     IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.models import fields, Sum, Avg, Variance, StdDev
-from django.db.utils import ConnectionHandler, DatabaseError, load_backend
+from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.utils import ConnectionHandler, DatabaseError
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings, str_prefix
@@ -724,3 +723,22 @@ class MySQLPKZeroTests(TestCase):
     def test_zero_as_autoval(self):
         with self.assertRaises(ValueError):
             models.Square.objects.create(id=0, root=0, square=1)
+
+
+class DBConstraintTestCase(TransactionTestCase):
+    def test_can_reference_existant(self):
+        obj = models.Object.objects.create()
+        ref = models.ObjectReference.objects.create(obj=obj)
+        self.assertEqual(ref.obj, obj)
+
+        ref = models.ObjectReference.objects.get(obj=obj)
+        self.assertEqual(ref.obj, obj)
+
+    def test_can_reference_non_existant(self):
+        self.assertFalse(models.Object.objects.filter(id=12345).exists())
+        ref = models.ObjectReference.objects.create(obj_id=12345)
+        ref_new = models.ObjectReference.objects.get(obj_id=12345)
+        self.assertEqual(ref, ref_new)
+
+        with self.assertRaises(models.Object.DoesNotExist):
+            ref.obj

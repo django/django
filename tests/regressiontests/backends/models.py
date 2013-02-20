@@ -39,7 +39,7 @@ if connection.features.supports_long_model_names:
             verbose_name = 'model_with_long_table_name'
         primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(primary_key=True)
         charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(max_length=100)
-        m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person,blank=True)
+        m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person, blank=True)
 
 
 class Tag(models.Model):
@@ -86,3 +86,16 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class Object(models.Model):
+    pass
+
+
+@python_2_unicode_compatible
+class ObjectReference(models.Model):
+    obj = models.ForeignKey(Object, db_constraint=False)
+
+    def __str__(self):
+        return str(self.obj_id)

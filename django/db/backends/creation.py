@@ -77,7 +77,7 @@ class BaseDatabaseCreation(object):
                     tablespace, inline=True)
                 if tablespace_sql:
                     field_output.append(tablespace_sql)
-            if f.rel:
+            if f.rel and f.db_constraint:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(
                     model, f, known_models, style)
                 if pending:
