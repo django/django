@@ -386,6 +386,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
+    def combine_expression(self, connector, sub_expressions):
+        """
+        MySQL requires special cases for ^ operators in query expressions
+        """
+        if connector == '^':
+            return 'POW(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'

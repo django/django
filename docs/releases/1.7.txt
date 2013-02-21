@@ -346,6 +346,9 @@ Models
   :attr:`~django.db.models.ForeignKey.related_name` to
   `'+'` or ending it with `'+'`.
 
+* :class:`F expressions <django.db.models.F>` support the power operator
+  (``**``).
+
 Signals
 ^^^^^^^
 
