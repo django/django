@@ -24,6 +24,19 @@ class TransactionManagementError(Exception):
     """
     pass
 
+################
+# Private APIs #
+################
+
+def get_connection(using=None):
+    """
+    Get a database connection by name, or the default database connection
+    if no name is provided.
+    """
+    if using is None:
+        using = DEFAULT_DB_ALIAS
+    return connections[using]
+
 def abort(using=None):
     """
     Roll back any ongoing transactions and clean the transaction management
@@ -34,10 +47,7 @@ def abort(using=None):
     request has finished, the transaction state isn't known, yet the connection
     must be cleaned up for the next request.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.abort()
+    get_connection(using).abort()
 
 def enter_transaction_management(managed=True, using=None):
     """
@@ -49,10 +59,7 @@ def enter_transaction_management(managed=True, using=None):
     from the settings, if there is no surrounding block (dirty is always false
     when no current block is running).
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.enter_transaction_management(managed)
+    get_connection(using).enter_transaction_management(managed)
 
 def leave_transaction_management(using=None):
     """
@@ -60,20 +67,14 @@ def leave_transaction_management(using=None):
     over to the surrounding block, as a commit will commit all changes, even
     those from outside. (Commits are on connection level.)
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.leave_transaction_management()
+    get_connection(using).leave_transaction_management()
 
 def is_dirty(using=None):
     """
     Returns True if the current transaction requires a commit for changes to
     happen.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    return connection.is_dirty()
+    return get_connection(using).is_dirty()
 
 def set_dirty(using=None):
     """
@@ -81,10 +82,7 @@ def set_dirty(using=None):
     to decide in a managed block of code to decide whether there are open
     changes waiting for commit.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.set_dirty()
+    get_connection(using).set_dirty()
 
 def set_clean(using=None):
     """
@@ -92,25 +90,19 @@ def set_clean(using=None):
     to decide in a managed block of code to decide whether a commit or rollback
     should happen.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.set_clean()
+    get_connection(using).set_clean()
 
 def clean_savepoints(using=None):
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.clean_savepoints()
+    """
+    Resets the counter used to generate unique savepoint ids in this thread.
+    """
+    get_connection(using).clean_savepoints()
 
 def is_managed(using=None):
     """
     Checks whether the transaction manager is in manual or in auto state.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    return connection.is_managed()
+    return get_connection(using).is_managed()
 
 def managed(flag=True, using=None):
     """
@@ -119,46 +111,35 @@ def managed(flag=True, using=None):
     management and there is a pending commit/rollback, the data will be
     commited.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.managed(flag)
+    get_connection(using).managed(flag)
 
 def commit_unless_managed(using=None):
     """
     Commits changes if the system is not in managed transaction mode.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.commit_unless_managed()
+    get_connection(using).commit_unless_managed()
 
 def rollback_unless_managed(using=None):
     """
     Rolls back changes if the system is not in managed transaction mode.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.rollback_unless_managed()
+    get_connection(using).rollback_unless_managed()
+
+###############
+# Public APIs #
+###############
 
 def commit(using=None):
     """
     Does the commit itself and resets the dirty flag.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.commit()
+    get_connection(using).commit()
 
 def rollback(using=None):
     """
     This function does the rollback itself and resets the dirty flag.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.rollback()
+    get_connection(using).rollback()
 
 def savepoint(using=None):
     """
@@ -166,30 +147,21 @@ def savepoint(using=None):
     current transaction. Returns an identifier for the savepoint that will be
     used for the subsequent rollback or commit.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    return connection.savepoint()
+    return get_connection(using).savepoint()
 
 def savepoint_rollback(sid, using=None):
     """
     Rolls back the most recent savepoint (if one exists). Does nothing if
     savepoints are not supported.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.savepoint_rollback(sid)
+    get_connection(using).savepoint_rollback(sid)
 
 def savepoint_commit(sid, using=None):
     """
     Commits the most recent savepoint (if one exists). Does nothing if
     savepoints are not supported.
     """
-    if using is None:
-        using = DEFAULT_DB_ALIAS
-    connection = connections[using]
-    connection.savepoint_commit(sid)
+    get_connection(using).savepoint_commit(sid)
 
 ##############
 # DECORATORS #
