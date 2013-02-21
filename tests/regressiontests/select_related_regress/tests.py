@@ -5,7 +5,7 @@ from django.utils import six
 
 from .models import (Building, Child, Device, Port, Item, Country, Connection,
     ClientStatus, State, Client, SpecialClient, TUser, Person, Student,
-    Organizer, Class, Enrollment)
+    Organizer, Class, Enrollment, Hen, Chick)
 
 
 class SelectRelatedRegressTests(TestCase):
@@ -162,3 +162,14 @@ class SelectRelatedRegressTests(TestCase):
             # The select_related join was promoted as there is already an
             # existing join.
             self.assertTrue('LEFT OUTER' in str(qs.query))
+
+    def test_regression_19870(self):
+        """
+        Regression for #19870
+
+        """
+        hen = Hen.objects.create(name='Hen')
+        chick = Chick.objects.create(name='Chick', mother=hen)
+
+        self.assertEqual(Chick.objects.all()[0].mother.name, 'Hen')
+        self.assertEqual(Chick.objects.select_related()[0].mother.name, 'Hen')

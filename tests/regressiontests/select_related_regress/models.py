@@ -94,3 +94,17 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+# Models for testing bug #19870.
+@python_2_unicode_compatible
+class Fowl(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+class Hen(Fowl):
+    pass
+
+class Chick(Fowl):
+    mother = models.ForeignKey(Hen)
