@@ -304,6 +304,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         res.extend(["UNION ALL SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
         return " ".join(res)
 
+    def combine_expression(self, connector, sub_expressions):
+        # SQLite doesn't have a power function, so we fake it with a
+        # user-defined function django_power that's registered in connect().
+        if connector == '^':
+            return 'django_power(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
@@ -376,6 +383,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        conn.create_function("django_power", 2, _sqlite_power)
         return conn
 
     def init_connection_state(self):
@@ -567,3 +575,7 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
 
 def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, force_text(re_string))) if re_string is not None else False
+
+
+def _sqlite_power(x, y):
+    return x ** y
