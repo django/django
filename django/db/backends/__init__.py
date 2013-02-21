@@ -208,6 +208,9 @@ class BaseDatabaseWrapper(object):
         self.clean_savepoints()
 
     def clean_savepoints(self):
+        """
+        Resets the counter used to generate unique savepoint ids in this thread.
+        """
         self.savepoint_state = 0
 
     def is_managed(self):
