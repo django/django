@@ -130,7 +130,7 @@ class BaseIncludeNode(Node):
         super(BaseIncludeNode, self).__init__(*args, **kwargs)
 
     def render_template(self, template, context):
-        values = dict([(name, var.resolve(context)) for name, var
+        values = dict([(name, var.resolve(context, ignore_failures=True)) for name, var
                        in six.iteritems(self.extra_context)])
         if self.isolated_context:
             return template.render(context.new(values))
