@@ -265,14 +265,19 @@ class SQLCompiler(object):
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
-        seen = self.query.included_inherited_models.copy()
-        if start_alias:
-            seen[None] = start_alias
+        if not start_alias:
+            start_alias = self.query.get_initial_alias()
+        # The 'seen_models' is used to optimize checking the needed parent
+        # alias for a given field. This also includes None -> start_alias to
+        # be used by local fields.
+        seen_models = {None: start_alias}
+
         for field, model in opts.get_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
-            alias = self.query.join_parent_model(opts, model, start_alias, seen)
+            alias = self.query.join_parent_model(opts, model, start_alias,
+                                                 seen_models)
             table = self.query.alias_map[alias].table_name
             if table in only_load and field.column not in only_load[table]:
                 continue
