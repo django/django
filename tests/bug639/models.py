@@ -25,3 +25,4 @@ class Photo(models.Model):
 class PhotoForm(ModelForm):
     class Meta:
         model = Photo
+        fields = '__all__'

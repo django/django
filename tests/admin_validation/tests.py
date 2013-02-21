@@ -285,6 +285,8 @@ class ValidationTestCase(TestCase):
             extra_data = forms.CharField()
             class Meta:
                 model = Song
+                fields = '__all__'
+
 
         class FieldsOnFormOnlyAdmin(admin.ModelAdmin):
             form = SongForm

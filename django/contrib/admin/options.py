@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet)
+    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
@@ -488,6 +488,10 @@ class ModelAdmin(BaseModelAdmin):
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
+
+        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
+            defaults['fields'] = forms.ALL_FIELDS
+
         try:
             return modelform_factory(self.model, **defaults)
         except FieldError as e:
@@ -523,6 +527,10 @@ class ModelAdmin(BaseModelAdmin):
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
+        if (defaults.get('fields') is None
+            and not modelform_defines_fields(defaults.get('form'))):
+            defaults['fields'] = forms.ALL_FIELDS
+
         return modelform_factory(self.model, **defaults)
 
     def get_changelist_formset(self, request, **kwargs):
@@ -1527,6 +1535,10 @@ class InlineModelAdmin(BaseModelAdmin):
                 return result
 
         defaults['form'] = DeleteProtectedModelForm
+
+        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
+            defaults['fields'] = forms.ALL_FIELDS
+
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
     def get_fieldsets(self, request, obj=None):

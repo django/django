@@ -25,6 +25,14 @@ Model Form Functions
 
     See :ref:`modelforms-factory` for example usage.
 
+    .. versionchanged:: 1.6
+
+    You must provide the list of fields explicitly, either via keyword arguments
+    ``fields`` or ``exclude``, or the corresponding attributes on the form's
+    inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for more
+    information. Omitting any definition of the fields to use will result in all
+    fields being used, but this behaviour is deprecated.
+
 .. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False)
 
     Returns a ``FormSet`` class for the given ``model`` class.
