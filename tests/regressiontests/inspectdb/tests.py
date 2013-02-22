@@ -5,8 +5,13 @@ import re
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
+from django.utils.unittest import expectedFailure
 from django.utils.six import StringIO
 
+if connection.vendor == 'oracle':
+    expectedFailureOnOracle = expectedFailure
+else:
+    expectedFailureOnOracle = lambda f: f
 
 class InspectDBTestCase(TestCase):
 
@@ -23,6 +28,8 @@ class InspectDBTestCase(TestCase):
         # inspected
         self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
 
+    # Inspecting oracle DB doesn't produce correct results, see #19884
+    @expectedFailureOnOracle
     def test_field_types(self):
         """Test introspection of various Django field types"""
         out = StringIO()
