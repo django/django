@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from django.db import connection, router
+from django.db import connection, connections, router
 from django.db.backends import util
 from django.db.models import signals, get_model
 from django.db.models.fields import (AutoField, Field, IntegerField,
@@ -497,7 +497,8 @@ class ForeignRelatedObjectsDescriptor(object):
                 except (AttributeError, KeyError):
                     db = self._db or router.db_for_read(self.model, instance=self.instance)
                     qs = super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
-                    if getattr(self.instance, attname) is None:
+                    val = getattr(self.instance, attname)
+                    if val is None or val == '' and connections[db].features.interprets_empty_strings_as_nulls:
                         # We don't want to use qs.none() here, see #19652
                         return qs.filter(pk__in=[])
                     qs._known_related_objects = {rel_field: {self.instance.pk: self.instance}}
