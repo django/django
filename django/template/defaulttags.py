@@ -746,7 +746,7 @@ def do_for(parser, token):
         ==========================  ================================================
 
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) < 4:
         raise TemplateSyntaxError("'for' statements should have at least four"
                                   " words: %s" % token.contents)
