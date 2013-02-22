@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import codecs
 import os
 import re
+import warnings
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -160,7 +161,24 @@ def _split_statements(content):
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(models.get_app(model._meta.app_label).__file__)), 'sql'))
+    app = models.get_app(model._meta.app_label)
+    app_dirs = []
+    if hasattr(app, '__path__'):
+        # It is a models/ subpackage
+        for path in app.__path__:
+            app_dirs.append(os.path.dirname(upath(path)))
+    else:
+        # It is a models.py module
+        app_dirs.append(os.path.dirname(upath(app.__file__)))
+    app_dirs = [os.path.normpath(os.path.join(d, 'sql')) for d in app_dirs]
+    # Deprecated location
+    old_app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(app.__file__)), 'sql'))
+    if old_app_dir not in app_dirs:
+        if os.path.exists(old_app_dir):
+            warnings.warn("Custom SQL location '<app_label>/models/sql' is deprecated, use '<app_label/sql>' instead.",
+                          PendingDeprecationWarning)
+        app_dirs.append(old_app_dir)
+
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
@@ -173,8 +191,10 @@ def custom_sql_for_model(model, style, connection):
 
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)),
-                 os.path.join(app_dir, "%s.sql" % opts.model_name)]
+    sql_files = []
+    for app_dir in app_dirs:
+        sql_files.append(os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)))
+        sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
