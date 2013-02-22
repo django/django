@@ -15,12 +15,19 @@ class SQLCommandsTestCase(TestCase):
     def test_sql_create(self):
         app = models.get_app('commands_sql')
         output = sql_create(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        six.assertRegex(self, output[0], r'^CREATE TABLE .commands_sql_book.*')
+        # Lower so that Oracle's upper case tbl names wont break
+        sql = output[0].lower()
+        six.assertRegex(self, sql, r'^create table .commands_sql_book.*')
 
     def test_sql_delete(self):
         app = models.get_app('commands_sql')
         output = sql_delete(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        six.assertRegex(self, output[0], r'^DROP TABLE .commands_sql_book.*')
+        # Oracle produces DROP SEQUENCE and DROP TABLE for this command.
+        if connections[DEFAULT_DB_ALIAS].vendor == 'oracle':
+            sql = output[1].lower()
+        else:
+            sql = output[0].lower()
+        six.assertRegex(self, sql, r'^drop table .commands_sql_book.*')
 
     def test_sql_indexes(self):
         app = models.get_app('commands_sql')
