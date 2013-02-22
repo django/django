@@ -224,7 +224,8 @@ WHEN (new.%(col_name)s IS NULL)
         if six.PY3:
             return cursor.statement
         else:
-            return cursor.statement.decode("utf-8")
+            query = cursor.statement
+            return query if isinstance(query, unicode) else query.decode("utf-8")
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
