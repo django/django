@@ -88,6 +88,8 @@ Minor features
 * Added the :attr:`django.db.models.ForeignKey.db_constraint`
   option.
 
+* The jQuery library embedded in the admin has been upgraded to version 1.9.1.
+
 Backwards incompatible changes in 1.6
 =====================================
 
