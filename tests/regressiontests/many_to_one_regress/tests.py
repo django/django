@@ -126,7 +126,7 @@ class ManyToOneRegressionTests(TestCase):
         # Now the model is saved, so we will need to execute an query.
         with self.assertNumQueries(1):
             self.assertEqual(th.child_set.count(), 0)
-    
+
     def test_related_null_to_field(self):
         c1 = Car.objects.create()
         c2 = Car.objects.create()
