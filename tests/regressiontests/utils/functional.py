@@ -1,5 +1,5 @@
 from django.utils import unittest
-from django.utils.functional import lazy, lazy_property
+from django.utils.functional import lazy, lazy_property, cached_property
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -37,3 +37,30 @@ class FunctionalTestCase(unittest.TestCase):
 
         self.assertRaises(NotImplementedError, lambda: A().do)
         self.assertEqual(B().do, 'DO IT')
+
+    def test_cached_property(self):
+        """
+        Test that cached_property caches its value,
+        and that it behaves like a property
+        """
+
+        class A(object):
+
+            @cached_property
+            def value(self):
+                return 1, object()
+
+        a = A()
+
+        # check that it is cached
+        self.assertEqual(a.value, a.value)
+
+        # check that it returns the right thing
+        self.assertEqual(a.value[0], 1)
+
+        # check that state isn't shared between instances
+        a2 = A()
+        self.assertNotEqual(a.value, a2.value)
+
+        # check that it behaves like a property when there's no instance
+        self.assertIsInstance(A.value, cached_property)
