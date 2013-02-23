@@ -170,6 +170,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             })
             kwargs['empty_label'] = db_field.blank and _('None') or None
 
+        related_admin = self.admin_site._registry.get(db_field.rel.to, None)
+        if related_admin is not None and related_admin.ordering is not None:
+            kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*related_admin.ordering).complex_filter(db_field.rel.limit_choices_to)
+
         return db_field.formfield(**kwargs)
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
