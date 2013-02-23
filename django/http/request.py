@@ -60,7 +60,7 @@ class HttpRequest(object):
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
-            server_port = str(self.META['SERVER_PORT'])
+            server_port = str(self.META.get('HTTP_X_FORWARDED_PORT', self.META['SERVER_PORT']))
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
 
