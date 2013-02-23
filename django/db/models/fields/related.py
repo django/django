@@ -904,6 +904,9 @@ class ReverseManyRelatedObjectsDescriptor(object):
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
         manager = self.__get__(instance)
+        # clear() can change expected output of 'value' queryset, we force evaluation
+        # of queryset before clear; ticket #19816
+        value = tuple(value)
         manager.clear()
         manager.add(*value)
 

@@ -208,7 +208,7 @@ ProcessFormView
         example, you could use ``success_url="/parent/%(parent_id)s/"`` to
         redirect to a URL composed out of the ``parent_id`` field on a model.
 
-    .. method:: get_success_url(obj)
+    .. method:: get_success_url()
 
         Returns the url to redirect to when the nominated object has been
         successfully deleted. Returns

@@ -19,10 +19,9 @@ except ImportError:     # Python 2
     from urlparse import urljoin
 
 from django import template
-from django.template import (base as template_base, Context, RequestContext,
-    Template)
 from django.core import urlresolvers
-from django.template import loader
+from django.template import (base as template_base, loader, Context,
+    RequestContext, Template, TemplateSyntaxError)
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
@@ -365,12 +364,26 @@ class Templates(TestCase):
     @override_settings(SETTINGS_MODULE=None, TEMPLATE_DEBUG=True)
     def test_url_reverse_no_settings_module(self):
         # Regression test for #9005
-        from django.template import Template, Context
-
         t = Template('{% url will_not_match %}')
         c = Context()
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
+
+    @override_settings(TEMPLATE_STRING_IF_INVALID='%s is invalid', SETTINGS_MODULE='also_something')
+    def test_url_reverse_view_name(self):
+        # Regression test for #19827
+        t = Template('{% url will_not_match %}')
+        c = Context()
+        try:
+            t.render(c)
+        except urlresolvers.NoReverseMatch:
+            tb = sys.exc_info()[2]
+            depth = 0
+            while tb.tb_next is not None:
+                tb = tb.tb_next
+                depth += 1
+            self.assertTrue(depth > 5,
+                "The traceback context was lost when reraising the traceback. See #19827")
 
     def test_url_explicit_exception_for_old_syntax_at_run_time(self):
         # Regression test for #19280
@@ -401,7 +414,6 @@ class Templates(TestCase):
 
     def test_invalid_block_suggestion(self):
         # See #7876
-        from django.template import Template, TemplateSyntaxError
         try:
             t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError as e:
@@ -773,6 +785,11 @@ class Templates(TestCase):
             'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"),
             'included-cycle': ('{{ abc }}', {'abc': 'xxx'}, 'xxx'),
             'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"),
+            'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '<'),
+
+            'cycle26': ('{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'),
+            'cycle27': ('{% load cycle from future %}{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}', {'a': '<', 'b': '>'}, '<>'),
+            'cycle28': ('{% load cycle from future %}{% cycle a|safe b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '<&gt;'),
 
             ### EXCEPTIONS ############################################################
 
@@ -804,7 +821,12 @@ class Templates(TestCase):
             'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
             'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
-            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'), # Variables are NOT auto-escaped.
+            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'),
+
+            'firstof11': ('{% load firstof from future %}{% firstof a b %}', {'a': '<', 'b': '>'}, '&lt;'),
+            'firstof12': ('{% load firstof from future %}{% firstof a b %}', {'a': '', 'b': '>'}, '&gt;'),
+            'firstof13': ('{% load firstof from future %}{% autoescape off %}{% firstof a %}{% endautoescape %}', {'a': '<'}, '<'),
+            'firstof14': ('{% load firstof from future %}{% firstof a|safe b %}', {'a': '<'}, '<'),
 
             ### FOR TAG ###############################################################
             'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
@@ -834,7 +856,7 @@ class Templates(TestCase):
             'for-tag-empty02': ("{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"),
             'for-tag-empty03': ("{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"),
             # Ticket 19882
-            'for-tag-filter-ws': ("{% for x in ''|add:'a b c' %}{{ x }}{% endfor %}", {}, 'a b c'),
+            'for-tag-filter-ws': ("{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}", {'s': 'abc'}, 'abc'),
 
             ### IF TAG ################################################################
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
@@ -1002,6 +1024,9 @@ class Templates(TestCase):
             'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'),
 
             'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
+
+            # Test whitespace in filter arguments
+            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
 
             ### IFEQUAL TAG ###########################################################
             'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -1343,6 +1368,10 @@ class Templates(TestCase):
             'i18n36': ('{% load i18n %}{% trans "Page not found" as page_not_found noop %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
             'i18n37': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{% blocktrans %}Error: {{ page_not_found }}{% endblocktrans %}', {'LANGUAGE_CODE': 'de'}, "Error: Seite nicht gefunden"),
 
+            # Test whitespace in filter arguments
+            'i18n38': ('{% load i18n custom %}{% get_language_info for "de"|noop:"x y" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
+            'i18n38_2': ('{% load i18n custom %}{% get_language_info_list for langcodes|noop:"x y" as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': ['it', 'no']}, 'it: Italian/italiano bidi=False; no: Norwegian/norsk bidi=False; '),
+
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
@@ -1424,6 +1453,16 @@ class Templates(TestCase):
                                     {'foo': 'z', 'bar': ['a', 'd']}]},
                           'abc:xy,ad:z,'),
 
+            # Test syntax
+            'regroup05': ('{% regroup data by bar as %}', {},
+                           template.TemplateSyntaxError),
+            'regroup06': ('{% regroup data by bar thisaintright grouped %}', {},
+                           template.TemplateSyntaxError),
+            'regroup07': ('{% regroup data thisaintright bar as grouped %}', {},
+                           template.TemplateSyntaxError),
+            'regroup08': ('{% regroup data by bar as grouped toomanyargs %}', {},
+                           template.TemplateSyntaxError),
+
             ### SSI TAG ########################################################
 
             # Test normal behavior
@@ -1491,6 +1530,9 @@ class Templates(TestCase):
             'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
             'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
             'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
+
+            # Test whitespace in filter argument
+            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1592,6 +1634,9 @@ class Templates(TestCase):
 
             # Regression test for #11270.
             'cache17': ('{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}', {'poem': 'Oh freddled gruntbuggly/Thy micturations are to me/As plurdled gabbleblotchits/On a lurgid bee/That mordiously hath bitled out/Its earted jurtles/Into a rancid festering/Or else I shall rend thee in the gobberwarts with my blurglecruncheon/See if I dont.'}, 'Some Content'),
+
+            # Test whitespace in filter arguments
+            'cache18': ('{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}', {}, 'cache18'),
 
 
             ### AUTOESCAPE TAG ##############################################
