@@ -204,6 +204,10 @@ class WhereNode(tree.Node):
                 raise EmptyResultSet
             if extra:
                 return ('%s IN %s' % (field_sql, extra), params)
+            if not params:
+                # Empty params would generate invalid sql in subquery
+                raise EmptyResultSet
+
             max_in_list_size = connection.ops.max_in_list_size()
             if max_in_list_size and len(params) > max_in_list_size:
                 # Break up the params list into an OR of manageable chunks.
