@@ -12,6 +12,13 @@ register = template.Library()
 def trim(value, num):
     return value[:num]
 
+@register.filter
+def noop(value, param=None):
+    """A noop filter that always return its first argument and does nothing with
+    its second (optional) one.
+    Useful for testing out whitespace in filter arguments (see #19882)."""
+    return value
+
 @register.simple_tag
 def no_params():
     """Expected no_params __doc__"""
