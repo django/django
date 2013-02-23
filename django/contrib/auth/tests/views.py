@@ -365,6 +365,14 @@ class LoginTest(AuthViewsTestCase):
             self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
 
+    def test_login_form_contains_request(self):
+        # 15198
+        response = self.client.post('/custom_requestauth_login/', {
+            'username': 'testclient',
+            'password': 'password',
+        }, follow=True)
+        # the custom authentication form used by this login asserts
+        # that a request is passed to the form successfully.
 
 @skipIfCustomUser
 class LoginURLSettings(AuthViewsTestCase):
