@@ -51,7 +51,7 @@ class FormsFormsetTestCase(TestCase):
         # for adding data. By default, it displays 1 blank form. It can display more,
         # but we'll look at how to do so later.
         formset = ChoiceFormSet(auto_id=False, prefix='choices')
-        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
+        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" /><input type="hidden" name="choices-MIN_NUM_FORMS" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" /></td></tr>""")
 
@@ -650,6 +650,71 @@ class FormsFormsetTestCase(TestCase):
         self.assertTrue(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), [])
 
+    def test_appending_min_forms(self):
+        # Ensuring the minimum number of forms ########################################
+        # Base case for min_num.
+
+        # When not passed, min_num will take its default value of None, i.e. no required
+        # forms, only controller by the value of the extra parameter.
+
+        initial = [dict(name='Kool-Aid')]
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=0, min_num=1)
+        formset = LimitedFavoriteDrinkFormSet()
+
+        self.assertHTMLEqual('\n'.join(str(form) for form in formset.forms), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>""")
+
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=0, min_num=2)
+        formset = LimitedFavoriteDrinkFormSet(initial=initial)
+
+        self.assertHTMLEqual('\n'.join(str(form) for form in formset.forms), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" value="Kool-Aid" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=0, min_num=1)
+        formset = LimitedFavoriteDrinkFormSet(initial=initial)
+
+        self.assertHTMLEqual('\n'.join(str(form) for form in formset.forms), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" value="Kool-Aid" /></td></tr>""")
+
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1, min_num=1)
+        formset = LimitedFavoriteDrinkFormSet(initial=initial)
+
+        self.assertHTMLEqual('\n'.join(str(form) for form in formset.forms), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" value="Kool-Aid" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1, min_num=1, max_num=1)
+        formset = LimitedFavoriteDrinkFormSet(initial=initial)
+
+        self.assertHTMLEqual('\n'.join(str(form) for form in formset.forms), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" value="Kool-Aid" /></td></tr>""")
+
+    def test_formset_management_form_contains_min_num(self):
+        self.maxDiff = None
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=0, min_num=1)
+        formset = LimitedFavoriteDrinkFormSet()
+
+        self.assertHTMLEqual(str(formset), """<input type="hidden" id="id_form-TOTAL_FORMS" name="form-TOTAL_FORMS" value="1" /><input type="hidden" id="id_form-INITIAL_FORMS" name="form-INITIAL_FORMS" value="1" /><input type="hidden" id="id_form-MAX_NUM_FORMS" name="form-MAX_NUM_FORMS" value="1000" /><input type="hidden" id="id_form-MIN_NUM_FORMS" name="form-MIN_NUM_FORMS" value="1" />
+<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" id="id_form-0-name" /></td></tr>""")
+
+    def test_formset_management_form_contains_default_min_num(self):
+        self.maxDiff = None
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=0)
+        formset = LimitedFavoriteDrinkFormSet()
+
+        self.assertHTMLEqual(str(formset), """<input type="hidden" id="id_form-TOTAL_FORMS" name="form-TOTAL_FORMS" value="0" /><input type="hidden" id="id_form-INITIAL_FORMS" name="form-INITIAL_FORMS" value="0" /><input type="hidden" id="id_form-MAX_NUM_FORMS" name="form-MAX_NUM_FORMS" value="1000" /><input type="hidden" id="id_form-MIN_NUM_FORMS" name="form-MIN_NUM_FORMS" />""")
+
+    def test_wrong_min_forms(self):
+        self.assertRaises(ValueError, formset_factory, FavoriteDrinkForm, min_num=2, max_num=1)
+
+    def test_less_than_min_num(self):
+        data = {
+            'form-TOTAL_FORMS': u'2',
+            'form-INITIAL_FORMS': u'2',
+            'form-MIN_NUM_FORMS': u'2',
+            'form-0-name': u'Kool-Aid',
+        }
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, min_num=2)
+        formset = LimitedFavoriteDrinkFormSet(data)
+        self.assertFalse(formset.is_valid())
+        self.assertIsNone(formset.errors)
+
     def test_limiting_max_forms(self):
         # Limiting the maximum number of forms ########################################
         # Base case for max_num.
@@ -954,19 +1019,19 @@ ChoiceFormSet = formset_factory(Choice)
 class FormsetAsFooTests(TestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" value="Calexico" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" value="100" /></td></tr>""")
 
     def test_as_p(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" />
 <p>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></p>
 <p>Votes: <input type="number" name="choices-0-votes" value="100" /></p>""")
 
     def test_as_ul(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" />
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>""")
 
