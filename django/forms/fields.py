@@ -1096,9 +1096,10 @@ class IPAddressField(CharField):
     }
     default_validators = [validators.validate_ipv4_address]
 
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(IPAddressField, self).clean(value)
+    def to_python(self, value):
+        if value in EMPTY_VALUES:
+            return ''
+        return value.strip()
 
 
 class GenericIPAddressField(CharField):
@@ -1111,16 +1112,13 @@ class GenericIPAddressField(CharField):
         self.default_error_messages['invalid'] = invalid_error_message
         super(GenericIPAddressField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(GenericIPAddressField, self).clean(value)
-
     def to_python(self, value):
         if value in validators.EMPTY_VALUES:
             return ''
+        value = value.strip()
         if value and ':' in value:
-                return clean_ipv6_address(value,
-                    self.unpack_ipv4, self.error_messages['invalid'])
+            return clean_ipv6_address(value,
+                self.unpack_ipv4, self.error_messages['invalid'])
         return value
 
 
