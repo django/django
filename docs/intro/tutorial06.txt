@@ -62,14 +62,8 @@ And, add at the top of your ``polls/templates/polls/index.html``:
     <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 
 That's all you need to do for development. Reload
-``http://localhost:8000/polls/`` and you should see that the poll links are no
-longer underlined: the stylesheet was properly loaded.
-
-Those are the **basics**. For more details on common configuration options,
-read on; for a detailed reference of the settings, commands, and other bits
-included with the framework see
-:doc:`the static files howto </howto/static-files>` and the
-:doc:`the staticfiles reference </ref/contrib/staticfiles>`.
+``http://localhost:8000/polls/`` and you should see that the poll links are
+green (django style !) which means that your stylesheet was properly loaded..
 
 Adding a background-image
 =========================
@@ -87,8 +81,9 @@ Then, add to your stylesheet (``polls/static/polls/style.css``):
         background: white url("images/background.gif") no-repeat right bottom;
     }
 
-Reload ``http://localhost:8000/polls/`` and you should see the background
-loaded in the bottom right of the screen.
+That's all you need for the development server. Reload
+``http://localhost:8000/polls/`` and you should see the background loaded in
+the bottom right of the screen.
 
 .. warning::
 
@@ -97,6 +92,12 @@ loaded in the bottom right of the screen.
     to link your static files between each others, because then you can change
     :setting:`STATIC_URL` later on. Also, remember this general best practice:
     **never hardcode absolute paths**.
+
+Those are the **basics**. For more details on common configuration options,
+read on; for a detailed reference of the settings, commands, and other bits
+included with the framework see
+:doc:`the static files howto </howto/static-files>` and the
+:doc:`the staticfiles reference </ref/contrib/staticfiles>`.
 
 What's next?
 ============
