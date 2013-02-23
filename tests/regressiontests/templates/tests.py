@@ -372,6 +372,22 @@ class Templates(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
 
+    @override_settings(TEMPLATE_STRING_IF_INVALID='%s is invalid', SETTINGS_MODULE='also_something')
+    def test_url_reverse_view_name(self):
+        # Regression test for #19827
+        t = Template('{% url will_not_match %}')
+        c = Context()
+        try:
+            t.render(c)
+        except urlresolvers.NoReverseMatch:
+            tb = sys.exc_info()[2]
+            depth = 0
+            while tb.tb_next is not None:
+                tb = tb.tb_next
+                depth += 1
+            self.assertTrue(depth > 5,
+                "The traceback context was lost when reraising the traceback. See #19827")
+
     def test_url_explicit_exception_for_old_syntax_at_run_time(self):
         # Regression test for #19280
         t = Template('{% url path.to.view %}')      # not quoted = old syntax
