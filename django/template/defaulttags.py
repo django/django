@@ -215,31 +215,43 @@ class IfChangedNode(Node):
 
     def __init__(self, nodelist_true, nodelist_false, *varlist):
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self._last_seen = None
         self._varlist = varlist
-        self._id = str(id(self))
 
     def render(self, context):
-        if 'forloop' in context and self._id not in context['forloop']:
-            self._last_seen = None
-            context['forloop'][self._id] = 1
+        # Init state storage
+        state_frame = self._get_context_stack_frame(context)
+        if self not in state_frame:
+            state_frame[self] = None
+
         try:
             if self._varlist:
                 # Consider multiple parameters.  This automatically behaves
                 # like an OR evaluation of the multiple variables.
                 compare_to = [var.resolve(context, True) for var in self._varlist]
             else:
+                # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
                 compare_to = self.nodelist_true.render(context)
         except VariableDoesNotExist:
             compare_to = None
 
-        if compare_to != self._last_seen:
-            self._last_seen = compare_to
-            content = self.nodelist_true.render(context)
-            return content
+        if compare_to != state_frame[self]:
+            state_frame[self] = compare_to
+            return self.nodelist_true.render(context)
         elif self.nodelist_false:
             return self.nodelist_false.render(context)
         return ''
+
+    def _get_context_stack_frame(self, context):
+        # The Context object behaves like a stack where each template tag can create a new scope.
+        # Find the place where to store the state to detect changes.
+        if 'forloop' in context:
+            # Ifchanged is bound to the local for loop.
+            # When there is a loop-in-loop, the state is bound to the inner loop,
+            # so it resets when the outer loop continues.
+            return context['forloop']
+        else:
+            # Using ifchanged outside loops. Effectively this is a no-op because the state is associated with 'self'.
+            return context.render_context
 
 class IfEqualNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
