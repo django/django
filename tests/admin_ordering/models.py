@@ -15,6 +15,7 @@ class Song(models.Model):
     band = models.ForeignKey(Band)
     name = models.CharField(max_length=100)
     duration = models.IntegerField()
+    other_interpreters = models.ManyToManyField(Band, related_name='covers')
 
     class Meta:
         ordering = ('name',)

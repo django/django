@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.test import TestCase, RequestFactory
+from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import User
 
@@ -104,3 +105,50 @@ class TestInlineModelAdminOrdering(TestCase):
         inline = SongInlineNewOrdering(self.b, None)
         names = [s.name for s in inline.queryset(request)]
         self.assertEqual(['Jaded', 'Pink', 'Dude (Looks Like a Lady)'], names)
+
+
+class TestRelatedFieldsAdminOrdering(TestCase):
+    def setUp(self):
+        self.b1 = Band(name='Pink Floyd', bio='', rank=1)
+        self.b1.save()
+        self.b2 = Band(name='Foo Fighters', bio='', rank=5)
+        self.b2.save()
+
+        # we need to register a custom ModelAdmin (instead of just using
+        # ModelAdmin) because the field creator tries to find the ModelAdmin
+        # for the related model
+        class SongAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Song, SongAdmin)
+
+    def check_ordering_of_field_choices(self, correct_ordering):
+        fk_field = admin.site._registry[Song].formfield_for_foreignkey(Song.band.field)
+        m2m_field = admin.site._registry[Song].formfield_for_manytomany(Song.other_interpreters.field)
+
+        self.assertEqual(list(fk_field.queryset), correct_ordering)
+        self.assertEqual(list(m2m_field.queryset), correct_ordering)
+
+    def test_no_admin_fallback_to_model_ordering(self):
+        # should be ordered by name (as defined by the model)
+        self.check_ordering_of_field_choices([self.b2, self.b1])
+
+    def test_admin_with_no_ordering_fallback_to_model_ordering(self):
+        class NoOrderingBandAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Band, NoOrderingBandAdmin)
+
+        # should be ordered by name (as defined by the model)
+        self.check_ordering_of_field_choices([self.b2, self.b1])
+
+    def test_admin_ordering_beats_model_ordering(self):
+        class StaticOrderingBandAdmin(admin.ModelAdmin):
+            ordering = ('rank', )
+        admin.site.register(Band, StaticOrderingBandAdmin)
+
+        # should be ordered by rank (defined by the ModelAdmin)
+        self.check_ordering_of_field_choices([self.b1, self.b2])
+
+    def tearDown(self):
+        admin.site.unregister(Song)
+        if Band in admin.site._registry:
+            admin.site.unregister(Band)
