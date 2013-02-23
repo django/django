@@ -320,6 +320,12 @@ these changes.
   deprecated. Use the :class:`warnings.catch_warnings` context manager
   available starting with Python 2.6 instead.
 
+* The undocumented ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` will be removed
+  following an accelerated deprecation. Users subclassing this form should
+  remove calls to this method, and instead ensure that their auth related views
+  are CSRF protected, which ensures that cookies are enabled.
+
 1.8
 ---
 

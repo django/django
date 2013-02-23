@@ -45,14 +45,9 @@ def login(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
-
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
-
-    request.session.set_test_cookie()
 
     current_site = get_current_site(request)
 
