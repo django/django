@@ -171,8 +171,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             kwargs['empty_label'] = db_field.blank and _('None') or None
 
         related_admin = self.admin_site._registry.get(db_field.rel.to, None)
-        if related_admin is not None and related_admin.ordering is not None:
-            kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*related_admin.ordering).complex_filter(db_field.rel.limit_choices_to)
+        if related_admin is not None:
+            ordering = related_admin.get_ordering(request)
+            if ordering is not None:
+                kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*ordering).complex_filter(db_field.rel.limit_choices_to)
 
         return db_field.formfield(**kwargs)
 
@@ -194,8 +196,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 
         related_admin = self.admin_site._registry.get(db_field.rel.to, None)
-        if related_admin is not None and related_admin.ordering is not None:
-            kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*related_admin.ordering).complex_filter(db_field.rel.limit_choices_to)
+        if related_admin is not None:
+            ordering = related_admin.get_ordering(request)
+            if ordering is not None:
+                kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*ordering).complex_filter(db_field.rel.limit_choices_to)
 
         return db_field.formfield(**kwargs)
 
