@@ -18,7 +18,7 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
-from django.db import router
+from django.db import router, transaction
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
@@ -835,6 +835,13 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 verbosity=0,
                 interactive=False
             )
+
+    def test_clear_commits_transaction(self):
+        # Ensure the database transaction is committed (#19896)
+        self.cache.set("key1", "spam")
+        self.cache.clear()
+        transaction.rollback()
+        self.assertEqual(self.cache.get("key1"), None)
 
 
 @override_settings(USE_TZ=True)
