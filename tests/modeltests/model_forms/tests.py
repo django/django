@@ -989,6 +989,7 @@ class OldFormForXTests(TestCase):
             (c2.pk, "It's a test"),
             (c3.pk, 'Third'),
             (c4.pk, 'Fourth')])
+        self.assertEqual(5, len(f.choices))
         with self.assertRaises(ValidationError):
             f.clean('')
         with self.assertRaises(ValidationError):
