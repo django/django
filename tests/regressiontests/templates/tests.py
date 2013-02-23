@@ -834,7 +834,7 @@ class Templates(TestCase):
             'for-tag-empty02': ("{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"),
             'for-tag-empty03': ("{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"),
             # Ticket 19882
-            'for-tag-filter-ws': ("{% for x in ''|add:'a b c' %}{{ x }}{% endfor %}", {}, 'a b c'),
+            'for-tag-filter-ws': ("{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}", {'s': 'abc'}, 'abc'),
 
             ### IF TAG ################################################################
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
@@ -1002,6 +1002,9 @@ class Templates(TestCase):
             'ifchanged-else03': ('{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'),
 
             'ifchanged-else04': ('{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'),
+
+            # Test whitespace in filter arguments
+            'ifchanged-filter-ws': ('{% load custom %}{% for n in num %}{% ifchanged n|noop:"x y" %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
 
             ### IFEQUAL TAG ###########################################################
             'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -1343,6 +1346,10 @@ class Templates(TestCase):
             'i18n36': ('{% load i18n %}{% trans "Page not found" as page_not_found noop %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
             'i18n37': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{% blocktrans %}Error: {{ page_not_found }}{% endblocktrans %}', {'LANGUAGE_CODE': 'de'}, "Error: Seite nicht gefunden"),
 
+            # Test whitespace in filter arguments
+            'i18n38': ('{% load i18n custom %}{% get_language_info for "de"|noop:"x y" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
+            'i18n38_2': ('{% load i18n custom %}{% get_language_info_list for langcodes|noop:"x y" as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': ['it', 'no']}, 'it: Italian/italiano bidi=False; no: Norwegian/norsk bidi=False; '),
+
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
@@ -1424,6 +1431,16 @@ class Templates(TestCase):
                                     {'foo': 'z', 'bar': ['a', 'd']}]},
                           'abc:xy,ad:z,'),
 
+            # Test syntax
+            'regroup05': ('{% regroup data by bar as %}', {},
+                           template.TemplateSyntaxError),
+            'regroup06': ('{% regroup data by bar thisaintright grouped %}', {},
+                           template.TemplateSyntaxError),
+            'regroup07': ('{% regroup data thisaintright bar as grouped %}', {},
+                           template.TemplateSyntaxError),
+            'regroup08': ('{% regroup data by bar as grouped toomanyargs %}', {},
+                           template.TemplateSyntaxError),
+
             ### SSI TAG ########################################################
 
             # Test normal behavior
@@ -1491,6 +1508,9 @@ class Templates(TestCase):
             'widthratio13b': ('{% widthratio a b c %}', {'a':0,'b':None,'c':100}, ''),
             'widthratio14a': ('{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, template.TemplateSyntaxError),
             'widthratio14b': ('{% widthratio a b c %}', {'a':0,'b':100,'c':None}, template.TemplateSyntaxError),
+
+            # Test whitespace in filter argument
+            'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1592,6 +1612,9 @@ class Templates(TestCase):
 
             # Regression test for #11270.
             'cache17': ('{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}', {'poem': 'Oh freddled gruntbuggly/Thy micturations are to me/As plurdled gabbleblotchits/On a lurgid bee/That mordiously hath bitled out/Its earted jurtles/Into a rancid festering/Or else I shall rend thee in the gobberwarts with my blurglecruncheon/See if I dont.'}, 'Some Content'),
+
+            # Test whitespace in filter arguments
+            'cache18': ('{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}', {}, 'cache18'),
 
 
             ### AUTOESCAPE TAG ##############################################

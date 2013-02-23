@@ -24,7 +24,7 @@ class GetAvailableLanguagesNode(Node):
 
 class GetLanguageInfoNode(Node):
     def __init__(self, lang_code, variable):
-        self.lang_code = Variable(lang_code)
+        self.lang_code = lang_code
         self.variable = variable
 
     def render(self, context):
@@ -35,7 +35,7 @@ class GetLanguageInfoNode(Node):
 
 class GetLanguageInfoListNode(Node):
     def __init__(self, languages, variable):
-        self.languages = Variable(languages)
+        self.languages = languages
         self.variable = variable
 
     def get_language_info(self, language):
@@ -185,6 +185,7 @@ def do_get_available_languages(parser, token):
     your setting file (or the default settings) and
     put it into the named variable.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
@@ -204,10 +205,10 @@ def do_get_language_info(parser, token):
         {{ l.name_local }}
         {{ l.bidi|yesno:"bi-directional,uni-directional" }}
     """
-    args = token.contents.split()
+    args = token.split_contents()
     if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
         raise TemplateSyntaxError("'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:]))
-    return GetLanguageInfoNode(args[2], args[4])
+    return GetLanguageInfoNode(parser.compile_filter(args[2]), args[4])
 
 @register.tag("get_language_info_list")
 def do_get_language_info_list(parser, token):
@@ -227,10 +228,10 @@ def do_get_language_info_list(parser, token):
           {{ l.bidi|yesno:"bi-directional,uni-directional" }}
         {% endfor %}
     """
-    args = token.contents.split()
+    args = token.split_contents()
     if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
         raise TemplateSyntaxError("'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:]))
-    return GetLanguageInfoListNode(args[2], args[4])
+    return GetLanguageInfoListNode(parser.compile_filter(args[2]), args[4])
 
 @register.filter
 def language_name(lang_code):
@@ -257,6 +258,7 @@ def do_get_current_language(parser, token):
     put it's value into the ``language`` context
     variable.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError("'get_current_language' requires 'as variable' (got %r)" % args)
@@ -275,6 +277,7 @@ def do_get_current_language_bidi(parser, token):
     put it's value into the ``bidi`` context variable.
     True indicates right-to-left layout, otherwise left-to-right
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError("'get_current_language_bidi' requires 'as variable' (got %r)" % args)
