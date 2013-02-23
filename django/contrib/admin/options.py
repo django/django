@@ -8,7 +8,8 @@ from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
+from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
+                                       model_format_dict, NestedObjects)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -1452,7 +1453,40 @@ class InlineModelAdmin(BaseModelAdmin):
             "max_num": self.max_num,
             "can_delete": can_delete,
         }
+
         defaults.update(kwargs)
+        base_model_form = defaults['form']
+
+        class DeleteProtectedModelForm(base_model_form):
+            def hand_clean_DELETE(self):
+                """
+                We are not validating the field 'DELETE' itself because on templates
+                it's not rendered using the field information, but just using a generic
+                "deletion_field" of the InlineModelAdmin.
+                """
+                data = self.cleaned_data.get('DELETE', '')
+
+                if data:
+                    using = router.db_for_write(self._meta.model)
+                    collector = NestedObjects(using=using)
+                    collector.collect([self.instance])
+                    if collector.protected:
+                        fmt_prot = [u'%s %s' % (p._meta.verbose_name, p)
+                                            for p in collector.protected]
+                        raise ValidationError("Deleting %s %s would require deleting "
+                                "the following protected related objects: %s"
+                                % (self._meta.model._meta.verbose_name,
+                                   self.instance,
+                                   ', '.join(fmt_prot)))
+                return data
+
+            def is_valid(self):
+                cleaned_data = self.cleaned_data
+                result = super(DeleteProtectedModelForm, self).is_valid()
+                self.hand_clean_DELETE()
+                return result
+
+        defaults['form'] = DeleteProtectedModelForm
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
     def get_fieldsets(self, request, obj=None):
