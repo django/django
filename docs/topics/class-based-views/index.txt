@@ -18,6 +18,34 @@ reusable views which suits your use case. For full details, see the
    generic-editing
    mixins
 
+Why class-based views?
+======================
+
+At their core, class-based views are intended to solve the same problem as
+function-based views: process requests and return responses. What makes class
+views different from function views is the approach they provide to solving
+that problem in different contexts where view functions may not suffice. That
+approach, as you could guess by the name, is modularity and extensibility via
+Python classes. The cost is potentially lost clarity around a views flow of
+control. However, there are situations where for a sufficiently complex view
+the flow of control can be unclear and the implied flow-control offered by
+a well documented base-class becomes appropriate. These are differences we'll
+demonstrate below.
+
+Finally, class-based views are not limited to the generic class-based views,
+which are simply Django's traditional generic views implemented as classes.
+However, those generic views do provide good examples for shallow inheritance
+and view composition via mixins.
+
+TODO continue...
+
+
+When should I use class-based views?
+====================================
+
+TODO
+
+
 Basic examples
 ==============
 
