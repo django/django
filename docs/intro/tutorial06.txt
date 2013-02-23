@@ -1,0 +1,77 @@
+=====================================
+Writing your first Django app, part 6
+=====================================
+
+This tutorial begins where :doc:`Tutorial 5 </intro/tutorial05>` left off.
+We've built a tested Web-poll application, and we'll now add a stylesheet.
+
+Customize your *app's* look and feel
+====================================
+
+First, create a directory called ``static`` in your ``polls`` directory. Django
+will look for static files there, similarly to how Django finds templates
+inside ``polls/templates/``.
+
+Django's :setting:`STATICFILES_FINDERS` setting contains a list of
+:class:`django.contrib.staticfiles.finders.BaseFinder` that know how to
+discover static files from various sources. One of the defaults is
+:class:`django.contrib.staticfiles.finders.AppDirectoriesFinder` which looks
+for a "static" subdirectory in each of the :setting:`INSTALLED_APPS` - this is
+how Django knows to find the polls static files by default, including for the
+admin site.
+
+Within the ``static`` directory you have just created, create another directory
+called ``polls`` and within that create a file called ``style.css``. In other
+words, your stylesheet should be at ``polls/static/polls/style.css``. Because
+of how ``AppDirectoriesFinder`` staticfile finder works as described above, you
+can refer to this static file in Django simply as ``polls/style.css``, exactly
+like for templates.
+
+.. admonition:: Static file namespacing
+
+    Now we *might* be able to get away with putting our static files directly
+    in ``polls/static`` (rather than creating another ``polls`` subdirectory),
+    but it would actually be a bad idea. Django will choose the first static
+    file it finds whose name matches, and if you had a static file with the
+    same name in a *different* application, Django would be unable to
+    distinguish between them. We need to be able to point Django at the right
+    one, and the easiest way to ensure this is by *namespacing* them. That is,
+    by putting those static files inside *another* directory named for the
+    application itself.
+
+Put the following code in that stylesheet:
+
+.. code-block:: css
+
+    li a { 
+        text-decoration: none;
+    }
+
+And, add at the top of your ``polls/templates/polls/index.html``:
+
+.. code-block:: html+django
+
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+That's all you need to do for development. Reload
+``http://localhost:8000/polls/`` and you should see that the poll links are no
+longer underlined: the stylesheet was properly loaded.
+
+Those are the **basics**. For more details on common configuration options,
+read on; for a detailed reference of the settings, commands, and other bits
+included with the framework see
+:doc:`the static files howto </howto/static-files>` and the
+:doc:`the staticfiles reference </ref/contrib/staticfiles>`.
+
+What's next?
+============
+
+The beginner tutorial ends here for the time being. In the meantime, you might
+want to check out some pointers on :doc:`where to go from here
+</intro/whatsnext>`.
+
+If you are familiar with Python packaging and interested in learning how to
+turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
+write reusable apps</intro/reusable-apps>`.
