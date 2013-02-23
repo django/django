@@ -276,7 +276,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
 
 .. code-block:: html+django
 
-    {% load static %}
+    {% load staticfiles %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
