@@ -537,7 +537,7 @@ Providing initial data for the forms
         ...     '0': {'subject': 'Hello', 'sender': 'user@example.com'},
         ...     '1': {'message': 'Hi there!'}
         ... }
-        >>> wiz = ContactWizard.as_view([ContactForm1, ContactForm2], initial_dict=initial)
+        >>> wiz = ContactWizard([ContactForm1, ContactForm2], initial_dict=initial)
         >>> form1 = wiz.get_form('0')
         >>> form2 = wiz.get_form('1')
         >>> form1.initial
