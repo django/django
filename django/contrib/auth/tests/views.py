@@ -365,6 +365,16 @@ class LoginTest(AuthViewsTestCase):
             self.assertTrue(good_url in response.url,
                             "%s should be allowed" % good_url)
 
+    def test_login_form_contains_request(self):
+        response = self.client.post('/custom_auth_login/', {
+            'username': 'testclient',
+            'password': 'password',
+        }, follow=True)
+        self.assertTrue('messages' in response.context)
+        messages = [message for message in response.context['messages']]
+        self.assertEqual(len(messages), 1)
+        self.assertEqual("%s" % messages[0], "Attempted login")
+
 
 @skipIfCustomUser
 class LoginURLSettings(AuthViewsTestCase):

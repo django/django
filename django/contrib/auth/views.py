@@ -35,7 +35,7 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
     if request.method == "POST":
-        form = authentication_form(data=request.POST)
+        form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
             # Ensure the user-originating redirection url is safe.
@@ -51,8 +51,6 @@ def login(request, template_name='registration/login.html',
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
-
-    request.session.set_test_cookie()
 
     current_site = get_current_site(request)
 
