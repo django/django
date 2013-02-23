@@ -404,7 +404,7 @@ system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``mytemplates`` directory in your project directory. Templates can
+Create a ``templates`` directory in your project directory. Templates can
 live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
@@ -412,13 +412,12 @@ project is a good convention to follow.
 Open your settings file (``mysite/settings.py``, remember) and  add a
 :setting:`TEMPLATE_DIRS` setting::
 
-    TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'mytemplates'),)
+    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-Don't forget the trailing comma. :setting:`TEMPLATE_DIRS` is a tuple of
-filesystem directories to check when loading Django templates; it's a search
-path.
+:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
+loading Django templates; it's a search path.
 
-Now create a directory called ``admin`` inside ``mytemplates``, and copy the
+Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
 (``django/contrib/admin/templates``) into that directory.
