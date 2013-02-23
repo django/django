@@ -71,7 +71,7 @@ class CachedFilesMixin(object):
                     pattern, template = pattern
                 else:
                     template = self.default_template
-                compiled = re.compile(pattern)
+                compiled = re.compile(pattern, re.IGNORECASE)
                 self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
