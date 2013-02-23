@@ -133,6 +133,9 @@ class ShortCategory(forms.ModelForm):
     slug = forms.CharField(max_length=5)
     url = forms.CharField(max_length=3)
 
+    class Meta:
+        model = Category
+
 class ImprovedArticleForm(forms.ModelForm):
     class Meta:
         model = ImprovedArticle
@@ -276,6 +279,19 @@ class ModelFormBaseTest(TestCase):
             list(BadForm.base_fields),
             ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
         )
+
+    def test_invalid_meta_model(self):
+        class InvalidModelForm(forms.ModelForm):
+            class Meta:
+                pass  # no model
+
+        # Can't create new form
+        with self.assertRaises(ValueError):
+            f = InvalidModelForm()
+
+        # Even if you provide a model instance
+        with self.assertRaises(ValueError):
+            f = InvalidModelForm(instance=Category)
 
     def test_subcategory_form(self):
         class SubCategoryForm(BaseCategoryForm):
