@@ -757,7 +757,6 @@ class ChoiceField(Field):
 
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
-        result._choices = copy.deepcopy(self._choices, memo)
         result._set_choices(result._choices)
         return result
 
