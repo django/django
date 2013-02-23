@@ -73,6 +73,16 @@ class BasicFieldTests(test.TestCase):
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
+    def test_formclass_with_choices(self):
+        # regression for 18162
+        class CustomChoiceField(forms.TypedChoiceField):
+            pass
+        choices = [('a@b.cc', 'a@b.cc'), ('b@b.cc', 'b@b.cc')]
+        field = models.CharField(choices=choices)
+        klass = CustomChoiceField
+        self.assertIsInstance(field.formfield(form_class=klass), klass)
+
+
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
         f = models.DecimalField(max_digits=4, decimal_places=2)
