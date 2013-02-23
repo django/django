@@ -542,6 +542,14 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         cache_validator.validate_key(cache_key)
         self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
 
+    def test_css_import_case_insensitive(self):
+        relpath = self.cached_file_path("cached/styles_insensitive.css")
+        self.assertEqual(relpath, "cached/styles_insensitive.2f0151cca872.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertNotIn(b"cached/other.css", content)
+            self.assertIn(b"other.d41d8cd98f00.css", content)
+
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(TEST_SETTINGS,
