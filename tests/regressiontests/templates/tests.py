@@ -19,10 +19,9 @@ except ImportError:     # Python 2
     from urlparse import urljoin
 
 from django import template
-from django.template import (base as template_base, Context, RequestContext,
-    Template)
 from django.core import urlresolvers
-from django.template import loader
+from django.template import (base as template_base, loader, Context,
+    RequestContext, Template, TemplateSyntaxError)
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
@@ -365,8 +364,6 @@ class Templates(TestCase):
     @override_settings(SETTINGS_MODULE=None, TEMPLATE_DEBUG=True)
     def test_url_reverse_no_settings_module(self):
         # Regression test for #9005
-        from django.template import Template, Context
-
         t = Template('{% url will_not_match %}')
         c = Context()
         with self.assertRaises(urlresolvers.NoReverseMatch):
@@ -417,7 +414,6 @@ class Templates(TestCase):
 
     def test_invalid_block_suggestion(self):
         # See #7876
-        from django.template import Template, TemplateSyntaxError
         try:
             t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError as e:
