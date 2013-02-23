@@ -15,7 +15,7 @@ class EmailBackend(BaseEmailBackend):
     A wrapper that manages the SMTP network connection.
     """
     def __init__(self, host=None, port=None, username=None, password=None,
-                 use_tls=None, fail_silently=False, **kwargs):
+                 use_tls=None, fail_silently=False, use_ssl=None, **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
@@ -31,6 +31,10 @@ class EmailBackend(BaseEmailBackend):
             self.use_tls = settings.EMAIL_USE_TLS
         else:
             self.use_tls = use_tls
+        if use_ssl is None:
+            self.use_ssl = settings.EMAIL_USE_SSL
+        else:
+            self.use_ssl = use_ssl
         self.connection = None
         self._lock = threading.RLock()
 
@@ -45,12 +49,18 @@ class EmailBackend(BaseEmailBackend):
         try:
             # If local_hostname is not specified, socket.getfqdn() gets used.
             # For performance, we use the cached FQDN for local_hostname.
-            self.connection = smtplib.SMTP(self.host, self.port,
+            if self.use_ssl:
+                self.connection = smtplib.SMTP_SSL(self.host, self.port,
                                            local_hostname=DNS_NAME.get_fqdn())
-            if self.use_tls:
-                self.connection.ehlo()
-                self.connection.starttls()
-                self.connection.ehlo()
+            else:
+                self.connection = smtplib.SMTP(self.host, self.port,
+                                           local_hostname=DNS_NAME.get_fqdn())
+                # TLS/SSL are mutually exclusive, so only attempt TLS over
+                # non-secure connections.
+                if self.use_tls:
+                    self.connection.ehlo()
+                    self.connection.starttls()
+                    self.connection.ehlo()
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
             return True

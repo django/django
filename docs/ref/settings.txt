@@ -1047,6 +1047,21 @@ EMAIL_USE_TLS
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL_USE_SSL`.
+
+.. setting:: EMAIL_USE_SSL
+
+EMAIL_USE_SSL
+-------------
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL_USE_TLS`. 
 
 .. setting:: FILE_CHARSET
 
