@@ -18,6 +18,9 @@ class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+
+    searched_locations = []
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
@@ -75,15 +78,14 @@ class FileSystemFinder(BaseFinder):
         as defined in ``STATICFILES_DIRS``.
         """
         matches = []
-        locations = []
         for prefix, root in self.locations:
             matched_path = self.find_location(root, path, prefix)
-            locations.append(root)
+            self.searched_locations.append(root)
             if matched_path:
                 if not all:
-                    return dict(matches=[matched_path], locations=locations)
+                    return matched_path
                 matches.append(matched_path)
-        return dict(matches=matches, locations=locations)
+        return matches
 
     def find_location(self, root, path, prefix=None):
         """
@@ -145,17 +147,16 @@ class AppDirectoriesFinder(BaseFinder):
         Looks for files in the app directories.
         """
         matches = []
-        locations = []
         for app in self.apps:
             match = self.find_in_app(app, path)
             storage = self.storages.get(app, None)
             if storage:
-                locations.append(storage.location)
+                self.searched_locations.append(storage.location)
             if match:
                 if not all:
-                    return dict(matches=[match], locations=locations)
+                    return match
                 matches.append(match)
-        return dict(matches=matches, locations=locations)
+        return matches
 
     def find_in_app(self, app, path):
         """
@@ -205,11 +206,11 @@ class BaseStorageFinder(BaseFinder):
         else:
             if self.storage.exists(path):
                 match = self.storage.path(path)
-                locations = [self.storage.location]
+                self.searched_locations.append(self.storage.location)
                 if all:
                     match = [match]
-                return dict(matches=match, locations=locations)
-        return dict(matches=[], locations=locations)
+                return match
+        return []
 
     def list(self, ignore_patterns):
         """
@@ -244,17 +245,13 @@ def find(path, all=False):
     matches = []
     locations = []
     
-    for finder in get_finders():    
+    for finder in get_finders():
+        locations.extend(finder.searched_locations)
         result = finder.find(path, all=all)
-        locations.extend(result.pop('locations'))
-        result=result.pop('matches')
-
         if not all and result:
-            return dict(matches=result, locations=locations)
-
+            return result
         if not isinstance(result, (list, tuple)):
             result = [result]
-
         matches.extend(result)
 
     if matches:
