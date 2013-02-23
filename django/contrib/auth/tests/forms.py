@@ -326,20 +326,28 @@ class PasswordResetFormTest(TestCase):
                          [force_text(EmailField.default_error_messages['invalid'])])
 
     def test_nonexistant_email(self):
-        # Test nonexistant email address
+        # Test nonexistant email address. This should not fail because it would
+        # expose information about registered users.
         data = {'email': 'foo@bar.com'}
         form = PasswordResetForm(data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors,
-                         {'email': [force_text(form.error_messages['unknown'])]})
+        self.assertTrue(form.is_valid())
+        self.assertEquals(len(mail.outbox), 0)
 
+    @override_settings(
+        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
+        TEMPLATE_DIRS=(
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+        ),
+    )
     def test_cleaned_data(self):
         # Regression test
         (user, username, email) = self.create_dummy_user()
         data = {'email': email}
         form = PasswordResetForm(data)
         self.assertTrue(form.is_valid())
+        form.save(domain_override='example.com')
         self.assertEqual(form.cleaned_data['email'], email)
+        self.assertEqual(len(mail.outbox), 1)
 
     @override_settings(
         TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
@@ -373,7 +381,8 @@ class PasswordResetFormTest(TestCase):
         user.is_active = False
         user.save()
         form = PasswordResetForm({'email': email})
-        self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_unusable_password(self):
         user = User.objects.create_user('testuser', 'test@example.com', 'test')
@@ -383,9 +392,10 @@ class PasswordResetFormTest(TestCase):
         user.set_unusable_password()
         user.save()
         form = PasswordResetForm(data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form["email"].errors,
-                         [_("The user account associated with this email address cannot reset the password.")])
+        # The form itself is valid, but no email is sent
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEquals(len(mail.outbox), 0)
 
 
 class ReadOnlyPasswordHashTest(TestCase):
