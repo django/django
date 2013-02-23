@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import copy
 
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
@@ -154,9 +155,8 @@ class NestedObjects(Collector):
             if source_attr:
                 self.add_edge(getattr(obj, source_attr), obj)
             else:
-                # If object of proxy model take concrete model's instance
-                # to avoid mismatch in `edges`
-                obj.__class__ = obj.__class__._meta.concrete_model
+                if obj._meta.proxy:
+                    obj = obj._meta.concrete_model(pk=obj.pk)
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
