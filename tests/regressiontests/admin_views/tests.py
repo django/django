@@ -972,6 +972,23 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post('/test_admin/admin/', dict(self.super_login, **new_next), QUERY_STRING=query_string)
         self.assertRedirects(login, redirect_url)
 
+    def testDoubleLoginIsNotAllowed(self):
+        """Regression test for #19327"""
+        self.client.login(username='super', password='secret')
+        query_string = 'the-answer=42'
+        redirect_url = '/test_admin/admin/?%s' % query_string
+        new_next = {REDIRECT_FIELD_NAME: redirect_url}
+
+        # If user provides valid credentials, a message should be displayed informing him that he is already logged in.
+        login = self.client.post('/test_admin/admin/', dict(self.joepublic_login, **new_next), follow=True, QUERY_STRING=query_string)
+        self.assertRedirects(login, redirect_url)
+        self.assertContains(login, 'You are already logged in')
+
+        # If credentials are invalid, user should be logged out.
+        login = self.client.post('/test_admin/admin/', dict({LOGIN_FORM_KEY: 1, 'username': 'invalid', 'password': 'bad_password'}, **new_next), QUERY_STRING = query_string)
+        self.assertEqual(login.status_code, 200)
+        self.assertContains(login, ERROR_MESSAGE)
+        
     def testAddView(self):
         """Test add view restricts access and actually adds items."""
 
