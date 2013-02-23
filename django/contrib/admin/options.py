@@ -164,7 +164,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         related_admin = self.admin_site._registry.get(db_field.rel.to, None)
         if related_admin is not None:
             ordering = related_admin.get_ordering(request)
-            if ordering is not None:
+            if ordering is not None and ordering != ():
                 return db_field.rel.to._default_manager.using(db).order_by(*ordering).complex_filter(db_field.rel.limit_choices_to)
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
