@@ -15,7 +15,6 @@ from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils import simplejson
 from django.utils._os import upath
 from django.utils import six
 from django.utils.six import PY3, StringIO
@@ -329,7 +328,6 @@ class TestFixtures(TestCase):
             stdout=stdout
         )
 
-
         # Output order isn't guaranteed, so check for parts
         data = stdout.getvalue()
 
@@ -347,20 +345,6 @@ class TestFixtures(TestCase):
 
         self.maxDiff = 1024
         self.assertEqual(data, animals_data)
-
-        stdout = StringIO()
-        management.call_command(
-            'dumpdata',
-            'fixtures_regress.animal',
-            format='json',
-            stdout=stdout,
-            primary_keys=['1 10']
-        )
-        data = stdout.getvalue()
-        test_json = simplejson.loads(data)
-        self.assertEqual(len(test_json), 2)
-        keys = sorted([item['pk'] for item in test_json])
-        self.assertEqual(keys, [1, 10])
 
 
     def test_proxy_model_included(self):

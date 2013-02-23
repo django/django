@@ -6,10 +6,6 @@ from django.utils.datastructures import SortedDict
 
 from optparse import make_option
 
-import itertools
-import sys
-
-
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--format', default='json', dest='format',
@@ -25,8 +21,6 @@ class Command(BaseCommand):
             help='Use natural keys if they are available.'),
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
-        make_option('--pks', dest='primary_keys', action='append', default=[],
-            help="Only dump objects with given primary keys. Accepts a space seperated list of keys or '-' to read from stdin. This option is applied to all apps/models."),
     )
     help = ("Output the contents of the database as a fixture of the given "
             "format (using each model's default manager unless --all is "
@@ -40,7 +34,6 @@ class Command(BaseCommand):
         indent = options.get('indent')
         using = options.get('database')
         excludes = options.get('exclude')
-        pks = options.get('primary_keys')
         show_traceback = options.get('traceback')
         use_natural_keys = options.get('use_natural_keys')
         use_base_manager = options.get('use_base_manager')
@@ -60,12 +53,6 @@ class Command(BaseCommand):
                     excluded_apps.add(app_obj)
                 except ImproperlyConfigured:
                     raise CommandError('Unknown app in excludes: %s' % exclude)
-
-        if pks == ['-']:
-            # Read from Stdin
-            primary_keys = sys.stdin.read().split()
-        else:
-            primary_keys = list(itertools.chain(*[pk.split() for pk in pks]))
 
         if len(app_labels) == 0:
             app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
@@ -120,12 +107,8 @@ class Command(BaseCommand):
                         objects = model._base_manager
                     else:
                         objects = model._default_manager
-
-                    queryset = objects.using(using).order_by(model._meta.pk.name)
-                    if primary_keys:
-                        queryset = queryset.filter(pk__in=primary_keys)
-
-                    for obj in queryset.iterator():
+                    for obj in objects.using(using).\
+                            order_by(model._meta.pk.name).iterator():
                         yield obj
 
         try:
@@ -136,7 +119,6 @@ class Command(BaseCommand):
             if show_traceback:
                 raise
             raise CommandError("Unable to serialize database: %s" % e)
-
 
 def sort_dependencies(app_list):
     """Sort a list of app,modellist pairs into a single list of models.

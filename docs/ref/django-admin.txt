@@ -198,11 +198,6 @@ By default, ``dumpdata`` will format its output in JSON, but you can use the
 ``--format`` option to specify another format. Currently supported formats
 are listed in :ref:`serialization-formats`.
 
-.. django-admin-option:: --pks <fmt>
-
-By default, ``dumpdata`` will output all the records of the model, but you can use the
-``--pks`` option to specify a space seperated list of primary keys on which to filter.
-
 .. django-admin-option:: --indent <num>
 
 By default, ``dumpdata`` will output all data on a single line. This isn't
