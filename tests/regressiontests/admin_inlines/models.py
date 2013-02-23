@@ -130,7 +130,6 @@ class Novel(models.Model):
 class Chapter(models.Model):
     novel = models.ForeignKey(Novel)
 
-
 # Models for #16838
 
 class CapoFamiglia(models.Model):
@@ -138,13 +137,19 @@ class CapoFamiglia(models.Model):
 
 
 class Consigliere(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, help_text='Help text for Consigliere')
     capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
 
 
 class SottoCapo(models.Model):
     name = models.CharField(max_length=100)
     capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
+
+
+class ReadOnlyInline(models.Model):
+    name = models.CharField(max_length=100, help_text='Help text for ReadOnlyInline')
+    capo_famiglia = models.ForeignKey(CapoFamiglia)
+
 
 # Models for #18433
 

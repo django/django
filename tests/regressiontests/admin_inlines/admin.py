@@ -28,6 +28,11 @@ class HolderAdmin(admin.ModelAdmin):
         js = ('my_awesome_admin_scripts.js',)
 
 
+class ReadOnlyInlineInline(admin.TabularInline):
+    model = ReadOnlyInline
+    readonly_fields = ['name']
+
+
 class InnerInline2(admin.StackedInline):
     model = Inner2
 
@@ -142,7 +147,7 @@ site.register(Novel, NovelAdmin)
 site.register(Fashionista, inlines=[InlineWeakness])
 site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)
-site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])
+site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline, ReadOnlyInlineInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
