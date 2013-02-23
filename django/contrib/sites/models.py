@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import pre_save, pre_delete
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -49,20 +50,6 @@ class Site(models.Model):
     def __str__(self):
         return self.domain
 
-    def save(self, *args, **kwargs):
-        super(Site, self).save(*args, **kwargs)
-        # Cached information will likely be incorrect now.
-        if self.id in SITE_CACHE:
-            del SITE_CACHE[self.id]
-
-    def delete(self):
-        pk = self.pk
-        super(Site, self).delete()
-        try:
-            del SITE_CACHE[pk]
-        except KeyError:
-            pass
-
 
 @python_2_unicode_compatible
 class RequestSite(object):
@@ -96,3 +83,16 @@ def get_current_site(request):
     else:
         current_site = RequestSite(request)
     return current_site
+
+
+def clear_site_cache(sender, **kwargs):
+    """
+    Clears the cache (if primed) each time a site is saved or deleted
+    """
+    instance = kwargs['instance']
+    try:
+        del SITE_CACHE[instance.pk]
+    except KeyError:
+        pass
+pre_save.connect(clear_site_cache, sender=Site)
+pre_delete.connect(clear_site_cache, sender=Site)
