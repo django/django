@@ -374,6 +374,11 @@ class BigIntegerFieldTests(test.TestCase):
         BigInt.objects.create(value ='10')
         b = BigInt.objects.get(value = '10')
         self.assertEqual(b.value, 10)
+        
+    def test_clean_coercing(self):
+        b = BigInt(value=10)
+        b.full_clean()
+        self.assertIsInstance(b.value, long)
 
 class TypeCoercionTests(test.TestCase):
     """
