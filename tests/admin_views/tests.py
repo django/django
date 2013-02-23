@@ -617,6 +617,56 @@ class AdminViewBasicTest(TestCase):
         with self.assertRaises(AttributeError):
             self.client.get('/test_admin/%s/admin_views/simple/' % self.urlbit)
 
+    def test_after_add_message_contains_change_link(self):
+        """
+        Tests if the message after saving an object contains link to object.
+        """
+        post_data = {
+            "name": "Another Section",
+            # inline data
+            "article_set-TOTAL_FORMS": "3",
+            "article_set-INITIAL_FORMS": "0",
+            "article_set-MAX_NUM_FORMS": "0",
+            }
+        response = self.client.post(
+            '/test_admin/%s/admin_views/section/add/' % self.urlbit,
+            post_data,
+            follow=True
+        )
+        section = Section.objects.all().latest('id')
+        section_url = reverse('%s:admin_views_section_change' % self.urlbit, args=(section.pk,))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            '<li class="info">The section "<a href="%s">Section object</a>" was added successfully.</li>' % section_url,
+            html=True
+        )
+
+    def test_after_change_message_contains_change_link(self):
+        """
+        Tests if the message after saving an object contains link to object.
+        """
+        post_data = {
+            "name": "Updated Section",
+            # inline data
+            "article_set-TOTAL_FORMS": "3",
+            "article_set-INITIAL_FORMS": "0",
+            "article_set-MAX_NUM_FORMS": "0",
+            }
+        response = self.client.post(
+            '/test_admin/%s/admin_views/section/1/' % self.urlbit,
+            post_data,
+            follow=True
+        )
+        section = Section.objects.get(pk=1)
+        section_url = reverse('%s:admin_views_section_change' % self.urlbit, args=(section.pk,))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            '<li class="info">The section "<a href="%s">Section object</a>" was changed successfully.</li>' % section_url,
+            html=True
+        )
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
@@ -2625,10 +2675,11 @@ class AdminCustomQuerysetTest(TestCase):
                                     post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
-        # Message should contain non-ugly model verbose name
+        # Message should contain non-ugly model verbose name and link to edit form
+        pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="info">The cover letter &quot;Candidate, Best&quot; was added successfully.</li>',
+            '<li class="info">The cover letter "<a href="/test_admin/admin/admin_views/coverletter/%d/">Candidate, Best</a>" was added successfully.</li>' % pk,
             html=True
         )
 
@@ -2643,10 +2694,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
-        # Message should contain non-ugly model verbose name
+        # Message should contain non-ugly model verbose name and link to edit form
+        pk = ShortMessage.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="info">The short message &quot;ShortMessage object&quot; was added successfully.</li>',
+            '<li class="info">The short message "<a href="/test_admin/admin/admin_views/shortmessage/%d/">ShortMessage object</a>" was added successfully.</li>' % pk,
             html=True
         )
 
@@ -2664,10 +2716,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
-        # Message should contain non-ugly model verbose name
+        # Message should contain non-ugly model verbose name and link to edit form
+        pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="info">The telegram &quot;Urgent telegram&quot; was added successfully.</li>',
+            '<li class="info">The telegram "<a href="/test_admin/admin/admin_views/telegram/%d/">Urgent telegram</a>" was added successfully.</li>' % pk,
             html=True
         )
 
@@ -2682,10 +2735,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
-        # Message should contain non-ugly model verbose name
+        # Message should contain non-ugly model verbose name and link to edit form
+        pk = Paper.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="info">The paper &quot;Paper object&quot; was added successfully.</li>',
+            '<li class="info">The paper "<a href="/test_admin/admin/admin_views/paper/%d/">Paper object</a>" was added successfully.</li>' % pk,
             html=True
         )
 
@@ -2706,11 +2760,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
-        # Message should contain non-ugly model verbose name. Instance
+        # Message should contain non-ugly model verbose name and link to edit form. Instance
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>',
+            '<li class="info">The cover letter "<a href="/test_admin/admin/admin_views/coverletter/%d/">John Doe II</a>" was changed successfully.</li>' % cl.pk,
             html=True
         )
 
@@ -2732,7 +2786,7 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="info">The short message &quot;ShortMessage_Deferred_timestamp object&quot; was changed successfully.</li>',
+            '<li class="info">The short message "<a href="/test_admin/admin/admin_views/shortmessage/%d/">ShortMessage_Deferred_timestamp object</a>" was changed successfully.</li>' % sm.pk,
             html=True
         )
 
@@ -2753,11 +2807,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
-        # Message should contain non-ugly model verbose name. The instance
+        # Message should contain non-ugly model verbose name and link to edit form. The instance
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="info">The telegram &quot;Telegram without typo&quot; was changed successfully.</li>',
+            '<li class="info">The telegram "<a href="/test_admin/admin/admin_views/telegram/%d/">Telegram without typo</a>" was changed successfully.</li>' % t.pk,
             html=True
         )
 
@@ -2775,11 +2829,11 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
-        # Message should contain non-ugly model verbose name. The ugly(!)
+        # Message should contain non-ugly model verbose name and link to edit form. The ugly(!)
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
+            '<li class="info">The paper "<a href="/test_admin/admin/admin_views/paper/%d/">Paper_Deferred_author object</a>" was changed successfully.</li>' % p.pk,
             html=True
         )
 
