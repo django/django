@@ -21,8 +21,10 @@ documentation.
 Databases can have any alias you choose. However, the alias
 ``default`` has special significance. Django uses the database with
 the alias of ``default`` when no other database has been selected. If
-you don't have a ``default`` database, you need to be careful to
-always specify the database that you want to use.
+the concept of a ``default`` database doesn't make sense in the context
+of your project, you need to be careful to always specify the database
+that you want to use. Django requires that a ``default`` database entry
+be defined, but the parameters can be left blank if it will not be used.
 
 The following is an example ``settings.py`` snippet defining two
 databases -- a default PostgreSQL database and a MySQL database called
