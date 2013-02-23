@@ -17,6 +17,7 @@ from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils import tzinfo
 from django.utils.unittest import skipIf
+from decimal import Decimal
 
 
 # Mock out datetime in some tests so they don't fail occasionally when they
@@ -58,20 +59,20 @@ class HumanizeTests(TestCase):
 
     def test_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
-                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567',
+                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567', Decimal('1234567.1234567'),
                      None)
         result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
-                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
                      None)
 
         self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_l10n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
-                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567',
+                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567', Decimal('1234567.1234567'),
                      None)
         result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
-                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
                      None)
 
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
