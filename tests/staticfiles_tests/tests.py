@@ -774,3 +774,33 @@ class TestTemplateTag(StaticFilesTestCase):
         self.assertStaticRenders("does/not/exist.png",
                                    "/static/does/not/exist.png")
         self.assertStaticRenders("testfile.txt", "/static/testfile.txt")
+
+
+class TestAppStaticStorage(TestCase):
+    def setUp(self):
+        # Creates a python module foo_module in a directory with non ascii
+        # characters
+        self.search_path = 'search_path_\xc3\xbc'
+        os.mkdir(self.search_path)
+        module_path = os.path.join(self.search_path, 'foo_module')
+        os.mkdir(module_path)
+        open(os.path.join(module_path, '__init__.py'), 'w')
+        sys.path.append(os.path.abspath(self.search_path))
+
+    def tearDown(self):
+        sys.path.remove(os.path.abspath(self.search_path))
+        shutil.rmtree(self.search_path)
+
+    def test_app_with_non_ascii_characters_in_path(self):
+        """
+        Regression test for #18404 - Tests AppStaticStorage with a module that
+        has non ascii characters in path and a non utf8 file system encoding
+        """
+        # set file system encoding to a non unicode encoding
+        old_enc_func = sys.getfilesystemencoding
+        sys.getfilesystemencoding = lambda: 'ISO-8859-1'
+        try:
+            st = storage.AppStaticStorage('foo_module')
+            st.path('bar')
+        finally:
+            sys.getfilesystemencoding = old_enc_func
