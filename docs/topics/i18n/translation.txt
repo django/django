@@ -674,7 +674,29 @@ markers<contextual-markers>` using the ``context`` keyword:
 
 .. code-block:: html+django
 
-    {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
+    {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{%
+    endblocktrans %}
+
+Another feature ``{% blocktrans %}`` supports is the ``trimmed`` option. This
+option will remove newline characters from the beginning and the end of the
+content of the ``{% blocktrans %}`` tag, replace any whitespace at the beginning
+and end of a line and merge all lines into one using a space character to
+separate them. This is quite useful for indenting the content of a ``{%
+blocktrans %}`` tag without having the indentation characters end up in the
+corresponding entry in the PO file, which makes the translation process easier.
+
+For instance, the following ``{% blocktrans %}`` tag::
+
+    {% blocktrans trimmed %}
+    First sentence.
+    Second paragraph.
+    {% endblocktrans %}
+
+will result in the entry "First sentence. Second paragraph." in the PO file,
+compared to "\\nFirst sentence.\\nSecond sentence.\\n", if the ``trimmed``
+option had not been specified.
+
+
 
 .. _translator-comments-in-templates:
 

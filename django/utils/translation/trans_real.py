@@ -17,7 +17,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
-from django.utils.translation import TranslatorCommentWarning
+from django.utils.translation import TranslatorCommentWarning, trim_whitespace
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -476,6 +476,7 @@ def blankout(src, char):
     """
     return dot_re.sub(char, src)
 
+
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
 inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
 block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
@@ -529,19 +530,22 @@ def templatize(src, origin=None):
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
                     if inplural:
+                        singular = trim_whitespace(''.join(singular))
+                        plural = trim_whitespace(''.join(plural))
                         if message_context:
-                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, singular, plural))
                         else:
-                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
+                            out.write(' ngettext(%r, %r, count) ' % (singular, plural))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
+                        singular = trim_whitespace(''.join(singular))
                         if message_context:
-                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                            out.write(' pgettext(%r, %r) ' % (message_context, singular))
                         else:
-                            out.write(' gettext(%r) ' % ''.join(singular))
+                            out.write(' gettext(%r) ' % singular)
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None
