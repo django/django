@@ -414,6 +414,9 @@ Open your settings file (``mysite/settings.py``, remember) and  add a
 
     TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
+:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
+loading Django templates; it's a search path.
+
 Now create a directory called ``admin`` inside ``mytemplates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
