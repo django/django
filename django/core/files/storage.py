@@ -37,12 +37,16 @@ class Storage(object):
 
     def save(self, name, content):
         """
-        Saves new content to the file specified by name. The content should be a
-        proper File object, ready to be read from the beginning.
+        Saves new content to the file specified by name. The content should be
+        a proper File object or any python file-like object, ready to be read
+        from the beginning.
         """
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name
+
+        if not hasattr(content, 'chunks'):
+            content = File(content)
 
         name = self.get_available_name(name)
         name = self._save(name, content)
