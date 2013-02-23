@@ -193,6 +193,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 
+        related_admin = self.admin_site._registry.get(db_field.rel.to, None)
+        if related_admin is not None and related_admin.ordering is not None:
+            kwargs['queryset'] = db_field.rel.to._default_manager.using(db).order_by(*related_admin.ordering).complex_filter(db_field.rel.limit_choices_to)
+
         return db_field.formfield(**kwargs)
 
     def _declared_fieldsets(self):

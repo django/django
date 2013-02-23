@@ -1379,9 +1379,12 @@ class ManyToManyField(RelatedField, Field):
         db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
         }
         defaults.update(kwargs)
+
+        if 'queryset' not in kwargs:
+            defaults['queryset'] = self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
+
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
         if defaults.get('initial') is not None:
