@@ -773,6 +773,11 @@ class Templates(TestCase):
             'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"),
             'included-cycle': ('{{ abc }}', {'abc': 'xxx'}, 'xxx'),
             'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"),
+            'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '<'),
+
+            'cycle26': ('{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'),
+            'cycle27': ('{% load cycle from future %}{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}', {'a': '<', 'b': '>'}, '<>'),
+            'cycle28': ('{% load cycle from future %}{% cycle a|safe b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '<&gt;'),
 
             ### EXCEPTIONS ############################################################
 
@@ -804,7 +809,12 @@ class Templates(TestCase):
             'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
             'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
-            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'), # Variables are NOT auto-escaped.
+            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'),
+
+            'firstof11': ('{% load firstof from future %}{% firstof a b %}', {'a': '<', 'b': '>'}, '&lt;'),
+            'firstof12': ('{% load firstof from future %}{% firstof a b %}', {'a': '', 'b': '>'}, '&gt;'),
+            'firstof13': ('{% load firstof from future %}{% autoescape off %}{% firstof a %}{% endautoescape %}', {'a': '<'}, '<'),
+            'firstof14': ('{% load firstof from future %}{% firstof a|safe b %}', {'a': '<'}, '<'),
 
             ### FOR TAG ###############################################################
             'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),

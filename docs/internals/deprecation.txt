@@ -323,6 +323,10 @@ these changes.
 1.8
 ---
 
+* The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
+  arguments. In 1.6 and 1.7, this behavior is provided by the version of these
+  tags in the ``future`` template tag library.
+
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
