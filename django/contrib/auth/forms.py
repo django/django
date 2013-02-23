@@ -206,30 +206,7 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    error_messages = {
-        'unknown': _("That email address doesn't have an associated "
-                     "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this email "
-                      "address cannot reset the password."),
-    }
     email = forms.EmailField(label=_("Email"), max_length=254)
-
-    def clean_email(self):
-        """
-        Validates that an active user exists with the given email address.
-        """
-        UserModel = get_user_model()
-        email = self.cleaned_data["email"]
-        self.users_cache = UserModel._default_manager.filter(email__iexact=email)
-        if not len(self.users_cache):
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if not any(user.is_active for user in self.users_cache):
-            # none of the filtered users are active
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password == UNUSABLE_PASSWORD)
-               for user in self.users_cache):
-            raise forms.ValidationError(self.error_messages['unusable'])
-        return email
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
@@ -241,7 +218,14 @@ class PasswordResetForm(forms.Form):
         user.
         """
         from django.core.mail import send_mail
-        for user in self.users_cache:
+        UserModel = get_user_model()
+        email = self.cleaned_data["email"]
+        users = UserModel._default_manager.filter(email__iexact=email)
+        for user in users:
+            # Make sure that no email is sent to a user that actually has
+            # a password marked as unusable
+            if user.password == UNUSABLE_PASSWORD:
+                continue
             if not domain_override:
                 current_site = get_current_site(request)
                 site_name = current_site.name
