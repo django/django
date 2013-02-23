@@ -743,10 +743,24 @@ patterns.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
+    If the email address provided does not exist in the system, this view
+    won't send an email, but the user won't receive any error message either.
+    This prevents information leaking to potential attackers. If you want to
+    provide an error message in this case, you can subclass
+    :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
+    ``password_reset_form`` argument.
+
+
     Users flagged with an unusable password (see
     :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
     allowed to request a password reset to prevent misuse when using an
-    external authentication source like LDAP.
+    external authentication source like LDAP. Note that they won't receive any
+    error message since this would expose their account's existence but no
+    mail will be sent either.
+
+    .. versionchanged:: 1.6
+        Previously, error messages indicated whether a given email was
+        registered.
 
     **URL name:** ``password_reset``
 
