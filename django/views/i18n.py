@@ -68,8 +68,10 @@ js_catalog_template = r"""
 {% autoescape off %}
 (function (globals) {
 
+  var django = globals.django || (globals.django = {});
+
   {% if plural %}
-  globals.pluralidx = function (n) {
+  django.pluralidx = function (n) {
     var v={{ plural }};
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
@@ -78,16 +80,16 @@ js_catalog_template = r"""
     }
   };
   {% else %}
-  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
+  django.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
   {% endif %}
 
   {% if catalog_str %}
   /* gettext library */
 
-  var catalog = {{ catalog_str }};
+  django.catalog = {{ catalog_str }};
 
-  globals.gettext = function (msgid) {
-    var value = catalog[msgid];
+  django.gettext = function (msgid) {
+    var value = django.catalog[msgid];
     if (typeof(value) == 'undefined') {
       return msgid;
     } else {
@@ -95,44 +97,43 @@ js_catalog_template = r"""
     }
   };
 
-  globals.ngettext = function (singular, plural, count) {
-    value = catalog[singular];
+  django.ngettext = function (singular, plural, count) {
+    value = django.catalog[singular];
     if (typeof(value) == 'undefined') {
       return (count == 1) ? singular : plural;
     } else {
-      return value[pluralidx(count)];
+      return value[django.pluralidx(count)];
     }
   };
 
-  globals.gettext_noop = function (msgid) { return msgid; };
+  django.gettext_noop = function (msgid) { return msgid; };
 
-  globals.pgettext = function (context, msgid) {
-    var value = gettext(context + '\\x04' + msgid);
+  django.pgettext = function (context, msgid) {
+    var value = django.gettext(context + '\\x04' + msgid);
     if (value.indexOf('\\x04') != -1) {
       value = msgid;
     }
     return value;
   };
 
-  globals.npgettext = function (context, singular, plural, count) {
-    var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
+  django.npgettext = function (context, singular, plural, count) {
+    var value = django.ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
     if (value.indexOf('\\x04') != -1) {
-      value = ngettext(singular, plural, count);
+      value = django.ngettext(singular, plural, count);
     }
     return value;
   };
   {% else %}
   /* gettext identity library */
 
-  globals.gettext = function (msgid) { return msgid; };
-  globals.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
-  globals.gettext_noop = function (msgid) { return msgid; };
-  globals.pgettext = function (context, msgid) { return msgid; };
-  globals.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
+  django.gettext = function (msgid) { return msgid; };
+  django.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
+  django.gettext_noop = function (msgid) { return msgid; };
+  django.pgettext = function (context, msgid) { return msgid; };
+  django.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
   {% endif %}
 
-
-  globals.interpolate = function (fmt, obj, named) {
+  django.interpolate = function (fmt, obj, named) {
     if (named) {
       return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
     } else {
@@ -143,16 +144,26 @@ js_catalog_template = r"""
 
   /* formatting library */
 
-  var formats = {{ formats_str }};
+  django.formats = {{ formats_str }};
 
-  globals.get_format = function (format_type) {
-    var value = formats[format_type];
+  django.get_format = function (format_type) {
+    var value = django.formats[format_type];
     if (typeof(value) == 'undefined') {
       return format_type;
     } else {
       return value;
     }
   };
+
+  /* add to global namespace */
+  globals.pluralidx = django.pluralidx;
+  globals.gettext = django.gettext;
+  globals.ngettext = django.ngettext;
+  globals.gettext_noop = django.gettext_noop;
+  globals.pgettext = django.pgettext;
+  globals.npgettext = django.npgettext;
+  globals.interpolate = django.interpolate;
+  globals.get_format = django.get_format;
 
 }(this));
 {% endautoescape %}
