@@ -128,7 +128,15 @@ class Novel(models.Model):
     name = models.CharField(max_length=40)
 
 class Chapter(models.Model):
+    name = models.CharField(max_length=40)
     novel = models.ForeignKey(Novel)
+
+class FootNote(models.Model):
+    """
+    Model added for ticket 19838
+    """
+    chapter = models.ForeignKey(Chapter, on_delete=models.PROTECT)
+    note = models.CharField(max_length=40)
 
 # Models for #16838
 
