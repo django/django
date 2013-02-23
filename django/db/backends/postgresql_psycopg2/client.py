@@ -16,6 +16,7 @@ class DatabaseClient(BaseDatabaseClient):
         if settings_dict['PORT']:
             args.extend(["-p", str(settings_dict['PORT'])])
         args += [settings_dict['NAME']]
+        os.environ['PGPASSWORD'] = settings_dict['PASSWORD']
         if os.name == 'nt':
             sys.exit(os.system(" ".join(args)))
         else:
