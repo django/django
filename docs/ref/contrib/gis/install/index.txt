@@ -415,7 +415,7 @@ __ http://python.org/download/
 PostgreSQL
 ^^^^^^^^^^
 
-First, download the latest `PostgreSQL 9.0 installer`__ from the
+First, download the latest `PostgreSQL installer`__ from the
 `EnterpriseDB`__ Web site.  After downloading, simply run the installer,
 follow the on-screen directions, and keep the default options unless
 you know the consequences of changing them.
