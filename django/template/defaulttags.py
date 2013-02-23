@@ -15,8 +15,8 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_text
-from django.utils.safestring import mark_safe
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe, SafeData, EscapeData
+from django.utils.html import format_html, escape
 from django.utils import six
 from django.utils import timezone
 
@@ -59,10 +59,11 @@ class CsrfTokenNode(Node):
             return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars, variable_name=None, silent=False):
+    def __init__(self, cyclevars, variable_name=None, silent=False, escape=False):
         self.cyclevars = cyclevars
         self.variable_name = variable_name
         self.silent = silent
+        self.escape = escape
 
     def render(self, context):
         if self not in context.render_context:
@@ -74,6 +75,8 @@ class CycleNode(Node):
             context[self.variable_name] = value
         if self.silent:
             return ''
+        if self.escape and (context.autoescape and not isinstance(value, SafeData)) or isinstance(value, EscapeData):
+            return escape(value)
         return value
 
 class DebugNode(Node):
@@ -97,13 +100,16 @@ class FilterNode(Node):
         return filtered
 
 class FirstOfNode(Node):
-    def __init__(self, vars):
-        self.vars = vars
+    def __init__(self, variables, escape=False):
+        self.vars = variables #`vars` is reserved name for built-in function
+        self.escape = escape
 
     def render(self, context):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
+                if self.escape and (context.autoescape and not isinstance(value, SafeData)) or isinstance(value, EscapeData):
+                    return escape(value)
                 return smart_text(value)
         return ''
 
@@ -508,7 +514,7 @@ def comment(parser, token):
     return CommentNode()
 
 @register.tag
-def cycle(parser, token):
+def cycle(parser, token, escape=False):
     """
     Cycles among the given strings each time this tag is encountered.
 
@@ -588,13 +594,13 @@ def cycle(parser, token):
     if as_form:
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
-        node = CycleNode(values, name, silent=silent)
+        node = CycleNode(values, name, silent=silent, escape=escape)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
         parser._namedCycleNodes[name] = node
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
-        node = CycleNode(values)
+        node = CycleNode(values, escape=escape)
     return node
 
 @register.tag
@@ -643,7 +649,7 @@ def do_filter(parser, token):
     return FilterNode(filter_expr, nodelist)
 
 @register.tag
-def firstof(parser, token):
+def firstof(parser, token, escape=False):
     """
     Outputs the first variable passed that is not False, without escaping.
 
@@ -680,7 +686,7 @@ def firstof(parser, token):
     bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits])
+    return FirstOfNode([parser.compile_filter(bit) for bit in bits], escape=escape)
 
 @register.tag('for')
 def do_for(parser, token):

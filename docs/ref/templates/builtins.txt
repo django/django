@@ -190,6 +190,23 @@ call to ``{% cycle %}`` doesn't specify silent::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
+If you want to have auto-escaping of variables in cycle tag, you can use
+future version of this tag by adding import to your template
+
+    {% load cycle from future %}
+
+After this, all variables passed to cycle will be escaped
+
+To disable auto-escaping you can use
+
+    {% autoescape off %}
+        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+    {% autoescape %}
+
+Or if only some variables should be escaped, you can use
+
+    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+
 .. templatetag:: debug
 
 debug
@@ -278,6 +295,23 @@ explicitly::
     {% filter force_escape %}
         {% firstof var1 var2 var3 "fallback value" %}
     {% endfilter %}
+
+If you want to have auto-escaping of variables in firstof tag, you can use
+future version of this tag by adding import to your template
+
+    {% load firstof from future %}
+
+After this, all variables passed to firstof will be escaped
+
+To disable auto-escaping you can use
+
+    {% autoescape off %}
+        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+    {% autoescape %}
+
+Or if only some variables should be escaped, you can use
+
+    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
