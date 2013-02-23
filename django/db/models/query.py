@@ -104,7 +104,7 @@ class QuerySet(object):
             len(self)
 
         if self._result_cache is None:
-            self._iter = self.iterator()
+            self._iter = self._safe_iterator(self.iterator())
             self._result_cache = []
         if self._iter:
             return self._result_iter()
@@ -340,6 +340,18 @@ class QuerySet(object):
                         setattr(obj, field.name, rel_obj)
 
             yield obj
+
+    def _safe_iterator(self, iterator):
+        # ensure result cache is cleared when iterating over a queryset
+        # raises an exception
+        try:
+            for item in iterator:
+                yield item
+        except StopIteration:
+            raise
+        except Exception:
+            self._result_cache = None
+            raise
 
     def aggregate(self, *args, **kwargs):
         """
