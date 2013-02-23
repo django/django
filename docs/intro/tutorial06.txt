@@ -51,7 +51,8 @@ And, add at the top of your ``polls/templates/polls/index.html``:
 
 .. code-block:: html+django
 
-    {% load static %}
+    {# this enables the static template tag #}
+    {% load staticfiles %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 
