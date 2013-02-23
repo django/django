@@ -137,6 +137,13 @@ def sql_indexes(app, style, connection):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
+def sql_destroy_indexes(app, style, connection):
+    "Returns a list of the DROP INDEX SQL statements for all models in the given app."
+    output = []
+    for model in models.get_models(app):
+        output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
+    return output
+
 
 def sql_all(app, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
