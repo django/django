@@ -11,7 +11,7 @@ import traceback
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
 
@@ -172,6 +172,8 @@ class BaseCommand(object):
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
             help='Print traceback on exception'),
+        make_option('--no-style', action='store_true', dest='no_style', default='False',
+            help='Avoids using color style in the command output.'),
     )
     help = ''
     args = ''
@@ -183,7 +185,11 @@ class BaseCommand(object):
     leave_locale_alone = False
 
     def __init__(self):
-        self.style = color_style()
+        options, args = OptionParser(option_list=self.option_list).parse_args()
+        if options.__dict__.get('no_style'):
+            self.style = no_style()
+        else:
+            self.style = color_style()
 
     def get_version(self):
         """
@@ -254,7 +260,10 @@ class BaseCommand(object):
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
-        self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+        if options.get('no_style'):
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
+        else:
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
             from django.conf import settings
