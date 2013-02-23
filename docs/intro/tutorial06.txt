@@ -89,7 +89,7 @@ the bottom right of the screen.
 
     Of course the ``{% static %}`` template tag is not available for use in
     static files like your stylesheet. You should always use **relative paths**
-    to link your static files between each others, because then you can change
+    to link your static files between each other, because then you can change
     :setting:`STATIC_URL` later on. Also, remember this general best practice:
     **never hardcode absolute paths**.
 
