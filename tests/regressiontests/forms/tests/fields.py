@@ -893,13 +893,13 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean(''))
 
     def test_choicefield_callable(self):
-        choices = lambda: [('J', 'John'), ('P', 'Paul')]
+        choices = lambda field: [('J', 'John'), ('P', 'Paul')]
         f = ChoiceField(choices=choices)
         self.assertEqual(u'J', f.clean('J'))
       
     def test_choicefield_callable_may_evaluate_to_different_values(self):
         choices = []
-        def choices_as_callable():
+        def choices_as_callable(field):
             return choices
 
         class ChoiceFieldForm(Form):
