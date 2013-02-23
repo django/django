@@ -136,6 +136,15 @@ Then, run the tests normally, for example:
 
     ./runtests.py --settings=test_sqlite admin_inlines
 
+If you have Selenium installed but for some reason don't want to run these tests
+(for example to speed up the test suite), use the ``--skip-selenium`` option
+of the test runner.
+
+.. code-block:: bash
+
+    ./runtests.py --settings=test_sqlite --skip-selenium admin_inlines
+
+
 .. _running-unit-tests-dependencies:
 
 Running all the tests

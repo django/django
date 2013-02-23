@@ -301,7 +301,12 @@ if __name__ == "__main__":
         '--liveserver', action='store', dest='liveserver', default=None,
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081.'),
+             'is localhost:8081.')
+    parser.add_option(
+        '--skip-selenium', action='store_true', dest='skip_selenium',
+        default=False,
+        help='Skip running Selenium tests even it Selenium itself is '
+             'installed. By default these tests are not skipped.')
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -313,6 +318,9 @@ if __name__ == "__main__":
 
     if options.liveserver is not None:
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
+
+    if options.skip_selenium:
+        os.environ['DJANGO_SKIP_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
         bisect_tests(options.bisect, options, args)

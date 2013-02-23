@@ -1,3 +1,5 @@
+import os
+
 from django.test import LiveServerTestCase
 from django.utils.module_loading import import_by_path
 from django.utils.unittest import SkipTest
@@ -8,6 +10,8 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
+        if os.environ.get('DJANGO_SKIP_SELENIUM_TESTS', False):
+            raise SkipTest('Selenium tests skipped by explicit request')
         try:
             cls.selenium = import_by_path(cls.webdriver_class)()
         except Exception as e:
