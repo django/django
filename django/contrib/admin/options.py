@@ -1464,21 +1464,20 @@ class InlineModelAdmin(BaseModelAdmin):
                 it's not rendered using the field information, but just using a generic
                 "deletion_field" of the InlineModelAdmin.
                 """
-                data = self.cleaned_data.get('DELETE', '')
-
-                if data:
+                if self.cleaned_data.get('DELETE', ''):
                     using = router.db_for_write(self._meta.model)
                     collector = NestedObjects(using=using)
                     collector.collect([self.instance])
                     if collector.protected:
                         fmt_prot = [u'%s %s' % (p._meta.verbose_name, p)
                                             for p in collector.protected]
-                        raise ValidationError("Deleting %s %s would require deleting "
-                                "the following protected related objects: %s"
-                                % (self._meta.model._meta.verbose_name,
-                                   self.instance,
-                                   ', '.join(fmt_prot)))
-                return data
+                        msg_dict = {'class_name': self._meta.model._meta.verbose_name,
+                                    'instance': self.instance,
+                                    'related_objects': ', '.join(fmt_prot)}
+                        msg = _("Deleting %(class_name)s %(instance)s would require "
+                                "deleting the following protected related objects: "
+                                "%(related_objects)s" % msg_dict)
+                        raise ValidationError(msg)
 
             def is_valid(self):
                 cleaned_data = self.cleaned_data
