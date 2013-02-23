@@ -2021,6 +2021,9 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
         Article.objects.create(name='three', created=datetime.datetime.now())
         Article.objects.create(name='four', created=datetime.datetime.now())
 
+        spam = Food.objects.create(name='spam')
+        Eaten.objects.create(meal='spam with cheese', food=spam)
+
     def test_tickets_7698_10202(self):
         # People like to slice with '0' as the high-water mark.
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
@@ -2035,6 +2038,11 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
     def test_empty_resultset_sql(self):
         # ticket #12192
         self.assertNumQueries(0, lambda: list(Number.objects.all()[1:1]))
+        # ticket #19263 - testing subqueries
+        self.assertNumQueries(0, lambda: list(Eaten.objects.filter(
+            food__in=Food.objects.all()[0:0])))
+        self.assertNumQueries(1, lambda: list(Eaten.objects.exclude(
+            food__in=Food.objects.all()[0:0])))
 
 
 class EscapingTests(TestCase):

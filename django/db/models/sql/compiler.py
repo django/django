@@ -64,8 +64,6 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        if with_limits and self.query.low_mark == self.query.high_mark:
-            return '', ()
 
         self.pre_sql_setup()
         # After executing the query, we must get rid of any joins the query
