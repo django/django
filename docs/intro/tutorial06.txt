@@ -93,9 +93,8 @@ the bottom right of the screen.
     :setting:`STATIC_URL` later on. Also, remember this general best practice:
     **never hardcode absolute paths**.
 
-Those are the **basics**. For more details on common configuration options,
-read on; for a detailed reference of the settings, commands, and other bits
-included with the framework see
+Those are the **basics**. For more details on settings and other bits included
+with the framework see
 :doc:`the static files howto </howto/static-files>` and the
 :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
 
