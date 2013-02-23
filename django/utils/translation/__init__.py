@@ -192,5 +192,5 @@ def get_language_info(lang_code):
             try:
                 return LANG_INFO[splited_lang_code]
             except KeyError:
-                raise KeyError("Unknown language code %r and %r." % (lang_code, splited_lang_code))
-        raise KeyError("Unknown language code %r." % lang_code)
+                raise KeyError("Unknown language code %s and %s." % (lang_code, splited_lang_code))
+        raise KeyError("Unknown language code %s." % lang_code)
