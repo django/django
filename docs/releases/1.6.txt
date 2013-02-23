@@ -60,9 +60,13 @@ Minor features
 * In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
   now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
 
-* The default widgets for :class:`~django.forms.EmailField` and
-  :class:`~django.forms.URLField` use the new type attributes available in
-  HTML5 (type='email', type='url').
+* The default widgets for :class:`~django.forms.EmailField`,
+  :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.FloatField` and :class:`~django.forms.DecimalField` use
+  the new type attributes available in HTML5 (type='email', type='url',
+  type='number'). Note that due to erratic support of the ``number`` input type
+  with localized numbers in current browsers, Django only uses it when numeric
+  fields are not localized.
 
 * The ``number`` argument for :ref:`lazy plural translations
   <lazy-plural-translations>` can be provided at translation time rather than
@@ -122,7 +126,8 @@ Backwards incompatible changes in 1.6
 
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as
-  ``type='email'`` or ``type='url'`` depending on their corresponding field type.
+  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
+  corresponding field type.
 
 * Extraction of translatable literals from templates with the
   :djadmin:`makemessages` command now correctly detects i18n constructs when

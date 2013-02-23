@@ -273,13 +273,13 @@ Lets you create a formset with the ability to order::
     ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
-    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
+    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="number" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
     <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
     <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
-    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="text" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
+    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="number" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
     <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
     <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
-    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
+    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="number" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
 
 This adds an additional field to each form. This new field is named ``ORDER``
 and is an ``forms.IntegerField``. For the forms that came from the initial

@@ -35,7 +35,6 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.test import SimpleTestCase
-from django.utils import formats
 from django.utils import six
 from django.utils._os import upath
 
@@ -131,6 +130,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_1(self):
         f = IntegerField()
+        self.assertWidgetRendersTo(f, '<input type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1, f.clean('1'))
@@ -165,6 +165,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_3(self):
         f = IntegerField(max_value=10)
+        self.assertWidgetRendersTo(f, '<input max="10" type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1, f.clean(1))
         self.assertEqual(10, f.clean(10))
@@ -176,6 +177,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_4(self):
         f = IntegerField(min_value=10)
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="number" name="f" min="10" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'", f.clean, 1)
         self.assertEqual(10, f.clean(10))
@@ -187,6 +189,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
+        self.assertWidgetRendersTo(f, '<input id="id_f" max="20" type="number" name="f" min="10" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 10.'", f.clean, 1)
         self.assertEqual(10, f.clean(10))
@@ -198,10 +201,19 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_value, 20)
         self.assertEqual(f.min_value, 10)
 
+    def test_integerfield_localized(self):
+        """
+        Make sure localized IntegerField's widget renders to a text input with
+        no number input specific attributes.
+        """
+        f1 = IntegerField(localize=True)
+        self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
+
     # FloatField ##################################################################
 
     def test_floatfield_1(self):
         f = FloatField()
+        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(1.0, f.clean('1'))
@@ -228,6 +240,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_3(self):
         f = FloatField(max_value=1.5, min_value=0.5)
+        self.assertWidgetRendersTo(f, '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(1.5, f.clean('1.5'))
@@ -235,10 +248,19 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
 
+    def test_floatfield_localized(self):
+        """
+        Make sure localized FloatField's widget renders to a text input with
+        no number input specific attributes.
+        """
+        f = FloatField(localize=True)
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
+
     # DecimalField ################################################################
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" maxlength="6" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(f.clean('1'), Decimal("1"))
@@ -284,6 +306,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" maxlength="6" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(f.clean('1.5'), Decimal("1.5"))
@@ -314,6 +337,14 @@ class FieldsTests(SimpleTestCase):
         f = DecimalField(max_digits=2, decimal_places=2)
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
+
+    def test_decimalfield_localized(self):
+        """
+        Make sure localized DecimalField's widget renders to a text input with
+        no number input specific attributes.
+        """
+        f = DecimalField(localize=True)
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
 
     # DateField ###################################################################
 
