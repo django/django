@@ -412,11 +412,7 @@ project is a good convention to follow.
 Open your settings file (``mysite/settings.py``, remember) and  add a
 :setting:`TEMPLATE_DIRS` setting::
 
-    TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'mytemplates'),)
-
-Don't forget the trailing comma. :setting:`TEMPLATE_DIRS` is a tuple of
-filesystem directories to check when loading Django templates; it's a search
-path.
+    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'mytemplates')]
 
 Now create a directory called ``admin`` inside ``mytemplates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
