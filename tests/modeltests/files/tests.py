@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import gzip
 import shutil
-import StringIO
 import tempfile
 
 from django.core.cache import cache
@@ -11,6 +10,7 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import unittest
+from django.utils.six import StringIO
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -115,12 +115,12 @@ class FileStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/file_obj'))
         self.assertEqual(
             temp_storage.open('tests/file_obj').read(),
-            'some content')
+            b'some content')
 
 
     def test_stringio(self):
         # Test passing StringIO instance as content argument to save
-        output = StringIO.StringIO()
+        output = StringIO()
         output.write('content')
         output.seek(0)
 
@@ -129,7 +129,7 @@ class FileStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         self.assertEqual(
             temp_storage.open('tests/stringio').read(),
-            'content')
+            b'content')
 
 
 
