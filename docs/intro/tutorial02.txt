@@ -440,7 +440,7 @@ system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``mytemplates`` directory in your project directory. Templates can
+Create a ``templates`` directory in your project directory. Templates can
 live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
@@ -449,16 +449,16 @@ By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
 tell Django where our templates live::
 
     TEMPLATE_DIRS = (
-        '/path/to/mysite/mytemplates', # Change this to your own directory.
+        '/path/to/mysite/templates', # Change this to your own directory.
     )
 
 Now copy the template ``admin/base_site.html`` from within the default Django
 admin template directory in the source code of Django itself
 (``django/contrib/admin/templates``) into an ``admin`` subdirectory of
 whichever directory you're using in :setting:`TEMPLATE_DIRS`. For example, if
-your :setting:`TEMPLATE_DIRS` includes ``'/path/to/mysite/mytemplates'``, as
+your :setting:`TEMPLATE_DIRS` includes ``'/path/to/mysite/templates'``, as
 above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
-``/path/to/mysite/mytemplates/admin/base_site.html``. Don't forget that
+``/path/to/mysite/templates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
 
 .. admonition:: Where are the Django source files?

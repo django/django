@@ -74,11 +74,11 @@ After the previous tutorials, our project should look like this::
                     results.html
             urls.py
             views.py
-        mytemplates/
+        templates/
             admin/
                 base_site.html
 
-You created ``mysite/mytemplates`` in :doc:`Tutorial 2 </intro/tutorial02>`,
+You created ``mysite/templates`` in :doc:`Tutorial 2 </intro/tutorial02>`,
 and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
 it is clearer why we chose to have separate template directories for the
 project and application: everything that is part of the polls application is in

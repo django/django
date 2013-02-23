@@ -300,7 +300,7 @@ Django knows to find the polls templates even though we didn't modify
     and it would work perfectly well. However, this template belongs to the
     polls application, so unlike the admin template we created in the previous
     tutorial, we'll put this one in the application's template directory
-    (``polls/templates``) rather than the project's (``mytemplates``). We'll
+    (``polls/templates``) rather than the project's (``templates``). We'll
     discuss in more detail in the :doc:`reusable apps tutorial
     </intro/reusable-apps>` *why* we do this.
 
