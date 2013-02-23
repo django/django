@@ -75,13 +75,15 @@ class FileSystemFinder(BaseFinder):
         as defined in ``STATICFILES_DIRS``.
         """
         matches = []
+        locations = []
         for prefix, root in self.locations:
             matched_path = self.find_location(root, path, prefix)
+            locations.append(root)
             if matched_path:
                 if not all:
-                    return matched_path
+                    return dict(matches=[matched_path], locations=locations)
                 matches.append(matched_path)
-        return matches
+        return dict(matches=matches, locations=locations)
 
     def find_location(self, root, path, prefix=None):
         """
@@ -143,13 +145,17 @@ class AppDirectoriesFinder(BaseFinder):
         Looks for files in the app directories.
         """
         matches = []
+        locations = []
         for app in self.apps:
             match = self.find_in_app(app, path)
+            storage = self.storages.get(app, None)
+            if storage:
+                locations.append(storage.location)
             if match:
                 if not all:
-                    return match
+                    return dict(matches=[match], locations=locations)
                 matches.append(match)
-        return matches
+        return dict(matches=matches, locations=locations)
 
     def find_in_app(self, app, path):
         """
@@ -199,10 +205,11 @@ class BaseStorageFinder(BaseFinder):
         else:
             if self.storage.exists(path):
                 match = self.storage.path(path)
+                locations = [self.storage.location]
                 if all:
                     match = [match]
-                return match
-        return []
+                return dict(matches=match, locations=locations)
+        return dict(matches=[], locations=locations)
 
     def list(self, ignore_patterns):
         """
@@ -235,17 +242,26 @@ def find(path, all=False):
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
     matches = []
-    for finder in get_finders():
+    locations = []
+    
+    for finder in get_finders():    
         result = finder.find(path, all=all)
+        locations.extend(result.pop('locations'))
+        result=result.pop('matches')
+
         if not all and result:
-            return result
+            return dict(matches=result, locations=locations)
+
         if not isinstance(result, (list, tuple)):
             result = [result]
+
         matches.extend(result)
+
     if matches:
-        return matches
+        return dict(matches=matches, locations=locations)
+
     # No match.
-    return all and [] or None
+    return all and dict(matches=[], locations=locations) or None
 
 
 def get_finders():
