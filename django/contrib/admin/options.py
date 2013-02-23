@@ -10,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
     model_format_dict, NestedObjects)
+from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -86,6 +87,14 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+
+    # validation
+    validator_class = validation.BaseValidator
+
+    @classmethod
+    def validate(cls, model):
+        validator = cls.validator_class()
+        validator.validate(cls, model)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
@@ -370,6 +379,9 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
+
+    # validation
+    validator_class = validation.ModelAdminValidator
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1446,6 +1458,9 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+
+    # validation
+    validator_class = validation.InlineValidator
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
