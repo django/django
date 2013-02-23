@@ -42,7 +42,7 @@ class TestTransactionClosing(TransactionTestCase):
         @commit_manually
         def non_comitter():
             "Execute a managed transaction with read-only operations and fail to commit"
-            _ = Mod.objects.count()
+            Mod.objects.count()
 
         self.assertRaises(TransactionManagementError, non_comitter)
 
@@ -56,7 +56,7 @@ class TestTransactionClosing(TransactionTestCase):
             """
             Perform a database query, then commit the transaction
             """
-            _ = Mod.objects.count()
+            Mod.objects.count()
             transaction.commit()
 
         try:
@@ -74,7 +74,7 @@ class TestTransactionClosing(TransactionTestCase):
             """
             Perform a database query, then rollback the transaction
             """
-            _ = Mod.objects.count()
+            Mod.objects.count()
             transaction.rollback()
 
         try:
@@ -90,9 +90,9 @@ class TestTransactionClosing(TransactionTestCase):
         @commit_manually
         def fake_committer():
             "Query, commit, then query again, leaving with a pending transaction"
-            _ = Mod.objects.count()
+            Mod.objects.count()
             transaction.commit()
-            _ = Mod.objects.count()
+            Mod.objects.count()
 
         self.assertRaises(TransactionManagementError, fake_committer)
 
@@ -239,7 +239,7 @@ class SavepointTest(TransactionTestCase):
             mod = Mod.objects.create(fld=1)
             pk = mod.pk
             sid = transaction.savepoint()
-            mod1 = Mod.objects.filter(pk=pk).update(fld=10)
+            Mod.objects.filter(pk=pk).update(fld=10)
             transaction.savepoint_commit(sid)
             mod2 = Mod.objects.get(pk=pk)
             transaction.commit()
@@ -257,7 +257,7 @@ class SavepointTest(TransactionTestCase):
             mod = Mod.objects.create(fld=1)
             pk = mod.pk
             sid = transaction.savepoint()
-            mod1 = Mod.objects.filter(pk=pk).update(fld=20)
+            Mod.objects.filter(pk=pk).update(fld=20)
             transaction.savepoint_rollback(sid)
             mod2 = Mod.objects.get(pk=pk)
             transaction.commit()
