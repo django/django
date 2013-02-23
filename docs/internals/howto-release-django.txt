@@ -2,7 +2,7 @@
 How is Django Formed?
 =====================
 
-This document explains how to release Django. If you're unluky enough to
+This document explains how to release Django. If you're unlucky enough to
 be driving a release, you should follow these instructions to get the
 package out.
 
@@ -24,14 +24,14 @@ There are three types of releases that you might need to make
 
 * Pre-releases, e.g. 1.6 beta or something.
 
-In general the steps are about the same reguardless, but there are a few
+In general the steps are about the same regardless, but there are a few
 differences noted. The short version is:
 
 #. If this is a security release, pre-notify the security distribution list
    at least one week before the actual release.
 
 #. Proofread (and create if needed) the release notes, looking for
-   organiztion, writing errors, deprecation timelines, etc. Draft a blog post
+   organization, writing errors, deprecation timelines, etc. Draft a blog post
    and email announcement.
 
 #. Update version numbers and create the release package(s)!
@@ -64,12 +64,12 @@ You'll need a few things hooked up to make this work:
 
 * Access to the admin on ``djangoproject.com``.
 
-* Access to post to ``django-announe``.
+* Access to post to ``django-announce``.
 
 * If this is a security release, access to the pre-notification distribution
   list.
 
-If this is your first release, you'll need to corrdinate with James and Jacob
+If this is your first release, you'll need to coordinate with James and Jacob
 to get all these things ready to go.
 
 Pre-release tasks
@@ -80,11 +80,11 @@ This stuff starts about a week before the release; most of it can be done
 any time leading up to the actual release:
 
 #. If this is a security release, send out pre-notification **one week**
-   before the release. We maintain a list of who gets these pre-notifcation
+   before the release. We maintain a list of who gets these pre-notification
    emails at *FIXME WHERE?*. This email should be signed by the key you'll use
    for the release, and should include patches for each issue being fixed.
 
-#. As the release aproaches, watch Trac to make sure no release blockers
+#. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
 
 #. Check with the other committers to make sure they don't have any
@@ -117,7 +117,7 @@ before release:
 
 #. Write the announcement blog post for the release. You can enter it into
    the admin at any time and mark it as inactive. Here's a few examples:
-   `example security release accouncement`__, `example regular release
+   `example security release announcement`__, `example regular release
    announcement`__, `example pre-release announcement`__.
 
    __ https://www.djangoproject.com/weblog/2013/feb/19/security/
@@ -143,7 +143,7 @@ OK, this is the fun part, where we actually push out a release!
    ``git checkout stable/<release>`` (e.g. checkout ``stable/1.5.x`` to issue
    a release in the 1.5 series.)
 
-#. If this is a security release, merge the apropriate patches from
+#. If this is a security release, merge the appropriate patches from
    ``django-private``. *FIXME: actual commands here - make sure to --ff-
    only right?*. Make sure the commit messages explain that the commit
    is a security fix and that an announcement will follow (`example
@@ -172,10 +172,13 @@ OK, this is the fun part, where we actually push out a release!
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
-#. Run ``python setup.py sdist`` to generate the release package.
+#. Run ``python setup.py sdist`` to generate the release package. This will
+   create the release package in a ``dist/`` directory.
 
-#. Generate the MD5 and SHA1 hashes of the release package. *FIXME
-   actual commands for doign this?*
+#. Generate the MD5 and SHA1 hashes of the release package::
+
+        $ md5sum dist/Django-<version>.tar.gz
+        $ sha1sum dist/Django-<version>.tar.gz
 
 #. Create a "checksums" file containing the hashes and release information.
    You can start with `a previous checksums file`__ and replace the
@@ -207,10 +210,10 @@ Now you're ready to actually put the release out there. To do this:
    and ``pip``. Here's how I do it (which requires `virtualenvwrapper`__):
 
         $ mktmpenv
-        $ easy_install http://www.djangoproject.com/download/<version>/tarball/
+        $ easy_install https://www.djangoproject.com/download/<version>/tarball/
         $ deactivate
         $ mktmpenv
-        $ pip install http://www.djangoproject.com/download/<version>/tarball/
+        $ pip install https://www.djangoproject.com/download/<version>/tarball/
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
@@ -224,9 +227,10 @@ Now you're ready to actually put the release out there. To do this:
    and following the instructions in it.
 
 #. If this is a security or regular release, register the new package with
-   PyPI by uploading the ``PGK-INFO`` file generated in the release package
-   *FIXME: be more specific about where this is and how to upload it.*
-   Don't do this for pre-releases.
+   PyPI by uploading the ``PGK-INFO`` file generated in the release package.
+   This file's *in* the distribution tarball, so you'll need to pull it
+   out. ``tar xzf dist/Django-<version>.tar.gz Django-<version>/PKG-INFO``
+   ought to work.
 
 #. Deploy the template changes you made a while back by running `fab deploy`
    from the ``djangoproject.com`` repo.
@@ -251,7 +255,7 @@ You're almost done! All that's left to do now is:
 #. Update the ``VERSION`` tuple in ``django/__init__.py`` again,
    incrementing to whatever the next expected release will be. For
    example, after releasing 1.2.1, update ``VERSION`` to report "1.2.2
-   pre-alpha".
+   pre-alpha". *FIXME: Is this correct? Do we still do this?*
 
 Notes on setting the VERSION tuple
 ==================================
