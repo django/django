@@ -172,7 +172,7 @@ class BaseCommand(object):
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
             help='Print traceback on exception'),
-        make_option('--no-style', action='store_true', dest='no_style', default='False',
+        make_option('--no-style', action='store_true', dest='no_style', default=False,
             help='Avoids using color style in the command output.'),
     )
     help = ''
