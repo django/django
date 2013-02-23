@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import Field, FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
@@ -639,3 +639,8 @@ class ModelTest(TestCase):
         Article.objects.bulk_create([Article(headline=lazy, pub_date=datetime.now())])
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
+
+    def test_invalid_qs_list(self):
+        qs = Article.objects.order_by('invalid_column')
+        self.assertRaises(FieldError, list, qs)
+        self.assertRaises(FieldError, list, qs)
