@@ -17,6 +17,14 @@ class LocaleMiddleware(object):
     is available, of course).
     """
 
+    def __init__(self):
+        self._supported_languages = dict(settings.LANGUAGES)
+        self._is_language_prefix_patterns_used = False
+        for url_pattern in get_resolver(None).url_patterns:
+            if isinstance(url_pattern, LocaleRegexURLResolver):
+                self._is_language_prefix_patterns_used = True
+                break
+
     def process_request(self, request):
         check_path = self.is_language_prefix_patterns_used()
         language = translation.get_language_from_request(
@@ -26,9 +34,11 @@ class LocaleMiddleware(object):
 
     def process_response(self, request, response):
         language = translation.get_language()
-        if (response.status_code == 404 and
-                not translation.get_language_from_path(request.path_info)
-                    and self.is_language_prefix_patterns_used()):
+        language_from_path = translation.get_language_from_path(
+                request.path_info, supported=self._supported_languages
+        )
+        if (response.status_code == 404 and not language_from_path
+                and self.is_language_prefix_patterns_used()):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
@@ -42,8 +52,9 @@ class LocaleMiddleware(object):
                     request.get_host(), language, request.get_full_path())
                 return HttpResponseRedirect(language_url)
         translation.deactivate()
-
-        patch_vary_headers(response, ('Accept-Language',))
+        if not (self.is_language_prefix_patterns_used()
+                and language_from_path):
+            patch_vary_headers(response, ('Accept-Language',))
         if 'Content-Language' not in response:
             response['Content-Language'] = language
         return response
@@ -53,7 +64,4 @@ class LocaleMiddleware(object):
         Returns `True` if the `LocaleRegexURLResolver` is used
         at root level of the urlpatterns, else it returns `False`.
         """
-        for url_pattern in get_resolver(None).url_patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
-                return True
-        return False
+        return self._is_language_prefix_patterns_used

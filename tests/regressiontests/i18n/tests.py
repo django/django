@@ -48,7 +48,8 @@ from .models import Company, TestModel
 from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
     URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase,
     URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests,
-    URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests)
+    URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests,
+    URLVaryAcceptLanguageTests)
 
 
 here = os.path.dirname(os.path.abspath(upath(__file__)))
