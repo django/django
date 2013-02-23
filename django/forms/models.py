@@ -513,6 +513,8 @@ class BaseModelFormSet(BaseFormSet):
             self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
+    save.alters_data = True
+
     def clean(self):
         self.validate_unique()
 
