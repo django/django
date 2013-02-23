@@ -758,6 +758,7 @@ class ChoiceField(Field):
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
         result._choices = copy.deepcopy(self._choices, memo)
+        result._set_choices(result._choices)
         return result
 
     def _get_choices(self):
@@ -767,6 +768,13 @@ class ChoiceField(Field):
         # Setting choices also sets the choices on the widget.
         # choices can be any iterable, but we call list() on it because
         # it will be consumed more than once.
+        if callable(value):
+            self._callable_choices = value
+            value = value()
+
+        if hasattr(self, '_callable_choices'):
+            value = self._callable_choices()
+
         self._choices = self.widget.choices = list(value)
 
     choices = property(_get_choices, _set_choices)

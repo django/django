@@ -49,7 +49,6 @@ def fix_os_paths(x):
     else:
         return x
 
-
 class FieldsTests(SimpleTestCase):
 
     def assertWidgetRendersTo(self, field, to):
@@ -892,6 +891,27 @@ class FieldsTests(SimpleTestCase):
     def test_typedchoicefield_6(self):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
         self.assertEqual(None, f.clean(''))
+
+    def test_choicefield_callable(self):
+        choices = lambda: [('J', 'John'), ('P', 'Paul')]
+        f = ChoiceField(choices=choices)
+        self.assertEqual(u'J', f.clean('J'))
+      
+    def test_choicefield_callable_may_evaluate_to_different_values(self):
+        choices = []
+        def choices_as_callable():
+            return choices
+
+        class ChoiceFieldForm(Form):
+            choicefield = ChoiceField(choices=choices_as_callable)
+
+        choices = [('J', 'John'), ('P', 'Paul')]
+        form = ChoiceFieldForm()
+        self.assertTrue("John" in form.as_p())
+
+        choices = [('M', 'Marie'),]
+        form = ChoiceFieldForm()
+        self.assertTrue("Marie" in form.as_p())
 
     # NullBooleanField ############################################################
 
