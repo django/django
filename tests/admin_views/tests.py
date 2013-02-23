@@ -4157,3 +4157,50 @@ class AdminUserMessageTest(TestCase):
         self.assertContains(response,
                             '<li class="extra_tag info">Test tags</li>',
                             html=True)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class Ticket11277(TestCase):
+    """ Labels of hidden fields in admin were not hidden. """
+
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_all_fields_visible(self):
+        response = self.client.get('/test_admin/admin/admin_views/emptymodelvisible/add/')
+
+        self.assert_fieldline_visible(response)
+        self.assert_field_visible(response, 'first')
+        self.assert_field_visible(response, 'second')
+
+    def test_all_fields_hidden(self):
+        response = self.client.get('/test_admin/admin/admin_views/emptymodelhidden/add/')
+
+        self.assert_fieldline_hidden(response)
+        self.assert_field_hidden(response, 'first')
+        self.assert_field_hidden(response, 'second')
+
+    def test_mixin(self):
+        response = self.client.get('/test_admin/admin/admin_views/emptymodelmixin/add/')
+
+        self.assert_fieldline_visible(response)
+        self.assert_field_hidden(response, 'first')
+        self.assert_field_visible(response, 'second')
+
+    def assert_field_visible(self, response, field_name):
+        self.assertContains(response, '<div class="field-box field-%s">' % field_name)
+
+    def assert_field_hidden(self, response, field_name):
+        self.assertContains(response, '<div class="field-box field-%s hidden">' % field_name)
+
+    def assert_fieldline_visible(self, response):
+        self.assertContains(response, '<div class="form-row field-first field-second">')
+
+    def assert_fieldline_hidden(self, response):
+        self.assertContains(response, '<div class="form-row hidden')
