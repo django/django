@@ -1591,6 +1591,15 @@ The ``InlineModelAdmin`` class adds:
     doesn't directly correlate to the number of objects, but can if the value
     is small enough. See :ref:`model-formsets-max-num` for more information.
 
+.. attribute:: InlineModelAdmin.min_num
+
+    .. versionadded:: 1.6
+
+    This controls the minumum number of forms to show in the inline.
+    See :ref:`formsets-min-num` for more information.
+
+    .. _ref-contrib-admin-inline-min-num:
+
 .. attribute:: InlineModelAdmin.raw_id_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
