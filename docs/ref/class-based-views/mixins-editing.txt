@@ -206,7 +206,7 @@ ProcessFormView
         The url to redirect to when the nominated object has been
         successfully deleted.
 
-    .. method:: get_success_url(obj)
+    .. method:: get_success_url()
 
         Returns the url to redirect to when the nominated object has been
         successfully deleted. Returns
