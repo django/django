@@ -468,9 +468,14 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         },
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
-        self.session.save()
-        self.assertEqual(get_cache('default').get(self.session.cache_key), None)
-        self.assertNotEqual(get_cache('sessions').get(self.session.cache_key), None)
+        # The session backend initiated in setUp() of SessionTestsMixin
+        # does not make use of the overridden settings. Hence, we initate
+        # it here aagain.
+        session = self.backend()
+
+        session.save()
+        self.assertEqual(get_cache('default').get(session.cache_key), None)
+        self.assertNotEqual(get_cache('sessions').get(session.cache_key), None)
 
 
 class SessionMiddlewareTests(unittest.TestCase):
