@@ -209,6 +209,10 @@ class QuerySet(object):
                 stop = int(k.stop)
             else:
                 stop = None
+
+            if start is not None and start == stop:
+                return self.none()
+
             qs.query.set_limits(start, stop)
             return k.step and list(qs)[::k.step] or qs
 
