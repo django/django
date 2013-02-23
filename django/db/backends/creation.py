@@ -259,6 +259,52 @@ class BaseDatabaseCreation(object):
         del references_to_delete[model]
         return output
 
+    def sql_destroy_indexes_for_model(self, model, style):
+        """
+        Returns the DROP INDEX SQL statements for a single model.
+        """
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
+            return []
+        output = []
+        for f in model._meta.local_fields:
+            output.extend(self.sql_destroy_indexes_for_field(model, f, style))
+        for fs in model._meta.index_together:
+            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            output.extend(self.sql_destroy_indexes_for_fields(model, fields, style))
+        return output
+
+    def sql_destroy_indexes_for_field(self, model, f, style):
+        """
+        Return the DROP INDEX SQL statements for a single model field.
+        """
+        if f.db_index and not f.unique:
+            return self.sql_destroy_indexes_for_fields(model, [f], style)
+        else:
+            return []
+
+    def sql_destroy_indexes_for_fields(self, model, fields, style):
+        if len(fields) == 1 and fields[0].db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
+        elif model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
+        else:
+            tablespace_sql = ""
+        if tablespace_sql:
+            tablespace_sql = " " + tablespace_sql
+
+        field_names = []
+        qn = self.connection.ops.quote_name
+        for f in fields:
+            field_names.append(style.SQL_FIELD(qn(f.column)))
+
+        index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
+
+        return [
+            style.SQL_KEYWORD("DROP INDEX") + " " +
+            style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + " " +
+            ";",
+        ]
+
     def create_test_db(self, verbosity=1, autoclobber=False):
         """
         Creates a test database, prompting the user for confirmation if the
