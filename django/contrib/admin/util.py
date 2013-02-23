@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
-import copy
 
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
