@@ -1,13 +1,19 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth import context_processors
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns
-from django.contrib.auth.views import password_reset
+from django.contrib.auth.views import password_reset, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.api import info
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from django.views.decorators.cache import never_cache
+
+class CustomRequestAuthenticationForm(AuthenticationForm):
+    def __init__(self, request, *args, **kwargs):
+        assert isinstance(request, HttpRequest)
+        super(CustomRequestAuthenticationForm, self).__init__(request, *args, **kwargs)
 
 @never_cache
 def remote_user_auth_view(request):
@@ -49,6 +55,9 @@ def auth_processor_messages(request):
 def userpage(request):
     pass
 
+def custom_request_auth_login(request):
+    return login(request, authentication_form=CustomRequestAuthenticationForm)
+
 # special urls for auth test cases
 urlpatterns = urlpatterns + patterns('',
     (r'^logout/custom_query/$', 'django.contrib.auth.views.logout', dict(redirect_field_name='follow')),
@@ -65,6 +74,7 @@ urlpatterns = urlpatterns + patterns('',
     (r'^auth_processor_perms/$', auth_processor_perms),
     (r'^auth_processor_perm_in_perms/$', auth_processor_perm_in_perms),
     (r'^auth_processor_messages/$', auth_processor_messages),
+    (r'^custom_request_auth_login/$', custom_request_auth_login),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
 )
 
