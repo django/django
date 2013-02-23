@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import gzip
+import warnings
 import zipfile
 from optparse import make_option
 
@@ -263,9 +264,7 @@ class Command(BaseCommand):
                 finally:
                     fixture.close()
 
-                # If the fixture we loaded contains 0 objects, assume that an
-                # error was encountered during fixture loading.
+                # If the fixture we loaded contains 0 objects a warning should be output.
                 if objects_in_fixture == 0:
-                    raise CommandError(
-                        "No fixture data found for '%s'. (File format may be invalid.)" %
-                            (fixture_name))
+                    warnings.warn("No fixture data found for '%s'. (File format may be invalid.)" % (fixture_name),
+                                  RuntimeWarning)
