@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.contenttypes import generic
 
 from .models import (Media, PhoneNumber, Episode, EpisodeExtra, Contact,
-    Category, EpisodePermanent, EpisodeMaxNum)
+    Category, EpisodePermanent, EpisodeMaxNum, EpisodeMinNum)
 
 
 site = admin.AdminSite(name="admin")
@@ -29,6 +29,10 @@ class MediaMaxNumInline(generic.GenericTabularInline):
     extra = 5
     max_num = 2
 
+class MediaMinNumInline(generic.GenericTabularInline):
+    model = Media
+    extra = 1
+    min_num = 3
 
 class PhoneNumberInline(generic.GenericTabularInline):
     model = PhoneNumber
@@ -42,6 +46,7 @@ class MediaPermanentInline(generic.GenericTabularInline):
 site.register(Episode, EpisodeAdmin)
 site.register(EpisodeExtra, inlines=[MediaExtraInline])
 site.register(EpisodeMaxNum, inlines=[MediaMaxNumInline])
+site.register(EpisodeMinNum, inlines=[MediaMinNumInline])
 site.register(Contact, inlines=[PhoneNumberInline])
 site.register(Category)
 site.register(EpisodePermanent, inlines=[MediaPermanentInline])

@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline
-from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
+from .models import (Episode, EpisodeExtra, EpisodeMaxNum, EpisodeMinNum, Media,
     EpisodePermanent, Category)
 
 
@@ -177,10 +177,27 @@ class GenericInlineAdminParametersTest(TestCase):
         With extra=5 and max_num=2, there should be only 2 forms.
         """
         e = self._create_object(EpisodeMaxNum)
-        inline_form_data = '<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="2" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" />'
+        inline_form_data = """<input id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" type="hidden" value="2" /><input id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" type="hidden" value="1" /><input id="id_generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS" name="generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS" type="hidden" value="2" /><input id="id_generic_inline_admin-media-content_type-object_id-MIN_NUM_FORMS" name="generic_inline_admin-media-content_type-object_id-MIN_NUM_FORMS" type="hidden" />"""
+
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
+
+        self.assertHTMLEqual(str(formset.management_form), inline_form_data)
         self.assertEqual(formset.total_form_count(), 2)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testMinNumParam(self):
+        """
+        With extra=1 and min_num=3, there should be exactly 3 forms, one filled and 2 blank.
+        """
+        e = self._create_object(EpisodeMinNum)
+        inline_form_data = """<input type="hidden" name="generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" value="3" id="id_generic_inline_admin-media-content_type-object_id-TOTAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" value="1" id="id_generic_inline_admin-media-content_type-object_id-INITIAL_FORMS" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS" id="id_generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS" value="1000" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-MIN_NUM_FORMS" value="3" id="id_generic_inline_admin-media-content_type-object_id-MIN_NUM_FORMS" />"""
+
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeminnum/%s/' % e.pk)
+        formset = response.context['inline_admin_formsets'][0].formset
+
+        self.assertHTMLEqual(str(formset.management_form), inline_form_data)
+        self.assertEqual(formset.total_form_count(), 3)
         self.assertEqual(formset.initial_form_count(), 1)
 
 
