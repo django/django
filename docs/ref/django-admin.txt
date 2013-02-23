@@ -1429,6 +1429,19 @@ that ``django-admin.py`` should print to the console.
 * ``2`` means verbose output.
 * ``3`` means *very* verbose output.
 
+.. django-admin-option:: --no-color
+
+.. versionadded:: 1.7
+
+Example usage::
+
+    django-admin.py sqlall --no-color
+
+By default, ``django-admin.py`` will format the output to be colorized. For
+example, errors will be printed to the console in red and SQL statements will
+be syntax highlighted. To prevent this and have a plain text output, pass the
+``--no-color`` option when running your command.
+
 Common options
 ==============
 
