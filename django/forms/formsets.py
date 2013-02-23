@@ -379,7 +379,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
     if min_num > max_num:
-        raise ValueError("min_num(%d) must less or equal than max_num(%d)"
+        raise ValueError("min_num(%d) must be less or equal than max_num(%d)"
                          % (min_num, max_num))
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
     # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
