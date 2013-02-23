@@ -14,7 +14,7 @@ from threading import local
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str, force_text, iri_to_uri
+from django.utils.encoding import force_str, force_text, iri_to_uri, python_2_unicode_compatible
 from django.utils.functional import memoize, lazy
 from django.utils.http import urlquote
 from django.utils.importlib import import_module
@@ -71,8 +71,17 @@ class ResolverMatch(object):
         return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name='%s', app_name='%s', namespace='%s')" % (
             self.func, self.args, self.kwargs, self.url_name, self.app_name, self.namespace)
 
+@python_2_unicode_compatible
 class Resolver404(Http404):
-    pass
+
+    def url(self):
+        return self.args[0].get('path')
+
+    def from_view(self):
+        return self.args[0].get('from_view', True)
+
+    def __str__(self):
+        return 'Failed to resolve %s to a view' % self.url()
 
 class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
@@ -206,7 +215,7 @@ class RegexURLPattern(LocaleRegexProvider):
             return
         self._callback_str = prefix + '.' + self._callback_str
 
-    def resolve(self, path):
+    def resolve(self, path, from_view=True):
         match = self.regex.search(path)
         if match:
             # If there are any named groups, use those as kwargs, ignoring
@@ -311,14 +320,14 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
-    def resolve(self, path):
+    def resolve(self, path, from_view=True):
         tried = []
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
             for pattern in self.url_patterns:
                 try:
-                    sub_match = pattern.resolve(new_path)
+                    sub_match = pattern.resolve(new_path, from_view=from_view)
                 except Resolver404 as e:
                     sub_tried = e.args[0].get('tried')
                     if sub_tried is not None:
@@ -331,8 +340,8 @@ class RegexURLResolver(LocaleRegexProvider):
                         sub_match_dict.update(sub_match.kwargs)
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
-            raise Resolver404({'tried': tried, 'path': new_path})
-        raise Resolver404({'path' : path})
+            raise Resolver404({'tried': tried, 'path': new_path, 'from_view': from_view})
+        raise Resolver404({'path' : path, 'from_view': from_view})
 
     @property
     def urlconf_module(self):
@@ -434,10 +443,10 @@ class LocaleRegexURLResolver(RegexURLResolver):
             self._regex_dict[language_code] = regex_compiled
         return self._regex_dict[language_code]
 
-def resolve(path, urlconf=None):
+def resolve(path, urlconf=None, from_view=True):
     if urlconf is None:
         urlconf = get_urlconf()
-    return get_resolver(urlconf).resolve(path)
+    return get_resolver(urlconf).resolve(path, from_view=from_view)
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
     if urlconf is None:

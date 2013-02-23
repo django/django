@@ -272,6 +272,7 @@ class ExceptionReporter(object):
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
             'loader_debug_info': self.loader_debug_info,
+            'http_status': 500,
         }
         # Check whether exception info is available
         if self.exc_type:
@@ -282,16 +283,20 @@ class ExceptionReporter(object):
             c['lastframe'] = frames[-1]
         return c
 
-    def get_traceback_html(self):
+    def get_traceback_html(self, extra_context=None):
         "Return HTML version of debug 500 HTTP error page."
         t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
         c = Context(self.get_traceback_data())
+        if extra_context is not None:
+            c.update(extra_context)
         return t.render(c)
 
-    def get_traceback_text(self):
+    def get_traceback_text(self, extra_context=None):
         "Return plain text version of debug 500 HTTP error page."
         t = Template(TECHNICAL_500_TEXT_TEMPLATE, name='Technical 500 template')
         c = Context(self.get_traceback_data(), autoescape=False)
+        if extra_context is not None:
+            c.update(extra_context)
         return t.render(c)
 
     def get_template_exception_info(self):
@@ -421,11 +426,10 @@ class ExceptionReporter(object):
         list += traceback.format_exception_only(self.exc_type, self.exc_value)
         return list
 
-
-def technical_404_response(request, exception):
+def technical_404_response(request, exc_type, exc_value, tb):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        tried = exception.args[0]['tried']
+        tried = exc_value.args[0]['tried']
     except (IndexError, TypeError, KeyError):
         tried = []
     else:
@@ -440,17 +444,31 @@ def technical_404_response(request, exception):
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
 
-    t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
+    # Trim leading slash from request.path_info
+    request_path = exc_value.url() or request.path_info[1:]
+
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
-        'request_path': request.path_info[1:], # Trim leading slash
+        'request_path': request_path,
         'urlpatterns': tried,
-        'reason': force_bytes(exception, errors='replace'),
+        'reason': force_bytes(exc_value, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
+        'http_status': 404,
     })
-    return HttpResponseNotFound(t.render(c), content_type='text/html')
+
+    if exc_value.from_view():
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        if request.is_ajax():
+            text = reporter.get_traceback_text(extra_context=c)
+            return HttpResponseNotFound(text, content_type='text/plain')
+        else:
+            html = reporter.get_traceback_html(extra_context=c)
+            return HttpResponseNotFound(html, content_type='text/html')
+    else:
+        t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
+        return HttpResponseNotFound(t.render(c), content_type='text/html')
 
 def default_urlconf(request):
     "Create an empty URLconf 404 error response."
@@ -506,6 +524,9 @@ TECHNICAL_500_TEMPLATE = """
     div.commands { margin-left: 40px; }
     div.commands a { color:#555; text-decoration:none; }
     .user div.commands a { color: black; }
+    #info { background:#f6f6f6; }
+    #info ol { margin: 0.5em 4em; }
+    #info ol li { font-family: monospace; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
@@ -636,6 +657,25 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
   </table>
 </div>
+{% if urlpatterns %}
+  <div id="info">
+      <p>
+      Using the URLconf defined in <code>{{ urlconf }}</code>,
+      Django tried these URL patterns, in this order:
+      </p>
+      <ol>
+        {% for pattern in urlpatterns %}
+          <li>
+            {% for pat in pattern %}
+                {{ pat.regex.pattern }}
+                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+            {% endfor %}
+          </li>
+        {% endfor %}
+      </ol>
+      <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
+  </div>
+{% endif %}
 {% if unicode_hint %}
 <div id="unicode-hint">
     <h2>Unicode error hint</h2>
@@ -918,7 +958,7 @@ Exception Value: {{ exception_value|force_escape }}
     <p>
       You're seeing this error because you have <code>DEBUG = True</code> in your
       Django settings file. Change that to <code>False</code>, and Django will
-      display a standard 500 page.
+      display a standard {{ http_status }} page.
     </p>
   </div>
 {% endif %}
@@ -940,6 +980,12 @@ Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
 {{ settings.MIDDLEWARE_CLASSES|pprint }}
+{% if urlpatterns %}
+Using the URLconf defined in {{ urlconf }}, Django tried these URL patterns, in this order:
+{% for pattern in urlpatterns %}{% for pat in pattern %}{{ pat.regex.pattern }} {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+{% endfor %}{% endfor %}
+The current URL, {{ request_path|escape }}, didn't match any of these.
+{% endif %}
 {% if template_does_not_exist %}Template loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
@@ -984,7 +1030,7 @@ Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.item
 
 You're seeing this error because you have DEBUG = True in your
 Django settings file. Change that to False, and Django will
-display a standard 500 page.
+display a standard {{ http_status }} page.
 """
 
 TECHNICAL_404_TEMPLATE = """

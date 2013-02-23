@@ -90,7 +90,7 @@ class BaseHandler(object):
                         urlresolvers.set_urlconf(urlconf)
                         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
-                    resolver_match = resolver.resolve(request.path_info)
+                    resolver_match = resolver.resolve(request.path_info, from_view=False)
                     callback, callback_args, callback_kwargs = resolver_match
                     request.resolver_match = resolver_match
 
@@ -136,7 +136,7 @@ class BaseHandler(object):
                                 'request': request
                             })
                 if settings.DEBUG:
-                    response = debug.technical_404_response(request, e)
+                    response = debug.technical_404_response(request, *sys.exc_info())
                 else:
                     try:
                         callback, param_dict = resolver.resolve404()

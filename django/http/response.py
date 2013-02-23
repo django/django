@@ -447,4 +447,9 @@ class HttpResponseServerError(HttpResponse):
 
 
 class Http404(Exception):
-    pass
+
+    def url(self):
+        return None
+
+    def from_view(self):
+        return True
