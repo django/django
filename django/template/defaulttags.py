@@ -5,13 +5,15 @@ import sys
 import re
 from datetime import datetime
 from itertools import groupby, cycle as itertools_cycle
+import warnings
 
 from django.conf import settings
 from django.template.base import (Node, NodeList, Template, Context, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
-    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
+    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re,
+    _render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_text
@@ -54,15 +56,15 @@ class CsrfTokenNode(Node):
             # misconfiguration, so we raise a warning
             from django.conf import settings
             if settings.DEBUG:
-                import warnings
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars, variable_name=None, silent=False):
+    def __init__(self, cyclevars, variable_name=None, silent=False, escape=False):
         self.cyclevars = cyclevars
         self.variable_name = variable_name
         self.silent = silent
+        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         if self not in context.render_context:
@@ -74,7 +76,9 @@ class CycleNode(Node):
             context[self.variable_name] = value
         if self.silent:
             return ''
-        return value
+        if not self.escape:
+            value = mark_safe(value)
+        return _render_value_in_context(value, context)
 
 class DebugNode(Node):
     def render(self, context):
@@ -97,14 +101,17 @@ class FilterNode(Node):
         return filtered
 
 class FirstOfNode(Node):
-    def __init__(self, vars):
-        self.vars = vars
+    def __init__(self, variables, escape=False):
+        self.vars = variables
+        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return smart_text(value)
+                if not self.escape:
+                    value = mark_safe(value)
+                return _render_value_in_context(value, context)
         return ''
 
 class ForNode(Node):
@@ -508,7 +515,7 @@ def comment(parser, token):
     return CommentNode()
 
 @register.tag
-def cycle(parser, token):
+def cycle(parser, token, escape=False):
     """
     Cycles among the given strings each time this tag is encountered.
 
@@ -541,6 +548,11 @@ def cycle(parser, token):
         {% endfor %}
 
     """
+    if not escape:
+        warnings.warn(
+            "'The syntax for the `cycle` template tag is changing. Load it "
+            "from the `future` tag library to start using the new behavior.",
+            PendingDeprecationWarning, stacklevel=2)
 
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -588,13 +600,13 @@ def cycle(parser, token):
     if as_form:
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
-        node = CycleNode(values, name, silent=silent)
+        node = CycleNode(values, name, silent=silent, escape=escape)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
         parser._namedCycleNodes[name] = node
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
-        node = CycleNode(values)
+        node = CycleNode(values, escape=escape)
     return node
 
 @register.tag
@@ -643,7 +655,7 @@ def do_filter(parser, token):
     return FilterNode(filter_expr, nodelist)
 
 @register.tag
-def firstof(parser, token):
+def firstof(parser, token, escape=False):
     """
     Outputs the first variable passed that is not False, without escaping.
 
@@ -657,11 +669,11 @@ def firstof(parser, token):
 
         {% if var1 %}
             {{ var1|safe }}
-        {% else %}{% if var2 %}
+        {% elif var2 %}
             {{ var2|safe }}
-        {% else %}{% if var3 %}
+        {% elif var3 %}
             {{ var3|safe }}
-        {% endif %}{% endif %}{% endif %}
+        {% endif %}
 
     but obviously much cleaner!
 
@@ -677,10 +689,16 @@ def firstof(parser, token):
         {% endfilter %}
 
     """
+    if not escape:
+        warnings.warn(
+            "'The syntax for the `firstof` template tag is changing. Load it "
+            "from the `future` tag library to start using the new behavior.",
+            PendingDeprecationWarning, stacklevel=2)
+
     bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits])
+    return FirstOfNode([parser.compile_filter(bit) for bit in bits], escape=escape)
 
 @register.tag('for')
 def do_for(parser, token):
