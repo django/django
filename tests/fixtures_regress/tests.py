@@ -181,55 +181,68 @@ class TestFixtures(TestCase):
         """
         Test for ticket #4371 -- Loading a fixture file with invalid data
         using explicit filename.
-        Validate that error conditions are caught correctly
+        Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
             management.call_command(
                 'loaddata',
                 'bad_fixture2.xml',
                 verbosity=0,
             )
+            warning = warning_list.pop()
+            self.assertEqual(warning.category, RuntimeWarning)
+            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
 
     def test_invalid_data_no_ext(self):
         """
         Test for ticket #4371 -- Loading a fixture file with invalid data
         without file extension.
-        Validate that error conditions are caught correctly
+        Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 verbosity=0,
             )
+            warning = warning_list.pop()
+            self.assertEqual(warning.category, RuntimeWarning)
+            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
 
     def test_empty(self):
         """
-        Test for ticket #4371 -- Loading a fixture file with no data returns an error.
-        Validate that error conditions are caught correctly
+        Test for ticket #18213 -- Loading a fixture file with no data output a warning.
+        Previously empty fixture raises an error exception, see ticket #4371.
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "No fixture data found for 'empty'. \(File format may be invalid.\)"):
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
             management.call_command(
                 'loaddata',
                 'empty',
                 verbosity=0,
             )
+            warning = warning_list.pop()
+            self.assertEqual(warning.category, RuntimeWarning)
+            self.assertEqual(str(warning.message), "No fixture data found for 'empty'. (File format may be invalid.)")
 
     def test_error_message(self):
         """
-        (Regression for #9011 - error message is correct)
+        Regression for #9011 - error message is correct.
+        Change from error to warning for ticket #18213.
         """
-        with six.assertRaisesRegex(self, management.CommandError,
-                "^No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)$"):
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 'animal',
                 verbosity=0,
             )
+            warning = warning_list.pop()
+            self.assertEqual(warning.category, RuntimeWarning)
+            self.assertEqual(str(warning.message), "No fixture data found for 'bad_fixture2'. (File format may be invalid.)")
 
     def test_pg_sequence_resetting_checks(self):
         """

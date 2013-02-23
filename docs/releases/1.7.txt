@@ -113,6 +113,9 @@ Miscellaneous
   :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
   to manually delete objects from deleted forms.
 
+* Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
+  :class:`~django.core.management.CommandError`.
+
 Features deprecated in 1.7
 ==========================
 
