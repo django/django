@@ -18,6 +18,7 @@ __all__ = ('BaseFormSet', 'all_valid')
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
 MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
+MIN_NUM_FORM_COUNT = 'MIN_NUM_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
 
@@ -34,6 +35,7 @@ class ManagementForm(Form):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
+        self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 @python_2_unicode_compatible
@@ -87,7 +89,8 @@ class BaseFormSet(object):
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
                 INITIAL_FORM_COUNT: self.initial_form_count(),
-                MAX_NUM_FORM_COUNT: self.max_num
+                MAX_NUM_FORM_COUNT: self.max_num,
+                MIN_NUM_FORM_COUNT: self.min_num
             })
         return form
 
@@ -104,6 +107,8 @@ class BaseFormSet(object):
                 total_forms = initial_forms
             elif total_forms > self.max_num >= 0:
                 total_forms = self.max_num
+            if total_forms < self.min_num:
+                total_forms = self.min_num
         return total_forms
 
     def initial_form_count(self):
@@ -115,6 +120,8 @@ class BaseFormSet(object):
             initial_forms = self.initial and len(self.initial) or 0
             if initial_forms > self.max_num >= 0:
                 initial_forms = self.max_num
+            if initial_forms < self.min_num:
+                initial_forms = self.min_num
         return initial_forms
 
     def _construct_forms(self):
@@ -367,16 +374,20 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None):
+                    can_delete=False, max_num=None, min_num=None):
     """Return a FormSet for the given form class."""
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
+    if min_num > max_num:
+        raise ValueError("min_num(%d) must less or equal than max_num(%d)"
+                         % (min_num, max_num))
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
     # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
     absolute_max = max(DEFAULT_MAX_NUM, max_num)
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num, 'absolute_max': absolute_max}
+             'max_num': max_num, 'min_num': min_num,
+             'absolute_max': absolute_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):
