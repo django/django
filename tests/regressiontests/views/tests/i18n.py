@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import gettext
+import os
 from os import path
 
 from django.conf import settings
@@ -176,6 +177,10 @@ class JsI18NTestsMultiPackage(TestCase):
                     javascript_quote('este texto de app3 debe ser traducido'))
 
 
+skip_selenium = os.environ.get('DJANGO_SKIP_SELENIUM_TESTS', False)
+
+
+@unittest.skipIf(skip_selenium, 'Selenium tests skipped by explicit request')
 @unittest.skipUnless(firefox, 'Selenium not installed')
 class JavascriptI18nTests(LiveServerTestCase):
     urls = 'regressiontests.views.urls'
