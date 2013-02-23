@@ -489,6 +489,7 @@ def autoescape(parser, token):
     """
     Force autoescape behavior for this block.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     args = token.contents.split()
     if len(args) != 2:
         raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
@@ -633,6 +634,7 @@ def do_filter(parser, token):
     Instead, use the ``autoescape`` tag to manage autoescaping for blocks of
     template code.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
     for func, unused in filter_expr.filters:
@@ -954,7 +956,7 @@ def ifchanged(parser, token):
                 {% endifchanged %}
             {% endfor %}
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     nodelist_true = parser.parse(('else', 'endifchanged'))
     token = parser.next_token()
     if token.contents == 'else':
@@ -1011,6 +1013,7 @@ def load(parser, token):
         {% load byline from news %}
 
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) >= 4 and bits[-2] == "from":
         try:
@@ -1109,17 +1112,16 @@ def regroup(parser, token):
         {% regroup people|dictsort:"gender" by gender as grouped %}
 
     """
-    firstbits = token.contents.split(None, 3)
-    if len(firstbits) != 4:
+    bits = token.split_contents()
+    if len(bits) != 6:
         raise TemplateSyntaxError("'regroup' tag takes five arguments")
-    target = parser.compile_filter(firstbits[1])
-    if firstbits[2] != 'by':
+    target = parser.compile_filter(bits[1])
+    if bits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
-    lastbits_reversed = firstbits[3][::-1].split(None, 2)
-    if lastbits_reversed[1][::-1] != 'as':
+    if bits[4] != 'as':
         raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
                                   " be 'as'")
-    var_name = lastbits_reversed[0][::-1]
+    var_name = bits[5]
     # RegroupNode will take each item in 'target', put it in the context under
     # 'var_name', evaluate 'var_name'.'expression' in the current context, and
     # group by the resulting value. After all items are processed, it will
@@ -1128,7 +1130,7 @@ def regroup(parser, token):
     # doesn't provide a context-aware equivalent of Python's getattr.
     expression = parser.compile_filter(var_name +
                                        VARIABLE_ATTRIBUTE_SEPARATOR +
-                                       lastbits_reversed[2][::-1])
+                                       bits[3])
     return RegroupNode(target, expression, var_name)
 
 @register.tag
@@ -1184,6 +1186,7 @@ def templatetag(parser, token):
         ``closecomment``    ``#}``
         ==================  =======
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'templatetag' statement takes one argument")
@@ -1325,7 +1328,7 @@ def widthratio(parser, token):
     the image in the above example will be 88 pixels wide
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) != 4:
         raise TemplateSyntaxError("widthratio takes three arguments")
     tag, this_value_expr, max_value_expr, max_width = bits
