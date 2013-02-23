@@ -957,7 +957,7 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['bidi'], False)
 
     def test_unknown_language_code(self):
-        with self.assertRaisesRegexp(KeyError, "Unknown language code u\'xx\'."):
+        with self.assertRaisesRegexp(KeyError, "Unknown language code xx."):
             get_language_info('xx')
 
     def test_unknown_only_country_code(self):
@@ -968,7 +968,7 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
-        with self.assertRaisesRegexp(KeyError, "Unknown language code u\'xx-xx\' and u\'xx\'."):
+        with self.assertRaisesRegexp(KeyError, "Unknown language code xx-xx and xx."):
             get_language_info('xx-xx')
 
 
