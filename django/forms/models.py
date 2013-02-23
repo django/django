@@ -233,9 +233,9 @@ class BaseModelForm(BaseForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
         opts = self._meta
-        if opts.model is None:
-            raise ValueError('ModelForm has no model class specified.')
         if instance is None:
+            if opts.model is None:
+                raise ValueError('ModelForm has no model class specified.')
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
@@ -513,8 +513,6 @@ class BaseModelFormSet(BaseFormSet):
             self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
-    save.alters_data = True
-
     def clean(self):
         self.validate_unique()
 
@@ -683,7 +681,8 @@ class BaseModelFormSet(BaseFormSet):
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
                          can_order=False, max_num=None, fields=None,
-                         exclude=None, widgets=None):
+                         exclude=None, widgets=None,
+                         display_at_top=False):
     """
     Returns a FormSet class for the given Django model class.
     """
@@ -691,7 +690,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              formfield_callback=formfield_callback,
                              widgets=widgets)
     FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
-                              can_order=can_order, can_delete=can_delete)
+                              can_order=can_order, can_delete=can_delete,
+                              display_at_top=display_at_top)
     FormSet.model = model
     return FormSet
 
@@ -827,7 +827,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None,
                           extra=3, can_order=False, can_delete=True, max_num=None,
-                          formfield_callback=None, widgets=None):
+                          formfield_callback=None, widgets=None,
+                          display_at_top=False):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 
@@ -849,6 +850,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'exclude': exclude,
         'max_num': max_num,
         'widgets': widgets,
+        'display_at_top': display_at_top,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk

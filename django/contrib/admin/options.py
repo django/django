@@ -1021,6 +1021,7 @@ class ModelAdmin(BaseModelAdmin):
             model_admin=self)
         media = self.media + adminForm.media
 
+        top_inline_admin_formsets = []
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request))
@@ -1028,7 +1029,11 @@ class ModelAdmin(BaseModelAdmin):
             prepopulated = dict(inline.get_prepopulated_fields(request))
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
                 fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
+            if formset.display_at_top:
+                top_inline_admin_formsets.append(inline_admin_formset)
+            else:
+                inline_admin_formsets.append(inline_admin_formset)
+
             media = media + inline_admin_formset.media
 
         context = {
@@ -1036,6 +1041,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'is_popup': "_popup" in request.REQUEST,
             'media': media,
+            'top_inline_admin_formsets': top_inline_admin_formsets,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'app_label': opts.app_label,
@@ -1111,6 +1117,7 @@ class ModelAdmin(BaseModelAdmin):
             model_admin=self)
         media = self.media + adminForm.media
 
+        top_inline_admin_formsets = []
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
@@ -1118,7 +1125,10 @@ class ModelAdmin(BaseModelAdmin):
             prepopulated = dict(inline.get_prepopulated_fields(request, obj))
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
                 fieldsets, prepopulated, readonly, model_admin=self)
-            inline_admin_formsets.append(inline_admin_formset)
+            if formset.display_at_top:
+                top_inline_admin_formsets.append(inline_admin_formset)
+            else:
+                inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
         context = {
@@ -1128,6 +1138,7 @@ class ModelAdmin(BaseModelAdmin):
             'original': obj,
             'is_popup': "_popup" in request.REQUEST,
             'media': media,
+            'top_inline_admin_formsets': top_inline_admin_formsets,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'app_label': opts.app_label,
@@ -1401,6 +1412,7 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+    display_at_top = False
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1451,6 +1463,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "extra": self.extra,
             "max_num": self.max_num,
             "can_delete": can_delete,
+            "display_at_top": self.display_at_top,
         }
         defaults.update(kwargs)
         return inlineformset_factory(self.parent_model, self.model, **defaults)

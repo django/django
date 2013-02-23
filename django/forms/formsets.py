@@ -367,7 +367,8 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None):
+                    can_delete=False, max_num=None,
+                    display_at_top=False):
     """Return a FormSet for the given form class."""
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
@@ -376,7 +377,8 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     absolute_max = max(DEFAULT_MAX_NUM, max_num)
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num, 'absolute_max': absolute_max}
+             'max_num': max_num, 'absolute_max': absolute_max,
+             'display_at_top': display_at_top}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):
