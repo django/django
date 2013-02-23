@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
@@ -153,8 +155,6 @@ class AuthenticationForm(forms.Form):
     error_messages = {
         'invalid_login': _("Please enter a correct %(username)s and password. "
                            "Note that both fields may be case-sensitive."),
-        'no_cookies': _("Your Web browser doesn't appear to have cookies "
-                        "enabled. Cookies are required for logging in."),
         'inactive': _("This account is inactive."),
     }
 
@@ -189,12 +189,11 @@ class AuthenticationForm(forms.Form):
                     })
             elif not self.user_cache.is_active:
                 raise forms.ValidationError(self.error_messages['inactive'])
-        self.check_for_test_cookie()
         return self.cleaned_data
 
     def check_for_test_cookie(self):
-        if self.request and not self.request.session.test_cookie_worked():
-            raise forms.ValidationError(self.error_messages['no_cookies'])
+        warnings.warn("check_for_test_cookie is deprecated; ensure your login "
+                "view is CSRF-protected.", DeprecationWarning)
 
     def get_user_id(self):
         if self.user_cache:
