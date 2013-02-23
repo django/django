@@ -150,7 +150,6 @@ class BaseListView(MultipleObjectMixin, View):
                 raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
                         % {'class_name': self.__class__.__name__})
         context = self.get_context_data(object_list=self.object_list)
-        context.update(kwargs)
         return self.render_to_response(context)
 
 
