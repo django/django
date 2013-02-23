@@ -152,7 +152,9 @@ class ProcessFormView(View):
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        return self.render_to_response(self.get_context_data(form=form))
+        context = self.get_context_data(form=form)
+        context.update(kwargs)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         """
