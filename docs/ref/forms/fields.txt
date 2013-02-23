@@ -454,7 +454,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: DecimalField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python ``decimal``.
     * Validates that the given value is a decimal. Leading and trailing
@@ -580,7 +581,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: FloatField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python float.
     * Validates that the given value is an float. Leading and trailing
@@ -621,7 +623,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: IntegerField(**kwargs)
 
-    * Default widget: :class:`TextInput`
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing

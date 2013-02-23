@@ -389,6 +389,19 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     Text input: ``<input type="text" ...>``
 
+``NumberInput``
+~~~~~~~~~~~~~~~
+
+.. class:: NumberInput
+
+    .. versionadded:: 1.6
+
+    Text input: ``<input type="number" ...>``
+
+    Beware that not all browsers support entering localized numbers in
+    ``number`` input types. Django itself avoids using them for fields having
+    their :attr:`~django.forms.Field.localize` property to ``True``.
+
 ``EmailInput``
 ~~~~~~~~~~~~~~
 

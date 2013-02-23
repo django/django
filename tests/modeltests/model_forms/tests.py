@@ -1133,7 +1133,7 @@ class OldFormForXTests(TestCase):
 <option value="%s">Joe Better</option>
 <option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
+<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
         data = {
             'writer': six.text_type(w_woodward.pk),
@@ -1151,7 +1151,7 @@ class OldFormForXTests(TestCase):
 <option value="%s">Joe Better</option>
 <option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
+<p><label for="id_age">Age:</label> <input type="number" name="age" value="65" id="id_age" min="0" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
     def test_file_field(self):
         # Test conditions when files is either not given or empty.
