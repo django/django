@@ -2064,11 +2064,13 @@ numbers and even characters.
 year
 ~~~~
 
-For date and datetime fields, an exact year match. Takes an integer year.
+For date and datetime fields, an exact year match. Takes a year as integer or 
+string
 
 Example::
 
     Entry.objects.filter(pub_date__year=2005)
+    Entry.objects.filter(pub_date__year='2005')
 
 SQL equivalent::
 
@@ -2084,12 +2086,13 @@ current time zone before filtering.
 month
 ~~~~~
 
-For date and datetime fields, an exact month match. Takes an integer 1
-(January) through 12 (December).
+For date and datetime fields, an exact month match. Takes a month as
+integer or string from 1 (January) through 12 (December).
 
 Example::
 
     Entry.objects.filter(pub_date__month=12)
+    Entry.objects.filter(pub_date__month='12')
 
 SQL equivalent::
 
@@ -2105,11 +2108,13 @@ current time zone before filtering.
 day
 ~~~
 
-For date and datetime fields, an exact day match. Takes an integer day.
+For date and datetime fields, an exact day match. Takes a day of the month 
+as integer or string.
 
 Example::
 
     Entry.objects.filter(pub_date__day=3)
+    Entry.objects.filter(pub_date__day='3')
 
 SQL equivalent::
 
@@ -2130,12 +2135,13 @@ week_day
 
 For date and datetime fields, a 'day of the week' match.
 
-Takes an integer value representing the day of week from 1 (Sunday) to 7
+Takes an integer or string value representing the day of week from 1 (Sunday) to 7
 (Saturday).
 
 Example::
 
     Entry.objects.filter(pub_date__week_day=2)
+    Entry.objects.filter(pub_date__week_day='2')
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
@@ -2154,11 +2160,13 @@ hour
 
 .. versionadded:: 1.6
 
-For datetime fields, an exact hour match. Takes an integer between 0 and 23.
+For datetime fields, an exact hour match. Takes an integer or string between 
+0 and 23.
 
 Example::
 
     Event.objects.filter(timestamp__hour=23)
+    Event.objects.filter(timestamp__hour='23')
 
 SQL equivalent::
 
@@ -2176,11 +2184,13 @@ minute
 
 .. versionadded:: 1.6
 
-For datetime fields, an exact minute match. Takes an integer between 0 and 59.
+For datetime fields, an exact minute match. Takes an integer or string between
+0 and 59.
 
 Example::
 
     Event.objects.filter(timestamp__minute=29)
+    Event.objects.filter(timestamp__minute='29')
 
 SQL equivalent::
 
@@ -2198,11 +2208,13 @@ second
 
 .. versionadded:: 1.6
 
-For datetime fields, an exact second match. Takes an integer between 0 and 59.
+For datetime fields, an exact second match. Takes an integer or string between
+0 and 59.
 
 Example::
 
     Event.objects.filter(timestamp__second=31)
+    Event.objects.filter(timestamp__second='31')
 
 SQL equivalent::
 
