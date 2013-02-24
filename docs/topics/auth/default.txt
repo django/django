@@ -919,6 +919,14 @@ If you don't want to use the built-in views, but want the convenience of not
 having to write forms for this functionality, the authentication system
 provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
+.. note::
+    The built-in authentication forms make certain assumptions about the user
+    model that they are working with. If you're using a :ref:`custom User model
+    <auth-custom-user>`, it may be necessary to define your own forms for the
+    authentication system. For more information, refer to the documentation
+    about :ref:`using the built-in authentication forms with custom user models
+    <custom-users-and-the-built-in-auth-forms>`.
+
 .. class:: AdminPasswordChangeForm
 
     A form used in the admin interface to change a user's password.
