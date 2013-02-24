@@ -6,7 +6,7 @@ from functools import update_wrapper
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 from django.utils.decorators import classonlymethod
 from django.utils import six
@@ -174,7 +174,7 @@ class RedirectView(View):
         elif self.pattern_name:
             try:
                 url = reverse(self.pattern_name, args=args, kwargs=kwargs)
-            except:
+            except NoReverseMatch:
                 if settings.DEBUG:
                     raise
                 else:
