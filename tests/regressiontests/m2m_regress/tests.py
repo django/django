@@ -106,6 +106,6 @@ class M2MRegressionTests(TestCase):
         hi = worksheet.lines.filter(name="hi")
 
         worksheet.lines = hi
-        self.assertEquals(1, worksheet.lines.count())
-        self.assertEquals(1, hi.count())
+        self.assertEqual(1, worksheet.lines.count())
+        self.assertEqual(1, hi.count())
 
