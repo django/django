@@ -674,6 +674,8 @@ custom profile fields. This class provides the full implementation of the
 default :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
 <abstract-base-classes>`.
 
+.. _custom-users-and-the-built-in-auth-forms:
+
 Custom users and the built-in auth forms
 ----------------------------------------
 
