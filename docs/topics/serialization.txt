@@ -162,11 +162,82 @@ Identifier  Information
 .. _json: http://json.org/
 .. _PyYAML: http://www.pyyaml.org/
 
-Notes for specific serialization formats
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+XML
+~~~
 
-json
-^^^^
+The basic XML serialization format is quite simple::
+    
+    <?xml version="1.0" encoding="utf-8"?>
+    <django-objects version="1.0">
+        <object pk="123" model="sessions.session">
+            <field type="DateTimeField" name="expire_date">2013-01-16T08:16:59.844560+00:00</field>
+            <!-- ... -->
+        </object>
+    </django-objects>
+
+The whole collection of objects that is either serialized or de-serialized is
+represented by a ``<django-objects>``-tag which contains multiple
+``<object>``-elements. Each such object has two attributes: "pk" and "model",
+the latter being represented by the name of the app ("sessions") and the
+lowercase name of the model ("session") separated by a dot.
+
+Each field of the object is serialized as a ``<field>``-element sporting the
+fields "type" and "name". The text content of the element represents the value
+that should be stored.
+
+Foreign keys and other relational fields are treated a little bit differently::
+    
+    <object pk="27" model="auth.permission">
+        <!-- ... -->
+        <field to="contenttypes.contenttype" name="content_type" rel="ManyToOneRel">9</field>
+        <!-- ... -->
+    </object>
+
+In this example we specify that the auth.Permission object with the PK 24 has
+a foreign key to the contenttypes.ContentType instance with the PK 9.
+
+ManyToMany-relations are exported for the model that binds them. For instance,
+the auth.User model has such a relation to the auth.Permission model::
+    
+    <object pk="1" model="auth.user">
+        <!-- ... -->
+        <field to="auth.permission" name="user_permissions" rel="ManyToManyRel">
+            <object pk="46"></object>
+            <object pk="47"></object>
+        </field>
+    </object>
+
+This example links the given user with the permission models with PKs 46 and 47.
+
+JSON
+~~~~
+
+When staying with the same example data as before it would be serialized as
+JSON in the following way::
+    
+    [
+        {
+            "pk": "4b678b301dfd8a4e0dad910de3ae245b",
+            "model": "sessions.session",
+            "fields": {
+                "expire_date": "2013-01-16T08:16:59.844Z",
+                ...
+            }
+        }
+    ]
+
+The formatting here is a bit simpler than with XML. The whole collection
+is just represented as an array and the objects are represented by JSON objects
+with three properties: "pk", "model" and "fields". "fields" is again an object
+containing each field's name and value as property and property-value
+respectively.
+
+Foreign keys just have the PK of the linked object as property value. 
+ManyToMany-relations are serialized for the model that defines them and are
+represented as a list of PKs.
+
+Date and datetime related types are treated in a special way by the JSON
+serializer to make the format compatible with `ECMA-262`_.
 
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
@@ -175,14 +246,29 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
     import json
     from django.utils.functional import Promise
     from django.utils.encoding import force_text
+    from django.core.serializers.json import DjangoJSONEncoder
 
-    class LazyEncoder(json.JSONEncoder):
+    class LazyEncoder(DjangoJSONEncoder):
         def default(self, obj):
             if isinstance(obj, Promise):
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
 .. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
+.. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
+
+YAML
+~~~~
+
+YAML serialization looks quite similar to JSON. The object list is serialized
+as a sequence mappings with the keys "pk", "model" and "fields". Each field is
+again a mapping with the key being name of the field and the value the value::
+    
+    -   fields: {expire_date: !!timestamp '2013-01-16 08:16:59.844560+00:00'}
+        model: sessions.session
+        pk: 4b678b301dfd8a4e0dad910de3ae245b
+
+Referential fields are again just represented by the PK or sequence of PKs.
 
 .. _topics-serialization-natural-keys:
 
