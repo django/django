@@ -187,10 +187,10 @@ def get_language_info(lang_code):
     try:
         return LANG_INFO[lang_code]
     except KeyError:
-        if '-' in lang_code:
-            splited_lang_code = lang_code.split('-')[0]
-            try:
-                return LANG_INFO[splited_lang_code]
-            except KeyError:
-                raise KeyError("Unknown language code %s and %s." % (lang_code, splited_lang_code))
-        raise KeyError("Unknown language code %s." % lang_code)
+        if '-' not in lang_code:
+            raise KeyError("Unknown language code %s." % lang_code)
+        generic_lang_code = lang_code.split('-')[0]
+        try:
+            return LANG_INFO[generic_lang_code]
+        except KeyError:
+            raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
