@@ -154,7 +154,10 @@ as changing your :setting:`STATICFILES_STORAGE` setting.
 
 For details on how you'd write one of these backends, see
 :doc:`/howto/custom-file-storage`. There are 3rd party apps available that
-provide storage backends for many common file storage APIs.
+provide storage backends for many common file storage APIs.  A good starting
+point is the `overview at djangopackages.com
+<https://www.djangopackages.com/grids/g/storage-backends/>`_
+
 
 Learn more
 ==========
