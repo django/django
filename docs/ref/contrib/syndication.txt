@@ -137,6 +137,51 @@ into those elements.
 
   See `a complex example`_ below that uses a description template.
 
+  There is also a way to pass additional information to title and description
+  templates, if you need to supply more than the two variables mentioned
+  before. You can provide your implementation of ``get_context_data`` method
+  in your Feed subclass. For example::
+
+    from mysite.models import Article
+    from django.contrib.syndication.views import Feed
+
+    class ArticlesFeed(Feed):
+        title = "My articles"
+        description_template = "feeds/articles.html"
+
+        def items(self):
+            return Article.objects.order_by('-pub_date')[:5]
+
+        def get_context_data(self, **kwargs):
+            context = super(ArticlesFeed, self).get_context_data(**kwargs)
+            context['foo'] = 'bar'
+            return context
+
+  And the template:
+
+  .. code-block:: html+django
+
+    Something about {{ foo }}: {{ obj.description }}
+
+  This method will be called once per each item in the list returned by
+  ``items()`` with the following keyword arguments:
+
+  * ``item``: the current item. For backward compatibility reasons, the name
+    of this context variable is ``{{ obj }}``.
+
+  * ``obj``: the object returned by ``get_object()``. By default this is not
+    exposed to the templates to avoid confusion with ``{{ obj }}`` (see above),
+    but you can use it in your implementation of ``get_context_data()``.
+
+  * ``site``: current site as described above.
+
+  * ``request``: current request.
+
+  The behavior of ``get_context_data()`` mimics that of
+  :ref:`generic views <adding-extra-context>` - you're supposed to call
+  ``super()`` to retrieve context data from parent class, add your data
+  and return the modified dictionary.
+
 * To specify the contents of ``<link>``, you have two options. For each item
   in ``items()``, Django first tries calling the
   ``item_link()`` method on the
@@ -598,6 +643,15 @@ This example illustrates all possible attributes and methods for a
             """
 
         item_description = 'A description of the item.' # Hard-coded description.
+
+        def get_context_data(self, **kwargs):
+            """
+            Returns a dictionary to use as extra context if either
+            description_template or item_template are used.
+
+            Default implementation preserves the old behavior
+            of using {'obj': item, 'site': current_site} as the context.
+            """
 
         # ITEM LINK -- One of these three is required. The framework looks for
         # them in this order.

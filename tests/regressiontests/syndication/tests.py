@@ -323,6 +323,22 @@ class SyndicationFeedTest(FeedTestCase):
             'link': 'http://example.com/blog/1/',
         })
 
+    def test_template_context_feed(self):
+        """
+        Test that custom context data can be passed to templates for title
+        and description.
+        """
+        response = self.client.get('/syndication/template_context/')
+        doc = minidom.parseString(response.content)
+        feed = doc.getElementsByTagName('rss')[0]
+        chan = feed.getElementsByTagName('channel')[0]
+        items = chan.getElementsByTagName('item')
+
+        self.assertChildNodeContent(items[0], {
+            'title': 'My first entry (foo is bar)',
+            'description': 'My first entry (foo is bar)',
+        })
+
     def test_add_domain(self):
         """
         Test add_domain() prefixes domains onto the correct URLs.

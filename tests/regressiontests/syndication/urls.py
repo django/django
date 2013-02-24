@@ -21,4 +21,5 @@ urlpatterns = patterns('django.contrib.syndication.views',
     (r'^syndication/feedurl/$', feeds.TestFeedUrlFeed()),
     (r'^syndication/articles/$', feeds.ArticlesFeed()),
     (r'^syndication/template/$', feeds.TemplateFeed()),
+    (r'^syndication/template_context/$', feeds.TemplateContextFeed()),
 )
