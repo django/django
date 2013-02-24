@@ -18,6 +18,10 @@ form .form-row p {
     font-size: 11px;
 }
 
+.hidden {
+    display: none;
+}
+
 /* FORM LABELS */
 
 form h4 {
