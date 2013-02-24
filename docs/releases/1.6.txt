@@ -97,6 +97,10 @@ Minor features
 
 * The jQuery library embedded in the admin has been upgraded to version 1.9.1.
 
+* Syndication feeds (:module:`django.contrib.syndication`) can now pass extra
+  context through to feed templates using a new `Feed.get_context_data()`
+  callback.
+
 Backwards incompatible changes in 1.6
 =====================================
 
