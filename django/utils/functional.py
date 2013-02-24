@@ -232,6 +232,16 @@ class LazyObject(object):
             self._setup()
         delattr(self._wrapped, name)
 
+    def __getitem__(self, name):
+        if self._wrapped is empty:
+            self._setup()
+        return self._wrapped[name]
+
+    def __setitem__(self, name, val):
+        if self._wrapped is empty:
+            self._setup()
+        self._wrapped[name] = val
+
     def _setup(self):
         """
         Must be implemented by subclasses to initialise the wrapped object.
