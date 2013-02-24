@@ -984,6 +984,14 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         # memcached limits key length to 250
         self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
 
+    def test_close_connection_on_del(self):
+        """
+        Test for ticket #17943 -- Too many open file descriptors while using memcache.
+        """
+        self.cache.set("key", "value")
+        self.cache.__del__()
+        self.assertTrue(all([host.socket is None for host in self.cache._client.servers]))
+
 
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """

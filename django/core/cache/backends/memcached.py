@@ -25,6 +25,10 @@ class BaseMemcachedCache(BaseCache):
         self._lib = library
         self._options = params.get('OPTIONS', None)
 
+    def __del__(self):
+        if getattr(self, '_client', None) is not None:
+            self._client.disconnect_all()
+
     @property
     def _cache(self):
         """
