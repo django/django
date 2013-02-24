@@ -2537,6 +2537,34 @@ class AdminCustomQuerysetTest(TestCase):
             else:
                 self.assertNotContains(response, 'Primary key = %s' % i)
 
+    def test_changelist_view_count_queries(self):
+        #create 2 Person objects
+        Person.objects.create(name='person1', gender=1)
+        Person.objects.create(name='person2', gender=2)
+
+        # 4 queries are expected: 1 for the session, 1 for the user,
+        # 1 for the count and 1 for the objects on the page
+        with self.assertNumQueries(4):
+            resp = self.client.get('/test_admin/admin/admin_views/person/')
+            self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
+            self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
+        with self.assertNumQueries(4):
+            extra = {'q': 'not_in_name'}
+            resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
+            self.assertEqual(resp.context['selection_note'], '0 of 0 selected')
+            self.assertEqual(resp.context['selection_note_all'], 'All 0 selected')
+        with self.assertNumQueries(4):
+            extra = {'q': 'person'}
+            resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
+            self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
+            self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
+        # here one more count(*) query will run, because filters were applied
+        with self.assertNumQueries(5):
+            extra = {'gender__exact': '1'}
+            resp = self.client.get('/test_admin/admin/admin_views/person/', extra)
+            self.assertEqual(resp.context['selection_note'], '0 of 1 selected')
+            self.assertEqual(resp.context['selection_note_all'], '1 selected')
+
     def test_change_view(self):
         for i in self.pks:
             response = self.client.get('/test_admin/admin/admin_views/emptymodel/%s/' % i)

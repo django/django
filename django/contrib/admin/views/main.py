@@ -79,15 +79,23 @@ class ChangeList(object):
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
-    def get_filters(self, request):
-        lookup_params = self.params.copy() # a dictionary of the query string
-        use_distinct = False
-
+    def get_filters_params(self, params=None):
+        """
+        Returns all params except IGNORED_PARAMS
+        """
+        if not params:
+            params = self.params
+        lookup_params = params.copy() # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
         for ignored in IGNORED_PARAMS:
             if ignored in lookup_params:
                 del lookup_params[ignored]
+        return lookup_params
+
+    def get_filters(self, request):
+        lookup_params = self.get_filters_params()
+        use_distinct = False
 
         # Normalize the types of keys
         for key, value in lookup_params.items():
@@ -166,14 +174,13 @@ class ChangeList(object):
         result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
-        # Perform a slight optimization: Check to see whether any filters were
-        # given. If not, use paginator.hits to calculate the number of objects,
-        # because we've already done paginator.hits and the value is cached.
-        if not self.query_set.query.where:
-            full_result_count = result_count
-        else:
+        # Perform a slight optimization:
+        # full_result_count is equal to paginator.count if no filters
+        # were applied
+        if self.get_filters_params():
             full_result_count = self.root_query_set.count()
-
+        else:
+            full_result_count = result_count
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
