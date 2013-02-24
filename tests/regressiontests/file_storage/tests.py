@@ -639,7 +639,7 @@ class FileLikeObjectTestCase(LiveServerBase):
         f = File(file_like_object)
         stored_filename = self.storage.save("remote_file.html", f)
 
-        stored_file = self.storage.open(stored_filename)
         remote_file = self.urlopen('/example_view/')
 
-        self.assertEqual(stored_file.read(), remote_file.read())
+        with self.storage.open(stored_filename) as stored_file:
+            self.assertEqual(stored_file.read(), remote_file.read())

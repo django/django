@@ -108,14 +108,12 @@ class FileStorageTests(TestCase):
         temp_storage.save('tests/example.txt', ContentFile('some content'))
 
         # Load it as python file object
-        file_obj = open(temp_storage.path('tests/example.txt'))
-
-        # Save it using storage and read its content
-        temp_storage.save('tests/file_obj', file_obj)
+        with open(temp_storage.path('tests/example.txt')) as file_obj:
+            # Save it using storage and read its content
+            temp_storage.save('tests/file_obj', file_obj)
         self.assertTrue(temp_storage.exists('tests/file_obj'))
-        self.assertEqual(
-            temp_storage.open('tests/file_obj').read(),
-            b'some content')
+        with temp_storage.open('tests/file_obj') as f:
+            self.assertEqual(f.read(), b'some content')
 
 
     def test_stringio(self):
@@ -127,9 +125,8 @@ class FileStorageTests(TestCase):
         # Save it and read written file
         temp_storage.save('tests/stringio', output)
         self.assertTrue(temp_storage.exists('tests/stringio'))
-        self.assertEqual(
-            temp_storage.open('tests/stringio').read(),
-            b'content')
+        with temp_storage.open('tests/stringio') as f:
+            self.assertEqual(f.read(), b'content')
 
 
 
