@@ -17,6 +17,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:     # Python 2
     from urlparse import urljoin
+import warnings
 
 from django import template
 from django.core import urlresolvers
@@ -491,7 +492,10 @@ class Templates(TestCase):
                 for is_cached in (False, True):
                     try:
                         try:
-                            test_template = loader.get_template(name)
+                            with warnings.catch_warnings():
+                                # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
+                                warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.template.base')
+                                test_template = loader.get_template(name)
                         except ShouldNotExecuteException:
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
