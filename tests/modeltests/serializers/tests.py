@@ -255,7 +255,7 @@ class SerializersTestBase(object):
         for obj in deserial_objs:
             self.assertFalse(obj.object.id)
             obj.save()
-        self.assertEqual(Category.objects.all().count(), 4)
+        self.assertEqual(Category.objects.all().count(), 5)
 
 
 class SerializersTransactionTestBase(object):
@@ -289,6 +289,9 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
 <django-objects version="1.0">
     <object model="serializers.category">
         <field type="CharField" name="name">Reference</field>
+    </object>
+    <object model="serializers.category">
+        <field type="CharField" name="name">Non-fiction</field>
     </object>
 </django-objects>"""
 
@@ -351,7 +354,15 @@ class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, Transacti
 
 class JsonSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "json"
-    pkless_str = """[{"pk": null, "model": "serializers.category", "fields": {"name": "Reference"}}]"""
+    pkless_str = """[
+    {
+        "pk": null,
+        "model": "serializers.category",
+        "fields": {"name": "Reference"}
+    }, {
+        "model": "serializers.category",
+        "fields": {"name": "Non-fiction"}
+    }]"""
 
     @staticmethod
     def _validate_output(serial_str):
@@ -433,6 +444,9 @@ else:
         pkless_str = """- fields:
     name: Reference
   pk: null
+  model: serializers.category
+- fields:
+    name: Non-fiction
   model: serializers.category"""
 
         @staticmethod
