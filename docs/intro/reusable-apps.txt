@@ -67,6 +67,10 @@ After the previous tutorials, our project should look like this::
             admin.py
             models.py
             tests.py
+            static/
+                style.css
+                images/
+                    background.gif
             templates/
                 polls/
                     detail.html
