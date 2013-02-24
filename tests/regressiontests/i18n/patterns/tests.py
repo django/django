@@ -19,7 +19,7 @@ from django.utils import translation
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
-    LANGUAGE_CODE='en',
+    LANGUAGE_CODE='en-us',
     LANGUAGES=(
         ('nl', 'Dutch'),
         ('en', 'English'),
@@ -167,6 +167,14 @@ class URLRedirectTests(URLTestCaseBase):
     def test_pt_br_redirect(self):
         response = self.client.get('/conta/registre-se/', HTTP_ACCEPT_LANGUAGE='pt-br')
         self.assertRedirects(response, '/pt-br/conta/registre-se/')
+
+        response = self.client.get(response['location'])
+        self.assertEqual(response.status_code, 200)
+
+    def test_pl_pl_redirect(self):
+        # language from outside of the supported LANGUAGES list
+        response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='pl-pl')
+        self.assertRedirects(response, '/en/account/register/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)

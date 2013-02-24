@@ -958,7 +958,7 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['bidi'], False)
 
     def test_unknown_language_code(self):
-        six.assertRaisesRegex(self, KeyError, "Unknown language code '?xx'?.", get_language_info, 'xx-xx')
+        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
 
     def test_unknown_only_country_code(self):
         li = get_language_info('de-xx')
@@ -968,7 +968,7 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
-        six.assertRaisesRegex(self, KeyError, "Unknown language code '?xx-xx'? and '?xx'?.", get_language_info, 'xx-xx')
+        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
 
 class MultipleLocaleActivationTests(TestCase):
