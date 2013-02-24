@@ -218,6 +218,15 @@ class ExceptionReporter(object):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
+    def format_path_status(self, path):
+        if not os.path.exists(path):
+            return "File does not exist"
+        if not os.path.isfile(path):
+            return "Not a file"
+        if not os.access(path, os.R_OK):
+            return "File is not readable"
+        return "File exists"
+
     def get_traceback_data(self):
         "Return a Context instance containing traceback information."
 
@@ -230,8 +239,10 @@ class ExceptionReporter(object):
                     source_list_func = loader.get_template_sources
                     # NOTE: This assumes exc_value is the name of the template that
                     # the loader attempted to load.
-                    template_list = [{'name': t, 'exists': os.path.exists(t)} \
-                        for t in source_list_func(str(self.exc_value))]
+                    template_list = [{
+                        'name': t,
+                        'status': self.format_path_status(t),
+                    } for t in source_list_func(str(self.exc_value))]
                 except AttributeError:
                     template_list = []
                 loader_name = loader.__module__ + '.' + loader.__class__.__name__
@@ -650,7 +661,9 @@ TECHNICAL_500_TEMPLATE = """
         <ul>
         {% for loader in loader_debug_info %}
             <li>Using loader <code>{{ loader.loader }}</code>:
-                <ul>{% for t in loader.templates %}<li><code>{{ t.name }}</code> (File {% if t.exists %}exists{% else %}does not exist{% endif %})</li>{% endfor %}</ul>
+                <ul>
+                {% for t in loader.templates %}<li><code>{{ t.name }}</code> ({{ t.status }})</li>{% endfor %}
+                </ul>
             </li>
         {% endfor %}
         </ul>
@@ -753,7 +766,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template Loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
 {% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
 {% endif %}
@@ -943,7 +956,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
 {% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
 {% endif %}
