@@ -17,20 +17,19 @@ First, create a directory called ``static`` in your ``polls`` directory. Django
 will look for static files there, similarly to how Django finds templates
 inside ``polls/templates/``.
 
-Django's :setting:`STATICFILES_FINDERS` setting contains a list of
-:class:`django.contrib.staticfiles.finders.BaseFinder` that know how to
-discover static files from various sources. One of the defaults is
-:class:`django.contrib.staticfiles.finders.AppDirectoriesFinder` which looks
-for a "static" subdirectory in each of the :setting:`INSTALLED_APPS` - this is
-how Django knows to find the polls static files by default, including for the
-admin site.
+Django's :setting:`STATICFILES_FINDERS` setting contains a list
+of finders that know how to discover static files from various
+sources. One of the defaults is ``AppDirectoriesFinder`` which
+looks for a "static" subdirectory in each of the
+:setting:`INSTALLED_APPS` - this is how Django knows to find the
+polls static files by default, including for the admin site.
 
 Within the ``static`` directory you have just created, create another directory
 called ``polls`` and within that create a file called ``style.css``. In other
 words, your stylesheet should be at ``polls/static/polls/style.css``. Because
 of how ``AppDirectoriesFinder`` staticfile finder works as described above, you
-can refer to this static file in Django simply as ``polls/style.css``, exactly
-like for templates.
+can refer to this static file in Django simply as ``polls/style.css``, similar
+to how you reference the path for templates.
 
 .. admonition:: Static file namespacing
 
@@ -52,18 +51,20 @@ Put the following code in that stylesheet (``polls/static/polls/style.css``):
         color: green;
     }
 
-And, add at the top of your ``polls/templates/polls/index.html``:
+In your template, load the ``{% static %}`` template tag from the
+``staticfiles`` template library with ``{% load static %}``.  Then, use ``{%
+static %}`` to generate the absolute URL of the static file. Add the following
+at the top of your ``polls/templates/polls/index.html``:
 
 .. code-block:: html+django
 
-    {# this enables the static template tag #}
     {% load staticfiles %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 
 That's all you need to do for development. Reload
 ``http://localhost:8000/polls/`` and you should see that the poll links are
-green (django style !) which means that your stylesheet was properly loaded..
+green (django style !) which means that your stylesheet was properly loaded.
 
 Adding a background-image
 =========================
