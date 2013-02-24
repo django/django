@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import string
 
 from django.db import models
@@ -20,7 +22,7 @@ def _simple_domain_name_validator(value):
     checks = ((s in value) for s in string.whitespace)
     if any(checks):
         raise ValidationError(
-            _(u"The domain name cannot contain any spaces or tabs."))
+            _("The domain name cannot contain any spaces or tabs."))
 
 
 class SiteManager(models.Manager):
