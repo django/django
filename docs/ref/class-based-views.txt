@@ -862,6 +862,12 @@ View
         one user visiting your view could have an effect on subsequent users
         visiting the same view.
 
+    .. classmethod:: as_view(**initkwargs)
+
+        Returns a callable view that takes a request and returns a response::
+
+            response = MyView.as_view()(request)
+
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
