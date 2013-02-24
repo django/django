@@ -521,6 +521,15 @@ def get_script_prefix():
     """
     return getattr(_prefixes, "value", '/')
 
+def clear_script_prefix():
+    """
+    Unsets the script prefix for the current thread.
+    """
+    try:
+        del _prefixes.value
+    except AttributeError:
+        pass
+
 def set_urlconf(urlconf_name):
     """
     Sets the URLconf for the current thread (overriding the default one in
