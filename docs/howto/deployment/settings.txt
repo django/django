@@ -1,0 +1,62 @@
+Deploy Settings Checklist
+=========================
+
+When you're finally ready to deploy your Django project to a production
+environment, you should take some time to review your ``settings.py`` file and
+make the appropriate changes for the transition.  You can use this section as a
+checklist for your deployment.
+
+Additionally, with the exception of :setting:`DEBUG`, if you're publishing the
+source code for your project, these variable should be treated as sensitive and
+confidential.  In these cases, it's generally better to keep these values in a
+separate unpublished file, imported by the published ``settings.py``.
+
+
+DEBUG
+-----
+You've probably been developing your project with ``DEBUG = True``, since this
+enables all manner of handy things like a full traceback in your browser window.
+For a production environment, this is a really bad idea, so it's best to turn
+this off by setting ``DEBUG = False``.
+
+
+DATABASES
+---------
+Your production database setup is likely different from that in your development
+environment.  It may only be the case that your username and password values
+differ, but for some cases, even the database engine is different.
+
+
+STATIC_ROOT
+-----------
+As :setting:`STATIC_ROOT` is a complete path, your static root on your
+development environment is probably very different from production.
+
+
+SECRET_KEY
+----------
+Obviously, :setting:`SECRET_KEY` should never be published, but there's value in
+making sure that the key used on production is only used on production: you
+reduce the number of vectors from which an attacker may acquire the key.
+
+
+ADMINS
+------
+Typically, :setting:`ADMINS` is blank in development, but in a production
+environment, users in this list can be notified of server errors by way of an
+internal service.  Leaving this blank won't prevent your site from working, but
+it may prevent you from finding out why it sometimes doesn't work.
+
+
+SERVER_EMAIL
+------------
+Variables like :setting:`ADMINS` depend on :setting:`SERVER_EMAIL` in order to
+be useful.  If your site sends email to anyone, for any reason, (including to
+yourself for error reports), then this value needs to be set.
+
+
+ALLOWED_HOSTS
+-------------
+This is just good security policy.  Not terribly important in development, the
+:setting:`ALLOWED_HOSTS` setting protects your site from cross site request
+forgeries, and should be enabled on any production server.
