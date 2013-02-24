@@ -18,7 +18,7 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
-from django.db import router
+from django.db import router, transaction
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
@@ -835,6 +835,15 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 verbosity=0,
                 interactive=False
             )
+
+    def test_clear(self):
+        # The cache can be emptied using clear
+        self.cache.set("key1", "spam")
+        self.cache.set("key2", "eggs")
+        self.cache.clear()
+        transaction.rollback_unless_managed()
+        self.assertEqual(self.cache.get("key1"), None)
+        self.assertEqual(self.cache.get("key2"), None)
 
 
 @override_settings(USE_TZ=True)
