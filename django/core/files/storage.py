@@ -150,7 +150,7 @@ class FileSystemStorage(Storage):
     Standard filesystem storage
     """
 
-    def __init__(self, location=None, base_url=None):
+    def __init__(self, location=None, base_url=None, locks=locks):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
@@ -158,6 +158,7 @@ class FileSystemStorage(Storage):
         if base_url is None:
             base_url = settings.MEDIA_URL
         self.base_url = base_url
+        self.locks = locks
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))
@@ -189,7 +190,7 @@ class FileSystemStorage(Storage):
             try:
                 # This file has a file path that we can move.
                 if hasattr(content, 'temporary_file_path'):
-                    file_move_safe(content.temporary_file_path(), full_path)
+                    file_move_safe(content.temporary_file_path(), full_path, self.locks)
                     content.close()
 
                 # This is a normal uploadedfile that we can stream.
@@ -201,7 +202,7 @@ class FileSystemStorage(Storage):
                     # The current umask value is masked out by os.open!
                     fd = os.open(full_path, flags, 0o666)
                     try:
-                        locks.lock(fd, locks.LOCK_EX)
+                        self.locks.lock(fd, self.locks.LOCK_EX)
                         _file = None
                         for chunk in content.chunks():
                             if _file is None:
@@ -209,7 +210,7 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
-                        locks.unlock(fd)
+                        self.locks.unlock(fd)
                         if _file is not None:
                             _file.close()
                         else:
