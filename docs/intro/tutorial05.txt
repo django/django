@@ -643,5 +643,6 @@ What's next?
 For full details on testing, see :doc:`Testing in Django documentation
 </topics/testing/index>`.
 
-When you're comfortable with testing server side code, read :doc:`part 6 of this
-tutorial</intro/tutorial06>` to learn about static files management.
+When you're comfortable with testing Django views, read
+:doc:`part 6 of this tutorial</intro/tutorial06>` to learn about
+static files management.
