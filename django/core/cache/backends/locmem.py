@@ -69,12 +69,12 @@ class LocMemCache(BaseCache):
     def set(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
+        try:
+            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        except pickle.PickleError:
+            return
         with self._lock.writer():
-            try:
-                pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-                self._set(key, pickled, timeout)
-            except pickle.PickleError:
-                pass
+            self._set(key, pickled, timeout)
 
     def incr(self, key, delta=1, version=None):
         value = self.get(key, version=version)
