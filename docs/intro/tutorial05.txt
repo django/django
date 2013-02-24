@@ -640,7 +640,7 @@ information about testing.
 What's next?
 ============
 
-For full details on testing, see :doc:`Testing in Django documentation
+For full details on testing, see :doc:`Testing in Django
 </topics/testing/index>`.
 
 When you're comfortable with testing Django views, read
