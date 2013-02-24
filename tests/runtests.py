@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import warnings
 
 from django import contrib
 from django.utils._os import upath
