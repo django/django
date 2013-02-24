@@ -1,0 +1,248 @@
+================================
+Class-based views usage patterns
+================================
+
+When is it useful to depart from function based views and trade simple
+flow-control for modularity? The following usage patterns attempt to
+demonstrate cases where this makes sense.
+
+Usage patterns documented elsewhere:
+ * :doc:`Generic display</topics/class-based-views/generic-display>`
+ * :doc:`Generic editing</topics/class-based-views/generic-editing>`
+
+Each of the usage examples below demonstrates specific benefits of class-based
+views. It is implied that all of the examples demonstrate composition of
+featuers into views.
+
+
+
+Requiring authenticated user or super-user
+==========================================
+Demonstrates: cross-cutting concerns
+
+views.py::
+
+    from django.contrib.auth.decorators import login_required
+    from django.core.exceptions import PermissionDenied
+    from django.utils.decorators import method_decorator
+    from django.views.generic.base import TemplateView
+
+    class LoginRequiredMixin(object):
+
+        @method_decorator(login_required)
+        def dispatch(self, request, *args, **kwargs):
+            return super(LoginRequiredMixin, self).dispatch(request, *args,
+                    **kwargs)
+
+    class SuperuserRequiredMixin(object):
+
+        def dispatch(self, request, *args, **kwargs):
+            if not request.user.is_superuser:
+                raise PermissionDenied
+            return super(SuperuserRequiredMixin, self).dispatch(request, *args,
+                    **kwargs)
+
+    class SecretView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+        template_name = 'secrets/secret.html'
+
+
+Responding differently to AJAX requests
+=======================================
+Demonstrates: cross-cutting concerns, extensibility
+
+views.py::
+
+    import json
+
+    from django.views.generic.base import TemplateView
+
+    class AjaxResponseMixin(object):
+        "Assume XHR requests want JSON data..."
+
+        def render_to_response(self, context, **response_kwargs):
+            if self.request.is_ajax():
+                return self.render_to_json_response(context, **response_kwargs)
+            return super(AjaxResponseMixin, self).render_to_response(context,
+                    **response_kwargs)
+
+        def render_to_json_response(self, context, **response_kwargs):
+            response_content = json.dumps(self.get_json_data(context))
+            response_kwargs['content_type'] = 'application/json; charset=utf-8'
+            return HttpResponse(response_content, **response_kwargs)
+
+        def get_json_data(self, context):
+            return context
+
+    class StatusView(AjaxResponseMixin, TemplateView):
+        template_name = 'site_status.html'
+
+        def get_json_data(self, context):
+            return {
+                'status': 'OK'
+            }
+
+
+Drop-in audit-logging of user's viewing data
+============================================
+Demonstrates: cross-cutting concerns
+
+models.py::
+
+    from django.db import models
+
+    class ViewAudit(models.Model):
+        viewer = models.ForeignKey('auth.User')
+        app_label = models.CharField(max_length=128)
+        model_name = models.CharField(max_length=128)
+        model_instance_pk = models.CharField(max_length=256)
+        viewed_at_time = models.DateTimeField(auto_now=True)
+
+    class Book(models.Model):
+        title = models.CharField(max_length=128)
+
+views.py::
+
+    from django.views.generic import DetailView
+    from .models import Book
+    from .models import ViewAudit
+
+    class ViewAuditLoggingMixin(object):
+        "Add this to DetailViews where you want to see who viewed data"
+
+        def get(self, request, *args, **kwargs):
+            response = super(ViewAuditLoggingMixin, self).get(request, *args,
+                    **kwargs)
+            # A user saw this object, so let's document that...
+            model_instance = self.get_object()
+            ViewAudit.objects.create(
+                viewer = request.user,
+                app_label = model_instance._meta.app_label,
+                model_name = model_instance._meta.model_name,
+                model_instance_pk = unicode(model_instance.pk)
+            )
+            return response
+
+    class BookDetailView(ViewAuditLoggingMixin, DetailView):
+        # Using the derived template name
+        model = Book
+
+In a real site, we would probably define the audit model and mixin in their own
+reusable Django app.
+
+
+Modularity for testing
+======================
+
+There are many who believe that the act of making code more testable is a
+natural path to improved modularity. One of the usage patterns is simply that:
+breaking down a view because it was hard to test, or so that it is as easy to
+test as possible even as more complexity is layered onto the view.
+
+For example, suppose we had the following view::
+
+    from django.shortcuts import render
+
+    def add(request):
+        a = int(request.GET.get('a', 0))
+        b = int(request.GET.get('b', 0))
+        result = a + b
+        return render(request, 'math/add_result.html', {'result': result})
+
+As it stands, testing this view is quite simple. We can simply mock requests
+with the query parameters that are directly relevant to the view and assert the
+results.
+
+Well, the results are buried in a rendered template, so we'll have to hope that
+the result is rendered in a predictable fashion in the response.
+
+Let's assume we've written several tests for this view now.
+
+Now let's protect our view::
+
+    from django.contrib.auth.decorators import login_required
+    from django.shortcuts import render
+
+    @login_required
+    def add(request):
+        a = int(request.GET.get('a', 0))
+        b = int(request.GET.get('b', 0))
+        result = a + b
+        return render(request, 'math/add_result.html', {'result': result})
+
+Now, for every single one of our tests we have to mock a user on the request.
+This may not sound like much, but the real problem is that it's an extra thing
+to maintain in these tests and it's not really relevant to testing the view's
+core logic. This is just the beginning of the problem. For every decorator we
+add, we have to ensure the tests still work and, worst-case, add more
+irrelevant cruft to the tests.
+
+So then how do we layer ancillary functionality onto a view without hiding away
+what it really does? Let's see how this looks as a class::
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic.base import TemplateView
+
+    class LoginRequiredMixin(object):
+
+        @method_decorator(login_required)
+        def dispatch(self, request, *args, **kwargs):
+            return super(LoginRequiredMixin, self).dispatch(request, *args,
+                    **kwargs)
+
+    class AddView(LoginRequiredMixin, TemplateView):
+        template_name = 'math/add_result.html'
+
+        def get_context_data(self, **kwargs):
+            context = super(AddView, self).get_context_data(**kwargs)
+            context['result'] = self.get_result()
+            return context
+
+        def get_result(self):
+            a = int(self.request.GET.get('a', 0))
+            b = int(self.request.GET.get('b', 0))
+            result = a + b
+
+What's different here is that, although we've already starting composing the
+extra functionality into our view, we still have a distinct place where the
+core view logic lives. We could require permissions or feature activations, we
+could add auto-logging or auto-transactions. Yet we still have a method that,
+if directly called, bypasses all of this extra layering. Let's take a look at a
+sample test.
+
+tests.py::
+
+    import unittest
+    from .views import AddView
+
+    class AddViewTests(unitttest.TestCase):
+
+        def test_1_plus_2(self):
+            class Request(object):
+                GET = {'a': '1': 'b': '2'}
+
+            view = AddView(request=Request())
+            result = view.get_result()
+            self.assertEqual(3, result)
+
+As you can see, we get to be pretty direct and to the point here. We would
+probably want to factor out our mock request class, perhaps simply use
+python `mock <http://www.voidspace.org.uk/python/mock>`_, or Django's own
+:class:`django.test.client.RequestFactory`, but otherwise this is a good,
+simple example of how easy testing class-based views can be.
+
+Depending on the type of class-based view, there will be different methods that
+you might go to when testing core view logic. For generic displays, it is often
+:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`.
+Though, as you can see above, we even broke another method out of that which
+allows the result to be tested apart from the rest of the context. For editing
+views, it may be
+:meth:`~django.views.generic.edit.FormMixin.form_valid` that contains the core
+logic to test.
+
+Got other ideas?
+================
+
+This page is only a start. If you think you've got more useful ideas for views
+that should be class-based and can help others decide, consider
+:doc:`contributing </intro/contributing>`

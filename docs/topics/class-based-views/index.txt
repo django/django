@@ -18,7 +18,6 @@ reusable views which suits your use case. For full details, see the
    generic-editing
    mixins
    usage-patterns
-   testing
 
 Why class-based views?
 ======================
