@@ -41,7 +41,7 @@ Why so many methods with this approach?
 
 You might notice with class-based views that once you break from a convention
 prescribed by a base-class, there are a lot of potential hook methods you could
-override to achieve your goal. In short, this is because the approach with many
+extend to achieve your goal. In short, this is because the approach with many
 of the provided base-classes and mixins is to define workflow using the classic
 `template method <http://en.wikipedia.org/wiki/Template_method_pattern>`_
 design pattern. The benefit here is that there are some straightforward
@@ -50,7 +50,7 @@ high-level methods that do easy-to-understand things, like
 Then there are specialized methods that let you hook into that "template method"
 such as
 :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
-(which is a more commonly overrided method).
+(which is a more commonly extended method).
 
 When should I use class-based views?
 ====================================
