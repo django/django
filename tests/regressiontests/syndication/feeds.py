@@ -97,6 +97,19 @@ class TemplateFeed(TestRss2Feed):
         return "Not in a template"
 
 
+class TemplateContextFeed(TestRss2Feed):
+    """
+    A feed to test custom context data in templates for title or description.
+    """
+    title_template = 'syndication/title_context.html'
+    description_template = 'syndication/description_context.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TemplateContextFeed, self).get_context_data(**kwargs)
+        context['foo'] = 'bar'
+        return context
+
+
 class NaiveDatesFeed(TestAtomFeed):
     """
     A feed with naive (non-timezone-aware) dates.

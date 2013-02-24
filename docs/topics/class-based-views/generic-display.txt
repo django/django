@@ -188,6 +188,8 @@ Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
 
 
+.. _adding-extra-context:
+
 Adding extra context
 --------------------
 
