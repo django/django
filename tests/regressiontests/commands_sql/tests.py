@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
-    sql_all)
+    sql_destroy_indexes, sql_all)
 from django.db import connections, DEFAULT_DB_ALIAS, models
 from django.test import TestCase
 from django.utils import six
@@ -35,6 +35,13 @@ class SQLCommandsTestCase(TestCase):
         # PostgreSQL creates two indexes
         self.assertIn(len(output), [1, 2])
         self.assertTrue(output[0].startswith("CREATE INDEX"))
+
+    def test_sql_destroy_indexes(self):
+        app = models.get_app('commands_sql')
+        output = sql_destroy_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        # PostgreSQL creates two indexes
+        self.assertIn(len(output), [1, 2])
+        self.assertTrue(output[0].startswith("DROP INDEX"))
 
     def test_sql_all(self):
         app = models.get_app('commands_sql')
