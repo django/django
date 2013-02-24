@@ -52,9 +52,9 @@ Put the following code in that stylesheet (``polls/static/polls/style.css``):
     }
 
 In your template, load the ``{% static %}`` template tag from the
-``staticfiles`` template library with ``{% load static %}``.  Then, use ``{%
-static %}`` to generate the absolute URL of the static file. Add the following
-at the top of your ``polls/templates/polls/index.html``:
+``staticfiles`` template library with ``{% load staticfiles %}``.  Then, use
+``{% static %}`` template tag to generate the absolute URL of the static file.
+Add the following at the top of your ``polls/templates/polls/index.html``:
 
 .. code-block:: html+django
 
@@ -66,7 +66,8 @@ That's all you need to do for development. Reload
 ``http://localhost:8000/polls/`` and you should see that the poll links are
 green (django style !) which means that your stylesheet was properly loaded.
 
-See :doc:`deploying static files in production </howto/static-files-in-production>` for more information.
+See :doc:`deploying static files </howto/static-files-in-production>` for more
+information.
 
 Adding a background-image
 =========================
@@ -88,7 +89,8 @@ That's all you need for the development server. Reload
 ``http://localhost:8000/polls/`` and you should see the background loaded in
 the bottom right of the screen.
 
-See :doc:`deploying static files in production </howto/static-files-in-production>` for more information.
+See :doc:`deploying static files </howto/static-files-in-production>` for more
+information.
 
 .. warning::
 
