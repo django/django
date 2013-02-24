@@ -331,12 +331,21 @@ Field types
 ``AutoField``
 -------------
 
-.. class:: AutoField(**options)
+.. class:: AutoField([big=False, **options])
 
 An :class:`IntegerField` that automatically increments
 according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
+
+.. attribute:: AutoField.big
+
+    .. versionadded:: 1.5
+
+    Optional.  Either ``False`` or ``True``.  Default is ``False``. Allow you
+    to use bigint for storing field values. This extends values range up to
+    max 64 bit integer (from 1 to 9223372036854775807).
+
 
 ``BigIntegerField``
 -------------------
