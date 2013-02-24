@@ -46,6 +46,12 @@
     {{ adminform.form.non_field_errors }}
 {% endif %}
 
+{% block top_inline_field_sets %}
+{% for inline_admin_formset in top_inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
 {% block field_sets %}
 {% for fieldset in adminform %}
   {% include "admin/includes/fieldset.html" %}
@@ -54,7 +60,7 @@
 
 {% block after_field_sets %}{% endblock %}
 
-{% block inline_field_sets %}
+{% block bottom_inline_field_sets %}
 {% for inline_admin_formset in inline_admin_formsets %}
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
