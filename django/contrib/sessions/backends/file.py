@@ -1,6 +1,7 @@
 import datetime
 import errno
 import os
+import shutil
 import tempfile
 
 from django.conf import settings
@@ -147,7 +148,14 @@ class SessionStore(SessionBase):
                     os.write(output_file_fd, self.encode(session_data).encode())
                 finally:
                     os.close(output_file_fd)
-                os.rename(output_file_name, session_file_name)
+
+                # Note: This will atomically rename the file if the platform
+                # supports it (os.rename). On Windows for example, this will
+                # result in a shutil.copy2 and os.unlink since os.rename will
+                # most likely fail.
+                #
+                # See ticket #9084
+                shutil.move(output_file_name, session_file_name)
                 renamed = True
             finally:
                 if not renamed:
