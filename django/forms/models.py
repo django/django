@@ -233,24 +233,24 @@ class BaseModelForm(BaseForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
         opts = self._meta
+        if opts.model is None:
+            raise ValueError('ModelForm has no model class specified.')
         if instance is None:
-            if opts.model is None:
-                raise ValueError('ModelForm has no model class specified.')
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
         else:
             self.instance = instance
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
-        # if initial was provided, it should override the values from instance
+            # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
-        # self._validate_unique will be set to True by BaseModelForm.clean().
+            # self._validate_unique will be set to True by BaseModelForm.clean().
         # It is False by default so overriding self.clean() and failing to call
         # super will stop validate_unique from being called.
         self._validate_unique = False
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
+            error_class, label_suffix, empty_permitted)
 
     def _update_errors(self, message_dict):
         for k, v in message_dict.items():
