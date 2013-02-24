@@ -1,10 +1,8 @@
 from __future__ import unicode_literals
 
-import hashlib
+from django.core.cache.utils import make_template_fragment_key
 from django.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
 from django.core.cache import cache
-from django.utils.encoding import force_bytes
-from django.utils.http import urlquote
 
 register = Library()
 
@@ -24,10 +22,8 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
-        # Build a key for this fragment and all vary-on's.
-        key = ':'.join([urlquote(var.resolve(context)) for var in self.vary_on])
-        args = hashlib.md5(force_bytes(key))
-        cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
+        vary_on = [var.resolve(context) for var in self.vary_on]
+        cache_key = make_template_fragment_key(self.fragment_name, vary_on)
         value = cache.get(cache_key)
         if value is None:
             value = self.nodelist.render(context)

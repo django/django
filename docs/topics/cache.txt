@@ -639,6 +639,23 @@ equivalent:
 This feature is useful in avoiding repetition in templates. You can set the
 timeout in a variable, in one place, and just reuse that value.
 
+.. function:: django.core.cache.utils.make_template_fragment_key(fragment_name, vary_on=None)
+
+If you want to obtain the cache key used for a cached fragment, you can use
+``make_template_fragment_key``. ``fragment_name`` is the same as second argument
+to the ``cache`` template tag; ``vary_on`` is a list of all additional arguments
+passed to the tag. This function can be useful for invalidating or overwriting
+a cached item, for example:
+
+.. code-block:: python
+
+    >>> from django.core.cache import cache
+    >>> from django.core.cache.utils import make_template_fragment_key
+    # cache key for {% cache 500 sidebar username %}
+    >>> key = make_template_fragment_key('sidebar', [username])
+    >>> cache.delete(key) # invalidates cached template fragment
+
+
 The low-level cache API
 =======================
 

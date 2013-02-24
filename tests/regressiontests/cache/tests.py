@@ -20,6 +20,7 @@ from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import router, transaction
+from django.core.cache.utils import make_template_fragment_key
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
@@ -1809,3 +1810,25 @@ class TestEtagWithAdmin(TestCase):
             response = self.client.get('/test_admin/admin/')
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.has_header('ETag'))
+
+
+class TestMakeTemplateFragmentKey(TestCase):
+    def test_without_vary_on(self):
+        key = make_template_fragment_key('a.fragment')
+        self.assertEqual(key, 'template.cache.a.fragment.d41d8cd98f00b204e9800998ecf8427e')
+
+    def test_with_one_vary_on(self):
+        key = make_template_fragment_key('foo', ['abc'])
+        self.assertEqual(key,
+            'template.cache.foo.900150983cd24fb0d6963f7d28e17f72')
+
+    def test_with_many_vary_on(self):
+        key = make_template_fragment_key('bar', ['abc', 'def'])
+        self.assertEqual(key,
+            'template.cache.bar.4b35f12ab03cec09beec4c21b2d2fa88')
+
+    def test_proper_escaping(self):
+        key = make_template_fragment_key('spam', ['abc:def%'])
+        self.assertEqual(key,
+            'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
+
