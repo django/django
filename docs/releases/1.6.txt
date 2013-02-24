@@ -149,6 +149,30 @@ Backwards incompatible changes in 1.6
     {{ title }}{# Translators: Extracted and associated with 'Welcome' below #}
     <h1>{% trans "Welcome" %}</h1>
 
+* The :doc:`comments </ref/contrib/comments/index>` app now uses a ``GenericIPAddressField``
+  for storing commenters' IP addresses, to support comments submitted from IPv6 addresses.
+  Until now, it stored them in an ``IPAddressField``, which is only meant to support IPv4.
+  When saving a comment made from an IPv6 address, the address would be silently truncated
+  on MySQL databases, and raise an exception on Oracle.
+  You will need to change the column type in your database to benefit from this change.
+
+  For MySQL, execute this query on your project's database:
+
+  .. code-block:: sql
+
+    ALTER TABLE django_comments MODIFY ip_address VARCHAR(39);
+
+  For Oracle, execute this query:
+
+  .. code-block:: sql
+
+    ALTER TABLE DJANGO_COMMENTS MODIFY (ip_address VARCHAR2(39));
+
+  If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6 addresses
+  are silently truncated; on Oracle, an exception is generated. No database
+  change is needed for SQLite or PostgreSQL databases.
+
+
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the

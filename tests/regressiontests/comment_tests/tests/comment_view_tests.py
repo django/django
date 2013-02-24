@@ -101,13 +101,43 @@ class CommentViewTests(CommentTestCase):
         settings.DEBUG = olddebug
 
     def testCreateValidComment(self):
+        address = "1.2.3.4"
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
-        self.response = self.client.post("/post/", data, REMOTE_ADDR="1.2.3.4")
+        self.response = self.client.post("/post/", data, REMOTE_ADDR=address)
         self.assertEqual(self.response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
         c = Comment.objects.all()[0]
-        self.assertEqual(c.ip_address, "1.2.3.4")
+        self.assertEqual(c.ip_address, address)
+        self.assertEqual(c.comment, "This is my comment")
+
+    def testCreateValidCommentIPv6(self):
+        """
+        Test creating a valid comment with a long IPv6 address.
+        Note that this test should fail when Comment.ip_address is an IPAddress instead of a GenericIPAddress,
+        but does not do so on SQLite or PostgreSQL, because they use the TEXT and INET types, which already
+        allow storing an IPv6 address internally.
+        """
+        address = "2a02::223:6cff:fe8a:2e8a"
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        self.response = self.client.post("/post/", data, REMOTE_ADDR=address)
+        self.assertEqual(self.response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 1)
+        c = Comment.objects.all()[0]
+        self.assertEqual(c.ip_address, address)
+        self.assertEqual(c.comment, "This is my comment")
+
+    def testCreateValidCommentIPv6Unpack(self):
+        address = "::ffff:18.52.18.52"
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        self.response = self.client.post("/post/", data, REMOTE_ADDR=address)
+        self.assertEqual(self.response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 1)
+        c = Comment.objects.all()[0]
+        # We trim the '::ffff:' bit off because it is an IPv4 addr
+        self.assertEqual(c.ip_address, address[7:])
         self.assertEqual(c.comment, "This is my comment")
 
     def testPostAsAuthenticatedUser(self):
