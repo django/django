@@ -84,6 +84,22 @@ class OverrideCleanTests(TestCase):
         # by form.full_clean().
         self.assertEqual(form.instance.left, 1)
 
+
+class LocalizedTripleForm(forms.ModelForm):
+    class Meta:
+        model = Triple
+        localized_fields = ('left', 'right',)
+
+
+class LocalizedModelFormTest(TestCase):
+    def test_model_form_applies_localize_to_fields(self):
+        f = LocalizedTripleForm({'left': 10, 'middle': 10, 'right': 10})
+        self.assertTrue(f.is_valid())
+        self.assertTrue(f.fields['left'].localize)
+        self.assertFalse(f.fields['middle'].localize)
+        self.assertTrue(f.fields['right'].localize)
+
+
 # Regression test for #12960.
 # Make sure the cleaned_data returned from ModelForm.clean() is applied to the
 # model instance.
