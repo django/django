@@ -405,7 +405,8 @@ The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a poll with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
-later, but if you'd like to quickly get the above example working, just::
+later, but if you'd like to quickly get the above example working, a file
+containing just::
 
     {{ poll }}
 
