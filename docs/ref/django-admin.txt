@@ -864,7 +864,7 @@ The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
 sqldropindexes <appname appname ...>
---------------------------------
+------------------------------------
 
 .. django-admin:: sqldropindexes
 
