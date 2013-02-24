@@ -12,10 +12,9 @@ from django.db import models
 from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text
 from django.template import Library
 from django.template.loader import get_template
 from django.template.context import Context
@@ -112,12 +111,13 @@ def result_headers(cl):
                 # Not sortable
                 yield {
                     "text": text,
+                    "class_attrib": format_html(' class="column-{0}"', field_name),
                     "sortable": False,
                 }
                 continue
 
         # OK, it is sortable if we got this far
-        th_classes = ['sortable']
+        th_classes = ['sortable', 'column-{0}'.format(field_name)]
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0
