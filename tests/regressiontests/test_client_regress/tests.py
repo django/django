@@ -551,6 +551,14 @@ class LoginTests(TestCase):
         # default client.
         self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
 
+    def test_login_with_inactive_user(self):
+        """
+        Test that logging in with an inactive user works.
+        Refs #19792.
+        """
+        login = self.client.login(username='inactive', password='password')
+        self.assertTrue(login, 'Could not log in')
+
 
 @override_settings(
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
