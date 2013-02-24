@@ -331,7 +331,7 @@ class PasswordResetFormTest(TestCase):
         data = {'email': 'foo@bar.com'}
         form = PasswordResetForm(data)
         self.assertTrue(form.is_valid())
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(
         TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
@@ -395,7 +395,7 @@ class PasswordResetFormTest(TestCase):
         # The form itself is valid, but no email is sent
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
 
 class ReadOnlyPasswordHashTest(TestCase):
