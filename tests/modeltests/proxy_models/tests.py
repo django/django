@@ -368,10 +368,6 @@ class ProxyModelAdminTests(TestCase):
         management.call_command('loaddata', 'myhorses.json', verbosity=0,
             commit=False)
 
-    def tearDown(self):
-        TrackerUser.objects.all().delete()
-        Issue.objects.all().delete()
-
     def test_cascade_delete_proxy_model_admin_warning(self):
         """
         Test if admin gives warning about cascade deleting models referenced
