@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.sites.models import Site, RequestSite, get_current_site
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -71,3 +71,13 @@ class SitesFrameworkTests(TestCase):
         site = get_current_site(request)
         self.assertTrue(isinstance(site, RequestSite))
         self.assertEqual(site.name, "example.com")
+
+    def test_domain_name_with_whitespaces(self):
+        # Regression for #17320
+        # Domain names are not allowed contain whitespace characters
+        site = Site(name="test name", domain="test test")
+        self.assertRaises(ValidationError, site.full_clean)
+        site.domain = "test\ttest"
+        self.assertRaises(ValidationError, site.full_clean)
+        site.domain = "test\ntest"
+        self.assertRaises(ValidationError, site.full_clean)
