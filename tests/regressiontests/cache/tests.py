@@ -12,6 +12,7 @@ import string
 import tempfile
 import time
 import warnings
+import pickle
 
 from django.conf import settings
 from django.core import management
@@ -983,6 +984,18 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
         # memcached limits key length to 250
         self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
+
+    # Explicitly display a skipped test if no configured cache uses MemcachedCache
+    @unittest.skipUnless(
+        any(cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache'
+            for cache in settings.CACHES.values()),
+        "cache with python-memcached library not available")
+    def test_memcached_uses_highest_pickle_version(self):
+        # Regression test for #19810
+        for cache_key, cache in settings.CACHES.items():
+            if cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
+                self.assertEqual(get_cache(cache_key)._cache.pickleProtocol,
+                                 pickle.HIGHEST_PROTOCOL)
 
 
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):

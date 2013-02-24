@@ -89,6 +89,9 @@ Minor features
   :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
   attribute (equivalent to the URL the response will redirect to).
 
+* The ``MemcachedCache`` cache backend now uses the latest :mod:`pickle`
+  protocol available.
+
 * Added the :attr:`django.db.models.ForeignKey.db_constraint`
   option.
 
