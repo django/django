@@ -1025,6 +1025,15 @@ class BigIntegerField(IntegerField):
 
     def get_internal_type(self):
         return "BigIntegerField"
+    
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return long(value)
+        except (TypeError, ValueError):
+            msg = self.error_messages['invalid'] % value
+            raise exceptions.ValidationError(msg)
 
     def formfield(self, **kwargs):
         defaults = {'min_value': -BigIntegerField.MAX_BIGINT - 1,
