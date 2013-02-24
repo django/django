@@ -326,9 +326,11 @@ files:
 Static file development view
 ----------------------------
 
+.. module:: django.contrib.staticfiles.views
+
 .. highlight:: python
 
-.. function:: django.contrib.staticfiles.views.serve(request, path)
+.. function:: serve
 
 This view function serves static files in development.
 
