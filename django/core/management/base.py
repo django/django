@@ -185,11 +185,7 @@ class BaseCommand(object):
     leave_locale_alone = False
 
     def __init__(self):
-        options, args = OptionParser(option_list=self.option_list).parse_args()
-        if options.__dict__.get('no_style'):
-            self.style = no_style()
-        else:
-            self.style = color_style()
+        self.style = color_style()
 
     def get_version(self):
         """
@@ -261,6 +257,7 @@ class BaseCommand(object):
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
         if options.get('no_style'):
+            self.style = no_style()
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
         else:
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
