@@ -23,13 +23,13 @@ def cycle(parser, token):
 
     By default all strings are escaped.
 
-    If you want to disable auto-escaping of variables you can use:
+    If you want to disable auto-escaping of variables you can use::
 
         {% autoescape off %}
             {% cycle var1 var2 var3 as somecycle %}
         {% autoescape %}
 
-    Or if only some variables should be escaped, you can use:
+    Or if only some variables should be escaped, you can use::
 
         {% cycle var1 var2|safe var3|safe  as somecycle %}
     """
@@ -41,23 +41,23 @@ def firstof(parser, token):
     """
     This is the future version of `firstof` with auto-escaping.
 
-    This is equivalent to:
+    This is equivalent to::
 
-       {% if var1 %}
-           {{ var1 }}
-       {% elif var2 %}
-           {{ var2 }}
-       {% elif var3 %}
-           {{ var3 }}
-       {% endif %}
+        {% if var1 %}
+            {{ var1 }}
+        {% elif var2 %}
+            {{ var2 }}
+        {% elif var3 %}
+            {{ var3 }}
+        {% endif %}
 
-    If you want to disable auto-escaping of variables you can use:
+    If you want to disable auto-escaping of variables you can use::
 
         {% autoescape off %}
             {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
         {% autoescape %}
 
-    Or if only some variables should be escaped, you can use:
+    Or if only some variables should be escaped, you can use::
 
         {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
