@@ -223,6 +223,7 @@ class IfChangedNode(Node):
         if self not in state_frame:
             state_frame[self] = None
 
+        nodelist_true_output = None
         try:
             if self._varlist:
                 # Consider multiple parameters.  This automatically behaves
@@ -230,13 +231,13 @@ class IfChangedNode(Node):
                 compare_to = [var.resolve(context, True) for var in self._varlist]
             else:
                 # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
-                compare_to = self.nodelist_true.render(context)
+                compare_to = nodelist_true_output = self.nodelist_true.render(context)
         except VariableDoesNotExist:
             compare_to = None
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
-            return self.nodelist_true.render(context)
+            return nodelist_true_output or self.nodelist_true.render(context)  # render true block if not already rendered
         elif self.nodelist_false:
             return self.nodelist_false.render(context)
         return ''
