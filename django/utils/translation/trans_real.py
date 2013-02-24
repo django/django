@@ -356,6 +356,20 @@ def check_for_language(lang_code):
             return True
     return False
 
+def get_supported_language_variant(lang_code, supported=None):
+    """
+    Returns the language-code that's listed in supported languages, possibly
+    selecting a more generic variant. Raises LookupError if nothing found.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    if lang_code and lang_code not in supported:
+        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
+    if lang_code and lang_code in supported and check_for_language(lang_code):
+        return lang_code
+    raise LookupError(lang_code)
+
 def get_language_from_path(path, supported=None):
     """
     Returns the language-code if there is a valid language-code
@@ -396,11 +410,10 @@ def get_language_from_request(request, check_path=False):
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
-    if lang_code and lang_code not in supported:
-        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
-
-    if lang_code and lang_code in supported and check_for_language(lang_code):
-        return lang_code
+    try:
+        return get_supported_language_variant(lang_code, supported)
+    except LookupError:
+        pass
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):
@@ -434,7 +447,10 @@ def get_language_from_request(request, check_path=False):
                     _accepted[normalized] = lang
                     return lang
 
-    return settings.LANGUAGE_CODE
+    try:
+        return get_supported_language_variant(settings.LANGUAGE_CODE, supported)
+    except LookupError:
+        return settings.LANGUAGE_CODE
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
