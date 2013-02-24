@@ -118,6 +118,8 @@ class Field(object):
 
         self.validators = self.default_validators + validators
 
+        super(Field, self).__init__()
+
     def prepare_value(self, value):
         return value
 
