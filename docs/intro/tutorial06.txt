@@ -66,6 +66,10 @@ That's all you need to do for development. Reload
 ``http://localhost:8000/polls/`` and you should see that the poll links are
 green (django style !) which means that your stylesheet was properly loaded.
 
+Refer to the documentation about serving static files in production, refer to
+the :doc:`Deploying static files in production
+</howto/static-files-in-production>`
+
 Adding a background-image
 =========================
 
@@ -85,6 +89,10 @@ Then, add to your stylesheet (``polls/static/polls/style.css``):
 That's all you need for the development server. Reload
 ``http://localhost:8000/polls/`` and you should see the background loaded in
 the bottom right of the screen.
+
+Refer to the documentation about serving static files in production, refer to
+the :doc:`Deploying static files in production
+</howto/static-files-in-production>`
 
 .. warning::
 
