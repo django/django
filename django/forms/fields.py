@@ -743,6 +743,15 @@ class NullBooleanField(BooleanField):
         return initial != data
 
 
+class CallableChoiceIterator(object):
+    def __init__(self, callable_func, field):
+        self.callable_func = callable_func
+        self.field = field
+
+    def __iter__(self):
+        for e in self.callable_func(self.field):
+            yield e
+
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -757,7 +766,7 @@ class ChoiceField(Field):
 
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
-        result._choices = copy.deepcopy(self._choices, memo)
+        result._set_choices(copy.deepcopy(self._choices, memo))
         return result
 
     def _get_choices(self):
@@ -765,9 +774,14 @@ class ChoiceField(Field):
 
     def _set_choices(self, value):
         # Setting choices also sets the choices on the widget.
-        # choices can be any iterable, but we call list() on it because
-        # it will be consumed more than once.
-        self._choices = self.widget.choices = list(value)
+        if callable(value):
+            value = CallableChoiceIterator(value, self)
+        else:
+            # choices can be any iterable, but we call list() on it because
+            # it will be consumed more than once.
+            value = list(value)
+
+        self._choices = self.widget.choices = value
 
     choices = property(_get_choices, _set_choices)
 
