@@ -47,8 +47,8 @@ environment.  It may only be the case that your username and password values
 differ, but for some cases, even the database engine is different.
 
 
-STATIC & MEDIA, ROOT & URL
-:::::::::::::::::::::::::
+STATIC_ROOT, MEDIA_ROOT, STATIC_URL, and MEDIA_URL
+::::::::::::::::::::::::::::::::::::::::::::::::::
 As :setting:`STATIC_ROOT` and :setting:`MEDIA_ROOT` are a complete paths, your
 values in your development environment are probably very different from
 production.  Maybe your production environment is using an NFS share,
@@ -58,20 +58,26 @@ to take a look at these values when you move environments.
 
 ALLOWED_INCLUDE_ROOTS
 :::::::::::::::::::::
+When you're the only developer on a project, this is just good policy.  When
+you're one of many developers, this even better policy.  Even moreso if it's
+possible that your code uses dynamically set template names.
+
 
 
 If You're Using HTTPS
 ---------------------
 If you're using Django, you should be using HTTPS.  Without it, it's just too
-easy to capture sensitive information like user session cookies etc.
+easy to capture sensitive information like user session cookies etc.  And
+remember, just using HTTPS on login pages isn't enough, as sessions can be
+hijacked and then used to access crucial sections of your site... like the admin.
 
 
-CSRF_COOKIE_SECURE
-::::::::::::::::::
+CSRF_COOKIE_SECURE and SESSION_COOKIE_SECURE
+::::::::::::::::::::::::::::::::::::::::::::
+With HTTPS on, there's no reason not to set these values to True.  It won't hurt
+you, and will protect you in the event that your site inadvertently starts
+serving pages under HTTP.
 
-
-SESSION_COOKIE_SECURE
-:::::::::::::::::::::
 
 
 Performance-related Settings
@@ -81,13 +87,21 @@ production.  A lot of that can be avoided by setting ``DEBUG = False``, but
 Django offers a number of additional services out-of-the-box to aid in the
 performance of your site.
 
+
 CACHES
 ::::::
+If your site is using caching (and it IS using caching... right?) then
+:setting:`CACHES` needs to be set to something sensible in a production
+environment.
 
 
 TEMPLATE_LOADERS
 ::::::::::::::::
-enable the cached template loader
+Like ``CACHES``, this isn't required for your site to function, but as it does
+save considerable processing time, it is recommended. See
+:doc:`/ref/templates/api/` for information regarding
+how to set this up.
+
 
 
 Error Reporting
@@ -107,6 +121,9 @@ error reports), these values need to be set.
 
 LOGGING
 :::::::
+Django's logging defaults are unlikely to be perfectly suited to your production
+environment.  It's worth taking a look here to keep tabs on what you want, where
+you want it logged.
 
 
 ADMINS
