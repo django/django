@@ -186,10 +186,10 @@ subclass::
     values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
     read-only.
 
-    The ``fields`` option, unlike :attr:`~ModelAdmin.list_display`, may contain
-    only field names of the model or the form specified by
-    :attr:`~ModelAdmin.form`, not callables. However it *can* contain callables
-    if they are defined in :attr:`~ModelAdmin.readonly_fields`.
+    The ``fields`` option, unlike :attr:`~ModelAdmin.list_display`, may only
+    contain names of fields on the model or the form specified by
+    :attr:`~ModelAdmin.form`. It may contain callables only if they are listed
+    in :attr:`~ModelAdmin.readonly_fields`.
 
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
@@ -258,10 +258,10 @@ subclass::
             'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
             }
 
-        Just like with the :attr:`~ModelAdmin.fields` option, to display
-        multiple fields on the same line, wrap those fields in their own
-        tuple. In this example, the ``first_name`` and ``last_name`` fields
-        will display on the same line::
+        As with the :attr:`~ModelAdmin.fields` option, to display multiple
+        fields on the same line, wrap those fields in their own tuple. In this
+        example, the ``first_name`` and ``last_name`` fields will display on
+        the same line::
 
             {
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
@@ -270,9 +270,9 @@ subclass::
         ``fields`` can contain values defined in
         :attr:`~ModelAdmin.readonly_fields` to be displayed as read-only.
 
-        If you add a callable name to ``fields``, the same rule applies as
-        with :attr:`~ModelAdmin.fields` option: the callable must be
-        specified in :attr:`~ModelAdmin.readonly_fields`.
+        If you add the name of a callable to ``fields``, the same rule applies
+        as with the :attr:`~ModelAdmin.fields` option: the callable must be
+        listed in :attr:`~ModelAdmin.readonly_fields`.
 
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
