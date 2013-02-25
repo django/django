@@ -910,14 +910,14 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_style', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
         self.assertNoOutput(err)
 
     def test_custom_command_with_environment(self):
         "alternate: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
         self.assertNoOutput(err)
 
 
@@ -1241,7 +1241,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_specific_help(self):
         "--help can be used on a specific command"
-        args = ['sqlall', '--help']
+        args = ['help', 'sqlall']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the given model module name(s).")
@@ -1251,35 +1251,35 @@ class CommandTypes(AdminScriptTestCase):
         args = ['base_command', 'testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_base_command_no_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=[('no_style', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_base_command_multiple_label(self):
         "User BaseCommands can execute when no labels are provided"
         args = ['base_command', 'testlabel', 'anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel', 'anotherlabel'), options=[('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel', 'anotherlabel'), options=[('no_style', False), ('option_a', '1'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_base_command_with_option(self):
         "User BaseCommands can execute with options when a label is provided"
         args = ['base_command', 'testlabel', '--option_a=x']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_base_command_with_options(self):
         "User BaseCommands can execute with multiple options when a label is provided"
         args = ['base_command', 'testlabel', '-a', 'x', '--option_b=y']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_base_run_from_argv(self):
         """
@@ -1311,7 +1311,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"
@@ -1326,7 +1326,7 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
         self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
-        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "'>, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
@@ -1341,10 +1341,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
         self.assertOutput(out, os.sep.join(['django', 'contrib', 'auth', 'models.py']))
-        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "'>, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.contenttypes.models'")
         self.assertOutput(out, os.sep.join(['django', 'contrib', 'contenttypes', 'models.py']))
-        self.assertOutput(out, "'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "'>, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_app_command_invalid_appname(self):
         "User AppCommands can execute when a single app name is provided"
@@ -1363,7 +1363,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
     def test_label_command_no_label(self):
         "User LabelCommands raise an error if no label is provided"
@@ -1376,8 +1376,8 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel', 'anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
-        self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
 
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
@@ -1401,35 +1401,35 @@ class ArgumentOrder(AdminScriptTestCase):
         args = ['base_command', 'testlabel', '--settings=alternate_settings', '--option_a=x']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
 
     def test_setting_then_short_option(self):
         "Short options passed after settings are correctly handled"
         args = ['base_command', 'testlabel', '--settings=alternate_settings', '--option_a=x']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
 
     def test_option_then_setting(self):
         "Options passed before settings are correctly handled"
         args = ['base_command', 'testlabel', '--option_a=x', '--settings=alternate_settings']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
 
     def test_short_option_then_setting(self):
         "Short options passed before settings are correctly handled"
         args = ['base_command', 'testlabel', '-a', 'x', '--settings=alternate_settings']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', '2'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
 
     def test_option_then_setting_then_option(self):
         "Options are correctly handled when they are passed before and after a setting"
         args = ['base_command', 'testlabel', '--option_a=x', '--settings=alternate_settings', '--option_b=y']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_style', False), ('option_a', 'x'), ('option_b', 'y'), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
 
 
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
