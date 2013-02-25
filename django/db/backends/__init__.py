@@ -51,7 +51,8 @@ class BaseDatabaseWrapper(object):
     def __ne__(self, other):
         return not self == other
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(self.alias)
 
     def get_connection_params(self):
         raise NotImplementedError
