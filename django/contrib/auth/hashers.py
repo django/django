@@ -38,6 +38,8 @@ def check_password(password, encoded, setter=None, preferred='default'):
     if ((len(encoded) == 32 and '$' not in encoded) or
             (len(encoded) == 37 and encoded.startswith('md5$$'))):
         hasher = get_hasher('unsalted_md5')
+    elif len(encoded) == 46 and encoded.startswith('sha1$$'):
+        hasher = get_hasher('unsalted_sha1')
     else:
         algorithm = encoded.split('$', 1)[0]
         hasher = get_hasher(algorithm)
@@ -359,7 +361,35 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
             (_('hash'), mask_hash(encoded, show=3)),
         ])
 
+class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
+    """
+    I am an incredibly insecure algorithm you should *never* use;
+    stores unsalted MD5 hashes without the algorithm prefix.
 
+    This class is implemented because Django used to store passwords
+    this way. Some older Django installs still have these values
+    lingering around so we need to handle and upgrade them properly.
+    """
+    algorithm = "unsalted_sha1"
+
+    def salt(self):
+        return ''
+
+    def encode(self, password, salt):
+        return hashlib.sha1(password).hexdigest()
+
+    def verify(self, password, encoded):
+        if len(encoded) == 46 and encoded.startswith('sha1$$'):
+            encoded = encoded[6:]
+        encoded_2 = self.encode(password, '')
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        return SortedDict([
+            (_('algorithm'), self.algorithm),
+            (_('hash'), mask_hash(encoded, show=3)),
+        ])
+        
 class CryptPasswordHasher(BasePasswordHasher):
     """
     Password hashing using UNIX crypt (not recommended)
