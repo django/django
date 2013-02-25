@@ -13,7 +13,7 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
     VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re,
-    _render_value_in_context)
+    render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_text
@@ -78,7 +78,7 @@ class CycleNode(Node):
             return ''
         if not self.escape:
             value = mark_safe(value)
-        return _render_value_in_context(value, context)
+        return render_value_in_context(value, context)
 
 class DebugNode(Node):
     def render(self, context):
@@ -111,7 +111,7 @@ class FirstOfNode(Node):
             if value:
                 if not self.escape:
                     value = mark_safe(value)
-                return _render_value_in_context(value, context)
+                return render_value_in_context(value, context)
         return ''
 
 class ForNode(Node):
