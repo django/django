@@ -1104,12 +1104,16 @@ class ForeignKey(RelatedField, Field):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.rel.to))
+
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)
+
+        if 'queryset' not in kwargs:
+            defaults['queryset'] = self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
+
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
@@ -1378,9 +1382,12 @@ class ManyToManyField(RelatedField, Field):
         db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
         }
         defaults.update(kwargs)
+
+        if 'queryset' not in kwargs:
+            defaults['queryset'] = self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
+
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
         if defaults.get('initial') is not None:
