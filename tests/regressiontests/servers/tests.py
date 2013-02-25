@@ -96,6 +96,8 @@ class LiveServerAddress(LiveServerBase):
             raise Exception("The line above should have raised an exception")
         except exception:
             pass
+        finally:
+            super(LiveServerAddress, cls).tearDownClass()
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
