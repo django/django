@@ -581,25 +581,27 @@ class ThreadTests(TestCase):
         Ensure that the connections are different for each thread.
         Refs #17258.
         """
-        connections_set = set()
+        # Map connections by id because connections with identical aliases
+        # have the same hash.
+        connections_dict = {}
         for conn in connections.all():
-            connections_set.add(conn)
+            connections_dict[id(conn)] = conn
         def runner():
             from django.db import connections
             for conn in connections.all():
                 # Allow thread sharing so the connection can be closed by the
                 # main thread.
                 conn.allow_thread_sharing = True
-                connections_set.add(conn)
+                connections_dict[id(conn)] = conn
         for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEqual(len(connections_set), 6)
+        self.assertEqual(len(connections_dict), 6)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
-        for conn in connections_set:
+        for conn in connections_dict.values():
             if conn != connection:
                 conn.close()
 

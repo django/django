@@ -150,7 +150,8 @@ def lazy(func, *resultclasses):
                 other = other.__cast()
             return self.__cast() < other
 
-        __hash__ = object.__hash__
+        def __hash__(self):
+            return hash(self.__cast())
 
         def __mod__(self, rhs):
             if self._delegate_bytes and not six.PY3:
