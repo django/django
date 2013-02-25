@@ -10,8 +10,8 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        if os.environ.get('DJANGO_SKIP_SELENIUM_TESTS', False):
-            raise SkipTest('Selenium tests skipped by explicit request')
+        if not os.environ.get('DJANGO_SELENIUM_TESTS', False):
+            raise SkipTest('Selenium tests not requested')
         try:
             cls.selenium = import_by_path(cls.webdriver_class)()
         except Exception as e:
