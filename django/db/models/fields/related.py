@@ -160,6 +160,9 @@ class RelatedField(object):
                 sql, params = value.as_sql()
             else:
                 sql, params = value._as_sql(connection=connection)
+            if not sql:
+                return QueryWrapper('', params)
+
             return QueryWrapper(('(%s)' % sql), params)
 
         # FIXME: lt and gt are explicitly allowed to make
