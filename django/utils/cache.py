@@ -237,6 +237,10 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
     if response.has_header('Vary'):
         is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
+        # If i18n or l10n are used, the generated cache key will be suffixed
+        # with the current locale. Adding the raw value of Accept-Language is
+        # redundant in that case and would result in storing the same content
+        # under multiple keys in the cache. See #18191 for details.
         headerlist = []
         for header in cc_delim_re.split(response['Vary']):
             header = header.upper().replace('-', '_')
