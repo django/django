@@ -364,9 +364,7 @@ class ProxyModelTests(TestCase):
 
 
 class ProxyModelAdminTests(TestCase):
-    def setUp(self):
-        management.call_command('loaddata', 'myhorses.json', verbosity=0,
-            commit=False)
+    fixtures = ['myhorses']
 
     def test_cascade_delete_proxy_model_admin_warning(self):
         """
