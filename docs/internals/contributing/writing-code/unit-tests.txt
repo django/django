@@ -128,21 +128,12 @@ Running the Selenium tests
 
 Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
 real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path.
-
-Then, run the tests normally, for example:
-
-.. code-block:: bash
-
-    ./runtests.py --settings=test_sqlite admin_inlines
-
-If you have Selenium installed but for some reason don't want to run these tests
-(for example to speed up the test suite), use the ``--skip-selenium`` option
-of the test runner.
+install the selenium_ package (version > 2.13) into your Python path and run
+the tests with the ``--selenium`` option:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite --skip-selenium admin_inlines
+    ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
 
 .. _running-unit-tests-dependencies:

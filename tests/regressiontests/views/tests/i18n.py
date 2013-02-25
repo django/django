@@ -177,10 +177,10 @@ class JsI18NTestsMultiPackage(TestCase):
                     javascript_quote('este texto de app3 debe ser traducido'))
 
 
-skip_selenium = os.environ.get('DJANGO_SKIP_SELENIUM_TESTS', False)
+skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 
-@unittest.skipIf(skip_selenium, 'Selenium tests skipped by explicit request')
+@unittest.skipIf(skip_selenium, 'Selenium tests not requested')
 @unittest.skipUnless(firefox, 'Selenium not installed')
 class JavascriptI18nTests(LiveServerTestCase):
     urls = 'regressiontests.views.urls'
