@@ -664,11 +664,9 @@ a.deletelink:hover {
     height: 16px;
 }
 
-.object-tools li:hover {
-
-}
-
 .object-tools a {
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
     border-radius: 15px;
 }
 
