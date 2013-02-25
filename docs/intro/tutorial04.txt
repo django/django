@@ -320,7 +320,7 @@ function anymore -- generic views can be (and are) used multiple times
 Run the server, and use your new polling app based on generic views.
 
 For full details on generic views, see the :doc:`generic views documentation
-</topics/http/generic-views>`.
+</topics/generic-views>`.
 
 Coming soon
 ===========

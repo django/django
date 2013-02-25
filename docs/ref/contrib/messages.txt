@@ -275,7 +275,7 @@ example::
     messages.info(request, 'Hello world.', fail_silently=True)
 
 Internally, Django uses this functionality in the create, update, and delete
-:doc:`generic views </topics/http/generic-views>` so that they work even if the
+:doc:`generic views </topics/generic-views>` so that they work even if the
 message framework is disabled.
 
 .. note::
