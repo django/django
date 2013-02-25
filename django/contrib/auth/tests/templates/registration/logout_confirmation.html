@@ -1,0 +1,8 @@
+<p>Are you sure you want to logout?</p>
+<form action="" method="post">
+    {% csrf_token %}
+    <div>
+        <input type="hidden" name="post" value="yes" />
+        <input type="submit" value="Yes, I'm sure" />
+    </div>
+</form>
