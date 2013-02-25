@@ -565,7 +565,8 @@ def cycle(parser, token, escape=False):
     """
     if not escape:
         warnings.warn(
-            "'The syntax for the `cycle` template tag is changing. Load it "
+            "'The `cycle` template tag is changing to escape its arguments; "
+            "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
             PendingDeprecationWarning, stacklevel=2)
 
@@ -707,7 +708,8 @@ def firstof(parser, token, escape=False):
     """
     if not escape:
         warnings.warn(
-            "'The syntax for the `firstof` template tag is changing. Load it "
+            "'The `firstof` template tag is changing to escape its arguments; "
+            "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
             PendingDeprecationWarning, stacklevel=2)
 
