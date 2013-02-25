@@ -576,9 +576,11 @@ class ThreadTests(TestCase):
         different for each thread.
         Refs #17258.
         """
-        connections_set = set()
+        # Map connections by id because connections with identical aliases
+        # have the same hash.
+        connections_dict = {}
         connection.cursor()
-        connections_set.add(connection)
+        connections_dict[id(connection)] = connection
         def runner():
             # Passing django.db.connection between threads doesn't work while
             # connections[DEFAULT_DB_ALIAS] does.
@@ -588,19 +590,19 @@ class ThreadTests(TestCase):
             # main thread.
             connection.allow_thread_sharing = True
             connection.cursor()
-            connections_set.add(connection)
+            connections_dict[id(connection)] = connection
         for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
         # Check that each created connection got different inner connection.
         self.assertEqual(
-            len(set([conn.connection for conn in connections_set])),
+            len(set(conn.connection for conn in connections_dict.values())),
             3)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
-        for conn in connections_set:
+        for conn in connections_dict.values() :
             if conn is not connection:
                 conn.close()
 
@@ -609,25 +611,27 @@ class ThreadTests(TestCase):
         Ensure that the connections are different for each thread.
         Refs #17258.
         """
-        connections_set = set()
+        # Map connections by id because connections with identical aliases
+        # have the same hash.
+        connections_dict = {}
         for conn in connections.all():
-            connections_set.add(conn)
+            connections_dict[id(conn)] = conn
         def runner():
             from django.db import connections
             for conn in connections.all():
                 # Allow thread sharing so the connection can be closed by the
                 # main thread.
                 conn.allow_thread_sharing = True
-                connections_set.add(conn)
+                connections_dict[id(conn)] = conn
         for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEqual(len(connections_set), 6)
+        self.assertEqual(len(connections_dict), 6)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
-        for conn in connections_set:
+        for conn in connections_dict.values():
             if conn is not connection:
                 conn.close()
 

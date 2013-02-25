@@ -85,7 +85,8 @@ class Element(object):
             return False
         return True
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash((self.name,) + tuple(a for a in self.attributes))
 
     def __ne__(self, element):
         return not self.__eq__(element)
