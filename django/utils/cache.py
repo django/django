@@ -236,8 +236,14 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
     if cache is None:
         cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
     if response.has_header('Vary'):
-        headerlist = ['HTTP_'+header.upper().replace('-', '_')
-                      for header in cc_delim_re.split(response['Vary'])]
+        is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
+        headerlist = []
+        for header in cc_delim_re.split(response['Vary']):
+            header = header.upper().replace('-', '_')
+            if header == 'ACCEPT_LANGUAGE' and is_accept_language_redundant:
+                continue
+            headerlist.append('HTTP_' + header)
+        headerlist.sort()
         cache.set(cache_key, headerlist, cache_timeout)
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:

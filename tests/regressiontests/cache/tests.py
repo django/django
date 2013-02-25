@@ -1324,6 +1324,73 @@ class CacheI18nTest(TestCase):
         key2 = get_cache_key(request)
         self.assertEqual(key, key2)
 
+    def check_accept_language_vary(self, accept_language, vary, reference_key):
+        request = self._get_request()
+        request.META['HTTP_ACCEPT_LANGUAGE'] = accept_language
+        request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
+        response = HttpResponse()
+        response['Vary'] = vary
+        key = learn_cache_key(request, response)
+        key2 = get_cache_key(request)
+        self.assertEqual(key, reference_key)
+        self.assertEqual(key2, reference_key)
+
+    @override_settings(USE_I18N=True, USE_L10N=False, USE_TZ=False)
+    def test_cache_key_i18n_translation_accept_language(self):
+        lang = translation.get_language()
+        self.assertEqual(lang, 'en')
+        request = self._get_request()
+        request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
+        response = HttpResponse()
+        response['Vary'] = 'accept-encoding'
+        key = learn_cache_key(request, response)
+        self.assertIn(lang, key, "Cache keys should include the language name when translation is active")
+        self.check_accept_language_vary(
+            'en-us',
+            'cookie, accept-language, accept-encoding',
+            key
+        )
+        self.check_accept_language_vary(
+            'en-US',
+            'cookie, accept-encoding, accept-language',
+            key
+        )
+        self.check_accept_language_vary(
+            'en-US,en;q=0.8',
+            'accept-encoding, accept-language, cookie',
+            key
+        )
+        self.check_accept_language_vary(
+            'en-US,en;q=0.8,ko;q=0.6',
+            'accept-language, cookie, accept-encoding',
+            key
+        )
+        self.check_accept_language_vary(
+            'ko-kr,ko;q=0.8,en-us;q=0.5,en;q=0.3 ',
+            'accept-encoding, cookie, accept-language',
+            key
+        )
+        self.check_accept_language_vary(
+            'ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4',
+            'accept-language, accept-encoding, cookie',
+            key
+        )
+        self.check_accept_language_vary(
+            'ko;q=1.0,en;q=0.5',
+            'cookie, accept-language, accept-encoding',
+            key
+        )
+        self.check_accept_language_vary(
+            'ko, en',
+            'cookie, accept-encoding, accept-language',
+            key
+        )
+        self.check_accept_language_vary(
+            'ko-KR, en-US',
+            'accept-encoding, accept-language, cookie',
+            key
+        )
+
     @override_settings(USE_I18N=False, USE_L10N=True, USE_TZ=False)
     def test_cache_key_i18n_formatting(self):
         request = self._get_request()
