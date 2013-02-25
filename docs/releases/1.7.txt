@@ -72,6 +72,9 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+* Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
+  property for rounded corners rather than GIF background images.
+
 Backwards incompatible changes in 1.7
 =====================================
 
