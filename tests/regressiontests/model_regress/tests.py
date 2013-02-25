@@ -57,6 +57,7 @@ class ModelTests(TestCase):
         Party.objects.create(when=datetime.datetime(1999, 12, 31))
         Party.objects.create(when=datetime.datetime(1998, 12, 31))
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
+        Party.objects.create(when=datetime.datetime(1, 3, 3))
         self.assertQuerysetEqual(
             Party.objects.filter(when__month=2), []
         )
@@ -103,6 +104,20 @@ class ModelTests(TestCase):
             ],
             attrgetter("when")
         )
+
+        # Regression test for #18969
+        self.assertQuerysetEqual(
+                Party.objects.filter(when__year=1), [
+                        datetime.date(1, 3, 3),
+                    ],
+                attrgetter("when")
+        )
+        self.assertQuerysetEqual(
+                Party.objects.filter(when__year='1'), [
+                        datetime.date(1, 3, 3),
+                    ],
+                attrgetter("when")
+       )
 
     def test_date_filter_null(self):
         # Date filtering was failing with NULL date values in SQLite
