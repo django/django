@@ -2,45 +2,45 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Nuno Mariz <nmariz@gmail.com>, 2011.
+# Nuno Mariz <nmariz@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-04-02 14:45+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
-"Language-Team: Portuguese (http://www.transifex.net/projects/p/django/"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
 "language/pt/)\n"
-"Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:123
+#: models.py:130
 msgid "python model class name"
-msgstr "nome da classe do modelo em python"
+msgstr "nome da classe do model em python"
 
-#: models.py:127
+#: models.py:134
 msgid "content type"
 msgstr "tipo de conteúdo"
 
-#: models.py:128
+#: models.py:135
 msgid "content types"
 msgstr "tipos de conteúdos"
 
-#: views.py:15
+#: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "Objeto do tipo de conteúdo %(ct_id)s não tem nenhum model associado"
 
-#: views.py:19
+#: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "Objeto %(obj_id)s do tipo de conteúdo %(ct_id)s não existe"
 
-#: views.py:25
+#: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "Objetos %(ct_name)s não tem um método get_absolute_url()"

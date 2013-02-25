@@ -1,80 +1,93 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Gašper Žejn <zejn@kiberpipa.org>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 #   <zejn@kiberpipa.org>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-05 19:52+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
-"Language-Team: Slovenian (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-31 20:26+0000\n"
+"Last-Translator: mateju <>\n"
+"Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
-"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3)\n"
+"%100==4 ? 2 : 3);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
-msgstr "značka:"
+msgstr "oznaka:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "filter:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "pogled:"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
-msgstr "Aplikacije %r ni mogoče najti"
+msgstr "Programa %r ni mogoče najti"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Modela %(model_name)r ni v aplikaciji %(app_label)r"
+msgstr "Modela %(model_name)r ni v programu %(app_label)r"
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "povezani `%(app_label)s.%(data_type)s` objekt"
+msgstr "povezani predmet `%(app_label)s.%(data_type)s`"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "model:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "povezani `%(app_label)s.%(object_name)s` objekti"
+msgstr "povezani predmeti `%(app_label)s.%(object_name)s`"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "vse %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "število %s"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
-msgstr "Polja na %s objektih"
+msgstr "Polja na predmetih %s"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s ne izgleda veljaven urlpattern objekt"
+msgstr "Predmet %s ni videti veljaven predmet urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "Domov"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -85,30 +98,18 @@ msgstr "%s ne izgleda veljaven urlpattern objekt"
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "Domov"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
-msgstr "Zaznamkice"
+msgstr "Apleti zaznamkov"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
-msgstr "Dokumentacijske zaznamkice"
+msgstr "Dokumentacijski apleti zaznamkov"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -119,72 +120,78 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Za inštalacijo zaznamkic povlečite povezavo v orodno "
-"vrstico\n"
-"z zaznamki, ali kliknite z desno miškino tipko na povezavo in jo dodajte med "
-"zaznamke. Zdaj lahko izberete zaznamkico s katerekoli strani tega spletnega "
-"mesta. Opomba: nekatere izmed teh strani lahko gledate le z računalnika, ki "
-"je označen kot \"notranji\" (v kolikor niste prepričani, če je vaš "
-"računalnik označen kot \"notranji\" se obrnite na sistemskega "
-"administratorja).</p>\n"
+"<p class=\"help\">Aplete zaznamkov je mogoče namestiti z vleko\n"
+"povezave v orodno vrstico z zaznamki, ali pa z desnim klikom na povezavo\n"
+"Zaznamek je mogoče izbrati s katerekoli strani tega spletnega mesta.\n"
+"Opomba: nekatere strani si je mogoče ogledati le le z računalnika, ki je\n"
+"označen kot \"notranji\" računalnik (za več podrobnosti o tem, se obrnite\n"
+"na skrbnika).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Dokumentacija te strani"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr ""
-"Skok na stran z dokumentacijo za pogled (view), ki generira trenutno stran."
+msgstr "Skok na stran z dokumentacijo za pogled, ki gustvarja trenutno stran."
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "Show object ID"
+msgstr "Pokaži ID predmeta"
 
 #: templates/admin_doc/bookmarklets.html:29
-msgid "Show object ID"
-msgstr "Pokaži ID objekta"
-
-#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Pokaže content-type in unikatni ID za strani, ki predstavljajo en objekt."
+"Pokaže vrsto content-type in enoznačni ID za strani, ki predstavljajo en "
+"predmet."
+
+#: templates/admin_doc/bookmarklets.html:31
+msgid "Edit this object (current window)"
+msgstr "Uredi predmet (v trenutnem oknu)"
 
 #: templates/admin_doc/bookmarklets.html:32
-msgid "Edit this object (current window)"
-msgstr "Uredi objekt (v trenutnem oknu)"
-
-#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Skok na administracijsko stran za vse strani, ki predstavljajo en objekt."
+msgstr "Skok na skrbniško stran vseh strani, ki predstavljajo en predmet."
+
+#: templates/admin_doc/bookmarklets.html:34
+msgid "Edit this object (new window)"
+msgstr "Uredi ta predmet (v novem oknu)"
 
 #: templates/admin_doc/bookmarklets.html:35
-msgid "Edit this object (new window)"
-msgstr "Uredi ta objekt (v novem oknu)"
-
-#: templates/admin_doc/bookmarklets.html:36
 msgid "As above, but opens the admin page in a new window."
-msgstr "Kot zgoraj, le da odpre administracijsko stran v novem oknu."
+msgstr "Kot zgoraj, le da odpre skrbniško stran v novem oknu."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
 msgstr "Modeli"
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Predloge"
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Filtri"
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr "Značke"
+msgstr "Oznake"
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
 msgstr "Pogledi"
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "Boolova vrednost (PRAV ali NAPAK)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Polje vrste: %(field_type)s"

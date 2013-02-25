@@ -7,28 +7,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:34+0100\n"
-"PO-Revision-Date: 2012-03-08 12:29+0000\n"
-"Last-Translator: yun_man_ger <germanilyin@gmail.com>\n"
-"Language-Team: Kazakh (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:52+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
 "kk/)\n"
-"Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: kk\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Таңдалған %(count)d %(items)s элемент өшірілді."
 
-#: actions.py:60 options.py:1295
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s өшіре алмайды"
 
-#: actions.py:62 options.py:1297
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "Сенімдісіз бе?"
 
@@ -37,198 +37,204 @@ msgstr "Сенімдісіз бе?"
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Таңдалған %(verbose_name_plural)s өшірілді"
 
-#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
 msgstr "Барлығы"
 
-#: filters.py:232
+#: filters.py:238
 msgid "Yes"
 msgstr "Иә"
 
-#: filters.py:233
+#: filters.py:239
 msgid "No"
 msgstr "Жоқ"
 
-#: filters.py:247
+#: filters.py:253
 msgid "Unknown"
 msgstr "Белгісіз"
 
-#: filters.py:306
+#: filters.py:308
 msgid "Any date"
 msgstr "Кез келген күн"
 
-#: filters.py:307
+#: filters.py:309
 msgid "Today"
 msgstr "Бүгін"
 
-#: filters.py:311
+#: filters.py:313
 msgid "Past 7 days"
 msgstr "Өткен 7 күн"
 
-#: filters.py:315
+#: filters.py:317
 msgid "This month"
 msgstr "Осы ай"
 
-#: filters.py:319
+#: filters.py:321
 msgid "This year"
 msgstr "Осы жыл"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
 
-#: forms.py:18
+#: forms.py:19
 msgid "Please log in again, because your session has expired."
 msgstr "Сіздің сессия уақытыңыз өтіп кентті, өтініш, қайты кіріп көріңіз,"
 
-#: forms.py:37
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Сіздің e-mail адресіңіз қолданушы атымен сәйкес келмейді, орнына '%s'-ды "
-"жазып көріңіз."
-
-#: helpers.py:20
+#: helpers.py:23
 msgid "Action:"
 msgstr "Әрекет:"
 
-#: models.py:19
+#: models.py:24
 msgid "action time"
 msgstr "әрекет уақыты"
 
-#: models.py:22
+#: models.py:27
 msgid "object id"
 msgstr "объекттің id-i"
 
-#: models.py:23
+#: models.py:28
 msgid "object repr"
 msgstr "объекттің repr-i"
 
-#: models.py:24
+#: models.py:29
 msgid "action flag"
 msgstr "әрекет белгісі"
 
-#: models.py:25
+#: models.py:30
 msgid "change message"
 msgstr "хабарламаны өзгерту"
 
-#: models.py:30
+#: models.py:35
 msgid "log entry"
 msgstr "Жорнал жазуы"
 
-#: models.py:31
+#: models.py:36
 msgid "log entries"
 msgstr "Жорнал жазулары"
 
-#: models.py:40
+#: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr ""
 
-#: models.py:42
+#: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr ""
 
-#: models.py:44
+#: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr ""
 
-#: models.py:46
+#: models.py:54
 msgid "LogEntry Object"
 msgstr ""
 
-#: options.py:150 options.py:166
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "Ешнәрсе"
 
-#: options.py:671
+#: options.py:684
 #, python-format
 msgid "Changed %s."
 msgstr "%s өзгертілді."
 
-#: options.py:671 options.py:681
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "және"
 
-#: options.py:676
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" қосылды."
 
-#: options.py:680
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s-нің %(list)s өзгертілді."
 
-#: options.py:685
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" өшірілді."
 
-#: options.py:689
+#: options.py:702
 msgid "No fields changed."
 msgstr "Ешқандай толтырма өзгермеді."
 
-#: options.py:772
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" сәтті қосылды."
-
-#: options.py:776 options.py:824
-msgid "You may edit it again below."
-msgstr "Төменде сіз қайта өзгерте аласыз."
-
-#: options.py:788 options.py:837
-#, python-format
-msgid "You may add another %s below."
-msgstr "Төменнен басқа %s қоса аласыз."
-
-#: options.py:822
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" сәтті өзгертілді."
-
-#: options.py:830
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" сәтті қосылды. Оны төменде өзгерте аласыз."
 
-#: options.py:899 options.py:1159
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" сәтті қосылды."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" сәтті өзгертілді."
+
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Бірнәрсені өзгерту үшін бірінші оларды таңдау керек. Ешнәрсе өзгертілмеді."
 
-#: options.py:918
+#: options.py:970
 msgid "No action selected."
 msgstr "Ешқандай әрекет таңдалмады."
 
-#: options.py:998
+#: options.py:1050
 #, python-format
 msgid "Add %s"
 msgstr "%s қосу"
 
-#: options.py:1023 options.py:1267
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Бірінші кілті %(key)r бар %(name)s объекті жоқ."
 
-#: options.py:1089
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "%s өзгету"
 
-#: options.py:1138
+#: options.py:1190
 msgid "Database error"
 msgstr "Мәліметтер базасының қатесі"
 
-#: options.py:1201
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -237,7 +243,7 @@ msgstr[0] ""
 "\n"
 "other: %(count)s %(name)s таңдалғандарының барі өзгертілді."
 
-#: options.py:1228
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -246,51 +252,59 @@ msgstr[0] ""
 "\n"
 "other: Барлығы %(total_count)s таңдалды"
 
-#: options.py:1233
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 of %(cnt)s-ден 0 таңдалды"
 
-#: options.py:1283
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" сәтті өшірілді."
 
-#: options.py:1330
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "Өзгерес тарихы: %s"
 
-#: sites.py:315 tests.py:61 templates/admin/login.html:49
-#: templates/registration/password_reset_complete.html:20
-#: views/decorators.py:23
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
 msgid "Log in"
 msgstr "Кіру"
 
-#: sites.py:380
+#: sites.py:388
 msgid "Site administration"
 msgstr "Сайт әкімшілігі"
 
-#: sites.py:432
+#: sites.py:440
 #, python-format
 msgid "%s administration"
 msgstr "%s әкімшілігі"
 
-#: widgets.py:87
+#: widgets.py:90
 msgid "Date:"
 msgstr "Күнтізбелік күн:"
 
-#: widgets.py:87
+#: widgets.py:91
 msgid "Time:"
 msgstr "Уақыт:"
 
-#: widgets.py:161
+#: widgets.py:165
 msgid "Lookup"
 msgstr "Іздеу"
 
-#: widgets.py:267
+#: widgets.py:271
 msgid "Add Another"
 msgstr "Тағы қосу"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr ""
+
+#: widgets.py:317
+msgid "Change:"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -300,42 +314,40 @@ msgstr "Бет табылмады"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Кешірім сұраймыз, сіздің сұраған бетіңіз табылмады."
 
-#: templates/admin/500.html:7 templates/admin/app_index.html:8
-#: templates/admin/base.html:45 templates/admin/change_form.html:21
-#: templates/admin/change_list.html:43
-#: templates/admin/delete_confirmation.html:8
-#: templates/admin/delete_selected_confirmation.html:8
-#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
-#: templates/admin/auth/user/change_password.html:15
-#: templates/registration/logged_out.html:5
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:7
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Негізгі"
 
-#: templates/admin/500.html:8
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "Сервердің қатесі"
 
-#: templates/admin/500.html:12
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Сервердің қатесі (500)"
 
-#: templates/admin/500.html:15
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Сервердің қатесі <em>(500)</em>"
 
-#: templates/admin/500.html:16
+#: templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Қате пайда болды, бүл қате e-mail арқылы сайт әкімшілігіне жіберілді және "
-"тез арада түзетіледі. Сізге бізді түсінгеніңіз үшін рахмет."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -358,7 +370,7 @@ msgstr "Осылардың %(total_count)s %(module_name)s барлығын та
 msgid "Clear selection"
 msgstr "Белгілерді өшіру"
 
-#: templates/admin/app_index.html:11 templates/admin/index.html:19
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -368,22 +380,22 @@ msgid "Welcome,"
 msgstr "Қош келдіңіз,"
 
 #: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "Құжаттама"
 
-#: templates/admin/base.html:35
-#: templates/admin/auth/user/change_password.html:19
-#: templates/admin/auth/user/change_password.html:53
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Құпия сөзді өзгерту"
 
-#: templates/admin/base.html:36
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Шығу"
 
@@ -395,36 +407,36 @@ msgstr "Даңғо сайтының әкімі"
 msgid "Django administration"
 msgstr "Даңғо әкімшілігі"
 
-#: templates/admin/change_form.html:24 templates/admin/index.html:29
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
 msgid "Add"
 msgstr "Қосу"
 
-#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
 msgid "History"
 msgstr "Тарих"
 
-#: templates/admin/change_form.html:35
+#: templates/admin/change_form.html:33
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Сайтта көру"
 
-#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
-#: templates/admin/login.html:18
-#: templates/admin/auth/user/change_password.html:29
-#: templates/registration/password_change_form.html:21
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 "one: Астындағы қатені дұрыстаңыз.\n"
 "other: Астындағы қателерді дұрыстаңыз."
 
-#: templates/admin/change_list.html:60
+#: templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s қосу"
 
-#: templates/admin/change_list.html:80
+#: templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Сүзгіз"
 
@@ -441,12 +453,12 @@ msgstr ""
 msgid "Toggle sorting"
 msgstr ""
 
-#: templates/admin/delete_confirmation.html:12
+#: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Өшіру"
 
-#: templates/admin/delete_confirmation.html:19
+#: templates/admin/delete_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -456,7 +468,7 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s' объектты өшіруы байланысты объекттерін "
 "өшіруді қажет етеді, бырақ сізде осындай объектерді өшіру рұқсаты жоқ:"
 
-#: templates/admin/delete_confirmation.html:27
+#: templates/admin/delete_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -465,7 +477,7 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s' объектті өшіру осындай байлансты "
 "объекттерды өшіруді қажет етеді:"
 
-#: templates/admin/delete_confirmation.html:35
+#: templates/admin/delete_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -474,16 +486,16 @@ msgstr ""
 "%(object_name)s \"%(escaped_object)s\" объекттерді өшіруге сенімдісіз бе? "
 "Бұл байланысты элементтер де өшіріледі:"
 
-#: templates/admin/delete_confirmation.html:40
-#: templates/admin/delete_selected_confirmation.html:45
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
 msgid "Yes, I'm sure"
 msgstr "Иә, сенімдімін"
 
-#: templates/admin/delete_selected_confirmation.html:11
+#: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
 msgstr "Бірнеше объекттерді өшіру"
 
-#: templates/admin/delete_selected_confirmation.html:18
+#: templates/admin/delete_selected_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -493,7 +505,7 @@ msgstr ""
 "%(objects_name)s объектты өшіруы байланысты объекттерін өшіруді қажет етеді, "
 "бырақ сізде осындай объектерді өшіру рұқсаты жоқ:"
 
-#: templates/admin/delete_selected_confirmation.html:26
+#: templates/admin/delete_selected_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -502,7 +514,7 @@ msgstr ""
 "Таңдалған %(objects_name)s-ді(ы) өшіру, онымен байланыстағы қорғалған "
 "объектілердің барлығын жояды:"
 
-#: templates/admin/delete_selected_confirmation.html:34
+#: templates/admin/delete_selected_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -516,36 +528,36 @@ msgstr ""
 msgid " By %(filter_title)s "
 msgstr " %(filter_title)s "
 
-#: templates/admin/index.html:18
+#: templates/admin/index.html:20
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "%(name)s бағдарламадағы қол жетімді улгілер."
+msgid "Models in the %(name)s application"
+msgstr ""
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:39
 msgid "Change"
 msgstr "Өзгетру"
 
-#: templates/admin/index.html:45
+#: templates/admin/index.html:49
 msgid "You don't have permission to edit anything."
 msgstr "Бірденке түзетуге рұқсатыңыз жоқ."
 
-#: templates/admin/index.html:53
+#: templates/admin/index.html:57
 msgid "Recent Actions"
 msgstr "Соңғы әрекеттер"
 
-#: templates/admin/index.html:54
+#: templates/admin/index.html:58
 msgid "My Actions"
 msgstr "Менің әрекеттерім"
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "None available"
 msgstr "Қол жетімдісі жоқ"
 
-#: templates/admin/index.html:72
+#: templates/admin/index.html:76
 msgid "Unknown content"
 msgstr "Белгісіз мазмұн"
 
-#: templates/admin/invalid_setup.html:13
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -554,31 +566,27 @@ msgstr ""
 "Дерекқор орнатуыңызда бір қате бар. Дерекқор кестелері дұрыс құрылғаның және "
 "дерекқор көрсетілген дерекқор пайдаланушыда оқұ рұқсаты бар."
 
-#: templates/admin/login.html:34
-msgid "Username:"
-msgstr "Қолданушы аты:"
-
-#: templates/admin/login.html:38
+#: templates/admin/login.html:37
 msgid "Password:"
 msgstr "Құпия сөз:"
 
-#: templates/admin/login.html:45
+#: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
 msgstr ""
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:23
 msgid "Date/time"
 msgstr "Өшіру/Уақыт"
 
-#: templates/admin/object_history.html:25
+#: templates/admin/object_history.html:24
 msgid "User"
 msgstr "Қолданушы"
 
-#: templates/admin/object_history.html:26
+#: templates/admin/object_history.html:25
 msgid "Action"
 msgstr "Әрекет"
 
-#: templates/admin/object_history.html:40
+#: templates/admin/object_history.html:39
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -632,65 +640,65 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "Пайдаланушының атын және құпия сөзді енгізіңіз."
 
-#: templates/admin/auth/user/change_password.html:33
+#: templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "<strong>%(username)s</strong> пайдаланушы үшін жаңа құпия сөзді енгізіңіз."
 
-#: templates/admin/auth/user/change_password.html:40
+#: templates/admin/auth/user/change_password.html:38
 msgid "Password"
 msgstr "Құпия сөз"
 
-#: templates/admin/auth/user/change_password.html:46
-#: templates/registration/password_change_form.html:43
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
 msgid "Password (again)"
 msgstr "Құпия сөз(қайтадан)"
 
-#: templates/admin/auth/user/change_password.html:47
+#: templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
 msgstr "Растау үшін жоғардағыдай құпия сөзді енгізіңіз."
 
-#: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:115
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Өшіру"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Тағы басқа %(verbose_name)s кос"
-
-#: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:118
-msgid "Remove"
-msgstr "Өшіру"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Өшіру?"
 
-#: templates/registration/logged_out.html:9
+#: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Бүгін Веб-торапқа уақыт бөлгеніңіз үшін рахмет."
 
-#: templates/registration/logged_out.html:11
+#: templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Қайтадан кіріңіз"
 
-#: templates/registration/password_change_done.html:8
-#: templates/registration/password_change_form.html:9
-#: templates/registration/password_change_form.html:13
-#: templates/registration/password_change_form.html:25
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
 msgid "Password change"
 msgstr "Құпия сөзді өзгерту"
 
-#: templates/registration/password_change_done.html:12
-#: templates/registration/password_change_done.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
 msgid "Password change successful"
 msgstr "Құпия сөз сәтті өзгертілді"
 
-#: templates/registration/password_change_done.html:18
+#: templates/registration/password_change_done.html:17
 msgid "Your password was changed."
 msgstr "Құпия сөзіңіз өзгертілді."
 
-#: templates/registration/password_change_form.html:27
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -698,64 +706,64 @@ msgstr ""
 "Ескі құпия сөзіңізді енгізіңіз, содан сон сенімді болу үшін жаңа құпия "
 "сөзіңізді екі рет енгізіңіз."
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "Ескі құпия сөз"
 
-#: templates/registration/password_change_form.html:38
+#: templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "Жаңа құпия сөз"
 
-#: templates/registration/password_change_form.html:49
-#: templates/registration/password_reset_confirm.html:27
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
 msgid "Change my password"
 msgstr "Құпия сөзімді өзгерту"
 
-#: templates/registration/password_reset_complete.html:8
-#: templates/registration/password_reset_confirm.html:12
-#: templates/registration/password_reset_done.html:8
-#: templates/registration/password_reset_form.html:8
-#: templates/registration/password_reset_form.html:12
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
 msgid "Password reset"
 msgstr "Құпия сөзді өзгерту"
 
-#: templates/registration/password_reset_complete.html:12
-#: templates/registration/password_reset_complete.html:16
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
 msgid "Password reset complete"
 msgstr "Құпия сөзді өзгерту бітті"
 
-#: templates/registration/password_reset_complete.html:18
+#: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Сіздің құпия сөзіңіз енгізілді.  Жүйеге кіруіңізге болады."
 
-#: templates/registration/password_reset_confirm.html:8
+#: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Құпия сөзді өзгерту растау"
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:17
 msgid "Enter new password"
 msgstr "Жаңа құпия сөзді енгізіңіз"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:19
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "Сенімді болу үшін жаңа құпия сөзіңізді екі рет енгізіңіз."
 
-#: templates/registration/password_reset_confirm.html:24
+#: templates/registration/password_reset_confirm.html:23
 msgid "New password:"
 msgstr "Жаңа құпия сөз:"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:25
 msgid "Confirm password:"
 msgstr "Құпия сөз (растау):"
 
-#: templates/registration/password_reset_confirm.html:32
+#: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
 msgstr "Құпия сөзді өзгертуы сәтсіз аяқталды"
 
-#: templates/registration/password_reset_confirm.html:34
+#: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -763,27 +771,23 @@ msgstr ""
 "Құпия сөзді өзгерту байланыс дұрыс емес, мүмкін ол осыған дейін "
 "пайдаланылды.  Жаңа құпия сөзді өзгерту сұрау жіберіңіз."
 
-#: templates/registration/password_reset_done.html:12
-#: templates/registration/password_reset_done.html:16
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
 msgstr "Құпия сөз сәтті өзгертілді"
 
-#: templates/registration/password_reset_done.html:18
+#: templates/registration/password_reset_done.html:17
 msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
+"We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Енгізген e-mail адреске құпия сөзді өзгерту нұскаларын жібердік. Жақын арада "
-"алуыңыз тиіс."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your "
+"You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Сіз %(site_name)s сайтындағы ұяшығыңыздың құпия сөзін өзгертуге сұраныс "
-"жібергендіктен, бұл e-mail-ді алып отырсыз."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -802,36 +806,34 @@ msgstr "Біздің веб-торабын қолданғаныңыз үшін �
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s тобы"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:17
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Құпия сөзді ұмытып қалдыңыз ба? Астыға email адресті енгізіңіз, содан кейін "
-"біз оған құпия сөзді өзгерту нұскаларын жібереміз."
 
-#: templates/registration/password_reset_form.html:22
-msgid "E-mail address:"
-msgstr "E-mail адрес:"
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr ""
 
-#: templates/registration/password_reset_form.html:22
+#: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "Құпия сөзді жаңала"
 
-#: templatetags/admin_list.py:336
+#: templatetags/admin_list.py:344
 msgid "All dates"
 msgstr "Барлық мерзімдер"
 
-#: views/main.py:31
+#: views/main.py:33
 msgid "(None)"
 msgstr "(Ешнарсе)"
 
-#: views/main.py:74
+#: views/main.py:76
 #, python-format
 msgid "Select %s"
 msgstr "%s таңда"
 
-#: views/main.py:76
+#: views/main.py:78
 #, python-format
 msgid "Select %s to change"
 msgstr "%s өзгерту үщін таңда"

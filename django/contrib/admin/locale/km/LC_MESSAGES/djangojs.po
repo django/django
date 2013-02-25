@@ -10,11 +10,11 @@ msgstr ""
 "PO-Revision-Date: 2012-03-08 10:42+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: English <en@li.org>\n"
-"Language: km\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
