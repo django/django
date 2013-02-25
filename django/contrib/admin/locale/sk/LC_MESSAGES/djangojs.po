@@ -1,7 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Dimitris Glezos <glezos@transifex.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Juraj Bubniak <>, 2012.
 # Marian Andre <marian@andre.sk>, 2012.
 # Martin Kosír <martin@martinkosir.net>, 2011.
 msgid ""
@@ -9,15 +11,15 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Marian Andre <marian@andre.sk>\n"
-"Language-Team: Slovak (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2012-07-16 12:08+0000\n"
+"Last-Translator: Juraj Bubniak <translations@jbub.eu>\n"
+"Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -30,11 +32,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Toto je zoznam dostupných %s. Pre výber je potrebné označiť ich v poli a "
+"následne kliknutím na šípku \"Vybrať\" presunúť."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Píšte do tohto poľa pre vyfiltrovanie dostupných %s."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -47,11 +51,11 @@ msgstr "Vybrať všetko"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Kliknite sem pre vybratie všetkých %s naraz."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Vybrať"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -68,6 +72,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Toto je zoznam dostupných %s. Pre vymazanie je potrebné označiť ich v poli a "
+"následne kliknutím na šípku \"Vymazať\" vymazať."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
@@ -76,7 +82,7 @@ msgstr "Odstrániť všetky"
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Kliknite sem pre vymazanie vybratých %s naraz."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

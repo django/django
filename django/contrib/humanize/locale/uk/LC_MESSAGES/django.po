@@ -8,47 +8,47 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:41+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-03-11 17:52+0000\n"
 "Last-Translator: Sergey Lysach <sergikoff88@gmail.com>\n"
-"Language-Team: Ukrainian (http://www.transifex.net/projects/p/django/"
+"Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
-"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: tests.py:108 templatetags/humanize.py:164
+#: tests.py:125 templatetags/humanize.py:167
 msgid "today"
 msgstr "сьогодні"
 
-#: tests.py:108 templatetags/humanize.py:168
+#: tests.py:125 templatetags/humanize.py:171
 msgid "yesterday"
 msgstr "вчора"
 
-#: tests.py:108 templatetags/humanize.py:166
+#: tests.py:125 templatetags/humanize.py:169
 msgid "tomorrow"
 msgstr "завтра"
 
-#: templatetags/humanize.py:24
+#: templatetags/humanize.py:25
 msgid "th"
 msgstr "ий"
 
-#: templatetags/humanize.py:24
+#: templatetags/humanize.py:25
 msgid "st"
 msgstr "ий"
 
-#: templatetags/humanize.py:24
+#: templatetags/humanize.py:25
 msgid "nd"
 msgstr "ій"
 
-#: templatetags/humanize.py:24
+#: templatetags/humanize.py:25
 msgid "rd"
 msgstr "ий"
 
-#: templatetags/humanize.py:53
+#: templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
@@ -56,7 +56,7 @@ msgstr[0] "%(value).1f мільйон"
 msgstr[1] "%(value).1f мільйони"
 msgstr[2] "%(value).1f мільйонів"
 
-#: templatetags/humanize.py:54
+#: templatetags/humanize.py:55
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
@@ -64,7 +64,7 @@ msgstr[0] "%(value)s мільйон"
 msgstr[1] "%(value)s мільйони"
 msgstr[2] "%(value)s мільйонів"
 
-#: templatetags/humanize.py:57
+#: templatetags/humanize.py:58
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
@@ -72,7 +72,7 @@ msgstr[0] "%(value).1f мільярд"
 msgstr[1] "%(value).1f мільярди"
 msgstr[2] "%(value).1f мільярдів"
 
-#: templatetags/humanize.py:58
+#: templatetags/humanize.py:59
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
@@ -80,7 +80,7 @@ msgstr[0] "%(value)s мільярд"
 msgstr[1] "%(value)s мільярди"
 msgstr[2] "%(value)s мільярдів"
 
-#: templatetags/humanize.py:61
+#: templatetags/humanize.py:62
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
@@ -88,7 +88,7 @@ msgstr[0] "%(value).1f трильйон"
 msgstr[1] "%(value).1f трильйони"
 msgstr[2] "%(value).1f трильйонів"
 
-#: templatetags/humanize.py:62
+#: templatetags/humanize.py:63
 #, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
@@ -96,7 +96,7 @@ msgstr[0] "%(value)s трильйон"
 msgstr[1] "%(value)s трильйони"
 msgstr[2] "%(value)s трильйонів"
 
-#: templatetags/humanize.py:65
+#: templatetags/humanize.py:66
 #, python-format
 msgid "%(value).1f quadrillion"
 msgid_plural "%(value).1f quadrillion"
@@ -104,7 +104,7 @@ msgstr[0] "%(value).1f квадрильйон"
 msgstr[1] "%(value).1f квадрильйони"
 msgstr[2] "%(value).1f квадрильйонів"
 
-#: templatetags/humanize.py:66
+#: templatetags/humanize.py:67
 #, python-format
 msgid "%(value)s quadrillion"
 msgid_plural "%(value)s quadrillion"
@@ -112,7 +112,7 @@ msgstr[0] "%(value)s квадрильйон"
 msgstr[1] "%(value)s квадрильйони"
 msgstr[2] "%(value)s квадрильйонів"
 
-#: templatetags/humanize.py:69
+#: templatetags/humanize.py:70
 #, python-format
 msgid "%(value).1f quintillion"
 msgid_plural "%(value).1f quintillion"
@@ -120,7 +120,7 @@ msgstr[0] "%(value).1f квінтильйон"
 msgstr[1] "%(value).1f квінтильйона"
 msgstr[2] "%(value).1f квінтильйонів"
 
-#: templatetags/humanize.py:70
+#: templatetags/humanize.py:71
 #, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
@@ -128,7 +128,7 @@ msgstr[0] "%(value)s квінтильйон"
 msgstr[1] "%(value)s квінтильйона"
 msgstr[2] "%(value)s квінтильйонів"
 
-#: templatetags/humanize.py:73
+#: templatetags/humanize.py:74
 #, python-format
 msgid "%(value).1f sextillion"
 msgid_plural "%(value).1f sextillion"
@@ -136,7 +136,7 @@ msgstr[0] "%(value).1f секстильйон"
 msgstr[1] "%(value).1f секстильйона"
 msgstr[2] "%(value).1f секстильйонів"
 
-#: templatetags/humanize.py:74
+#: templatetags/humanize.py:75
 #, python-format
 msgid "%(value)s sextillion"
 msgid_plural "%(value)s sextillion"
@@ -144,7 +144,7 @@ msgstr[0] "%(value)s секстильйон"
 msgstr[1] "%(value)s секстильйона"
 msgstr[2] "%(value)s секстильйонів"
 
-#: templatetags/humanize.py:77
+#: templatetags/humanize.py:78
 #, python-format
 msgid "%(value).1f septillion"
 msgid_plural "%(value).1f septillion"
@@ -152,7 +152,7 @@ msgstr[0] "%(value).1f септильйон"
 msgstr[1] "%(value).1f септильйона"
 msgstr[2] "%(value).1f септильйонів"
 
-#: templatetags/humanize.py:78
+#: templatetags/humanize.py:79
 #, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
@@ -160,7 +160,7 @@ msgstr[0] "%(value)s септильйон"
 msgstr[1] "%(value)s септильйона"
 msgstr[2] "%(value)s септильйонів"
 
-#: templatetags/humanize.py:81
+#: templatetags/humanize.py:82
 #, python-format
 msgid "%(value).1f octillion"
 msgid_plural "%(value).1f octillion"
@@ -168,7 +168,7 @@ msgstr[0] "%(value).1f октильйон"
 msgstr[1] "%(value).1f октильйони"
 msgstr[2] "%(value).1f октильйонів"
 
-#: templatetags/humanize.py:82
+#: templatetags/humanize.py:83
 #, python-format
 msgid "%(value)s octillion"
 msgid_plural "%(value)s octillion"
@@ -176,7 +176,7 @@ msgstr[0] "%(value)s октильйон"
 msgstr[1] "%(value)s октильйони"
 msgstr[2] "%(value)s октильйонів"
 
-#: templatetags/humanize.py:85
+#: templatetags/humanize.py:86
 #, python-format
 msgid "%(value).1f nonillion"
 msgid_plural "%(value).1f nonillion"
@@ -184,7 +184,7 @@ msgstr[0] "%(value).1f нонільйон"
 msgstr[1] "%(value).1f нонільйони"
 msgstr[2] "%(value).1f нонільйонів"
 
-#: templatetags/humanize.py:86
+#: templatetags/humanize.py:87
 #, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
@@ -192,7 +192,7 @@ msgstr[0] "%(value)s нонільйон"
 msgstr[1] "%(value)s нонільйони"
 msgstr[2] "%(value)s нонільйонів"
 
-#: templatetags/humanize.py:89
+#: templatetags/humanize.py:90
 #, python-format
 msgid "%(value).1f decillion"
 msgid_plural "%(value).1f decillion"
@@ -200,7 +200,7 @@ msgstr[0] "%(value).1f децильйон"
 msgstr[1] "%(value).1f децильйони"
 msgstr[2] "%(value).1f децильйонів"
 
-#: templatetags/humanize.py:90
+#: templatetags/humanize.py:91
 #, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
@@ -208,7 +208,7 @@ msgstr[0] "%(value)s децильйон"
 msgstr[1] "%(value)s децильйони"
 msgstr[2] "%(value)s децильйонів"
 
-#: templatetags/humanize.py:93
+#: templatetags/humanize.py:94
 #, python-format
 msgid "%(value).1f googol"
 msgid_plural "%(value).1f googol"
@@ -216,7 +216,7 @@ msgstr[0] "%(value).1f гугол"
 msgstr[1] "%(value).1f гуголі"
 msgstr[2] "%(value).1f гуголів"
 
-#: templatetags/humanize.py:94
+#: templatetags/humanize.py:95
 #, python-format
 msgid "%(value)s googol"
 msgid_plural "%(value)s googol"
@@ -224,53 +224,53 @@ msgstr[0] "%(value)s гугол"
 msgstr[1] "%(value)s гуголі"
 msgstr[2] "%(value)s гуголів"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "one"
 msgstr "один"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "two"
 msgstr "два"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "three"
 msgstr "три"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "four"
 msgstr "чотири"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "five"
 msgstr "п'ять"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "six"
 msgstr "шість"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "seven"
 msgstr "сім"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "eight"
 msgstr "вісім"
 
-#: templatetags/humanize.py:143
+#: templatetags/humanize.py:144
 msgid "nine"
 msgstr "дев'ять"
 
-#: templatetags/humanize.py:185
+#: templatetags/humanize.py:190
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr "%(delta)s тому"
 
-#: templatetags/humanize.py:188 templatetags/humanize.py:210
+#: templatetags/humanize.py:193 templatetags/humanize.py:215
 msgid "now"
 msgstr "зараз"
 
-#: templatetags/humanize.py:191
+#: templatetags/humanize.py:196
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
@@ -278,7 +278,7 @@ msgstr[0] "секунду тому"
 msgstr[1] "%(count)s секунди тому"
 msgstr[2] "%(count)s секунд тому"
 
-#: templatetags/humanize.py:196
+#: templatetags/humanize.py:201
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
@@ -286,7 +286,7 @@ msgstr[0] "хвилину тому"
 msgstr[1] "%(count)s хвилини тому"
 msgstr[2] "%(count)s хвилин тому"
 
-#: templatetags/humanize.py:201
+#: templatetags/humanize.py:206
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
@@ -294,13 +294,13 @@ msgstr[0] "годину тому"
 msgstr[1] "%(count)s години тому"
 msgstr[2] "%(count)s годин тому"
 
-#: templatetags/humanize.py:207
+#: templatetags/humanize.py:212
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "через %(delta)s"
 
-#: templatetags/humanize.py:213
+#: templatetags/humanize.py:218
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
@@ -308,7 +308,7 @@ msgstr[0] "через секунду"
 msgstr[1] "через %(count)s секунди"
 msgstr[2] "через %(count)s секунд"
 
-#: templatetags/humanize.py:218
+#: templatetags/humanize.py:223
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
@@ -316,7 +316,7 @@ msgstr[0] "через хвилину"
 msgstr[1] "через %(count)s хвилини"
 msgstr[2] "через %(count)s хвилин"
 
-#: templatetags/humanize.py:223
+#: templatetags/humanize.py:228
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"

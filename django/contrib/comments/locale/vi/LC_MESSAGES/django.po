@@ -7,64 +7,64 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Tran <hongdiepkien@gmail.com>\n"
-"Language-Team: Vietnamese (http://www.transifex.net/projects/p/django/"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
-"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Nội dung"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Siêu dữ liệu"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] ""
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "Đặt cờ những nhận xét được chọn"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "phê duyệt"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "Phê duyệt những nhận xét đã chọn"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "loại bỏ"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Loại bỏ nhận xét được chọn"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr ""
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Nhận xét cuối cùng trên %(site_name)s"
@@ -100,56 +100,56 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Bất kì bình luận nào bạn nhập vào đây cũng sẽ bị coi là thư rác"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "kiểu nội dung"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "object ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "Người dùng"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "Tên người sử dụng"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "Địa chỉ email của người sử dụng"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "Đường dẫn URL của người sử dụng"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "Bình luận"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "Ngày/giờ đã đăng kí"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "Địa chỉ IP"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "Được phổ biến"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Không đánh dấu vào hộp này để gỡ bình luận ra khỏi Site"
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "Bị xóa"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -157,11 +157,11 @@ msgstr ""
 "Đánh dấu vào hộp này nếu bình luận không thích hợp. Tin nhắn \"Bình luận đã "
 "bị xóa\" sẽ thay thế vào đó."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "những nhận xét"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -169,7 +169,7 @@ msgstr ""
 "nhận xét này đã được đăng bởi một người dùng xác thực và do đó đặt tên cho "
 "là chỉ đọc."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -177,7 +177,7 @@ msgstr ""
 "nhận xét này đã được đăng bởi một người dùng xác thực và do đó email là chỉ "
 "đọc."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -190,19 +190,19 @@ msgstr ""
 "%(comment)s\n"
 "http://%(domain)s%(url)s "
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr ""
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "ngày"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "cờ nhận xét"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr ""
 

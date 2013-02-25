@@ -8,22 +8,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-15 13:39+0000\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
 "Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
-"Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
 "hi/)\n"
-"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "उन्नत विकल्प"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
 msgstr "URL"
 
@@ -51,23 +51,23 @@ msgstr "यूआरएल से अनुगामी स्लैश गा�
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "%(site)s साइट के लिए %(url)s यूआरएल के साथ चपटापृष्ट मौजूद है."
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "शीर्षक"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "विषय सूची"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
 msgstr "टिप्पणियां सक्षम करें"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "सांचे का नाम"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -75,18 +75,22 @@ msgstr ""
 "उदाहरण: 'flatpages/contact_page.html'. यदि यह जिक्र नहीं किया तो यह प्रणाली "
 "'flatpages/default.html' का प्रयोग करेगी. ."
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
 msgstr "पंजीकरण आवश्यक"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "अगर इस जाँच की है, केवल लॉग इन करने वालों के लिए पृष्ठ देखने में सक्षम हो जाएगा."
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "चपटा पृष्ट"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "चपटे पृष्ट"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "यह क्षेत्र अपेक्षित हैं"

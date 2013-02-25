@@ -6,28 +6,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:38+0100\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Albanian (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-11-25 19:30+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
-"Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
-msgstr ""
+msgstr "hapi i parë"
 
 #: templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
-msgstr ""
+msgstr "hapi i mëparshëm"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr ""
+msgstr "parashtroje"
 
 #: wizard/legacy.py:159
 msgid ""

@@ -1,21 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012.
 # Sagar Chalise <chalisesagar@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: sagarchalise <chalisesagar@gmail.com>\n"
-"Language-Team: Nepali (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-09-29 04:33+0000\n"
+"Last-Translator: Paras Nath Chaudhary <opnchaudhary@gmail.com>\n"
+"Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
-"Language: ne\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ne\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: models.py:38
 msgid "session key"
@@ -23,7 +24,7 @@ msgstr "अवधि साँचो"
 
 #: models.py:40
 msgid "session data"
-msgstr "अवधि मिति"
+msgstr "अवधि विवरण"
 
 #: models.py:41
 msgid "expire date"

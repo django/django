@@ -3,20 +3,21 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#   <julenx@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 14:15+0000\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Basque (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2012-07-10 08:52+0000\n"
+"Last-Translator: julen <julenx@gmail.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
-"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -57,7 +58,7 @@ msgstr "Aukeratu"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
-msgstr "Ezabatu"
+msgstr "Kendu"
 
 #: static/admin/js/SelectFilter2.js:75
 #, c-format
