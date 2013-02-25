@@ -6,6 +6,8 @@ from __future__ import absolute_import, unicode_literals
 import inspect
 import os
 import sys
+import tempfile
+import shutil
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,10 +18,12 @@ from django.test.utils import (override_settings, setup_test_template_loader,
 from django.utils.encoding import force_text
 from django.views.debug import ExceptionReporter
 
+
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller)
+from django.utils.unittest import skipIf
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
@@ -77,9 +81,41 @@ class DebugViewTests(TestCase):
                         raising_loc)
 
     def test_template_loader_postmortem(self):
-        response = self.client.get(reverse('raises_template_does_not_exist'))
-        template_path = os.path.join('templates', 'i_dont_exist.html')
-        self.assertContains(response, template_path, status_code=500)
+        template_name = "notfound.html"
+        tempdir = os.path.abspath(tempfile.mkdtemp(__name__))
+        try:
+            template_path = os.path.join(tempdir, template_name)
+            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+                response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
+            self.assertContains(response, "%s (File does not exist)" % template_path, status_code=500, count=1)
+        finally:
+            shutil.rmtree(tempdir)
+
+    @skipIf(sys.platform == "win32", "Python on Windows doesn't have working os.chmod() and os.access().")
+    def test_template_loader_postmortem_notreadable(self):
+        template_name = "unreadable.html"
+        tempdir = os.path.abspath(tempfile.mkdtemp(__name__))
+        try:
+            template_path = os.path.join(tempdir, template_name)
+            open(template_path, "w+").close()
+            os.chmod(template_path, 0o0222)
+            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+                response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
+            self.assertContains(response, "%s (File is not readable)" % template_path, status_code=500, count=1)
+        finally:
+            shutil.rmtree(tempdir)
+
+    def test_template_loader_postmortem_notafile(self):
+        template_name = "directory.html"
+        tempdir = os.path.abspath(tempfile.mkdtemp(__name__))
+        try:
+            template_path = os.path.join(tempdir, template_name)
+            os.mkdir(template_path)
+            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+                response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
+            self.assertContains(response, "%s (Not a file)" % template_path, status_code=500, count=1)
+        finally:
+            shutil.rmtree(tempdir)
 
 
 class ExceptionReporterTests(TestCase):
