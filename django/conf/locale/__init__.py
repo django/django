@@ -4,6 +4,12 @@ from __future__ import unicode_literals
 # inside a sentence in your language.
 
 LANG_INFO = {
+    'af': {
+        'bidi': False,
+        'code': 'af',
+        'name': 'Afrikaans',
+        'name_local': 'Afrikaans',
+    },
     'ar': {
         'bidi': True,
         'code': 'ar',
@@ -16,6 +22,12 @@ LANG_INFO = {
         'name': 'Azerbaijani',
         'name_local': 'az\u0259rbaycan dili',
     },
+    'be': {
+        'bidi': False,
+        'code': 'be',
+        'name': 'Belarusian',
+        'name_local': '\u0431\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f',
+    },
     'bg': {
         'bidi': False,
         'code': 'bg',
@@ -27,6 +39,12 @@ LANG_INFO = {
         'code': 'bn',
         'name': 'Bengali',
         'name_local': '\u09ac\u09be\u0982\u09b2\u09be',
+    },
+    'br': {
+        'bidi': False,
+        'code': 'br',
+        'name': 'Breton',
+        'name_local': 'brezhoneg',
     },
     'bs': {
         'bidi': False,
@@ -112,6 +130,12 @@ LANG_INFO = {
         'name': 'Nicaraguan Spanish',
         'name_local': 'espa\xf1ol de Nicaragua',
     },
+    'es-ve': {
+        'bidi': False,
+        'code': 'es-ve',
+        'name': 'Venezuelan Spanish',
+        'name_local': 'espa\xf1ol de Venezuela',
+    },
     'et': {
         'bidi': False,
         'code': 'et',
@@ -184,6 +208,12 @@ LANG_INFO = {
         'name': 'Hungarian',
         'name_local': 'Magyar',
     },
+    'ia': {
+        'bidi': False,
+        'code': 'ia',
+        'name': 'Interlingua',
+        'name_local': 'Interlingua',
+    },
     'id': {
         'bidi': False,
         'code': 'id',
@@ -237,6 +267,12 @@ LANG_INFO = {
         'code': 'ko',
         'name': 'Korean',
         'name_local': '\ud55c\uad6d\uc5b4',
+    },
+    'lb': {
+        'bidi': False,
+        'code': 'lb',
+        'name': 'Luxembourgish',
+        'name_local': 'L\u00ebtzebuergesch',
     },
     'lt': {
         'bidi': False,
@@ -405,6 +441,12 @@ LANG_INFO = {
         'code': 'tt',
         'name': 'Tatar',
         'name_local': '\u0422\u0430\u0442\u0430\u0440\u0447\u0430',
+    },
+    'udm': {
+        'bidi': False,
+        'code': 'udm',
+        'name': 'Udmurt',
+        'name_local': '\u0423\u0434\u043c\u0443\u0440\u0442',
     },
     'uk': {
         'bidi': False,

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:55+0200\n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -14,286 +14,314 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: conf/global_settings.py:48
-msgid "Arabic"
+msgid "Afrikaans"
 msgstr ""
 
 #: conf/global_settings.py:49
-msgid "Azerbaijani"
+msgid "Arabic"
 msgstr ""
 
 #: conf/global_settings.py:50
-msgid "Bulgarian"
+msgid "Azerbaijani"
 msgstr ""
 
 #: conf/global_settings.py:51
-msgid "Bengali"
+msgid "Bulgarian"
 msgstr ""
 
 #: conf/global_settings.py:52
-msgid "Bosnian"
+msgid "Belarusian"
 msgstr ""
 
 #: conf/global_settings.py:53
-msgid "Catalan"
+msgid "Bengali"
 msgstr ""
 
 #: conf/global_settings.py:54
-msgid "Czech"
+msgid "Breton"
 msgstr ""
 
 #: conf/global_settings.py:55
-msgid "Welsh"
+msgid "Bosnian"
 msgstr ""
 
 #: conf/global_settings.py:56
-msgid "Danish"
+msgid "Catalan"
 msgstr ""
 
 #: conf/global_settings.py:57
-msgid "German"
+msgid "Czech"
 msgstr ""
 
 #: conf/global_settings.py:58
-msgid "Greek"
+msgid "Welsh"
 msgstr ""
 
 #: conf/global_settings.py:59
-msgid "English"
+msgid "Danish"
 msgstr ""
 
 #: conf/global_settings.py:60
-msgid "British English"
+msgid "German"
 msgstr ""
 
 #: conf/global_settings.py:61
-msgid "Esperanto"
+msgid "Greek"
 msgstr ""
 
 #: conf/global_settings.py:62
-msgid "Spanish"
+msgid "English"
 msgstr ""
 
 #: conf/global_settings.py:63
-msgid "Argentinian Spanish"
+msgid "British English"
 msgstr ""
 
 #: conf/global_settings.py:64
-msgid "Mexican Spanish"
+msgid "Esperanto"
 msgstr ""
 
 #: conf/global_settings.py:65
-msgid "Nicaraguan Spanish"
+msgid "Spanish"
 msgstr ""
 
 #: conf/global_settings.py:66
-msgid "Estonian"
+msgid "Argentinian Spanish"
 msgstr ""
 
 #: conf/global_settings.py:67
-msgid "Basque"
+msgid "Mexican Spanish"
 msgstr ""
 
 #: conf/global_settings.py:68
-msgid "Persian"
+msgid "Nicaraguan Spanish"
 msgstr ""
 
 #: conf/global_settings.py:69
-msgid "Finnish"
+msgid "Venezuelan Spanish"
 msgstr ""
 
 #: conf/global_settings.py:70
-msgid "French"
+msgid "Estonian"
 msgstr ""
 
 #: conf/global_settings.py:71
-msgid "Frisian"
+msgid "Basque"
 msgstr ""
 
 #: conf/global_settings.py:72
-msgid "Irish"
+msgid "Persian"
 msgstr ""
 
 #: conf/global_settings.py:73
-msgid "Galician"
+msgid "Finnish"
 msgstr ""
 
 #: conf/global_settings.py:74
-msgid "Hebrew"
+msgid "French"
 msgstr ""
 
 #: conf/global_settings.py:75
-msgid "Hindi"
+msgid "Frisian"
 msgstr ""
 
 #: conf/global_settings.py:76
-msgid "Croatian"
+msgid "Irish"
 msgstr ""
 
 #: conf/global_settings.py:77
-msgid "Hungarian"
+msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:78
-msgid "Indonesian"
+msgid "Hebrew"
 msgstr ""
 
 #: conf/global_settings.py:79
-msgid "Icelandic"
+msgid "Hindi"
 msgstr ""
 
 #: conf/global_settings.py:80
-msgid "Italian"
+msgid "Croatian"
 msgstr ""
 
 #: conf/global_settings.py:81
-msgid "Japanese"
+msgid "Hungarian"
 msgstr ""
 
 #: conf/global_settings.py:82
-msgid "Georgian"
+msgid "Interlingua"
 msgstr ""
 
 #: conf/global_settings.py:83
-msgid "Kazakh"
+msgid "Indonesian"
 msgstr ""
 
 #: conf/global_settings.py:84
-msgid "Khmer"
+msgid "Icelandic"
 msgstr ""
 
 #: conf/global_settings.py:85
-msgid "Kannada"
+msgid "Italian"
 msgstr ""
 
 #: conf/global_settings.py:86
-msgid "Korean"
+msgid "Japanese"
 msgstr ""
 
 #: conf/global_settings.py:87
-msgid "Lithuanian"
+msgid "Georgian"
 msgstr ""
 
 #: conf/global_settings.py:88
-msgid "Latvian"
+msgid "Kazakh"
 msgstr ""
 
 #: conf/global_settings.py:89
-msgid "Macedonian"
+msgid "Khmer"
 msgstr ""
 
 #: conf/global_settings.py:90
-msgid "Malayalam"
+msgid "Kannada"
 msgstr ""
 
 #: conf/global_settings.py:91
-msgid "Mongolian"
+msgid "Korean"
 msgstr ""
 
 #: conf/global_settings.py:92
-msgid "Norwegian Bokmal"
+msgid "Luxembourgish"
 msgstr ""
 
 #: conf/global_settings.py:93
-msgid "Nepali"
+msgid "Lithuanian"
 msgstr ""
 
 #: conf/global_settings.py:94
-msgid "Dutch"
+msgid "Latvian"
 msgstr ""
 
 #: conf/global_settings.py:95
-msgid "Norwegian Nynorsk"
+msgid "Macedonian"
 msgstr ""
 
 #: conf/global_settings.py:96
-msgid "Punjabi"
+msgid "Malayalam"
 msgstr ""
 
 #: conf/global_settings.py:97
-msgid "Polish"
+msgid "Mongolian"
 msgstr ""
 
 #: conf/global_settings.py:98
-msgid "Portuguese"
+msgid "Norwegian Bokmal"
 msgstr ""
 
 #: conf/global_settings.py:99
-msgid "Brazilian Portuguese"
+msgid "Nepali"
 msgstr ""
 
 #: conf/global_settings.py:100
-msgid "Romanian"
+msgid "Dutch"
 msgstr ""
 
 #: conf/global_settings.py:101
-msgid "Russian"
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: conf/global_settings.py:102
-msgid "Slovak"
+msgid "Punjabi"
 msgstr ""
 
 #: conf/global_settings.py:103
-msgid "Slovenian"
+msgid "Polish"
 msgstr ""
 
 #: conf/global_settings.py:104
-msgid "Albanian"
+msgid "Portuguese"
 msgstr ""
 
 #: conf/global_settings.py:105
-msgid "Serbian"
+msgid "Brazilian Portuguese"
 msgstr ""
 
 #: conf/global_settings.py:106
-msgid "Serbian Latin"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:107
-msgid "Swedish"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:108
-msgid "Swahili"
+msgid "Slovak"
 msgstr ""
 
 #: conf/global_settings.py:109
-msgid "Tamil"
+msgid "Slovenian"
 msgstr ""
 
 #: conf/global_settings.py:110
-msgid "Telugu"
+msgid "Albanian"
 msgstr ""
 
 #: conf/global_settings.py:111
-msgid "Thai"
+msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:112
-msgid "Turkish"
+msgid "Serbian Latin"
 msgstr ""
 
 #: conf/global_settings.py:113
-msgid "Tatar"
+msgid "Swedish"
 msgstr ""
 
 #: conf/global_settings.py:114
-msgid "Ukrainian"
+msgid "Swahili"
 msgstr ""
 
 #: conf/global_settings.py:115
-msgid "Urdu"
+msgid "Tamil"
 msgstr ""
 
 #: conf/global_settings.py:116
-msgid "Vietnamese"
+msgid "Telugu"
 msgstr ""
 
 #: conf/global_settings.py:117
-msgid "Simplified Chinese"
+msgid "Thai"
 msgstr ""
 
 #: conf/global_settings.py:118
+msgid "Turkish"
+msgstr ""
+
+#: conf/global_settings.py:119
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:120
+msgid "Udmurt"
+msgstr ""
+
+#: conf/global_settings.py:121
+msgid "Ukrainian"
+msgstr ""
+
+#: conf/global_settings.py:122
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:123
+msgid "Vietnamese"
+msgstr ""
+
+#: conf/global_settings.py:124
+msgid "Simplified Chinese"
+msgstr ""
+
+#: conf/global_settings.py:125
 msgid "Traditional Chinese"
 msgstr ""
 
@@ -355,16 +383,16 @@ msgid ""
 "%(show_value)d)."
 msgstr ""
 
-#: db/models/base.py:843
+#: db/models/base.py:857
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 
-#: db/models/base.py:866 forms/models.py:573
+#: db/models/base.py:880 forms/models.py:573
 msgid "and"
 msgstr ""
 
-#: db/models/base.py:867 db/models/fields/__init__.py:70
+#: db/models/base.py:881 db/models/fields/__init__.py:70
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
@@ -536,37 +564,32 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: db/models/fields/files.py:211
-#, python-format
-msgid "Filename is %(extra)d characters too long."
-msgstr ""
-
-#: db/models/fields/files.py:221
+#: db/models/fields/files.py:216
 msgid "File"
 msgstr ""
 
-#: db/models/fields/files.py:347
+#: db/models/fields/files.py:323
 msgid "Image"
 msgstr ""
 
-#: db/models/fields/related.py:950
+#: db/models/fields/related.py:979
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
 
-#: db/models/fields/related.py:952
+#: db/models/fields/related.py:981
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: db/models/fields/related.py:1082
+#: db/models/fields/related.py:1111
 msgid "One-to-one relationship"
 msgstr ""
 
-#: db/models/fields/related.py:1149
+#: db/models/fields/related.py:1178
 msgid "Many-to-many relationship"
 msgstr ""
 
-#: db/models/fields/related.py:1174
+#: db/models/fields/related.py:1203
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -647,15 +670,15 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: forms/fields.py:747 forms/fields.py:835 forms/models.py:999
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr ""
 
-#: forms/formsets.py:323 forms/formsets.py:325
+#: forms/formsets.py:324 forms/formsets.py:326
 msgid "Order"
 msgstr ""
 
-#: forms/formsets.py:327
+#: forms/formsets.py:328
 msgid "Delete"
 msgstr ""
 
@@ -680,20 +703,20 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: forms/models.py:849
+#: forms/models.py:852
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:910
+#: forms/models.py:913
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1000
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1002
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
@@ -717,15 +740,15 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: forms/widgets.py:591
+#: forms/widgets.py:594
 msgid "Unknown"
 msgstr ""
 
-#: forms/widgets.py:592
+#: forms/widgets.py:595
 msgid "Yes"
 msgstr ""
 
-#: forms/widgets.py:593
+#: forms/widgets.py:596
 msgid "No"
 msgstr ""
 
@@ -1126,11 +1149,11 @@ msgstr ""
 msgid ", %(number)d %(type)s"
 msgstr ""
 
-#: views/static.py:55
+#: views/static.py:56
 msgid "Directory indexes are not allowed here."
 msgstr ""
 
-#: views/static.py:57
+#: views/static.py:58
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr ""
@@ -1178,16 +1201,16 @@ msgstr ""
 msgid "No %(verbose_name)s found matching the query"
 msgstr ""
 
-#: views/generic/list.py:49
+#: views/generic/list.py:51
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
 
-#: views/generic/list.py:54
+#: views/generic/list.py:56
 #, python-format
-msgid "Invalid page (%(page_number)s)"
+msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
-#: views/generic/list.py:134
+#: views/generic/list.py:137
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr ""
