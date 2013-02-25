@@ -17,7 +17,7 @@ class BaseCommentNode(template.Node):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse get_comment_list/count/form and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
@@ -146,7 +146,7 @@ class RenderCommentFormNode(CommentFormNode):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_form and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
@@ -182,7 +182,7 @@ class RenderCommentListNode(CommentListNode):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_list and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
