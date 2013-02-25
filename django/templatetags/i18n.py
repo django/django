@@ -3,7 +3,7 @@ import re
 
 from django.template import (Node, Variable, TemplateSyntaxError,
     TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
-from django.template.base import _render_value_in_context
+from django.template.base import render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import six
 from django.utils import translation
@@ -87,7 +87,7 @@ class TranslateNode(Node):
             self.filter_expression.var.message_context = (
                 self.message_context.resolve(context))
         output = self.filter_expression.resolve(context)
-        value = _render_value_in_context(output, context)
+        value = render_value_in_context(output, context)
         if self.asvar:
             context[self.asvar] = value
             return ''
@@ -143,7 +143,7 @@ class BlockTranslateNode(Node):
                 result = translation.pgettext(message_context, singular)
             else:
                 result = translation.ugettext(singular)
-        data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
+        data = dict([(v, render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
         try:
             result = result % data
