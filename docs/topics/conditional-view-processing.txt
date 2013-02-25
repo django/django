@@ -27,7 +27,7 @@ instead of a full response, telling the client that nothing has changed.
 When you need more fine-grained control you may use per-view conditional
 processing functions.
 
-.. conditional-decorators:
+.. _conditional-decorators:
 
 The ``condition`` decorator
 ===========================
