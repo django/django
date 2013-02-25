@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 #   <rafi.tahmid@gmail.com>, 2012.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-10-17 09:16+0000\n"
-"Last-Translator: tahmidrafi <rafi.tahmid@gmail.com>\n"
+"PO-Revision-Date: 2013-02-20 14:00+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,15 +22,15 @@ msgstr ""
 
 #: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr ""
+msgstr "সসসস অথবা এসসসসএএএ আকারে পোস্টাল কোড লিখুন।"
 
 #: ar/forms.py:52 br/forms.py:95 br/forms.py:134 pe/forms.py:27 pe/forms.py:55
 msgid "This field requires only numbers."
-msgstr ""
+msgstr "এই এলাকায় কেবল সংখ্যা দেওয়া যাবে।"
 
 #: ar/forms.py:53
 msgid "This field requires 7 or 8 digits."
-msgstr ""
+msgstr "এই এলাকায় কেবল সংখ্যা দেওয়া যাবে।"
 
 #: ar/forms.py:82
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
@@ -44,31 +46,31 @@ msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
-msgstr ""
+msgstr "বার্গেনল্যাণ্ড"
 
 #: at/at_states.py:6
 msgid "Carinthia"
-msgstr ""
+msgstr "ক্যারিন্থিয়া"
 
 #: at/at_states.py:7
 msgid "Lower Austria"
-msgstr ""
+msgstr "নিম্ন অস্ট্রিয়া"
 
 #: at/at_states.py:8
 msgid "Upper Austria"
-msgstr ""
+msgstr "উচ্চ অস্ট্রিয়া"
 
 #: at/at_states.py:9
 msgid "Salzburg"
-msgstr ""
+msgstr "সলৎবুর্গ"
 
 #: at/at_states.py:10
 msgid "Styria"
-msgstr ""
+msgstr "সিরিয়া"
 
 #: at/at_states.py:11
 msgid "Tyrol"
-msgstr ""
+msgstr "টাইরোল"
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
@@ -80,7 +82,7 @@ msgstr "ভিয়েনা"
 
 #: at/forms.py:22 ch/forms.py:22 no/forms.py:19
 msgid "Enter a zip code in the format XXXX."
-msgstr ""
+msgstr "নননন আকারে জীপ কোড লিখুন।"
 
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."

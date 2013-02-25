@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Besnik <besnik@programeshqip.org>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
+"PO-Revision-Date: 2013-02-20 08:30+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
@@ -79,7 +80,7 @@ msgstr "Ripohim fjalëkalimi"
 
 #: forms.py:81
 msgid "Enter the same password as above, for verification."
-msgstr "Jepni të njëjtin fjalëkalim si më sipër, për verifikim."
+msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
 
 #: forms.py:122
 msgid ""

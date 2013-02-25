@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 #   <rafi.tahmid@gmail.com>, 2012.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: tahmidrafi <rafi.tahmid@gmail.com>\n"
+"PO-Revision-Date: 2013-02-08 15:20+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -190,4 +192,4 @@ msgstr "বুলিয়ান (হয় True অথবা False)"
 #: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "ফিল্ডের ধরণ: %(field_type)s"

@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 #   <rafi.tahmid@gmail.com>, 2012.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"PO-Revision-Date: 2013-02-20 15:10+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +37,7 @@ msgstr "আপনি কি নিশ্চিত?"
 #: actions.py:83
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "চিহ্নিত অংশটি %(verbose_name_plural)s মুছে ফেলুন"
 
 #: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
@@ -86,7 +88,7 @@ msgstr "অনুগ্রহ করে পুনরায় প্রবেশ �
 
 #: helpers.py:23
 msgid "Action:"
-msgstr ""
+msgstr "কাজ:"
 
 #: models.py:24
 msgid "action time"
@@ -133,7 +135,7 @@ msgstr "\"%(object)s\" ডিলিট করা হয়েছে"
 
 #: models.py:54
 msgid "LogEntry Object"
-msgstr ""
+msgstr "লগ-এন্ট্রি দ্রব্য"
 
 #: options.py:156 options.py:172
 msgid "None"
@@ -210,11 +212,11 @@ msgstr "%(name)s \"%(obj)s\" সফলতার সাথে পরিবর্�
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
+msgstr "কাজ করার আগে বস্তুগুলিকে অবশ্যই চিহ্নিত করতে হবে। কোনো বস্তু পরিবর্তিত হয়নি।"
 
 #: options.py:970
 msgid "No action selected."
-msgstr ""
+msgstr "কোনো কাজ "
 
 #: options.py:1050
 #, python-format
@@ -297,11 +299,11 @@ msgstr "আরেকটি যোগ করুন"
 
 #: widgets.py:316
 msgid "Currently:"
-msgstr ""
+msgstr "বর্তমান অবস্থা:"
 
 #: widgets.py:317
 msgid "Change:"
-msgstr ""
+msgstr "পরিবর্তন:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -348,7 +350,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "চিহ্নিত কাজটি শুরু করুন"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -356,7 +358,7 @@ msgstr "যান"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "সকল পৃষ্ঠার দ্রব্য পছন্দ করতে এখানে ক্লিক করুন"
 
 #: templates/admin/actions.html:11
 #, python-format
@@ -365,7 +367,7 @@ msgstr ""
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "চিহ্নিত অংশের চিহ্ন মুছে ফেলুন"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
@@ -438,7 +440,7 @@ msgstr "ফিল্টার"
 
 #: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
-msgstr ""
+msgstr "ক্রমানুসারে সাজানো থেকে বিরত হোন"
 
 #: templates/admin/change_list_results.html:18
 #, python-format
@@ -447,7 +449,7 @@ msgstr ""
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "ক্রমানুসারে সাজানো চালু করুন/ বন্ধ করুন"
 
 #: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
@@ -487,7 +489,7 @@ msgstr "হ্যা়ঁ, আমি নিশ্চিত"
 
 #: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "একাধিক জিনিস মুছে ফেলুন"
 
 #: templates/admin/delete_selected_confirmation.html:17
 #, python-format
@@ -543,7 +545,7 @@ msgstr "কিছুই পাওয়া যায়নি"
 
 #: templates/admin/index.html:76
 msgid "Unknown content"
-msgstr ""
+msgstr "অজানা বিষয়"
 
 #: templates/admin/invalid_setup.html:12
 msgid ""
@@ -803,7 +805,7 @@ msgstr ""
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "ইমেইল ঠিকানা:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
@@ -815,7 +817,7 @@ msgstr "সকল তারিখ"
 
 #: views/main.py:33
 msgid "(None)"
-msgstr ""
+msgstr "(কিছুই না)"
 
 #: views/main.py:76
 #, python-format

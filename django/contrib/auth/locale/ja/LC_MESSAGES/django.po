@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Shinya Okano <tokibito@gmail.com>, 2012.
+# Shinya Okano <tokibito@gmail.com>, 2012-2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Yoichi Fujimoto <wozozo@gmail.com>\n"
+"PO-Revision-Date: 2013-02-20 06:52+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -87,9 +88,9 @@ msgid ""
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
-"生のパスワードが格納されているので、このユーザーのパスワードは参照できません"
-"が、 <a href=\"password/\">このフォーム</a> を使用してパスワードを変更できま"
-"す 。"
+"生のパスワードが格納されていないので、このユーザーのパスワードは参照できませ"
+"んが、 <a href=\"password/\">このフォーム</a> を使用してパスワードを変更でき"
+"ます 。"
 
 #: forms.py:151
 #, python-format

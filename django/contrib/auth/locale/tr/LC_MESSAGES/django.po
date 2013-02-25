@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# Gökmen Görgen <gokmen@alageek.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Metin Amiroff <amiroff@gmail.com>, 2012.
 # Murat Çorlu <muratcorlu@gmail.com>, 2012.
@@ -10,8 +12,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Metin Amiroff <amiroff@gmail.com>\n"
+"PO-Revision-Date: 2013-02-23 14:50+0000\n"
+"Last-Translator: Gökmen Görgen <gokmen@alageek.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -99,6 +101,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Lütfen %(username)s için geçerli parolayı giriniz. Tüm alanlar büyük/küçük "
+"harfe duyarlıdır."
 
 #: forms.py:153
 msgid ""

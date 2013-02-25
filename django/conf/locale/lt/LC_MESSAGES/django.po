@@ -5,6 +5,7 @@
 # Kostas  <tamosiunas@gmail.com>, 2011.
 # lauris <lauris@runbox.com>, 2011.
 #   <naktinis@gmail.com>, 2012.
+# Nikolajus Krauklis <nikolajus@gmail.com>, 2013.
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011, 2012.
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012.
 # Simonas Simas <simonas@kazlauskas.me>, 2012.
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: Simonas Kazlauskas <simonas@kazlauskas.me>\n"
+"PO-Revision-Date: 2013-02-23 13:00+0000\n"
+"Last-Translator: Nikolajus Krauklis <nikolajus@gmail.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +28,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikiečių"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -43,7 +44,7 @@ msgstr "Bulgarų"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusų"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -51,7 +52,7 @@ msgstr "Bengalų"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "Breton"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -111,7 +112,7 @@ msgstr "Nikaragvos Ispanijos"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venesuelos Ispanų"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -163,7 +164,7 @@ msgstr "Vengrų"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -203,7 +204,7 @@ msgstr "Korėjiečių"
 
 #: conf/global_settings.py:92
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Liuksemburgiečių"
 
 #: conf/global_settings.py:93
 msgid "Lithuanian"
@@ -315,7 +316,7 @@ msgstr "Totorių"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "Udmurtų"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"
@@ -1259,7 +1260,7 @@ msgstr ""
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Neegzistuojantis puslapis (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:137
 #, python-format

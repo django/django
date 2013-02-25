@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Apostolis Bessas <mpessas+txc@transifex.com>, 2013.
 # Dimitris Glezos <glezos@indifex.com>, 2011.
 # Dimitris Glezos <glezos@transifex.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-07 11:25+0000\n"
-"Last-Translator: Dimitris Glezos <glezos@transifex.com>\n"
+"PO-Revision-Date: 2013-02-23 22:50+0000\n"
+"Last-Translator: Apostolos Mpessas <mpessas+txc@transifex.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -338,7 +339,7 @@ msgstr "Εισάγετε μια έγκυρη τιμή."
 
 #: core/validators.py:104 forms/fields.py:464
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
 
 #: core/validators.py:107 forms/fields.py:1013
 msgid ""
@@ -537,7 +538,7 @@ msgstr "διεύθυνση IP"
 #: db/models/fields/__init__.py:1090
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr ""
+msgstr "Η τιμή του '%s' πρέπει να είναι None, True ή False."
 
 #: db/models/fields/__init__.py:1092
 msgid "Boolean (Either True, False or None)"
@@ -1259,7 +1260,7 @@ msgstr ""
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Άκυρη σελίδα (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:137
 #, python-format

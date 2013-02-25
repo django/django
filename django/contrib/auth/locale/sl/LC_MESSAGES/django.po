@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Jure Cuhalev <gandalf@owca.info>, 2012.
 # Jure Čuhalev <gandalf@owca.info>, 2012.
+#  <zejn@kiberpipa.org>, 2013.
 #   <zejn@kiberpipa.org>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: mateju <>\n"
+"PO-Revision-Date: 2013-02-15 18:00+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
 "MIME-Version: 1.0\n"
@@ -100,6 +102,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Vnesite veljavno %(username)s in geslo. Opomba: obe polji upoštevata "
+"velikost črk."
 
 #: forms.py:153
 msgid ""

@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Denis Darii <sinednx@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Алексей Борискин <sun.void@gmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Denis Darii <sinednx@gmail.com>\n"
+"PO-Revision-Date: 2013-02-05 20:10+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -30,24 +32,24 @@ msgstr "Метаданные"
 #: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "выбран"
-msgstr[1] "выбраны"
-msgstr[2] "выбраны"
+msgstr[0] "помечен"
+msgstr[1] "помечены"
+msgstr[2] "помечены"
 
 #: admin.py:56
 msgid "Flag selected comments"
-msgstr "Отметить выбранные комментарии"
+msgstr "Пометить выбранные комментарии"
 
 #: admin.py:60
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "одобренный"
-msgstr[1] "одобренные"
-msgstr[2] "одобренные"
+msgstr[0] "одобрен"
+msgstr[1] "одобрены"
+msgstr[2] "одобрены"
 
 #: admin.py:61
 msgid "Approve selected comments"
-msgstr "Подтвердить выбранные комментарии"
+msgstr "Одобрить выбранные комментарии"
 
 #: admin.py:65
 msgid "removed"
@@ -65,7 +67,7 @@ msgstr "Удалить выбранные комментарии"
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s комментарий был успешно %(action)s."
-msgstr[1] "%(count)s комментариев были успешно %(action)s."
+msgstr[1] "%(count)s комментария были успешно %(action)s."
 msgstr[2] "%(count)s комментариев были успешно %(action)s."
 
 #: feeds.py:14
@@ -98,9 +100,12 @@ msgstr "Комментарий"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Следите за своими словами! Слово %s не позволенно здесь."
-msgstr[1] "Следите за своими словами! Слова %s не позволенны здесь."
-msgstr[2] "Следите за своими словами! Слова %s не позволенны здесь."
+msgstr[0] ""
+"Следите за своими словами! Употребление слова \"%s\" здесь запрещено."
+msgstr[1] ""
+"Следите за своими словами! Употребление слов \"%s\" здесь запрещено."
+msgstr[2] ""
+"Следите за своими словами! Употребление слов \"%s\" здесь запрещено."
 
 #: forms.py:181 templates/comments/preview.html:16
 msgid "and"
@@ -110,7 +115,7 @@ msgstr "и"
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
-"Если что-нибудь введете в это поле, то ваш комментарий будет признан спамом"
+"Если вы что-то введете в это поле, то ваш комментарий будет помечен как спам"
 
 #: models.py:23
 msgid "content type"
@@ -159,7 +164,7 @@ msgstr "Снимите выделение, чтобы убрать коммен�
 
 #: models.py:67
 msgid "is removed"
-msgstr "удален"
+msgstr "удалён"
 
 #: models.py:68
 msgid ""
@@ -222,7 +227,7 @@ msgstr "отметки комментариев"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr "Подтвердить комментарий"
+msgstr "Одобрить комментарий"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -230,11 +235,11 @@ msgstr "Вы уверены, что хотите опубликовать это
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr "Подтвердить"
+msgstr "Одобрить"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr "Спасибо за подтверждение"
+msgstr "Спасибо, что одобрили комментарий"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7

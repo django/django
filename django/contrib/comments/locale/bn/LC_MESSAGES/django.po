@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-02-20 15:10+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -28,32 +30,32 @@ msgstr "মেটাডাটা"
 #: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ফ্ল্যাগ করা হয়েছে"
+msgstr[1] "ফ্ল্যাগ করা হয়েছে"
 
 #: admin.py:56
 msgid "Flag selected comments"
-msgstr ""
+msgstr "চয়িত মন্তব্যগুলোকে ফ্ল্যাগ করুন"
 
 #: admin.py:60
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "অনুমোদিত"
+msgstr[1] "অনুমোদিত"
 
 #: admin.py:61
 msgid "Approve selected comments"
-msgstr ""
+msgstr "চিহ্নিত মন্তব্যগুলি অনুমোদন করুন"
 
 #: admin.py:65
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "মুছে ফেলা হয়েছে"
+msgstr[1] "মুছে ফেলা হয়েছে"
 
 #: admin.py:66
 msgid "Remove selected comments"
-msgstr ""
+msgstr "চয়িত মন্তব্যগুলি মুছে ফেলুন"
 
 #: admin.py:78
 #, python-format
@@ -195,73 +197,73 @@ msgstr ""
 
 #: models.py:179
 msgid "flag"
-msgstr ""
+msgstr "পতাকা"
 
 #: models.py:180
 msgid "date"
-msgstr ""
+msgstr "তারিখ"
 
 #: models.py:190
 msgid "comment flag"
-msgstr ""
+msgstr "মন্তব্য পতাকা"
 
 #: models.py:191
 msgid "comment flags"
-msgstr ""
+msgstr "মন্তব্য পতাকাসমূহ"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "একটি মন্তব্য অনুমোদন করুন"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "সত্যিই কি এই মন্তব্যকে সাধারণের জন্য উন্মুক্ত করতে চান?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "অনুমোদন"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "অনুমোদন করার জন্য ধন্যবাদ"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
+msgstr "আমাদের সাইটের উন্নতিকল্পে আলোচনায় যোগ দেওয়ার জন্য আপনাকে সাধুবাদ জানাই"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "একটি মন্তব্য মুছে ফেলুন"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "সত্যিই কি এই মন্তব্যকে উড়িয়ে দিতে চান?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "মুছে ফেলুন"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "মুছে ফেলার জন্য ধন্যবাদ"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "এই মন্তব্যকে পতাকাচিহ্নিত করুন"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "সত্যিই কি এই মন্তব্যকে পতাকাচিহ্নিত করতে চান?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "পতাকা"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "পতাকাচিহ্নিত করার জন্য ধন্যবাদ"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
@@ -269,19 +271,19 @@ msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "প্রাকদর্শন"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "মন্তব্য লেখার জন্য ধন্যবাদ"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "আপনার মতামতের জন্য ধন্যবাদ"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "আপনার মন্তব্যকে প্রাকদর্শন করুন"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"

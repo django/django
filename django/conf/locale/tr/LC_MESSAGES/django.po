@@ -3,7 +3,9 @@
 # Translators:
 # Caner Başaran <basaran.caner@gmail.com>, 2012.
 #   <cihadgundogdu@gmail.com>, 2012.
+# Gökmen Görgen <gokmen@alageek.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Mesut Can Gürle <mesutcang@gmail.com>, 2013.
 # Metin Amiroff <amiroff@gmail.com>, 2011-2012.
 # Murat Çorlu <muratcorlu@gmail.com>, 2012.
 # Murat Sahin <martinamca@gmail.com>, 2011, 2012.
@@ -12,8 +14,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: Metin Amiroff <amiroff@gmail.com>\n"
+"PO-Revision-Date: 2013-02-24 17:10+0000\n"
+"Last-Translator: Gökmen Görgen <gokmen@alageek.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +26,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "Güney Afrika Hollanda Lehçesi"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -40,7 +42,7 @@ msgstr "Bulgarca"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "Beyaz Rusça"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -48,7 +50,7 @@ msgstr "Bengali Dili"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "Bretonca"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -108,7 +110,7 @@ msgstr "Nikaragua İspanyolcası"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venezüella İspanyolcası"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -160,7 +162,7 @@ msgstr "Macarca"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -200,7 +202,7 @@ msgstr "Korece"
 
 #: conf/global_settings.py:92
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Lüksemburgca"
 
 #: conf/global_settings.py:93
 msgid "Lithuanian"
@@ -312,7 +314,7 @@ msgstr "Tatarca"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "Udmurtça"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"
@@ -1248,7 +1250,7 @@ msgstr "Sayfa 'sonuncu' değil, veya int'e çevirilemez."
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Geçersiz sayfa (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:137
 #, python-format

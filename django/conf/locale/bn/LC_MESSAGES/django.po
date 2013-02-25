@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-24 00:04+0000\n"
+"PO-Revision-Date: 2013-02-08 15:20+0000\n"
 "Last-Translator: nsmgr8 <nasim.haque@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
@@ -421,7 +421,7 @@ msgstr "এই ফিল্ডের মান ফাঁকা হতে পা�
 #: db/models/fields/__init__.py:76
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "ফিল্ডের ধরণ: %(field_type)s"
 
 #: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
 msgid "Integer"

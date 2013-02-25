@@ -1,11 +1,12 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Kostas  <tamosiunas@gmail.com>, 2011.
 # lauris <lauris@runbox.com>, 2011.
 #   <naktinis@gmail.com>, 2012.
-# Nikolajus Krauklis <nikolajus@gmail.com>, 2011.
+# Nikolajus Krauklis <nikolajus@gmail.com>, 2011,2013.
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012.
 # Simonas Simas <simonas@kazlauskas.me>, 2012.
 # Vytautas Astrauskas <vastrauskas@gmail.com>, 2011.
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-10-17 09:16+0000\n"
-"Last-Translator: naktinis <naktinis@gmail.com>\n"
+"PO-Revision-Date: 2013-02-23 13:10+0000\n"
+"Last-Translator: Nikolajus Krauklis <nikolajus@gmail.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +49,7 @@ msgstr "Negaliojantis asmens identifikavimo numeris."
 
 #: ar/forms.py:84
 msgid "Invalid legal type. Type must be 27, 20, 23 or 30."
-msgstr ""
+msgstr "Neteisingas juridinis tipas. Tipas turi būti 27, 20, 23 arba 30."
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -223,7 +224,7 @@ msgstr "Telefono numeriai turi būti XXX-XXX-XXXX formatu."
 
 #: ca/forms.py:69
 msgid "Enter a Canadian province or territory."
-msgstr ""
+msgstr "Įveskite Kanados valstiją arba teritoriją"
 
 #: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
@@ -336,7 +337,7 @@ msgstr "Zurich"
 
 #: ch/forms.py:37
 msgid "Phone numbers must be in 0XX XXX XX XX format."
-msgstr ""
+msgstr "Telefono numeriai turi būti 0XX XXX XX XX formatu."
 
 #: ch/forms.py:68
 msgid ""
@@ -539,7 +540,7 @@ msgstr ""
 
 #: es/es_provinces.py:5
 msgid "Araba"
-msgstr ""
+msgstr "Araba"
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -1138,17 +1139,17 @@ msgstr "Velsas"
 #: hk/forms.py:37
 #, python-format
 msgid "Phone number should not start with one of the followings: %s."
-msgstr ""
+msgstr "Telefono numeris neturi prasidėti: %s."
 
 #: hk/forms.py:40
 #, python-format
 msgid "Phone number must be in one of the following formats: %s."
-msgstr ""
+msgstr "Telefono numeris turi būti vienu iš išvardytais formatu: %s."
 
 #: hk/forms.py:42
 #, python-format
 msgid "Phone number should start with one of the followings: %s."
-msgstr ""
+msgstr "Telefono numeris turi prasidėti: %s."
 
 #: hr/forms.py:76
 msgid "Enter a valid 13 digit JMBG"

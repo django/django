@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# Apostolis Bessas <mpessas+txc@transifex.com>, 2013.
 # Dimitris Glezos <glezos@indifex.com>, 2011, 2012.
 # glogiotatidis <seadog@sealabs.net>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
@@ -10,8 +12,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Dimitris Glezos <glezos@transifex.com>\n"
+"PO-Revision-Date: 2013-02-23 21:50+0000\n"
+"Last-Translator: Apostolos Mpessas <mpessas+txc@transifex.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +242,7 @@ msgstr ""
 
 #: models.py:381
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Εισάφετε ένα έγκυρο όνομα χρήστη."
 
 #: models.py:383
 msgid "first name"

@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Leonardo José Guzmán <ljguzman@gmail.com>, 2013.
 # Ramiro Morales <cramm0@gmail.com>, 2011-2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-11 15:02+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"PO-Revision-Date: 2013-02-18 17:50+0000\n"
+"Last-Translator: ljguzman <ljguzman@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
 "django/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -752,7 +754,7 @@ msgstr "Reinicialización de contraseña completada"
 
 #: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Se le ha enviado su contraseña.  Ahora puede continuar e ingresar."
+msgstr "Su contraseña ha sido cambiada.  Ahora puede continuar e ingresar."
 
 #: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
