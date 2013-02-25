@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
-from django.contrib.auth.hashers import (is_password_usable, 
+from django.contrib.auth.hashers import (is_password_usable,
     check_password, make_password, PBKDF2PasswordHasher, load_hashers,
     PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
 from django.utils import unittest
@@ -52,7 +52,7 @@ class TestUtilsHashPass(unittest.TestCase):
 
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
-        self.assertEqual(encoded, 
+        self.assertEqual(encoded,
                          'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
@@ -60,7 +60,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertEqual(identify_hasher(encoded).algorithm, "md5")
 
     def test_unsalted_md5(self):
-        encoded = make_password('lètmein', 'seasalt', 'unsalted_md5')
+        encoded = make_password('lètmein', '', 'unsalted_md5')
         self.assertEqual(encoded, '88a434c88cca4e900f7874cd98123f43')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
@@ -71,6 +71,17 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(alt_encoded))
         self.assertTrue(check_password('lètmein', alt_encoded))
         self.assertFalse(check_password('lètmeinz', alt_encoded))
+
+    def test_unsalted_sha1(self):
+        encoded = make_password('lètmein', '', 'unsalted_sha1')
+        self.assertEqual(encoded, 'sha1$$6d138ca3ae545631b3abd71a4f076ce759c5700b')
+        self.assertTrue(is_password_usable(encoded))
+        self.assertTrue(check_password('lètmein', encoded))
+        self.assertFalse(check_password('lètmeinz', encoded))
+        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_sha1")
+        # Raw SHA1 isn't acceptable
+        alt_encoded = encoded[6:]
+        self.assertFalse(check_password('lètmein', alt_encoded))
 
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
