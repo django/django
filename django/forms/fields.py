@@ -119,6 +119,8 @@ class Field(object):
         self.validators = self.default_validators + validators
 
     def prepare_value(self, value):
+        if self.widget.is_localized:
+            value = formats.localize_input(value)
         return value
 
     def to_python(self, value):
@@ -452,6 +454,7 @@ class DateTimeField(BaseTemporalField):
     }
 
     def prepare_value(self, value):
+        value = super(DateTimeField, self).prepare_value(value)
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)
         return value
