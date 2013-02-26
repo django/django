@@ -9,7 +9,7 @@ from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from regressiontests.swappable_models.models import Article
+from swappable_models.models import Article
 
 
 class SwappableModelTests(TestCase):

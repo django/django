@@ -18,7 +18,7 @@ CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-SUBDIRS_TO_SKIP = ['test_templates']
+SUBDIRS_TO_SKIP = ['templates']
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
@@ -54,7 +54,8 @@ def get_test_modules():
                 # Python 3 byte code dirs (PEP 3147)
                 f == '__pycache__' or
                 f.startswith('sql') or
-                os.path.basename(f) in SUBDIRS_TO_SKIP):
+                os.path.basename(f) in SUBDIRS_TO_SKIP or
+                os.path.isfile(f)):
                 continue
             modules.append((loc, f))
     return modules

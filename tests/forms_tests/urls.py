@@ -5,5 +5,5 @@ from .views import ArticleFormView
 
 
 urlpatterns = patterns('',
-    url(r'^/model_form/(?P<pk>\d+)/$', ArticleFormView.as_view(), name="article_form"),
+    url(r'^model_form/(?P<pk>\d+)/$', ArticleFormView.as_view(), name="article_form"),
 )

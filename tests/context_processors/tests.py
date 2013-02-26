@@ -9,7 +9,7 @@ class RequestContextProcessorTests(TestCase):
     Tests for the ``django.core.context_processors.request`` processor.
     """
 
-    urls = 'regressiontests.context_processors.urls'
+    urls = 'context_processors.urls'
 
     def test_request_attributes(self):
         """

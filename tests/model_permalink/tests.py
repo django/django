@@ -6,7 +6,7 @@ from .models import Guitarist
 
 
 class PermalinkTests(TestCase):
-    urls = 'regressiontests.model_permalink.urls'
+    urls = 'model_permalink.urls'
 
     def test_permalink(self):
         g = Guitarist(name='Adrien Moignard', slug='adrienmoignard')

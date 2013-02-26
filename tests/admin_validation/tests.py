@@ -142,7 +142,7 @@ class ValidationTestCase(TestCase):
             model = TwoAlbumFKAndAnE
 
         self.assertRaisesMessage(Exception,
-            "<class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> has more than 1 ForeignKey to <class 'regressiontests.admin_validation.models.Album'>",
+            "<class 'admin_validation.models.TwoAlbumFKAndAnE'> has more than 1 ForeignKey to <class 'admin_validation.models.Album'>",
             validate_inline,
             TwoAlbumFKAndAnEInline, None, Album)
 

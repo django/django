@@ -15,12 +15,12 @@ from django.test.testcases import connections_support_transactions
 from django.utils import unittest
 from django.utils.importlib import import_module
 
-from ..admin_scripts.tests import AdminScriptTestCase
+from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
 
 
-TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
-TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
+TEST_APP_OK = 'test_runner.valid_app.models'
+TEST_APP_ERROR = 'test_runner.invalid_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -146,14 +146,14 @@ class ManageCommandTests(unittest.TestCase):
 
     def test_custom_test_runner(self):
         call_command('test', 'sites',
-                     testrunner='regressiontests.test_runner.tests.MockTestRunner')
+                     testrunner='test_runner.tests.MockTestRunner')
         self.assertTrue(MockTestRunner.invoked,
                         "The custom test runner has not been invoked")
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
             call_command('test', 'sites',
-                testrunner='regressiontests.test_runner.NonExistentRunner')
+                testrunner='test_runner.NonExistentRunner')
 
 
 class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
@@ -178,7 +178,7 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
 
     def setUp(self):
         settings = {
-            'TEST_RUNNER': '\'regressiontests.test_runner.tests.CustomOptionsTestRunner\'',
+            'TEST_RUNNER': '\'test_runner.tests.CustomOptionsTestRunner\'',
         }
         self.write_settings('settings.py', sdict=settings)
 
@@ -186,25 +186,25 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_default_options(self):
-        args = ['test', '--settings=regressiontests.settings']
+        args = ['test', '--settings=settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:2:3')
 
     def test_default_and_given_options(self):
-        args = ['test', '--settings=regressiontests.settings', '--option_b=foo']
+        args = ['test', '--settings=settings', '--option_b=foo']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:foo:3')
 
     def test_option_name_and_value_separated(self):
-        args = ['test', '--settings=regressiontests.settings', '--option_b', 'foo']
+        args = ['test', '--settings=settings', '--option_b', 'foo']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:foo:3')
 
     def test_all_options_given(self):
-        args = ['test', '--settings=regressiontests.settings', '--option_a=bar', '--option_b=foo', '--option_c=31337']
+        args = ['test', '--settings=settings', '--option_a=bar', '--option_b=foo', '--option_c=31337']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'bar:foo:31337')
@@ -288,7 +288,7 @@ class DummyBackendTest(unittest.TestCase):
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
-        settings = {'INSTALLED_APPS': '("regressiontests.test_runner.deprecation_app",)',
+        settings = {'INSTALLED_APPS': '("test_runner.deprecation_app",)',
                     'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
         self.write_settings('settings.py', sdict=settings)
 
@@ -296,14 +296,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_runner_deprecation_verbosity_default(self):
-        args = ['test', '--settings=regressiontests.settings']
+        args = ['test', '--settings=settings']
         out, err = self.run_django_admin(args)
         self.assertTrue("DeprecationWarning: warning from test" in err)
 
     @unittest.skipIf(sys.version_info[:2] == (2, 6),
         "On Python 2.6, DeprecationWarnings are visible anyway")
     def test_runner_deprecation_verbosity_zero(self):
-        args = ['test', '--settings=regressiontests.settings', '--verbosity=0']
+        args = ['test', '--settings=settings', '--verbosity=0']
         out, err = self.run_django_admin(args)
         self.assertFalse("DeprecationWarning: warning from test" in err)
 

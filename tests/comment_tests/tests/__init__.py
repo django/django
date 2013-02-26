@@ -17,7 +17,7 @@ CT = ContentType.objects.get_for_model
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',))
 class CommentTestCase(TestCase):
     fixtures = ["comment_tests"]
-    urls = 'regressiontests.comment_tests.urls_default'
+    urls = 'comment_tests.urls_default'
 
     def createSomeComments(self):
         # Two anonymous comments on two different objects
@@ -85,11 +85,11 @@ class CommentTestCase(TestCase):
         d.update(f.initial)
         return d
 
-from regressiontests.comment_tests.tests.app_api_tests import *
-from regressiontests.comment_tests.tests.feed_tests import *
-from regressiontests.comment_tests.tests.model_tests import *
-from regressiontests.comment_tests.tests.comment_form_tests import *
-from regressiontests.comment_tests.tests.templatetag_tests import *
-from regressiontests.comment_tests.tests.comment_view_tests import *
-from regressiontests.comment_tests.tests.moderation_view_tests import *
-from regressiontests.comment_tests.tests.comment_utils_moderators_tests import *
+from comment_tests.tests.app_api_tests import *
+from comment_tests.tests.feed_tests import *
+from comment_tests.tests.model_tests import *
+from comment_tests.tests.comment_form_tests import *
+from comment_tests.tests.templatetag_tests import *
+from comment_tests.tests.comment_view_tests import *
+from comment_tests.tests.moderation_view_tests import *
+from comment_tests.tests.comment_utils_moderators_tests import *

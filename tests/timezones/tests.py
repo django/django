@@ -1047,7 +1047,7 @@ class NewFormsTests(TestCase):
                   PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminTests(TestCase):
 
-    urls = 'modeltests.timezones.urls'
+    urls = 'timezones.urls'
     fixtures = ['tz_users.xml']
 
     def setUp(self):

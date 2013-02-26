@@ -17,7 +17,7 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInline(TestCase):
-    urls = "regressiontests.admin_inlines.urls"
+    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -196,7 +196,7 @@ class TestInline(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineMedia(TestCase):
-    urls = "regressiontests.admin_inlines.urls"
+    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -233,7 +233,7 @@ class TestInlineMedia(TestCase):
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
 class TestInlineAdminForm(TestCase):
-    urls = "regressiontests.admin_inlines.urls"
+    urls = "admin_inlines.urls"
 
     def test_immutable_content_type(self):
         """Regression for #9362
@@ -256,7 +256,7 @@ class TestInlinePermissions(TestCase):
     inline. Refs #8060.
 
     """
-    urls = "regressiontests.admin_inlines.urls"
+    urls = "admin_inlines.urls"
 
     def setUp(self):
         self.user = User(username='admin')
@@ -451,7 +451,7 @@ class TestInlinePermissions(TestCase):
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-views-users.xml']
-    urls = "regressiontests.admin_inlines.urls"
+    urls = "admin_inlines.urls"
 
     def test_add_stackeds(self):
         """

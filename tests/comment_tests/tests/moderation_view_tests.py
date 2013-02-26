@@ -252,7 +252,7 @@ class ApproveViewTests(CommentTestCase):
         self.assertTemplateUsed(response, "comments/approved.html")
 
 class AdminActionsTests(CommentTestCase):
-    urls = "regressiontests.comment_tests.urls_admin"
+    urls = "comment_tests.urls_admin"
 
     def setUp(self):
         super(AdminActionsTests, self).setUp()

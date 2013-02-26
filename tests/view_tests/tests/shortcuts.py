@@ -7,7 +7,7 @@ from django.test.utils import override_settings
     STATIC_URL='/path/to/static/media/',
 )
 class ShortcutTests(TestCase):
-    urls = 'regressiontests.views.generic_urls'
+    urls = 'view_tests.generic_urls'
 
     def test_render_to_response(self):
         response = self.client.get('/shortcuts/render_to_response/')

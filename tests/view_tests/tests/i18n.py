@@ -119,7 +119,7 @@ class JsI18NTests(TestCase):
         available. The Javascript i18n view must return a NON empty language catalog
         with the proper English translations. See #13726 for more details.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views.app0']
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app0']
         with self.settings(LANGUAGE_CODE='fr', INSTALLED_APPS=extended_apps):
             with override('en-us'):
                 response = self.client.get('/views/jsi18n_english_translation/')
@@ -149,7 +149,7 @@ class JsI18NTestsMultiPackage(TestCase):
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views.app1', 'regressiontests.views.app2']
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app1', 'view_tests.app2']
         with self.settings(LANGUAGE_CODE='en-us', INSTALLED_APPS=extended_apps):
             with override('fr'):
                 response = self.client.get('/views/jsi18n_multi_packages1/')
@@ -160,7 +160,7 @@ class JsI18NTestsMultiPackage(TestCase):
         Similar to above but with neither default or requested language being
         English.
         """
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views.app3', 'regressiontests.views.app4']
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app3', 'view_tests.app4']
         with self.settings(LANGUAGE_CODE='fr', INSTALLED_APPS=extended_apps):
             with override('es-ar'):
                 response = self.client.get('/views/jsi18n_multi_packages2/')
@@ -183,7 +183,7 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
 @unittest.skipUnless(firefox, 'Selenium not installed')
 class JavascriptI18nTests(LiveServerTestCase):
-    urls = 'regressiontests.views.urls'
+    urls = 'view_tests.urls'
 
     @classmethod
     def setUpClass(cls):
@@ -197,7 +197,7 @@ class JavascriptI18nTests(LiveServerTestCase):
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests']
         with self.settings(INSTALLED_APPS=extended_apps):
             self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
 
@@ -215,7 +215,7 @@ class JavascriptI18nTests(LiveServerTestCase):
             self.assertEqual(elem.text, "455 Resultate")
 
     def test_escaping(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.views']
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests']
         with self.settings(INSTALLED_APPS=extended_apps):
             response = self.client.get('%s%s' % (self.live_server_url, '/jsi18n_admin/'))
             self.assertContains(response, '\\x04')

@@ -45,23 +45,23 @@ class CommentAppAPITests(CommentTestCase):
 
 
 @override_settings(
-    COMMENTS_APP='regressiontests.comment_tests.custom_comments',
+    COMMENTS_APP='comment_tests.custom_comments',
     INSTALLED_APPS=list(settings.INSTALLED_APPS) + [
-        'regressiontests.comment_tests.custom_comments'],
+        'comment_tests.custom_comments'],
 )
 class CustomCommentTest(CommentTestCase):
-    urls = 'regressiontests.comment_tests.urls'
+    urls = 'comment_tests.urls'
 
     def testGetCommentApp(self):
-        from regressiontests.comment_tests import custom_comments
+        from comment_tests import custom_comments
         self.assertEqual(comments.get_comment_app(), custom_comments)
 
     def testGetModel(self):
-        from regressiontests.comment_tests.custom_comments.models import CustomComment
+        from comment_tests.custom_comments.models import CustomComment
         self.assertEqual(comments.get_model(), CustomComment)
 
     def testGetForm(self):
-        from regressiontests.comment_tests.custom_comments.forms import CustomCommentForm
+        from comment_tests.custom_comments.forms import CustomCommentForm
         self.assertEqual(comments.get_form(), CustomCommentForm)
 
     def testGetFormTarget(self):

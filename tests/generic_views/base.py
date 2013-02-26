@@ -229,7 +229,7 @@ class ViewTest(unittest.TestCase):
 
 
 class TemplateViewTest(TestCase):
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     rf = RequestFactory()
 

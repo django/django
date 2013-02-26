@@ -25,7 +25,7 @@ default_testobj = URLObject('testapp', 'testapp')
 otherobj1 = URLObject('nodefault', 'other-ns1')
 otherobj2 = URLObject('nodefault', 'other-ns2')
 
-urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
+urlpatterns = patterns('urlpatterns_reverse.views',
     url(r'^normal/$', 'empty_view', name='normal-view'),
     url(r'^normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='normal-view'),
     url(r'^resolver_match/$', 'pass_resolver_match_view', name='test-resolver-match'),
@@ -47,13 +47,13 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     (r'^other1/', include(otherobj1.urls)),
     (r'^other[246]/', include(otherobj2.urls)),
 
-    (r'^ns-included[135]/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
-    (r'^ns-included2/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
+    (r'^ns-included[135]/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
+    (r'^ns-included2/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
-    (r'^included/', include('regressiontests.urlpatterns_reverse.included_namespace_urls')),
-    (r'^inc(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_urls', namespace='inc-ns5')),
+    (r'^included/', include('urlpatterns_reverse.included_namespace_urls')),
+    (r'^inc(?P<outer>\d+)/', include('urlpatterns_reverse.included_urls', namespace='inc-ns5')),
 
-    (r'^ns-outer/(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
+    (r'^ns-outer/(?P<outer>\d+)/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
 
-    (r'^\+\\\$\*/', include('regressiontests.urlpatterns_reverse.namespace_urls', namespace='special')),
+    (r'^\+\\\$\*/', include('urlpatterns_reverse.namespace_urls', namespace='special')),
 )

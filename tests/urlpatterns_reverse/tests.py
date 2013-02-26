@@ -30,8 +30,8 @@ resolve_test_data = (
     ('/included/mixed_args/42/37/', 'inc-mixed-args', None, '', views.empty_view, tuple(), {'arg2': '37'}),
 
     # Unnamed views will be resolved to the function/class name
-    ('/unnamed/normal/42/37/', 'regressiontests.urlpatterns_reverse.views.empty_view', None, '', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
-    ('/unnamed/view_class/42/37/', 'regressiontests.urlpatterns_reverse.views.ViewClass', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
+    ('/unnamed/normal/42/37/', 'urlpatterns_reverse.views.empty_view', None, '', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
+    ('/unnamed/view_class/42/37/', 'urlpatterns_reverse.views.ViewClass', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
 
     # If you have no kwargs, you get an args list.
     ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42','37'), {}),
@@ -131,8 +131,8 @@ test_data = (
     # correct view for the arguments provided.
     ('kwargs_view', '/arg_view/', [], {}),
     ('kwargs_view', '/arg_view/10/', [], {'arg1':10}),
-    ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
-    ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
+    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
+    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
     ('non_path_include', '/includes/non_path_include/', [], {}),
 
     # Tests for #13154
@@ -143,7 +143,7 @@ test_data = (
 )
 
 class NoURLPatternsTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.no_urls'
+    urls = 'urlpatterns_reverse.no_urls'
 
     def test_no_urls_exception(self):
         """
@@ -152,11 +152,11 @@ class NoURLPatternsTests(TestCase):
         resolver = RegexURLResolver(r'^$', self.urls)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf regressiontests.urlpatterns_reverse.no_urls "\
+            "The included urlconf urlpatterns_reverse.no_urls "\
             "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
 
 class URLPatternReverse(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.urls'
+    urls = 'urlpatterns_reverse.urls'
 
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
@@ -190,7 +190,7 @@ class ResolverTests(unittest.TestCase):
         (#17892).
         """
         # Pick a resolver from a namespaced urlconf
-        resolver = get_resolver('regressiontests.urlpatterns_reverse.namespace_urls')
+        resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
         self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
 
@@ -214,7 +214,7 @@ class ResolverTests(unittest.TestCase):
         exception contains a list in the right format for printing out in
         the DEBUG 404 page with both the patterns and URL names, if available.
         """
-        urls = 'regressiontests.urlpatterns_reverse.named_urls'
+        urls = 'urlpatterns_reverse.named_urls'
         # this list matches the expected URL types and names returned when
         # you try to resolve a non-existent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/non-existent-url')
@@ -245,7 +245,7 @@ class ResolverTests(unittest.TestCase):
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
 
 class ReverseLazyTest(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.reverse_lazy_urls'
+    urls = 'urlpatterns_reverse.reverse_lazy_urls'
 
     def test_redirect_with_lazy_reverse(self):
         response = self.client.get('/redirect/')
@@ -260,7 +260,7 @@ class ReverseLazyTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 class ReverseShortcutTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.urls'
+    urls = 'urlpatterns_reverse.urls'
 
     def test_redirect_to_object(self):
         # We don't really need a model; just something with a get_absolute_url
@@ -299,7 +299,7 @@ class ReverseShortcutTests(TestCase):
 
 
 class NamespaceTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.namespace_urls'
+    urls = 'urlpatterns_reverse.namespace_urls'
 
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
@@ -458,8 +458,8 @@ class ErrorHandlerResolutionTests(TestCase):
 
     def setUp(self):
         from django.core.urlresolvers import RegexURLResolver
-        urlconf = 'regressiontests.urlpatterns_reverse.urls_error_handlers'
-        urlconf_callables = 'regressiontests.urlpatterns_reverse.urls_error_handlers_callables'
+        urlconf = 'urlpatterns_reverse.urls_error_handlers'
+        urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
         self.resolver = RegexURLResolver(r'^$', urlconf)
         self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
 
@@ -476,7 +476,7 @@ class ErrorHandlerResolutionTests(TestCase):
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 
 class DefaultErrorHandlerTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.urls_without_full_import'
+    urls = 'urlpatterns_reverse.urls_without_full_import'
 
     def test_default_handler(self):
         "If the urls.py doesn't specify handlers, the defaults are used"
@@ -499,7 +499,7 @@ class NoRootUrlConfTests(TestCase):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
 
 class ResolverMatchTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.namespace_urls'
+    urls = 'urlpatterns_reverse.namespace_urls'
 
     def test_urlpattern_resolve(self):
         for path, name, app_name, namespace, func, args, kwargs in resolve_test_data:
@@ -530,7 +530,7 @@ class ResolverMatchTests(TestCase):
         self.assertEqual(resolver_match.url_name, 'test-resolver-match')
 
 class ErroneousViewTests(TestCase):
-    urls = 'regressiontests.urlpatterns_reverse.erroneous_urls'
+    urls = 'urlpatterns_reverse.erroneous_urls'
 
     def test_erroneous_resolve(self):
         self.assertRaises(ImportError, self.client.get, '/erroneous_inner/')
@@ -554,9 +554,9 @@ class ViewLoadingTests(TestCase):
         # ViewDoesNotExist, ...
         six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*",
             get_callable,
-            'regressiontests.urlpatterns_reverse.views.i_should_not_exist')
+            'urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.
         self.assertRaises(AttributeError, get_callable,
-            'regressiontests.urlpatterns_reverse.views_broken.i_am_broken')
+            'urlpatterns_reverse.views_broken.i_am_broken')
 

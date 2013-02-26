@@ -577,7 +577,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, 'abcd')
 
     # EmailField ##################################################################
-    # See also modeltests/validators tests for validate_email specific tests
+    # See also validators tests for validate_email specific tests
 
     def test_emailfield_1(self):
         f = EmailField()
@@ -1131,7 +1131,7 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [
-            ('/tests/regressiontests/forms/tests/filepath_test_files/directory', 'directory'),
+            ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1140,10 +1140,10 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, allow_folders=True, allow_files=True)
         f.choices.sort()
         expected = [
-            ('/tests/regressiontests/forms/tests/filepath_test_files/.dot-file', '.dot-file'),
-            ('/tests/regressiontests/forms/tests/filepath_test_files/directory', 'directory'),
-            ('/tests/regressiontests/forms/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
-            ('/tests/regressiontests/forms/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
+            ('/tests/forms_tests/tests/filepath_test_files/.dot-file', '.dot-file'),
+            ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
+            ('/tests/forms_tests/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
+            ('/tests/forms_tests/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
         ]
 
         actual = fix_os_paths(f.choices)

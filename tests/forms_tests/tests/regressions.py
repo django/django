@@ -7,7 +7,7 @@ from django.forms import *
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy, override
 
-from regressiontests.forms.models import Cheese
+from forms_tests.models import Cheese
 
 
 class FormsRegressionsTestCase(TestCase):
@@ -121,7 +121,7 @@ class FormsRegressionsTestCase(TestCase):
         f = SomeForm({'field': ['<script>']})
         self.assertHTMLEqual(t.render(Context({'form': f})), '<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>')
 
-        from regressiontests.forms.models import ChoiceModel
+        from forms_tests.models import ChoiceModel
 
         class SomeForm(Form):
             field = ModelMultipleChoiceField(ChoiceModel.objects.all())

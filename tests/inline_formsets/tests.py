@@ -124,7 +124,7 @@ class InlineFormsetFactoryTest(TestCase):
         to use for the inline formset, we should get an exception.
         """
         six.assertRaisesRegex(self, Exception,
-            "<class 'regressiontests.inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
+            "<class 'inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child
         )
 
@@ -134,7 +134,7 @@ class InlineFormsetFactoryTest(TestCase):
         to the parent model, we should get an exception.
         """
         self.assertRaises(Exception,
-            "fk_name 'school' is not a ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
+            "fk_name 'school' is not a ForeignKey to <class 'inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child, fk_name='school'
         )
 
@@ -144,7 +144,7 @@ class InlineFormsetFactoryTest(TestCase):
         exception.
         """
         six.assertRaisesRegex(self, Exception,
-            "<class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'",
+            "<class 'inline_formsets.models.Child'> has no field named 'test'",
             inlineformset_factory, Parent, Child, fk_name='test'
         )
 

@@ -24,7 +24,7 @@ from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
 class DebugViewTests(TestCase):
-    urls = "regressiontests.views.urls"
+    urls = "view_tests.urls"
 
     def test_files(self):
         response = self.client.get('/raises/')

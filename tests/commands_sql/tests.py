@@ -7,7 +7,7 @@ from django.db import connections, DEFAULT_DB_ALIAS, models
 from django.test import TestCase
 from django.utils import six
 
-# See also regressiontests/initial_sql_regress for 'custom_sql_for_model' tests
+# See also initial_sql_regress for 'custom_sql_for_model' tests
 
 
 class SQLCommandsTestCase(TestCase):

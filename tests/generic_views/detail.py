@@ -9,7 +9,7 @@ from .models import Artist, Author, Page
 
 class DetailViewTest(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_simple_object(self):
         res = self.client.get('/detail/obj/')

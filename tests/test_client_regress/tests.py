@@ -554,7 +554,7 @@ class LoginTests(TestCase):
 
 @override_settings(
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    SESSION_ENGINE='regressiontests.test_client_regress.session'
+    SESSION_ENGINE='test_client_regress.session'
 )
 class SessionEngineTests(TestCase):
     fixtures = ['testdata']
@@ -644,7 +644,7 @@ class TemplateExceptionTests(TestCase):
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
 class UrlconfSubstitutionTests(TestCase):
-    urls = 'regressiontests.test_client_regress.urls'
+    urls = 'test_client_regress.urls'
 
     def test_urlconf_was_changed(self):
         "TestCase can enforce a custom URLconf on a per-test basis"

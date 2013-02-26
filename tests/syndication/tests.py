@@ -35,7 +35,7 @@ class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.
     """
-    urls = 'regressiontests.syndication.urls'
+    urls = 'syndication.urls'
 
     def test_rss2_feed(self):
         """
