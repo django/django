@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
-from django.db.utils import (ConnectionHandler, ConnectionRouter,
-    load_backend, DEFAULT_DB_ALIAS, DatabaseError, IntegrityError)
+from django.db.utils import (DEFAULT_DB_ALIAS,
+    DataError, OperationalError, IntegrityError, InternalError,
+    ProgrammingError, NotSupportedError, DatabaseError,
+    InterfaceError, Error,
+    load_backend, ConnectionHandler, ConnectionRouter)
 
 __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'DEFAULT_DB_ALIAS')

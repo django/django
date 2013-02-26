@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 import pkgutil
 from threading import local
@@ -12,14 +13,85 @@ from django.utils import six
 
 DEFAULT_DB_ALIAS = 'default'
 
-# Define some exceptions that mirror the PEP249 interface.
-# We will rethrow any backend-specific errors using these
-# common wrappers
-class DatabaseError(Exception):
+
+class Error(StandardError):
     pass
+
+
+class InterfaceError(Error):
+    pass
+
+
+class DatabaseError(Error):
+    pass
+
+
+class DataError(DatabaseError):
+    pass
+
+
+class OperationalError(DatabaseError):
+    pass
+
 
 class IntegrityError(DatabaseError):
     pass
+
+
+class InternalError(DatabaseError):
+    pass
+
+
+class ProgrammingError(DatabaseError):
+    pass
+
+
+class NotSupportedError(DatabaseError):
+    pass
+
+
+class DatabaseErrorWrapper(object):
+    """
+    Context manager and decorator that re-throws backend-specific database
+    exceptions using Django's common wrappers.
+    """
+
+    def __init__(self, database):
+        """
+        database is a module defining PEP-249 exceptions.
+        """
+        self.database = database
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            return
+        for dj_exc_type in (
+                DataError,
+                OperationalError,
+                IntegrityError,
+                InternalError,
+                ProgrammingError,
+                NotSupportedError,
+                DatabaseError,
+                InterfaceError,
+                Error,
+            ):
+            db_exc_type = getattr(self.database, dj_exc_type.__name__)
+            if issubclass(exc_type, db_exc_type):
+                dj_exc_value = dj_exc_type(*tuple(exc_value.args))
+                if six.PY3:
+                    dj_exc_value.__cause__ = exc_value
+                six.reraise(dj_exc_type, dj_exc_value, traceback)
+
+    def __call__(self, func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+        return inner
 
 
 def load_backend(backend_name):
