@@ -7,10 +7,8 @@ code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-* Models and the database API (``tests/modeltests``),
-* Everything else in core Django code (``tests/regressiontests``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or
-  ``tests/regressiontests/<app>_...``).
+* Models, the database API and everything else in core Django core (``tests/``),
+* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
@@ -105,9 +103,9 @@ internationalization, type:
 
     ./runtests.py --settings=path.to.settings generic_relations i18n
 
-How do you find out the names of individual tests? Look in
-``tests/modeltests`` and ``tests/regressiontests`` — each directory name
-there is the name of a test. Contrib app names are also valid test names.
+How do you find out the names of individual tests? Look in ``tests/`` — each
+directory name there is the name of a test. Contrib app names are also valid
+test names.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
