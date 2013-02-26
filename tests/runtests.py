@@ -22,7 +22,7 @@ REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-REGRESSION_SUBDIRS_TO_SKIP = []
+SUBDIRS_TO_SKIP = ['test_templates']
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
@@ -60,7 +60,7 @@ def get_test_modules():
                 # Python 3 byte code dirs (PEP 3147)
                 f == '__pycache__' or
                 f.startswith('sql') or
-                os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
+                os.path.basename(f) in SUBDIRS_TO_SKIP):
                 continue
             modules.append((loc, f))
     return modules
