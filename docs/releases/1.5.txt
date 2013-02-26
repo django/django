@@ -2,6 +2,8 @@
 Django 1.5 release notes
 ========================
 
+*February 26, 2013*
+
 Welcome to Django 1.5!
 
 These release notes cover the `new features`_, as well
