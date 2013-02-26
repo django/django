@@ -1327,7 +1327,7 @@ class CacheI18nTest(TestCase):
     def check_accept_language_vary(self, accept_language, vary, reference_key):
         request = self._get_request()
         request.META['HTTP_ACCEPT_LANGUAGE'] = accept_language
-        request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
+        request.META['HTTP_ACCEPT_ENCODING'] = b'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
         response['Vary'] = vary
         key = learn_cache_key(request, response)
@@ -1340,53 +1340,53 @@ class CacheI18nTest(TestCase):
         lang = translation.get_language()
         self.assertEqual(lang, 'en')
         request = self._get_request()
-        request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
+        request.META['HTTP_ACCEPT_ENCODING'] = b'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
         response['Vary'] = 'accept-encoding'
         key = learn_cache_key(request, response)
         self.assertIn(lang, key, "Cache keys should include the language name when translation is active")
         self.check_accept_language_vary(
-            'en-us',
+            b'en-us',
             'cookie, accept-language, accept-encoding',
             key
         )
         self.check_accept_language_vary(
-            'en-US',
+            b'en-US',
             'cookie, accept-encoding, accept-language',
             key
         )
         self.check_accept_language_vary(
-            'en-US,en;q=0.8',
+            b'en-US,en;q=0.8',
             'accept-encoding, accept-language, cookie',
             key
         )
         self.check_accept_language_vary(
-            'en-US,en;q=0.8,ko;q=0.6',
+            b'en-US,en;q=0.8,ko;q=0.6',
             'accept-language, cookie, accept-encoding',
             key
         )
         self.check_accept_language_vary(
-            'ko-kr,ko;q=0.8,en-us;q=0.5,en;q=0.3 ',
+            b'ko-kr,ko;q=0.8,en-us;q=0.5,en;q=0.3 ',
             'accept-encoding, cookie, accept-language',
             key
         )
         self.check_accept_language_vary(
-            'ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4',
+            b'ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4',
             'accept-language, accept-encoding, cookie',
             key
         )
         self.check_accept_language_vary(
-            'ko;q=1.0,en;q=0.5',
+            b'ko;q=1.0,en;q=0.5',
             'cookie, accept-language, accept-encoding',
             key
         )
         self.check_accept_language_vary(
-            'ko, en',
+            b'ko, en',
             'cookie, accept-encoding, accept-language',
             key
         )
         self.check_accept_language_vary(
-            'ko-KR, en-US',
+            b'ko-KR, en-US',
             'accept-encoding, accept-language, cookie',
             key
         )
