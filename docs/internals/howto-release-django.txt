@@ -255,17 +255,17 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Make the blog post announcing the release live.
 
-#. Post the release announcement to the django-announce,
-   django-developers and django-users mailing lists. This should
-   include links to both the announcement blog post and the release
-   notes. *FIXME: make some templates with example text*.
-
 #. For a new version release (e.g. 1.5, 1.6), update the default stable version
    of the docs by flipping the ``is_default`` flag to ``True`` on the
    appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database (this will automatically flip it to ``False`` for all
    others). *FIXME: I had to do this via fab managepy:shell,docs but we should
    probably make it possible to do via the admin.*
+
+#. Post the release announcement to the django-announce,
+   django-developers and django-users mailing lists. This should
+   include links to both the announcement blog post and the release
+   notes. *FIXME: make some templates with example text*.
 
 Post-release
 ============
@@ -276,6 +276,12 @@ You're almost done! All that's left to do now is:
    incrementing to whatever the next expected release will be. For
    example, after releasing 1.2.1, update ``VERSION`` to report "1.2.2
    pre-alpha". *FIXME: Is this correct? Do we still do this?*
+
+#. For the first alpha release of a new version (when we create the
+   ``stable/1.?.x`` git branch), you'll want to create a new
+   ``DocumentRelease`` object in the ``docs.djangoproject.com`` database for
+   the new version's docs, and update the ``docs/fixtures/doc_releases.json``
+   JSON fixture. *FIXME: what is the purpose of maintaining this fixture?*
 
 Notes on setting the VERSION tuple
 ==================================
