@@ -10,15 +10,11 @@ from django.utils._os import upath
 from django.utils import six
 
 CONTRIB_DIR_NAME = 'django.contrib'
-MODEL_TESTS_DIR_NAME = 'modeltests'
-REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
 RUNTESTS_DIR = os.path.dirname(upath(__file__))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
-MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
-REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
@@ -37,9 +33,9 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'regressiontests.staticfiles_tests',
-    'regressiontests.staticfiles_tests.apps.test',
-    'regressiontests.staticfiles_tests.apps.no_label',
+    'staticfiles_tests',
+    'staticfiles_tests.apps.test',
+    'staticfiles_tests.apps.no_label',
 ]
 
 def geodjango(settings):
@@ -51,12 +47,10 @@ def geodjango(settings):
 def get_test_modules():
     modules = []
     for loc, dirpath in (
-        (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR),
-        (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR),
+        (None, RUNTESTS_DIR),
         (CONTRIB_DIR_NAME, CONTRIB_DIR)):
         for f in os.listdir(dirpath):
-            if (f.startswith('__init__') or
-                f.startswith('.') or
+            if ('.' in f or
                 # Python 3 byte code dirs (PEP 3147)
                 f == '__pycache__' or
                 f.startswith('sql') or
@@ -118,7 +112,10 @@ def setup(verbosity, test_labels):
         settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for module_dir, module_name in test_modules:
-        module_label = '.'.join([module_dir, module_name])
+        if module_dir:
+            module_label = '.'.join([module_dir, module_name])
+        else:
+            module_label = module_name
         # if the module was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to the list to test.
