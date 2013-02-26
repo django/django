@@ -260,6 +260,13 @@ Now you're ready to actually put the release out there. To do this:
    include links to both the announcement blog post and the release
    notes. *FIXME: make some templates with example text*.
 
+#. For a new version release (e.g. 1.5, 1.6), update the default stable version
+   of the docs by flipping the ``is_default`` flag to ``True`` on the
+   appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
+   database (this will automatically flip it to ``False`` for all
+   others). *FIXME: I had to do this via fab managepy:shell,docs but we should
+   probably make it possible to do via the admin.*
+
 Post-release
 ============
 
