@@ -14,7 +14,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
-from django.db.utils import wrap_database_errors
+from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils import six
@@ -55,6 +55,9 @@ class BaseDatabaseWrapper(object):
     def __hash__(self):
         return hash(self.alias)
 
+    def wrap_database_errors(self):
+        return DatabaseErrorWrapper(self)
+
     def get_connection_params(self):
         raise NotImplementedError
 
@@ -68,7 +71,7 @@ class BaseDatabaseWrapper(object):
         raise NotImplementedError
 
     def _cursor(self):
-        with wrap_database_errors(self):
+        with self.wrap_database_errors():
             if self.connection is None:
                 conn_params = self.get_connection_params()
                 self.connection = self.get_new_connection(conn_params)
@@ -78,17 +81,17 @@ class BaseDatabaseWrapper(object):
 
     def _commit(self):
         if self.connection is not None:
-            with wrap_database_errors(self):
+            with self.wrap_database_errors():
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            with wrap_database_errors(self):
+            with self.wrap_database_errors():
                 return self.connection.rollback()
 
     def _close(self):
         if self.connection is not None:
-            with wrap_database_errors(self):
+            with self.wrap_database_errors():
                 return self.connection.close()
 
     def _enter_transaction_management(self, managed):

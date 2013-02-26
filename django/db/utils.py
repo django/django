@@ -22,7 +22,7 @@ class IntegrityError(DatabaseError):
     pass
 
 
-class wrap_database_errors(object):
+class DatabaseErrorWrapper(object):
     """
     Context manager and decorator that re-throws backend-specific database
     exceptions using Django's common wrappers.
