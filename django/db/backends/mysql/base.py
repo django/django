@@ -439,7 +439,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        self.set_autocommit(self._autocommit_status)
+        self.connection.autocommit(self._autocommit_status)
         cursor = self.connection.cursor()
         # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
         # on a recently-inserted row will return when the field is tested for
