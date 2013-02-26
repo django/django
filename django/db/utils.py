@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 import pkgutil
 from threading import local
@@ -12,14 +13,45 @@ from django.utils import six
 
 DEFAULT_DB_ALIAS = 'default'
 
-# Define some exceptions that mirror the PEP249 interface.
-# We will rethrow any backend-specific errors using these
-# common wrappers
+
 class DatabaseError(Exception):
     pass
 
+
 class IntegrityError(DatabaseError):
     pass
+
+
+class wrap_database_errors(object):
+    """
+    Context manager and decorator that re-throws backend-specific database
+    exceptions using Django's common wrappers.
+    """
+
+    def __init__(self, db):
+        """
+        db is a database connection wrapper providing DatabaseError and
+        IntegrityError attributes.
+        """
+        self.db = db
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            return
+        if issubclass(exc_type, self.db.IntegrityError):
+            six.reraise(IntegrityError, IntegrityError(*tuple(exc_value.args)), traceback)
+        if issubclass(exc_type, self.db.DatabaseError):
+            six.reraise(DatabaseError, DatabaseError(*tuple(exc_value.args)), traceback)
+
+    def __call__(self, func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+        return inner
 
 
 def load_backend(backend_name):

@@ -501,6 +501,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
     })
 
+    DatabaseError = Database.DatabaseError
+    IntegrityError = Database.IntegrityError
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
