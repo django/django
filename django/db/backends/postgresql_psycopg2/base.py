@@ -40,40 +40,6 @@ def utc_tzinfo_factory(offset):
         raise AssertionError("database connection isn't set to UTC")
     return utc
 
-class CursorWrapper(object):
-    """
-    A thin wrapper around psycopg2's normal cursor class so that we can catch
-    particular exception instances and reraise them with the right types.
-    """
-
-    def __init__(self, cursor):
-        self.cursor = cursor
-
-    def execute(self, query, args=None):
-        try:
-            return self.cursor.execute(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-
-    def executemany(self, query, args):
-        try:
-            return self.cursor.executemany(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-
-    def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
-
-    def __iter__(self):
-        return iter(self.cursor)
-
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
@@ -208,7 +174,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
-        return CursorWrapper(cursor)
+        return cursor
 
     def _enter_transaction_management(self, managed):
         """
@@ -239,10 +205,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
-
-    def _commit(self):
-        if self.connection is not None:
-            try:
-                return self.connection.commit()
-            except Database.IntegrityError as e:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
