@@ -33,7 +33,7 @@ def raises(request):
 
 def raises404(request):
     resolver = get_resolver(None)
-    resolver.resolve('')
+    resolver.resolve('/not-in-urls')
 
 def raises403(request):
     raise PermissionDenied
