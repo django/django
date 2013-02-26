@@ -401,6 +401,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation(self)
 
+        autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
+        self.features.uses_autocommit = autocommit
+
     def get_connection_params(self):
         kwargs = {
             'conv': django_conversions,
@@ -433,6 +436,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
+        if self.features.uses_autocommit:
+            self.set_autocommit(True)
         cursor = self.connection.cursor()
         # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
         # on a recently-inserted row will return when the field is tested for
@@ -459,6 +464,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
         return tuple([int(x) for x in match.groups()])
+
+    def _enter_transaction_management(self, managed):
+        """
+        Switch the isolation level when needing transaction support, so that
+        the same transaction is visible across all the queries.
+        """
+        if self.features.uses_autocommit and managed and self._autocommit_status:
+            self.set_autocommit(False)
+
+    def _leave_transaction_management(self, managed):
+        """
+        If the normal operating mode is "autocommit", switch back to that when
+        leaving transaction management.
+        """
+        if self.features.uses_autocommit and not managed and not self._autocommit_status:
+            self.set_autocommit(True)
+
+    def set_autocommit(self, state):
+        self._autocommit_status = state
+        self.connection.autocommit(state)
 
     def disable_constraint_checking(self):
         """
