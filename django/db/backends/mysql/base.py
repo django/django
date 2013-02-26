@@ -403,6 +403,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
         self.features.uses_autocommit = autocommit
+        self.set_autocommit(autocommit)
 
     def get_connection_params(self):
         kwargs = {
@@ -427,6 +428,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # "UPDATE", not the number of changed rows.
         kwargs['client_flag'] = CLIENT.FOUND_ROWS
         kwargs.update(settings_dict['OPTIONS'])
+        if 'autocommit' in kwargs:
+            del kwargs['autocommit']
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -436,8 +439,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        if self.features.uses_autocommit:
-            self.set_autocommit(True)
+        self.set_autocommit(self._autocommit_status)
         cursor = self.connection.cursor()
         # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
         # on a recently-inserted row will return when the field is tested for
@@ -483,7 +485,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def set_autocommit(self, state):
         self._autocommit_status = state
-        self.connection.autocommit(state)
+        if self.connection is not None:
+            self.connection.autocommit(state)
 
     def disable_constraint_checking(self):
         """
