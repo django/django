@@ -7,6 +7,7 @@ import logging
 from time import time
 
 from django.conf import settings
+from django.db.utils import wrap_database_errors
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
@@ -26,7 +27,12 @@ class CursorWrapper(object):
     def __getattr__(self, attr):
         if attr in ('execute', 'executemany', 'callproc'):
             self.set_dirty()
-        return getattr(self.cursor, attr)
+        cursor_attr = getattr(self.cursor, attr)
+        if attr in ('callproc', 'close', 'execute', 'executemany',
+                    'fetchone', 'fetchmany', 'fetchall', 'nextset'):
+            return wrap_database_errors(self.db)(cursor_attr)
+        else:
+            return cursor_attr
 
     def __iter__(self):
         return iter(self.cursor)
@@ -38,7 +44,8 @@ class CursorDebugWrapper(CursorWrapper):
         self.set_dirty()
         start = time()
         try:
-            return self.cursor.execute(sql, params)
+            with wrap_database_errors(self.db):
+                return self.cursor.execute(sql, params)
         finally:
             stop = time()
             duration = stop - start
@@ -55,7 +62,8 @@ class CursorDebugWrapper(CursorWrapper):
         self.set_dirty()
         start = time()
         try:
-            return self.cursor.executemany(sql, param_list)
+            with wrap_database_errors(self.db):
+                return self.cursor.executemany(sql, param_list)
         finally:
             stop = time()
             duration = stop - start

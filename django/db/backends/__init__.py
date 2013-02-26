@@ -14,6 +14,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
+from django.db.utils import wrap_database_errors
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils import six
@@ -67,20 +68,28 @@ class BaseDatabaseWrapper(object):
         raise NotImplementedError
 
     def _cursor(self):
-        if self.connection is None:
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
-        return self.create_cursor()
+        with wrap_database_errors(self):
+            if self.connection is None:
+                conn_params = self.get_connection_params()
+                self.connection = self.get_new_connection(conn_params)
+                self.init_connection_state()
+                connection_created.send(sender=self.__class__, connection=self)
+            return self.create_cursor()
 
     def _commit(self):
         if self.connection is not None:
-            return self.connection.commit()
+            with wrap_database_errors(self):
+                return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            return self.connection.rollback()
+            with wrap_database_errors(self):
+                return self.connection.rollback()
+
+    def _close(self):
+        if self.connection is not None:
+            with wrap_database_errors(self):
+                return self.connection.close()
 
     def _enter_transaction_management(self, managed):
         """
@@ -340,8 +349,9 @@ class BaseDatabaseWrapper(object):
 
     def close(self):
         self.validate_thread_sharing()
-        if self.connection is not None:
-            self.connection.close()
+        try:
+            self._close()
+        finally:
             self.connection = None
 
     def cursor(self):
