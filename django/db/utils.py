@@ -41,10 +41,13 @@ class DatabaseErrorWrapper(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             return
-        if issubclass(exc_type, self.db.IntegrityError):
-            six.reraise(IntegrityError, IntegrityError(*tuple(exc_value.args)), traceback)
-        if issubclass(exc_type, self.db.DatabaseError):
-            six.reraise(DatabaseError, DatabaseError(*tuple(exc_value.args)), traceback)
+        for dj_exc_type in (IntegrityError, DatabaseError):
+            db_exc_type = getattr(self.db, dj_exc_type.__name__)
+            if issubclass(exc_type, db_exc_type):
+                dj_exc_value = dj_exc_type(*tuple(exc_value.args))
+                if six.PY3:
+                    dj_exc_value.__cause__ = exc_value
+                six.reraise(dj_exc_type, dj_exc_value, traceback)
 
     def __call__(self, func):
         @wraps(func)
