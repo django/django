@@ -13,7 +13,7 @@ CONTRIB_DIR_NAME = 'django.contrib'
 
 TEST_TEMPLATE_DIR = 'templates'
 
-RUNTESTS_DIR = os.path.dirname(upath(__file__))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
