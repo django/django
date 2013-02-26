@@ -73,7 +73,9 @@ class SelectDateWidget(Widget):
                         v = datetime.datetime.strptime(force_str(value), input_format)
                         year_val, month_val, day_val = v.year, v.month, v.day
                     except ValueError:
-                        pass
+                        match = RE_DATE.match(value)
+                        if match:
+                            year_val, month_val, day_val = [int(v) for v in match.groups()]
                 else:
                     match = RE_DATE.match(value)
                     if match:
