@@ -19,35 +19,35 @@ class DefaultLoader(unittest.TestCase):
 
     def test_loader(self):
         "Normal module existence can be tested"
-        test_module = import_module('regressiontests.utils.test_module')
+        test_module = import_module('utils_tests.test_module')
         test_no_submodule = import_module(
-            'regressiontests.utils.test_no_submodule')
+            'utils_tests.test_no_submodule')
 
         # An importable child
         self.assertTrue(module_has_submodule(test_module, 'good_module'))
-        mod = import_module('regressiontests.utils.test_module.good_module')
+        mod = import_module('utils_tests.test_module.good_module')
         self.assertEqual(mod.content, 'Good Module')
 
         # A child that exists, but will generate an import error if loaded
         self.assertTrue(module_has_submodule(test_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.bad_module')
+        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.bad_module')
 
         # A child that doesn't exist
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.no_such_module')
+        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.no_such_module')
 
         # A child that doesn't exist, but is the name of a package on the path
         self.assertFalse(module_has_submodule(test_module, 'django'))
-        self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.django')
+        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
 
         # Don't be confused by caching of import misses
-        import types  # causes attempted import of regressiontests.utils.types
-        self.assertFalse(module_has_submodule(sys.modules['regressiontests.utils'], 'types'))
+        import types  # causes attempted import of utils_tests.types
+        self.assertFalse(module_has_submodule(sys.modules['utils_tests'], 'types'))
 
         # A module which doesn't have a __path__ (so no submodules)
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
         self.assertRaises(ImportError, import_module,
-            'regressiontests.utils.test_no_submodule.anything')
+            'utils_tests.test_no_submodule.anything')
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
@@ -113,7 +113,7 @@ class ModuleImportTestCase(unittest.TestCase):
 
         # Test exceptions raised
         for path in ('no_dots_in_path', 'unexistent.path',
-                'tests.regressiontests.utils.unexistent'):
+                'tests.utils_tests.unexistent'):
             self.assertRaises(ImproperlyConfigured, import_by_path, path)
 
         with self.assertRaises(ImproperlyConfigured) as cm:

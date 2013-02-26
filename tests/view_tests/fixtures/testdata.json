@@ -19,44 +19,44 @@
     },
     {
         "pk": 1,
-        "model": "views.author",
+        "model": "view_tests.author",
         "fields": {
             "name": "Boris"
         }
     },
     {
         "pk": 1,
-        "model": "views.article",
+        "model": "view_tests.article",
         "fields": {
             "author": 1,
             "title": "Old Article",
             "slug": "old_article",
             "date_created": "2001-01-01 21:22:23"
         }
-    }, 
+    },
     {
-        "pk": 2, 
-        "model": "views.article", 
+        "pk": 2,
+        "model": "view_tests.article",
         "fields": {
-            "author": 1, 
+            "author": 1,
             "title": "Current Article",
             "slug": "current_article",
             "date_created": "2007-09-17 21:22:23"
         }
-    }, 
+    },
     {
-        "pk": 3, 
-        "model": "views.article", 
+        "pk": 3,
+        "model": "view_tests.article",
         "fields": {
-            "author": 1, 
+            "author": 1,
             "title": "Future Article",
             "slug": "future_article",
             "date_created": "3000-01-01 21:22:23"
         }
-    }, 
+    },
 	{
         "pk": 1,
-        "model": "views.urlarticle",
+        "model": "view_tests.urlarticle",
         "fields": {
             "author": 1,
             "title": "Old Article",

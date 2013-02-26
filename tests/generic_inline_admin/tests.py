@@ -19,7 +19,7 @@ from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericAdminViewTest(TestCase):
-    urls = "regressiontests.generic_inline_admin.urls"
+    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -132,7 +132,7 @@ class GenericAdminViewTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminParametersTest(TestCase):
-    urls = "regressiontests.generic_inline_admin.urls"
+    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -186,7 +186,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
-    urls = "regressiontests.generic_inline_admin.urls"
+    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -213,7 +213,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.assertEqual(response.status_code, 302) # redirect somewhere
 
 class NoInlineDeletionTest(TestCase):
-    urls = "regressiontests.generic_inline_admin.urls"
+    urls = "generic_inline_admin.urls"
 
     def test_no_deletion(self):
         fake_site = object()
@@ -235,7 +235,7 @@ request.user = MockSuperUser()
 
 
 class GenericInlineModelAdminTest(TestCase):
-    urls = "regressiontests.generic_inline_admin.urls"
+    urls = "generic_inline_admin.urls"
 
     def setUp(self):
         self.site = AdminSite()

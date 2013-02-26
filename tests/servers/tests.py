@@ -30,7 +30,7 @@ TEST_SETTINGS = {
 
 
 class LiveServerBase(LiveServerTestCase):
-    urls = 'regressiontests.servers.urls'
+    urls = 'servers.urls'
     fixtures = ['testdata.json']
 
     @classmethod

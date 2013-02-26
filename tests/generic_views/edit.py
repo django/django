@@ -22,7 +22,7 @@ class FormMixinTests(TestCase):
 
 
 class BasicFormTests(TestCase):
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_post_data(self):
         res = self.client.post('/contact/', {'name': "Me", 'message': "Hello"})
@@ -35,7 +35,7 @@ class ModelFormMixinTests(TestCase):
         self.assertEqual(form_class._meta.model, Author)
 
 class CreateViewTests(TestCase):
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_create(self):
         res = self.client.get('/edit/authors/create/')
@@ -114,7 +114,7 @@ class CreateViewTests(TestCase):
 
 
 class UpdateViewTests(TestCase):
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_update_post(self):
         a = Author.objects.create(
@@ -252,7 +252,7 @@ class UpdateViewTests(TestCase):
 
 
 class DeleteViewTests(TestCase):
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_delete_by_post(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})

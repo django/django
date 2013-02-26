@@ -15,13 +15,13 @@ from django.utils._os import upath
 
 def test_processor(request):
     return {'processors': 'yes'}
-test_processor_name = 'regressiontests.templates.response.test_processor'
+test_processor_name = 'template_tests.response.test_processor'
 
 
 # A test middleware that installs a temporary URLConf
 class CustomURLConfMiddleware(object):
     def process_request(self, request):
-        request.urlconf = 'regressiontests.templates.alternate_urls'
+        request.urlconf = 'template_tests.alternate_urls'
 
 
 class SimpleTemplateResponseTest(TestCase):
@@ -298,12 +298,12 @@ class TemplateResponseTest(TestCase):
 
 
 class CustomURLConfTest(TestCase):
-    urls = 'regressiontests.templates.urls'
+    urls = 'template_tests.urls'
 
     def setUp(self):
         self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
         settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES) + [
-            'regressiontests.templates.response.CustomURLConfMiddleware'
+            'template_tests.response.CustomURLConfMiddleware'
         ]
 
     def tearDown(self):
@@ -316,7 +316,7 @@ class CustomURLConfTest(TestCase):
 
 
 class CacheMiddlewareTest(TestCase):
-    urls = 'regressiontests.templates.alternate_urls'
+    urls = 'template_tests.alternate_urls'
 
     def setUp(self):
         self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES

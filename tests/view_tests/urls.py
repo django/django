@@ -15,27 +15,27 @@ locale_dir = path.join(base_dir, 'locale')
 
 js_info_dict = {
     'domain': 'djangojs',
-    'packages': ('regressiontests.views',),
+    'packages': ('view_tests',),
 }
 
 js_info_dict_english_translation = {
     'domain': 'djangojs',
-    'packages': ('regressiontests.views.app0',),
+    'packages': ('view_tests.app0',),
 }
 
 js_info_dict_multi_packages1 = {
     'domain': 'djangojs',
-    'packages': ('regressiontests.views.app1', 'regressiontests.views.app2'),
+    'packages': ('view_tests.app1', 'view_tests.app2'),
 }
 
 js_info_dict_multi_packages2 = {
     'domain': 'djangojs',
-    'packages': ('regressiontests.views.app3', 'regressiontests.views.app4'),
+    'packages': ('view_tests.app3', 'view_tests.app4'),
 }
 
 js_info_dict_admin = {
     'domain': 'djangojs',
-    'packages': ('django.contrib.admin', 'regressiontests.views'),
+    'packages': ('django.contrib.admin', 'view_tests'),
 }
 
 urlpatterns = patterns('',
@@ -64,7 +64,7 @@ urlpatterns = patterns('',
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),
 )
 
-urlpatterns += patterns('regressiontests.views.views',
+urlpatterns += patterns('view_tests.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
     url(r'^raises_template_does_not_exist/$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),

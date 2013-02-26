@@ -237,7 +237,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
 class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_modelchoicefield(self):
         # Create choices for the model choice field tests below.
-        from regressiontests.forms.models import ChoiceModel
+        from forms_tests.models import ChoiceModel
         c1 = ChoiceModel.objects.create(pk=1, name='a')
         c2 = ChoiceModel.objects.create(pk=2, name='b')
         c3 = ChoiceModel.objects.create(pk=3, name='c')

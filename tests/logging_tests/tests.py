@@ -14,7 +14,7 @@ from django.utils.log import CallbackFilter, RequireDebugFalse, RequireDebugTrue
 from django.utils.six import StringIO
 from django.utils.unittest import skipUnless
 
-from ..admin_scripts.tests import AdminScriptTestCase
+from admin_scripts.tests import AdminScriptTestCase
 
 from .logconfig import MyEmailBackend
 
@@ -145,7 +145,7 @@ class AdminEmailHandlerTest(TestCase):
     logger = logging.getLogger('django.request')
 
     def get_admin_email_handler(self, logger):
-        # Inspired from regressiontests/views/views.py: send_log()
+        # Inspired from views/views.py: send_log()
         # ensuring the AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
@@ -290,7 +290,7 @@ class AdminEmailHandlerTest(TestCase):
         orig_email_backend = admin_email_handler.email_backend
         mail.mail_admins = my_mail_admins
         admin_email_handler.email_backend = (
-            'regressiontests.logging_tests.logconfig.MyEmailBackend')
+            'logging_tests.logconfig.MyEmailBackend')
 
         try:
             self.logger.error(message)
@@ -341,5 +341,5 @@ class SettingsConfigureLogging(TestCase):
     def test_configure_initializes_logging(self):
         settings = LazySettings()
         settings.configure(
-            LOGGING_CONFIG='regressiontests.logging_tests.tests.dictConfig')
+            LOGGING_CONFIG='logging_tests.tests.dictConfig')
         self.assertTrue(dictConfig.called)

@@ -10,7 +10,7 @@ from django.utils import six, unittest
 
 
 class WSGITest(TestCase):
-    urls = "regressiontests.wsgi.urls"
+    urls = "wsgi.urls"
 
     def test_get_wsgi_application(self):
         """
@@ -44,7 +44,7 @@ class WSGITest(TestCase):
 
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):
-    @override_settings(WSGI_APPLICATION="regressiontests.wsgi.wsgi.application")
+    @override_settings(WSGI_APPLICATION="wsgi.wsgi.application")
     def test_success(self):
         """
         If ``WSGI_APPLICATION`` is a dotted path, the referenced object is
@@ -81,19 +81,19 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
             basehttp.get_wsgi_application = _orig_get_wsgi_app
 
 
-    @override_settings(WSGI_APPLICATION="regressiontests.wsgi.noexist.app")
+    @override_settings(WSGI_APPLICATION="wsgi.noexist.app")
     def test_bad_module(self):
         with six.assertRaisesRegex(self,
             ImproperlyConfigured,
-            r"^WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; Error importing.*"):
+            r"^WSGI application 'wsgi.noexist.app' could not be loaded; Error importing.*"):
 
             get_internal_wsgi_application()
 
 
-    @override_settings(WSGI_APPLICATION="regressiontests.wsgi.wsgi.noexist")
+    @override_settings(WSGI_APPLICATION="wsgi.wsgi.noexist")
     def test_bad_name(self):
         with six.assertRaisesRegex(self,
             ImproperlyConfigured,
-            r"^WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; Module.*"):
+            r"^WSGI application 'wsgi.wsgi.noexist' could not be loaded; Module.*"):
 
             get_internal_wsgi_application()

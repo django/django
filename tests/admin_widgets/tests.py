@@ -460,7 +460,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']
-    urls = "regressiontests.admin_widgets.urls"
+    urls = "admin_widgets.urls"
 
     def test_show_hide_date_time_picker_widgets(self):
         """
@@ -516,7 +516,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']
-    urls = "regressiontests.admin_widgets.urls"
+    urls = "admin_widgets.urls"
 
     def setUp(self):
         self.lisa = models.Student.objects.create(name='Lisa')

@@ -12,7 +12,7 @@ from ..models import Article
 
 
 class CommentFeedTests(CommentTestCase):
-    urls = 'regressiontests.comment_tests.urls'
+    urls = 'comment_tests.urls'
     feed_url = '/rss/comments/'
 
     def setUp(self):

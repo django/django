@@ -34,7 +34,7 @@ class URLTestCaseBase(TestCase):
     """
     TestCase base-class for the URL tests.
     """
-    urls = 'regressiontests.i18n.patterns.urls.default'
+    urls = 'i18n.patterns.urls.default'
 
     def setUp(self):
         # Make sure the cache is empty before we are doing our tests.
@@ -61,13 +61,13 @@ class URLPrefixTests(URLTestCaseBase):
         with translation.override('nl'):
             self.assertEqual(reverse('prefixed'), '/nl/prefixed/')
 
-    @override_settings(ROOT_URLCONF='regressiontests.i18n.patterns.urls.wrong')
+    @override_settings(ROOT_URLCONF='i18n.patterns.urls.wrong')
     def test_invalid_prefix_use(self):
         self.assertRaises(ImproperlyConfigured, lambda: reverse('account:register'))
 
 
 class URLDisabledTests(URLTestCaseBase):
-    urls = 'regressiontests.i18n.patterns.urls.disabled'
+    urls = 'i18n.patterns.urls.disabled'
 
     @override_settings(USE_I18N=False)
     def test_prefixed_i18n_disabled(self):
@@ -82,7 +82,7 @@ class PathUnusedTests(URLTestCaseBase):
     Check that if no i18n_patterns is used in root urlconfs, then no
     language activation happens based on url prefix.
     """
-    urls = 'regressiontests.i18n.patterns.urls.path_unused'
+    urls = 'i18n.patterns.urls.path_unused'
 
     def test_no_lang_activate(self):
         response = self.client.get('/nl/foo/')

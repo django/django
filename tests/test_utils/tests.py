@@ -23,7 +23,7 @@ class SkippingTestCase(TestCase):
 
 
 class AssertNumQueriesTests(TestCase):
-    urls = 'regressiontests.test_utils.urls'
+    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
@@ -95,7 +95,7 @@ class AssertQuerysetEqualTests(TestCase):
 
 
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'regressiontests.test_utils.urls'
+    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):

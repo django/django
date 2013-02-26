@@ -27,7 +27,7 @@ from django.utils import six
 from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
-from ..servers.tests import LiveServerBase
+from servers.tests import LiveServerBase
 
 # Try to import PIL in either of the two ways it can end up installed.
 # Checking for the existence of Image is enough for CPython, but

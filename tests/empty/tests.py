@@ -31,7 +31,7 @@ class NoModelTests(TestCase):
 
     It seemed like an appropriate home for it.
     """
-    @override_settings(INSTALLED_APPS=("modeltests.empty.no_models",))
+    @override_settings(INSTALLED_APPS=("empty.no_models",))
     def test_no_models(self):
         with six.assertRaisesRegex(self, ImproperlyConfigured,
                     'App with label no_models is missing a models.py module.'):

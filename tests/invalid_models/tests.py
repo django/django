@@ -43,7 +43,7 @@ class InvalidModelTestCase(unittest.TestCase):
     )
     def test_invalid_models(self):
         try:
-            module = load_app("modeltests.invalid_models.invalid_models")
+            module = load_app("invalid_models.invalid_models")
         except Exception:
             self.fail('Unable to load invalid model module')
 

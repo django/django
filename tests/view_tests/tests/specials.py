@@ -8,7 +8,7 @@ class URLHandling(TestCase):
     """
     Tests for URL handling in views and responses.
     """
-    urls = 'regressiontests.views.generic_urls'
+    urls = 'view_tests.generic_urls'
     redirect_target = "/%E4%B8%AD%E6%96%87/target/"
 
     def test_combining_redirect(self):

@@ -31,7 +31,7 @@ class HandlerTests(TestCase):
 
 
 class SignalsTests(TestCase):
-    urls = 'regressiontests.handlers.urls'
+    urls = 'handlers.urls'
 
     def setUp(self):
         self.signals = []

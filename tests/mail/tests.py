@@ -243,7 +243,7 @@ class MailTests(TestCase):
 
     def test_custom_backend(self):
         """Test custom backend defined in this suite."""
-        conn = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
+        conn = mail.get_connection('mail.custombackend.EmailBackend')
         self.assertTrue(hasattr(conn, 'test_outbox'))
         email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         conn.send_messages([email])
@@ -271,13 +271,13 @@ class MailTests(TestCase):
         mail.outbox = []
 
         # Send using non-default connection
-        connection = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
+        connection = mail.get_connection('mail.custombackend.EmailBackend')
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, 'Subject')
 
-        connection = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
+        connection = mail.get_connection('mail.custombackend.EmailBackend')
         send_mass_mail([
                 ('Subject1', 'Content1', 'from1@example.com', ['to1@example.com']),
                 ('Subject2', 'Content2', 'from2@example.com', ['to2@example.com']),
@@ -287,13 +287,13 @@ class MailTests(TestCase):
         self.assertEqual(connection.test_outbox[0].subject, 'Subject1')
         self.assertEqual(connection.test_outbox[1].subject, 'Subject2')
 
-        connection = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
+        connection = mail.get_connection('mail.custombackend.EmailBackend')
         mail_admins('Admin message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, '[Django] Admin message')
 
-        connection = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
+        connection = mail.get_connection('mail.custombackend.EmailBackend')
         mail_managers('Manager message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)

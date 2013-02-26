@@ -16,5 +16,5 @@ urlpatterns += i18n_patterns('',
     url(r'^prefixed/$', view, name='prefixed'),
     url(r'^prefixed\.xml$', view, name='prefixed_xml'),
     url(_(r'^users/$'), view, name='users'),
-    url(_(r'^account/'), include('regressiontests.i18n.patterns.urls.namespace', namespace='account')),
+    url(_(r'^account/'), include('i18n.patterns.urls.namespace', namespace='account')),
 )

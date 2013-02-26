@@ -299,8 +299,8 @@ class TestCollectionFilesOverride(CollectionTestCase):
     Check for proper handling of apps order in INSTALLED_APPS even if file modification
     dates are in different order:
 
-        'regressiontests.staticfiles_tests.apps.test',
-        'regressiontests.staticfiles_tests.apps.no_label',
+        'staticfiles_tests.apps.test',
+        'staticfiles_tests.apps.no_label',
 
     """
     def setUp(self):
@@ -350,7 +350,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.DummyStorage',
+    STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage',
 )
 class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
     """
@@ -553,7 +553,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(TEST_SETTINGS,
-    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
+    STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
     DEBUG=False,
 ))
 class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
@@ -613,7 +613,7 @@ class TestServeStatic(StaticFilesTestCase):
     """
     Test static asset serving view.
     """
-    urls = 'regressiontests.staticfiles_tests.urls.default'
+    urls = 'staticfiles_tests.urls.default'
 
     def _response(self, filepath):
         return self.client.get(
@@ -650,7 +650,7 @@ class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.
     """
-    urls = 'regressiontests.staticfiles_tests.urls.helper'
+    urls = 'staticfiles_tests.urls.helper'
 
 
 class TestServeAdminMedia(TestServeStatic):

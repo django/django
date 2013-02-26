@@ -11,7 +11,7 @@ from .models import Author, Artist
 
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'generic_views.urls'
 
     def test_items(self):
         res = self.client.get('/list/dict/')

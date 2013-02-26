@@ -24,7 +24,7 @@ from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
 
 
 class ChangeListTests(TestCase):
-    urls = "regressiontests.admin_changelist.urls"
+    urls = "admin_changelist.urls"
 
     def setUp(self):
         self.factory = RequestFactory()

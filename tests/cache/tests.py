@@ -809,7 +809,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.prefix_cache = get_cache(self.backend_name, LOCATION=self._table_name, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, LOCATION=self._table_name, VERSION=2)
         self.custom_key_cache = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         from django.db import connection
@@ -897,7 +897,7 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.prefix_cache = get_cache(self.backend_name, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, VERSION=2)
         self.custom_key_cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        self.custom_key_cache2 = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30}, KEY_FUNCTION='cache.tests.custom_key_func')
 
         # LocMem requires a hack to make the other caches
         # share a data store with the 'normal' cache.
@@ -966,7 +966,7 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         self.prefix_cache = get_cache(cache_key, KEY_PREFIX=random_prefix)
         self.v2_cache = get_cache(cache_key, VERSION=2)
         self.custom_key_cache = get_cache(cache_key, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(cache_key, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        self.custom_key_cache2 = get_cache(cache_key, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
@@ -1011,7 +1011,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         self.prefix_cache = get_cache(self.backend_name, LOCATION=self.dirname, KEY_PREFIX='cacheprefix')
         self.v2_cache = get_cache(self.backend_name, LOCATION=self.dirname, VERSION=2)
         self.custom_key_cache = get_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION=custom_key_func)
-        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION='regressiontests.cache.tests.custom_key_func')
+        self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self.dirname, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
         self.cache.clear()
@@ -1055,7 +1055,7 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 
     """
     def test_custom_key_validation(self):
-        cache = get_cache('regressiontests.cache.liberal_backend://')
+        cache = get_cache('cache.liberal_backend://')
 
         # this key is both longer than 250 characters, and has spaces
         key = 'some key with spaces' * 15
@@ -1082,7 +1082,7 @@ class GetCacheTests(unittest.TestCase):
 
     def test_close(self):
         from django.core import signals
-        cache = get_cache('regressiontests.cache.closeable_cache.CacheClass')
+        cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
@@ -1865,7 +1865,7 @@ class TestWithTemplateResponse(TestCase):
 
 class TestEtagWithAdmin(TestCase):
     # See https://code.djangoproject.com/ticket/16003
-    urls = "regressiontests.admin_views.urls"
+    urls = "admin_views.urls"
 
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
