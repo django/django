@@ -24,7 +24,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
@@ -911,11 +911,10 @@ class ModelAdmin(BaseModelAdmin):
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if IS_POPUP_VAR in request.POST:
-            return HttpResponse(
-                '<!DOCTYPE html><html><head><title></title></head><body>'
-                '<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' % \
-                # escape() calls force_text.
-                (escape(pk_value), escapejs(obj)))
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'pk_value': escape(pk_value),
+                'obj': escapejs(obj)
+            })
 
         elif "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict

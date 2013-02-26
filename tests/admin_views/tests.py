@@ -2554,6 +2554,17 @@ action)</option>
             '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
         self.assertEqual(response.context["action_form"], None)
 
+    def test_popup_template_response(self):
+        """
+        Success on popups shall be rendered from template in order to allow
+        easy customization.
+        """
+        response = self.client.post(
+            '/test_admin/admin/admin_views/actor/add/?%s=1' % IS_POPUP_VAR,
+            {'name': 'Troy McClure', 'age': '55', IS_POPUP_VAR: '1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template_name, 'admin/popup_response.html')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestCustomChangeList(TestCase):
@@ -4275,7 +4286,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Get the `add_view`.
         response = self.client.get(self.get_add_url())
         self.assertEqual(response.status_code, 200)
-    
+
         # Check the form action.
         form_action = """<form enctype="multipart/form-data" action="?%s" method="post" id="user_form">""" % self.get_preserved_filters_querystring()
         self.assertContains(response, form_action, count=1)
