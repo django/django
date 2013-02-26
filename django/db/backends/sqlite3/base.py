@@ -10,7 +10,6 @@ import datetime
 import decimal
 import warnings
 import re
-import sys
 
 from django.db import utils
 from django.db.backends import *
@@ -291,6 +290,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
@@ -398,24 +399,14 @@ class SQLiteCursorWrapper(Database.Cursor):
     """
     def execute(self, query, params=()):
         query = self.convert_query(query)
-        try:
-            return Database.Cursor.execute(self, query, params)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+        return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
-        try:
-            return Database.Cursor.executemany(self, query, param_list)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+        return Database.Cursor.executemany(self, query, param_list)
 
     def convert_query(self, query):
-        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')
+        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%', '%')
 
 def _sqlite_date_extract(lookup_type, dt):
     if dt is None:
