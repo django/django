@@ -4,11 +4,13 @@ import sys
 import time
 
 from django.conf import settings
-from django.db import transaction, connection
+from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.utils import unittest
+
+from multiple_database.tests import TestRouter
 
 from .models import Person
 
@@ -268,3 +270,13 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         people = list(Person.objects.select_for_update())
         self.assertTrue(transaction.is_dirty())
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_select_for_update_on_multidb(self):
+        old_routers = router.routers
+        try:
+            router.routers = [TestRouter()]
+            query = Person.objects.select_for_update()
+            self.assertEqual(router.db_for_write(Person), query.db)
+        finally:
+            router.routers = old_routers
