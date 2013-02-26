@@ -64,9 +64,9 @@ Serving files uploaded by a user
 ================================
 
 During development, you can serve user-uploaded media files from
-:setting:`MEDIA_ROOT`.  using, the
-:func:`django.contrib.staticfiles.views.serve` view. For clarity, this
-is not suitable for production use. For some common deployment strategies, see
+:setting:`MEDIA_ROOT` using, the
+:func:`django.contrib.staticfiles.views.serve` view. For clarity, this is not
+suitable for production use. For some common deployment strategies, see
 :doc:`/howto/static-files-in-production`.
 
 For example, if your :setting:`MEDIA_URL` is defined as '/media/', you can do
