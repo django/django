@@ -105,7 +105,7 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def run_test(self, script, args, settings_file=None, apps=None):
         project_dir = test_dir
-        base_dir = os.path.dirname(project_dir)
+        base_dir = os.path.dirname(test_dir)
         import django
         django_dir = os.path.dirname(os.path.dirname(django.__file__))
         tests_dir = os.path.join(django_dir, 'tests')
@@ -126,7 +126,7 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
-        python_path = [project_dir, base_dir, django_dir, tests_dir]
+        python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
