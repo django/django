@@ -2470,6 +2470,17 @@ class AdminActionsTest(TestCase):
             '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
         self.assertEqual(response.context["action_form"], None)
 
+    def test_popup_template_response(self):
+        """
+        Success on popups shall be rendered from template in order to allow
+        easy customization.
+        """
+        response = self.client.post(
+            '/test_admin/admin/admin_views/actor/add/?_popup=1',
+            {'name': 'Troy McClure', 'age': '55', '_popup': '1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template_name, 'admin/popup_response.html')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestCustomChangeList(TestCase):
