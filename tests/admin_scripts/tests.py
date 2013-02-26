@@ -106,9 +106,12 @@ class AdminScriptTestCase(unittest.TestCase):
     def run_test(self, script, args, settings_file=None, apps=None):
         project_dir = test_dir
         base_dir = os.path.dirname(test_dir)
-        import django
-        django_dir = os.path.dirname(os.path.dirname(django.__file__))
-        tests_dir = os.path.join(django_dir, 'tests')
+        # The base dir for Django's tests is one level up.
+        tests_dir = os.path.dirname(os.path.dirname(__file__))
+        # The base dir for Django is one level above the test dir. We don't use
+        # `import django` to figure that out, so we don't pick up a Django
+        # from site-packages or similar.
+        django_dir = os.path.dirname(tests_dir)
         ext_backend_base_dirs = self._ext_backend_paths()
 
         # Remember the old environment
