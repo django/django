@@ -8,7 +8,7 @@ import threading
 from django.conf import settings
 from django.core.management.color import no_style
 from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
-    IntegrityError, transaction)
+    DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.models import Sum, Avg, Variance, StdDev
@@ -444,7 +444,7 @@ class BackendTestCase(TestCase):
         connection.settings_dict['PASSWORD'] = "françois"
         try:
             cursor = connection.cursor()
-        except backend.Database.DatabaseError:
+        except DatabaseError:
             # As password is probably wrong, a database exception is expected
             pass
         except Exception as e:
