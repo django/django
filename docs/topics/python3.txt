@@ -238,7 +238,7 @@ under Python 3, use the :func:`str` builtin::
     str('my string')
 
 In Python 3, there aren't any automatic conversions between ``str`` and
-``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.decode`
+``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.encode`
 always returns ``bytes``, and ``bytes.decode`` always returns ``str``. As a
 consequence, the following pattern is sometimes necessary::
 
