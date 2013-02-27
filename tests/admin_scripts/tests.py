@@ -26,7 +26,7 @@ from django.utils.six import StringIO
 from django.test import LiveServerTestCase
 
 
-test_dir = os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project')
+test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
     open(os.path.join(test_dir, '__init__.py'), 'w').close()
