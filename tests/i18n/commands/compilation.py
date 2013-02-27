@@ -56,6 +56,10 @@ class PercentRenderingTests(MessageCompilationTests):
     LOCALE='it'
     MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
+    def setUp(self):
+        super(PercentRenderingTests, self).setUp()
+        self.addCleanup(os.unlink, os.path.join(test_dir, self.MO_FILE))
+
     @override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
     def test_percent_symbol_escaping(self):
         from django.template import Template, Context
