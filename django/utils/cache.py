@@ -181,7 +181,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:
-            ctx.update(value)
+            ctx.update(force_bytes(value))
     path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, path.hexdigest(), ctx.hexdigest())
