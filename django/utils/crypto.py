@@ -72,10 +72,10 @@ def get_random_string(length=12,
         # is better than absolute predictability.
         random.seed(
             hashlib.sha256(
-                "%s%s%s" % (
+                ("%s%s%s" % (
                     random.getstate(),
                     time.time(),
-                    settings.SECRET_KEY)
+                    settings.SECRET_KEY)).encode('utf-8')
                 ).digest())
     return ''.join([random.choice(allowed_chars) for i in range(length)])
 
