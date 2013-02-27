@@ -14,9 +14,12 @@ class MessageCompilationTests(SimpleTestCase):
 
     def setUp(self):
         self._cwd = os.getcwd()
+        self.addCleanup(os.chdir, self._cwd)
+        os.chdir(test_dir)
 
-    def tearDown(self):
-        os.chdir(self._cwd)
+    def rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
 
 
 class PoFileTests(MessageCompilationTests):
@@ -25,7 +28,6 @@ class PoFileTests(MessageCompilationTests):
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def test_bom_rejection(self):
-        os.chdir(test_dir)
         with self.assertRaises(CommandError) as cm:
             call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
         self.assertIn("file has a BOM (Byte Order Mark)", cm.exception.args[0])
@@ -43,7 +45,6 @@ class PoFileContentsTests(MessageCompilationTests):
         self.addCleanup(os.unlink, os.path.join(test_dir, self.MO_FILE))
 
     def test_percent_symbol_in_po_file(self):
-        os.chdir(test_dir)
         call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
         self.assertTrue(os.path.exists(self.MO_FILE))
 
@@ -58,7 +59,6 @@ class PercentRenderingTests(MessageCompilationTests):
     @override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
     def test_percent_symbol_escaping(self):
         from django.template import Template, Context
-        os.chdir(test_dir)
         call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
         with translation.override(self.LOCALE):
             t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
@@ -77,24 +77,18 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
     def setUp(self):
         super(MultipleLocaleCompilationTests, self).setUp()
-        self.localedir = os.path.join(test_dir, 'locale')
-        self.MO_FILE_HR = os.path.join(self.localedir, 'hr/LC_MESSAGES/django.mo')
-        self.MO_FILE_FR = os.path.join(self.localedir, 'fr/LC_MESSAGES/django.mo')
-        self.addCleanup(self._rmfile, os.path.join(self.localedir, self.MO_FILE_HR))
-        self.addCleanup(self._rmfile, os.path.join(self.localedir, self.MO_FILE_FR))
-
-    def _rmfile(self, filepath):
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        localedir = os.path.join(test_dir, 'locale')
+        self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
+        self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
+        self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_HR))
+        self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_FR))
 
     def test_one_locale(self):
-        os.chdir(test_dir)
         call_command('compilemessages', locale='hr', stderr=StringIO())
 
         self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
-        os.chdir(test_dir)
         call_command('compilemessages', locale=['hr', 'fr'], stderr=StringIO())
 
         self.assertTrue(os.path.exists(self.MO_FILE_HR))
@@ -108,13 +102,8 @@ class CompilationErrorHandling(MessageCompilationTests):
 
     def setUp(self):
         super(CompilationErrorHandling, self).setUp()
-        self.addCleanup(self._rmfile, os.path.join(test_dir, self.MO_FILE))
-
-    def _rmfile(self, filepath):
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        self.addCleanup(self.rmfile, os.path.join(test_dir, self.MO_FILE))
 
     def test_error_reported_by_msgfmt(self):
-        os.chdir(test_dir)
         with self.assertRaises(CommandError):
             call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
