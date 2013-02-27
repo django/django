@@ -14,7 +14,7 @@ from django.utils import six
 DEFAULT_DB_ALIAS = 'default'
 
 
-class Error(StandardError):
+class Error(Exception if six.PY3 else StandardError):
     pass
 
 
@@ -81,7 +81,12 @@ class DatabaseErrorWrapper(object):
             ):
             db_exc_type = getattr(self.database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
-                dj_exc_value = dj_exc_type(*tuple(exc_value.args))
+                # Under Python 2.6, exc_value can still be a string.
+                try:
+                    args = tuple(exc_value.args)
+                except AttributeError:
+                    args = (exc_value,)
+                dj_exc_value = dj_exc_type(*args)
                 if six.PY3:
                     dj_exc_value.__cause__ = exc_value
                 six.reraise(dj_exc_type, dj_exc_value, traceback)
