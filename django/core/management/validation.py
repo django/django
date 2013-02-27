@@ -56,8 +56,8 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
 
             # Check that REQUIRED_FIELDS is a list.
-            if not isinstance(cls.REQUIRED_FIELDS, list):
-                e.add(opts, 'The REQUIRED_FIELDS must be a list.')
+            if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                e.add(opts, 'The REQUIRED_FIELDS must be a list or tuple.')
 
             # Check that the username field is unique
             if not opts.get_field(cls.USERNAME_FIELD).unique:
