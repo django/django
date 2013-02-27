@@ -21,7 +21,7 @@ from django.template import Template, Context
 from django.utils import archive
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.commands.makemessages import handle_extensions
+from django.core.management.utils import handle_extensions
 
 
 _drive_re = re.compile('^([a-z]):', re.I)
