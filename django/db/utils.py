@@ -14,11 +14,39 @@ from django.utils import six
 DEFAULT_DB_ALIAS = 'default'
 
 
-class DatabaseError(Exception):
+class Error(StandardError):
+    pass
+
+
+class InterfaceError(Error):
+    pass
+
+
+class DatabaseError(Error):
+    pass
+
+
+class DataError(DatabaseError):
+    pass
+
+
+class OperationalError(DatabaseError):
     pass
 
 
 class IntegrityError(DatabaseError):
+    pass
+
+
+class InternalError(DatabaseError):
+    pass
+
+
+class ProgrammingError(DatabaseError):
+    pass
+
+
+class NotSupportedError(DatabaseError):
     pass
 
 
@@ -28,12 +56,11 @@ class DatabaseErrorWrapper(object):
     exceptions using Django's common wrappers.
     """
 
-    def __init__(self, db):
+    def __init__(self, database):
         """
-        db is a database connection wrapper providing DatabaseError and
-        IntegrityError attributes.
+        database is a module defining PEP-249 exceptions.
         """
-        self.db = db
+        self.database = database
 
     def __enter__(self):
         pass
@@ -41,8 +68,18 @@ class DatabaseErrorWrapper(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             return
-        for dj_exc_type in (IntegrityError, DatabaseError):
-            db_exc_type = getattr(self.db, dj_exc_type.__name__)
+        for dj_exc_type in (
+                DataError,
+                OperationalError,
+                IntegrityError,
+                InternalError,
+                ProgrammingError,
+                NotSupportedError,
+                DatabaseError,
+                InterfaceError,
+                Error,
+            ):
+            db_exc_type = getattr(self.database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*tuple(exc_value.args))
                 if six.PY3:

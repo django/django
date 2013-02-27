@@ -56,7 +56,7 @@ class BaseDatabaseWrapper(object):
         return hash(self.alias)
 
     def wrap_database_errors(self):
-        return DatabaseErrorWrapper(self)
+        return DatabaseErrorWrapper(self.Database)
 
     def get_connection_params(self):
         raise NotImplementedError

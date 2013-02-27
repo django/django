@@ -290,8 +290,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
-    DatabaseError = Database.DatabaseError
-    IntegrityError = Database.IntegrityError
+    Database = Database
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
