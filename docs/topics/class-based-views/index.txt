@@ -14,6 +14,7 @@ reusable views which suits your use case. For full details, see the
 .. toctree::
    :maxdepth: 1
 
+   intro
    generic-display
    generic-editing
    mixins
@@ -127,68 +128,3 @@ the client issues a ``HEAD`` request, the response has an empty body and
 the ``Last-Modified`` header indicates when the most recent book was published.
 Based on this information, the client may or may not download the full object
 list.
-
-Decorating class-based views
-============================
-
-.. highlightlang:: python
-
-Since class-based views aren't functions, decorating them works differently
-depending on if you're using ``as_view`` or creating a subclass.
-
-Decorating in URLconf
----------------------
-
-The simplest way of decorating class-based views is to decorate the
-result of the :meth:`~django.views.generic.base.View.as_view` method.
-The easiest place to do this is in the URLconf where you deploy your view::
-
-    from django.contrib.auth.decorators import login_required, permission_required
-    from django.views.generic import TemplateView
-
-    from .views import VoteView
-
-    urlpatterns = patterns('',
-        (r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        (r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
-    )
-
-This approach applies the decorator on a per-instance basis. If you
-want every instance of a view to be decorated, you need to take a
-different approach.
-
-.. _decorating-class-based-views:
-
-Decorating the class
---------------------
-
-To decorate every instance of a class-based view, you need to decorate
-the class definition itself. To do this you apply the decorator to the
-:meth:`~django.views.generic.base.View.dispatch` method of the class.
-
-A method on a class isn't quite the same as a standalone function, so
-you can't just apply a function decorator to the method -- you need to
-transform it into a method decorator first. The ``method_decorator``
-decorator transforms a function decorator into a method decorator so
-that it can be used on an instance method. For example::
-
-    from django.contrib.auth.decorators import login_required
-    from django.utils.decorators import method_decorator
-    from django.views.generic import TemplateView
-
-    class ProtectedView(TemplateView):
-        template_name = 'secret.html'
-
-        @method_decorator(login_required)
-        def dispatch(self, *args, **kwargs):
-            return super(ProtectedView, self).dispatch(*args, **kwargs)
-
-In this example, every instance of ``ProtectedView`` will have
-login protection.
-
-.. note::
-
-    ``method_decorator`` passes ``*args`` and ``**kwargs``
-    as parameters to the decorated method on the class. If your method
-    does not accept a compatible set of parameters it will raise a
-    ``TypeError`` exception.
