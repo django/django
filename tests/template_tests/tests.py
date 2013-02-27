@@ -1392,7 +1392,10 @@ class Templates(TestCase):
             'i18n33': ('{% load i18n %}{{ langcode|language_name }} {{ langcode|language_name_local }} {{ langcode|language_bidi }}', {'langcode': 'nl'}, 'Dutch Nederlands False'),
 
             # blocktrans handling of variables which are not in the context.
-            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, ''),
+            # this should work as if blocktrans was not there (bug #19915)
+            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, ('', 'INVALID')),
+            'i18n34_2': ("{% load i18n %}{% blocktrans with a='α' %}{{ missing }}{% endblocktrans %}", {}, ('', 'INVALID')),
+            'i18n34_3': ('{% load i18n %}{% blocktrans with a=anton %}{{ missing }}{% endblocktrans %}', {'anton': 'α'}, ('', 'INVALID')),
 
             # trans tag with as var
             'i18n35': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),

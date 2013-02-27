@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 
+from django.conf import settings
 from django.template import (Node, Variable, TemplateSyntaxError,
     TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
 from django.template.base import render_value_in_context
@@ -17,7 +18,6 @@ class GetAvailableLanguagesNode(Node):
         self.variable = variable
 
     def render(self, context):
-        from django.conf import settings
         context[self.variable] = [(k, translation.ugettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
@@ -143,7 +143,10 @@ class BlockTranslateNode(Node):
                 result = translation.pgettext(message_context, singular)
             else:
                 result = translation.ugettext(singular)
-        data = dict([(v, render_value_in_context(context.get(v, ''), context)) for v in vars])
+        default_value = settings.TEMPLATE_STRING_IF_INVALID
+        render_value = lambda v: render_value_in_context(
+            context.get(v, default_value), context)
+        data = dict([(v, render_value(v)) for v in vars])
         context.pop()
         try:
             result = result % data
