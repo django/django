@@ -1586,32 +1586,32 @@ The most efficient method of finding whether a model with a unique field
 (e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
 
     entry = Entry.objects.get(pk=123)
-    if some_query_set.filter(pk=entry.pk).exists():
+    if some_queryset.filter(pk=entry.pk).exists():
         print("Entry contained in queryset")
 
 Which will be faster than the following which requires evaluating and iterating
 through the entire queryset::
 
-    if entry in some_query_set:
+    if entry in some_queryset:
        print("Entry contained in QuerySet")
 
 And to find whether a queryset contains any items::
 
-    if some_query_set.exists():
-        print("There is at least one object in some_query_set")
+    if some_queryset.exists():
+        print("There is at least one object in some_queryset")
 
 Which will be faster than::
 
-    if some_query_set:
-        print("There is at least one object in some_query_set")
+    if some_queryset:
+        print("There is at least one object in some_queryset")
 
 ... but not by a large degree (hence needing a large queryset for efficiency
 gains).
 
-Additionally, if a ``some_query_set`` has not yet been evaluated, but you know
-that it will be at some point, then using ``some_query_set.exists()`` will do
+Additionally, if a ``some_queryset`` has not yet been evaluated, but you know
+that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
-retrieve the results) than simply using ``bool(some_query_set)``, which
+retrieve the results) than simply using ``bool(some_queryset)``, which
 retrieves the results and then checks if any were returned.
 
 update

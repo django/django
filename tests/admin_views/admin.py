@@ -177,10 +177,10 @@ class PersonAdmin(admin.ModelAdmin):
         return super(PersonAdmin, self).get_changelist_formset(request,
             formset=BasePersonModelFormSet, **kwargs)
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         # Order by a field that isn't in list display, to be able to test
         # whether ordering is preserved.
-        return super(PersonAdmin, self).queryset(request).order_by('age')
+        return super(PersonAdmin, self).get_queryset(request).order_by('age')
 
 
 class FooAccount(Account):
@@ -283,8 +283,8 @@ class ParentAdmin(admin.ModelAdmin):
 
 
 class EmptyModelAdmin(admin.ModelAdmin):
-    def queryset(self, request):
-        return super(EmptyModelAdmin, self).queryset(request).filter(pk__gt=1)
+    def get_queryset(self, request):
+        return super(EmptyModelAdmin, self).get_queryset(request).filter(pk__gt=1)
 
 
 class OldSubscriberAdmin(admin.ModelAdmin):
@@ -427,8 +427,8 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class CustomChangeList(ChangeList):
-    def get_query_set(self, request):
-        return self.root_query_set.filter(pk=9999) # Does not exist
+    def get_queryset(self, request):
+        return self.root_queryset.filter(pk=9999) # Does not exist
 
 
 class GadgetAdmin(admin.ModelAdmin):
@@ -452,52 +452,52 @@ class FoodDeliveryAdmin(admin.ModelAdmin):
 
 class CoverLetterAdmin(admin.ModelAdmin):
     """
-    A ModelAdmin with a custom queryset() method that uses defer(), to test
+    A ModelAdmin with a custom get_queryset() method that uses defer(), to test
     verbose_name display in messages shown after adding/editing CoverLetter
     instances.
     Note that the CoverLetter model defines a __unicode__ method.
     For testing fix for ticket #14529.
     """
 
-    def queryset(self, request):
-        return super(CoverLetterAdmin, self).queryset(request).defer('date_written')
+    def get_queryset(self, request):
+        return super(CoverLetterAdmin, self).get_queryset(request).defer('date_written')
 
 
 class PaperAdmin(admin.ModelAdmin):
     """
-    A ModelAdmin with a custom queryset() method that uses only(), to test
+    A ModelAdmin with a custom get_queryset() method that uses only(), to test
     verbose_name display in messages shown after adding/editing Paper
     instances.
     For testing fix for ticket #14529.
     """
 
-    def queryset(self, request):
-        return super(PaperAdmin, self).queryset(request).only('title')
+    def get_queryset(self, request):
+        return super(PaperAdmin, self).get_queryset(request).only('title')
 
 
 class ShortMessageAdmin(admin.ModelAdmin):
     """
-    A ModelAdmin with a custom queryset() method that uses defer(), to test
+    A ModelAdmin with a custom get_queryset() method that uses defer(), to test
     verbose_name display in messages shown after adding/editing ShortMessage
     instances.
     For testing fix for ticket #14529.
     """
 
-    def queryset(self, request):
-        return super(ShortMessageAdmin, self).queryset(request).defer('timestamp')
+    def get_queryset(self, request):
+        return super(ShortMessageAdmin, self).get_queryset(request).defer('timestamp')
 
 
 class TelegramAdmin(admin.ModelAdmin):
     """
-    A ModelAdmin with a custom queryset() method that uses only(), to test
+    A ModelAdmin with a custom get_queryset() method that uses only(), to test
     verbose_name display in messages shown after adding/editing Telegram
     instances.
     Note that the Telegram model defines a __unicode__ method.
     For testing fix for ticket #14529.
     """
 
-    def queryset(self, request):
-        return super(TelegramAdmin, self).queryset(request).only('title')
+    def get_queryset(self, request):
+        return super(TelegramAdmin, self).get_queryset(request).only('title')
 
 
 class StoryForm(forms.ModelForm):
