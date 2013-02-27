@@ -14,6 +14,7 @@ class DateFormatTests(unittest.TestCase):
     def setUp(self):
         self.old_TZ = os.environ.get('TZ')
         os.environ['TZ'] = 'Europe/Copenhagen'
+        self._orig_lang = translation.get_language()
         translation.activate('en-us')
 
         try:
@@ -25,6 +26,7 @@ class DateFormatTests(unittest.TestCase):
             self.tz_tests = False
 
     def tearDown(self):
+        translation.activate(self._orig_lang)
         if self.old_TZ is None:
             del os.environ['TZ']
         else:
