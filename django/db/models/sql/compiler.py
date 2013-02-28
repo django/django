@@ -1057,6 +1057,10 @@ class SQLDateTimeCompiler(SQLCompiler):
                 # Datetimes are artifically returned in UTC on databases that
                 # don't support time zone. Restore the zone used in the query.
                 if settings.USE_TZ:
+                    if datetime is None:
+                        raise ValueError("Database returned an invalid value "
+                                         "in QuerySet.dates(). Are time zone "
+                                         "definitions installed?")
                     datetime = datetime.replace(tzinfo=None)
                     datetime = timezone.make_aware(datetime, self.query.tzinfo)
                 yield datetime
