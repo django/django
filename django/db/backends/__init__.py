@@ -863,19 +863,19 @@ class BaseDatabaseOperations(object):
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
-        raise NotImplementedError
+        return "SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_commit_sql(self, sid):
         """
         Returns the SQL for committing the given savepoint.
         """
-        raise NotImplementedError
+        return "RELEASE SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
         """
         Returns the SQL for rolling back the given savepoint.
         """
-        raise NotImplementedError
+        return "ROLLBACK TO SAVEPOINT %s" % self.quote_name(sid)
 
     def set_time_zone_sql(self):
         """
