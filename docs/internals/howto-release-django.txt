@@ -283,6 +283,10 @@ You're almost done! All that's left to do now is:
    the new version's docs, and update the ``docs/fixtures/doc_releases.json``
    JSON fixture. *FIXME: what is the purpose of maintaining this fixture?*
 
+#. Add the release in `Trac's versions list`_.
+
+.. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
+
 Notes on setting the VERSION tuple
 ==================================
 
