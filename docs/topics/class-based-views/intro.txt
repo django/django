@@ -123,7 +123,7 @@ and methods in the subclass. So that if your parent class had an attribute
 
 You can override that in a subclass::
 
-    class MorningGreetingView(MyView):
+    class MorningGreetingView(GreetingView):
         greeting = "Morning to ya"
 
 Another option is to configure class attributes as keyword arguments to the
