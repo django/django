@@ -142,6 +142,13 @@ subclass::
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
 
+    .. note::
+
+        ``date_hierarchy`` uses :meth:`QuerySet.datetimes()
+        <django.db.models.query.QuerySet.datetimes>` internally. Please refer
+        to its documentation for some caveats when time zone support is
+        enabled (:setting:`USE_TZ = True <USE_TZ>`).
+
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from
