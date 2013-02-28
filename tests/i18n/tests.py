@@ -1096,3 +1096,26 @@ class MultipleLocaleActivationTests(TestCase):
             t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
+
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=(
+        ('en', 'English'),
+        ('fr', 'French'),
+    ),
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ),
+)
+class LocaleMiddlewareTests(TestCase):
+
+    urls = 'i18n.urls'
+
+    def test_streaming_response(self):
+        # Regression test for #5241
+        response = self.client.get('/fr/streaming/')
+        self.assertContains(response, "Oui/Non")
+        response = self.client.get('/en/streaming/')
+        self.assertContains(response, "Yes/No")
