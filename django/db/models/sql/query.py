@@ -1204,7 +1204,8 @@ class Query(object):
 
         if negate:
             self.promote_joins(join_list)
-            if lookup_type != 'isnull' and (self.is_nullable(target) or len(join_list) > 1):
+            if (lookup_type != 'isnull' and (
+                    self.is_nullable(target) or self.alias_map[join_list[-1]].join_type == self.LOUTER)):
                 # The condition added here will be SQL like this:
                 # NOT (col IS NOT NULL), where the first NOT is added in
                 # upper layers of code. The reason for addition is that if col
@@ -1447,7 +1448,7 @@ class Query(object):
         # nothing
         if self.is_nullable(query.select[0].field):
             alias, col = query.select[0].col
-            query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
+            query.where.add((Constraint(alias, col, query.select[0].field), 'isnull', False), AND)
 
         # Still make sure that the trimmed parts in the inner query and
         # trimmed prefix are in sync. So, use the trimmed_joins to make sure

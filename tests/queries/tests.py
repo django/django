@@ -24,7 +24,8 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
     SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
     SingleObject, RelatedObject, ModelA, ModelD, Responsibility, Job,
-    JobResponsibilities, BaseA, Identifier, Program, Channel)
+    JobResponsibilities, BaseA, Identifier, Program, Channel, Page, Paragraph,
+    Chapter, Book)
 
 
 class BaseQuerysetTest(TestCase):
@@ -2638,3 +2639,25 @@ class ManyToManyExcludeTest(TestCase):
             Identifier.objects.exclude(program__channel=None).order_by('name'),
             ['<Identifier: program>']
         )
+
+    def test_ticket_12823(self):
+        pg3 = Page.objects.create(text='pg3')
+        pg2 = Page.objects.create(text='pg2')
+        pg1 = Page.objects.create(text='pg1')
+        pa1 = Paragraph.objects.create(text='pa1')
+        pa1.page = [pg1, pg2]
+        pa2 = Paragraph.objects.create(text='pa2')
+        pa2.page = [pg2, pg3]
+        pa3 = Paragraph.objects.create(text='pa3')
+        ch1 = Chapter.objects.create(title='ch1', paragraph=pa1)
+        ch2 = Chapter.objects.create(title='ch2', paragraph=pa2)
+        ch3 = Chapter.objects.create(title='ch3', paragraph=pa3)
+        b1 = Book.objects.create(title='b1', chapter=ch1)
+        b2 = Book.objects.create(title='b2', chapter=ch2)
+        b3 = Book.objects.create(title='b3', chapter=ch3)
+        q = Book.objects.exclude(chapter__paragraph__page__text='pg1')
+        self.assertNotIn('IS NOT NULL', str(q.query))
+        self.assertEqual(len(q), 2)
+        self.assertNotIn(b1, q)
+        self.assertIn(b2, q)
+        self.assertIn(b3, q)

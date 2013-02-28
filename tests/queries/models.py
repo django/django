@@ -454,3 +454,19 @@ class Program(models.Model):
 class Channel(models.Model):
     programs = models.ManyToManyField(Program)
     identifier = models.OneToOneField(Identifier)
+
+class Book(models.Model):
+    title = models.TextField()
+    chapter = models.ForeignKey('Chapter')
+
+class Chapter(models.Model):
+    title = models.TextField()
+    paragraph = models.ForeignKey('Paragraph')
+
+
+class Paragraph(models.Model):
+    text = models.TextField()
+    page = models.ManyToManyField('Page')
+
+class Page(models.Model):
+    text = models.TextField()
