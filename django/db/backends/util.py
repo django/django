@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
+from ..utils import DatabaseError, IntegrityError
 
 logger = logging.getLogger('django.db.backends')
 
