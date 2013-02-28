@@ -548,8 +548,27 @@ class RequestsTests(unittest.TestCase):
         with self.assertRaises(UnreadablePostError):
             request.body
 
-class TransactionRequestTests(TransactionTestCase):
+
+@unittest.skipIf(connection.vendor == 'sqlite'
+        and connection.settings_dict['NAME'] in ('', ':memory:'),
+        "Cannot establish two connections to an in-memory SQLite database.")
+class DatabaseConnectionHandlingTests(TransactionTestCase):
+
+    def setUp(self):
+        # Use a temporary connection to avoid messing with the main one.
+        self._old_default_connection = connections['default']
+        del connections['default']
+
+    def tearDown(self):
+        try:
+            connections['default'].close()
+        finally:
+            connections['default'] = self._old_default_connection
+
     def test_request_finished_db_state(self):
+        # Force closing connection on request end
+        connection.settings_dict['CONN_MAX_AGE'] = 0
+
         # The GET below will not succeed, but it will give a response with
         # defined ._handler_class. That is needed for sending the
         # request_finished signal.
@@ -559,31 +578,27 @@ class TransactionRequestTests(TransactionTestCase):
         connection.enter_transaction_management()
         connection.managed(True)
         signals.request_finished.send(sender=response._handler_class)
-        # In-memory sqlite doesn't actually close connections.
-        if connection.vendor != 'sqlite':
-            self.assertIs(connection.connection, None)
         self.assertEqual(len(connection.transaction_state), 0)
 
-    @unittest.skipIf(connection.vendor == 'sqlite',
-                     'This test will close the connection, in-memory '
-                     'sqlite connections must not be closed.')
     def test_request_finished_failed_connection(self):
-        conn = connections[DEFAULT_DB_ALIAS]
-        conn.enter_transaction_management()
-        conn.managed(True)
-        conn.set_dirty()
+        # Force closing connection on request end
+        connection.settings_dict['CONN_MAX_AGE'] = 0
+
+        connection.enter_transaction_management()
+        connection.managed(True)
+        connection.set_dirty()
         # Test that the rollback doesn't succeed (for example network failure
         # could cause this).
         def fail_horribly():
             raise Exception("Horrible failure!")
-        conn._rollback = fail_horribly
+        connection._rollback = fail_horribly
         try:
             with self.assertRaises(Exception):
                 signals.request_finished.send(sender=self.__class__)
             # The connection's state wasn't cleaned up
-            self.assertTrue(len(connection.transaction_state), 1)
+            self.assertEqual(len(connection.transaction_state), 1)
         finally:
-            del conn._rollback
+            del connection._rollback
         # The connection will be cleaned on next request where the conn
         # works again.
         signals.request_finished.send(sender=self.__class__)

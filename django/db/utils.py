@@ -183,6 +183,9 @@ class ConnectionHandler(object):
     def __setitem__(self, key, value):
         setattr(self._connections, key, value)
 
+    def __delitem__(self, key):
+        delattr(self._connections, key)
+
     def __iter__(self):
         return iter(self.databases)
 

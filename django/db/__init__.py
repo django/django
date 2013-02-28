@@ -39,6 +39,9 @@ class DefaultConnectionProxy(object):
     def __setattr__(self, name, value):
         return setattr(connections[DEFAULT_DB_ALIAS], name, value)
 
+    def __delattr__(self, name):
+        return delattr(connections[DEFAULT_DB_ALIAS], name)
+
 connection = DefaultConnectionProxy()
 backend = load_backend(connection.settings_dict['ENGINE'])
 
