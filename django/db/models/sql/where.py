@@ -34,9 +34,15 @@ class WhereNode(tree.Node):
     The class is tied to the Query class that created it (in order to create
     the correct SQL).
 
-    The children in this tree are usually either Q-like objects or lists of
-    [table_alias, field_name, db_type, lookup_type, value_annotation, params].
-    However, a child could also be any class with as_sql() and relabel_aliases() methods.
+    A child is usually a tuple of:
+        (Constraint(alias, targetcol, field), lookup_type, value)
+    where value can be either raw Python value, or Query, ExpressionNode or
+    something else knowing how to turn itself into SQL.
+
+    However, a child could also be any class with as_sql() and either
+    relabeled_clone() method or relabel_aliases() and clone() methods. The
+    second alternative should be used if the alias is not the only mutable
+    variable.
     """
     default = AND
 
@@ -255,30 +261,22 @@ class WhereNode(tree.Node):
             lhs = qn(name)
         return connection.ops.field_cast_sql(db_type) % lhs
 
-    def relabel_aliases(self, change_map, node=None):
+    def relabel_aliases(self, change_map):
         """
         Relabels the alias values of any children. 'change_map' is a dictionary
         mapping old (current) alias values to the new values.
         """
-        if not node:
-            node = self
-        for pos, child in enumerate(node.children):
+        for pos, child in enumerate(self.children):
             if hasattr(child, 'relabel_aliases'):
+                # For example another WhereNode
                 child.relabel_aliases(change_map)
-            elif isinstance(child, tree.Node):
-                self.relabel_aliases(change_map, child)
             elif isinstance(child, (list, tuple)):
-                if isinstance(child[0], (list, tuple)):
-                    elt = list(child[0])
-                    if elt[0] in change_map:
-                        elt[0] = change_map[elt[0]]
-                        node.children[pos] = (tuple(elt),) + child[1:]
-                else:
-                    child[0].relabel_aliases(change_map)
-
-                # Check if the query value also requires relabelling
-                if hasattr(child[3], 'relabel_aliases'):
-                    child[3].relabel_aliases(change_map)
+                # tuple starting with Constraint
+                child = (child[0].relabeled_clone(change_map),) + child[1:]
+                if hasattr(child[3], 'relabeled_clone'):
+                    child = (child[0], child[1], child[2]) + (
+                        child[3].relabeled_clone(change_map),)
+                self.children[pos] = child
 
     def clone(self):
         """
@@ -290,11 +288,10 @@ class WhereNode(tree.Node):
         clone = self.__class__._new_instance(
             children=[], connector=self.connector, negated=self.negated)
         for child in self.children:
-            if isinstance(child, tuple):
-                clone.children.append(
-                    (child[0].clone(), child[1], child[2], child[3]))
-            else:
+            if hasattr(child, 'clone'):
                 clone.children.append(child.clone())
+            else:
+                clone.children.append(child)
         return clone
 
 class EmptyWhere(WhereNode):
@@ -313,11 +310,6 @@ class EverythingNode(object):
     def as_sql(self, qn=None, connection=None):
         return '', []
 
-    def relabel_aliases(self, change_map, node=None):
-        return
-
-    def clone(self):
-        return self
 
 class NothingNode(object):
     """
@@ -326,11 +318,6 @@ class NothingNode(object):
     def as_sql(self, qn=None, connection=None):
         raise EmptyResultSet
 
-    def relabel_aliases(self, change_map, node=None):
-        return
-
-    def clone(self):
-        return self
 
 class ExtraWhere(object):
     def __init__(self, sqls, params):
@@ -341,8 +328,6 @@ class ExtraWhere(object):
         sqls = ["(%s)" % sql for sql in self.sqls]
         return " AND ".join(sqls), list(self.params or ())
 
-    def clone(self):
-        return self
 
 class Constraint(object):
     """
@@ -405,12 +390,11 @@ class Constraint(object):
 
         return (self.alias, self.col, db_type), params
 
-    def relabel_aliases(self, change_map):
-        if self.alias in change_map:
-            self.alias = change_map[self.alias]
-
-    def clone(self):
-        new = Empty()
-        new.__class__ = self.__class__
-        new.alias, new.col, new.field = self.alias, self.col, self.field
-        return new
+    def relabeled_clone(self, change_map):
+        if self.alias not in change_map:
+            return self
+        else:
+            new = Empty()
+            new.__class__ = self.__class__
+            new.alias, new.col, new.field = change_map[self.alias], self.col, self.field
+            return new

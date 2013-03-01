@@ -470,3 +470,8 @@ class Paragraph(models.Model):
 
 class Page(models.Model):
     text = models.TextField()
+
+class MyObject(models.Model):
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    data = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
