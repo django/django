@@ -60,9 +60,13 @@ class IntrospectionTests(TestCase):
     def test_get_table_description_types(self):
         cursor = connection.cursor()
         desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        # The MySQL exception is due to the cursor.description returning the same constant for
+        # text and blob columns. TODO: use information_schema database to retrieve the proper
+        # field type on MySQL
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
-            ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
+            ['IntegerField', 'CharField', 'CharField', 'CharField',
+             'BigIntegerField', 'BinaryField' if connection.vendor != 'mysql' else 'TextField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
@@ -85,7 +89,7 @@ class IntrospectionTests(TestCase):
         desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[6] for r in desc],
-            [False, False, False, False, True]
+            [False, False, False, False, True, True]
         )
 
     # Regression test for #9991 - 'real' types in postgres

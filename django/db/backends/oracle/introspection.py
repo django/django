@@ -7,6 +7,7 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type objects to Django Field types.
     data_types_reverse = {
+        cx_Oracle.BLOB: 'BinaryField',
         cx_Oracle.CLOB: 'TextField',
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',

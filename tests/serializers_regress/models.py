@@ -12,6 +12,9 @@ from django.contrib.contenttypes.models import ContentType
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
 
+class BinaryData(models.Model):
+    data = models.BinaryField(null=True)
+
 class BooleanData(models.Model):
     data = models.BooleanField()
 
