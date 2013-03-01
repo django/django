@@ -1,9 +1,11 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.test import TestCase
+from django.test.testcases import CaptureQueriesContext
 from django.utils import six
 
 from .models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
@@ -294,3 +296,25 @@ class ModelInheritanceTests(TestCase):
         )
         with self.assertNumQueries(6):
             ir.save()
+
+    def test_update_parent_filtering(self):
+        """
+        Test that updating a field of a model subclass doesn't issue an UPDATE
+        query constrained by an inner query.
+        Refs #10399
+        """
+        supplier = Supplier.objects.create(
+            name='Central market',
+            address='610 some street'
+        )
+        # Capture the expected query in a database agnostic way
+        with CaptureQueriesContext(connection) as captured_queries:
+            Place.objects.filter(pk=supplier.pk).update(name=supplier.name)
+        expected_sql = captured_queries[0]['sql']
+        # Capture the queries executed when a subclassed model instance is saved.
+        with CaptureQueriesContext(connection) as captured_queries:
+            supplier.save(update_fields=('name',))
+        for query in captured_queries:
+            sql = query['sql']
+            if 'UPDATE' in sql:
+                self.assertEqual(expected_sql, sql)
