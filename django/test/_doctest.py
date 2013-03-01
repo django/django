@@ -883,7 +883,7 @@ class DocTestFinder:
         if module is None:
             return True
         elif inspect.isfunction(object):
-            return module.__dict__ is object.__globals__
+            return module.__dict__ is six.get_function_globals(object)
         elif inspect.isclass(object):
             return module.__name__ == object.__module__
         elif inspect.getmodule(object) is not None:

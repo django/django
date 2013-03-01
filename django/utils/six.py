@@ -371,9 +371,14 @@ def with_metaclass(meta, base=object):
 if PY3:
     _iterlists = "lists"
     _assertRaisesRegex = "assertRaisesRegex"
+    _func_globals = "__globals__"    
 else:
     _iterlists = "iterlists"
     _assertRaisesRegex = "assertRaisesRegexp"
+    _func_globals = "func_globals"    
+
+
+get_function_globals = operator.attrgetter(_func_globals)
 
 
 def iterlists(d):
