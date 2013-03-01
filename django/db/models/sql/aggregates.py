@@ -63,14 +63,11 @@ class Aggregate(object):
 
         self.field = tmp
 
-    def clone(self):
-        # Different aggregates have different init methods, so use copy here
-        # deepcopy is not needed, as self.col is only changing variable.
-        return copy.copy(self)
-
-    def relabel_aliases(self, change_map):
+    def relabeled_clone(self, change_map):
+        clone = copy.copy(self)
         if isinstance(self.col, (list, tuple)):
-            self.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
+            clone.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
+        return clone
 
     def as_sql(self, qn, connection):
         "Return the aggregate, rendered as SQL with parameters."

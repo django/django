@@ -294,8 +294,7 @@ class Query(object):
         obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_related = self.select_related
         obj.related_select_cols = []
-        obj.aggregates = SortedDict((k, v.clone())
-                                    for k, v in self.aggregates.items())
+        obj.aggregates = self.aggregates.copy()
         if self.aggregate_select_mask is None:
             obj.aggregate_select_mask = None
         else:
@@ -559,9 +558,8 @@ class Query(object):
                 new_col = change_map.get(col[0], col[0]), col[1]
                 self.select.append(SelectInfo(new_col, field))
             else:
-                item = col.clone()
-                item.relabel_aliases(change_map)
-                self.select.append(SelectInfo(item, field))
+                new_col = col.relabeled_clone(change_map)
+                self.select.append(SelectInfo(new_col, field))
 
         if connector == OR:
             # It would be nice to be able to handle this, but the queries don't
@@ -769,26 +767,6 @@ class Query(object):
         The principle for promotion is: any alias which is used (it is in
         alias_usage_counts), is not used by every child of the ORed filter,
         and isn't pre-existing needs to be promoted to LOUTER join.
-
-        Some examples (assume all joins used are nullable):
-            - existing filter: a__f1=foo
-            - add filter: b__f1=foo|b__f2=foo
-            In this case we should not promote either of the joins (using INNER
-            doesn't remove results). We correctly avoid join promotion, because
-            a is not used in this branch, and b is used two times.
-
-            - add filter a__f1=foo|b__f2=foo
-            In this case we should promote both a and b, otherwise they will
-            remove results. We will also correctly do that as both aliases are
-            used, and in addition both are used only once while there are two
-            filters.
-
-            - existing: a__f1=bar
-            - add filter: a__f2=foo|b__f2=foo
-            We will not promote a as it is previously used. If the join results
-            in null, the existing filter can't succeed.
-
-        The above (and some more) are tested in queries.DisjunctionPromotionTests
         """
         for alias, use_count in alias_usage_counts.items():
             if use_count < num_childs and alias not in aliases_before:
@@ -807,8 +785,7 @@ class Query(object):
                 old_alias = col[0]
                 return (change_map.get(old_alias, old_alias), col[1])
             else:
-                col.relabel_aliases(change_map)
-                return col
+                return col.relabeled_clone(change_map)
         # 1. Update references in "select" (normal columns plus aliases),
         # "group by", "where" and "having".
         self.where.relabel_aliases(change_map)

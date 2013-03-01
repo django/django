@@ -1,6 +1,7 @@
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import FieldDoesNotExist
+import copy
 
 class SQLEvaluator(object):
     def __init__(self, expression, query, allow_joins=True, reuse=None):
@@ -12,22 +13,22 @@ class SQLEvaluator(object):
         self.reuse = reuse
         self.expression.prepare(self, query, allow_joins)
 
+    def relabeled_clone(self, change_map):
+        clone = copy.copy(self)
+        clone.cols = []
+        for node, col in self.cols[:]:
+            if hasattr(col, 'relabeled_clone'):
+                clone.cols.append((node, col.relabeled_clone(change_map)))
+            else:
+                clone.cols.append((node,
+                                   (change_map.get(col[0], col[0]), col[1])))
+        return clone
+
     def prepare(self):
         return self
 
     def as_sql(self, qn, connection):
         return self.expression.evaluate(self, qn, connection)
-
-    def relabel_aliases(self, change_map):
-        new_cols = []
-        for node, col in self.cols:
-            if hasattr(col, "relabel_aliases"):
-                col.relabel_aliases(change_map)
-                new_cols.append((node, col))
-            else:
-                new_cols.append((node,
-                                (change_map.get(col[0], col[0]), col[1])))
-        self.cols = new_cols
 
     #####################################################
     # Vistor methods for initial expression preparation #
