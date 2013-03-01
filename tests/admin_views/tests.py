@@ -131,6 +131,15 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/abc/' % self.urlbit)
         self.assertEqual(response.status_code, 404)
 
+    def testBasicInheritanceGetStringPK(self):
+        """
+        A smoke test to ensure GET on the change_view works on inherited
+        models (returns an HTTP 404 error, see #19951) when passing a string
+        as the PK argument for a model with an integer PK field.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/supervillain/abc/' % self.urlbit)
+        self.assertEqual(response.status_code, 404)
+
     def testBasicAddPost(self):
         """
         A smoke test to ensure POST on add_view works.
