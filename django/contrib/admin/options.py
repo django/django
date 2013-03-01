@@ -501,7 +501,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             object_id = model._meta.pk.to_python(object_id)
             return queryset.get(pk=object_id)
-        except (model.DoesNotExist, ValidationError):
+        except (model.DoesNotExist, ValidationError, ValueError):
             return None
 
     def get_changelist_form(self, request, **kwargs):
