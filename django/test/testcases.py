@@ -24,30 +24,29 @@ from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
-from django.core.signals import request_started
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
 from django.core.urlresolvers import clear_url_caches
 from django.core.validators import EMPTY_VALUES
-from django.db import (transaction, connection, connections, DEFAULT_DB_ALIAS,
-    reset_queries)
+from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
-from django.test.utils import (override_settings, compare_xml, strip_quotes)
-from django.test.utils import ContextList
-from django.utils import unittest as ut2
+from django.test.utils import (CaptureQueriesContext, ContextList,
+    override_settings, compare_xml, strip_quotes)
+from django.utils import six, unittest as ut2
 from django.utils.encoding import force_text
-from django.utils import six
+from django.utils.unittest import skipIf # Imported here for backward compatibility
 from django.utils.unittest.util import safe_repr
-from django.utils.unittest import skipIf
 from django.views.static import serve
+
 
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
+
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)",
@@ -168,28 +167,17 @@ class DocTestRunner(doctest.DocTestRunner):
             transaction.rollback_unless_managed(using=conn)
 
 
-class _AssertNumQueriesContext(object):
+class _AssertNumQueriesContext(CaptureQueriesContext):
     def __init__(self, test_case, num, connection):
         self.test_case = test_case
         self.num = num
-        self.connection = connection
-
-    def __enter__(self):
-        self.old_debug_cursor = self.connection.use_debug_cursor
-        self.connection.use_debug_cursor = True
-        self.starting_queries = len(self.connection.queries)
-        request_started.disconnect(reset_queries)
-        return self
+        super(_AssertNumQueriesContext, self).__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.connection.use_debug_cursor = self.old_debug_cursor
-        request_started.connect(reset_queries)
         if exc_type is not None:
             return
-
-        final_queries = len(self.connection.queries)
-        executed = final_queries - self.starting_queries
-
+        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
+        executed = len(self)
         self.test_case.assertEqual(
             executed, self.num, "%d queries executed, %d expected" % (
                 executed, self.num
@@ -1051,7 +1039,6 @@ class LiveServerThread(threading.Thread):
         http requests.
         """
         if self.connections_override:
-            from django.db import connections
             # Override this thread's database connections with the ones
             # provided by the main thread.
             for alias, conn in self.connections_override.items():
