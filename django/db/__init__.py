@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
