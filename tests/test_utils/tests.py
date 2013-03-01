@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
+import warnings
 
+from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.html import HTMLParseError, parse_html
+from django.test.utils import CaptureQueriesContext
 from django.utils import six
 from django.utils.unittest import skip
 
@@ -92,6 +96,60 @@ class AssertQuerysetEqualTests(TestCase):
             Person.objects.filter(name='p1'),
             [repr(self.p1)]
         )
+
+
+class CaptureQueriesContextManagerTests(TestCase):
+    urls = 'test_utils.urls'
+
+    def setUp(self):
+        self.person_pk = six.text_type(Person.objects.create(name='test').pk)
+
+    def test_simple(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Person.objects.get(pk=self.person_pk)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn(self.person_pk, captured_queries[0]['sql'])
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            pass
+        self.assertEqual(0, len(captured_queries))
+
+    def test_within(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Person.objects.get(pk=self.person_pk)
+            self.assertEqual(len(captured_queries), 1)
+            self.assertIn(self.person_pk, captured_queries[0]['sql'])
+
+    def test_nested(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Person.objects.count()
+            with CaptureQueriesContext(connection) as nested_captured_queries:
+                Person.objects.count()
+        self.assertEqual(1, len(nested_captured_queries))
+        self.assertEqual(2, len(captured_queries))
+
+    def test_failure(self):
+        with self.assertRaises(TypeError):
+            with CaptureQueriesContext(connection):
+                raise TypeError
+
+    def test_with_client(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn(self.person_pk, captured_queries[0]['sql'])
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn(self.person_pk, captured_queries[0]['sql'])
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+            self.client.get("/test_utils/get_person/%s/" % self.person_pk)
+        self.assertEqual(len(captured_queries), 2)
+        self.assertIn(self.person_pk, captured_queries[0]['sql'])
+        self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
 class AssertNumQueriesContextManagerTests(TestCase):
@@ -219,7 +277,6 @@ class SaveRestoreWarningState(TestCase):
         # In reality this test could be satisfied by many broken implementations
         # of save_warnings_state/restore_warnings_state (e.g. just
         # warnings.resetwarnings()) , but it is difficult to test more.
-        import warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
 
@@ -245,7 +302,6 @@ class SaveRestoreWarningState(TestCase):
 
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
-        from django.test.html import parse_html
         element = parse_html('<div><p>Hello</p></div>')
         self.assertEqual(len(element.children), 1)
         self.assertEqual(element.children[0].name, 'p')
@@ -259,7 +315,6 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom[0], 'foo')
 
     def test_parse_html_in_script(self):
-        from django.test.html import parse_html
         parse_html('<script>var a = "<p" + ">";</script>');
         parse_html('''
             <script>
@@ -275,8 +330,6 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        from django.test.html import parse_html
-
         self_closing_tags = ('br' , 'hr', 'input', 'img', 'meta', 'spacer',
             'link', 'frame', 'base', 'col')
         for tag in self_closing_tags:
@@ -400,7 +453,6 @@ class HTMLEqualTests(TestCase):
         </html>""")
 
     def test_html_contain(self):
-        from django.test.html import parse_html
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
@@ -424,7 +476,6 @@ class HTMLEqualTests(TestCase):
         self.assertTrue(dom1 in dom2)
 
     def test_count(self):
-        from django.test.html import parse_html
         # equal html contains each other one time
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
@@ -459,7 +510,6 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom2.count(dom1), 0)
 
     def test_parsing_errors(self):
-        from django.test.html import HTMLParseError, parse_html
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('<p>', '')
         with self.assertRaises(AssertionError):
@@ -488,7 +538,6 @@ class HTMLEqualTests(TestCase):
             self.assertContains(response, '<p "whats" that>')
 
     def test_unicode_handling(self):
-        from django.http import HttpResponse
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
