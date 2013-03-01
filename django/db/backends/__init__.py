@@ -176,54 +176,59 @@ class BaseDatabaseWrapper(object):
     ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
-        if not self.features.uses_savepoints or self.autocommit:
-            return
         self.cursor().execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
-        if not self.features.uses_savepoints or self.autocommit:
-            return
         self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
-        if not self.features.uses_savepoints or self.autocommit:
-            return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
+
+    def _savepoint_allowed(self):
+        # Savepoints cannot be created outside a transaction
+        return self.features.uses_savepoints and not self.autocommit
 
     ##### Generic savepoint management methods #####
 
     def savepoint(self):
         """
-        Creates a savepoint (if supported and required by the backend) inside the
-        current transaction. Returns an identifier for the savepoint that will be
-        used for the subsequent rollback or commit.
+        Creates a savepoint inside the current transaction. Returns an
+        identifier for the savepoint that will be used for the subsequent
+        rollback or commit. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         thread_ident = thread.get_ident()
+        tid = str(thread_ident).replace('-', '')
 
         self.savepoint_state += 1
-
-        tid = str(thread_ident).replace('-', '')
         sid = "s%s_x%d" % (tid, self.savepoint_state)
+
+        self.validate_thread_sharing()
         self._savepoint(sid)
+
         return sid
 
     def savepoint_rollback(self, sid):
         """
-        Rolls back the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
+        Rolls back to a savepoint. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_rollback(sid)
+        self._savepoint_rollback(sid)
 
     def savepoint_commit(self, sid):
         """
-        Commits the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
+        Releases a savepoint. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_commit(sid)
+        self._savepoint_commit(sid)
 
     def clean_savepoints(self):
         """
