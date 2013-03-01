@@ -82,8 +82,6 @@ The full error: %s""" % (connection.settings_dict['NAME'], e))
             emit_post_sync_signal(set(all_models), verbosity, interactive, db)
 
             # Reinstall the initial_data fixture.
-            kwargs = options.copy()
-            kwargs['database'] = db
             if options.get('load_initial_data'):
                 # Reinstall the initial_data fixture.
                 call_command('loaddata', 'initial_data', **options)
