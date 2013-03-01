@@ -341,8 +341,8 @@ Login and logout signals
 
 .. module:: django.contrib.auth.signals
 
-The auth framework uses two :doc:`signals </topics/signals>` that can be used
-for notification when a user logs in or out.
+The auth framework uses the following :doc:`signals </topics/signals>` that
+can be used for notification when a user logs in or out.
 
 .. function:: user_logged_in
 
