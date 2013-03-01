@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import translation
 from django.utils.encoding import force_str
 from django.utils.six import binary_type, PY3, StringIO
 
@@ -232,3 +233,13 @@ class BasicTestCase(TestCase):
         "The current user model must point to an installed model"
         with self.assertRaises(ImproperlyConfigured):
             get_user_model()
+
+    @skipIfCustomUser
+    def test_user_verbose_names_translatable(self):
+        "Default User model verbose names are translatable (#19945)"
+        with translation.override('en'):
+            self.assertEqual(User._meta.verbose_name, 'user')
+            self.assertEqual(User._meta.verbose_name_plural, 'users')
+        with translation.override('es'):
+            self.assertEqual(User._meta.verbose_name, 'usuario')
+            self.assertEqual(User._meta.verbose_name_plural, 'usuarios')
