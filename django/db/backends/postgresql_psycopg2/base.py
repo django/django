@@ -77,20 +77,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
+        opts = self.settings_dict["OPTIONS"]
+        RC = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
+        self.isolation_level = opts.get('isolation_level', RC)
+
         self.features = DatabaseFeatures(self)
-        autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
-        self.features.uses_autocommit = autocommit
-        if autocommit:
-            level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-        else:
-            level = self.settings_dict["OPTIONS"].get('isolation_level',
-                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
-        self._set_isolation_level(level)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
+
+        autocommit = opts.get('autocommit', False)
+        self.features.uses_autocommit = autocommit
+        self.features.uses_savepoints = not autocommit
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -135,11 +135,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
             if conn_tz != tz:
                 # Set the time zone in autocommit mode (see #17062)
-                self.connection.set_isolation_level(
-                        psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+                self.set_autocommit(True)
                 self.connection.cursor().execute(
                         self.ops.set_time_zone_sql(), [tz])
         self.connection.set_isolation_level(self.isolation_level)
+        if self.features.uses_autocommit:
+            self.set_autocommit(True)
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -172,42 +173,40 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Switch the isolation level when needing transaction support, so that
         the same transaction is visible across all the queries.
         """
-        if self.features.uses_autocommit and managed and not self.isolation_level:
-            level = self.settings_dict["OPTIONS"].get('isolation_level',
-                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
-            self._set_isolation_level(level)
+        if self.connection is None:             # Force creating a connection.
+            self.cursor().close()
+        if self.features.uses_autocommit and managed and self.autocommit:
+            self.set_autocommit(False)
+            self.features.uses_savepoints = True
 
     def _leave_transaction_management(self, managed):
         """
         If the normal operating mode is "autocommit", switch back to that when
         leaving transaction management.
         """
-        if self.features.uses_autocommit and not managed and self.isolation_level:
-            self._set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        if self.connection is None:             # Force creating a connection.
+            self.cursor().close()
+        if self.features.uses_autocommit and not managed and not self.autocommit:
+            self.rollback()                     # Must terminate transaction first.
+            self.set_autocommit(True)
+            self.features.uses_savepoints = False
 
-    def _set_isolation_level(self, level):
-        """
-        Do all the related feature configurations for changing isolation
-        levels. This doesn't touch the uses_autocommit feature, since that
-        controls the movement *between* isolation levels.
-        """
-        assert level in range(5)
-        try:
-            if self.connection is not None:
-                self.connection.set_isolation_level(level)
-            if level == psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT:
-                self.set_clean()
-        finally:
-            self.isolation_level = level
-            self.features.uses_savepoints = bool(level)
+    def _set_isolation_level(self, isolation_level):
+        assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
+        if self.psycopg2_version >= (2, 4, 2):
+            self.connection.set_session(isolation_level=isolation_level)
+        else:
+            self.connection.set_isolation_level(isolation_level)
 
     def _set_autocommit(self, autocommit):
-        if autocommit:
-            level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        if self.psycopg2_version >= (2, 4, 2):
+            self.connection.autocommit = autocommit
         else:
-            level = self.settings_dict["OPTIONS"].get('isolation_level',
-                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
-        self._set_isolation_level(level)
+            if autocommit:
+                level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+            else:
+                level = self.isolation_level
+            self.connection.set_isolation_level(level)
 
     def set_dirty(self):
         if ((self.transaction_state and self.transaction_state[-1]) or
@@ -230,6 +229,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    @cached_property
+    def psycopg2_version(self):
+        version = psycopg2.__version__.split(' ', 1)[0]
+        return tuple(int(v) for v in version.split('.'))
 
     @cached_property
     def pg_version(self):
