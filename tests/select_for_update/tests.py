@@ -25,7 +25,6 @@ class SelectForUpdateTests(TransactionTestCase):
 
     def setUp(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         self.person = Person.objects.create(name='Reinhardt')
 
         # We have to commit here so that code in run_select_for_update can
@@ -37,7 +36,6 @@ class SelectForUpdateTests(TransactionTestCase):
         new_connections = ConnectionHandler(settings.DATABASES)
         self.new_connection = new_connections[DEFAULT_DB_ALIAS]
         self.new_connection.enter_transaction_management()
-        self.new_connection.managed(True)
 
         # We need to set settings.DEBUG to True so we can capture
         # the output SQL to examine.
@@ -162,7 +160,6 @@ class SelectForUpdateTests(TransactionTestCase):
             # We need to enter transaction management again, as this is done on
             # per-thread basis
             transaction.enter_transaction_management()
-            transaction.managed(True)
             people = list(
                 Person.objects.all().select_for_update(nowait=nowait)
             )

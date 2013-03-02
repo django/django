@@ -223,7 +223,6 @@ class TestNewConnection(TransactionTestCase):
     def test_commit_unless_managed_in_managed(self):
         cursor = connection.cursor()
         connection.enter_transaction_management()
-        transaction.managed(True)
         cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
         connection.commit_unless_managed()
         self.assertTrue(connection.is_dirty())
@@ -280,7 +279,6 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
 
     def test_transaction_management(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
@@ -288,7 +286,6 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
 
     def test_transaction_stacking(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.enter_transaction_management()
@@ -302,13 +299,11 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
 
     def test_enter_autocommit(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         self.assertEqual(connection.isolation_level, self._serializable)
         list(Mod.objects.all())
         self.assertTrue(transaction.is_dirty())
         # Enter autocommit mode again.
         transaction.enter_transaction_management(False)
-        transaction.managed(False)
         self.assertFalse(transaction.is_dirty())
         self.assertEqual(
             connection.connection.get_transaction_status(),

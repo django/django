@@ -54,7 +54,7 @@ def force_managed(func):
     @wraps(func)
     def decorated(self, *args, **kwargs):
         if not transaction.is_managed(using=self.using):
-            transaction.enter_transaction_management(using=self.using)
+            transaction.enter_transaction_management(using=self.using, forced=True)
             forced_managed = True
         else:
             forced_managed = False
