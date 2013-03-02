@@ -39,6 +39,18 @@ def get_connection(using=None):
         using = DEFAULT_DB_ALIAS
     return connections[using]
 
+def get_autocommit(using=None):
+    """
+    Get the autocommit status of the connection.
+    """
+    return get_connection(using).autocommit
+
+def set_autocommit(using=None, autocommit=True):
+    """
+    Set the autocommit status of the connection.
+    """
+    return get_connection(using).set_autocommit(autocommit)
+
 def abort(using=None):
     """
     Roll back any ongoing transactions and clean the transaction management

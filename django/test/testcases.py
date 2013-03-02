@@ -63,6 +63,7 @@ def to_list(value):
         value = [value]
     return value
 
+real_set_autocommit = transaction.set_autocommit
 real_commit = transaction.commit
 real_rollback = transaction.rollback
 real_enter_transaction_management = transaction.enter_transaction_management
@@ -73,6 +74,7 @@ def nop(*args, **kwargs):
     return
 
 def disable_transaction_methods():
+    transaction.set_autocommit = nop
     transaction.commit = nop
     transaction.rollback = nop
     transaction.enter_transaction_management = nop
@@ -80,6 +82,7 @@ def disable_transaction_methods():
     transaction.abort = nop
 
 def restore_transaction_methods():
+    transaction.set_autocommit = real_set_autocommit
     transaction.commit = real_commit
     transaction.rollback = real_rollback
     transaction.enter_transaction_management = real_enter_transaction_management

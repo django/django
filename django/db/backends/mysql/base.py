@@ -445,6 +445,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         except Database.NotSupportedError:
             pass
 
+    def _set_autocommit(self, autocommit):
+        self.connection.autocommit(autocommit)
+
     def disable_constraint_checking(self):
         """
         Disables foreign key checks, primarily for use in adding rows with forward references. Always returns True,

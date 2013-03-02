@@ -1,6 +1,7 @@
 import hashlib
 import sys
 import time
+import warnings
 
 from django.conf import settings
 from django.db.utils import load_backend
@@ -466,7 +467,10 @@ class BaseDatabaseCreation(object):
         anymore by Django code. Kept for compatibility with user code that
         might use it.
         """
-        pass
+        warnings.warn(
+            "set_autocommit was moved from BaseDatabaseCreation to "
+            "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
+        return self.connection.set_autocommit()
 
     def _prepare_for_test_db_ddl(self):
         """
