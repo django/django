@@ -17,8 +17,10 @@ DATE_INPUT_FORMATS = (
 )
 DATETIME_INPUT_FORMATS = (
     '%d/%m/%Y %H:%M:%S',
+    '%d/%m/%Y %H:%M:%S.%f',
     '%d/%m/%Y %H:%M',
     '%d/%m/%y %H:%M:%S',
+    '%d/%m/%y %H:%M:%S.%f',
     '%d/%m/%y %H:%M',
 )
 DECIMAL_SEPARATOR = '.'   # ',' is also official (less common): NOM-008-SCFI-2002
