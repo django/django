@@ -5,7 +5,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase
-from django.test.testcases import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
 from .models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
