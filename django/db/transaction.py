@@ -12,6 +12,8 @@ Managed transactions don't do those commits, but will need some kind of manual
 or implicit commits or rollbacks.
 """
 
+import warnings
+
 from functools import wraps
 
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -49,7 +51,7 @@ def abort(using=None):
     """
     get_connection(using).abort()
 
-def enter_transaction_management(managed=True, using=None):
+def enter_transaction_management(managed=True, using=None, forced=False):
     """
     Enters transaction management for a running thread. It must be balanced with
     the appropriate leave_transaction_management call, since the actual state is
@@ -59,7 +61,7 @@ def enter_transaction_management(managed=True, using=None):
     from the settings, if there is no surrounding block (dirty is always false
     when no current block is running).
     """
-    get_connection(using).enter_transaction_management(managed)
+    get_connection(using).enter_transaction_management(managed, forced)
 
 def leave_transaction_management(using=None):
     """
@@ -105,13 +107,8 @@ def is_managed(using=None):
     return get_connection(using).is_managed()
 
 def managed(flag=True, using=None):
-    """
-    Puts the transaction manager into a manual state: managed transactions have
-    to be committed explicitly by the user. If you switch off transaction
-    management and there is a pending commit/rollback, the data will be
-    commited.
-    """
-    get_connection(using).managed(flag)
+    warnings.warn("'managed' no longer serves a purpose.",
+        PendingDeprecationWarning, stacklevel=2)
 
 def commit_unless_managed(using=None):
     """
@@ -224,7 +221,6 @@ def autocommit(using=None):
     """
     def entering(using):
         enter_transaction_management(managed=False, using=using)
-        managed(False, using=using)
 
     def exiting(exc_value, using):
         leave_transaction_management(using=using)
@@ -240,7 +236,6 @@ def commit_on_success(using=None):
     """
     def entering(using):
         enter_transaction_management(using=using)
-        managed(True, using=using)
 
     def exiting(exc_value, using):
         try:
@@ -268,7 +263,6 @@ def commit_manually(using=None):
     """
     def entering(using):
         enter_transaction_management(using=using)
-        managed(True, using=using)
 
     def exiting(exc_value, using):
         leave_transaction_management(using=using)

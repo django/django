@@ -234,7 +234,7 @@ class BaseDatabaseWrapper(object):
 
     ##### Generic transaction management methods #####
 
-    def enter_transaction_management(self, managed=True):
+    def enter_transaction_management(self, managed=True, forced=False):
         """
         Enters transaction management for a running thread. It must be balanced with
         the appropriate leave_transaction_management call, since the actual state is
@@ -243,12 +243,14 @@ class BaseDatabaseWrapper(object):
         The state and dirty flag are carried over from the surrounding block or
         from the settings, if there is no surrounding block (dirty is always false
         when no current block is running).
+
+        If you switch off transaction management and there is a pending
+        commit/rollback, the data will be commited, unless "forced" is True.
         """
-        if self.transaction_state:
-            self.transaction_state.append(self.transaction_state[-1])
-        else:
-            self.transaction_state.append(settings.TRANSACTIONS_MANAGED)
+        self.transaction_state.append(managed)
         self._enter_transaction_management(managed)
+        if not managed and self.is_dirty() and not forced:
+            self.commit()
 
     def leave_transaction_management(self):
         """
@@ -313,22 +315,6 @@ class BaseDatabaseWrapper(object):
         if self.transaction_state:
             return self.transaction_state[-1]
         return settings.TRANSACTIONS_MANAGED
-
-    def managed(self, flag=True):
-        """
-        Puts the transaction manager into a manual state: managed transactions have
-        to be committed explicitly by the user. If you switch off transaction
-        management and there is a pending commit/rollback, the data will be
-        commited.
-        """
-        top = self.transaction_state
-        if top:
-            top[-1] = flag
-            if not flag and self.is_dirty():
-                self.commit()
-        else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
 
     def commit_unless_managed(self):
         """
@@ -574,7 +560,6 @@ class BaseDatabaseFeatures(object):
             # otherwise autocommit will cause the confimation to
             # fail.
             self.connection.enter_transaction_management()
-            self.connection.managed(True)
             cursor = self.connection.cursor()
             cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
             self.connection.commit()

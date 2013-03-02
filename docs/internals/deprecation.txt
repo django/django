@@ -339,8 +339,6 @@ these changes.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 
-* The private API ``django.db.close_connection`` will be removed.
-
 * Remove the backward compatible shims introduced to rename ``get_query_set``
   and similar queryset methods. This affects the following classes:
   ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
@@ -349,6 +347,10 @@ these changes.
 
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
+
+* The private API ``django.db.close_connection`` will be removed.
+
+* The private API ``django.transaction.managed`` will be removed.
 
 2.0
 ---
