@@ -242,17 +242,18 @@ class TestNewConnection(TransactionTestCase):
 
 @skipUnless(connection.vendor == 'postgresql',
             "This test only valid for PostgreSQL")
-class TestPostgresAutocommit(TransactionTestCase):
+class TestPostgresAutocommitAndIsolation(TransactionTestCase):
     """
-    Tests to make sure psycopg2's autocommit mode is restored after entering
-    and leaving transaction management. Refs #16047.
+    Tests to make sure psycopg2's autocommit mode and isolation level
+    is restored after entering and leaving transaction management.
+    Refs #16047, #18130.
     """
     def setUp(self):
         from psycopg2.extensions import (ISOLATION_LEVEL_AUTOCOMMIT,
-                                         ISOLATION_LEVEL_READ_COMMITTED,
+                                         ISOLATION_LEVEL_SERIALIZABLE,
                                          TRANSACTION_STATUS_IDLE)
         self._autocommit = ISOLATION_LEVEL_AUTOCOMMIT
-        self._read_committed = ISOLATION_LEVEL_READ_COMMITTED
+        self._serializable = ISOLATION_LEVEL_SERIALIZABLE
         self._idle = TRANSACTION_STATUS_IDLE
 
         # We want a clean backend with autocommit = True, so
@@ -261,6 +262,7 @@ class TestPostgresAutocommit(TransactionTestCase):
         settings = self._old_backend.settings_dict.copy()
         opts = settings['OPTIONS'].copy()
         opts['autocommit'] = True
+        opts['isolation_level'] = ISOLATION_LEVEL_SERIALIZABLE
         settings['OPTIONS'] = opts
         new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
         connections[DEFAULT_DB_ALIAS] = new_backend
@@ -279,7 +281,7 @@ class TestPostgresAutocommit(TransactionTestCase):
     def test_transaction_management(self):
         transaction.enter_transaction_management()
         transaction.managed(True)
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
         self.assertEqual(connection.isolation_level, self._autocommit)
@@ -287,13 +289,13 @@ class TestPostgresAutocommit(TransactionTestCase):
     def test_transaction_stacking(self):
         transaction.enter_transaction_management()
         transaction.managed(True)
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.enter_transaction_management()
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
         self.assertEqual(connection.isolation_level, self._autocommit)
@@ -301,7 +303,7 @@ class TestPostgresAutocommit(TransactionTestCase):
     def test_enter_autocommit(self):
         transaction.enter_transaction_management()
         transaction.managed(True)
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
         list(Mod.objects.all())
         self.assertTrue(transaction.is_dirty())
         # Enter autocommit mode again.
@@ -314,7 +316,7 @@ class TestPostgresAutocommit(TransactionTestCase):
         list(Mod.objects.all())
         self.assertFalse(transaction.is_dirty())
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._read_committed)
+        self.assertEqual(connection.isolation_level, self._serializable)
         transaction.leave_transaction_management()
         self.assertEqual(connection.isolation_level, self._autocommit)
 
