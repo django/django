@@ -692,7 +692,6 @@ class TransactionMiddlewareTest(TransactionTestCase):
 
     def test_managed_response(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         Band.objects.create(name='The Beatles')
         self.assertTrue(transaction.is_dirty())
         TransactionMiddleware().process_response(self.request, self.response)
@@ -700,8 +699,7 @@ class TransactionMiddlewareTest(TransactionTestCase):
         self.assertEqual(Band.objects.count(), 1)
 
     def test_unmanaged_response(self):
-        transaction.enter_transaction_management()
-        transaction.managed(False)
+        transaction.enter_transaction_management(False)
         self.assertEqual(Band.objects.count(), 0)
         TransactionMiddleware().process_response(self.request, self.response)
         self.assertFalse(transaction.is_managed())
@@ -711,7 +709,6 @@ class TransactionMiddlewareTest(TransactionTestCase):
 
     def test_exception(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         Band.objects.create(name='The Beatles')
         self.assertTrue(transaction.is_dirty())
         TransactionMiddleware().process_exception(self.request, None)
@@ -726,7 +723,6 @@ class TransactionMiddlewareTest(TransactionTestCase):
                 raise IntegrityError()
             connections[DEFAULT_DB_ALIAS].commit = raise_exception
             transaction.enter_transaction_management()
-            transaction.managed(True)
             Band.objects.create(name='The Beatles')
             self.assertTrue(transaction.is_dirty())
             with self.assertRaises(IntegrityError):

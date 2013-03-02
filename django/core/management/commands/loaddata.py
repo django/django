@@ -75,7 +75,6 @@ class Command(BaseCommand):
         if commit:
             transaction.commit_unless_managed(using=self.using)
             transaction.enter_transaction_management(using=self.using)
-            transaction.managed(True, using=self.using)
 
         class SingleZipReader(zipfile.ZipFile):
             def __init__(self, *args, **kwargs):

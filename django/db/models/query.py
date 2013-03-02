@@ -443,7 +443,7 @@ class QuerySet(object):
         connection = connections[self.db]
         fields = self.model._meta.local_fields
         if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
+            transaction.enter_transaction_management(using=self.db, forced=True)
             forced_managed = True
         else:
             forced_managed = False
@@ -582,7 +582,7 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
+            transaction.enter_transaction_management(using=self.db, forced=True)
             forced_managed = True
         else:
             forced_managed = False

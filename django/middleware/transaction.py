@@ -10,7 +10,6 @@ class TransactionMiddleware(object):
     def process_request(self, request):
         """Enters transaction management"""
         transaction.enter_transaction_management()
-        transaction.managed(True)
 
     def process_exception(self, request, exception):
         """Rolls back the database and leaves transaction management"""

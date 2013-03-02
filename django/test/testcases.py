@@ -67,7 +67,6 @@ real_commit = transaction.commit
 real_rollback = transaction.rollback
 real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
-real_managed = transaction.managed
 real_abort = transaction.abort
 
 def nop(*args, **kwargs):
@@ -78,7 +77,6 @@ def disable_transaction_methods():
     transaction.rollback = nop
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
-    transaction.managed = nop
     transaction.abort = nop
 
 def restore_transaction_methods():
@@ -86,7 +84,6 @@ def restore_transaction_methods():
     transaction.rollback = real_rollback
     transaction.enter_transaction_management = real_enter_transaction_management
     transaction.leave_transaction_management = real_leave_transaction_management
-    transaction.managed = real_managed
     transaction.abort = real_abort
 
 
@@ -833,7 +830,6 @@ class TestCase(TransactionTestCase):
 
         for db_name in self._databases_names():
             transaction.enter_transaction_management(using=db_name)
-            transaction.managed(True, using=db_name)
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
