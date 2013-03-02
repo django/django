@@ -515,14 +515,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
 
-    def check_constraints(self, table_names=None):
-        """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
-        """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
-
     def _connect_string(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():
@@ -535,9 +527,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             dsn = settings_dict['NAME']
         return "%s/%s@%s" % (settings_dict['USER'],
                              settings_dict['PASSWORD'], dsn)
-
-    def create_cursor(self):
-        return FormatStylePlaceholderCursor(self.connection)
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -598,21 +587,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # stmtcachesize is available only in 4.3.2 and up.
             pass
 
-    def is_usable(self):
-        try:
-            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
-                self.connection.ping()
-            else:
-                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
-                self.connection.cursor().execute("SELECT 1 FROM DUAL")
-        except DatabaseError:
-            return False
-        else:
-            return True
-
-    # Oracle doesn't support savepoint commits.  Ignore them.
-    def _savepoint_commit(self, sid):
-        pass
+    def create_cursor(self):
+        return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
         if self.connection is not None:
@@ -631,6 +607,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
+
+    # Oracle doesn't support savepoint commits.  Ignore them.
+    def _savepoint_commit(self, sid):
+        pass
+
+    def check_constraints(self, table_names=None):
+        """
+        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
+        are returned to deferred.
+        """
+        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
+        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+
+    def is_usable(self):
+        try:
+            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
+                self.connection.ping()
+            else:
+                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
+                self.connection.cursor().execute("SELECT 1 FROM DUAL")
+        except DatabaseError:
+            return False
+        else:
+            return True
 
     @cached_property
     def oracle_version(self):

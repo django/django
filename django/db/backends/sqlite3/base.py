@@ -347,8 +347,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
-    def is_usable(self):
-        return True
+    def close(self):
+        self.validate_thread_sharing()
+        # If database is in memory, closing the connection destroys the
+        # database. To prevent accidental data loss, ignore close requests on
+        # an in-memory db.
+        if self.settings_dict['NAME'] != ":memory:":
+            BaseDatabaseWrapper.close(self)
 
     def check_constraints(self, table_names=None):
         """
@@ -384,13 +389,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0], table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
 
-    def close(self):
-        self.validate_thread_sharing()
-        # If database is in memory, closing the connection destroys the
-        # database. To prevent accidental data loss, ignore close requests on
-        # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:":
-            BaseDatabaseWrapper.close(self)
+    def is_usable(self):
+        return True
+
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 
