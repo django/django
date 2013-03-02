@@ -201,6 +201,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
 
+    def _set_autocommit(self, autocommit):
+        if autocommit:
+            level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        else:
+            level = self.settings_dict["OPTIONS"].get('isolation_level',
+                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
+        self._set_isolation_level(level)
+
     def set_dirty(self):
         if ((self.transaction_state and self.transaction_state[-1]) or
                 not self.features.uses_autocommit):
