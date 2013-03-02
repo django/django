@@ -133,7 +133,10 @@ def get_system_username():
         # (a very restricted chroot environment, for example).
         return ''
     if not six.PY3:
-        default_locale = locale.getdefaultlocale()[1]
+        try:
+            default_locale = locale.getdefaultlocale()[1]
+        except ValueError:
+            return ''
         if not default_locale:
             return ''
         try:
