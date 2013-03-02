@@ -91,40 +91,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
 
-    def check_constraints(self, table_names=None):
-        """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
-        """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
-
-    def close(self):
-        self.validate_thread_sharing()
-        if self.connection is None:
-            return
-
-        try:
-            self.connection.close()
-            self.connection = None
-        except Database.Error:
-            # In some cases (database restart, network connection lost etc...)
-            # the connection to the database is lost without giving Django a
-            # notification. If we don't set self.connection to None, the error
-            # will occur a every request.
-            self.connection = None
-            logger.warning('psycopg2 error while closing the connection.',
-                exc_info=sys.exc_info()
-            )
-            raise
-        finally:
-            self.set_clean()
-
-    @cached_property
-    def pg_version(self):
-        with self.temporary_connection():
-            return get_version(self.connection)
-
     def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
@@ -177,14 +143,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
-    def is_usable(self):
+    def close(self):
+        self.validate_thread_sharing()
+        if self.connection is None:
+            return
+
         try:
-            # Use a psycopg cursor directly, bypassing Django's utilities.
-            self.connection.cursor().execute("SELECT 1")
-        except DatabaseError:
-            return False
-        else:
-            return True
+            self.connection.close()
+            self.connection = None
+        except Database.Error:
+            # In some cases (database restart, network connection lost etc...)
+            # the connection to the database is lost without giving Django a
+            # notification. If we don't set self.connection to None, the error
+            # will occur a every request.
+            self.connection = None
+            logger.warning('psycopg2 error while closing the connection.',
+                exc_info=sys.exc_info()
+            )
+            raise
+        finally:
+            self.set_clean()
 
     def _enter_transaction_management(self, managed):
         """
@@ -222,3 +200,25 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if ((self.transaction_state and self.transaction_state[-1]) or
                 not self.features.uses_autocommit):
             super(DatabaseWrapper, self).set_dirty()
+
+    def check_constraints(self, table_names=None):
+        """
+        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
+        are returned to deferred.
+        """
+        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
+        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+
+    def is_usable(self):
+        try:
+            # Use a psycopg cursor directly, bypassing Django's utilities.
+            self.connection.cursor().execute("SELECT 1")
+        except DatabaseError:
+            return False
+        else:
+            return True
+
+    @cached_property
+    def pg_version(self):
+        with self.temporary_connection():
+            return get_version(self.connection)

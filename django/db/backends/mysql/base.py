@@ -439,28 +439,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
 
-    def is_usable(self):
-        try:
-            self.connection.ping()
-        except DatabaseError:
-            return False
-        else:
-            return True
-
     def _rollback(self):
         try:
             BaseDatabaseWrapper._rollback(self)
         except Database.NotSupportedError:
             pass
-
-    @cached_property
-    def mysql_version(self):
-        with self.temporary_connection():
-            server_info = self.connection.get_server_info()
-        match = server_version_re.match(server_info)
-        if not match:
-            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
 
     def disable_constraint_checking(self):
         """
@@ -510,3 +493,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0],
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
+
+    def is_usable(self):
+        try:
+            self.connection.ping()
+        except DatabaseError:
+            return False
+        else:
+            return True
+
+    @cached_property
+    def mysql_version(self):
+        with self.temporary_connection():
+            server_info = self.connection.get_server_info()
+        match = server_version_re.match(server_info)
+        if not match:
+            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
+        return tuple([int(x) for x in match.groups()])
