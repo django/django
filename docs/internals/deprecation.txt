@@ -348,9 +348,10 @@ these changes.
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
 
-* The private API ``django.db.close_connection`` will be removed.
-
-* The private API ``django.transaction.managed`` will be removed.
+* The following private APIs will be removed:
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.managed()``
 
 2.0
 ---

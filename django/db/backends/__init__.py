@@ -44,6 +44,7 @@ class BaseDatabaseWrapper(object):
         self.savepoint_state = 0
 
         # Transaction management related attributes
+        self.autocommit = False
         self.transaction_state = []
         # Tracks if the connection is believed to be in transaction. This is
         # set somewhat aggressively, as the DBAPI doesn't make it easy to
@@ -232,6 +233,12 @@ class BaseDatabaseWrapper(object):
         """
         pass
 
+    def _set_autocommit(self, autocommit):
+        """
+        Backend-specific implementation to enable or disable autocommit.
+        """
+        raise NotImplementedError
+
     ##### Generic transaction management methods #####
 
     def enter_transaction_management(self, managed=True, forced=False):
@@ -273,6 +280,13 @@ class BaseDatabaseWrapper(object):
             self.rollback()
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
+
+    def set_autocommit(self, autocommit=True):
+        """
+        Enable or disable autocommit.
+        """
+        self._set_autocommit(autocommit)
+        self.autocommit = autocommit
 
     def abort(self):
         """

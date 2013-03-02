@@ -208,6 +208,23 @@ This applies to all database operations, not just write operations. Even
 if your transaction only reads from the database, the transaction must
 be committed or rolled back before you complete a request.
 
+.. _managing-autocommit:
+
+Managing autocommit
+===================
+
+.. versionadded:: 1.6
+
+Django provides a straightforward API to manage the autocommit state of each
+database connection, if you need to.
+
+.. function:: get_autocommit(using=None)
+
+.. function:: set_autocommit(using=None, autocommit=True)
+
+These functions take a ``using`` argument which should be the name of a
+database. If it isn't provided, Django uses the ``"default"`` database.
+
 .. _deactivate-transaction-management:
 
 How to globally deactivate transaction management

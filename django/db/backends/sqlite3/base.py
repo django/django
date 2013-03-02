@@ -355,6 +355,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.settings_dict['NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
 
+    def _set_autocommit(self, autocommit):
+        if autocommit:
+            level = None
+        else:
+            # sqlite3's internal default is ''. It's different from None.
+            # See Modules/_sqlite/connection.c.
+            level = ''
+        # 'isolation_level' is a misleading API.
+        # SQLite always runs at the SERIALIZABLE isolation level.
+        self.connection.isolation_level = level
+
     def check_constraints(self, table_names=None):
         """
         Checks each table name in `table_names` for rows with invalid foreign key references. This method is

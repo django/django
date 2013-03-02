@@ -57,6 +57,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     _savepoint_rollback = ignore
     _enter_transaction_management = complain
     _leave_transaction_management = ignore
+    _set_autocommit = complain
     set_dirty = complain
     set_clean = complain
     commit_unless_managed = complain
