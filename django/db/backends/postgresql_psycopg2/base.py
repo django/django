@@ -88,9 +88,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
 
-        autocommit = opts.get('autocommit', False)
-        self.features.uses_autocommit = autocommit
-        self.features.uses_savepoints = not autocommit
+        self.features.uses_savepoints = False
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -139,8 +137,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.connection.cursor().execute(
                         self.ops.set_time_zone_sql(), [tz])
         self.connection.set_isolation_level(self.isolation_level)
-        if self.features.uses_autocommit:
-            self.set_autocommit(True)
+        self.set_autocommit(not settings.TRANSACTIONS_MANAGED)
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -175,7 +172,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         if self.connection is None:             # Force creating a connection.
             self.cursor().close()
-        if self.features.uses_autocommit and managed and self.autocommit:
+        if managed and self.autocommit:
             self.set_autocommit(False)
             self.features.uses_savepoints = True
 
@@ -186,7 +183,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         if self.connection is None:             # Force creating a connection.
             self.cursor().close()
-        if self.features.uses_autocommit and not managed and not self.autocommit:
+        if not managed and not self.autocommit:
             self.rollback()                     # Must terminate transaction first.
             self.set_autocommit(True)
             self.features.uses_savepoints = False
@@ -209,8 +206,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(level)
 
     def set_dirty(self):
-        if ((self.transaction_state and self.transaction_state[-1]) or
-                not self.features.uses_autocommit):
+        if self.transaction_state and self.transaction_state[-1]:
             super(DatabaseWrapper, self).set_dirty()
 
     def check_constraints(self, table_names=None):
