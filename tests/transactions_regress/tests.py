@@ -274,31 +274,39 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
             connections[DEFAULT_DB_ALIAS] = self._old_backend
 
     def test_initial_autocommit_state(self):
+        # Autocommit is activated when the connection is created.
+        connection.cursor().close()
+
         self.assertTrue(connection.features.uses_autocommit)
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
     def test_transaction_management(self):
         transaction.enter_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
     def test_transaction_stacking(self):
         transaction.enter_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.enter_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
     def test_enter_autocommit(self):
         transaction.enter_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
         list(Mod.objects.all())
         self.assertTrue(transaction.is_dirty())
@@ -311,9 +319,10 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
         list(Mod.objects.all())
         self.assertFalse(transaction.is_dirty())
         transaction.leave_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
 
 class TestManyToManyAddTransaction(TransactionTestCase):
