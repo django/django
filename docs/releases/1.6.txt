@@ -125,6 +125,8 @@ Minor features
 * The admin list columns have a ``column-<field_name>`` class in the HTML
   so the columns header can be styled with CSS, e.g. to set a column width.
 
+* The isolation level can be customized under PostgreSQL.
+
 Backwards incompatible changes in 1.6
 =====================================
 

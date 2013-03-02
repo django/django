@@ -143,8 +143,11 @@ autocommit behavior is enabled by setting the ``autocommit`` key in
 the :setting:`OPTIONS` part of your database configuration in
 :setting:`DATABASES`::
 
-    'OPTIONS': {
-        'autocommit': True,
+    DATABASES = {
+        # ...
+        'OPTIONS': {
+            'autocommit': True,
+        },
     }
 
 In this configuration, Django still ensures that :ref:`delete()
@@ -167,6 +170,34 @@ wrap you operations in manual transaction handling to ensure data consistency.
 You should also audit your existing code for any instances of this behavior
 before enabling this feature. It's faster, but it provides less automatic
 protection for multi-call operations.
+
+Isolation level
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
+level <postgresql-isolation-levels>`_. If you need a higher isolation level
+such as ``REPEATABLE READ`` or ``SERIALIZABLE``, set it in the
+:setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
+
+    import psycopg2.extensions
+
+    DATABASES = {
+        # ...
+        'OPTIONS': {
+            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+        },
+    }
+
+.. note::
+
+    Under higher isolation levels, your application should be prepared to
+    handle exceptions raised on serialization failures. This option is
+    designed for advanced uses.
+
+.. _postgresql-isolation-levels: http://www.postgresql.org/docs/devel/static/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
