@@ -302,8 +302,8 @@ class PostgresNewConnectionTest(TestCase):
     transaction is rolled back.
     """
     @unittest.skipUnless(
-        connection.vendor == 'postgresql' and connection.isolation_level > 0,
-        "This test applies only to PostgreSQL without autocommit")
+        connection.vendor == 'postgresql',
+        "This test applies only to PostgreSQL")
     def test_connect_and_rollback(self):
         new_connections = ConnectionHandler(settings.DATABASES)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
