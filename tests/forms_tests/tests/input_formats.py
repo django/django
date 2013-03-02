@@ -9,7 +9,8 @@ from django.test import SimpleTestCase
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)
 class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
-        # nl/formats.py has customized TIME_INPUT_FORMATS
+        # nl/formats.py has customized TIME_INPUT_FORMATS:
+        # ('%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M')
         activate('nl')
 
     def tearDown(self):
@@ -36,6 +37,10 @@ class LocalizedTimeTests(SimpleTestCase):
         # Check that the parsed result does a round trip to default format
         text = f.widget._format_value(result)
         self.assertEqual(text, "13:30:00")
+
+        # ISO formats are accepted, even if not specified in formats.py
+        result = f.clean('13:30:05.000155')
+        self.assertEqual(result, time(13,30,5,155))
 
     def test_localized_timeField(self):
         "Localized TimeFields act as unlocalized widgets"

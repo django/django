@@ -365,6 +365,7 @@ DATE_INPUT_FORMATS = (
 # * Note that these format strings are different from the ones to display dates
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
+    '%H:%M:%S.%f',  # '14:30:59.000200'
     '%H:%M',        # '14:30'
 )
 

@@ -1731,6 +1731,7 @@ Default::
 
     (
         '%H:%M:%S',     # '14:30:59'
+        '%H:%M:%S.%f',  # '14:30:59.000200'
         '%H:%M',        # '14:30'
     )
 
@@ -1743,6 +1744,10 @@ When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
+
+.. versionchanged:: 1.6
+
+Input format with microseconds has been added.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
