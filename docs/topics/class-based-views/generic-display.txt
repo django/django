@@ -230,7 +230,7 @@ more::
     get_context_data on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
-    to super), any children of that class will also need to explictly set it
+    to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 
