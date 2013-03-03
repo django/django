@@ -4,21 +4,24 @@ Managing database transactions
 
 .. module:: django.db.transaction
 
-Django gives you a few ways to control how database transactions are managed,
-if you're using a database that supports transactions.
+Django gives you a few ways to control how database transactions are managed.
 
 Django's default transaction behavior
 =====================================
 
-Django's default behavior is to run with an open transaction which it
-commits automatically when any built-in, data-altering model function is
-called. For example, if you call ``model.save()`` or ``model.delete()``, the
-change will be committed immediately.
+Django's default behavior is to run in autocommit mode. Each query is
+immediately committed to the database. :ref:`See below for details
+<autocommit-details>`.
 
-This is much like the auto-commit setting for most databases. As soon as you
-perform an action that needs to write to the database, Django produces the
-``INSERT``/``UPDATE``/``DELETE`` statements and then does the ``COMMIT``.
-There's no implicit ``ROLLBACK``.
+..
+   Django uses transactions or savepoints automatically to guarantee the
+   integrity of ORM operations that require multiple queries, especially
+   :ref:`delete() <topics-db-queries-delete>` and :ref:`update()
+   <topics-db-queries-update>` queries.
+
+.. versionchanged:: 1.6
+    Previous version of Django featured :ref:`a more complicated default
+    behavior <transactions-changes-from-1.5>`.
 
 Tying transactions to HTTP requests
 ===================================
@@ -26,7 +29,7 @@ Tying transactions to HTTP requests
 The recommended way to handle transactions in Web requests is to tie them to
 the request and response phases via Django's ``TransactionMiddleware``.
 
-It works like this: When a request starts, Django starts a transaction. If the
+It works like this. When a request starts, Django starts a transaction. If the
 response is produced without problems, Django commits any pending transactions.
 If the view function produces an exception, Django rolls back any pending
 transactions.
@@ -47,11 +50,11 @@ view functions, but also for all middleware modules that come after it. So if
 you use the session middleware after the transaction middleware, session
 creation will be part of the transaction.
 
-The various cache middlewares are an exception:
-``CacheMiddleware``, :class:`~django.middleware.cache.UpdateCacheMiddleware`,
-and :class:`~django.middleware.cache.FetchFromCacheMiddleware` are never
-affected. Even when using database caching, Django's cache backend uses its own
-database cursor (which is mapped to its own database connection internally).
+The various cache middlewares are an exception: ``CacheMiddleware``,
+:class:`~django.middleware.cache.UpdateCacheMiddleware`, and
+:class:`~django.middleware.cache.FetchFromCacheMiddleware` are never affected.
+Even when using database caching, Django's cache backend uses its own database
+connection internally.
 
 .. note::
 
@@ -116,7 +119,7 @@ managers, too.
 .. function:: autocommit
 
     Use the ``autocommit`` decorator to switch a view function to Django's
-    default commit behavior, regardless of the global transaction setting.
+    default commit behavior.
 
     Example::
 
@@ -195,14 +198,14 @@ managers, too.
 Requirements for transaction handling
 =====================================
 
-Django requires that every transaction that is opened is closed before
-the completion of a request. If you are using :func:`autocommit` (the
-default commit mode) or :func:`commit_on_success`, this will be done
-for you automatically (with the exception of :ref:`executing custom SQL
-<executing-custom-sql>`). However, if you are manually managing
-transactions (using the :func:`commit_manually` decorator), you must
-ensure that the transaction is either committed or rolled back before
-a request is completed.
+Django requires that every transaction that is opened is closed before the
+completion of a request.
+
+If you are using :func:`autocommit` (the default commit mode) or
+:func:`commit_on_success`, this will be done for you automatically. However,
+if you are manually managing transactions (using the :func:`commit_manually`
+decorator), you must ensure that the transaction is either committed or rolled
+back before a request is completed.
 
 This applies to all database operations, not just write operations. Even
 if your transaction only reads from the database, the transaction must
@@ -231,17 +234,17 @@ How to globally deactivate transaction management
 =================================================
 
 Control freaks can totally disable all transaction management by setting
-:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file.
+:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file. If
+you do this, Django won't enable autocommit. You'll get the regular behavior
+of the underlying database library.
 
-If you do this, Django won't provide any automatic transaction management
-whatsoever. Middleware will no longer implicitly commit transactions, and
-you'll need to roll management yourself. This even requires you to commit
-changes done by middleware somewhere else.
+This requires you to commit explicitly every transaction, even those started
+by Django or by third-party libraries. Thus, this is best used in situations
+where you want to run your own transaction-controlling middleware or do
+something really strange.
 
-Thus, this is best used in situations where you want to run your own
-transaction-controlling middleware or do something really strange. In almost
-all situations, you'll be better off using the default behavior, or the
-transaction middleware, and only modify selected functions as needed.
+In almost all situations, you'll be better off using the default behavior, or
+the transaction middleware, and only modify selected functions as needed.
 
 .. _topics-db-transactions-savepoints:
 
@@ -308,8 +311,11 @@ The following example demonstrates the use of savepoints::
 
       transaction.commit()
 
+Database-specific notes
+=======================
+
 Transactions in MySQL
-=====================
+---------------------
 
 If you're using MySQL, your tables may or may not support transactions; it
 depends on your MySQL version and the table types you're using. (By
@@ -318,14 +324,14 @@ peculiarities are outside the scope of this article, but the MySQL site has
 `information on MySQL transactions`_.
 
 If your MySQL setup does *not* support transactions, then Django will function
-in auto-commit mode: Statements will be executed and committed as soon as
+in autocommit mode: Statements will be executed and committed as soon as
 they're called. If your MySQL setup *does* support transactions, Django will
 handle transactions as explained in this document.
 
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
 
 Handling exceptions within PostgreSQL transactions
-==================================================
+--------------------------------------------------
 
 When a call to a PostgreSQL cursor raises an exception (typically
 ``IntegrityError``), all subsequent SQL in the same transaction will fail with
@@ -338,7 +344,7 @@ force_insert/force_update flag, or invoking custom SQL.
 There are several ways to recover from this sort of error.
 
 Transaction rollback
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The first option is to roll back the entire transaction. For example::
 
@@ -355,7 +361,7 @@ made by ``a.save()`` would be lost, even though that operation raised no error
 itself.
 
 Savepoint rollback
-------------------
+~~~~~~~~~~~~~~~~~~
 
 If you are using PostgreSQL 8 or later, you can use :ref:`savepoints
 <topics-db-transactions-savepoints>` to control the extent of a rollback.
@@ -375,25 +381,135 @@ offending operation, rather than the entire transaction. For example::
 In this example, ``a.save()`` will not be undone in the case where
 ``b.save()`` raises an exception.
 
-Database-level autocommit
--------------------------
+Under the hood
+==============
 
-With PostgreSQL 8.2 or later, there is an advanced option to run PostgreSQL
-with :doc:`database-level autocommit </ref/databases>`. If you use this option,
-there is no constantly open transaction, so it is always possible to continue
-after catching an exception. For example::
+.. _autocommit-details:
 
-    a.save() # succeeds
-    try:
-        b.save() # Could throw exception
-    except IntegrityError:
-        pass
-    c.save() # succeeds
+Details on autocommit
+---------------------
 
-.. note::
+In the SQL standards, each SQL query starts a transaction, unless one is
+already in progress. Such transactions must then be committed or rolled back.
 
-    This is not the same as the :ref:`autocommit decorator
-    <topics-db-transactions-autocommit>`. When using database level autocommit
-    there is no database transaction at all. The ``autocommit`` decorator
-    still uses transactions, automatically committing each transaction when
-    a database modifying operation occurs.
+This isn't always convenient for application developers. To alleviate this
+problem, most databases provide an autocommit mode. When autocommit is turned
+on, each SQL query is wrapped in its own transaction. In other words, the
+transaction is not only automatically started, but also automatically
+committed.
+
+:pep:`249`, the Python Database API Specification v2.0, requires autocommit to
+be initially turned off. Django overrides this default and turns autocommit
+on.
+
+To avoid this, you can :ref:`deactivate the transaction management
+<deactivate-transaction-management>`, but it isn't recommended.
+
+.. versionchanged:: 1.6
+    Before Django 1.6, autocommit was turned off, and it was emulated by
+    forcing a commit after write operations in the ORM.
+
+.. warning::
+
+    If you're using the database API directly — for instance, you're running
+    SQL queries with ``cursor.execute()`` — be aware that autocommit is on,
+    and consider wrapping your operations in a transaction to ensure
+    consistency.
+
+.. _transaction-states:
+
+Transaction management states
+-----------------------------
+
+At any time, each database connection is in one of these two states:
+
+- **auto mode**: autocommit is enabled;
+- **managed mode**: autocommit is disabled.
+
+Django starts in auto mode. ``TransactionMiddleware``,
+:func:`commit_on_success` and :func:`commit_manually` activate managed mode;
+:func:`autocommit` activates auto mode.
+
+Internally, Django keeps a stack of states. Activations and deactivations must
+be balanced.
+
+For example, at the beginning of each HTTP request, ``TransactionMiddleware``
+switches to managed mode; at the end of the request, it commits or rollbacks,
+and switches back to auto mode.
+
+.. admonition:: Nesting decorators / context managers
+
+    :func:`commit_on_success` has two effects: it changes the transaction
+    state, and defines an atomic transaction block.
+
+    Nesting with :func:`autocommit` and :func:`commit_manually` will give the
+    expected results in terms of transaction state, but not in terms of
+    transaction semantics. Most often, the inner block will commit, breaking
+    the atomicity of the outer block.
+
+Django currently doesn't provide any APIs to create transactions in auto mode.
+
+.. _transactions-changes-from-1.5:
+
+Changes from Django 1.5 and earlier
+===================================
+
+Since version 1.6, Django uses database-level autocommit in auto mode.
+
+Previously, it implemented application-level autocommit by triggering a commit
+after each ORM write.
+
+As a consequence, each database query (for instance, an
+ORM read) started a transaction that lasted until the next ORM write. Such
+"automatic transactions" no longer exist in Django 1.6.
+
+There are four known scenarios where this is backwards-incompatible.
+
+Note that managed mode isn't affected at all. This section assumes auto mode.
+See the :ref:`description of modes <transaction-states>` above.
+
+Sequences of custom SQL queries
+-------------------------------
+
+If you're executing several :ref:`custom SQL queries <executing-custom-sql>`
+in a row, each one now runs in its own transaction, instead of sharing the
+same "automatic transaction". If you need to enforce atomicity, you must wrap
+the sequence of queries in :func:`commit_on_success`.
+
+To check for this problem, look for calls to ``cursor.execute()``. They're
+usually followed by a call to ``transaction.commit_unless_managed``, which
+isn't necessary any more and should be removed.
+
+Select for update
+-----------------
+
+If you were relying on "automatic transactions" to provide locking between
+:meth:`~django.db.models.query.QuerySet.select_for_update` and a subsequent
+write operation — an extremely fragile design, but nonetheless possible — you
+must wrap the relevant code in :func:`commit_on_success`.
+
+Using a high isolation level
+----------------------------
+
+If you were using the "repeatable read" isolation level or higher, and if you
+relied on "automatic transactions" to guarantee consistency between successive
+reads, the new behavior is backwards-incompatible. To maintain consistency,
+you must wrap such sequences in :func:`commit_on_success`.
+
+MySQL defaults to "repeatable read" and SQLite to "serializable"; they may be
+affected by this problem.
+
+At the "read committed" isolation level or lower, "automatic transactions"
+have no effect on the semantics of any sequence of ORM operations.
+
+PostgreSQL and Oracle default to "read committed" and aren't affected, unless
+you changed the isolation level.
+
+Using unsupported database features
+-----------------------------------
+
+With triggers, views, or functions, it's possible to make ORM reads result in
+database modifications. Django 1.5 and earlier doesn't deal with this case and
+it's theoretically possible to observe a different behavior after upgrading to
+Django 1.6 or later. In doubt, use :func:`commit_on_success` to enforce
+integrity.

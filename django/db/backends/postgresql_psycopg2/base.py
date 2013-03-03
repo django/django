@@ -136,7 +136,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.connection.cursor().execute(
                         self.ops.set_time_zone_sql(), [tz])
         self.connection.set_isolation_level(self.isolation_level)
-        self.set_autocommit(not settings.TRANSACTIONS_MANAGED)
 
     def create_cursor(self):
         cursor = self.connection.cursor()
