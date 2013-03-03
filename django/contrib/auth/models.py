@@ -462,6 +462,8 @@ class User(AbstractUser):
     Username, password and email are required. Other fields are optional.
     """
     class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
         swappable = 'AUTH_USER_MODEL'
 
 
