@@ -814,8 +814,8 @@ generating large CSV files.
 .. admonition:: Performance considerations
 
     Django is designed for short-lived requests. Streaming responses will tie
-    a worker process and keep a database connection idle in transaction for
-    the entire duration of the response. This may result in poor performance.
+    a worker process for the entire duration of the response. This may result
+    in poor performance.
 
     Generally speaking, you should perform expensive tasks outside of the
     request-response cycle, rather than resorting to a streamed response.
