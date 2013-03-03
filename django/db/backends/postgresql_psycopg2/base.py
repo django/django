@@ -49,6 +49,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_bulk_insert = True
+    uses_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
     can_distinct_on_fields = True
@@ -87,8 +88,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
-
-        self.features.uses_savepoints = False
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -174,7 +173,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.cursor().close()
         if managed and self.autocommit:
             self.set_autocommit(False)
-            self.features.uses_savepoints = True
 
     def _leave_transaction_management(self, managed):
         """
@@ -186,7 +184,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not managed and not self.autocommit:
             self.rollback()                     # Must terminate transaction first.
             self.set_autocommit(True)
-            self.features.uses_savepoints = False
 
     def _set_isolation_level(self, isolation_level):
         assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0

@@ -161,17 +161,17 @@ class BaseDatabaseWrapper(object):
     ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
-        if not self.features.uses_savepoints:
+        if not self.features.uses_savepoints or self.autocommit:
             return
         self.cursor().execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
-        if not self.features.uses_savepoints:
+        if not self.features.uses_savepoints or self.autocommit:
             return
         self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
-        if not self.features.uses_savepoints:
+        if not self.features.uses_savepoints or self.autocommit:
             return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
