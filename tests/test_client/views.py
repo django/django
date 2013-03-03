@@ -154,8 +154,8 @@ def _permission_protected_view(request):
                  name='Permissions Template')
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
-permission_protected_view = permission_required('modeltests.test_perm')(_permission_protected_view)
-permission_protected_view_exception = permission_required('modeltests.test_perm', raise_exception=True)(_permission_protected_view)
+permission_protected_view = permission_required('permission_not_granted')(_permission_protected_view)
+permission_protected_view_exception = permission_required('permission_not_granted', raise_exception=True)(_permission_protected_view)
 
 class _ViewManager(object):
     @method_decorator(login_required)
@@ -166,7 +166,7 @@ class _ViewManager(object):
         c = Context({'user': request.user})
         return HttpResponse(t.render(c))
 
-    @method_decorator(permission_required('modeltests.test_perm'))
+    @method_decorator(permission_required('permission_not_granted'))
     def permission_protected_view(self, request):
         t = Template('This is a permission protected test using a method. '
                      'Username is {{ user.username }}. '
