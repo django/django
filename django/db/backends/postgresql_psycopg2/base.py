@@ -169,8 +169,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Switch the isolation level when needing transaction support, so that
         the same transaction is visible across all the queries.
         """
-        if self.connection is None:             # Force creating a connection.
-            self.cursor().close()
         if managed and self.autocommit:
             self.set_autocommit(False)
 
@@ -179,8 +177,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         If the normal operating mode is "autocommit", switch back to that when
         leaving transaction management.
         """
-        if self.connection is None:             # Force creating a connection.
-            self.cursor().close()
         if not managed and not self.autocommit:
             self.rollback()                     # Must terminate transaction first.
             self.set_autocommit(True)
