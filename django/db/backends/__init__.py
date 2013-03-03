@@ -86,20 +86,33 @@ class BaseDatabaseWrapper(object):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError
 
+    ##### Backend-specific methods for creating connections #####
+
+    def connect(self):
+        """Connects to the database. Assumes that the connection is closed."""
+        # Reset parameters defining when to close the connection
+        max_age = self.settings_dict['CONN_MAX_AGE']
+        self.close_at = None if max_age is None else time.time() + max_age
+        self.errors_occurred = False
+        # Establish the connection
+        conn_params = self.get_connection_params()
+        self.connection = self.get_new_connection(conn_params)
+        self.init_connection_state()
+        connection_created.send(sender=self.__class__, connection=self)
+
+    def ensure_connection(self):
+        """
+        Guarantees that a connection to the database is established.
+        """
+        if self.connection is None:
+            with self.wrap_database_errors():
+                self.connect()
+
     ##### Backend-specific wrappers for PEP-249 connection methods #####
 
     def _cursor(self):
+        self.ensure_connection()
         with self.wrap_database_errors():
-            if self.connection is None:
-                # Reset parameters defining when to close the connection
-                max_age = self.settings_dict['CONN_MAX_AGE']
-                self.close_at = None if max_age is None else time.time() + max_age
-                self.errors_occurred = False
-                # Establish the connection
-                conn_params = self.get_connection_params()
-                self.connection = self.get_new_connection(conn_params)
-                self.init_connection_state()
-                connection_created.send(sender=self.__class__, connection=self)
             return self.create_cursor()
 
     def _commit(self):
@@ -285,6 +298,7 @@ class BaseDatabaseWrapper(object):
         """
         Enable or disable autocommit.
         """
+        self.ensure_connection()
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
