@@ -1,6 +1,8 @@
 import os
 from subprocess import PIPE, Popen
 
+from django.utils.encoding import force_text, DEFAULT_LOCALE_ENCODING
+
 
 def popen_wrapper(args):
     """
@@ -11,7 +13,12 @@ def popen_wrapper(args):
     p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE,
               close_fds=os.name != 'nt', universal_newlines=True)
     output, errors = p.communicate()
-    return output, errors, p.returncode
+    return (
+        output,
+        force_text(errors, DEFAULT_LOCALE_ENCODING, strings_only=True),
+        p.returncode
+    )
+
 
 def handle_extensions(extensions=('html',), ignored=('py',)):
     """
