@@ -8,15 +8,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
+"POT-Creation-Date: 2013-03-03 04:40+0200\n"
 "PO-Revision-Date: 2012-12-16 08:51+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
+"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:41
@@ -40,47 +40,47 @@ msgstr "הסיסמה שונתה בהצלחה."
 msgid "Change password: %s"
 msgstr "שינוי סיסמה: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: forms.py:33 tests/forms.py:261 tests/forms.py:266 tests/forms.py:408
 msgid "No password set."
 msgstr "לא נקבעה סיסמה."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: forms.py:39 tests/forms.py:271 tests/forms.py:277
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
 
-#: forms.py:67
+#: forms.py:72
 msgid "A user with that username already exists."
 msgstr "משתמש עם שם משתמש זה קיים כבר"
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: forms.py:73 forms.py:254 forms.py:314
 msgid "The two password fields didn't match."
 msgstr "שני שדות הסיסמה אינם זהים."
 
-#: forms.py:70 forms.py:115
+#: forms.py:75 forms.py:120
 msgid "Username"
 msgstr "שם משתמש"
 
-#: forms.py:72 forms.py:116
+#: forms.py:77 forms.py:121
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
 
-#: forms.py:75 forms.py:119
+#: forms.py:80 forms.py:124
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ בלבד."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: forms.py:82 forms.py:126 forms.py:153 forms.py:316
 msgid "Password"
 msgstr "סיסמה"
 
-#: forms.py:79
+#: forms.py:84
 msgid "Password confirmation"
 msgstr "אימות סיסמה"
 
-#: forms.py:81
+#: forms.py:86
 msgid "Enter the same password as above, for verification."
 msgstr "יש להזין את אותה סיסמה שוב,לאימות."
 
-#: forms.py:122
+#: forms.py:127
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -89,81 +89,64 @@ msgstr ""
 "הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, ניתן "
 "לשנות את הסיסמה בעזרת  <a href=\"password/\">טופס זה</a>."
 
-#: forms.py:151
+#: forms.py:156
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך. הן נדרשות כדי להתחבר."
-
-#: forms.py:155
+#: forms.py:158
 msgid "This account is inactive."
 msgstr "חשבון זה אינו פעיל."
 
 #: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "כתובת הדוא\"ל הזו אינה משוייכת לחשבון משתמש. האם בטוח שנרשמת ?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr "חשבון המשתמש המשוייך לכתובת דוא\"ל זו אינו יכול לאפס את הסיסמה."
-
-#: forms.py:211
 msgid "Email"
 msgstr "דוא\"ל"
 
-#: forms.py:271
+#: forms.py:256
 msgid "New password"
 msgstr "סיסמה חדשה"
 
-#: forms.py:273
+#: forms.py:258
 msgid "New password confirmation"
 msgstr "אימות סיסמה חדשה"
 
-#: forms.py:302
+#: forms.py:287
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "סיסמתך הישנה הוזנה בצורה שגויה. נא להזינה שוב."
 
-#: forms.py:305
+#: forms.py:290
 msgid "Old password"
 msgstr "סיסמה ישנה"
 
-#: forms.py:333
+#: forms.py:318
 msgid "Password (again)"
 msgstr "סיסמה (שוב)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: hashers.py:242 hashers.py:295 hashers.py:324 hashers.py:352 hashers.py:385
+#: hashers.py:418 hashers.py:452
 msgid "algorithm"
 msgstr "אלגוריתם"
 
-#: hashers.py:242
+#: hashers.py:243
 msgid "iterations"
 msgstr "חזרות"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: hashers.py:244 hashers.py:297 hashers.py:325 hashers.py:353 hashers.py:453
 msgid "salt"
 msgstr "salt"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: hashers.py:245 hashers.py:326 hashers.py:354 hashers.py:386 hashers.py:419
+#: hashers.py:454
 msgid "hash"
 msgstr "גיבוב"
 
-#: hashers.py:293
+#: hashers.py:296
 msgid "work factor"
 msgstr "work factor"
 
-#: hashers.py:295
+#: hashers.py:298
 msgid "checksum"
 msgstr "סיכום ביקורת"
 
@@ -278,7 +261,15 @@ msgstr "משתמש"
 msgid "users"
 msgstr "משתמשים"
 
-#: views.py:94
+#: models.py:465
+msgid "User"
+msgstr "משתמש"
+
+#: models.py:466
+msgid "Users"
+msgstr "משתמשים"
+
+#: views.py:89
 msgid "Logged out"
 msgstr "יצאת מהמערכת"
 
@@ -286,3 +277,18 @@ msgstr "יצאת מהמערכת"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "החלפת הסיסמה ב-%(site_name)s"
+
+#~ msgid ""
+#~ "Your Web browser doesn't appear to have cookies enabled. Cookies are "
+#~ "required for logging in."
+#~ msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך. הן נדרשות כדי להתחבר."
+
+#~ msgid ""
+#~ "That email address doesn't have an associated user account. Are you sure "
+#~ "you've registered?"
+#~ msgstr "כתובת הדוא\"ל הזו אינה משוייכת לחשבון משתמש. האם בטוח שנרשמת ?"
+
+#~ msgid ""
+#~ "The user account associated with this email address cannot reset the "
+#~ "password."
+#~ msgstr "חשבון המשתמש המשוייך לכתובת דוא\"ל זו אינו יכול לאפס את הסיסמה."
