@@ -98,6 +98,8 @@ class BaseDatabaseWrapper(object):
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
         self.init_connection_state()
+        if not settings.TRANSACTIONS_MANAGED:
+            self.set_autocommit()
         connection_created.send(sender=self.__class__, connection=self)
 
     def ensure_connection(self):
