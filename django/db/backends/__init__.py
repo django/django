@@ -231,21 +231,6 @@ class BaseDatabaseWrapper(object):
 
     ##### Backend-specific transaction management methods #####
 
-    def _enter_transaction_management(self, managed):
-        """
-        A hook for backend-specific changes required when entering manual
-        transaction handling.
-        """
-        pass
-
-    def _leave_transaction_management(self, managed):
-        """
-        A hook for backend-specific changes required when leaving manual
-        transaction handling. Will usually be implemented only when
-        _enter_transaction_management() is also required.
-        """
-        pass
-
     def _set_autocommit(self, autocommit):
         """
         Backend-specific implementation to enable or disable autocommit.
@@ -268,7 +253,10 @@ class BaseDatabaseWrapper(object):
         commit/rollback, the data will be commited, unless "forced" is True.
         """
         self.transaction_state.append(managed)
-        self._enter_transaction_management(managed)
+
+        if managed and self.autocommit:
+            self.set_autocommit(False)
+
         if not managed and self.is_dirty() and not forced:
             self.commit()
 
@@ -283,16 +271,20 @@ class BaseDatabaseWrapper(object):
         else:
             raise TransactionManagementError(
                 "This code isn't under transaction management")
-        # The _leave_transaction_management hook can change the dirty flag,
-        # so memoize it.
-        dirty = self._dirty
-        # We will pass the next status (after leaving the previous state
-        # behind) to subclass hook.
-        self._leave_transaction_management(self.is_managed())
-        if dirty:
+
+        # That's the next state -- we already left the previous state behind.
+        managed = self.is_managed()
+
+        if self._dirty:
             self.rollback()
+            if not managed and not self.autocommit:
+                self.set_autocommit(True)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
+
+        if not managed and not self.autocommit:
+            self.set_autocommit(True)
+
 
     def set_autocommit(self, autocommit=True):
         """

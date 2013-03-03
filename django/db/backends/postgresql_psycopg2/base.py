@@ -164,23 +164,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         finally:
             self.set_clean()
 
-    def _enter_transaction_management(self, managed):
-        """
-        Switch the isolation level when needing transaction support, so that
-        the same transaction is visible across all the queries.
-        """
-        if managed and self.autocommit:
-            self.set_autocommit(False)
-
-    def _leave_transaction_management(self, managed):
-        """
-        If the normal operating mode is "autocommit", switch back to that when
-        leaving transaction management.
-        """
-        if not managed and not self.autocommit:
-            self.rollback()                     # Must terminate transaction first.
-            self.set_autocommit(True)
-
     def _set_isolation_level(self, isolation_level):
         assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
         if self.psycopg2_version >= (2, 4, 2):
