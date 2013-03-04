@@ -329,6 +329,10 @@ these changes.
 1.8
 ---
 
+* The decorators and context managers ``django.db.transaction.autocommit``,
+  ``commit_on_success`` and ``commit_manually`` will be removed. See
+  :ref:`transactions-upgrading-from-1.5`.
+
 * The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
   arguments. In 1.6 and 1.7, this behavior is provided by the version of these
   tags in the ``future`` template tag library.

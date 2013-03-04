@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
 import sys
+import warnings
 
 from django.db import connection, transaction, IntegrityError
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.unittest import skipUnless
 
@@ -158,7 +159,69 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
-class TransactionTests(TransactionTestCase):
+class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
+
+    def setUp(self):
+        transaction.enter_transaction_management()
+
+    def tearDown(self):
+        # The tests access the database after exercising 'atomic', making the
+        # connection dirty; a rollback is required to make it clean.
+        transaction.rollback()
+        transaction.leave_transaction_management()
+
+
+@skipUnless(connection.features.uses_savepoints,
+        "'atomic' requires transactions and savepoints.")
+class AtomicErrorsTests(TransactionTestCase):
+
+    def test_atomic_requires_autocommit(self):
+        transaction.set_autocommit(autocommit=False)
+        try:
+            with self.assertRaises(transaction.TransactionManagementError):
+                with transaction.atomic():
+                    pass
+        finally:
+            transaction.set_autocommit(autocommit=True)
+
+    def test_atomic_prevents_disabling_autocommit(self):
+        autocommit = transaction.get_autocommit()
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.set_autocommit(autocommit=not autocommit)
+        # Make sure autocommit wasn't changed.
+        self.assertEqual(connection.autocommit, autocommit)
+
+    def test_atomic_prevents_calling_transaction_methods(self):
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.commit()
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.rollback()
+
+    def test_atomic_prevents_calling_transaction_management_methods(self):
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.enter_transaction_management()
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.leave_transaction_management()
+
+
+class IgnorePendingDeprecationWarningsMixin(object):
+
+    def setUp(self):
+        super(IgnorePendingDeprecationWarningsMixin, self).setUp()
+        self.catch_warnings = warnings.catch_warnings()
+        self.catch_warnings.__enter__()
+        warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+    def tearDown(self):
+        self.catch_warnings.__exit__(*sys.exc_info())
+        super(IgnorePendingDeprecationWarningsMixin, self).tearDown()
+
+
+class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
     def create_a_reporter_then_fail(self, first, last):
         a = Reporter(first_name=first, last_name=last)
         a.save()
@@ -313,7 +376,7 @@ class TransactionTests(TransactionTestCase):
         )
 
 
-class TransactionRollbackTests(TransactionTestCase):
+class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def execute_bad_sql(self):
         cursor = connection.cursor()
         cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
@@ -330,7 +393,7 @@ class TransactionRollbackTests(TransactionTestCase):
         self.assertRaises(IntegrityError, execute_bad_sql)
         transaction.rollback()
 
-class TransactionContextManagerTests(TransactionTestCase):
+class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def create_reporter_and_fail(self):
         Reporter.objects.create(first_name="Bob", last_name="Holtzman")
         raise Exception

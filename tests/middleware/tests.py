@@ -24,6 +24,8 @@ from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
 from django.utils.unittest import expectedFailure
 
+from transactions.tests import IgnorePendingDeprecationWarningsMixin
+
 from .models import Band
 
 
@@ -670,11 +672,12 @@ class ETagGZipMiddlewareTest(TestCase):
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
 
-class TransactionMiddlewareTest(TransactionTestCase):
+class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Test the transaction middleware.
     """
     def setUp(self):
+        super(TransactionMiddlewareTest, self).setUp()
         self.request = HttpRequest()
         self.request.META = {
             'SERVER_NAME': 'testserver',
@@ -686,6 +689,7 @@ class TransactionMiddlewareTest(TransactionTestCase):
 
     def tearDown(self):
         transaction.abort()
+        super(TransactionMiddlewareTest, self).tearDown()
 
     def test_request(self):
         TransactionMiddleware().process_request(self.request)
