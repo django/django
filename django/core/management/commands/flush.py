@@ -57,18 +57,17 @@ Are you sure you want to do this?
 
         if confirm == 'yes':
             try:
-                cursor = connection.cursor()
-                for sql in sql_list:
-                    cursor.execute(sql)
+                with transaction.commit_on_success_unless_managed():
+                    cursor = connection.cursor()
+                    for sql in sql_list:
+                        cursor.execute(sql)
             except Exception as e:
-                transaction.rollback_unless_managed(using=db)
                 raise CommandError("""Database %s couldn't be flushed. Possible reasons:
   * The database isn't running or isn't configured correctly.
   * At least one of the expected database tables doesn't exist.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
 The full error: %s""" % (connection.settings_dict['NAME'], e))
-            transaction.commit_unless_managed(using=db)
 
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been

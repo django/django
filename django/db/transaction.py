@@ -123,16 +123,12 @@ def managed(flag=True, using=None):
         PendingDeprecationWarning, stacklevel=2)
 
 def commit_unless_managed(using=None):
-    """
-    Commits changes if the system is not in managed transaction mode.
-    """
-    get_connection(using).commit_unless_managed()
+    warnings.warn("'commit_unless_managed' is now a no-op.",
+        PendingDeprecationWarning, stacklevel=2)
 
 def rollback_unless_managed(using=None):
-    """
-    Rolls back changes if the system is not in managed transaction mode.
-    """
-    get_connection(using).rollback_unless_managed()
+    warnings.warn("'rollback_unless_managed' is now a no-op.",
+        PendingDeprecationWarning, stacklevel=2)
 
 ###############
 # Public APIs #
@@ -280,3 +276,18 @@ def commit_manually(using=None):
         leave_transaction_management(using=using)
 
     return _transaction_func(entering, exiting, using)
+
+def commit_on_success_unless_managed(using=None):
+    """
+    Transitory API to preserve backwards-compatibility while refactoring.
+    """
+    if is_managed(using):
+        def entering(using):
+            pass
+
+        def exiting(exc_value, using):
+            set_dirty(using=using)
+
+        return _transaction_func(entering, exiting, using)
+    else:
+        return commit_on_success(using)

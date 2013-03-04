@@ -339,27 +339,6 @@ class BaseDatabaseWrapper(object):
             return self.transaction_state[-1]
         return settings.TRANSACTIONS_MANAGED
 
-    def commit_unless_managed(self):
-        """
-        Commits changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self.commit()
-            self.clean_savepoints()
-        else:
-            self.set_dirty()
-
-    def rollback_unless_managed(self):
-        """
-        Rolls back changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self.rollback()
-        else:
-            self.set_dirty()
-
     ##### Foreign key constraints checks handling #####
 
     @contextmanager

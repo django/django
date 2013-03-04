@@ -555,10 +555,6 @@ class LayerMapping(object):
                     except SystemExit:
                         raise
                     except Exception as msg:
-                        if self.transaction_mode == 'autocommit':
-                            # Rolling back the transaction so that other model saves
-                            # will work.
-                            transaction.rollback_unless_managed()
                         if strict:
                             # Bailing out if the `strict` keyword is set.
                             if not silent:
