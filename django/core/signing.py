@@ -88,7 +88,8 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     except AttributeError as e:
         raise ImproperlyConfigured(
             'Error importing cookie signer %s: "%s"' % (modpath, e))
-    return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
+    key = force_bytes(settings.SECRET_KEY)
+    return Signer(b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer(object):
