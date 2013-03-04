@@ -1,13 +1,16 @@
-==============================
-Managing database transactions
-==============================
+=====================
+Database transactions
+=====================
 
 .. module:: django.db.transaction
 
 Django gives you a few ways to control how database transactions are managed.
 
+Managing database transactions
+==============================
+
 Django's default transaction behavior
-=====================================
+-------------------------------------
 
 Django's default behavior is to run in autocommit mode. Each query is
 immediately committed to the database. :ref:`See below for details
@@ -24,7 +27,7 @@ immediately committed to the database. :ref:`See below for details
     behavior <transactions-changes-from-1.5>`.
 
 Tying transactions to HTTP requests
-===================================
+-----------------------------------
 
 The recommended way to handle transactions in Web requests is to tie them to
 the request and response phases via Django's ``TransactionMiddleware``.
@@ -62,6 +65,85 @@ connection internally.
     as "default" within your :setting:`DATABASES` setting.  If you are using
     multiple databases and want transaction control over databases other than
     "default", you will need to write your own transaction middleware.
+
+Controlling transactions explicitly
+-----------------------------------
+
+.. versionadded:: 1.6
+
+Django provides a single API to control database transactions.
+
+.. function:: atomic(using=None)
+
+    This function creates an atomic block for writes to the database.
+    (Atomicity is the defining property of database transactions.)
+
+    When the block completes successfully, the changes are committed to the
+    database. When it raises an exception, the changes are rolled back.
+
+    ``atomic`` can be nested. In this case, when an inner block completes
+    successfully, its effects can still be rolled back if an exception is
+    raised in the outer block at a later point.
+
+    ``atomic`` takes a ``using`` argument which should be the name of a
+    database. If this argument isn't provided, Django uses the ``"default"``
+    database.
+
+    ``atomic`` is usable both as a decorator::
+
+        from django.db import transaction
+
+        @transaction.atomic
+        def viewfunc(request):
+            # This code executes inside a transaction.
+            do_stuff()
+
+    and as a context manager::
+
+        from django.db import transaction
+
+        def viewfunc(request):
+            # This code executes in autocommit mode (Django's default).
+            do_stuff()
+
+            with transaction.atomic():
+                # This code executes inside a transaction.
+                do_more_stuff()
+
+    Wrapping ``atomic`` in a try/except block allows for natural handling of
+    integrity errors::
+
+        from django.db import IntegrityError, transaction
+
+        @transaction.atomic
+        def viewfunc(request):
+            do_stuff()
+
+            try:
+                with transaction.atomic():
+                    do_stuff_that_could_fail()
+            except IntegrityError:
+                handle_exception()
+
+            do_more_stuff()
+
+    In this example, even if ``do_stuff_that_could_fail()`` causes a database
+    error by breaking an integrity constraint, you can execute queries in
+    ``do_more_stuff()``, and the changes from ``do_stuff()`` are still there.
+
+    In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
+    to commit, roll back, or change the autocommit state of the database
+    connection within an ``atomic`` block will raise an exception.
+
+    ``atomic`` can only be used in autocommit mode. It will raise an exception
+    if autocommit is turned off.
+
+    Under the hood, Django's transaction management code:
+
+    - opens a transaction when entering the outermost ``atomic`` block;
+    - creates a savepoint when entering an inner ``atomic`` block;
+    - releases or rolls back to the savepoint when exiting an inner block;
+    - commits or rolls back the transaction when exiting the outermost block.
 
 .. _transaction-management-functions:
 
@@ -325,9 +407,8 @@ When autocommit is enabled, savepoints don't make sense. When it's disabled,
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
 ``DELETE`` and ``REPLACE``.)
 
-As a consequence, savepoints are only usable if you start a transaction
-manually while in autocommit mode, and Django doesn't provide an API to
-achieve that.
+As a consequence, savepoints are only usable inside a transaction ie. inside
+an :func:`atomic` block.
 
 Transactions in MySQL
 ---------------------
