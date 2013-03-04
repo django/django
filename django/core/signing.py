@@ -160,18 +160,18 @@ class Signer(object):
 
     def __init__(self, key=None, sep=':', salt=None):
         # Use of native strings in all versions of Python
-        self.sep = str(sep)
-        self.key = str(key or settings.SECRET_KEY)
-        self.salt = str(salt or
+        self.sep = force_bytes(sep)
+        self.key = force_bytes(key or settings.SECRET_KEY)
+        self.salt = force_bytes(salt or
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):
-        signature = base64_hmac(self.salt + 'signer', value, self.key)
+        signature = base64_hmac(self.salt + b'signer', value, self.key)
         # Convert the signature from bytes to str only on Python 3
         return force_str(signature)
 
     def sign(self, value):
-        value = force_str(value)
+        value = force_bytes(value)
         return str('%s%s%s') % (value, self.sep, self.signature(value))
 
     def unsign(self, signed_value):
