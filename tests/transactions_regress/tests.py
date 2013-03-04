@@ -309,6 +309,8 @@ class TestManyToManyAddTransaction(TransactionTestCase):
 
 class SavepointTest(TransactionTestCase):
 
+    @skipIf(connection.vendor == 'sqlite',
+            "SQLite doesn't support savepoints in managed mode")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_commit(self):
         @commit_manually
@@ -324,6 +326,8 @@ class SavepointTest(TransactionTestCase):
 
         work()
 
+    @skipIf(connection.vendor == 'sqlite',
+            "SQLite doesn't support savepoints in managed mode")
     @skipIf(connection.vendor == 'mysql' and
             connection.features._mysql_storage_engine == 'MyISAM',
             "MyISAM MySQL storage engine doesn't support savepoints")

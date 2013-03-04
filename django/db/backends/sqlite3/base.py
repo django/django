@@ -101,6 +101,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     @cached_property
+    def uses_savepoints(self):
+        return Database.sqlite_version_info >= (3, 6, 8)
+
+    @cached_property
     def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
 
@@ -354,6 +358,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # an in-memory db.
         if self.settings_dict['NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
+
+    def _savepoint_allowed(self):
+        # When 'isolation_level' is None, Django doesn't provide a way to
+        # create a transaction (yet) so savepoints can't be created. When it
+        # isn't, sqlite3 commits before each savepoint -- it's a bug.
+        return False
 
     def _set_autocommit(self, autocommit):
         if autocommit:
