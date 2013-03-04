@@ -50,6 +50,12 @@ class BaseDatabaseWrapper(object):
         # set somewhat aggressively, as the DBAPI doesn't make it easy to
         # deduce if the connection is in transaction or not.
         self._dirty = False
+        # Tracks if the connection is in a transaction managed by 'atomic'
+        self.in_atomic_block = False
+        # List of savepoints created by 'atomic'
+        self.savepoint_ids = []
+        # Hack to provide compatibility with legacy transaction management
+        self._atomic_forced_unmanaged = False
 
         # Connection termination related attributes
         self.close_at = None
@@ -148,7 +154,7 @@ class BaseDatabaseWrapper(object):
 
     def commit(self):
         """
-        Does the commit itself and resets the dirty flag.
+        Commits a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
         self._commit()
@@ -156,7 +162,7 @@ class BaseDatabaseWrapper(object):
 
     def rollback(self):
         """
-        Does the rollback itself and resets the dirty flag.
+        Rolls back a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
         self._rollback()
@@ -447,6 +453,12 @@ class BaseDatabaseWrapper(object):
             if must_close:
                 self.close()
 
+    def _start_transaction_under_autocommit(self):
+        """
+        Only required when autocommits_when_autocommit_is_off = True.
+        """
+        raise NotImplementedError
+
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
@@ -548,6 +560,10 @@ class BaseDatabaseFeatures(object):
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
+
+    # Does the backend decide to commit before SAVEPOINT statements
+    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    autocommits_when_autocommit_is_off = False
 
     def __init__(self, connection):
         self.connection = connection
@@ -931,6 +947,9 @@ class BaseDatabaseOperations(object):
         return "BEGIN;"
 
     def end_transaction_sql(self, success=True):
+        """
+        Returns the SQL statement required to end a transaction.
+        """
         if not success:
             return "ROLLBACK;"
         return "COMMIT;"

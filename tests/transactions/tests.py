@@ -1,9 +1,161 @@
 from __future__ import absolute_import
 
+import sys
+
 from django.db import connection, transaction, IntegrityError
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils import six
+from django.utils.unittest import skipUnless
 
 from .models import Reporter
+
+
+@skipUnless(connection.features.uses_savepoints,
+        "'atomic' requires transactions and savepoints.")
+class AtomicTests(TransactionTestCase):
+    """
+    Tests for the atomic decorator and context manager.
+
+    The tests make assertions on internal attributes because there isn't a
+    robust way to ask the database for its current transaction state.
+
+    Since the decorator syntax is converted into a context manager (see the
+    implementation), there are only a few basic tests with the decorator
+    syntax and the bulk of the tests use the context manager syntax.
+    """
+
+    def test_decorator_syntax_commit(self):
+        @transaction.atomic
+        def make_reporter():
+            Reporter.objects.create(first_name="Tintin")
+        make_reporter()
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_decorator_syntax_rollback(self):
+        @transaction.atomic
+        def make_reporter():
+            Reporter.objects.create(first_name="Haddock")
+            raise Exception("Oops, that's his last name")
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            make_reporter()
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_alternate_decorator_syntax_commit(self):
+        @transaction.atomic()
+        def make_reporter():
+            Reporter.objects.create(first_name="Tintin")
+        make_reporter()
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_alternate_decorator_syntax_rollback(self):
+        @transaction.atomic()
+        def make_reporter():
+            Reporter.objects.create(first_name="Haddock")
+            raise Exception("Oops, that's his last name")
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            make_reporter()
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_commit(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_rollback(self):
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_nested_commit_commit(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+        self.assertQuerysetEqual(Reporter.objects.all(),
+                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+
+    def test_nested_commit_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with transaction.atomic():
+                    Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_nested_rollback_commit(self):
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with transaction.atomic():
+                Reporter.objects.create(last_name="Tintin")
+                with transaction.atomic():
+                    Reporter.objects.create(last_name="Haddock")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_nested_rollback_rollback(self):
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with transaction.atomic():
+                Reporter.objects.create(last_name="Tintin")
+                with six.assertRaisesRegex(self, Exception, "Oops"):
+                    with transaction.atomic():
+                        Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_reuse_commit_commit(self):
+        atomic = transaction.atomic()
+        with atomic:
+            Reporter.objects.create(first_name="Tintin")
+            with atomic:
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+        self.assertQuerysetEqual(Reporter.objects.all(),
+                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+
+    def test_reuse_commit_rollback(self):
+        atomic = transaction.atomic()
+        with atomic:
+            Reporter.objects.create(first_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with atomic:
+                    Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_reuse_rollback_commit(self):
+        atomic = transaction.atomic()
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with atomic:
+                Reporter.objects.create(last_name="Tintin")
+                with atomic:
+                    Reporter.objects.create(last_name="Haddock")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_reuse_rollback_rollback(self):
+        atomic = transaction.atomic()
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with atomic:
+                Reporter.objects.create(last_name="Tintin")
+                with six.assertRaisesRegex(self, Exception, "Oops"):
+                    with atomic:
+                        Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+
+class AtomicInsideTransactionTests(AtomicTests):
+    """All basic tests for atomic should also pass within an existing transaction."""
+
+    def setUp(self):
+        self.atomic = transaction.atomic()
+        self.atomic.__enter__()
+
+    def tearDown(self):
+        self.atomic.__exit__(*sys.exc_info())
 
 
 class TransactionTests(TransactionTestCase):
