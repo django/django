@@ -99,6 +99,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
+    autocommits_when_autocommit_is_off = True
 
     @cached_property
     def uses_savepoints(self):
@@ -360,10 +361,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):
-        # When 'isolation_level' is None, Django doesn't provide a way to
-        # create a transaction (yet) so savepoints can't be created. When it
-        # isn't, sqlite3 commits before each savepoint -- it's a bug.
-        return False
+        # When 'isolation_level' is not None, sqlite3 commits before each
+        # savepoint; it's a bug. When it is None, savepoints don't make sense
+        # because autocommit is enabled. The only exception is inside atomic
+        # blocks. To work around that bug, on SQLite, atomic starts a
+        # transaction explicitly rather than simply disable autocommit.
+        return self.in_atomic_block
 
     def _set_autocommit(self, autocommit):
         if autocommit:
@@ -413,6 +416,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def is_usable(self):
         return True
 
+    def _start_transaction_under_autocommit(self):
+        """
+        Start a transaction explicitly in autocommit mode.
+
+        Staying in autocommit mode works around a bug of sqlite3 that breaks
+        savepoints when autocommit is disabled.
+        """
+        self.cursor().execute("BEGIN")
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 
