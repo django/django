@@ -39,7 +39,7 @@ should improve performance. The existing APIs were deprecated, and new APIs
 were introduced, as described in :doc:`/topics/db/transactions`.
 
 Please review carefully the list of :ref:`known backwards-incompatibilities
-<transactions-changes-from-1.5>` to determine if you need to make changes in
+<transactions-upgrading-from-1.5>` to determine if you need to make changes in
 your code.
 
 Persistent database connections
@@ -163,7 +163,7 @@ Backwards incompatible changes in 1.6
 * Database-level autocommit is enabled by default in Django 1.6. While this
   doesn't change the general spirit of Django's transaction management, there
   are a few known backwards-incompatibities, described in the :ref:`transaction
-  management docs <transactions-changes-from-1.5>`. You should review your code
+  management docs <transactions-upgrading-from-1.5>`. You should review your code
   to determine if you're affected.
 
 * In previous versions, database-level autocommit was only an option for
@@ -255,6 +255,19 @@ Backwards incompatible changes in 1.6
 
 Features deprecated in 1.6
 ==========================
+
+Transaction management APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transaction management was completely overhauled in Django 1.6, and the
+current APIs are deprecated:
+
+- :func:`django.db.transaction.autocommit`
+- :func:`django.db.transaction.commit_on_success`
+- :func:`django.db.transaction.commit_manually`
+
+The reasons for this change and the upgrade path are described in the
+:ref:`transactions documentation <transactions-upgrading-from-1.5>`.
 
 Changes to :ttag:`cycle` and :ttag:`firstof`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

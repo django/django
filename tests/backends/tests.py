@@ -522,7 +522,8 @@ class FkConstraintsTests(TransactionTestCase):
         """
         When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
         """
-        with transaction.commit_manually():
+        transaction.set_autocommit(autocommit=False)
+        try:
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -536,12 +537,15 @@ class FkConstraintsTests(TransactionTestCase):
                 self.fail("IntegrityError should not have occurred.")
             finally:
                 transaction.rollback()
+        finally:
+            transaction.set_autocommit(autocommit=True)
 
     def test_disable_constraint_checks_context_manager(self):
         """
         When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
         """
-        with transaction.commit_manually():
+        transaction.set_autocommit(autocommit=False)
+        try:
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -554,12 +558,15 @@ class FkConstraintsTests(TransactionTestCase):
                 self.fail("IntegrityError should not have occurred.")
             finally:
                 transaction.rollback()
+        finally:
+            transaction.set_autocommit(autocommit=True)
 
     def test_check_constraints(self):
         """
         Constraint checks should raise an IntegrityError when bad data is in the DB.
         """
-        with transaction.commit_manually():
+        try:
+            transaction.set_autocommit(autocommit=False)
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -572,6 +579,8 @@ class FkConstraintsTests(TransactionTestCase):
                         connection.check_constraints()
             finally:
                 transaction.rollback()
+        finally:
+            transaction.set_autocommit(autocommit=True)
 
 
 class ThreadTests(TestCase):

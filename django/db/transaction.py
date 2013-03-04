@@ -367,6 +367,9 @@ def autocommit(using=None):
     this decorator is useful if you globally activated transaction management in
     your settings file and want the default behavior in some view functions.
     """
+    warnings.warn("autocommit is deprecated in favor of set_autocommit.",
+        PendingDeprecationWarning, stacklevel=2)
+
     def entering(using):
         enter_transaction_management(managed=False, using=using)
 
@@ -382,6 +385,9 @@ def commit_on_success(using=None):
     a rollback is made. This is one of the most common ways to do transaction
     control in Web apps.
     """
+    warnings.warn("commit_on_success is deprecated in favor of atomic.",
+        PendingDeprecationWarning, stacklevel=2)
+
     def entering(using):
         enter_transaction_management(using=using)
 
@@ -409,6 +415,9 @@ def commit_manually(using=None):
     own -- it's up to the user to call the commit and rollback functions
     themselves.
     """
+    warnings.warn("commit_manually is deprecated in favor of set_autocommit.",
+        PendingDeprecationWarning, stacklevel=2)
+
     def entering(using):
         enter_transaction_management(using=using)
 
@@ -420,10 +429,15 @@ def commit_manually(using=None):
 def commit_on_success_unless_managed(using=None):
     """
     Transitory API to preserve backwards-compatibility while refactoring.
+
+    Once the legacy transaction management is fully deprecated, this should
+    simply be replaced by atomic. Until then, it's necessary to avoid making a
+    commit where Django didn't use to, since entering atomic in managed mode
+    triggers a commmit.
     """
     connection = get_connection(using)
-    if connection.autocommit and not connection.in_atomic_block:
-        return commit_on_success(using)
+    if connection.autocommit or connection.in_atomic_block:
+        return atomic(using)
     else:
         def entering(using):
             pass

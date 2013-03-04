@@ -6,10 +6,12 @@ from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils.unittest import skipIf, skipUnless, expectedFailure
 
+from transactions.tests import IgnorePendingDeprecationWarningsMixin
+
 from .models import Mod, M2mA, M2mB
 
 
-class TestTransactionClosing(TransactionTestCase):
+class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure that transactions are properly closed
     when they should be, and aren't left pending after operations
@@ -166,7 +168,7 @@ class TestTransactionClosing(TransactionTestCase):
         (connection.settings_dict['NAME'] == ':memory:' or
          not connection.settings_dict['NAME']),
         'Test uses multiple connections, but in-memory sqlite does not support this')
-class TestNewConnection(TransactionTestCase):
+class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Check that new connections don't have special behaviour.
     """
@@ -211,7 +213,7 @@ class TestNewConnection(TransactionTestCase):
 
 @skipUnless(connection.vendor == 'postgresql',
             "This test only valid for PostgreSQL")
-class TestPostgresAutocommitAndIsolation(TransactionTestCase):
+class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure psycopg2's autocommit mode and isolation level
     is restored after entering and leaving transaction management.
@@ -292,7 +294,7 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
         self.assertTrue(connection.autocommit)
 
 
-class TestManyToManyAddTransaction(TransactionTestCase):
+class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def test_manyrelated_add_commit(self):
         "Test for https://code.djangoproject.com/ticket/16818"
         a = M2mA.objects.create()
@@ -307,7 +309,7 @@ class TestManyToManyAddTransaction(TransactionTestCase):
         self.assertEqual(a.others.count(), 1)
 
 
-class SavepointTest(TransactionTestCase):
+class SavepointTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
 
     @skipIf(connection.vendor == 'sqlite',
             "SQLite doesn't support savepoints in managed mode")
