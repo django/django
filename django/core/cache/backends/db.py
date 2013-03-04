@@ -10,7 +10,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
-from django.db import connections, router, transaction, DatabaseError
+from django.db import connections, router, DatabaseError
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
 
@@ -70,7 +70,6 @@ class DatabaseCache(BaseDatabaseCache):
             cursor = connections[db].cursor()
             cursor.execute("DELETE FROM %s "
                            "WHERE cache_key = %%s" % table, [key])
-            transaction.commit_unless_managed(using=db)
             return default
         value = connections[db].ops.process_clob(row[1])
         return pickle.loads(base64.b64decode(force_bytes(value)))
@@ -124,10 +123,8 @@ class DatabaseCache(BaseDatabaseCache):
                                [key, b64encoded, connections[db].ops.value_to_db_datetime(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
-            transaction.rollback_unless_managed(using=db)
             return False
         else:
-            transaction.commit_unless_managed(using=db)
             return True
 
     def delete(self, key, version=None):
@@ -139,7 +136,6 @@ class DatabaseCache(BaseDatabaseCache):
         cursor = connections[db].cursor()
 
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
-        transaction.commit_unless_managed(using=db)
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -184,7 +180,6 @@ class DatabaseCache(BaseDatabaseCache):
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
         cursor.execute('DELETE FROM %s' % table)
-        transaction.commit_unless_managed(using=db)
 
 # For backwards compatibility
 class CacheClass(DatabaseCache):

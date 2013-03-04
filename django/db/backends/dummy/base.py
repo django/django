@@ -58,8 +58,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     _set_autocommit = complain
     set_dirty = complain
     set_clean = complain
-    commit_unless_managed = complain
-    rollback_unless_managed = ignore
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)

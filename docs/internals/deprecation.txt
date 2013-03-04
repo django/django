@@ -352,6 +352,8 @@ these changes.
   - ``django.db.close_connection()``
   - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
   - ``django.db.transaction.managed()``
+  - ``django.db.transaction.commit_unless_managed()``
+  - ``django.db.transaction.rollback_unless_managed()``
 
 2.0
 ---

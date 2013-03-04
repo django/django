@@ -157,14 +157,6 @@ class DocTestRunner(doctest.DocTestRunner):
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
         self.optionflags = doctest.ELLIPSIS
 
-    def report_unexpected_exception(self, out, test, example, exc_info):
-        doctest.DocTestRunner.report_unexpected_exception(self, out, test,
-                                                          example, exc_info)
-        # Rollback, in case of database errors. Otherwise they'd have
-        # side effects on other tests.
-        for conn in connections:
-            transaction.rollback_unless_managed(using=conn)
-
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     def __init__(self, test_case, num, connection):
@@ -490,14 +482,10 @@ class TransactionTestCase(SimpleTestCase):
                 conn.ops.sequence_reset_by_name_sql(no_style(),
                                                     conn.introspection.sequence_list())
             if sql_list:
-                try:
+                with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
                     for sql in sql_list:
                         cursor.execute(sql)
-                except Exception:
-                    transaction.rollback_unless_managed(using=db_name)
-                    raise
-                transaction.commit_unless_managed(using=db_name)
 
     def _fixture_setup(self):
         for db_name in self._databases_names(include_mirrors=False):
@@ -537,11 +525,6 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        # Roll back any pending transactions in order to avoid a deadlock
-        # during flush when TEST_MIRROR is used (#18984).
-        for conn in connections.all():
-            conn.rollback_unless_managed()
-
         for db in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False, database=db,
                          skip_validation=True, reset_sequences=False)

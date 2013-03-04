@@ -460,8 +460,6 @@ class QuerySet(object):
                     self._batched_insert(objs_without_pk, fields, batch_size)
             if forced_managed:
                 transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
         finally:
             if forced_managed:
                 transaction.leave_transaction_management(using=self.db)
@@ -590,8 +588,6 @@ class QuerySet(object):
             rows = query.get_compiler(self.db).execute_sql(None)
             if forced_managed:
                 transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
         finally:
             if forced_managed:
                 transaction.leave_transaction_management(using=self.db)
