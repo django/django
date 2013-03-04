@@ -62,8 +62,6 @@ def force_managed(func):
             func(self, *args, **kwargs)
             if forced_managed:
                 transaction.commit(using=self.using)
-            else:
-                transaction.commit_unless_managed(using=self.using)
         finally:
             if forced_managed:
                 transaction.leave_transaction_management(using=self.using)

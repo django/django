@@ -208,38 +208,6 @@ class TestNewConnection(TransactionTestCase):
         connection.leave_transaction_management()
         self.assertEqual(orig_dirty, connection._dirty)
 
-    # TODO: update this test to account for database-level autocommit.
-    @expectedFailure
-    def test_commit_unless_managed(self):
-        cursor = connection.cursor()
-        cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 1)
-        self.assertTrue(connection.is_dirty())
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-
-    # TODO: update this test to account for database-level autocommit.
-    @expectedFailure
-    def test_commit_unless_managed_in_managed(self):
-        cursor = connection.cursor()
-        connection.enter_transaction_management()
-        cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
-        connection.commit_unless_managed()
-        self.assertTrue(connection.is_dirty())
-        connection.rollback()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-        connection.commit()
-        connection.leave_transaction_management()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-        self.assertTrue(connection.is_dirty())
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-
 
 @skipUnless(connection.vendor == 'postgresql',
             "This test only valid for PostgreSQL")

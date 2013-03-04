@@ -77,14 +77,3 @@ def close_old_connections(**kwargs):
         conn.close_if_unusable_or_obsolete()
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)
-
-# Register an event that rolls back the connections
-# when a Django request has an exception.
-def _rollback_on_exception(**kwargs):
-    from django.db import transaction
-    for conn in connections:
-        try:
-            transaction.rollback_unless_managed(using=conn)
-        except DatabaseError:
-            pass
-signals.got_request_exception.connect(_rollback_on_exception)

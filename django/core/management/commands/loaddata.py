@@ -73,7 +73,6 @@ class Command(BaseCommand):
         # Start transaction management. All fixtures are installed in a
         # single transaction to ensure that all references are resolved.
         if commit:
-            transaction.commit_unless_managed(using=self.using)
             transaction.enter_transaction_management(using=self.using)
 
         class SingleZipReader(zipfile.ZipFile):
