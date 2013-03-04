@@ -53,7 +53,7 @@ def DO_NOTHING(collector, field, sub_objs, using):
 def force_managed(func):
     @wraps(func)
     def decorated(self, *args, **kwargs):
-        if not transaction.is_managed(using=self.using):
+        if transaction.get_autocommit(using=self.using):
             transaction.enter_transaction_management(using=self.using, forced=True)
             forced_managed = True
         else:

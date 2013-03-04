@@ -442,7 +442,7 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_fields
-        if not transaction.is_managed(using=self.db):
+        if transaction.get_autocommit(using=self.db):
             transaction.enter_transaction_management(using=self.db, forced=True)
             forced_managed = True
         else:
@@ -579,7 +579,7 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed(using=self.db):
+        if transaction.get_autocommit(using=self.db):
             transaction.enter_transaction_management(using=self.db, forced=True)
             forced_managed = True
         else:

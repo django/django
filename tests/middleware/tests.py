@@ -689,7 +689,7 @@ class TransactionMiddlewareTest(TransactionTestCase):
 
     def test_request(self):
         TransactionMiddleware().process_request(self.request)
-        self.assertTrue(transaction.is_managed())
+        self.assertFalse(transaction.get_autocommit())
 
     def test_managed_response(self):
         transaction.enter_transaction_management()

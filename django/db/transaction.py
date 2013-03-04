@@ -113,10 +113,8 @@ def clean_savepoints(using=None):
     get_connection(using).clean_savepoints()
 
 def is_managed(using=None):
-    """
-    Checks whether the transaction manager is in manual or in auto state.
-    """
-    return get_connection(using).is_managed()
+    warnings.warn("'is_managed' is deprecated.",
+        PendingDeprecationWarning, stacklevel=2)
 
 def managed(flag=True, using=None):
     warnings.warn("'managed' no longer serves a purpose.",
@@ -281,7 +279,9 @@ def commit_on_success_unless_managed(using=None):
     """
     Transitory API to preserve backwards-compatibility while refactoring.
     """
-    if is_managed(using):
+    if get_autocommit(using):
+        return commit_on_success(using)
+    else:
         def entering(using):
             pass
 
@@ -289,5 +289,3 @@ def commit_on_success_unless_managed(using=None):
             set_dirty(using=using)
 
         return _transaction_func(entering, exiting, using)
-    else:
-        return commit_on_success(using)
