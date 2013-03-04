@@ -23,7 +23,7 @@ class TransactionMiddleware(object):
 
     def process_response(self, request, response):
         """Commits and leaves transaction management."""
-        if transaction.is_managed():
+        if not transaction.get_autocommit():
             if transaction.is_dirty():
                 # Note: it is possible that the commit fails. If the reason is
                 # closed connection or some similar reason, then there is

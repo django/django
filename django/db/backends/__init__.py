@@ -256,11 +256,12 @@ class BaseDatabaseWrapper(object):
         """
         self.transaction_state.append(managed)
 
-        if managed and self.autocommit:
-            self.set_autocommit(False)
-
         if not managed and self.is_dirty() and not forced:
             self.commit()
+            self.set_clean()
+
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
         """
@@ -274,19 +275,20 @@ class BaseDatabaseWrapper(object):
             raise TransactionManagementError(
                 "This code isn't under transaction management")
 
-        # That's the next state -- we already left the previous state behind.
-        managed = self.is_managed()
+        if self.transaction_state:
+            managed = self.transaction_state[-1]
+        else:
+            managed = settings.TRANSACTIONS_MANAGED
 
         if self._dirty:
             self.rollback()
-            if not managed and not self.autocommit:
-                self.set_autocommit(True)
+            if managed == self.autocommit:
+                self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
 
-        if not managed and not self.autocommit:
-            self.set_autocommit(True)
-
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
 
     def set_autocommit(self, autocommit=True):
         """
@@ -330,14 +332,6 @@ class BaseDatabaseWrapper(object):
         """
         self._dirty = False
         self.clean_savepoints()
-
-    def is_managed(self):
-        """
-        Checks whether the transaction manager is in manual or in auto state.
-        """
-        if self.transaction_state:
-            return self.transaction_state[-1]
-        return settings.TRANSACTIONS_MANAGED
 
     ##### Foreign key constraints checks handling #####
 
