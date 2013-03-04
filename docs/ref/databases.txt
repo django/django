@@ -424,8 +424,7 @@ Savepoints
 
 Both the Django ORM and MySQL (when using the InnoDB :ref:`storage engine
 <mysql-storage-engines>`) support database :ref:`savepoints
-<topics-db-transactions-savepoints>`, but this feature wasn't available in
-Django until version 1.4 when such support was added.
+<topics-db-transactions-savepoints>`.
 
 If you use the MyISAM storage engine please be aware of the fact that you will
 receive database-generated errors if you try to use the :ref:`savepoint-related

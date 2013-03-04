@@ -251,11 +251,11 @@ the transaction middleware, and only modify selected functions as needed.
 Savepoints
 ==========
 
-A savepoint is a marker within a transaction that enables you to roll back part
-of a transaction, rather than the full transaction. Savepoints are available
-with the PostgreSQL 8, Oracle and MySQL (when using the InnoDB storage engine)
-backends. Other backends provide the savepoint functions, but they're empty
-operations -- they don't actually do anything.
+A savepoint is a marker within a transaction that enables you to roll back
+part of a transaction, rather than the full transaction. Savepoints are
+available with the SQLite (≥ 3.6.8), PostgreSQL, Oracle and MySQL (when using
+the InnoDB storage engine) backends. Other backends provide the savepoint
+functions, but they're empty operations -- they don't actually do anything.
 
 Savepoints aren't especially useful if you are using the default
 ``autocommit`` behavior of Django. However, if you are using
@@ -314,6 +314,21 @@ The following example demonstrates the use of savepoints::
 Database-specific notes
 =======================
 
+Savepoints in SQLite
+--------------------
+
+While SQLite ≥ 3.6.8 supports savepoints, a flaw in the design of the
+:mod:`sqlite3` makes them hardly usable.
+
+When autocommit is enabled, savepoints don't make sense. When it's disabled,
+:mod:`sqlite3` commits implicitly before savepoint-related statement. (It
+commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
+``DELETE`` and ``REPLACE``.)
+
+As a consequence, savepoints are only usable if you start a transaction
+manually while in autocommit mode, and Django doesn't provide an API to
+achieve that.
+
 Transactions in MySQL
 ---------------------
 
@@ -363,11 +378,11 @@ itself.
 Savepoint rollback
 ~~~~~~~~~~~~~~~~~~
 
-If you are using PostgreSQL 8 or later, you can use :ref:`savepoints
-<topics-db-transactions-savepoints>` to control the extent of a rollback.
-Before performing a database operation that could fail, you can set or update
-the savepoint; that way, if the operation fails, you can roll back the single
-offending operation, rather than the entire transaction. For example::
+You can use :ref:`savepoints <topics-db-transactions-savepoints>` to control
+the extent of a rollback. Before performing a database operation that could
+fail, you can set or update the savepoint; that way, if the operation fails,
+you can roll back the single offending operation, rather than the entire
+transaction. For example::
 
     a.save() # Succeeds, and never undone by savepoint rollback
     try:
