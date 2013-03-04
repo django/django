@@ -158,6 +158,53 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
+class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
+
+    def setUp(self):
+        transaction.enter_transaction_management()
+
+    def tearDown(self):
+        # The tests access the database after exercising 'atomic', making the
+        # connection dirty; a rollback is required to make it clean.
+        transaction.rollback()
+        transaction.leave_transaction_management()
+
+
+@skipUnless(connection.features.uses_savepoints,
+        "'atomic' requires transactions and savepoints.")
+class AtomicErrorsTests(TransactionTestCase):
+
+    def test_atomic_requires_autocommit(self):
+        transaction.set_autocommit(autocommit=False)
+        try:
+            with self.assertRaises(transaction.TransactionManagementError):
+                with transaction.atomic():
+                    pass
+        finally:
+            transaction.set_autocommit(autocommit=True)
+
+    def test_atomic_prevents_disabling_autocommit(self):
+        autocommit = transaction.get_autocommit()
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.set_autocommit(autocommit=not autocommit)
+        # Make sure autocommit wasn't changed.
+        self.assertEqual(connection.autocommit, autocommit)
+
+    def test_atomic_prevents_calling_transaction_methods(self):
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.commit()
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.rollback()
+
+    def test_atomic_prevents_calling_transaction_management_methods(self):
+        with transaction.atomic():
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.enter_transaction_management()
+            with self.assertRaises(transaction.TransactionManagementError):
+                transaction.leave_transaction_management()
+
 class TransactionTests(TransactionTestCase):
     def create_a_reporter_then_fail(self, first, last):
         a = Reporter(first_name=first, last_name=last)

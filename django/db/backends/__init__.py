@@ -157,6 +157,7 @@ class BaseDatabaseWrapper(object):
         Commits a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
+        self.validate_no_atomic_block()
         self._commit()
         self.set_clean()
 
@@ -165,6 +166,7 @@ class BaseDatabaseWrapper(object):
         Rolls back a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
+        self.validate_no_atomic_block()
         self._rollback()
         self.set_clean()
 
@@ -265,6 +267,8 @@ class BaseDatabaseWrapper(object):
         If you switch off transaction management and there is a pending
         commit/rollback, the data will be commited, unless "forced" is True.
         """
+        self.validate_no_atomic_block()
+
         self.transaction_state.append(managed)
 
         if not managed and self.is_dirty() and not forced:
@@ -280,6 +284,8 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
+        self.validate_no_atomic_block()
+
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
@@ -305,9 +311,18 @@ class BaseDatabaseWrapper(object):
         """
         Enable or disable autocommit.
         """
+        self.validate_no_atomic_block()
         self.ensure_connection()
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
+
+    def validate_no_atomic_block(self):
+        """
+        Raise an error if an atomic block is active.
+        """
+        if self.in_atomic_block:
+            raise TransactionManagementError(
+                "This is forbidden when an 'atomic' block is active.")
 
     def abort(self):
         """
