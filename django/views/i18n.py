@@ -109,16 +109,16 @@ js_catalog_template = r"""
   django.gettext_noop = function (msgid) { return msgid; };
 
   django.pgettext = function (context, msgid) {
-    var value = django.gettext(context + '\\x04' + msgid);
-    if (value.indexOf('\\x04') != -1) {
+    var value = django.gettext(context + '\x04' + msgid);
+    if (value.indexOf('\x04') != -1) {
       value = msgid;
     }
     return value;
   };
 
   django.npgettext = function (context, singular, plural, count) {
-    var value = django.ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
-    if (value.indexOf('\\x04') != -1) {
+    var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+    if (value.indexOf('\x04') != -1) {
       value = django.ngettext(singular, plural, count);
     }
     return value;
