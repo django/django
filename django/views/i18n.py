@@ -1,3 +1,4 @@
+import json
 import os
 import gettext as gettext_module
 
@@ -5,7 +6,6 @@ from django import http
 from django.conf import settings
 from django.template import Context, Template
 from django.utils import importlib
-from django.utils import simplejson
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
@@ -173,9 +173,9 @@ js_catalog_template = r"""
 def render_javascript_catalog(catalog=None, plural=None):
     template = Template(js_catalog_template)
     context = Context({
-        'catalog_str': simplejson.dumps(catalog, sort_keys=True,
+        'catalog_str': json.dumps(catalog, sort_keys=True,
                 indent=2).replace('\n', '\n  ') if catalog else None,
-        'formats_str': simplejson.dumps(get_formats(), sort_keys=True,
+        'formats_str': json.dumps(get_formats(), sort_keys=True,
                 indent=2).replace('\n', '\n  '),
         'plural': plural,
     })
