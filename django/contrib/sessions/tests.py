@@ -194,12 +194,12 @@ class SessionTestsMixin(object):
     # Custom session expiry
     def test_default_expiry(self):
         # A normal session has a max age equal to settings
-        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE['AGE'])
 
         # So does a custom session with an idle expiration time of 0 (but it'll
         # expire at browser close)
         self.session.set_expiry(0)
-        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE['AGE'])
 
     def test_custom_expiry_seconds(self):
         modification = timezone.now()
@@ -244,7 +244,7 @@ class SessionTestsMixin(object):
         self.session.set_expiry(None)
         self.session.set_expiry(10)
         self.session.set_expiry(None)
-        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE['AGE'])
 
     def test_get_expire_at_browser_close(self):
         # Tests get_expire_at_browser_close with different settings and different
@@ -441,7 +441,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         Test clearsessions command for clearing expired sessions.
         """
         storage_path = self.backend._get_storage_path()
-        file_prefix = settings.SESSION_COOKIE_NAME
+        file_prefix = settings.SESSION_COOKIE['NAME']
 
         def count_sessions():
             return len([session_file for session_file in os.listdir(storage_path)
@@ -501,7 +501,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 class SessionMiddlewareTests(unittest.TestCase):
 
-    @override_settings(SESSION_COOKIE_SECURE=True)
+    #@override_settings(SESSION_COOKIE['SECURE']=True)
+    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, SECURE=True))
     def test_secure_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -514,9 +515,10 @@ class SessionMiddlewareTests(unittest.TestCase):
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
         self.assertTrue(
-            response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
+            response.cookies[settings.SESSION_COOKIE['NAME']]['secure'])
 
-    @override_settings(SESSION_COOKIE_HTTPONLY=True)
+    #@override_settings(SESSION_COOKIE['HTTPONLY']=True)
+    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=True))
     def test_httponly_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -529,11 +531,12 @@ class SessionMiddlewareTests(unittest.TestCase):
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
         self.assertTrue(
-            response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+            response.cookies[settings.SESSION_COOKIE['NAME']]['httponly'])
         self.assertIn('httponly',
-            str(response.cookies[settings.SESSION_COOKIE_NAME]))
+            str(response.cookies[settings.SESSION_COOKIE['NAME']]))
 
-    @override_settings(SESSION_COOKIE_HTTPONLY=False)
+    #@override_settings(SESSION_COOKIE['HTTPONLY']=False)
+    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=False))
     def test_no_httponly_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -545,10 +548,10 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertFalse(response.cookies[settings.SESSION_COOKIE['NAME']]['httponly'])
 
         self.assertNotIn('httponly',
-                         str(response.cookies[settings.SESSION_COOKIE_NAME]))
+                         str(response.cookies[settings.SESSION_COOKIE['NAME']]))
 
     def test_session_save_on_500(self):
         request = RequestFactory().get('/')

@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.cookie import (CookieStorage,
@@ -41,7 +42,8 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-@override_settings(SESSION_COOKIE_DOMAIN='.example.com')
+#@override_settings(SESSION_COOKIE['DOMAIN']='.example.com')
+@override_settings(SESSION_COOKIE=settings.SESSION_COOKIE.update({'DOMAIN': '.example.com'}))
 class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
@@ -58,7 +60,7 @@ class CookieTest(BaseTests, TestCase):
 
     def test_domain(self):
         """
-        Ensure that CookieStorage honors SESSION_COOKIE_DOMAIN.
+        Ensure that CookieStorage honors SESSION_COOKIE['DOMAIN'].
         Refs #15618.
         """
         # Test before the messages have been consumed

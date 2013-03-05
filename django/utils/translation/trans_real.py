@@ -430,7 +430,7 @@ def get_language_from_request(request, check_path=False):
         if lang_code in supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
-    lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+    lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE['NAME'])
 
     try:
         return get_supported_language_variant(lang_code, supported)
