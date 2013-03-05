@@ -269,6 +269,8 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_no_atomic_block()
 
+        self.ensure_connection()
+
         self.transaction_state.append(managed)
 
         if not managed and self.is_dirty() and not forced:
@@ -285,6 +287,8 @@ class BaseDatabaseWrapper(object):
         those from outside. (Commits are on connection level.)
         """
         self.validate_no_atomic_block()
+
+        self.ensure_connection()
 
         if self.transaction_state:
             del self.transaction_state[-1]
