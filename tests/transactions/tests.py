@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
 import sys
+import warnings
 
 from django.db import connection, transaction, IntegrityError
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.unittest import skipUnless
 
@@ -205,7 +206,22 @@ class AtomicErrorsTests(TransactionTestCase):
             with self.assertRaises(transaction.TransactionManagementError):
                 transaction.leave_transaction_management()
 
-class TransactionTests(TransactionTestCase):
+
+class IgnorePendingDeprecationWarningsMixin(object):
+
+    def setUp(self):
+        super(IgnorePendingDeprecationWarningsMixin, self).setUp()
+        self.catch_warnings = warnings.catch_warnings()
+        self.catch_warnings.__enter__()
+        warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+    def tearDown(self):
+        self.catch_warnings.__exit__(*sys.exc_info())
+        super(IgnorePendingDeprecationWarningsMixin, self).tearDown()
+
+
+class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
     def create_a_reporter_then_fail(self, first, last):
         a = Reporter(first_name=first, last_name=last)
         a.save()
@@ -360,7 +376,7 @@ class TransactionTests(TransactionTestCase):
         )
 
 
-class TransactionRollbackTests(TransactionTestCase):
+class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def execute_bad_sql(self):
         cursor = connection.cursor()
         cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
@@ -377,7 +393,7 @@ class TransactionRollbackTests(TransactionTestCase):
         self.assertRaises(IntegrityError, execute_bad_sql)
         transaction.rollback()
 
-class TransactionContextManagerTests(TransactionTestCase):
+class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def create_reporter_and_fail(self):
         Reporter.objects.create(first_name="Bob", last_name="Holtzman")
         raise Exception

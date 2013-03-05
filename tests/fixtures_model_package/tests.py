@@ -25,7 +25,8 @@ class SampleTestCase(TestCase):
 
 class TestNoInitialDataLoading(TransactionTestCase):
     def test_syncdb(self):
-        with transaction.commit_manually():
+        transaction.set_autocommit(autocommit=False)
+        try:
             Book.objects.all().delete()
 
             management.call_command(
@@ -35,6 +36,9 @@ class TestNoInitialDataLoading(TransactionTestCase):
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
             transaction.rollback()
+        finally:
+            transaction.set_autocommit(autocommit=True)
+
 
     def test_flush(self):
         # Test presence of fixture (flush called by TransactionTestCase)
@@ -45,7 +49,8 @@ class TestNoInitialDataLoading(TransactionTestCase):
             lambda a: a.name
         )
 
-        with transaction.commit_manually():
+        transaction.set_autocommit(autocommit=False)
+        try:
             management.call_command(
                 'flush',
                 verbosity=0,
@@ -55,6 +60,8 @@ class TestNoInitialDataLoading(TransactionTestCase):
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
             transaction.rollback()
+        finally:
+            transaction.set_autocommit(autocommit=True)
 
 
 class FixtureTestCase(TestCase):

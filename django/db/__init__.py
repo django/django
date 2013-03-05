@@ -70,6 +70,7 @@ signals.request_started.connect(reset_queries)
 # their lifetime. NB: abort() doesn't do anything outside of a transaction.
 def close_old_connections(**kwargs):
     for conn in connections.all():
+        # Remove this when the legacy transaction management goes away.
         try:
             conn.abort()
         except DatabaseError:
