@@ -1,6 +1,5 @@
 from copy import copy
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 
 # Cache of actual callables.
 _standard_context_processors = None
@@ -146,16 +145,7 @@ def get_standard_processors():
         collect.extend(_builtin_context_processors)
         collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
         for path in collect:
-            i = path.rfind('.')
-            module, attr = path[:i], path[i+1:]
-            try:
-                mod = import_module(module)
-            except ImportError as e:
-                raise ImproperlyConfigured('Error importing request processor module %s: "%s"' % (module, e))
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured('Module "%s" does not define a "%s" callable request processor' % (module, attr))
+            func = import_by_path(path)
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors

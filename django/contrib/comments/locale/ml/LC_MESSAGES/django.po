@@ -7,68 +7,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
-"Language-Team: Malayalam (http://www.transifex.net/projects/p/django/"
+"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
-"Language: ml\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "ഉള്ളടക്കം"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "മെറ്റാ-ഡാറ്റ"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "അടയാളപ്പെടുത്തി"
 msgstr[1] "അടയാളപ്പെടുത്തി"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ അടയാളപ്പെടുത്തുക"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "അംഗീകരിച്ചു"
 msgstr[1] "അംഗീകരിച്ചു"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ അംഗീകരിക്കുക"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "നീക്കം ചെയ്തു"
 msgstr[1] "നീക്കം ചെയ്തു"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ നീക്കം ചെയ്യുക"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "1 അഭിപ്രായം വിജയകരമായി %(action)s."
 msgstr[1] "%(count)s അഭിപ്രായങ്ങള്‍ വിജയകരമായി %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s അഭിപ്രായങ്ങള്‍"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "%(site_name)s ലെ ഏറ്റവും പുതിയ അഭിപ്രായങ്ങള്‍"
@@ -105,56 +105,56 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "ഈ കള്ളിയില്‍ എന്തെങ്കിലും രേഖപ്പെടുത്തിയാല്‍ നിങ്ങളുടെ അഭിപ്രായം സ്പാം ആയി കണക്കാക്കും"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "ഏതു തരം ഉള്ളടക്കം"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "വസ്തുവിന്റെ ID (തിരിച്ചറിയല്‍ സംഖ്യ)"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "യൂസര്‍ (ഉപയോക്താവ്)"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "യൂസറുടെ പേര്"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "യൂസറുടെ ഇ-മെയില്‍ വിലാസം"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "യൂസറുടെ URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "അഭിപ്രായം"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "സമര്‍പ്പിച്ച തീയതി/സമയം"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP വിലാസം"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "പരസ്യമാണ്"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "അഭിപ്രായം സൈറ്റില്‍ നിന്നും ഫലപ്രദമായി നീക്കം ചെയ്യാന്‍ ഈ ബോക്സിലെ ടിക് ഒഴിവാക്കുക."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "നീക്കം ചെയ്തു."
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -162,17 +162,17 @@ msgstr ""
 "അഭിപ്രായം അനുചിതമെങ്കില്‍ ഈ ബോക്സ് ടിക് ചെയ്യുക. \"ഈ അഭിപ്രായം നീക്കം ചെയ്തു \" എന്ന സന്ദേശം "
 "ആയിരിക്കും പകരം കാണുക."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "അഭിപ്രായങ്ങള്‍"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr "ഈ അഭിപ്രായം ഒരു അംഗീകൃത യൂസര്‍ രേഖപ്പെടുത്തിയതാണ്. അതിനാല്‍ പേര് വായിക്കാന്‍ മാത്രം."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -180,7 +180,7 @@ msgstr ""
 "ഈ അഭിപ്രായം ഒരു അംഗീകൃത യൂസര്‍ രേഖപ്പെടുത്തിയതാണ്. അതിനാല്‍ ഇ-മെയില്‍ വിലാസം വായിക്കാന്‍ "
 "മാത്രം."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -195,19 +195,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "അടയാളം"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "തീയതി"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "അഭിപ്രായ അടയാളം"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "അഭിപ്രായ അടയാളങ്ങള്‍"
 

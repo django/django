@@ -125,6 +125,8 @@ class GeoIP(object):
 
     def __del__(self):
         # Cleaning any GeoIP file handles lying around.
+        if GeoIP_delete is None:
+            return
         if self._country: GeoIP_delete(self._country)
         if self._city: GeoIP_delete(self._city)
 

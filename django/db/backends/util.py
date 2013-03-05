@@ -19,14 +19,15 @@ class CursorWrapper(object):
         self.cursor = cursor
         self.db = db
 
-    def set_dirty(self):
-        if self.db.is_managed():
-            self.db.set_dirty()
-
     def __getattr__(self, attr):
         if attr in ('execute', 'executemany', 'callproc'):
-            self.set_dirty()
-        return getattr(self.cursor, attr)
+            self.db.set_dirty()
+        cursor_attr = getattr(self.cursor, attr)
+        if attr in ('callproc', 'close', 'execute', 'executemany',
+                    'fetchone', 'fetchmany', 'fetchall', 'nextset'):
+            return self.db.wrap_database_errors()(cursor_attr)
+        else:
+            return cursor_attr
 
     def __iter__(self):
         return iter(self.cursor)
@@ -35,10 +36,11 @@ class CursorWrapper(object):
 class CursorDebugWrapper(CursorWrapper):
 
     def execute(self, sql, params=()):
-        self.set_dirty()
+        self.db.set_dirty()
         start = time()
         try:
-            return self.cursor.execute(sql, params)
+            with self.db.wrap_database_errors():
+                return self.cursor.execute(sql, params)
         finally:
             stop = time()
             duration = stop - start
@@ -52,10 +54,11 @@ class CursorDebugWrapper(CursorWrapper):
             )
 
     def executemany(self, sql, param_list):
-        self.set_dirty()
+        self.db.set_dirty()
         start = time()
         try:
-            return self.cursor.executemany(sql, param_list)
+            with self.db.wrap_database_errors():
+                return self.cursor.executemany(sql, param_list)
         finally:
             stop = time()
             duration = stop - start

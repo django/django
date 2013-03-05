@@ -2,77 +2,90 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Malayalam (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-22 08:46+0000\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
-"Language: ml\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "ടാഗ്:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "അരിപ്പ:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "വ്യൂ"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "%r എന്ന App കണ്ടില്ല."
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "%(app_label)r എന്ന Appല്‍ %(model_name)r എന്ന മാത്രുക കണ്ടില്ല."
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "ബന്ധപ്പെട്ട `%(app_label)s.%(data_type)s` വസ്തു"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "മാത്രുക:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "ബന്ധപ്പെട്ട `%(app_label)s.%(object_name)s` വസ്തുക്കള്‍"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "%s എല്ലാം"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "%sന്റെ എണ്ണം"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "%s വസ്തുക്കളിലെ വിവരങ്ങള്‍"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s വിലാസ മാത്രുക (urlpattern object) ആണെന്ന് തോന്നുന്നില്ല."
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "പൂമുഖം"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -83,30 +96,18 @@ msgstr "%s വിലാസ മാത്രുക (urlpattern object) ആണെ�
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "പൂമുഖം"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "സഹായക്കുറിപ്പുകള്‍"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "ബുക്ക് മാര്‍ക്കുകള്‍"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "സഹായക്കുറിപ്പുകളുടെ ബുക്ക്മാര്‍ക്കുകള്‍"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -126,61 +127,70 @@ msgstr ""
 "നിങ്ങളുടെ കംപ്യൂട്ടര്‍ അത്തരത്തില്‍ പെട്ടതാണോ എന്നറിയാന്‍ സിസ്റ്റം അഡ്മിനിസ്ട്രേട്ടറെ ബന്ധപ്പെടുക.</"
 "p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "ഈ പേജിന്റെ സഹായക്കുറിപ്പുകള്‍"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "ഏതു പേജില്‍ നിന്നും അതിന്റെ ഉദ്ഭവമായ വ്യൂവിന്റെ സഹായക്കുറിപ്പിലേക്കു ചാടാന്‍"
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "വസ്തുവിന്റെ ഐഡി കാണിക്കുക."
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "ഒറ്റ വസ്തുവിനെ പ്രതിനിധീകരിക്കുന്ന പേജുകളുടെ ഉള്ളടക്കത്തിന്റെ തരവും തനതായ IDയും കാണിക്കുന്നു."
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "ഈ വസ്തുവില് മാറ്റം വരുത്തുക (ഇതേ വിന്‍ഡോ)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "ഒറ്റ വസ്തുവിനെ പ്രതിനിധീകരിക്കുന്ന പേജുകള്‍ക്കുള്ള അഡ്മിന്‍ പേജിലേക്ക് ചാടുന്നു."
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "ഈ വസ്തുവില് മാറ്റം വരുത്തുക (പുതിയ വിന്‍ഡോ)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "മുകളിലേതു പോലെ, പക്ഷെ, അഡ്മിന്‍ പേജ് പുതിയ വിന്ഡോവിലാണ് തുറക്കുക."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
-msgstr ""
+msgstr "മോഡലുകള്‍"
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
-msgstr ""
+msgstr "ടെമ്പ്‌ലേറ്റുകള്‍"
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
-msgstr ""
+msgstr "ഫില്‍ട്ടറുകള്‍"
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr ""
+msgstr "ടാഗുകള്‍"
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
-msgstr ""
+msgstr "വ്യൂകള്‍"
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "%(field_type)s എന്ന തരത്തിലുള്ള കളം (ഫീല്‍ഡ്)"

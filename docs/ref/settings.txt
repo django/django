@@ -56,6 +56,42 @@ of (Full name, email address). Example::
 Note that Django will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
 
+.. setting:: ALLOWED_HOSTS
+
+ALLOWED_HOSTS
+-------------
+
+Default: ``[]`` (Empty list)
+
+A list of strings representing the host/domain names that this Django site can
+serve. This is a security measure to prevent an attacker from poisoning caches
+and password reset emails with links to malicious hosts by submitting requests
+with a fake HTTP ``Host`` header, which is possible even under many
+seemingly-safe webserver configurations.
+
+Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
+in which case they will be matched against the request's ``Host`` header
+exactly (case-insensitive, not including port). A value beginning with a period
+can be used as a subdomain wildcard: ``'.example.com'`` will match
+``example.com``, ``www.example.com``, and any other subdomain of
+``example.com``. A value of ``'*'`` will match anything; in this case you are
+responsible to provide your own validation of the ``Host`` header (perhaps in a
+middleware; if so this middleware must be listed first in
+:setting:`MIDDLEWARE_CLASSES`).
+
+If the ``Host`` header (or ``X-Forwarded-Host`` if
+:setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
+list, the :meth:`django.http.HttpRequest.get_host()` method will raise
+:exc:`~django.core.exceptions.SuspiciousOperation`.
+
+When :setting:`DEBUG` is ``True`` or when running tests, host validation is
+disabled; any host will be accepted. Thus it's usually only necessary to set it
+in production.
+
+This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+if your code accesses the ``Host`` header directly from ``request.META`` you
+are bypassing this security protection.
+
 .. setting:: ALLOWED_INCLUDE_ROOTS
 
 ALLOWED_INCLUDE_ROOTS
@@ -281,6 +317,19 @@ Please note that the presence of this setting does not imply that Django's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
 :ref:`CSRF limitations <csrf-limitations>` section.
 
+.. setting:: CSRF_COOKIE_HTTPONLY
+
+CSRF_COOKIE_HTTPONLY
+--------------------
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Whether to use HttpOnly flag on the CSRF cookie. If this is set to ``True``,
+client-side JavaScript will not to be able to access the CSRF cookie. See
+:setting:`SESSION_COOKIE_HTTPONLY` for details on HttpOnly.
+
 .. setting:: CSRF_COOKIE_NAME
 
 CSRF_COOKIE_NAME
@@ -414,6 +463,19 @@ Default: ``''`` (Empty string)
 The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+
+.. setting:: CONN_MAX_AGE
+
+CONN_MAX_AGE
+~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``600``
+
+The lifetime of a database connection, in seconds. Use ``0`` to close database
+connections at the end of each request — Django's historical behavior — and
+``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 
@@ -636,9 +698,13 @@ DATE_INPUT_FORMATS
 
 Default::
 
-    ('%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', '%b %d %Y',
-    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
-    '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
+    (
+        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
+        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
+        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
+        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
+        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+    )
 
 A tuple of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
@@ -673,9 +739,20 @@ DATETIME_INPUT_FORMATS
 
 Default::
 
-    ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d',
-    '%m/%d/%Y %H:%M:%S', '%m/%d/%Y %H:%M', '%m/%d/%Y',
-    '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
+    (
+        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+        '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
+        '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+        '%Y-%m-%d',              # '2006-10-25'
+        '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+        '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
+        '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+        '%m/%d/%Y',              # '10/25/2006'
+        '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+        '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
+        '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+        '%m/%d/%y',              # '10/25/06'
+    )
 
 A tuple of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
@@ -1134,9 +1211,12 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be in
-standard :term:`language format<language code>`. For example, U.S. English is
-``"en-us"``. See :doc:`/topics/i18n/index`.
+A string representing the language code for this installation. This should be
+in standard :term:`language format<language code>`. For example, U.S. English
+is ``"en-us"``. See also the `list of language identifiers`_ and
+:doc:`/topics/i18n/index`.
+
+.. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -1647,7 +1727,13 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 TIME_INPUT_FORMATS
 ------------------
 
-Default: ``('%H:%M:%S', '%H:%M')``
+Default::
+
+    (
+        '%H:%M:%S',     # '14:30:59'
+        '%H:%M:%S.%f',  # '14:30:59.000200'
+        '%H:%M',        # '14:30'
+    )
 
 A tuple of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
@@ -1659,6 +1745,10 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
+.. versionchanged:: 1.6
+
+Input format with microseconds has been added.
+
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
@@ -1668,12 +1758,14 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation, or
-``None``. `See available choices`_. (Note that list of available
-choices lists more than one on the same line; you'll want to use just
-one of the choices for a given time zone. For instance, one line says
-``'Europe/London GB GB-Eire'``, but you should use the first bit of
-that -- ``'Europe/London'`` -- as your :setting:`TIME_ZONE` setting.)
+A string representing the time zone for this installation, or ``None``. See
+the `list of time zones`_.
+
+.. note::
+    Since Django was first released with the :setting:`TIME_ZONE` set to
+    ``'America/Chicago'``, the global setting (used if nothing is defined in
+    your project's ``settings.py``) remains ``'America/Chicago'`` for backwards
+    compatibility. New project templates default to ``'UTC'``.
 
 Note that this isn't necessarily the time zone of the server. For example, one
 server may serve multiple Django-powered sites, each with a separate time zone
@@ -1706,7 +1798,7 @@ to ensure your processes are running in the correct environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. _pytz: http://pytz.sourceforge.net/
 

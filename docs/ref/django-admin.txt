@@ -288,8 +288,23 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
+If your plan is that your Django application(s) modify data (i.e. edit, remove
+records and create new ones) in the existing database tables corresponding to
+any of the introspected models then one of the manual review and edit steps
+you need to perform on the resulting ``models.py`` file is to change the
+Python declaration of each one of these models to specify it is a
+:attr:`managed <django.db.models.Options.managed>` one.
+
+This servers as an explicit opt-in to give your nascent Django project write
+access to your precious data on a model by model basis.
+
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
+
+.. versionchanged:: 1.6
+
+The behavior by which introspected models are created as unmanaged ones is new
+in Django 1.6.
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -848,6 +863,18 @@ Note that the order in which the SQL files are processed is undefined.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
+sqldropindexes <appname appname ...>
+------------------------------------
+
+.. django-admin:: sqldropindexes
+
+.. versionadded:: 1.6
+
+Prints the DROP INDEX SQL statements for the given app name(s).
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlflush
 --------
 
@@ -906,6 +933,8 @@ For example::
 
     django-admin.py startapp myapp /Users/jezdez/Code/myapp
 
+.. _custom-app-and-project-templates:
+
 .. django-admin-option:: --template
 
 With the ``--template`` option, you can use a custom app template by providing
@@ -937,6 +966,7 @@ with the ``--name`` option. The :class:`template context
   options)
 - ``app_name`` -- the app name as passed to the command
 - ``app_directory`` -- the full path of the newly created app
+- ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 
 .. _render_warning:
 
@@ -1006,6 +1036,7 @@ with the ``--name`` option. The :class:`template context
 - ``project_name`` -- the project name as passed to the command
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
+- ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.

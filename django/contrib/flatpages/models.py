@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import get_script_prefix
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible
-
+from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class FlatPage(models.Model):
@@ -27,4 +27,5 @@ class FlatPage(models.Model):
         return "%s -- %s" % (self.url, self.title)
 
     def get_absolute_url(self):
-        return self.url
+        # Handle script prefix manually because we bypass reverse()
+        return iri_to_uri(get_script_prefix().rstrip('/') + self.url)

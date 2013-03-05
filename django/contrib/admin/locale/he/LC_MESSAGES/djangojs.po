@@ -4,20 +4,21 @@
 # Alex Gaynor <alex.gaynor@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Meir Kriheli <meir@mksoft.co.il>, 2011.
+# Meir Kriheli <mkriheli@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Alex Gaynor <alex.gaynor@gmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2012-10-21 11:05+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
-"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -30,11 +31,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"זו רשימת %s הזמינים לבחירה. ניתן לבחור חלק ע\"י סימון בתיבה מתחת ולחיצה על "
+"חץ  \"בחר\" בין שתי התיבות."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "ניתן להקליד בתיבה זו כדי לסנן %s."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -47,11 +50,11 @@ msgstr "בחירת הכל"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "בחירת כל ה%s בבת אחת."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "בחר"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -60,7 +63,7 @@ msgstr "הסרה"
 #: static/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
-msgstr "%s נבחרות"
+msgstr "%s אשר נבחרו"
 
 #: static/admin/js/SelectFilter2.js:76
 #, c-format
@@ -68,15 +71,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"זו רשימת %s אשר נבחרו. ניתן להסיר חלק ע\"י בחירה בתיבה מתחת ולחיצה על חץ "
+"\"הסרה\" בין שתי התיבות."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "הסרת הכל"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "הסרת כל %s אשר נבחרו בבת אחת."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

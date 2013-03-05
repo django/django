@@ -23,7 +23,7 @@ from django.utils import datetime_safe, formats, six
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput',
-    'EmailInput', 'URLInput', 'PasswordInput',
+    'EmailInput', 'URLInput', 'NumberInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput', 'ClearableFileInput',
     'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
@@ -252,6 +252,10 @@ class TextInput(Input):
         super(TextInput, self).__init__(attrs)
 
 
+class NumberInput(TextInput):
+    input_type = 'number'
+
+
 class EmailInput(TextInput):
     input_type = 'email'
 
@@ -327,6 +331,8 @@ class ClearableFileInput(FileInput):
 
     template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
 
+    url_markup_template = '<a href="{0}">{1}</a>'
+
     def clear_checkbox_name(self, name):
         """
         Given the name of the file input, return the name of the clear checkbox
@@ -352,7 +358,7 @@ class ClearableFileInput(FileInput):
 
         if value and hasattr(value, "url"):
             template = self.template_with_initial
-            substitutions['initial'] = format_html('<a href="{0}">{1}</a>',
+            substitutions['initial'] = format_html(self.url_markup_template,
                                                    value.url,
                                                    force_text(value))
             if not self.is_required:

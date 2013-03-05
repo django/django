@@ -19,7 +19,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
 from django.forms.widgets import (
-    TextInput, PasswordInput, EmailInput, URLInput, HiddenInput,
+    TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION
@@ -184,17 +184,13 @@ class Field(object):
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ ''.
-        if data is None:
-            data_value = ''
-        else:
-            data_value = data
-        if initial is None:
-            initial_value = ''
-        else:
-            initial_value = initial
-        if force_text(initial_value) != force_text(data_value):
+        initial_value = initial if initial is not None else ''
+        try:
+            data = self.to_python(data)
+        except ValidationError:
             return True
-        return False
+        data_value = data if data is not None else ''
+        return initial_value != data_value
 
     def __deepcopy__(self, memo):
         result = copy.copy(self)
@@ -234,6 +230,7 @@ class IntegerField(Field):
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
+        kwargs.setdefault('widget', NumberInput if not kwargs.get('localize') else self.widget)
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
@@ -257,6 +254,16 @@ class IntegerField(Field):
             raise ValidationError(self.error_messages['invalid'])
         return value
 
+    def widget_attrs(self, widget):
+        attrs = super(IntegerField, self).widget_attrs(widget)
+        if isinstance(widget, NumberInput):
+            if self.min_value is not None:
+                attrs['min'] = self.min_value
+            if self.max_value is not None:
+                attrs['max'] = self.max_value
+        return attrs
+
+
 class FloatField(IntegerField):
     default_error_messages = {
         'invalid': _('Enter a number.'),
@@ -278,25 +285,24 @@ class FloatField(IntegerField):
             raise ValidationError(self.error_messages['invalid'])
         return value
 
-class DecimalField(Field):
+    def widget_attrs(self, widget):
+        attrs = super(FloatField, self).widget_attrs(widget)
+        if isinstance(widget, NumberInput):
+            attrs.setdefault('step', 'any')
+        return attrs
+
+
+class DecimalField(IntegerField):
     default_error_messages = {
         'invalid': _('Enter a number.'),
-        'max_value': _('Ensure this value is less than or equal to %(limit_value)s.'),
-        'min_value': _('Ensure this value is greater than or equal to %(limit_value)s.'),
         'max_digits': _('Ensure that there are no more than %s digits in total.'),
         'max_decimal_places': _('Ensure that there are no more than %s decimal places.'),
         'max_whole_digits': _('Ensure that there are no more than %s digits before the decimal point.')
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        Field.__init__(self, *args, **kwargs)
-
-        if max_value is not None:
-            self.validators.append(validators.MaxValueValidator(max_value))
-        if min_value is not None:
-            self.validators.append(validators.MinValueValidator(min_value))
+        super(DecimalField, self).__init__(max_value, min_value, *args, **kwargs)
 
     def to_python(self, value):
         """
@@ -345,6 +351,19 @@ class DecimalField(Field):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
+    def widget_attrs(self, widget):
+        attrs = super(DecimalField, self).widget_attrs(widget)
+        if isinstance(widget, NumberInput):
+            if self.max_digits is not None:
+                max_length = self.max_digits + 1  # for the sign
+                if self.decimal_places is None or self.decimal_places > 0:
+                    max_length += 1  # for the dot
+                attrs['maxlength'] = max_length
+            if self.decimal_places:
+                attrs['step'] = '0.%s1' % ('0' * (self.decimal_places-1))
+        return attrs
+
+
 class BaseTemporalField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
@@ -369,12 +388,6 @@ class BaseTemporalField(Field):
     def strptime(self, value, format):
         raise NotImplementedError('Subclasses must define this method.')
 
-    def _has_changed(self, initial, data):
-        try:
-            data = self.to_python(data)
-        except ValidationError:
-            return True
-        return self.to_python(initial) != data
 
 class DateField(BaseTemporalField):
     widget = DateInput
@@ -1073,6 +1086,11 @@ class IPAddressField(CharField):
     }
     default_validators = [validators.validate_ipv4_address]
 
+    def to_python(self, value):
+        if value in EMPTY_VALUES:
+            return ''
+        return value.strip()
+
 
 class GenericIPAddressField(CharField):
     default_error_messages = {}
@@ -1087,9 +1105,10 @@ class GenericIPAddressField(CharField):
     def to_python(self, value):
         if value in validators.EMPTY_VALUES:
             return ''
+        value = value.strip()
         if value and ':' in value:
-                return clean_ipv6_address(value,
-                    self.unpack_ipv4, self.error_messages['invalid'])
+            return clean_ipv6_address(value,
+                self.unpack_ipv4, self.error_messages['invalid'])
         return value
 
 

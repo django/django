@@ -39,8 +39,8 @@ By default, Django will send email from root@localhost. However, some mail
 providers reject all email from this address. To use a different sender
 address, modify the :setting:`SERVER_EMAIL` setting.
 
-To disable this behavior, just remove all entries from the :setting:`ADMINS`
-setting.
+To activate this behavior, put the email addresses of the recipients in the
+:setting:`ADMINS` setting.
 
 .. seealso::
 

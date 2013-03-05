@@ -58,12 +58,21 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
+
         # six.with_metaclass() inserts an extra class called 'NewBase' in the
-        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        # inheritance tree: Model -> NewBase -> object. But the initialization
+        # should be executed only once for a given model class.
+
+        # attrs will never be empty for classes declared in the standard way
+        # (ie. with the `class` keyword). This is quite robust.
+        if name == 'NewBase' and attrs == {}:
+            return super_new(cls, name, bases, attrs)
+
+        # Also ensure initialization is only performed for subclasses of Model
+        # (excluding Model class itself).
         parents = [b for b in bases if isinstance(b, ModelBase) and
                 not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
-            # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
 
         # Create the class.
@@ -191,7 +200,7 @@ class ModelBase(type):
                 if base in o2o_map:
                     field = o2o_map[base]
                 elif not is_proxy:
-                    attr_name = '%s_ptr' % base._meta.module_name
+                    attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
                             auto_created=True, parent_link=True)
                     new_class.add_to_class(attr_name, field)
@@ -973,7 +982,7 @@ def method_get_order(ordered_obj, self):
 ##############################################
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
+    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.model_name), func)(self, *args, **kwargs)
 
 
 ########

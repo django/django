@@ -159,8 +159,7 @@ can do in an automated test, so let's turn that into an automated test.
 The best place for an application's tests is in the application's ``tests.py``
 file - the testing system will look there for tests automatically.
 
-Put the following in the ``tests.py`` file in the ``polls`` application (you'll
-notice  ``tests.py`` contains some dummy tests, you can remove those)::
+Put the following in the ``tests.py`` file in the ``polls`` application::
 
     import datetime
 

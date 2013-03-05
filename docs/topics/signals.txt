@@ -213,7 +213,8 @@ Defining signals
 
 All signals are :class:`django.dispatch.Signal` instances. The
 ``providing_args`` is a list of the names of arguments the signal will provide
-to listeners.
+to listeners. This is purely documentational, however, as there is nothing that
+checks that the signal actually provides these arguments to its listeners.
 
 For example:
 

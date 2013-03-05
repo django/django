@@ -358,7 +358,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             return op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
-            return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+            return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []
 
         raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 

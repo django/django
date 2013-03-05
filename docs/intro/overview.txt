@@ -271,16 +271,18 @@ Finally, Django uses the concept of "template inheritance": That's what the
 following blocks." In short, that lets you dramatically cut down on redundancy
 in templates: each template has to define only what's unique to that template.
 
-Here's what the "base.html" template might look like:
+Here's what the "base.html" template, including the use of :doc:`static files
+</howto/static-files>`, might look like:
 
 .. code-block:: html+django
 
+    {% load staticfiles %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="sitelogo.png" alt="Logo" />
+        <img src="{% static "images/sitelogo.png" %}" alt="Logo" />
         {% block content %}{% endblock %}
     </body>
     </html>

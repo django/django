@@ -8,13 +8,13 @@ import sys
 
 from django.db import utils
 from django.db.backends import *
-from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
 from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
 from django.utils import six
 from django.utils.timezone import utc
@@ -40,40 +40,6 @@ def utc_tzinfo_factory(offset):
         raise AssertionError("database connection isn't set to UTC")
     return utc
 
-class CursorWrapper(object):
-    """
-    A thin wrapper around psycopg2's normal cursor class so that we can catch
-    particular exception instances and reraise them with the right types.
-    """
-
-    def __init__(self, cursor):
-        self.cursor = cursor
-
-    def execute(self, query, args=None):
-        try:
-            return self.cursor.execute(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-
-    def executemany(self, query, args):
-        try:
-            return self.cursor.executemany(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-
-    def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
-
-    def __iter__(self):
-        return iter(self.cursor)
-
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
@@ -84,6 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_nowait = True
     has_bulk_insert = True
     supports_tablespaces = True
+    supports_transactions = True
     can_distinct_on_fields = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -105,6 +72,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': 'LIKE UPPER(%s)',
     }
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
@@ -114,47 +83,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if autocommit:
             level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
         else:
-            level = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
+            level = self.settings_dict["OPTIONS"].get('isolation_level',
+                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
         self._set_isolation_level(level)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
-        self._pg_version = None
-
-    def check_constraints(self, table_names=None):
-        """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
-        """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
-
-    def close(self):
-        self.validate_thread_sharing()
-        if self.connection is None:
-            return
-
-        try:
-            self.connection.close()
-            self.connection = None
-        except Database.Error:
-            # In some cases (database restart, network connection lost etc...)
-            # the connection to the database is lost without giving Django a
-            # notification. If we don't set self.connection to None, the error
-            # will occur a every request.
-            self.connection = None
-            logger.warning('psycopg2 error while closing the connection.',
-                exc_info=sys.exc_info()
-            )
-            raise
-
-    def _get_pg_version(self):
-        if self._pg_version is None:
-            self._pg_version = get_version(self.connection)
-        return self._pg_version
-    pg_version = property(_get_pg_version)
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -169,6 +105,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn_params.update(settings_dict['OPTIONS'])
         if 'autocommit' in conn_params:
             del conn_params['autocommit']
+        if 'isolation_level' in conn_params:
+            del conn_params['isolation_level']
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
@@ -202,17 +140,32 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.connection.cursor().execute(
                         self.ops.set_time_zone_sql(), [tz])
         self.connection.set_isolation_level(self.isolation_level)
-        self._get_pg_version()
 
-    def _cursor(self):
-        if self.connection is None:
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
+    def create_cursor(self):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
-        return CursorWrapper(cursor)
+        return cursor
+
+    def close(self):
+        self.validate_thread_sharing()
+        if self.connection is None:
+            return
+
+        try:
+            self.connection.close()
+            self.connection = None
+        except Database.Error:
+            # In some cases (database restart, network connection lost etc...)
+            # the connection to the database is lost without giving Django a
+            # notification. If we don't set self.connection to None, the error
+            # will occur a every request.
+            self.connection = None
+            logger.warning('psycopg2 error while closing the connection.',
+                exc_info=sys.exc_info()
+            )
+            raise
+        finally:
+            self.set_clean()
 
     def _enter_transaction_management(self, managed):
         """
@@ -220,7 +173,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         the same transaction is visible across all the queries.
         """
         if self.features.uses_autocommit and managed and not self.isolation_level:
-            self._set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
+            level = self.settings_dict["OPTIONS"].get('isolation_level',
+                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
+            self._set_isolation_level(level)
 
     def _leave_transaction_management(self, managed):
         """
@@ -240,13 +195,35 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             if self.connection is not None:
                 self.connection.set_isolation_level(level)
+            if level == psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT:
+                self.set_clean()
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
 
-    def _commit(self):
-        if self.connection is not None:
-            try:
-                return self.connection.commit()
-            except Database.IntegrityError as e:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+    def set_dirty(self):
+        if ((self.transaction_state and self.transaction_state[-1]) or
+                not self.features.uses_autocommit):
+            super(DatabaseWrapper, self).set_dirty()
+
+    def check_constraints(self, table_names=None):
+        """
+        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
+        are returned to deferred.
+        """
+        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
+        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+
+    def is_usable(self):
+        try:
+            # Use a psycopg cursor directly, bypassing Django's utilities.
+            self.connection.cursor().execute("SELECT 1")
+        except DatabaseError:
+            return False
+        else:
+            return True
+
+    @cached_property
+    def pg_version(self):
+        with self.temporary_connection():
+            return get_version(self.connection)

@@ -14,7 +14,13 @@ Django's admin interface.
 Overview
 ========
 
-There are seven steps in activating the Django admin site:
+The admin is enabled in the default project template used by
+:djadmin:`startproject`.
+
+.. versionchanged:: 1.6
+    In previous versions, the admin wasn't enabled by default.
+
+For reference, here are the requirements:
 
 1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
    setting.
@@ -136,6 +142,13 @@ subclass::
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
 
+    .. note::
+
+        ``date_hierarchy`` uses :meth:`QuerySet.datetimes()
+        <django.db.models.query.QuerySet.datetimes>` internally. Please refer
+        to its documentation for some caveats when time zone support is
+        enabled (:setting:`USE_TZ = True <USE_TZ>`).
+
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from
@@ -179,6 +192,11 @@ subclass::
     will be displayed, sequentially, in the form. ``fields`` can contain
     values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
     read-only.
+
+    The ``fields`` option, unlike :attr:`~ModelAdmin.list_display`, may only
+    contain names of fields on the model or the form specified by
+    :attr:`~ModelAdmin.form`. It may contain callables only if they are listed
+    in :attr:`~ModelAdmin.readonly_fields`.
 
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
@@ -247,10 +265,10 @@ subclass::
             'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
             }
 
-        Just like with the :attr:`~ModelAdmin.fields` option, to display
-        multiple fields on the same line, wrap those fields in their own
-        tuple. In this example, the ``first_name`` and ``last_name`` fields
-        will display on the same line::
+        As with the :attr:`~ModelAdmin.fields` option, to display multiple
+        fields on the same line, wrap those fields in their own tuple. In this
+        example, the ``first_name`` and ``last_name`` fields will display on
+        the same line::
 
             {
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
@@ -259,13 +277,17 @@ subclass::
         ``fields`` can contain values defined in
         :attr:`~ModelAdmin.readonly_fields` to be displayed as read-only.
 
+        If you add the name of a callable to ``fields``, the same rule applies
+        as with the :attr:`~ModelAdmin.fields` option: the callable must be
+        listed in :attr:`~ModelAdmin.readonly_fields`.
+
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
 
         Example::
 
             {
-            'classes': ['wide', 'extrapretty'],
+            'classes': ('wide', 'extrapretty'),
             }
 
         Two useful classes defined by the default admin site stylesheet are
@@ -527,6 +549,13 @@ subclass::
 
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
+
+    * .. versionadded:: 1.6
+
+      The field names in ``list_display`` will also appear as CSS classes in
+      the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
+      element. This can be used to set column widths in a CSS file for example.
+
 
 .. attribute:: ModelAdmin.list_display_links
 
@@ -1070,6 +1099,13 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_fieldsets(self, request, obj=None)
+
+    The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
+    being edited (or ``None`` on an add form) and is expected to return a list
+    of two-tuples, in which each two-tuple represents a ``<fieldset>`` on the
+    admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
+
 .. method:: ModelAdmin.get_list_filter(self, request)
 
     .. versionadded:: 1.5
@@ -1407,9 +1443,12 @@ jQuery
 Django admin Javascript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 1.4.2) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 1.9.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
+
+.. versionchanged:: 1.6
+    The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``'s list of media resources unless you have

@@ -8,74 +8,86 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-22 08:46+0000\n"
 "Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
-"Language-Team: Greek (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
-"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "ετικέτα:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "φίλτρο:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "προβολή:"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "Δε βρέθηκε η εφαρμογή %r"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 "Το μοντέλο %(model_name)r δεν μπορεί να βρεθεί στην εφαρμογή %(app_label)r"
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "το συσχετισμένο `%(app_label)s.%(data_type)s`  αντικείμενο"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "μοντέλο:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "συσχετισμένα `%(app_label)s.%(object_name)s` αντικείμενα"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "όλα %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "πλήθος number of %s"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Πεδία στα αντικείμενα %s"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "Το %s δε φαίνεται να είναι ένα αντικείμενο urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "Αρχική"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -86,30 +98,18 @@ msgstr "Το %s δε φαίνεται να είναι ένα αντικείμε�
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "Αρχική"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "Σελιδοδείκτες"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Σελιδοδείκτες τεκμηρίωσης"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -130,11 +130,11 @@ msgstr ""
 "Απευθυνθείτε στον διαχειριστή σας αν δεν γνωρίζεται αν ο υπολογιστής σας "
 "θερείται \"εσωτερικός\".</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Τεκμηρίωση για αυτήν τη σελίδα"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -142,11 +142,11 @@ msgstr ""
 "Μεταπήδηση από οποιαδήποτε σελίδα στην τεκμηρίωση για το view που "
 "δημιούργησε τη σελίδα αυτή."
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Εμφάνιση ID αντικειμένου"
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -154,43 +154,52 @@ msgstr ""
 "Εμφάνιση του content-type και του μοναδικού αναγνωριστικού για τις σελίδες "
 "που αντιπροσωπεύουν ένα μοναδικό αντικείμενο."
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (τρέχον παράθυρο)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Αν η σελίδα αναπαριστά ένα και μοναδικό αντικείμενο τότε οδηγεί στην "
 "αντίστοιχη σελίδα διαχείρισης."
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (νέο παράθυρο)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 "Όπως και παραπάνω, αλλά άνοιγμα της σελίδας διαχείρισης σε νέο παράθυρο."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
 msgstr ""
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr ""
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr ""
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr ""
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
 msgstr ""
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Είδος πεδίου: %(field_type)s"

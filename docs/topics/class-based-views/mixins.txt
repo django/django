@@ -32,7 +32,6 @@ Two central mixins are provided that help in providing a consistent
 interface to working with templates in class-based views.
 
 :class:`~django.views.generic.base.TemplateResponseMixin`
-
     Every built in view which returns a
     :class:`~django.template.response.TemplateResponse` will call the
     :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`

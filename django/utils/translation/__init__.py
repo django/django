@@ -106,7 +106,13 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 else:
                     number_value = rhs
                 kwargs['number'] = number_value
-                return func(**kwargs) % rhs
+                translated = func(**kwargs)
+                try:
+                    translated = translated % rhs
+                except TypeError:
+                    # String doesn't contain a placeholder for the number
+                    pass
+                return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
     return proxy
@@ -159,8 +165,8 @@ def to_locale(language):
 def get_language_from_request(request, check_path=False):
     return _trans.get_language_from_request(request, check_path)
 
-def get_language_from_path(path):
-    return _trans.get_language_from_path(path)
+def get_language_from_path(path, supported=None):
+    return _trans.get_language_from_path(path, supported=supported)
 
 def templatize(src, origin=None):
     return _trans.templatize(src, origin)
@@ -181,4 +187,10 @@ def get_language_info(lang_code):
     try:
         return LANG_INFO[lang_code]
     except KeyError:
-        raise KeyError("Unknown language code %r." % lang_code)
+        if '-' not in lang_code:
+            raise KeyError("Unknown language code %s." % lang_code)
+        generic_lang_code = lang_code.split('-')[0]
+        try:
+            return LANG_INFO[generic_lang_code]
+        except KeyError:
+            raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))

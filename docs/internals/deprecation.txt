@@ -320,12 +320,26 @@ these changes.
   deprecated. Use the :class:`warnings.catch_warnings` context manager
   available starting with Python 2.6 instead.
 
+* The undocumented ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` will be removed
+  following an accelerated deprecation. Users subclassing this form should
+  remove calls to this method, and instead ensure that their auth related views
+  are CSRF protected, which ensures that cookies are enabled.
+
 1.8
 ---
+
+* The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
+  arguments. In 1.6 and 1.7, this behavior is provided by the version of these
+  tags in the ``future`` template tag library.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
+* ``Model._meta.module_name`` was renamed to ``model_name``.
+
+* The private API ``django.db.close_connection`` will be removed.
 
 2.0
 ---

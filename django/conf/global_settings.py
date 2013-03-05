@@ -29,6 +29,10 @@ ADMINS = ()
 #   * Receive x-headers
 INTERNAL_IPS = ()
 
+# Hosts/domain names that are valid for this site.
+# "*" matches anything, ".example.com" matches example.com and all subdomains
+ALLOWED_HOSTS = []
+
 # Local time zone for this installation. All choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
@@ -44,10 +48,13 @@ LANGUAGE_CODE = 'en-us'
 
 # Languages we provide translations for, out of the box.
 LANGUAGES = (
+    ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
     ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
+    ('be', gettext_noop('Belarusian')),
     ('bn', gettext_noop('Bengali')),
+    ('br', gettext_noop('Breton')),
     ('bs', gettext_noop('Bosnian')),
     ('ca', gettext_noop('Catalan')),
     ('cs', gettext_noop('Czech')),
@@ -62,6 +69,7 @@ LANGUAGES = (
     ('es-ar', gettext_noop('Argentinian Spanish')),
     ('es-mx', gettext_noop('Mexican Spanish')),
     ('es-ni', gettext_noop('Nicaraguan Spanish')),
+    ('es-ve', gettext_noop('Venezuelan Spanish')),
     ('et', gettext_noop('Estonian')),
     ('eu', gettext_noop('Basque')),
     ('fa', gettext_noop('Persian')),
@@ -74,6 +82,7 @@ LANGUAGES = (
     ('hi', gettext_noop('Hindi')),
     ('hr', gettext_noop('Croatian')),
     ('hu', gettext_noop('Hungarian')),
+    ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
@@ -83,6 +92,7 @@ LANGUAGES = (
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('ko', gettext_noop('Korean')),
+    ('lb', gettext_noop('Luxembourgish')),
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
@@ -110,6 +120,7 @@ LANGUAGES = (
     ('th', gettext_noop('Thai')),
     ('tr', gettext_noop('Turkish')),
     ('tt', gettext_noop('Tatar')),
+    ('udm', gettext_noop('Udmurt')),
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),
@@ -354,6 +365,7 @@ DATE_INPUT_FORMATS = (
 # * Note that these format strings are different from the ones to display dates
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
+    '%H:%M:%S.%f',  # '14:30:59.000200'
     '%H:%M',        # '14:30'
 )
 
@@ -506,6 +518,7 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
 )
@@ -529,6 +542,7 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 ############
 # MESSAGES #

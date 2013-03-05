@@ -56,12 +56,13 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
         lookup_info = self.geometry_functions.get(lookup_type, False)
         if lookup_info:
-            return "%s(%s, %s)" % (lookup_info, geo_col,
-                                   self.get_geom_placeholder(value, field.srid))
+            sql = "%s(%s, %s)" % (lookup_info, geo_col,
+                                  self.get_geom_placeholder(value, field.srid))
+            return sql, []
 
         # TODO: Is this really necessary? MySQL can't handle NULL geometries
         #  in its spatial indexes anyways.
         if lookup_type == 'isnull':
-            return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+            return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []
 
         raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))

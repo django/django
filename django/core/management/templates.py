@@ -21,7 +21,7 @@ from django.template import Template, Context
 from django.utils import archive
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.commands.makemessages import handle_extensions
+from django.core.management.utils import handle_extensions
 
 
 _drive_re = re.compile('^([a-z]):', re.I)
@@ -61,6 +61,9 @@ class TemplateCommand(BaseCommand):
     can_import_settings = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
+    # Can't perform any active locale changes during this command, because
+    # setting might not be available at all.
+    leave_locale_alone = True
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
@@ -102,10 +105,15 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
+        if django.VERSION[-1] == 0:
+            docs_version = 'dev'
+        else:
+            docs_version = '%d.%d' % django.VERSION[:2]
 
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
+            'docs_version': docs_version,
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering

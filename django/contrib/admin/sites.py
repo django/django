@@ -247,7 +247,7 @@ class AdminSite(object):
         # Add in each model's views.
         for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.module_name),
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name),
                     include(model_admin.urls))
             )
         return urlpatterns
@@ -351,7 +351,7 @@ class AdminSite(object):
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
-                    info = (app_label, model._meta.module_name)
+                    info = (app_label, model._meta.model_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
                         'object_name': model._meta.object_name,
@@ -407,7 +407,7 @@ class AdminSite(object):
                     # Check whether user has any perm for this module.
                     # If so, add the module to the model_list.
                     if True in perms.values():
-                        info = (app_label, model._meta.module_name)
+                        info = (app_label, model._meta.model_name)
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
                             'object_name': model._meta.object_name,

@@ -22,7 +22,7 @@ class GeoFeedTest(TestCase):
         Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
-        "Taken from regressiontests/syndication/tests.py."
+        "Taken from syndication/tests.py."
         actual = set([n.nodeName for n in elem.childNodes])
         expected = set(expected)
         self.assertEqual(actual, expected)

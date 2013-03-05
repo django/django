@@ -25,7 +25,7 @@ class ContentTypeManager(models.Manager):
         return model._meta
 
     def _get_from_cache(self, opts):
-        key = (opts.app_label, opts.object_name.lower())
+        key = (opts.app_label, opts.model_name)
         return self.__class__._cache[self.db][key]
 
     def get_for_model(self, model, for_concrete_model=True):
@@ -43,7 +43,7 @@ class ContentTypeManager(models.Manager):
             # django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
                 app_label = opts.app_label,
-                model = opts.object_name.lower(),
+                model = opts.model_name,
                 defaults = {'name': smart_text(opts.verbose_name_raw)},
             )
             self._add_to_cache(self.db, ct)
@@ -67,7 +67,7 @@ class ContentTypeManager(models.Manager):
                 ct = self._get_from_cache(opts)
             except KeyError:
                 needed_app_labels.add(opts.app_label)
-                needed_models.add(opts.object_name.lower())
+                needed_models.add(opts.model_name)
                 needed_opts.add(opts)
             else:
                 results[model] = ct
@@ -86,7 +86,7 @@ class ContentTypeManager(models.Manager):
             # These weren't in the cache, or the DB, create them.
             ct = self.create(
                 app_label=opts.app_label,
-                model=opts.object_name.lower(),
+                model=opts.model_name,
                 name=smart_text(opts.verbose_name_raw),
             )
             self._add_to_cache(self.db, ct)
@@ -119,7 +119,7 @@ class ContentTypeManager(models.Manager):
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
         model = ct.model_class()
-        key = (model._meta.app_label, model._meta.object_name.lower())
+        key = (model._meta.app_label, model._meta.model_name)
         self.__class__._cache.setdefault(using, {})[key] = ct
         self.__class__._cache.setdefault(using, {})[ct.id] = ct
 

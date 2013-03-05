@@ -12,6 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
+from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_noop as _
 
 
@@ -84,13 +85,7 @@ def load_hashers(password_hashers=None):
     if not password_hashers:
         password_hashers = settings.PASSWORD_HASHERS
     for backend in password_hashers:
-        try:
-            mod_path, cls_name = backend.rsplit('.', 1)
-            mod = importlib.import_module(mod_path)
-            hasher_cls = getattr(mod, cls_name)
-        except (AttributeError, ImportError, ValueError):
-            raise ImproperlyConfigured("hasher not found: %s" % backend)
-        hasher = hasher_cls()
+        hasher = import_by_path(backend)()
         if not getattr(hasher, 'algorithm'):
             raise ImproperlyConfigured("hasher doesn't specify an "
                                        "algorithm name: %s" % backend)
@@ -132,8 +127,14 @@ def identify_hasher(encoded):
     get_hasher() to return hasher. Raises ValueError if
     algorithm cannot be identified, or if hasher is not loaded.
     """
-    if len(encoded) == 32 and '$' not in encoded:
+    # Ancient versions of Django created plain MD5 passwords and accepted
+    # MD5 passwords with an empty salt.
+    if ((len(encoded) == 32 and '$' not in encoded) or
+            (len(encoded) == 37 and encoded.startswith('md5$$'))):
         algorithm = 'unsalted_md5'
+    # Ancient versions of Django accepted SHA1 passwords with an empty salt.
+    elif len(encoded) == 46 and encoded.startswith('sha1$$'):
+        algorithm = 'unsalted_sha1'
     else:
         algorithm = encoded.split('$', 1)[0]
     return get_hasher(algorithm)
@@ -354,14 +355,48 @@ class MD5PasswordHasher(BasePasswordHasher):
         ])
 
 
+class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
+    """
+    Very insecure algorithm that you should *never* use; stores SHA1 hashes
+    with an empty salt.
+
+    This class is implemented because Django used to accept such password
+    hashes. Some older Django installs still have these values lingering
+    around so we need to handle and upgrade them properly.
+    """
+    algorithm = "unsalted_sha1"
+
+    def salt(self):
+        return ''
+
+    def encode(self, password, salt):
+        assert salt == ''
+        hash = hashlib.sha1(force_bytes(password)).hexdigest()
+        return 'sha1$$%s' % hash
+
+    def verify(self, password, encoded):
+        encoded_2 = self.encode(password, '')
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        assert encoded.startswith('sha1$$')
+        hash = encoded[6:]
+        return SortedDict([
+            (_('algorithm'), self.algorithm),
+            (_('hash'), mask_hash(hash)),
+        ])
+
+
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
-    I am an incredibly insecure algorithm you should *never* use;
-    stores unsalted MD5 hashes without the algorithm prefix.
+    Incredibly insecure algorithm that you should *never* use; stores unsalted
+    MD5 hashes without the algorithm prefix, also accepts MD5 hashes with an
+    empty salt.
 
-    This class is implemented because Django used to store passwords
-    this way. Some older Django installs still have these values
-    lingering around so we need to handle and upgrade them properly.
+    This class is implemented because Django used to store passwords this way
+    and to accept such password hashes. Some older Django installs still have
+    these values lingering around so we need to handle and upgrade them
+    properly.
     """
     algorithm = "unsalted_md5"
 
@@ -369,9 +404,12 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
+        assert salt == ''
         return hashlib.md5(force_bytes(password)).hexdigest()
 
     def verify(self, password, encoded):
+        if len(encoded) == 37 and encoded.startswith('md5$$'):
+            encoded = encoded[5:]
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
 

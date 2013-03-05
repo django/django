@@ -633,6 +633,14 @@ Use the ``django.test.client.Client`` class to make requests.
         The ``follow`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
+    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, **extra)
+
+        Makes a PATCH request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes an DELETE request on the provided ``path`` and returns a

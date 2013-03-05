@@ -80,7 +80,8 @@ class LocalTimezone(tzinfo):
             return ZERO
 
     def tzname(self, dt):
-        return _time.tzname[self._isdst(dt)]
+        is_dst = False if dt is None else self._isdst(dt)
+        return _time.tzname[is_dst]
 
     def _isdst(self, dt):
         tt = (dt.year, dt.month, dt.day,
@@ -145,8 +146,7 @@ def _get_timezone_name(timezone):
         return timezone.zone
     except AttributeError:
         # for regular tzinfo objects
-        local_now = datetime.now(timezone)
-        return timezone.tzname(local_now)
+        return timezone.tzname(None)
 
 # Timezone selection functions.
 

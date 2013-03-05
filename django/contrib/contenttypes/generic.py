@@ -43,7 +43,7 @@ class GenericForeignKey(object):
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
-        Handles initializing an object with the generic FK instaed of
+        Handles initializing an object with the generic FK instead of
         content-type/object-id fields.
         """
         if self.name in kwargs:
@@ -52,7 +52,7 @@ class GenericForeignKey(object):
             kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None, using=None):
-        if obj:
+        if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
             return ContentType.objects.db_manager(using).get_for_id(id)
@@ -389,7 +389,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         opts = self.model._meta
         self.instance = instance
         self.rel_name = '-'.join((
-            opts.app_label, opts.object_name.lower(),
+            opts.app_label, opts.model_name,
             self.ct_field.name, self.ct_fk_field.name,
         ))
         if self.instance is None or self.instance.pk is None:
@@ -409,7 +409,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     @classmethod
     def get_default_prefix(cls):
         opts = cls.model._meta
-        return '-'.join((opts.app_label, opts.object_name.lower(),
+        return '-'.join((opts.app_label, opts.model_name,
                         cls.ct_field.name, cls.ct_fk_field.name,
         ))
 

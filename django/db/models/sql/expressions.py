@@ -52,10 +52,10 @@ class SQLEvaluator(object):
                 field, source, opts, join_list, path = query.setup_joins(
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
-                col, _, join_list = query.trim_joins(source, join_list, path)
+                target, _, join_list = query.trim_joins(source, join_list, path)
                 if self.reuse is not None:
                     self.reuse.update(join_list)
-                self.cols.append((node, (join_list[-1], col)))
+                self.cols.append((node, (join_list[-1], target.column)))
             except FieldDoesNotExist:
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (self.name,
@@ -94,9 +94,9 @@ class SQLEvaluator(object):
         if col is None:
             raise ValueError("Given node not found")
         if hasattr(col, 'as_sql'):
-            return col.as_sql(qn, connection), ()
+            return col.as_sql(qn, connection)
         else:
-            return '%s.%s' % (qn(col[0]), qn(col[1])), ()
+            return '%s.%s' % (qn(col[0]), qn(col[1])), []
 
     def evaluate_date_modifier_node(self, node, qn, connection):
         timedelta = node.children.pop()

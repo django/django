@@ -3,12 +3,13 @@ from functools import update_wrapper, partial
 
 from django import forms
 from django.conf import settings
-from django.forms.formsets import all_valid
+from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
+from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
+    model_format_dict, NestedObjects)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -156,6 +157,19 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 )
         return db_field.formfield(**kwargs)
 
+    def get_field_queryset(self, db, db_field, request):
+        """
+        If the ModelAdmin specifies ordering, the queryset should respect that
+        ordering.  Otherwise don't specify the queryset, let the field decide
+        (returns None in that case).
+        """
+        related_admin = self.admin_site._registry.get(db_field.rel.to, None)
+        if related_admin is not None:
+            ordering = related_admin.get_ordering(request)
+            if ordering is not None and ordering != ():
+                return db_field.rel.to._default_manager.using(db).order_by(*ordering).complex_filter(db_field.rel.limit_choices_to)
+        return None
+
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
         """
         Get a form Field for a ForeignKey.
@@ -169,6 +183,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 'class': get_ul_class(self.radio_fields[db_field.name]),
             })
             kwargs['empty_label'] = db_field.blank and _('None') or None
+
+        queryset = self.get_field_queryset(db, db_field, request)
+        if queryset is not None:
+            kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
 
@@ -188,6 +206,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
+
+        queryset = self.get_field_queryset(db, db_field, request)
+        if queryset is not None:
+            kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
 
@@ -371,7 +393,7 @@ class ModelAdmin(BaseModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        info = self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.model_name
 
         urlpatterns = patterns('',
             url(r'^$',
@@ -783,7 +805,7 @@ class ModelAdmin(BaseModelAdmin):
             form_template = self.change_form_template
 
         return TemplateResponse(request, form_template or [
-            "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
         ], context, current_app=self.admin_site.name)
@@ -803,7 +825,7 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg)
             if post_url_continue is None:
                 post_url_continue = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(pk_value,),
                                             current_app=self.admin_site.name)
             if "_popup" in request.POST:
@@ -845,14 +867,14 @@ class ModelAdmin(BaseModelAdmin):
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
             self.message_user(request, msg)
             return HttpResponseRedirect(reverse('admin:%s_%s_change' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         args=(pk_value,),
                                         current_app=self.admin_site.name))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
             self.message_user(request, msg)
             return HttpResponseRedirect(reverse('admin:%s_%s_add' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
         else:
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
@@ -867,7 +889,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.module_name),
+                               (opts.app_label, opts.model_name),
                                current_app=self.admin_site.name)
         else:
             post_url = reverse('admin:index',
@@ -882,7 +904,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.module_name),
+                               (opts.app_label, opts.model_name),
                                current_app=self.admin_site.name)
         else:
             post_url = reverse('admin:index',
@@ -1060,7 +1082,7 @@ class ModelAdmin(BaseModelAdmin):
 
         if request.method == 'POST' and "_saveasnew" in request.POST:
             return self.add_view(request, form_url=reverse('admin:%s_%s_add' %
-                                    (opts.app_label, opts.module_name),
+                                    (opts.app_label, opts.model_name),
                                     current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
@@ -1283,7 +1305,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.change_list_template or [
-            'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
+            'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
         ], context, current_app=self.admin_site.name)
@@ -1323,7 +1345,7 @@ class ModelAdmin(BaseModelAdmin):
                 return HttpResponseRedirect(reverse('admin:index',
                                                     current_app=self.admin_site.name))
             return HttpResponseRedirect(reverse('admin:%s_%s_changelist' %
-                                        (opts.app_label, opts.module_name),
+                                        (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
 
         object_name = force_text(opts.verbose_name)
@@ -1346,7 +1368,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.model_name),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, current_app=self.admin_site.name)
@@ -1354,15 +1376,21 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+        # First check if the user can see this history.
         model = self.model
+        obj = get_object_or_404(model, pk=unquote(object_id))
+
+        if not self.has_change_permission(request, obj):
+            raise PermissionDenied
+
+        # Then get the history for this object.
         opts = model._meta
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
-            object_id = unquote(object_id),
-            content_type__id__exact = ContentType.objects.get_for_model(model).id
+            object_id=unquote(object_id),
+            content_type__id__exact=ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
-        # If no history was found, see whether this object even exists.
-        obj = get_object_or_404(model, pk=unquote(object_id))
+
         context = {
             'title': _('Change history: %s') % force_text(obj),
             'action_list': action_list,
@@ -1373,7 +1401,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
@@ -1446,7 +1474,44 @@ class InlineModelAdmin(BaseModelAdmin):
             "max_num": self.max_num,
             "can_delete": can_delete,
         }
+
         defaults.update(kwargs)
+        base_model_form = defaults['form']
+
+        class DeleteProtectedModelForm(base_model_form):
+            def hand_clean_DELETE(self):
+                """
+                We don't validate the 'DELETE' field itself because on
+                templates it's not rendered using the field information, but
+                just using a generic "deletion_field" of the InlineModelAdmin.
+                """
+                if self.cleaned_data.get(DELETION_FIELD_NAME, False):
+                    using = router.db_for_write(self._meta.model)
+                    collector = NestedObjects(using=using)
+                    collector.collect([self.instance])
+                    if collector.protected:
+                        objs = []
+                        for p in collector.protected:
+                            objs.append(
+                                # Translators: Model verbose name and instance representation, suitable to be an item in a list
+                                _('%(class_name)s %(instance)s') % {
+                                    'class_name': p._meta.verbose_name,
+                                    'instance': p}
+                            )
+                        msg_dict = {'class_name': self._meta.model._meta.verbose_name,
+                                    'instance': self.instance,
+                                    'related_objects': get_text_list(objs, _('and'))}
+                        msg = _("Deleting %(class_name)s %(instance)s would require "
+                                "deleting the following protected related objects: "
+                                "%(related_objects)s") % msg_dict
+                        raise ValidationError(msg)
+
+            def is_valid(self):
+                result = super(DeleteProtectedModelForm, self).is_valid()
+                self.hand_clean_DELETE()
+                return result
+
+        defaults['form'] = DeleteProtectedModelForm
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
     def get_fieldsets(self, request, obj=None):

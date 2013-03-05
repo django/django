@@ -17,11 +17,56 @@ deprecation process for some features`_.
 What's new in Django 1.6
 ========================
 
+Simplified default project and app templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default templates used by :djadmin:`startproject` and :djadmin:`startapp`
+have been simplified and modernized. The :doc:`admin
+</ref/contrib/admin/index>` is now enabled by default in new projects; the
+:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`Language
+detection <how-django-discovers-language-preference>` and :ref:`clickjacking
+prevention <clickjacking-prevention>` are turned on.
+
+If the default templates don't suit your tastes, you can use :ref:`custom
+project and app templates <custom-app-and-project-templates>`.
+
+Persistent database connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now supports reusing the same database connection for several requests.
+This avoids the overhead of re-establishing a connection at the beginning of
+each request.
+
+By default, database connections will kept open for 10 minutes. This behavior
+is controlled by the :setting:`CONN_MAX_AGE` setting. To restore the previous
+behavior of closing the connection at the end of each request, set
+:setting:`CONN_MAX_AGE` to ``0``. See :ref:`persistent-database-connections`
+for details.
+
+Time zone aware aggregation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The support for :doc:`time zones </topics/i18n/timezones>` introduced in
+Django 1.4 didn't work well with :meth:`QuerySet.dates()
+<django.db.models.query.QuerySet.dates>`: aggregation was always performed in
+UTC. This limitation was lifted in Django 1.6. Use :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` to perform time zone aware
+aggregation on a :class:`~django.db.models.DateTimeField`.
+
+``BinaryField`` model field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new :class:`django.db.models.BinaryField` model field allows to store raw
+binary data in the database.
+
 Minor features
 ~~~~~~~~~~~~~~
 
 * Authentication backends can raise ``PermissionDenied`` to immediately fail
   the authentication chain.
+
+* The HttpOnly flag can be set on the CSRF cookie with
+  :setting:`CSRF_COOKIE_HTTPONLY`.
 
 * The ``assertQuerysetEqual()`` now checks for undefined order and raises
   ``ValueError`` if undefined order is spotted. The order is seen as
@@ -31,13 +76,60 @@ Minor features
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
 
-* The default widgets for :class:`~django.forms.EmailField` and
-  :class:`~django.forms.URLField` use the new type attributes available in
-  HTML5 (type='email', type='url').
+* In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
+  now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
+
+* Django now wraps all PEP-249 exceptions.
+
+* The default widgets for :class:`~django.forms.EmailField`,
+  :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.FloatField` and :class:`~django.forms.DecimalField` use
+  the new type attributes available in HTML5 (type='email', type='url',
+  type='number'). Note that due to erratic support of the ``number`` input type
+  with localized numbers in current browsers, Django only uses it when numeric
+  fields are not localized.
 
 * The ``number`` argument for :ref:`lazy plural translations
   <lazy-plural-translations>` can be provided at translation time rather than
   at definition time.
+
+* For custom management commands: Verification of the presence of valid
+  settings in commands that ask for it by using the
+  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  option is now performed independently from handling of the locale that
+  should be active during the execution of the command. The latter can now be
+  influenced by the new
+  :attr:`~django.core.management.BaseCommand.leave_locale_alone` internal
+  option. See :ref:`management-commands-and-locales` for more details.
+
+* The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
+  :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
+  its ``object``\'s ``__dict__``.
+
+* :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
+  attribute (equivalent to the URL the response will redirect to).
+
+* The ``MemcachedCache`` cache backend now uses the latest :mod:`pickle`
+  protocol available.
+
+* Added the :attr:`django.db.models.ForeignKey.db_constraint`
+  option.
+
+* The jQuery library embedded in the admin has been upgraded to version 1.9.1.
+
+* Syndication feeds (:mod:`django.contrib.syndication`) can now pass extra
+  context through to feed templates using a new `Feed.get_context_data()`
+  callback.
+
+* The admin list columns have a ``column-<field_name>`` class in the HTML
+  so the columns header can be styled with CSS, e.g. to set a column width.
+
+* The isolation level can be customized under PostgreSQL.
+
+* The :ttag:`blocktrans` template tag now respects
+  :setting:`TEMPLATE_STRING_IF_INVALID` for variables not present in the
+  context, just like other template constructs.
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -47,9 +139,40 @@ Backwards incompatible changes in 1.6
   :meth:`~django.db.models.query.QuerySet.none` has been called:
   ``isinstance(qs.none(), EmptyQuerySet)``
 
+* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` raises an
+  error if it's used on :class:`~django.db.models.DateTimeField` when time
+  zone support is active. Use :meth:`QuerySet.datetimes()
+  <django.db.models.query.QuerySet.datetimes>` instead.
+
+* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` returns a
+  list of :class:`~datetime.date`. It used to return a list of
+  :class:`~datetime.datetime`.
+
+* The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
+  admin on a :class:`~django.db.models.DateTimeField` requires time zone
+  definitions in the database when :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
+* Accessing ``date_list`` in the context of a date-based generic view requires
+  time zone definitions in the database when the view is based on a
+  :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is ``True``.
+  :ref:`Learn more <database-time-zone-definitions>`.
+
+* Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
+  lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
+
+* When Django establishes a connection to the database, it sets up appropriate
+  parameters, depending on the backend being used. Since `persistent database
+  connections <persistent-database-connections>`_ are enabled by default in
+  Django 1.6, this setup isn't repeated at every request any more. If you
+  modifiy parameters such as the connection's isolation level or time zone,
+  you should either restore Django's defaults at the end of each request, or
+  force an appropriate value at the beginning of each request.
+
 * If your CSS/Javascript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as
-  ``type='email'`` or ``type='url'`` depending on their corresponding field type.
+  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
+  corresponding field type.
 
 * Extraction of translatable literals from templates with the
   :djadmin:`makemessages` command now correctly detects i18n constructs when
@@ -71,6 +194,30 @@ Backwards incompatible changes in 1.6
     {{ title }}{# Translators: Extracted and associated with 'Welcome' below #}
     <h1>{% trans "Welcome" %}</h1>
 
+* The :doc:`comments </ref/contrib/comments/index>` app now uses a ``GenericIPAddressField``
+  for storing commenters' IP addresses, to support comments submitted from IPv6 addresses.
+  Until now, it stored them in an ``IPAddressField``, which is only meant to support IPv4.
+  When saving a comment made from an IPv6 address, the address would be silently truncated
+  on MySQL databases, and raise an exception on Oracle.
+  You will need to change the column type in your database to benefit from this change.
+
+  For MySQL, execute this query on your project's database:
+
+  .. code-block:: sql
+
+    ALTER TABLE django_comments MODIFY ip_address VARCHAR(39);
+
+  For Oracle, execute this query:
+
+  .. code-block:: sql
+
+    ALTER TABLE DJANGO_COMMENTS MODIFY (ip_address VARCHAR2(39));
+
+  If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6 addresses
+  are silently truncated; on Oracle, an exception is generated. No database
+  change is needed for SQLite or PostgreSQL databases.
+
+
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
@@ -81,6 +228,34 @@ Backwards incompatible changes in 1.6
 
 Features deprecated in 1.6
 ==========================
+
+Changes to :ttag:`cycle` and :ttag:`firstof`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The template system generally escapes all variables to avoid XSS attacks.
+However, due to an accident of history, the :ttag:`cycle` and :ttag:`firstof`
+tags render their arguments as-is.
+
+Django 1.6 starts a process to correct this inconsistency. The ``future``
+template library provides alternate implementations of :ttag:`cycle` and
+:ttag:`firstof` that autoescape their inputs. If you're using these tags,
+you're encourage to include the following line at the top of your templates to
+enable the new behavior::
+
+    {% load cycle from future %}
+
+or::
+
+    {% load firstof from future %}
+
+The tags implementing the old behavior have been deprecated, and in Django
+1.8, the old behavior will be replaced with the new behavior. To ensure
+compatibility with future versions of Django, existing templates should be
+modified to use the ``future`` versions.
+
+If necessary, you can temporarily disable auto-escaping with
+:func:`~django.utils.safestring.mark_safe` or :ttag:`{% autoescape off %}
+<autoescape>`.
 
 ``SEND_BROKEN_LINK_EMAILS`` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,3 +280,9 @@ from your settings.
 
 If you defined your own form widgets and defined the ``_has_changed`` method
 on a widget, you should now define this method on the form field itself.
+
+``module_name`` model meta attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Model._meta.module_name`` was renamed to ``model_name``. Despite being a
+private API, it will go through a regular deprecation path.

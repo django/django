@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db.backends import BaseDatabaseOperations
 
 
@@ -35,6 +36,30 @@ class DatabaseOperations(BaseDatabaseOperations):
     def date_trunc_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = "%s AT TIME ZONE %%s" % field_name
+            params = [tzname]
+        else:
+            params = []
+        # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        if lookup_type == 'week_day':
+            # For consistency across backends, we return Sunday=1, Saturday=7.
+            sql = "EXTRACT('dow' FROM %s) + 1" % field_name
+        else:
+            sql = "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+        return sql, params
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = "%s AT TIME ZONE %%s" % field_name
+            params = [tzname]
+        else:
+            params = []
+        # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+        return sql, params
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
@@ -170,8 +195,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         NotImplementedError if this is the database in use.
         """
         if aggregate.sql_function in ('STDDEV_POP', 'VAR_POP'):
-            pg_version = self.connection.pg_version
-            if pg_version >= 80200 and pg_version <= 80204:
+            if 80200 <= self.connection.pg_version <= 80204:
                 raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
 
     def max_name_length(self):

@@ -233,9 +233,9 @@ class BaseModelForm(BaseForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
         opts = self._meta
+        if opts.model is None:
+            raise ValueError('ModelForm has no model class specified.')
         if instance is None:
-            if opts.model is None:
-                raise ValueError('ModelForm has no model class specified.')
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
@@ -513,6 +513,8 @@ class BaseModelFormSet(BaseFormSet):
             self.save_m2m = save_m2m
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
+    save.alters_data = True
+
     def clean(self):
         self.validate_unique()
 
@@ -520,9 +522,9 @@ class BaseModelFormSet(BaseFormSet):
         # Collect unique_checks and date_checks to run from all the forms.
         all_unique_checks = set()
         all_date_checks = set()
-        for form in self.forms:
-            if not form.is_valid():
-                continue
+        forms_to_delete = self.deleted_forms
+        valid_forms = [form for form in self.forms if form.is_valid() and form not in forms_to_delete]
+        for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
             all_unique_checks = all_unique_checks.union(set(unique_checks))
@@ -532,9 +534,7 @@ class BaseModelFormSet(BaseFormSet):
         # Do each of the unique checks (unique and unique_together)
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
-            for form in self.forms:
-                if not form.is_valid():
-                    continue
+            for form in valid_forms:
                 # get data for each field of each of unique_check
                 row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
                 if row_data and not None in row_data:
@@ -554,9 +554,7 @@ class BaseModelFormSet(BaseFormSet):
         for date_check in all_date_checks:
             seen_data = set()
             uclass, lookup, field, unique_for = date_check
-            for form in self.forms:
-                if not form.is_valid():
-                    continue
+            for form in valid_forms:
                 # see if we have data for both fields
                 if (form.cleaned_data and form.cleaned_data[field] is not None
                     and form.cleaned_data[unique_for] is not None):
@@ -611,10 +609,7 @@ class BaseModelFormSet(BaseFormSet):
             return []
 
         saved_instances = []
-        try:
-            forms_to_delete = self.deleted_forms
-        except AttributeError:
-            forms_to_delete = []
+        forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
@@ -678,7 +673,11 @@ class BaseModelFormSet(BaseFormSet):
             else:
                 qs = self.model._default_manager.get_query_set()
             qs = qs.using(form.instance._state.db)
-            form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=HiddenInput)
+            if form._meta.widgets:
+                widget = form._meta.widgets.get(self._pk_field.name, HiddenInput)
+            else:
+                widget = HiddenInput
+            form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=widget)
         super(BaseModelFormSet, self).add_fields(form, index)
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
@@ -918,7 +917,8 @@ class ModelChoiceIterator(object):
                 yield self.choice(obj)
 
     def __len__(self):
-        return len(self.queryset)
+        return len(self.queryset) +\
+                    (1 if self.field.empty_label is not None else 0)
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1012,6 +1012,11 @@ class ModelChoiceField(ChoiceField):
     def validate(self, value):
         return Field.validate(self, value)
 
+    def _has_changed(self, initial, data):
+        initial_value = initial if initial is not None else ''
+        data_value = data if data is not None else ''
+        return force_text(self.prepare_value(initial_value)) != force_text(data_value)
+
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
     widget = SelectMultiple
@@ -1059,3 +1064,14 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
+
+    def _has_changed(self, initial, data):
+        if initial is None:
+            initial = []
+        if data is None:
+            data = []
+        if len(initial) != len(data):
+            return True
+        initial_set = set([force_text(value) for value in self.prepare_value(initial)])
+        data_set = set([force_text(value) for value in data])
+        return data_set != initial_set

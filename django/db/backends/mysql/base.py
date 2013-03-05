@@ -30,21 +30,19 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
 from MySQLdb.converters import conversions, Thing2Literal
 from MySQLdb.constants import FIELD_TYPE, CLIENT
 
+from django.conf import settings
 from django.db import utils
 from django.db.backends import *
-from django.db.backends.signals import connection_created
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
 
 # Raise exceptions for database warnings if DEBUG is on
-from django.conf import settings
 if settings.DEBUG:
     warnings.filterwarnings("error", category=Database.Warning)
 
@@ -118,30 +116,22 @@ class CursorWrapper(object):
     def execute(self, query, args=None):
         try:
             return self.cursor.execute(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -193,6 +183,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Confirm support for introspected foreign keys"
         return self._mysql_storage_engine != 'MyISAM'
 
+    @cached_property
+    def has_zoneinfo_database(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
+        return cursor.fetchone() is not None
+
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
 
@@ -217,6 +213,39 @@ class DatabaseOperations(BaseDatabaseOperations):
             format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
+            params = [tzname]
+        else:
+            params = []
+        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        if lookup_type == 'week_day':
+            # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
+            # Note: WEEKDAY() returns 0-6, Monday=0.
+            sql = "DAYOFWEEK(%s)" % field_name
+        else:
+            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        return sql, params
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        if settings.USE_TZ:
+            field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
+            params = [tzname]
+        else:
+            params = []
+        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        try:
+            i = fields.index(lookup_type) + 1
+        except ValueError:
+            sql = field_name
+        else:
+            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+        return sql, params
 
     def date_interval_sql(self, sql, connector, timedelta):
         return "(%s %s INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND)" % (sql, connector,
@@ -314,11 +343,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # MySQL doesn't support microseconds
         return six.text_type(value.replace(microsecond=0))
 
-    def year_lookup_bounds(self, value):
+    def year_lookup_bounds_for_datetime_field(self, value):
         # Again, no microseconds
-        first = '%s-01-01 00:00:00'
-        second = '%s-12-31 23:59:59.99'
-        return [first % value, second % value]
+        first, second = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
+        return [first.replace(microsecond=0), second.replace(microsecond=0)]
 
     def max_name_length(self):
         return 64
@@ -355,25 +383,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': 'LIKE %s',
     }
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.server_version = None
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation(self)
-
-    def _valid_connection(self):
-        if self.connection is not None:
-            try:
-                self.connection.ping()
-                return True
-            except DatabaseError:
-                self.close()
-        return False
 
     def get_connection_params(self):
         kwargs = {
@@ -415,12 +435,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.execute('SET SQL_AUTO_IS_NULL = 0')
         cursor.close()
 
-    def _cursor(self):
-        if not self._valid_connection():
-            conn_params = self.get_connection_params()
-            self.connection = self.get_new_connection(conn_params)
-            self.init_connection_state()
-            connection_created.send(sender=self.__class__, connection=self)
+    def create_cursor(self):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
 
@@ -429,25 +444,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             BaseDatabaseWrapper._rollback(self)
         except Database.NotSupportedError:
             pass
-
-    @cached_property
-    def mysql_version(self):
-        if not self.server_version:
-            new_connection = False
-            if not self._valid_connection():
-                # Ensure we have a connection with the DB by using a temporary
-                # cursor
-                new_connection = True
-                self.cursor().close()
-            server_info = self.connection.get_server_info()
-            if new_connection:
-                # Make sure we close the connection
-                self.close()
-            m = server_version_re.match(server_info)
-            if not m:
-                raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-            self.server_version = tuple([int(x) for x in m.groups()])
-        return self.server_version
 
     def disable_constraint_checking(self):
         """
@@ -497,3 +493,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0],
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
+
+    def is_usable(self):
+        try:
+            self.connection.ping()
+        except DatabaseError:
+            return False
+        else:
+            return True
+
+    @cached_property
+    def mysql_version(self):
+        with self.temporary_connection():
+            server_info = self.connection.get_server_info()
+        match = server_version_re.match(server_info)
+        if not match:
+            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
+        return tuple([int(x) for x in match.groups()])

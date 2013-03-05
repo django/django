@@ -23,7 +23,7 @@ class Options(object):
     def __init__(self, table):
         self.db_table = table
         self.app_label = 'django_cache'
-        self.module_name = 'cacheentry'
+        self.model_name = 'cacheentry'
         self.verbose_name = 'cache entry'
         self.verbose_name_plural = 'cache entries'
         self.object_name =  'CacheEntry'
@@ -184,6 +184,7 @@ class DatabaseCache(BaseDatabaseCache):
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
         cursor.execute('DELETE FROM %s' % table)
+        transaction.commit_unless_managed(using=db)
 
 # For backwards compatibility
 class CacheClass(DatabaseCache):

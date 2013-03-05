@@ -248,8 +248,8 @@ Alternatively you can use plain text and
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any fields in your model, Django
-will automatically add an :class:`IntegerField` to hold the primary key, so you
+If you don't specify ``primary_key=True`` for any field in your model, Django
+will automatically add an :class:`AutoField` to hold the primary key, so you
 don't need to set ``primary_key=True`` on any of your fields unless you want to
 override the default primary-key behavior. For more, see
 :ref:`automatic-primary-key-fields`.
@@ -347,6 +347,22 @@ A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
 default form widget for this field is a :class:`~django.forms.TextInput`.
 
+``BinaryField``
+-------------------
+
+.. class:: BinaryField([**options])
+
+.. versionadded:: 1.6
+
+A field to store raw binary data. It only supports ``bytes`` assignment. Be
+aware that this field has limited functionality. For example, it is not possible
+to filter a queryset on a ``BinaryField`` value.
+
+.. admonition:: Abusing ``BinaryField``
+
+    Although you might think about storing files in the database, consider that
+    it is bad design in 99% of the cases. This field is *not* a replacement for
+    proper :ref.`static files <static-files> handling.
 
 ``BooleanField``
 ----------------
@@ -1050,6 +1066,19 @@ define the details of how the relation works.
 
     The field on the related object that the relation is to. By default, Django
     uses the primary key of the related object.
+
+.. attribute:: ForeignKey.db_constraint
+
+    Controls whether or not a constraint should be created in the database for
+    this foreign key. The default is ``True``, and that's almost certainly what
+    you want; setting this to ``False`` can be very bad for data integrity.
+    That said, here are some scenarios where you might want to do this:
+
+    * You have legacy data that is not valid.
+    * You're sharding your database.
+
+    If this is set to ``False``, accessing a related object that doesn't exist
+    will raise its ``DoesNotExist`` exception.
 
 .. attribute:: ForeignKey.on_delete
 

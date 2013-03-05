@@ -262,7 +262,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 return lookup_info.as_sql(geo_col, self.get_geom_placeholder(field, value))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
-            return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+            return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []
 
         raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 
@@ -288,7 +288,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
         return SpatialRefSys
-    
+
     def modify_insert_params(self, placeholders, params):
         """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
         backend due to #10888

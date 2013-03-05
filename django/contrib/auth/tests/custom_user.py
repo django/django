@@ -144,3 +144,25 @@ class IsActiveTestUser1(AbstractBaseUser):
         app_label = 'auth'
 
     # the is_active attr is provided by AbstractBaseUser
+
+
+class CustomUserNonUniqueUsername(AbstractBaseUser):
+    "A user with a non-unique username"
+    username = models.CharField(max_length=30)
+
+    USERNAME_FIELD = 'username'
+
+    class Meta:
+        app_label = 'auth'
+
+
+class CustomUserBadRequiredFields(AbstractBaseUser):
+    "A user with a non-unique username"
+    username = models.CharField(max_length=30, unique=True)
+    date_of_birth = models.DateField()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['username', 'date_of_birth']
+
+    class Meta:
+        app_label = 'auth'

@@ -6,6 +6,7 @@ import datetime
 import decimal
 import math
 import warnings
+from base64 import b64decode, b64encode
 from itertools import tee
 
 from django.db import connection
@@ -19,7 +20,7 @@ from django.utils.functional import curry, total_ordering
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 
@@ -135,7 +136,8 @@ class Field(object):
             return self.creation_counter < other.creation_counter
         return NotImplemented
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(self.creation_counter)
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
@@ -312,9 +314,10 @@ class Field(object):
             return value._prepare()
 
         if lookup_type in (
-                'regex', 'iregex', 'month', 'day', 'week_day', 'search',
-                'contains', 'icontains', 'iexact', 'startswith', 'istartswith',
-                'endswith', 'iendswith', 'isnull'
+                'iexact', 'contains', 'icontains',
+                'startswith', 'istartswith', 'endswith', 'iendswith',
+                'month', 'day', 'week_day', 'hour', 'minute', 'second',
+                'isnull', 'search', 'regex', 'iregex',
             ):
             return value
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
@@ -350,8 +353,8 @@ class Field(object):
                 sql, params = value._as_sql(connection=connection)
             return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day',
-                           'search'):
+        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute',
+                           'second', 'search', 'regex', 'iregex'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
@@ -370,10 +373,12 @@ class Field(object):
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':
-            if self.get_internal_type() == 'DateField':
+            if isinstance(self, DateTimeField):
+                return connection.ops.year_lookup_bounds_for_datetime_field(value)
+            elif isinstance(self, DateField):
                 return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
-                return connection.ops.year_lookup_bounds(value)
+                return [value]          # this isn't supposed to happen
 
     def has_default(self):
         """
@@ -464,7 +469,7 @@ class Field(object):
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 
-    def formfield(self, form_class=forms.CharField, **kwargs):
+    def formfield(self, form_class=None, **kwargs):
         """
         Returns a django.forms.Field instance for this database Field.
         """
@@ -485,7 +490,8 @@ class Field(object):
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            form_class = forms.TypedChoiceField
+            if form_class is None or not issubclass(form_class, forms.TypedChoiceField):
+                form_class = forms.TypedChoiceField
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
@@ -495,6 +501,8 @@ class Field(object):
                              'error_messages', 'show_hidden_initial'):
                     del kwargs[k]
         defaults.update(kwargs)
+        if form_class is None:
+            form_class = forms.CharField
         return form_class(**defaults)
 
     def value_from_object(self, obj):
@@ -722,9 +730,9 @@ class DateField(Field):
                       is_next=False))
 
     def get_prep_lookup(self, lookup_type, value):
-        # For "__month", "__day", and "__week_day" lookups, convert the value
-        # to an int so the database backend always sees a consistent type.
-        if lookup_type in ('month', 'day', 'week_day'):
+        # For dates lookups, convert the value to an int
+        # so the database backend always sees a consistent type.
+        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute', 'second'):
             return int(value)
         return super(DateField, self).get_prep_lookup(lookup_type, value)
 
@@ -1284,3 +1292,40 @@ class URLField(CharField):
         }
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
+
+class BinaryField(Field):
+    description = _("Raw binary data")
+
+    def __init__(self, *args, **kwargs):
+        kwargs['editable'] = False
+        super(BinaryField, self).__init__(*args, **kwargs)
+        if self.max_length is not None:
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def get_internal_type(self):
+        return "BinaryField"
+
+    def get_default(self):
+        if self.has_default() and not callable(self.default):
+            return self.default
+        default = super(BinaryField, self).get_default()
+        if default == '':
+            return b''
+        return default
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super(BinaryField, self
+            ).get_db_prep_value(value, connection, prepared)
+        if value is not None:
+            return connection.Database.Binary(value)
+        return value
+
+    def value_to_string(self, obj):
+        """Binary data is serialized as base64"""
+        return b64encode(force_bytes(self._get_val_from_obj(obj))).decode('ascii')
+
+    def to_python(self, value):
+        # If it's a string, it should be base64-encoded data
+        if isinstance(value, six.text_type):
+            return six.memoryview(b64decode(force_bytes(value)))
+        return value

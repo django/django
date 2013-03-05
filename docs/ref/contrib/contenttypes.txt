@@ -182,7 +182,7 @@ The ``ContentTypeManager``
 
         Clears an internal cache used by
         :class:`~django.contrib.contenttypes.models.ContentType` to keep track
-        of which models for which it has created
+        of models for which it has created
         :class:`~django.contrib.contenttypes.models.ContentType` instances. You
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
@@ -239,11 +239,11 @@ Prior to Django 1.5,
 :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
 always returned the :class:`~django.contrib.contenttypes.models.ContentType`
 associated with the concrete model of the specified one(s). That means there
-was no way to retreive the
+was no way to retrieve the
 :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
 using those methods. As of Django 1.5 you can now pass a boolean flag –
 ``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
-wether or not you want to retreive the
+wether or not you want to retrieve the
 :class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
 direct model.
 
@@ -277,7 +277,7 @@ A normal :class:`~django.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
 :class:`~django.db.models.ForeignKey` it would have to
 choose one and only one model to store tags for. The contenttypes
-application provides a special field type which
+application provides a special field type (``GenericForeignKey``) which
 works around this and allows the relationship to be with any
 model:
 
@@ -287,7 +287,8 @@ model:
     :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
 
     1. Give your model a :class:`~django.db.models.ForeignKey`
-       to :class:`~django.contrib.contenttypes.models.ContentType`.
+       to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
+       name for this field is "content_type".
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a

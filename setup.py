@@ -68,9 +68,7 @@ django_dir = 'django'
 
 for dirpath, dirnames, filenames in os.walk(django_dir):
     # Ignore PEP 3147 cache dirs and those whose names start with '.'
-    for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.') or dirname == '__pycache__':
-            del dirnames[i]
+    dirnames[:] = [d for d in dirnames if not d.startswith('.') and d != '__pycache__']
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)))
     elif filenames:
@@ -108,6 +106,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: WSGI',
