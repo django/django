@@ -62,12 +62,12 @@ class I18NTests(TestCase):
                     trans_txt = catalog.ugettext('this is to be translated')
                 response = self.client.get('/views/jsi18n/')
                 # in response content must to be a line like that:
-                # catalog['this is to be translated'] = 'same_that_trans_txt'
+                # "this is to be translated": "same_that_trans_txt"
                 # javascript_quote is used to be able to check unicode strings
                 self.assertContains(response, javascript_quote(trans_txt), 1)
                 if lang_code == 'fr':
                     # Message with context (msgctxt)
-                    self.assertContains(response, "['month name\x04May'] = 'mai';", 1)
+                    self.assertContains(response, '"month name\u0004May": "mai"', 1)
 
 
 class JsI18NTests(TestCase):
