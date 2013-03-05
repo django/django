@@ -172,11 +172,12 @@ js_catalog_template = r"""
 
 def render_javascript_catalog(catalog=None, plural=None):
     template = Template(js_catalog_template)
+    indent = lambda s: s.replace('\n', '\n  ')
     context = Context({
-        'catalog_str': json.dumps(catalog, sort_keys=True,
-                indent=2).replace('\n', '\n  ') if catalog else None,
-        'formats_str': json.dumps(get_formats(), sort_keys=True,
-                indent=2).replace('\n', '\n  '),
+        'catalog_str': indent(json.dumps(
+            catalog, sort_keys=True, indent=2)) if catalog else None,
+        'formats_str': indent(json.dumps(
+            get_formats(), sort_keys=True, indent=2)),
         'plural': plural,
     })
 
