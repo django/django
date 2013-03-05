@@ -277,6 +277,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         plural = [el.strip() for el in plural.split(';') if el.strip().startswith('plural=')][0].split('=', 1)[1]
 
     pdict = {}
+    maxcnts = {}
     catalog = {}
     for k, v in t.items():
         if k == '':
@@ -284,14 +285,13 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         if isinstance(k, six.string_types):
             catalog[k] = v
         elif isinstance(k, tuple):
-            if k[0] not in pdict:
-                pdict[k[0]] = k[1]
-            else:
-                pdict[k[0]] = max(k[1], pdict[k[0]])
-            catalog.setdefault(k, {})[k[1]] = v
+            msgid = k[0]
+            cnt = k[1]
+            maxcnts[msgid] = max(cnt, maxcnts.get(msgid, 0))
+            pdict.setdefault(msgid, {})[cnt] = v
         else:
             raise TypeError(k)
     for k, v in pdict.items():
-        catalog[k] = ','.join(["''"] * (v + 1))
+        catalog[k] = [v.get(i, '') for i in range(maxcnts[msgid] + 1)]
 
     return render_javascript_catalog(catalog, plural)
