@@ -443,7 +443,7 @@ class BaseModelFormSet(BaseFormSet):
     def initial_form_count(self):
         """Returns the number of forms that are required in this FormSet."""
         if not (self.data or self.files):
-            return len(self.get_queryset())
+            return max(len(self.get_queryset()), self.min_num)
         return super(BaseModelFormSet, self).initial_form_count()
 
     def _existing_object(self, pk):
@@ -452,7 +452,7 @@ class BaseModelFormSet(BaseFormSet):
         return self._object_dict.get(pk)
 
     def _construct_form(self, i, **kwargs):
-        if self.is_bound and i < self.initial_form_count():
+        if self.is_bound and i < len(self.get_queryset()):
             # Import goes here instead of module-level because importing
             # django.db has side effects.
             from django.db import connections
@@ -464,9 +464,9 @@ class BaseModelFormSet(BaseFormSet):
             if isinstance(pk, list):
                 pk = pk[0]
             kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and not kwargs.get('instance'):
+        if i < len(self.get_queryset()) and not kwargs.get('instance'):
             kwargs['instance'] = self.get_queryset()[i]
-        if i >= self.initial_form_count() and self.initial_extra:
+        if i >= len(self.get_queryset()) and self.initial_extra:
             # Set initial values for extra forms
             try:
                 kwargs['initial'] = self.initial_extra[i-self.initial_form_count()]
