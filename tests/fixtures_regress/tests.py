@@ -87,6 +87,20 @@ class TestFixtures(TestCase):
         )
         self.assertEqual(Animal.specimens.all()[0].name, 'Lion')
 
+    def test_loaddata_not_found_fields_ignore_xml(self):
+        """
+        Test for ticket #19998 -- Ignore entries in the XML serialised data
+        for fields that have been removed from the model definition.
+        """
+        management.call_command(
+            'loaddata',
+            'sequence_extra_xml',
+            ignore=True,
+            verbosity=0,
+            commit=False
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, 'Wolf')
+
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml(self):
         """
