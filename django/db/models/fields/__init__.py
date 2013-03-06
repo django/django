@@ -57,6 +57,7 @@ class Field(object):
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True
+    empty_values = list(validators.EMPTY_VALUES)
 
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
@@ -157,7 +158,7 @@ class Field(object):
         return value
 
     def run_validators(self, value):
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return
 
         errors = []
@@ -184,7 +185,7 @@ class Field(object):
             # Skip validation for non-editable fields.
             return
 
-        if self._choices and value not in validators.EMPTY_VALUES:
+        if self._choices and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -200,7 +201,7 @@ class Field(object):
         if value is None and not self.null:
             raise exceptions.ValidationError(self.error_messages['null'])
 
-        if not self.blank and value in validators.EMPTY_VALUES:
+        if not self.blank and value in self.empty_values:
             raise exceptions.ValidationError(self.error_messages['blank'])
 
     def clean(self, value, model_instance):
@@ -1295,6 +1296,7 @@ class URLField(CharField):
 
 class BinaryField(Field):
     description = _("Raw binary data")
+    empty_values = [None, b'']
 
     def __init__(self, *args, **kwargs):
         kwargs['editable'] = False
