@@ -155,6 +155,7 @@ class Deserializer(base.Deserializer):
         super(Deserializer, self).__init__(stream_or_string, **options)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
         self.db = options.pop('using', DEFAULT_DB_ALIAS)
+        self.ignore = options.pop('ignorenonexistent', False)
 
     def _make_parser(self):
         """Create a hardened XML parser (no custom/external entities)."""
@@ -188,6 +189,7 @@ class Deserializer(base.Deserializer):
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
 
+        model_fields = Model._meta.get_all_field_names()
         # Deseralize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
@@ -198,7 +200,9 @@ class Deserializer(base.Deserializer):
 
             # Get the field from the Model. This will raise a
             # FieldDoesNotExist if, well, the field doesn't exist, which will
-            # be propagated correctly.
+            # be propagated correctly unless ignorenonexistent=True is used.
+            if self.ignore and field_name not in model_fields:
+                continue
             field = Model._meta.get_field(field_name)
 
             # As is usually the case, relation fields get the special treatment.
