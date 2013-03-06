@@ -81,9 +81,6 @@ class SelectForUpdateTests(TransactionTestCase):
         sql = tested_connection.queries[-1]['sql']
         return bool(sql.find(for_update_sql) > -1)
 
-    def check_exc(self, exc):
-        self.assertTrue(isinstance(exc, DatabaseError))
-
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_sql_generated(self):
         """
@@ -129,7 +126,7 @@ class SelectForUpdateTests(TransactionTestCase):
         time.sleep(1)
         thread.join()
         self.end_blocking_transaction()
-        self.check_exc(status[-1])
+        self.assertIsInstance(status[-1], DatabaseError)
 
     # In Python 2.6 beta and some final releases, exceptions raised in __len__
     # are swallowed (Python issue 1242657), so these cases return an empty
@@ -261,7 +258,7 @@ class SelectForUpdateTests(TransactionTestCase):
         time.sleep(1)
         thread.join()
         self.end_blocking_transaction()
-        self.check_exc(status[-1])
+        self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_transaction_dirty_managed(self):
