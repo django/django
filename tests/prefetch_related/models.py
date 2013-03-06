@@ -87,8 +87,8 @@ class Qualification(models.Model):
 
 
 class TeacherManager(models.Manager):
-    def get_query_set(self):
-        return super(TeacherManager, self).get_query_set().prefetch_related('qualifications')
+    def get_queryset(self):
+        return super(TeacherManager, self).get_queryset().prefetch_related('qualifications')
 
 
 @python_2_unicode_compatible

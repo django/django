@@ -1074,7 +1074,7 @@ class ValidationTests(unittest.TestCase):
                 return 'awesomeness'
             def get_choices(self, request):
                 return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
-            def get_query_set(self, cl, qs):
+            def get_queryset(self, cl, qs):
                 return qs
 
         class ValidationTestModelAdmin(ModelAdmin):

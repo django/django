@@ -22,8 +22,8 @@ request.user = MockSuperUser()
 
 class TestAdminOrdering(TestCase):
     """
-    Let's make sure that ModelAdmin.queryset uses the ordering we define in
-    ModelAdmin rather that ordering defined in the model's inner Meta
+    Let's make sure that ModelAdmin.get_queryset uses the ordering we define
+    in ModelAdmin rather that ordering defined in the model's inner Meta
     class.
     """
 
@@ -42,7 +42,7 @@ class TestAdminOrdering(TestCase):
         class.
         """
         ma = ModelAdmin(Band, None)
-        names = [b.name for b in ma.queryset(request)]
+        names = [b.name for b in ma.get_queryset(request)]
         self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
     def test_specified_ordering(self):
@@ -53,7 +53,7 @@ class TestAdminOrdering(TestCase):
         class BandAdmin(ModelAdmin):
             ordering = ('rank',) # default ordering is ('name',)
         ma = BandAdmin(Band, None)
-        names = [b.name for b in ma.queryset(request)]
+        names = [b.name for b in ma.get_queryset(request)]
         self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
 
     def test_dynamic_ordering(self):
@@ -65,17 +65,17 @@ class TestAdminOrdering(TestCase):
         request = self.request_factory.get('/')
         request.user = super_user
         ma = DynOrderingBandAdmin(Band, None)
-        names = [b.name for b in ma.queryset(request)]
+        names = [b.name for b in ma.get_queryset(request)]
         self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
         request.user = other_user
-        names = [b.name for b in ma.queryset(request)]
+        names = [b.name for b in ma.get_queryset(request)]
         self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
 
 class TestInlineModelAdminOrdering(TestCase):
     """
-    Let's make sure that InlineModelAdmin.queryset uses the ordering we define
-    in InlineModelAdmin.
+    Let's make sure that InlineModelAdmin.get_queryset uses the ordering we
+    define in InlineModelAdmin.
     """
 
     def setUp(self):
@@ -95,7 +95,7 @@ class TestInlineModelAdminOrdering(TestCase):
         class.
         """
         inline = SongInlineDefaultOrdering(self.b, None)
-        names = [s.name for s in inline.queryset(request)]
+        names = [s.name for s in inline.get_queryset(request)]
         self.assertEqual(['Dude (Looks Like a Lady)', 'Jaded', 'Pink'], names)
 
     def test_specified_ordering(self):
@@ -103,7 +103,7 @@ class TestInlineModelAdminOrdering(TestCase):
         Let's check with ordering set to something different than the default.
         """
         inline = SongInlineNewOrdering(self.b, None)
-        names = [s.name for s in inline.queryset(request)]
+        names = [s.name for s in inline.get_queryset(request)]
         self.assertEqual(['Jaded', 'Pink', 'Dude (Looks Like a Lady)'], names)
 
 

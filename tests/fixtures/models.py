@@ -78,8 +78,8 @@ class Person(models.Model):
         return (self.name,)
 
 class SpyManager(PersonManager):
-    def get_query_set(self):
-        return super(SpyManager, self).get_query_set().filter(cover_blown=False)
+    def get_queryset(self):
+        return super(SpyManager, self).get_queryset().filter(cover_blown=False)
 
 class Spy(Person):
     objects = SpyManager()

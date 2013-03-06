@@ -176,8 +176,8 @@ class LoopZ(models.Model):
 
 # A model and custom default manager combination.
 class CustomManager(models.Manager):
-    def get_query_set(self):
-        qs = super(CustomManager, self).get_query_set()
+    def get_queryset(self):
+        qs = super(CustomManager, self).get_queryset()
         return qs.filter(public=True, tag__name='t1')
 
 @python_2_unicode_compatible
@@ -197,8 +197,8 @@ class Detail(models.Model):
     data = models.CharField(max_length=10)
 
 class MemberManager(models.Manager):
-    def get_query_set(self):
-        return super(MemberManager, self).get_query_set().select_related("details")
+    def get_queryset(self):
+        return super(MemberManager, self).get_queryset().select_related("details")
 
 class Member(models.Model):
     name = models.CharField(max_length=10)

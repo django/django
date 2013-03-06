@@ -30,11 +30,11 @@ class Person(models.Model):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-# An example of a custom manager that sets get_query_set().
+# An example of a custom manager that sets get_queryset().
 
 class PublishedBookManager(models.Manager):
-    def get_query_set(self):
-        return super(PublishedBookManager, self).get_query_set().filter(is_published=True)
+    def get_queryset(self):
+        return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
 
 @python_2_unicode_compatible
 class Book(models.Model):
@@ -50,8 +50,8 @@ class Book(models.Model):
 # An example of providing multiple custom managers.
 
 class FastCarManager(models.Manager):
-    def get_query_set(self):
-        return super(FastCarManager, self).get_query_set().filter(top_speed__gt=150)
+    def get_queryset(self):
+        return super(FastCarManager, self).get_queryset().filter(top_speed__gt=150)
 
 @python_2_unicode_compatible
 class Car(models.Model):

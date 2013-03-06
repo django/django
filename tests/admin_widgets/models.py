@@ -37,8 +37,8 @@ class Album(models.Model):
         return self.name
 
 class HiddenInventoryManager(models.Manager):
-    def get_query_set(self):
-        return super(HiddenInventoryManager, self).get_query_set().filter(hidden=False)
+    def get_queryset(self):
+        return super(HiddenInventoryManager, self).get_queryset().filter(hidden=False)
 
 @python_2_unicode_compatible
 class Inventory(models.Model):

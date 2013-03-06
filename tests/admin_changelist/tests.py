@@ -39,15 +39,15 @@ class ChangeListTests(TestCase):
 
     def test_select_related_preserved(self):
         """
-        Regression test for #10348: ChangeList.get_query_set() shouldn't
-        overwrite a custom select_related provided by ModelAdmin.queryset().
+        Regression test for #10348: ChangeList.get_queryset() shouldn't
+        overwrite a custom select_related provided by ModelAdmin.get_queryset().
         """
         m = ChildAdmin(Child, admin.site)
         request = self.factory.get('/child/')
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
-        self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
+        self.assertEqual(cl.queryset.query.select_related, {'parent': {'name': {}}})
 
     def test_result_list_empty_changelist_value(self):
         """
@@ -277,7 +277,7 @@ class ChangeListTests(TestCase):
                         m.list_max_show_all, m.list_editable, m)
 
         # Make sure distinct() was called
-        self.assertEqual(cl.query_set.count(), 1)
+        self.assertEqual(cl.queryset.count(), 1)
 
     def test_distinct_for_non_unique_related_object_in_search_fields(self):
         """
@@ -297,7 +297,7 @@ class ChangeListTests(TestCase):
                         m.list_max_show_all, m.list_editable, m)
 
         # Make sure distinct() was called
-        self.assertEqual(cl.query_set.count(), 1)
+        self.assertEqual(cl.queryset.count(), 1)
 
     def test_pagination(self):
         """
@@ -317,7 +317,7 @@ class ChangeListTests(TestCase):
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all,
                 m.list_editable, m)
-        self.assertEqual(cl.query_set.count(), 60)
+        self.assertEqual(cl.queryset.count(), 60)
         self.assertEqual(cl.paginator.count, 60)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
 
@@ -327,7 +327,7 @@ class ChangeListTests(TestCase):
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all,
                 m.list_editable, m)
-        self.assertEqual(cl.query_set.count(), 30)
+        self.assertEqual(cl.queryset.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
 

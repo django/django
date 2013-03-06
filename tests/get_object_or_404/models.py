@@ -22,8 +22,8 @@ class Author(models.Model):
         return self.name
 
 class ArticleManager(models.Manager):
-    def get_query_set(self):
-        return super(ArticleManager, self).get_query_set().filter(authors__name__icontains='sir')
+    def get_queryset(self):
+        return super(ArticleManager, self).get_queryset().filter(authors__name__icontains='sir')
 
 @python_2_unicode_compatible
 class Article(models.Model):

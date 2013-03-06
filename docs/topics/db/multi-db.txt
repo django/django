@@ -506,19 +506,19 @@ solution is to use ``db_manager()``, like this::
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
-Using ``get_query_set()`` with multiple databases
+Using ``get_queryset()`` with multiple databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're overriding ``get_query_set()`` on your manager, be sure to
+If you're overriding ``get_queryset()`` on your manager, be sure to
 either call the method on the parent (using ``super()``) or do the
 appropriate handling of the ``_db`` attribute on the manager (a string
 containing the name of the database to use).
 
 For example, if you want to return a custom ``QuerySet`` class from
-the ``get_query_set`` method, you could do this::
+the ``get_queryset`` method, you could do this::
 
     class MyManager(models.Manager):
-        def get_query_set(self):
+        def get_queryset(self):
             qs = CustomQuerySet(self.model)
             if self._db is not None:
                 qs = qs.using(self._db)
@@ -548,9 +548,9 @@ multiple-database support::
             # Tell Django to delete objects from the 'other' database
             obj.delete(using=self.using)
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for objects on the 'other' database.
-            return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+            return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
@@ -573,9 +573,9 @@ Inlines can be handled in a similar fashion. They require three customized metho
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
-            return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+            return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
