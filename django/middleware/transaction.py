@@ -1,4 +1,7 @@
-from django.db import transaction
+import warnings
+
+from django.core.exceptions import MiddlewareNotUsed
+from django.db import connection, transaction
 
 class TransactionMiddleware(object):
     """
@@ -7,6 +10,14 @@ class TransactionMiddleware(object):
     commit, the commit is done when a successful response is created. If an
     exception happens, the database is rolled back.
     """
+
+    def __init__(self):
+        warnings.warn(
+            "TransactionMiddleware is deprecated in favor of ATOMIC_REQUESTS.",
+            PendingDeprecationWarning, stacklevel=2)
+        if connection.settings_dict['ATOMIC_REQUESTS']:
+            raise MiddlewareNotUsed
+
     def process_request(self, request):
         """Enters transaction management"""
         transaction.enter_transaction_management()

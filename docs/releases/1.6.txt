@@ -262,9 +262,11 @@ Transaction management APIs
 Transaction management was completely overhauled in Django 1.6, and the
 current APIs are deprecated:
 
-- :func:`django.db.transaction.autocommit`
-- :func:`django.db.transaction.commit_on_success`
-- :func:`django.db.transaction.commit_manually`
+- ``django.middleware.transaction.TransactionMiddleware``
+- ``django.db.transaction.autocommit``
+- ``django.db.transaction.commit_on_success``
+- ``django.db.transaction.commit_manually``
+- the ``TRANSACTIONS_MANAGED`` setting
 
 The reasons for this change and the upgrade path are described in the
 :ref:`transactions documentation <transactions-upgrading-from-1.5>`.
