@@ -104,7 +104,7 @@ class BaseDatabaseWrapper(object):
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
         self.init_connection_state()
-        if not settings.TRANSACTIONS_MANAGED:
+        if self.settings_dict['AUTOCOMMIT']:
             self.set_autocommit()
         connection_created.send(sender=self.__class__, connection=self)
 
@@ -299,7 +299,7 @@ class BaseDatabaseWrapper(object):
         if self.transaction_state:
             managed = self.transaction_state[-1]
         else:
-            managed = settings.TRANSACTIONS_MANAGED
+            managed = not self.settings_dict['AUTOCOMMIT']
 
         if self._dirty:
             self.rollback()
