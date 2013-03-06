@@ -6,10 +6,10 @@ import types
 
 from django import http
 from django.conf import settings
-from django.core import exceptions
 from django.core import urlresolvers
 from django.core import signals
 from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
+from django.db import connections, transaction
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils import six
@@ -65,6 +65,13 @@ class BaseHandler(object):
         # as a flag for initialization being complete.
         self._request_middleware = request_middleware
 
+    def make_view_atomic(self, view):
+        if getattr(view, 'transactions_per_request', True):
+            for db in connections.all():
+                if db.settings_dict['ATOMIC_REQUESTS']:
+                    view = transaction.atomic(using=db.alias)(view)
+        return view
+
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         try:
@@ -101,8 +108,9 @@ class BaseHandler(object):
                             break
 
                 if response is None:
+                    wrapped_callback = self.make_view_atomic(callback)
                     try:
-                        response = callback(request, *callback_args, **callback_kwargs)
+                        response = wrapped_callback(request, *callback_args, **callback_kwargs)
                     except Exception as e:
                         # If the view raised an exception, run it through exception
                         # middleware, and if the exception middleware returns a

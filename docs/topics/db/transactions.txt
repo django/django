@@ -26,45 +26,61 @@ immediately committed to the database. :ref:`See below for details
     Previous version of Django featured :ref:`a more complicated default
     behavior <transactions-upgrading-from-1.5>`.
 
+.. _tying-transactions-to-http-requests:
+
 Tying transactions to HTTP requests
 -----------------------------------
 
-The recommended way to handle transactions in Web requests is to tie them to
-the request and response phases via Django's ``TransactionMiddleware``.
+A common way to handle transactions on the web is to wrap each request in a
+transaction. Set :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` to
+``True`` in the configuration of each database for which you want to enable
+this behavior.
 
 It works like this. When a request starts, Django starts a transaction. If the
-response is produced without problems, Django commits any pending transactions.
-If the view function produces an exception, Django rolls back any pending
-transactions.
+response is produced without problems, Django commits the transaction. If the
+view function produces an exception, Django rolls back the transaction.
+Middleware always runs outside of this transaction.
 
-To activate this feature, just add the ``TransactionMiddleware`` middleware to
-your :setting:`MIDDLEWARE_CLASSES` setting::
+You may perfom partial commits and rollbacks in your view code, typically with
+the :func:`atomic` context manager. However, at the end of the view, either
+all the changes will be committed, or none of them.
 
-    MIDDLEWARE_CLASSES = (
-        'django.middleware.cache.UpdateCacheMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.transaction.TransactionMiddleware',
-        'django.middleware.cache.FetchFromCacheMiddleware',
-    )
+To disable this behavior for a specific view, you must set the
+``transactions_per_request`` attribute of the view function itself to
+``False``, like this::
 
-The order is quite important. The transaction middleware applies not only to
-view functions, but also for all middleware modules that come after it. So if
-you use the session middleware after the transaction middleware, session
-creation will be part of the transaction.
+    def my_view(request):
+        do_stuff()
+    my_view.transactions_per_request = False
 
-The various cache middlewares are an exception: ``CacheMiddleware``,
-:class:`~django.middleware.cache.UpdateCacheMiddleware`, and
-:class:`~django.middleware.cache.FetchFromCacheMiddleware` are never affected.
-Even when using database caching, Django's cache backend uses its own database
-connection internally.
+.. warning::
 
-.. note::
+    While the simplicity of this transaction model is appealing, it also makes it
+    inefficient when traffic increases. Opening a transaction for every view has
+    some overhead. The impact on performance depends on the query patterns of your
+    application and on how well your database handles locking.
 
-    The ``TransactionMiddleware`` only affects the database aliased
-    as "default" within your :setting:`DATABASES` setting.  If you are using
-    multiple databases and want transaction control over databases other than
-    "default", you will need to write your own transaction middleware.
+.. admonition:: Per-request transactions and streaming responses
+
+    When a view returns a :class:`~django.http.StreamingHttpResponse`, reading
+    the contents of the response will often execute code to generate the
+    content. Since the view has already returned, such code runs outside of
+    the transaction.
+
+    Generally speaking, it isn't advisable to write to the database while
+    generating a streaming response, since there's no sensible way to handle
+    errors after starting to send the response.
+
+In practice, this feature simply wraps every view function in the :func:`atomic`
+decorator described below.
+
+Note that only the execution of your view in enclosed in the transactions.
+Middleware run outside of the transaction, and so does the rendering of
+template responses.
+
+.. versionchanged:: 1.6
+    Django used to provide this feature via ``TransactionMiddleware``, which is
+    now deprecated.
 
 Controlling transactions explicitly
 -----------------------------------
@@ -283,18 +299,20 @@ if autocommit is off. Django will also refuse to turn autocommit off when an
 Deactivating transaction management
 -----------------------------------
 
-Control freaks can totally disable all transaction management by setting
-:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file. If
-you do this, Django won't enable autocommit. You'll get the regular behavior
-of the underlying database library.
+You can totally disable Django's transaction management for a given database
+by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
+configuration. If you do this, Django won't enable autocommit, and won't
+perform any commits. You'll get the regular behavior of the underlying
+database library.
 
 This requires you to commit explicitly every transaction, even those started
 by Django or by third-party libraries. Thus, this is best used in situations
 where you want to run your own transaction-controlling middleware or do
 something really strange.
 
-In almost all situations, you'll be better off using the default behavior, or
-the transaction middleware, and only modify selected functions as needed.
+.. versionchanged:: 1.6
+    This used to be controlled by the ``TRANSACTIONS_MANAGED`` setting.
+
 
 Database-specific notes
 =======================
@@ -459,6 +477,35 @@ atomicity of the outer block.
 API changes
 -----------
 
+Transaction middleware
+~~~~~~~~~~~~~~~~~~~~~~
+
+In Django 1.6, ``TransactionMiddleware`` is deprecated and replaced
+:setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>`. While the general
+behavior is the same, there are a few differences.
+
+With the transaction middleware, it was still possible to switch to autocommit
+or to commit explicitly in a view. Since :func:`atomic` guarantees atomicity,
+this isn't allowed any longer.
+
+To avoid wrapping a particular view in a transaction, instead of::
+
+    @transaction.autocommit
+    def my_view(request):
+        do_stuff()
+
+you must now use this pattern::
+
+    def my_view(request):
+        do_stuff()
+    my_view.transactions_per_request = False
+
+The transaction middleware applied not only to view functions, but also to
+middleware modules that come after it. For instance, if you used the session
+middleware after the transaction middleware, session creation was part of the
+transaction. :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` only
+applies to the view itself.
+
 Managing transactions
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -507,6 +554,13 @@ you should now use::
         # do stuff
     finally:
         transaction.set_autocommit(autocommit=False)
+
+Disabling transaction management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of setting ``TRANSACTIONS_MANAGED = True``, set the ``AUTOCOMMIT`` key
+to ``False`` in the configuration of each database, as explained in :ref
+:`deactivate-transaction-management`.
 
 Backwards incompatibilities
 ---------------------------

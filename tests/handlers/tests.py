@@ -1,9 +1,8 @@
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.signals import request_started, request_finished
-from django.db import close_old_connections
-from django.test import RequestFactory, TestCase
+from django.db import close_old_connections, connection
+from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.test.utils import override_settings
-from django.utils import six
 
 
 class HandlerTests(TestCase):
@@ -36,6 +35,31 @@ class HandlerTests(TestCase):
         response = handler(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)
 
+
+class TransactionsPerRequestTests(TransactionTestCase):
+    urls = 'handlers.urls'
+
+    def test_no_transaction(self):
+        response = self.client.get('/in_transaction/')
+        self.assertContains(response, 'False')
+
+    def test_auto_transaction(self):
+        old_atomic_requests = connection.settings_dict['ATOMIC_REQUESTS']
+        try:
+            connection.settings_dict['ATOMIC_REQUESTS'] = True
+            response = self.client.get('/in_transaction/')
+        finally:
+            connection.settings_dict['ATOMIC_REQUESTS'] = old_atomic_requests
+        self.assertContains(response, 'True')
+
+    def test_no_auto_transaction(self):
+        old_atomic_requests = connection.settings_dict['ATOMIC_REQUESTS']
+        try:
+            connection.settings_dict['ATOMIC_REQUESTS'] = True
+            response = self.client.get('/not_in_transaction/')
+        finally:
+            connection.settings_dict['ATOMIC_REQUESTS'] = old_atomic_requests
+        self.assertContains(response, 'False')
 
 class SignalsTests(TestCase):
     urls = 'handlers.urls'
