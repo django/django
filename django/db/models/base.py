@@ -9,7 +9,6 @@ import django.db.models.manager  # Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ManyToOneRel,
     OneToOneField, add_lazy_relation)
@@ -940,7 +939,7 @@ class Model(six.with_metaclass(ModelBase)):
             # Skip validation for empty fields with blank=True. The developer
             # is responsible for making sure they have a valid value.
             raw_value = getattr(self, f.attname)
-            if f.blank and raw_value in validators.EMPTY_VALUES:
+            if f.blank and raw_value in f.empty_values:
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
