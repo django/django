@@ -39,17 +39,9 @@ def get_connection(using=None):
         using = DEFAULT_DB_ALIAS
     return connections[using]
 
-def get_autocommit(using=None):
-    """
-    Get the autocommit status of the connection.
-    """
-    return get_connection(using).autocommit
-
-def set_autocommit(using=None, autocommit=True):
-    """
-    Set the autocommit status of the connection.
-    """
-    return get_connection(using).set_autocommit(autocommit)
+###########################
+# Deprecated private APIs #
+###########################
 
 def abort(using=None):
     """
@@ -106,12 +98,6 @@ def set_clean(using=None):
     """
     get_connection(using).set_clean()
 
-def clean_savepoints(using=None):
-    """
-    Resets the counter used to generate unique savepoint ids in this thread.
-    """
-    get_connection(using).clean_savepoints()
-
 def is_managed(using=None):
     warnings.warn("'is_managed' is deprecated.",
         PendingDeprecationWarning, stacklevel=2)
@@ -131,6 +117,18 @@ def rollback_unless_managed(using=None):
 ###############
 # Public APIs #
 ###############
+
+def get_autocommit(using=None):
+    """
+    Get the autocommit status of the connection.
+    """
+    return get_connection(using).autocommit
+
+def set_autocommit(using=None, autocommit=True):
+    """
+    Set the autocommit status of the connection.
+    """
+    return get_connection(using).set_autocommit(autocommit)
 
 def commit(using=None):
     """
@@ -166,6 +164,11 @@ def savepoint_commit(sid, using=None):
     """
     get_connection(using).savepoint_commit(sid)
 
+def clean_savepoints(using=None):
+    """
+    Resets the counter used to generate unique savepoint ids in this thread.
+    """
+    get_connection(using).clean_savepoints()
 
 #################################
 # Decorators / context managers #
