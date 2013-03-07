@@ -164,6 +164,13 @@ Django provides a single API to control database transactions.
     - releases or rolls back to the savepoint when exiting an inner block;
     - commits or rolls back the transaction when exiting the outermost block.
 
+.. admonition:: Performance considerations
+
+    Open transactions have a performance cost for your database server. To
+    minimize this overhead, keep your transactions as short as possible. This
+    is especially important of you're using :func:`atomic` in long-running
+    processes, outside of Django's request / response cycle.
+
 Autocommit
 ==========
 
