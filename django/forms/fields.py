@@ -53,6 +53,7 @@ class Field(object):
         'required': _('This field is required.'),
         'invalid': _('Enter a valid value.'),
     }
+    empty_values = list(validators.EMPTY_VALUES)
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
@@ -125,11 +126,11 @@ class Field(object):
         return value
 
     def validate(self, value):
-        if value in validators.EMPTY_VALUES and self.required:
+        if value in self.empty_values and self.required:
             raise ValidationError(self.error_messages['required'])
 
     def run_validators(self, value):
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return
         errors = []
         for v in self.validators:
@@ -210,7 +211,7 @@ class CharField(Field):
 
     def to_python(self, value):
         "Returns a Unicode object."
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return ''
         return smart_text(value)
 
@@ -244,7 +245,7 @@ class IntegerField(Field):
         of int(). Returns None for empty values.
         """
         value = super(IntegerField, self).to_python(value)
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
@@ -275,7 +276,7 @@ class FloatField(IntegerField):
         of float(). Returns None for empty values.
         """
         value = super(IntegerField, self).to_python(value)
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
@@ -311,7 +312,7 @@ class DecimalField(IntegerField):
         than max_digits in the number, and no more than decimal_places digits
         after the decimal point.
         """
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
@@ -324,7 +325,7 @@ class DecimalField(IntegerField):
 
     def validate(self, value):
         super(DecimalField, self).validate(value)
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return
         # Check for NaN, Inf and -Inf values. We can't compare directly for NaN,
         # since it is never equal to itself. However, NaN is the only value that
@@ -401,7 +402,7 @@ class DateField(BaseTemporalField):
         Validates that the input can be converted to a date. Returns a Python
         datetime.date object.
         """
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if isinstance(value, datetime.datetime):
             return value.date()
@@ -425,7 +426,7 @@ class TimeField(BaseTemporalField):
         Validates that the input can be converted to a time. Returns a Python
         datetime.time object.
         """
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if isinstance(value, datetime.time):
             return value
@@ -451,7 +452,7 @@ class DateTimeField(BaseTemporalField):
         Validates that the input can be converted to a datetime. Returns a
         Python datetime.datetime object.
         """
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return None
         if isinstance(value, datetime.datetime):
             return from_current_timezone(value)
@@ -463,7 +464,7 @@ class DateTimeField(BaseTemporalField):
             # components: date and time.
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'])
-            if value[0] in validators.EMPTY_VALUES and value[1] in validators.EMPTY_VALUES:
+            if value[0] in self.empty_values and value[1] in self.empty_values:
                 return None
             value = '%s %s' % tuple(value)
         result = super(DateTimeField, self).to_python(value)
@@ -531,7 +532,7 @@ class FileField(Field):
         super(FileField, self).__init__(*args, **kwargs)
 
     def to_python(self, data):
-        if data in validators.EMPTY_VALUES:
+        if data in self.empty_values:
             return None
 
         # UploadedFile objects should have name and size attributes.
@@ -562,7 +563,7 @@ class FileField(Field):
                 return False
             # If the field is required, clearing is not possible (the widget
             # shouldn't return False data in that case anyway). False is not
-            # in validators.EMPTY_VALUES; if a False value makes it this far
+            # in self.empty_value; if a False value makes it this far
             # it should be validated from here on out as None (so it will be
             # caught by the required check).
             data = None
@@ -763,7 +764,7 @@ class ChoiceField(Field):
 
     def to_python(self, value):
         "Returns a Unicode object."
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return ''
         return smart_text(value)
 
@@ -801,7 +802,7 @@ class TypedChoiceField(ChoiceField):
         """
         value = super(TypedChoiceField, self).to_python(value)
         super(TypedChoiceField, self).validate(value)
-        if value == self.empty_value or value in validators.EMPTY_VALUES:
+        if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
             value = self.coerce(value)
@@ -864,7 +865,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         """
         value = super(TypedMultipleChoiceField, self).to_python(value)
         super(TypedMultipleChoiceField, self).validate(value)
-        if value == self.empty_value or value in validators.EMPTY_VALUES:
+        if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         new_value = []
         for choice in value:
@@ -945,7 +946,7 @@ class MultiValueField(Field):
         clean_data = []
         errors = ErrorList()
         if not value or isinstance(value, (list, tuple)):
-            if not value or not [v for v in value if v not in validators.EMPTY_VALUES]:
+            if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
                     raise ValidationError(self.error_messages['required'])
                 else:
@@ -957,7 +958,7 @@ class MultiValueField(Field):
                 field_value = value[i]
             except IndexError:
                 field_value = None
-            if self.required and field_value in validators.EMPTY_VALUES:
+            if self.required and field_value in self.empty_values:
                 raise ValidationError(self.error_messages['required'])
             try:
                 clean_data.append(field.clean(field_value))
@@ -1071,9 +1072,9 @@ class SplitDateTimeField(MultiValueField):
         if data_list:
             # Raise a validation error if time or date is empty
             # (possible if SplitDateTimeField has required=False).
-            if data_list[0] in validators.EMPTY_VALUES:
+            if data_list[0] in self.empty_values:
                 raise ValidationError(self.error_messages['invalid_date'])
-            if data_list[1] in validators.EMPTY_VALUES:
+            if data_list[1] in self.empty_values:
                 raise ValidationError(self.error_messages['invalid_time'])
             result = datetime.datetime.combine(*data_list)
             return from_current_timezone(result)
@@ -1087,7 +1088,7 @@ class IPAddressField(CharField):
     default_validators = [validators.validate_ipv4_address]
 
     def to_python(self, value):
-        if value in EMPTY_VALUES:
+        if value in self.empty_values:
             return ''
         return value.strip()
 
@@ -1103,7 +1104,7 @@ class GenericIPAddressField(CharField):
         super(GenericIPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return ''
         value = value.strip()
         if value and ':' in value:
