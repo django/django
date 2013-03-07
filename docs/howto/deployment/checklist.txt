@@ -113,7 +113,7 @@ Static files are automatically served by the development server. In
 production, you must define a :setting:`STATIC_ROOT` directory where
 :djadmin:`collectstatic` will copy them.
 
-See :doc:`/howto/static-files` for more information.
+See :doc:`/howto/static-files/index` for more information.
 
 :setting:`MEDIA_ROOT` and :setting:`MEDIA_URL`
 ----------------------------------------------
