@@ -305,6 +305,15 @@ class SimpleLazyObject(LazyObject):
     def __reduce__(self):
         return (self.__newobj__, (self.__class__,), self.__getstate__())
 
+    # Return a meaningful representation of the lazy object for debugging
+    # without evaluating the wrapped object.
+    def __repr__(self):
+        if self._wrapped is empty:
+            repr_attr = self._setupfunc
+        else:
+            repr_attr = self._wrapped
+        return '<SimpleLazyObject: %r>' % repr_attr
+
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
