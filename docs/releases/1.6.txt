@@ -131,6 +131,9 @@ Minor features
   :setting:`TEMPLATE_STRING_IF_INVALID` for variables not present in the
   context, just like other template constructs.
 
+* SimpleLazyObjects will now present more helpful representations in shell
+  debugging situations.
+
 Backwards incompatible changes in 1.6
 =====================================
 

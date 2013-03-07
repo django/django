@@ -59,10 +59,18 @@ class TestUtilsSimpleLazyObject(TestCase):
                          hash(SimpleLazyObject(complex_object)))
 
     def test_repr(self):
-        # For debugging, it will really confuse things if there is no clue that
-        # SimpleLazyObject is actually a proxy object. So we don't
-        # proxy __repr__
-        self.assertTrue("SimpleLazyObject" in repr(SimpleLazyObject(complex_object)))
+        # First, for an unevaluated SimpleLazyObject
+        x = SimpleLazyObject(complex_object)
+        # __repr__ contains __repr__ of setup function and does not evaluate
+        # the SimpleLazyObject
+        self.assertEqual("<SimpleLazyObject: %r>" % complex_object, repr(x))
+        self.assertEqual(empty, x._wrapped)
+
+        # Second, for an evaluated SimpleLazyObject
+        name = x.name # evaluate
+        self.assertTrue(isinstance(x._wrapped, _ComplexObject))
+        # __repr__ contains __repr__ of wrapped object
+        self.assertEqual("<SimpleLazyObject: %r>" % x._wrapped, repr(x))
 
     def test_bytes(self):
         self.assertEqual(b"I am _ComplexObject('joe')",
