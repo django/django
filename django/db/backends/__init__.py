@@ -417,12 +417,19 @@ class BaseDatabaseWrapper(object):
         or if it outlived its maximum age.
         """
         if self.connection is not None:
+            # If the application didn't restore the original autocommit setting,
+            # don't take chances, drop the connection.
+            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+                self.close()
+                return
+
             if self.errors_occurred:
                 if self.is_usable():
                     self.errors_occurred = False
                 else:
                     self.close()
                     return
+
             if self.close_at is not None and time.time() >= self.close_at:
                 self.close()
                 return
