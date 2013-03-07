@@ -311,7 +311,8 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        self._dirty = True
+        if not self.autocommit:
+            self._dirty = True
 
     def set_clean(self):
         """

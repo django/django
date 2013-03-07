@@ -202,10 +202,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 level = self.isolation_level
             self.connection.set_isolation_level(level)
 
-    def set_dirty(self):
-        if self.transaction_state and self.transaction_state[-1]:
-            super(DatabaseWrapper, self).set_dirty()
-
     def check_constraints(self, table_names=None):
         """
         To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
