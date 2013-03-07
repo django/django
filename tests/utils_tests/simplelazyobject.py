@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import copy
 import pickle
 
-from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
@@ -67,7 +66,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(empty, x._wrapped)
 
         # Second, for an evaluated SimpleLazyObject
-        name = x.name # evaluate
+        name = x.name  # evaluate
         self.assertTrue(isinstance(x._wrapped, _ComplexObject))
         # __repr__ contains __repr__ of wrapped object
         self.assertEqual("<SimpleLazyObject: %r>" % x._wrapped, repr(x))
@@ -97,14 +96,14 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(s2, complex_object())
 
         # Second, for an evaluated SimpleLazyObject
-        name = s.name # evaluate
+        name = s.name  # evaluate
         self.assertIsNot(s._wrapped, empty)
         s3 = copy.deepcopy(s)
         self.assertEqual(s3, complex_object())
 
-
     def test_none(self):
         i = [0]
+
         def f():
             i[0] += 1
             return None
