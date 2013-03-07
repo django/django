@@ -52,6 +52,20 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
     patterns you can construct. The only limit is that you can only create 254
     at a time (the 255th argument is the initial prefix argument).
 
+static()
+--------
+
+.. function:: static.static(prefix, view='django.views.static.serve', **kwargs)
+
+Helper function to return a URL pattern for serving files in debug mode::
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = patterns('',
+        # ... the rest of your URLconf goes here ...
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 url()
 -----
 

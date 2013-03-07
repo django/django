@@ -708,7 +708,7 @@ If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
 are configured and your Web server serves those files correctly. The
 development server continues to serve the admin files just like before. Read
-the :doc:`static files howto </howto/static-files>` for more details.
+the :doc:`static files howto </howto/static-files/index>` for more details.
 
 If your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
 ``http://media.example.com/admin/``), make sure to also set your

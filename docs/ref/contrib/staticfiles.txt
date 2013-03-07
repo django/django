@@ -12,7 +12,8 @@ can easily be served in production.
 .. seealso::
 
     For an introduction to the static files app and some usage examples, see
-    :doc:`/howto/static-files`.
+    :doc:`/howto/static-files/index`. For guidelines on deploying static files,
+    see :doc:`/howto/static-files/deployment`.
 
 .. _staticfiles-settings:
 
@@ -422,9 +423,18 @@ files:
 Static file development view
 ----------------------------
 
+.. currentmodule:: django.contrib.staticfiles
+
+The static files tools are mostly designed to help with getting static files
+successfully deployed into production. This usually means a separate,
+dedicated static file server, which is a lot of overhead to mess with when
+developing locally. Thus, the ``staticfiles`` app ships with a
+**quick and dirty helper view** that you can use to serve files locally in
+development.
+
 .. highlight:: python
 
-.. function:: django.contrib.staticfiles.views.serve(request, path)
+.. function:: views.serve(request, path)
 
 This view function serves static files in development.
 
@@ -451,9 +461,10 @@ primary URL configuration::
 Note, the beginning of the pattern (``r'^static/'``) should be your
 :setting:`STATIC_URL` setting.
 
-Since this is a bit finicky, there's also a helper function that'll do this for you:
+Since this is a bit finicky, there's also a helper function that'll do this for
+you:
 
-.. function:: django.contrib.staticfiles.urls.staticfiles_urlpatterns()
+.. function:: urls.staticfiles_urlpatterns()
 
 This will return the proper URL pattern for serving static files to your
 already defined pattern list. Use it like this::
@@ -464,8 +475,18 @@ already defined pattern list. Use it like this::
 
    urlpatterns += staticfiles_urlpatterns()
 
+This will inspect your :setting:`STATIC_URL` setting and wire up the view
+to serve static files accordingly. Don't forget to set the
+:setting:`STATICFILES_DIRS` setting appropriately to let
+``django.contrib.staticfiles`` know where to look for files in addition to
+files in app directories.
+
 .. warning::
 
     This helper function will only work if :setting:`DEBUG` is ``True``
     and your :setting:`STATIC_URL` setting is neither empty nor a full
     URL such as ``http://static.example.com/``.
+
+    That's because this view is **grossly inefficient** and probably
+    **insecure**. This is only intended for local development, and should
+    **never be used in production**.
