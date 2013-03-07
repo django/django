@@ -113,7 +113,7 @@ class ModuleImportTestCase(unittest.TestCase):
 
         # Test exceptions raised
         for path in ('no_dots_in_path', 'unexistent.path',
-                'tests.utils_tests.unexistent'):
+                'utils_tests.unexistent'):
             self.assertRaises(ImproperlyConfigured, import_by_path, path)
 
         with self.assertRaises(ImproperlyConfigured) as cm:
