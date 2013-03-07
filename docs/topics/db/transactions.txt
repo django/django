@@ -164,10 +164,131 @@ Django provides a single API to control database transactions.
     - releases or rolls back to the savepoint when exiting an inner block;
     - commits or rolls back the transaction when exiting the outermost block.
 
+Autocommit
+==========
+
+.. _autocommit-details:
+
+Why Django uses autocommit
+--------------------------
+
+In the SQL standards, each SQL query starts a transaction, unless one is
+already in progress. Such transactions must then be committed or rolled back.
+
+This isn't always convenient for application developers. To alleviate this
+problem, most databases provide an autocommit mode. When autocommit is turned
+on, each SQL query is wrapped in its own transaction. In other words, the
+transaction is not only automatically started, but also automatically
+committed.
+
+:pep:`249`, the Python Database API Specification v2.0, requires autocommit to
+be initially turned off. Django overrides this default and turns autocommit
+on.
+
+To avoid this, you can :ref:`deactivate the transaction management
+<deactivate-transaction-management>`, but it isn't recommended.
+
+.. versionchanged:: 1.6
+    Before Django 1.6, autocommit was turned off, and it was emulated by
+    forcing a commit after write operations in the ORM.
+
+.. warning::
+
+    If you're using the database API directly — for instance, you're running
+    SQL queries with ``cursor.execute()`` — be aware that autocommit is on,
+    and consider wrapping your operations in a transaction, with
+    :func:`atomic`, to ensure consistency.
+
+.. _deactivate-transaction-management:
+
+Deactivating transaction management
+-----------------------------------
+
+You can totally disable Django's transaction management for a given database
+by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
+configuration. If you do this, Django won't enable autocommit, and won't
+perform any commits. You'll get the regular behavior of the underlying
+database library.
+
+This requires you to commit explicitly every transaction, even those started
+by Django or by third-party libraries. Thus, this is best used in situations
+where you want to run your own transaction-controlling middleware or do
+something really strange.
+
+.. versionchanged:: 1.6
+    This used to be controlled by the ``TRANSACTIONS_MANAGED`` setting.
+
+Low-level APIs
+==============
+
+.. warning::
+
+    Always prefer :func:`atomic` if possible at all. It accounts for the
+    idiosyncrasies of each database and prevents invalid operations.
+
+    The low level APIs are only useful if you're implementing your own
+    transaction management.
+
+.. _managing-autocommit:
+
+Autocommit
+----------
+
+.. versionadded:: 1.6
+
+Django provides a straightforward API to manage the autocommit state of each
+database connection, if you need to.
+
+.. function:: get_autocommit(using=None)
+
+.. function:: set_autocommit(using=None, autocommit=True)
+
+These functions take a ``using`` argument which should be the name of a
+database. If it isn't provided, Django uses the ``"default"`` database.
+
+Autocommit is initially turned on. If you turn it off, it's your
+responsibility to restore it.
+
+Once you turn autocommit off, you get the default behavior of your database
+adapter, and Django won't help you. Although that behavior is specified in
+:pep:`249`, implementations of adapters aren't always consistent with one
+another. Review the documentation of the adapter you're using carefully.
+
+You must ensure that no transaction is active, usually by issuing a
+:func:`commit` or a :func:`rollback`, before turning autocommit back on.
+
+:func:`atomic` requires autocommit to be turned on; it will raise an exception
+if autocommit is off. Django will also refuse to turn autocommit off when an
+:func:`atomic` block is active, because that would break atomicity.
+
+Transactions
+------------
+
+A transaction is an atomic set of database queries. Even if your program
+crashes, the database guarantees that either all the changes will be applied,
+or none of them.
+
+Django doesn't provide an API to start a transaction. The expected way to
+start a transaction is to disable autocommit with :func:`set_autocommit`.
+
+Once you're in a transaction, you can choose either to apply the changes
+you've performed until this point with :func:`commit`, or to cancel them with
+:func:`rollback`.
+
+.. function:: commit(using=None)
+
+.. function:: rollback(using=None)
+
+These functions take a ``using`` argument which should be the name of a
+database. If it isn't provided, Django uses the ``"default"`` database.
+
+Django will refuse to commit or to rollback when an :func:`atomic` block is
+active, because that would break atomicity.
+
 .. _topics-db-transactions-savepoints:
 
 Savepoints
-==========
+----------
 
 A savepoint is a marker within a transaction that enables you to roll back
 part of a transaction, rather than the full transaction. Savepoints are
@@ -242,85 +363,6 @@ The following example demonstrates the use of savepoints::
       else:
           transaction.savepoint_rollback(sid)
           # open transaction now contains only a.save()
-
-Autocommit
-==========
-
-.. _autocommit-details:
-
-Why Django uses autocommit
---------------------------
-
-In the SQL standards, each SQL query starts a transaction, unless one is
-already in progress. Such transactions must then be committed or rolled back.
-
-This isn't always convenient for application developers. To alleviate this
-problem, most databases provide an autocommit mode. When autocommit is turned
-on, each SQL query is wrapped in its own transaction. In other words, the
-transaction is not only automatically started, but also automatically
-committed.
-
-:pep:`249`, the Python Database API Specification v2.0, requires autocommit to
-be initially turned off. Django overrides this default and turns autocommit
-on.
-
-To avoid this, you can :ref:`deactivate the transaction management
-<deactivate-transaction-management>`, but it isn't recommended.
-
-.. versionchanged:: 1.6
-    Before Django 1.6, autocommit was turned off, and it was emulated by
-    forcing a commit after write operations in the ORM.
-
-.. warning::
-
-    If you're using the database API directly — for instance, you're running
-    SQL queries with ``cursor.execute()`` — be aware that autocommit is on,
-    and consider wrapping your operations in a transaction, with
-    :func:`atomic`, to ensure consistency.
-
-.. _managing-autocommit:
-
-Managing autocommit
--------------------
-
-.. versionadded:: 1.6
-
-Django provides a straightforward API to manage the autocommit state of each
-database connection, if you need to.
-
-.. function:: get_autocommit(using=None)
-
-.. function:: set_autocommit(using=None, autocommit=True)
-
-These functions take a ``using`` argument which should be the name of a
-database. If it isn't provided, Django uses the ``"default"`` database.
-
-Autocommit is initially turned on. If you turn it off, it's your
-responsibility to restore it.
-
-:func:`atomic` requires autocommit to be turned on; it will raise an exception
-if autocommit is off. Django will also refuse to turn autocommit off when an
-:func:`atomic` block is active, because that would break atomicity.
-
-.. _deactivate-transaction-management:
-
-Deactivating transaction management
------------------------------------
-
-You can totally disable Django's transaction management for a given database
-by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
-configuration. If you do this, Django won't enable autocommit, and won't
-perform any commits. You'll get the regular behavior of the underlying
-database library.
-
-This requires you to commit explicitly every transaction, even those started
-by Django or by third-party libraries. Thus, this is best used in situations
-where you want to run your own transaction-controlling middleware or do
-something really strange.
-
-.. versionchanged:: 1.6
-    This used to be controlled by the ``TRANSACTIONS_MANAGED`` setting.
-
 
 Database-specific notes
 =======================
