@@ -4,7 +4,7 @@ from django.db import connection, connections, transaction, DEFAULT_DB_ALIAS, Da
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
-from django.utils.unittest import skipIf, skipUnless, expectedFailure
+from django.utils.unittest import skipIf, skipUnless
 
 from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
@@ -187,22 +187,24 @@ class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCa
             connections[DEFAULT_DB_ALIAS].close()
             connections[DEFAULT_DB_ALIAS] = self._old_backend
 
-    # TODO: update this test to account for database-level autocommit.
-    @expectedFailure
     def test_commit(self):
         """
         Users are allowed to commit and rollback connections.
         """
-        # The starting value is False, not None.
-        self.assertIs(connection._dirty, False)
-        list(Mod.objects.all())
-        self.assertTrue(connection.is_dirty())
-        connection.commit()
-        self.assertFalse(connection.is_dirty())
-        list(Mod.objects.all())
-        self.assertTrue(connection.is_dirty())
-        connection.rollback()
-        self.assertFalse(connection.is_dirty())
+        connection.set_autocommit(False)
+        try:
+            # The starting value is False, not None.
+            self.assertIs(connection._dirty, False)
+            list(Mod.objects.all())
+            self.assertTrue(connection.is_dirty())
+            connection.commit()
+            self.assertFalse(connection.is_dirty())
+            list(Mod.objects.all())
+            self.assertTrue(connection.is_dirty())
+            connection.rollback()
+            self.assertFalse(connection.is_dirty())
+        finally:
+            connection.set_autocommit(True)
 
     def test_enter_exit_management(self):
         orig_dirty = connection._dirty
