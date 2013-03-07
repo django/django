@@ -3,10 +3,18 @@ from __future__ import absolute_import
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
-from django.template import Template, Context
+from django.template import Template, Context, Library, libraries
 
 from ..models import Article, Author
 from . import CommentTestCase
+
+register = Library()
+
+@register.filter
+def noop(variable, param=None):
+    return variable
+
+libraries['comment_testtags'] = register
 
 
 class CommentTemplateTagTests(CommentTestCase):
@@ -32,6 +40,9 @@ class CommentTemplateTagTests(CommentTestCase):
     def testGetCommentFormFromObject(self):
         self.testGetCommentForm("{% get_comment_form for a as form %}")
 
+    def testWhitespaceInGetCommentFormTag(self):
+        self.testGetCommentForm("{% load comment_testtags %}{% get_comment_form for a|noop:'x y' as form %}")
+
     def testRenderCommentForm(self, tag=None):
         t = "{% load comments %}" + (tag or "{% render_comment_form for comment_tests.article a.id %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
@@ -43,6 +54,9 @@ class CommentTemplateTagTests(CommentTestCase):
 
     def testRenderCommentFormFromObject(self):
         self.testRenderCommentForm("{% render_comment_form for a %}")
+
+    def testWhitespaceInRenderCommentFormTag(self):
+        self.testRenderCommentForm("{% load comment_testtags %}{% render_comment_form for a|noop:'x y' %}")
 
     def testRenderCommentFormFromObjectWithQueryCount(self):
         with self.assertNumQueries(1):
@@ -65,6 +79,10 @@ class CommentTemplateTagTests(CommentTestCase):
         self.createSomeComments()
         self.verifyGetCommentCount("{% get_comment_count for a as cc %}")
 
+    def testWhitespaceInGetCommentCountTag(self):
+        self.createSomeComments()
+        self.verifyGetCommentCount("{% load comment_testtags %}{% get_comment_count for a|noop:'x y' as cc %}")
+
     def verifyGetCommentList(self, tag=None):
         c1, c2, c3, c4 = Comment.objects.all()[:4]
         t = "{% load comments %}" +  (tag or "{% get_comment_list for comment_tests.author a.id as cl %}")
@@ -84,6 +102,10 @@ class CommentTemplateTagTests(CommentTestCase):
         self.createSomeComments()
         self.verifyGetCommentList("{% get_comment_list for a as cl %}")
 
+    def testWhitespaceInGetCommentListTag(self):
+        self.createSomeComments()
+        self.verifyGetCommentList("{% load comment_testtags %}{% get_comment_list for a|noop:'x y' as cl %}")
+
     def testGetCommentPermalink(self):
         c1, c2, c3, c4 = self.createSomeComments()
         t = "{% load comments %}{% get_comment_list for comment_tests.author author.id as cl %}"
@@ -102,6 +124,15 @@ class CommentTemplateTagTests(CommentTestCase):
         ctx, out = self.render(t, author=author)
         self.assertEqual(out, "/cr/%s/%s/#c%s-by-Joe Somebody" % (ct.id, author.id, c2.id))
 
+    def testWhitespaceInGetCommentPermalinkTag(self):
+        c1, c2, c3, c4 = self.createSomeComments()
+        t = "{% load comments comment_testtags %}{% get_comment_list for comment_tests.author author.id as cl %}"
+        t += "{% get_comment_permalink cl.0|noop:'x y' %}"
+        ct = ContentType.objects.get_for_model(Author)
+        author = Author.objects.get(pk=1)
+        ctx, out = self.render(t, author=author)
+        self.assertEqual(out, "/cr/%s/%s/#c%s" % (ct.id, author.id, c2.id))
+
     def testRenderCommentList(self, tag=None):
         t = "{% load comments %}" + (tag or "{% render_comment_list for comment_tests.article a.id %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
@@ -113,6 +144,9 @@ class CommentTemplateTagTests(CommentTestCase):
 
     def testRenderCommentListFromObject(self):
         self.testRenderCommentList("{% render_comment_list for a %}")
+
+    def testWhitespaceInRenderCommentListTag(self):
+        self.testRenderCommentList("{% load comment_testtags %}{% render_comment_list for a|noop:'x y' %}")
 
     def testNumberQueries(self):
         """
