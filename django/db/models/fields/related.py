@@ -955,7 +955,9 @@ class OneToOneRel(ManyToOneRel):
 
 class ManyToManyRel(object):
     def __init__(self, to, related_name=None, limit_choices_to=None,
-            symmetrical=True, through=None):
+            symmetrical=True, through=None, db_constraint=True):
+        if through and not db_constraint:
+            raise ValueError("Can't supply a through model and db_constraint=False")
         self.to = to
         self.related_name = related_name
         if limit_choices_to is None:
@@ -964,6 +966,7 @@ class ManyToManyRel(object):
         self.symmetrical = symmetrical
         self.multiple = True
         self.through = through
+        self.db_constraint = db_constraint
 
     def is_hidden(self):
         "Should the related object be hidden?"
@@ -1196,15 +1199,15 @@ def create_many_to_many_intermediary_model(field, klass):
     return type(name, (models.Model,), {
         'Meta': meta,
         '__module__': klass.__module__,
-        from_: models.ForeignKey(klass, related_name='%s+' % name, db_tablespace=field.db_tablespace),
-        to: models.ForeignKey(to_model, related_name='%s+' % name, db_tablespace=field.db_tablespace)
+        from_: models.ForeignKey(klass, related_name='%s+' % name, db_tablespace=field.db_tablespace, db_constraint=field.rel.db_constraint),
+        to: models.ForeignKey(to_model, related_name='%s+' % name, db_tablespace=field.db_tablespace, db_constraint=field.rel.db_constraint)
     })
 
 
 class ManyToManyField(RelatedField, Field):
     description = _("Many-to-many relationship")
 
-    def __init__(self, to, **kwargs):
+    def __init__(self, to, db_constraint=True, **kwargs):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -1219,13 +1222,15 @@ class ManyToManyField(RelatedField, Field):
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
-            through=kwargs.pop('through', None))
+            through=kwargs.pop('through', None),
+            db_constraint=db_constraint,
+        )
 
         self.db_table = kwargs.pop('db_table', None)
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
-        Field.__init__(self, **kwargs)
+        super(ManyToManyField, self).__init__(**kwargs)
 
         msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
