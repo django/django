@@ -193,24 +193,32 @@ Each of these functions takes a ``using`` argument which should be the name of
 a database for which the behavior applies.  If no ``using`` argument is
 provided then the ``"default"`` database is used.
 
-Savepoints are controlled by three methods on the transaction object:
+Savepoints are controlled by three functions in :mod:`django.db.transaction`:
 
-.. method:: transaction.savepoint(using=None)
+.. function:: savepoint(using=None)
 
     Creates a new savepoint. This marks a point in the transaction that
     is known to be in a "good" state.
 
-    Returns the savepoint ID (sid).
+    Returns the savepoint ID (``sid``).
 
-.. method:: transaction.savepoint_commit(sid, using=None)
+.. function:: savepoint_commit(sid, using=None)
 
-    Updates the savepoint to include any operations that have been performed
-    since the savepoint was created, or since the last commit.
+    Releases savepoint ``sid``. The changes performed since the savepoint was
+    created become part of the transaction.
 
-.. method:: transaction.savepoint_rollback(sid, using=None)
+.. function:: savepoint_rollback(sid, using=None)
 
-    Rolls the transaction back to the last point at which the savepoint was
-    committed.
+    Rolls back the transaction to savepoint ``sid``.
+
+These functions do nothing if savepoints aren't supported or if the database
+is in autocommit mode.
+
+In addition, there's a utility function:
+
+.. function:: clean_savepoints(using=None)
+
+    Resets the counter used to generate unique savepoint IDs.
 
 The following example demonstrates the use of savepoints::
 
