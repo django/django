@@ -364,6 +364,15 @@ class DatabaseOperations(BaseDatabaseOperations):
     def savepoint_rollback_sql(self, sid):
         return "ROLLBACK TO SAVEPOINT %s" % sid
 
+    def combine_expression(self, connector, sub_expressions):
+        """
+        Mysql requires special cases for ^ operators in query expressions
+        """
+        if connector == '^':
+            return 'POW(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
     operators = {
