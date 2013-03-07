@@ -27,7 +27,6 @@ from django.core.management.color import no_style
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
 from django.core.urlresolvers import clear_url_caches
-from django.core.validators import EMPTY_VALUES
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -322,7 +321,7 @@ class SimpleTestCase(ut2.TestCase):
                     raised error messages.
             field_args: the args passed to instantiate the field
             field_kwargs: the kwargs passed to instantiate the field
-            empty_value: the expected clean output for inputs in EMPTY_VALUES
+            empty_value: the expected clean output for inputs in empty_values
 
         """
         if field_args is None:
@@ -347,7 +346,7 @@ class SimpleTestCase(ut2.TestCase):
             self.assertEqual(context_manager.exception.messages, errors)
         # test required inputs
         error_required = [force_text(required.error_messages['required'])]
-        for e in EMPTY_VALUES:
+        for e in required.empty_values:
             with self.assertRaises(ValidationError) as context_manager:
                 required.clean(e)
             self.assertEqual(context_manager.exception.messages,

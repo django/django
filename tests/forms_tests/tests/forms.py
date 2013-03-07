@@ -1797,3 +1797,32 @@ class FormsTestCase(TestCase):
         form = NameForm(data={'name' : ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
+
+    def test_empty_values(self):
+        class OldFakeJSONField(forms.Field):
+            def to_python(self, value):
+                if value in [None, '']:
+                    return None
+                # Fake json.loads.
+                if value == '{}':
+                    return {}
+                raise NotImplementedError
+
+            def prepare_value(self, value):
+                if value in [None, '']:
+                    return ''
+                # Fake json.dumps
+                if value == {}:
+                    return '{}'
+                raise NotImplementedError
+
+        class NewFakeJSONField(OldFakeJSONField):
+            empty_values = [None, '']
+
+        class FakeJSONForm(forms.Form):
+            old = OldFakeJSONField()
+            new = NewFakeJSONField()
+        form = FakeJSONForm(data={'old': '{}', 'new': '{}'});
+        form.full_clean()
+        self.assertEqual(form.errors, {'old': ['This field is required.']})
+        self.assertEqual(form.cleaned_data, {'new' : {}})
