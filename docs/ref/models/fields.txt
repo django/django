@@ -1227,6 +1227,20 @@ that control how the relationship functions.
     the table for the model defining the relationship and the name of the field
     itself.
 
+.. attribute:: ManyToManyField.db_constraint
+
+    Controls whether or not constraints should be created in the database for
+    the foreign keys in the intermediary table. The default is ``True``, and
+    that's almost certainly what you want; setting this to ``False`` can be
+    very bad for data integrity. That said, here are some scenarios where you
+    might want to do this:
+
+    * You have legacy data that is not valid.
+    * You're sharding your database.
+
+    It is an error to pass both ``db_constraint`` and ``through``.
+
+
 .. _ref-onetoone:
 
 ``OneToOneField``
