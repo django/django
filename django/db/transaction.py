@@ -308,6 +308,24 @@ def atomic(using=None):
         return Atomic(using)
 
 
+def atomic_if_autocommit(using=None):
+    # This variant only exists to support the ability to disable transaction
+    # management entirely in the DATABASES setting. It doesn't care about the
+    # autocommit state at run time.
+    db = DEFAULT_DB_ALIAS if callable(using) else using
+    autocommit = get_connection(db).settings_dict['AUTOCOMMIT']
+
+    if autocommit:
+        return atomic(using)
+    else:
+        # Bare decorator: @atomic_if_autocommit
+        if callable(using):
+            return using
+        # Decorator: @atomic_if_autocommit(...)
+        else:
+            return lambda func: func
+
+
 ############################################
 # Deprecated decorators / context managers #
 ############################################
@@ -431,13 +449,13 @@ def commit_on_success_unless_managed(using=None):
     Transitory API to preserve backwards-compatibility while refactoring.
 
     Once the legacy transaction management is fully deprecated, this should
-    simply be replaced by atomic. Until then, it's necessary to avoid making a
-    commit where Django didn't use to, since entering atomic in managed mode
-    triggers a commmit.
+    simply be replaced by atomic_if_autocommit. Until then, it's necessary to
+    avoid making a commit where Django didn't use to, since entering atomic in
+    managed mode triggers a commmit.
     """
     connection = get_connection(using)
     if connection.autocommit or connection.in_atomic_block:
-        return atomic(using)
+        return atomic_if_autocommit(using)
     else:
         def entering(using):
             pass
