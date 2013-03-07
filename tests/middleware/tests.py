@@ -703,19 +703,6 @@ class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, Transacti
         self.assertFalse(transaction.is_dirty())
         self.assertEqual(Band.objects.count(), 1)
 
-    # TODO: update this test to account for database-level autocommit.
-    # Currently it fails under PostgreSQL because connections are never
-    # marked dirty in non-managed mode.
-    @expectedFailure
-    def test_unmanaged_response(self):
-        transaction.enter_transaction_management(False)
-        self.assertEqual(Band.objects.count(), 0)
-        TransactionMiddleware().process_response(self.request, self.response)
-        self.assertFalse(transaction.is_managed())
-        # The transaction middleware doesn't commit/rollback if management
-        # has been disabled.
-        self.assertTrue(transaction.is_dirty())
-
     def test_exception(self):
         transaction.enter_transaction_management()
         Band.objects.create(name='The Beatles')
