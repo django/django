@@ -1069,6 +1069,8 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.db_constraint
 
+    .. versionadded:: 1.6
+
     Controls whether or not a constraint should be created in the database for
     this foreign key. The default is ``True``, and that's almost certainly what
     you want; setting this to ``False`` can be very bad for data integrity.
@@ -1228,6 +1230,8 @@ that control how the relationship functions.
     itself.
 
 .. attribute:: ManyToManyField.db_constraint
+
+    .. versionadded:: 1.6
 
     Controls whether or not constraints should be created in the database for
     the foreign keys in the intermediary table. The default is ``True``, and
