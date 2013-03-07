@@ -1,17 +1,19 @@
 import copy
 import operator
-from functools import wraps, update_wrapper
+from functools import wraps
 import sys
 
 from django.utils import six
+
 
 # You can't trivially replace this with `functools.partial` because this binds
 # to classes and returns bound instances, whereas functools.partial (on
 # CPython) is a type and its instances don't bind.
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
-        return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
+        return _curried_func(*(args + moreargs), **dict(kwargs, **morekwargs))
     return _curried
+
 
 def memoize(func, cache, num_args):
     """
@@ -31,6 +33,7 @@ def memoize(func, cache, num_args):
         return result
     return wrapper
 
+
 class cached_property(object):
     """
     Decorator that converts a method with a single self argument into a
@@ -45,6 +48,7 @@ class cached_property(object):
         res = instance.__dict__[self.func.__name__] = self.func(instance)
         return res
 
+
 class Promise(object):
     """
     This is just a base class for the proxy class created in
@@ -52,6 +56,7 @@ class Promise(object):
     promises in code.
     """
     pass
+
 
 def lazy(func, *resultclasses):
     """
@@ -88,9 +93,9 @@ def lazy(func, *resultclasses):
                 cls.__dispatch[resultclass] = {}
                 for type_ in reversed(resultclass.mro()):
                     for (k, v) in type_.__dict__.items():
-                        # All __promise__ return the same wrapper method, but they
-                        # also do setup, inserting the method into the dispatch
-                        # dict.
+                        # All __promise__ return the same wrapper method, but
+                        # they also do setup, inserting the method into the
+                        # dispatch dict.
                         meth = cls.__promise__(resultclass, k, v)
                         if hasattr(cls, k):
                             continue
@@ -111,8 +116,8 @@ def lazy(func, *resultclasses):
         __prepare_class__ = classmethod(__prepare_class__)
 
         def __promise__(cls, klass, funcname, method):
-            # Builds a wrapper around some magic method and registers that magic
-            # method for the given type and method name.
+            # Builds a wrapper around some magic method and registers that
+            # magic method for the given type and method name.
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
@@ -176,8 +181,10 @@ def lazy(func, *resultclasses):
 
     return __wrapper__
 
+
 def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
     return lazy(func, *resultclasses)(*args, **kwargs)
+
 
 def allow_lazy(func, *resultclasses):
     """
@@ -197,12 +204,15 @@ def allow_lazy(func, *resultclasses):
     return wrapper
 
 empty = object()
+
+
 def new_method_proxy(func):
     def inner(self, *args):
         if self._wrapped is empty:
             self._setup()
         return func(self._wrapped, *args)
     return inner
+
 
 class LazyObject(object):
     """
@@ -246,6 +256,7 @@ class LazyObject(object):
 # Workaround for http://bugs.python.org/issue12370
 _super = super
 
+
 class SimpleLazyObject(LazyObject):
     """
     A lazy object initialised from any function.
@@ -288,8 +299,8 @@ class SimpleLazyObject(LazyObject):
     # Because we have messed with __class__ below, we confuse pickle as to what
     # class we are pickling. It also appears to stop __reduce__ from being
     # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is a
-    # builtin, but it is better than nothing.
+    # that pickle interprets this class.  This fails when the wrapped class is
+    # a builtin, but it is better than nothing.
     def __getstate__(self):
         if self._wrapped is empty:
             self._setup()
@@ -314,8 +325,8 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._wrapped
         return '<SimpleLazyObject: %r>' % repr_attr
 
-    # Need to pretend to be the wrapped class, for the sake of objects that care
-    # about this (especially in equality tests)
+    # Need to pretend to be the wrapped class, for the sake of objects that
+    # care about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
     __hash__ = new_method_proxy(hash)
@@ -343,6 +354,7 @@ class lazy_property(property):
                 return getattr(instance, name)()
         return property(fget, fset, fdel, doc)
 
+
 def partition(predicate, values):
     """
     Splits the values into two sets, based on the return value of the function
@@ -356,7 +368,7 @@ def partition(predicate, values):
         results[predicate(item)].append(item)
     return results
 
-if sys.version_info >= (2,7,2):
+if sys.version_info >= (2, 7, 2):
     from functools import total_ordering
 else:
     # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
