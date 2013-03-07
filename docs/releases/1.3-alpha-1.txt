@@ -72,7 +72,7 @@ at :setting:`STATIC_URL`.
 
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details or learn how to :doc:`manage static files
-</howto/static-files>`.
+</howto/static-files/index>`.
 
 ``unittest2`` support
 ~~~~~~~~~~~~~~~~~~~~~

@@ -191,7 +191,7 @@ testing of Django applications:
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
-  :doc:`Handling static files <howto/static-files>` |
+  :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
 The admin
