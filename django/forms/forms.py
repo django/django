@@ -345,8 +345,13 @@ class BaseForm(object):
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
-                    initial_value = field.to_python(hidden_widget.value_from_datadict(
-                        self.data, self.files, initial_prefixed_name))
+                    try:
+                        initial_value = field.to_python(hidden_widget.value_from_datadict(
+                            self.data, self.files, initial_prefixed_name))
+                    except ValidationError:
+                        # Always assume data has changed if validation fails.
+                        self._changed_data.append(name)
+                        continue
                 if hasattr(field.widget, '_has_changed'):
                     warnings.warn("The _has_changed method on widgets is deprecated,"
                         " define it at field level instead.",
