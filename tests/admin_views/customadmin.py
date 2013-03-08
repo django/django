@@ -35,8 +35,8 @@ class Admin2(admin.AdminSite):
 
 class UserLimitedAdmin(UserAdmin):
     # used for testing password change on a user not in queryset
-    def queryset(self, request):
-        qs = super(UserLimitedAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super(UserLimitedAdmin, self).get_queryset(request)
         return qs.filter(is_superuser=False)
 
 

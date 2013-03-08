@@ -289,3 +289,9 @@ on a widget, you should now define this method on the form field itself.
 
 ``Model._meta.module_name`` was renamed to ``model_name``. Despite being a
 private API, it will go through a regular deprecation path.
+
+``get_query_set`` and similar methods renamed to ``get_queryset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
+``ModelAdmin.queryset`` have been renamed to ``get_queryset``.

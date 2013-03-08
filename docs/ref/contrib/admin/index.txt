@@ -703,7 +703,7 @@ subclass::
                       Only show the lookups if there actually is
                       anyone born in the corresponding decades.
                       """
-                      qs = model_admin.queryset(request)
+                      qs = model_admin.get_queryset(request)
                       if qs.filter(birthday__gte=date(1980, 1, 1),
                                     birthday__lte=date(1989, 12, 31)).exists():
                           yield ('80s', _('in the eighties'))
@@ -1326,19 +1326,22 @@ templates used by the :class:`ModelAdmin` views:
     be interpreted as meaning that the current user is not permitted to delete
     any object of this type).
 
-.. method:: ModelAdmin.queryset(self, request)
+.. method:: ModelAdmin.get_queryset(self, request)
 
-    The ``queryset`` method on a ``ModelAdmin`` returns a
+    The ``get_queryset`` method on a ``ModelAdmin`` returns a
     :class:`~django.db.models.query.QuerySet` of all model instances that
     can be edited by the admin site. One use case for overriding this method
     is to show objects owned by the logged-in user::
 
         class MyModelAdmin(admin.ModelAdmin):
-            def queryset(self, request):
-                qs = super(MyModelAdmin, self).queryset(request)
+            def get_queryset(self, request):
+                qs = super(MyModelAdmin, self).get_queryset(request)
                 if request.user.is_superuser:
                     return qs
                 return qs.filter(author=request.user)
+
+    .. versionchanged:: 1.6
+        The ``get_queryset`` method was previously named ``queryset``.
 
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
@@ -1549,7 +1552,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
-- :meth:`~ModelAdmin.queryset`
+- :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`

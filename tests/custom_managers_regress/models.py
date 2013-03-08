@@ -10,8 +10,8 @@ class RestrictedManager(models.Manager):
     """
     A manager that filters out non-public instances.
     """
-    def get_query_set(self):
-        return super(RestrictedManager, self).get_query_set().filter(is_public=True)
+    def get_queryset(self):
+        return super(RestrictedManager, self).get_queryset().filter(is_public=True)
 
 @python_2_unicode_compatible
 class RelatedModel(models.Model):

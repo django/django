@@ -291,7 +291,7 @@ class AdminViewBasicTest(TestCase):
         """
         If no ordering is defined in `ModelAdmin.ordering` or in the query
         string, then the underlying order of the queryset should not be
-        changed, even if it is defined in `Modeladmin.queryset()`.
+        changed, even if it is defined in `Modeladmin.get_queryset()`.
         Refs #11868, #7309.
         """
         p1 = Person.objects.create(name="Amy", gender=1, alive=True, age=80)
@@ -440,7 +440,7 @@ class AdminViewBasicTest(TestCase):
                         self.urlbit, query_string))
                 self.assertEqual(filtered_response.status_code, 200)
                 # ensure changelist contains only valid objects
-                for obj in filtered_response.context['cl'].query_set.all():
+                for obj in filtered_response.context['cl'].queryset.all():
                     self.assertTrue(params['test'](obj, value))
 
     def testIncorrectLookupParameters(self):
@@ -2583,7 +2583,7 @@ class AdminCustomQuerysetTest(TestCase):
                 self.assertEqual(response.status_code, 404)
 
     def test_add_model_modeladmin_defer_qs(self):
-        # Test for #14529. defer() is used in ModelAdmin.queryset()
+        # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
         # model has __unicode__ method
         self.assertEqual(CoverLetter.objects.count(), 0)
@@ -2622,7 +2622,7 @@ class AdminCustomQuerysetTest(TestCase):
         )
 
     def test_add_model_modeladmin_only_qs(self):
-        # Test for #14529. only() is used in ModelAdmin.queryset()
+        # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
         # model has __unicode__ method
         self.assertEqual(Telegram.objects.count(), 0)
@@ -2661,7 +2661,7 @@ class AdminCustomQuerysetTest(TestCase):
         )
 
     def test_edit_model_modeladmin_defer_qs(self):
-        # Test for #14529. defer() is used in ModelAdmin.queryset()
+        # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
         # model has __unicode__ method
         cl = CoverLetter.objects.create(author="John Doe")
@@ -2708,7 +2708,7 @@ class AdminCustomQuerysetTest(TestCase):
         )
 
     def test_edit_model_modeladmin_only_qs(self):
-        # Test for #14529. only() is used in ModelAdmin.queryset()
+        # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
         # model has __unicode__ method
         t = Telegram.objects.create(title="Frist Telegram")

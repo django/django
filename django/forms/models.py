@@ -478,7 +478,7 @@ class BaseModelFormSet(BaseFormSet):
             if self.queryset is not None:
                 qs = self.queryset
             else:
-                qs = self.model._default_manager.get_query_set()
+                qs = self.model._default_manager.get_queryset()
 
             # If the queryset isn't already ordered we need to add an
             # artificial ordering here to make sure that all formsets
@@ -668,9 +668,9 @@ class BaseModelFormSet(BaseFormSet):
                 except IndexError:
                     pk_value = None
             if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
-                qs = pk.rel.to._default_manager.get_query_set()
+                qs = pk.rel.to._default_manager.get_queryset()
             else:
-                qs = self.model._default_manager.get_query_set()
+                qs = self.model._default_manager.get_queryset()
             qs = qs.using(form.instance._state.db)
             if form._meta.widgets:
                 widget = form._meta.widgets.get(self._pk_field.name, HiddenInput)

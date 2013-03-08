@@ -16,10 +16,18 @@ from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
+from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import smart_text
 
 
-class GenericForeignKey(object):
+class RenameGenericForeignKeyMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+    )
+
+
+class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
@@ -60,7 +68,7 @@ class GenericForeignKey(object):
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
-    def get_prefetch_query_set(self, instances):
+    def get_prefetch_queryset(self, instances):
         # For efficiency, group the instances by content type and then do one
         # query per model
         fk_dict = defaultdict(set)
@@ -316,21 +324,21 @@ def create_generic_related_manager(superclass):
                 '%s__exact' % object_id_field_name: instance._get_pk_val(),
             }
 
-        def get_query_set(self):
+        def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
                 db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
+                return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
 
-        def get_prefetch_query_set(self, instances):
+        def get_prefetch_queryset(self, instances):
             db = self._db or router.db_for_read(self.model, instance=instances[0])
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
                 '%s__in' % self.object_id_field_name:
                     set(obj._get_pk_val() for obj in instances)
                 }
-            qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            qs = super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**query)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
