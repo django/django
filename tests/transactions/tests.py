@@ -106,6 +106,44 @@ class AtomicTests(TransactionTestCase):
                 raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
+    def test_merged_commit_commit(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with transaction.atomic(savepoint=False):
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+        self.assertQuerysetEqual(Reporter.objects.all(),
+                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+
+    def test_merged_commit_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with transaction.atomic(savepoint=False):
+                    Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+        # Writes in the outer block are rolled back too.
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_merged_rollback_commit(self):
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with transaction.atomic():
+                Reporter.objects.create(last_name="Tintin")
+                with transaction.atomic(savepoint=False):
+                    Reporter.objects.create(last_name="Haddock")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_merged_rollback_rollback(self):
+        with six.assertRaisesRegex(self, Exception, "Oops"):
+            with transaction.atomic():
+                Reporter.objects.create(last_name="Tintin")
+                with six.assertRaisesRegex(self, Exception, "Oops"):
+                    with transaction.atomic(savepoint=False):
+                        Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+                raise Exception("Oops, that's his first name")
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
     def test_reuse_commit_commit(self):
         atomic = transaction.atomic()
         with atomic:
@@ -169,6 +207,61 @@ class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
         # connection dirty; a rollback is required to make it clean.
         transaction.rollback()
         transaction.leave_transaction_management()
+
+
+@skipUnless(connection.features.uses_savepoints,
+        "'atomic' requires transactions and savepoints.")
+class AtomicMergeTests(TransactionTestCase):
+    """Test merging transactions with savepoint=False."""
+
+    def test_merged_outer_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with transaction.atomic(savepoint=False):
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+                with six.assertRaisesRegex(self, Exception, "Oops"):
+                    with transaction.atomic(savepoint=False):
+                        Reporter.objects.create(first_name="Tournesol")
+                        raise Exception("Oops, that's his last name")
+                # It wasn't possible to roll back
+                self.assertEqual(Reporter.objects.count(), 3)
+            # It wasn't possible to roll back
+            self.assertEqual(Reporter.objects.count(), 3)
+        # The outer block must roll back
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_merged_inner_savepoint_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+                with six.assertRaisesRegex(self, Exception, "Oops"):
+                    with transaction.atomic(savepoint=False):
+                        Reporter.objects.create(first_name="Tournesol")
+                        raise Exception("Oops, that's his last name")
+                # It wasn't possible to roll back
+                self.assertEqual(Reporter.objects.count(), 3)
+            # The first block with a savepoint must roll back
+            self.assertEqual(Reporter.objects.count(), 1)
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    def test_merged_outer_rollback_after_inner_failure_and_inner_success(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            # Inner block without a savepoint fails
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with transaction.atomic(savepoint=False):
+                    Reporter.objects.create(first_name="Haddock")
+                    raise Exception("Oops, that's his last name")
+            # It wasn't possible to roll back
+            self.assertEqual(Reporter.objects.count(), 2)
+            # Inner block with a savepoint succeeds
+            with transaction.atomic(savepoint=False):
+                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+            # It still wasn't possible to roll back
+            self.assertEqual(Reporter.objects.count(), 3)
+        # The outer block must rollback
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
 
 
 @skipUnless(connection.features.uses_savepoints,

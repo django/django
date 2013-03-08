@@ -52,6 +52,9 @@ class BaseDatabaseWrapper(object):
         self._dirty = False
         # Tracks if the connection is in a transaction managed by 'atomic'
         self.in_atomic_block = False
+        # Tracks if the transaction should be rolled back to the next
+        # available savepoint because of an exception in an inner block.
+        self.needs_rollback = False
         # List of savepoints created by 'atomic'
         self.savepoint_ids = []
         # Hack to provide compatibility with legacy transaction management
