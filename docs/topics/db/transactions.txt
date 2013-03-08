@@ -16,11 +16,10 @@ Django's default behavior is to run in autocommit mode. Each query is
 immediately committed to the database. :ref:`See below for details
 <autocommit-details>`.
 
-..
-   Django uses transactions or savepoints automatically to guarantee the
-   integrity of ORM operations that require multiple queries, especially
-   :ref:`delete() <topics-db-queries-delete>` and :ref:`update()
-   <topics-db-queries-update>` queries.
+Django uses transactions or savepoints automatically to guarantee the
+integrity of ORM operations that require multiple queries, especially
+:ref:`delete() <topics-db-queries-delete>` and :ref:`update()
+<topics-db-queries-update>` queries.
 
 .. versionchanged:: 1.6
     Previous version of Django featured :ref:`a more complicated default
