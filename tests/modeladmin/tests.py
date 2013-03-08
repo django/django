@@ -69,7 +69,7 @@ class ModelAdminTests(TestCase):
         # If we specify the fields argument, fieldsets_add and fielsets_change should
         # just stick the fields into a formsets structure and return it.
         class BandAdmin(ModelAdmin):
-             fields = ['name']
+            fields = ['name']
 
         ma = BandAdmin(Band, self.site)
 
@@ -1074,7 +1074,7 @@ class ValidationTests(unittest.TestCase):
                 return 'awesomeness'
             def get_choices(self, request):
                 return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
-            def get_query_set(self, cl, qs):
+            def get_queryset(self, cl, qs):
                 return qs
 
         class ValidationTestModelAdmin(ModelAdmin):

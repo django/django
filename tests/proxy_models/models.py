@@ -10,12 +10,12 @@ from django.utils.encoding import python_2_unicode_compatible
 # A couple of managers for testing managing overriding in proxy model cases.
 
 class PersonManager(models.Manager):
-    def get_query_set(self):
-        return super(PersonManager, self).get_query_set().exclude(name="fred")
+    def get_queryset(self):
+        return super(PersonManager, self).get_queryset().exclude(name="fred")
 
 class SubManager(models.Manager):
-    def get_query_set(self):
-        return super(SubManager, self).get_query_set().exclude(name="wilma")
+    def get_queryset(self):
+        return super(SubManager, self).get_queryset().exclude(name="wilma")
 
 @python_2_unicode_compatible
 class Person(models.Model):

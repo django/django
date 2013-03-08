@@ -1733,9 +1733,9 @@ def prefetch_related_objects(result_cache, related_lookups):
 def get_prefetcher(instance, attr):
     """
     For the attribute 'attr' on the given instance, finds
-    an object that has a get_prefetch_query_set().
+    an object that has a get_prefetch_queryset().
     Returns a 4 tuple containing:
-    (the object with get_prefetch_query_set (or None),
+    (the object with get_prefetch_queryset (or None),
      the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
      a boolean that is True if the attribute has already been fetched)
@@ -1758,8 +1758,8 @@ def get_prefetcher(instance, attr):
         attr_found = True
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
-            # get_prefetch_query_set() method.
-            if hasattr(rel_obj_descriptor, 'get_prefetch_query_set'):
+            # get_prefetch_queryset() method.
+            if hasattr(rel_obj_descriptor, 'get_prefetch_queryset'):
                 prefetcher = rel_obj_descriptor
                 if rel_obj_descriptor.is_cached(instance):
                     is_fetched = True
@@ -1768,7 +1768,7 @@ def get_prefetcher(instance, attr):
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, attr)
-                if hasattr(rel_obj, 'get_prefetch_query_set'):
+                if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
@@ -1784,7 +1784,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     prefetches that must be done due to prefetch_related lookups
     found from default managers.
     """
-    # prefetcher must have a method get_prefetch_query_set() which takes a list
+    # prefetcher must have a method get_prefetch_queryset() which takes a list
     # of instances, and returns a tuple:
 
     # (queryset of instances of self.model that are related to passed in instances,
@@ -1797,7 +1797,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     # in a dictionary.
 
     rel_qs, rel_obj_attr, instance_attr, single, cache_name =\
-        prefetcher.get_prefetch_query_set(instances)
+        prefetcher.get_prefetch_queryset(instances)
     # We have to handle the possibility that the default manager itself added
     # prefetch_related lookups to the QuerySet we just got back. We don't want to
     # trigger the prefetch_related functionality by evaluating the query.

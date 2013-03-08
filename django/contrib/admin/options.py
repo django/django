@@ -29,6 +29,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -64,7 +65,13 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
-class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
+class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
+    renamed_methods = (
+        ('queryset', 'get_queryset', PendingDeprecationWarning),
+    )
+
+
+class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
@@ -239,12 +246,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         """
         return self.prepopulated_fields
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
-        qs = self.model._default_manager.get_query_set()
+        qs = self.model._default_manager.get_queryset()
         # TODO: this should be handled by some parameter to the ChangeList.
         ordering = self.get_ordering(request)
         if ordering:
@@ -496,7 +503,7 @@ class ModelAdmin(BaseModelAdmin):
         returned if no match is found (or the object_id failed validation
         against the primary key field).
         """
-        queryset = self.queryset(request)
+        queryset = self.get_queryset(request)
         model = queryset.model
         try:
             object_id = model._meta.pk.to_python(object_id)
@@ -1008,7 +1015,7 @@ class ModelAdmin(BaseModelAdmin):
                 formset = FormSet(data=request.POST, files=request.FILES,
                                   instance=new_object,
                                   save_as_new="_saveasnew" in request.POST,
-                                  prefix=prefix, queryset=inline.queryset(request))
+                                  prefix=prefix, queryset=inline.get_queryset(request))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, False)
@@ -1034,7 +1041,7 @@ class ModelAdmin(BaseModelAdmin):
                 if prefixes[prefix] != 1 or not prefix:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(instance=self.model(), prefix=prefix,
-                                  queryset=inline.queryset(request))
+                                  queryset=inline.get_queryset(request))
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
@@ -1104,7 +1111,7 @@ class ModelAdmin(BaseModelAdmin):
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(request.POST, request.FILES,
                                   instance=new_object, prefix=prefix,
-                                  queryset=inline.queryset(request))
+                                  queryset=inline.get_queryset(request))
 
                 formsets.append(formset)
 
@@ -1124,7 +1131,7 @@ class ModelAdmin(BaseModelAdmin):
                 if prefixes[prefix] != 1 or not prefix:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(instance=obj, prefix=prefix,
-                                  queryset=inline.queryset(request))
+                                  queryset=inline.get_queryset(request))
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
@@ -1209,7 +1216,7 @@ class ModelAdmin(BaseModelAdmin):
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):
             if selected:
-                response = self.response_action(request, queryset=cl.get_query_set(request))
+                response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
                     return response
                 else:
@@ -1225,7 +1232,7 @@ class ModelAdmin(BaseModelAdmin):
                 helpers.ACTION_CHECKBOX_NAME in request.POST and
                 'index' not in request.POST and '_save' not in request.POST):
             if selected:
-                response = self.response_action(request, queryset=cl.get_query_set(request))
+                response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
                     return response
                 else:
@@ -1521,8 +1528,8 @@ class InlineModelAdmin(BaseModelAdmin):
         fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
-    def queryset(self, request):
-        queryset = super(InlineModelAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        queryset = super(InlineModelAdmin, self).get_queryset(request)
         if not self.has_change_permission(request):
             queryset = queryset.none()
         return queryset

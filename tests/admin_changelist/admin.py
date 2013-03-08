@@ -34,8 +34,8 @@ class ChildAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_filter = ['parent', 'age']
 
-    def queryset(self, request):
-        return super(ChildAdmin, self).queryset(request).select_related("parent__name")
+    def get_queryset(self, request):
+        return super(ChildAdmin, self).get_queryset(request).select_related("parent__name")
 
 
 class CustomPaginationAdmin(ChildAdmin):
@@ -46,8 +46,8 @@ class FilteredChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']
     list_per_page = 10
 
-    def queryset(self, request):
-        return super(FilteredChildAdmin, self).queryset(request).filter(
+    def get_queryset(self, request):
+        return super(FilteredChildAdmin, self).get_queryset(request).filter(
             name__contains='filtered')
 
 

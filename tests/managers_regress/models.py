@@ -7,18 +7,18 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 class OnlyFred(models.Manager):
-    def get_query_set(self):
-        return super(OnlyFred, self).get_query_set().filter(name='fred')
+    def get_queryset(self):
+        return super(OnlyFred, self).get_queryset().filter(name='fred')
 
 
 class OnlyBarney(models.Manager):
-    def get_query_set(self):
-        return super(OnlyBarney, self).get_query_set().filter(name='barney')
+    def get_queryset(self):
+        return super(OnlyBarney, self).get_queryset().filter(name='barney')
 
 
 class Value42(models.Manager):
-    def get_query_set(self):
-        return super(Value42, self).get_query_set().filter(value=42)
+    def get_queryset(self):
+        return super(Value42, self).get_queryset().filter(value=42)
 
 
 class AbstractBase1(models.Model):

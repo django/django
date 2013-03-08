@@ -88,8 +88,8 @@ class Mineral(models.Model):
         return self.name
 
 class GeckoManager(models.Manager):
-    def get_query_set(self):
-        return super(GeckoManager, self).get_query_set().filter(has_tail=True)
+    def get_queryset(self):
+        return super(GeckoManager, self).get_queryset().filter(has_tail=True)
 
 class Gecko(models.Model):
     has_tail = models.BooleanField()
