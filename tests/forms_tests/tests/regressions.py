@@ -149,3 +149,14 @@ class FormsRegressionsTestCase(TestCase):
         obj = form.save()
         obj.name = 'Camembert'
         obj.full_clean()
+
+    def test_regression_16612(self):
+        class PedanticField(forms.Field):
+            def to_python(self, value):
+                raise ValidationError('Whatever')
+
+        class Form(forms.Form):
+            pedantic = PedanticField(show_hidden_initial=True)
+
+        form = Form(data={'initial-pedantic': 'whatever'})
+        form.changed_data
