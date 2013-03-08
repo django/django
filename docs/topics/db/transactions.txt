@@ -89,7 +89,7 @@ Controlling transactions explicitly
 
 Django provides a single API to control database transactions.
 
-.. function:: atomic(using=None)
+.. function:: atomic(using=None, savepoint=True)
 
     This function creates an atomic block for writes to the database.
     (Atomicity is the defining property of database transactions.)
@@ -163,6 +163,14 @@ Django provides a single API to control database transactions.
     - creates a savepoint when entering an inner ``atomic`` block;
     - releases or rolls back to the savepoint when exiting an inner block;
     - commits or rolls back the transaction when exiting the outermost block.
+
+    You can disable the creation of savepoints for inner blocks by setting the
+    ``savepoint`` argument to ``False``. If an exception occurs, Django will
+    perform the rollback when exiting the first parent block with a savepoint
+    if there is one, and the outermost block otherwise. Atomicity is still
+    guaranteed by the outer transaction. This option should only be used if
+    the overhead of savepoints is noticeable. It has the drawback of breaking
+    the error handling described above.
 
 .. admonition:: Performance considerations
 
