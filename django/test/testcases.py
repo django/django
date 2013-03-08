@@ -63,7 +63,6 @@ def to_list(value):
         value = [value]
     return value
 
-real_set_autocommit = transaction.set_autocommit
 real_commit = transaction.commit
 real_rollback = transaction.rollback
 real_enter_transaction_management = transaction.enter_transaction_management
@@ -74,7 +73,6 @@ def nop(*args, **kwargs):
     return
 
 def disable_transaction_methods():
-    transaction.set_autocommit = nop
     transaction.commit = nop
     transaction.rollback = nop
     transaction.enter_transaction_management = nop
@@ -82,7 +80,6 @@ def disable_transaction_methods():
     transaction.abort = nop
 
 def restore_transaction_methods():
-    transaction.set_autocommit = real_set_autocommit
     transaction.commit = real_commit
     transaction.rollback = real_rollback
     transaction.enter_transaction_management = real_enter_transaction_management
@@ -814,8 +811,11 @@ class TestCase(TransactionTestCase):
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
 
+        self.atomics = {}
         for db_name in self._databases_names():
-            transaction.enter_transaction_management(using=db_name)
+            self.atomics[db_name] = transaction.atomic(using=db_name)
+            self.atomics[db_name].__enter__()
+        # Remove this when the legacy transaction management goes away.
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
@@ -835,10 +835,12 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
+        # Remove this when the legacy transaction management goes away.
         restore_transaction_methods()
-        for db in self._databases_names():
-            transaction.rollback(using=db)
-            transaction.leave_transaction_management(using=db)
+        for db_name in reversed(self._databases_names()):
+            # Hack to force a rollback
+            connections[db_name].needs_rollback = True
+            self.atomics[db_name].__exit__(None, None, None)
 
 
 def _deferredSkip(condition, reason):
