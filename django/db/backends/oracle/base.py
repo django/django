@@ -672,6 +672,8 @@ class OracleParam(object):
             param = "0"
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
+        elif isinstance(param, six.memoryview):
+            self.force_bytes = param
         else:
             self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)
