@@ -1342,8 +1342,13 @@ Example usage::
     django-admin.py syncdb --traceback
 
 By default, ``django-admin.py`` will show a simple error message whenever an
-error occurs. If you specify ``--traceback``, ``django-admin.py``  will
-output a full stack trace whenever an exception is raised.
+:class:`~django.core.management.CommandError` occurs, but a full stack trace
+for any other exception. If you specify ``--traceback``, ``django-admin.py``
+will also output a full stack trace when a ``CommandError`` is raised.
+
+.. versionchanged:: 1.6
+    Previously, Django didn't show a full stack trace by default for exceptions
+    other than ``CommandError``.
 
 .. django-admin-option:: --verbosity
 

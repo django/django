@@ -16,7 +16,7 @@ import codecs
 
 from django import conf, bin, get_version
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.db import connection
 from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest
@@ -1297,22 +1297,34 @@ class CommandTypes(AdminScriptTestCase):
         Also test proper traceback display.
         """
         command = BaseCommand()
-        command.execute = lambda args: args  # This will trigger TypeError
+        def raise_command_error(*args, **kwargs):
+            raise CommandError("Custom error")
 
         old_stderr = sys.stderr
         sys.stderr = err = StringIO()
         try:
+            command.execute = lambda args: args  # This will trigger TypeError
+            with self.assertRaises(SystemExit):
+                command.run_from_argv(['', ''])
+            err_message = err.getvalue()
+            # Exceptions other than CommandError automatically output the traceback
+            self.assertIn("Traceback", err_message)
+            self.assertIn("TypeError", err_message)
+
+            command.execute = raise_command_error
+            err.truncate(0)
             with self.assertRaises(SystemExit):
                 command.run_from_argv(['', ''])
             err_message = err.getvalue()
             self.assertNotIn("Traceback", err_message)
-            self.assertIn("TypeError", err_message)
+            self.assertIn("CommandError", err_message)
 
+            err.truncate(0)
             with self.assertRaises(SystemExit):
                 command.run_from_argv(['', '', '--traceback'])
             err_message = err.getvalue()
             self.assertIn("Traceback (most recent call last)", err_message)
-            self.assertIn("TypeError", err_message)
+            self.assertIn("CommandError", err_message)
         finally:
             sys.stderr = old_stderr
 

@@ -241,7 +241,7 @@ class BaseCommand(object):
         except Exception as e:
             # self.stderr is not guaranteed to be set here
             stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
-            if options.traceback:
+            if options.traceback or not isinstance(e, CommandError):
                 stderr.write(traceback.format_exc())
             else:
                 stderr.write('%s: %s' % (e.__class__.__name__, e))
