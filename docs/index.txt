@@ -254,7 +254,6 @@ applications:
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`
 * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
-* :doc:`Comments <ref/contrib/comments/index>`, :doc:`comment moderation <ref/contrib/comments/moderation>` and :doc:`custom comments <ref/contrib/comments/custom>`
 * :doc:`Pagination <topics/pagination>`
 * :doc:`Messages framework <ref/contrib/messages>`
 * :doc:`Serialization <topics/serialization>`
