@@ -6,6 +6,7 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
 {{ module }}.wkt_f = new OpenLayers.Format.WKT();
 {{ module }}.is_collection = {{ is_collection|yesno:"true,false" }};
 {{ module }}.collection_type = '{{ collection_type }}';
+{{ module }}.is_generic = {{ is_generic|yesno:"true,false" }};
 {{ module }}.is_linestring = {{ is_linestring|yesno:"true,false" }};
 {{ module }}.is_polygon = {{ is_polygon|yesno:"true,false" }};
 {{ module }}.is_point = {{ is_point|yesno:"true,false" }};
@@ -89,24 +90,19 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
 // Create an array of controls based on geometry type
 {{ module }}.getControls = function(lyr){
   {{ module }}.panel = new OpenLayers.Control.Panel({'displayClass': 'olControlEditingToolbar'});
-  var nav = new OpenLayers.Control.Navigation();
-  var draw_ctl;
-  if ({{ module }}.is_linestring){
-    draw_ctl = new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'});
-  } else if ({{ module }}.is_polygon){
-    draw_ctl = new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'});
-  } else if ({{ module }}.is_point){
-    draw_ctl = new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'});
+  {{ module }}.controls = [new OpenLayers.Control.Navigation()];
+  if (!{{ module }}.modifiable && lyr.features.length) return;
+  if ({{ module }}.is_linestring || {{ module }}.is_generic){
+    {{ module }}.controls.push(new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
+  }
+  if ({{ module }}.is_polygon || {{ module }}.is_generic){
+    {{ module }}.controls.push(new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'}));
+  }
+  if ({{ module }}.is_point || {{ module }}.is_generic){
+    {{ module }}.controls.push(new OpenLayers.Control.DrawFeature(lyr, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'}));
   }
   if ({{ module }}.modifiable){
-    var mod = new OpenLayers.Control.ModifyFeature(lyr, {'displayClass': 'olControlModifyFeature'});
-    {{ module }}.controls = [nav, draw_ctl, mod];
-  } else {
-    if(!lyr.features.length){
-      {{ module }}.controls = [nav, draw_ctl];
-    } else {
-      {{ module }}.controls = [nav];
-    }
+    {{ module }}.controls.push(new OpenLayers.Control.ModifyFeature(lyr, {'displayClass': 'olControlModifyFeature'}));
   }
 };
 {{ module }}.init = function(){

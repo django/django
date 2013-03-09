@@ -94,6 +94,7 @@ class GeoModelAdmin(ModelAdmin):
                       'scrollable' : self.scrollable,
                       'layerswitcher' : self.layerswitcher,
                       'collection_type' : collection_type,
+                      'is_generic' : db_field.geom_type == 'GEOMETRY',
                       'is_linestring' : db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
                       'is_polygon' : db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
                       'is_point' : db_field.geom_type in ('POINT', 'MULTIPOINT'),
