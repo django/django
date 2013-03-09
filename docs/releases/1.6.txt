@@ -134,6 +134,9 @@ Minor features
 * SimpleLazyObjects will now present more helpful representations in shell
   debugging situations.
 
+* Generic :class:`~django.contrib.gis.db.models.GeometryField` is now editable
+  with the OpenLayers widget in the admin.
+
 Backwards incompatible changes in 1.6
 =====================================
 
