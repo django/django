@@ -365,6 +365,8 @@ these changes.
   - ``django.db.transaction.commit_unless_managed()``
   - ``django.db.transaction.rollback_unless_managed()``
 
+* ``django.contrib.comments`` will be removed.
+
 2.0
 ---
 
