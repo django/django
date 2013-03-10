@@ -121,7 +121,7 @@ the next time you make a change, either when you add a new feature or fix a bug.
 
 So let's do that right away.
 
-.. _test-driven development: http://en.wikipedia.org/wiki/Test-driven_development/
+.. _test-driven development: http://en.wikipedia.org/wiki/Test-driven_development
 
 Writing our first test
 ======================
