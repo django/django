@@ -44,6 +44,7 @@ class HttpRequest(object):
         self.path = ''
         self.path_info = ''
         self.method = None
+        self.resolver_match = None
         self._post_parse_error = False
 
     def __repr__(self):
