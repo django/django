@@ -271,6 +271,19 @@ current APIs are deprecated:
 The reasons for this change and the upgrade path are described in the
 :ref:`transactions documentation <transactions-upgrading-from-1.5>`.
 
+``django.contrib.comments``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's comment framework has been deprecated and is no longer supported. It
+will be available in Django 1.6 and 1.7, and removed in Django 1.8. Most users
+will be better served with a custom solution, or a hosted product like Disqus__.
+
+The code formerly known as ``django.contrib.comments`` is `still available
+in an external repository`__.
+
+__ https://disqus.com/
+__ https://github.com/django/django-contrib-comments
+
 Changes to :ttag:`cycle` and :ttag:`firstof`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
