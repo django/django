@@ -22,9 +22,7 @@ class DeleteLockingTest(TransactionTestCase):
         self.conn2 = new_connections[DEFAULT_DB_ALIAS]
         # Put both DB connections into managed transaction mode
         transaction.enter_transaction_management()
-        transaction.managed(True)
         self.conn2.enter_transaction_management()
-        self.conn2.managed(True)
 
     def tearDown(self):
         # Close down the second connection.
@@ -335,7 +333,7 @@ class Ticket19102Tests(TestCase):
             ).select_related('orgunit').delete()
         self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
-    
+
     @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_defer(self):
         with self.assertNumQueries(1):

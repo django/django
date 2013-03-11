@@ -684,5 +684,8 @@ class TestTicket11101(TransactionTestCase):
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):
         """Test that fixtures can be rolled back (ticket #11101)."""
-        ticket_11101 = transaction.commit_manually(self.ticket_11101)
-        ticket_11101()
+        transaction.set_autocommit(False)
+        try:
+            self.ticket_11101()
+        finally:
+            transaction.set_autocommit(True)

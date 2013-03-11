@@ -72,9 +72,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             # Remove the SQLite database file
             os.remove(test_database_name)
 
-    def set_autocommit(self):
-        self.connection.connection.isolation_level = None
-
     def test_db_signature(self):
         """
         Returns a tuple that uniquely identifies a test database.

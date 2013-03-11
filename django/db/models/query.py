@@ -442,12 +442,7 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_fields
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
@@ -458,13 +453,6 @@ class QuerySet(object):
                 if objs_without_pk:
                     fields= [f for f in fields if not isinstance(f, AutoField)]
                     self._batched_insert(objs_without_pk, fields, batch_size)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
 
         return objs
 
@@ -581,20 +569,8 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(None)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
         self._result_cache = None
         return rows
     update.alters_data = True

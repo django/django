@@ -44,11 +44,21 @@ class BaseDatabaseWrapper(object):
         self.savepoint_state = 0
 
         # Transaction management related attributes
+        self.autocommit = False
         self.transaction_state = []
         # Tracks if the connection is believed to be in transaction. This is
         # set somewhat aggressively, as the DBAPI doesn't make it easy to
         # deduce if the connection is in transaction or not.
         self._dirty = False
+        # Tracks if the connection is in a transaction managed by 'atomic'
+        self.in_atomic_block = False
+        # Tracks if the transaction should be rolled back to the next
+        # available savepoint because of an exception in an inner block.
+        self.needs_rollback = False
+        # List of savepoints created by 'atomic'
+        self.savepoint_ids = []
+        # Hack to provide compatibility with legacy transaction management
+        self._atomic_forced_unmanaged = False
 
         # Connection termination related attributes
         self.close_at = None
@@ -85,20 +95,35 @@ class BaseDatabaseWrapper(object):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError
 
+    ##### Backend-specific methods for creating connections #####
+
+    def connect(self):
+        """Connects to the database. Assumes that the connection is closed."""
+        # Reset parameters defining when to close the connection
+        max_age = self.settings_dict['CONN_MAX_AGE']
+        self.close_at = None if max_age is None else time.time() + max_age
+        self.errors_occurred = False
+        # Establish the connection
+        conn_params = self.get_connection_params()
+        self.connection = self.get_new_connection(conn_params)
+        self.init_connection_state()
+        if self.settings_dict['AUTOCOMMIT']:
+            self.set_autocommit(True)
+        connection_created.send(sender=self.__class__, connection=self)
+
+    def ensure_connection(self):
+        """
+        Guarantees that a connection to the database is established.
+        """
+        if self.connection is None:
+            with self.wrap_database_errors():
+                self.connect()
+
     ##### Backend-specific wrappers for PEP-249 connection methods #####
 
     def _cursor(self):
+        self.ensure_connection()
         with self.wrap_database_errors():
-            if self.connection is None:
-                # Reset parameters defining when to close the connection
-                max_age = self.settings_dict['CONN_MAX_AGE']
-                self.close_at = None if max_age is None else time.time() + max_age
-                self.errors_occurred = False
-                # Establish the connection
-                conn_params = self.get_connection_params()
-                self.connection = self.get_new_connection(conn_params)
-                self.init_connection_state()
-                connection_created.send(sender=self.__class__, connection=self)
             return self.create_cursor()
 
     def _commit(self):
@@ -132,17 +157,19 @@ class BaseDatabaseWrapper(object):
 
     def commit(self):
         """
-        Does the commit itself and resets the dirty flag.
+        Commits a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
+        self.validate_no_atomic_block()
         self._commit()
         self.set_clean()
 
     def rollback(self):
         """
-        Does the rollback itself and resets the dirty flag.
+        Rolls back a transaction and resets the dirty flag.
         """
         self.validate_thread_sharing()
+        self.validate_no_atomic_block()
         self._rollback()
         self.set_clean()
 
@@ -160,54 +187,59 @@ class BaseDatabaseWrapper(object):
     ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
+
+    def _savepoint_allowed(self):
+        # Savepoints cannot be created outside a transaction
+        return self.features.uses_savepoints and not self.autocommit
 
     ##### Generic savepoint management methods #####
 
     def savepoint(self):
         """
-        Creates a savepoint (if supported and required by the backend) inside the
-        current transaction. Returns an identifier for the savepoint that will be
-        used for the subsequent rollback or commit.
+        Creates a savepoint inside the current transaction. Returns an
+        identifier for the savepoint that will be used for the subsequent
+        rollback or commit. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         thread_ident = thread.get_ident()
+        tid = str(thread_ident).replace('-', '')
 
         self.savepoint_state += 1
-
-        tid = str(thread_ident).replace('-', '')
         sid = "s%s_x%d" % (tid, self.savepoint_state)
+
+        self.validate_thread_sharing()
         self._savepoint(sid)
+
         return sid
 
     def savepoint_rollback(self, sid):
         """
-        Rolls back the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
+        Rolls back to a savepoint. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_rollback(sid)
+        self._savepoint_rollback(sid)
 
     def savepoint_commit(self, sid):
         """
-        Commits the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
+        Releases a savepoint. Does nothing if savepoints are not supported.
         """
+        if not self._savepoint_allowed():
+            return
+
         self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_commit(sid)
+        self._savepoint_commit(sid)
 
     def clean_savepoints(self):
         """
@@ -217,24 +249,15 @@ class BaseDatabaseWrapper(object):
 
     ##### Backend-specific transaction management methods #####
 
-    def _enter_transaction_management(self, managed):
+    def _set_autocommit(self, autocommit):
         """
-        A hook for backend-specific changes required when entering manual
-        transaction handling.
+        Backend-specific implementation to enable or disable autocommit.
         """
-        pass
-
-    def _leave_transaction_management(self, managed):
-        """
-        A hook for backend-specific changes required when leaving manual
-        transaction handling. Will usually be implemented only when
-        _enter_transaction_management() is also required.
-        """
-        pass
+        raise NotImplementedError
 
     ##### Generic transaction management methods #####
 
-    def enter_transaction_management(self, managed=True):
+    def enter_transaction_management(self, managed=True, forced=False):
         """
         Enters transaction management for a running thread. It must be balanced with
         the appropriate leave_transaction_management call, since the actual state is
@@ -243,12 +266,22 @@ class BaseDatabaseWrapper(object):
         The state and dirty flag are carried over from the surrounding block or
         from the settings, if there is no surrounding block (dirty is always false
         when no current block is running).
+
+        If you switch off transaction management and there is a pending
+        commit/rollback, the data will be commited, unless "forced" is True.
         """
-        if self.transaction_state:
-            self.transaction_state.append(self.transaction_state[-1])
-        else:
-            self.transaction_state.append(settings.TRANSACTIONS_MANAGED)
-        self._enter_transaction_management(managed)
+        self.validate_no_atomic_block()
+
+        self.ensure_connection()
+
+        self.transaction_state.append(managed)
+
+        if not managed and self.is_dirty() and not forced:
+            self.commit()
+            self.set_clean()
+
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
         """
@@ -256,21 +289,47 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
+        self.validate_no_atomic_block()
+
+        self.ensure_connection()
+
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
             raise TransactionManagementError(
                 "This code isn't under transaction management")
-        # The _leave_transaction_management hook can change the dirty flag,
-        # so memoize it.
-        dirty = self._dirty
-        # We will pass the next status (after leaving the previous state
-        # behind) to subclass hook.
-        self._leave_transaction_management(self.is_managed())
-        if dirty:
+
+        if self.transaction_state:
+            managed = self.transaction_state[-1]
+        else:
+            managed = not self.settings_dict['AUTOCOMMIT']
+
+        if self._dirty:
             self.rollback()
+            if managed == self.autocommit:
+                self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
+
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
+
+    def set_autocommit(self, autocommit):
+        """
+        Enable or disable autocommit.
+        """
+        self.validate_no_atomic_block()
+        self.ensure_connection()
+        self._set_autocommit(autocommit)
+        self.autocommit = autocommit
+
+    def validate_no_atomic_block(self):
+        """
+        Raise an error if an atomic block is active.
+        """
+        if self.in_atomic_block:
+            raise TransactionManagementError(
+                "This is forbidden when an 'atomic' block is active.")
 
     def abort(self):
         """
@@ -295,7 +354,8 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        self._dirty = True
+        if not self.autocommit:
+            self._dirty = True
 
     def set_clean(self):
         """
@@ -305,51 +365,6 @@ class BaseDatabaseWrapper(object):
         """
         self._dirty = False
         self.clean_savepoints()
-
-    def is_managed(self):
-        """
-        Checks whether the transaction manager is in manual or in auto state.
-        """
-        if self.transaction_state:
-            return self.transaction_state[-1]
-        return settings.TRANSACTIONS_MANAGED
-
-    def managed(self, flag=True):
-        """
-        Puts the transaction manager into a manual state: managed transactions have
-        to be committed explicitly by the user. If you switch off transaction
-        management and there is a pending commit/rollback, the data will be
-        commited.
-        """
-        top = self.transaction_state
-        if top:
-            top[-1] = flag
-            if not flag and self.is_dirty():
-                self.commit()
-        else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
-
-    def commit_unless_managed(self):
-        """
-        Commits changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self.commit()
-            self.clean_savepoints()
-        else:
-            self.set_dirty()
-
-    def rollback_unless_managed(self):
-        """
-        Rolls back changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self.rollback()
-        else:
-            self.set_dirty()
 
     ##### Foreign key constraints checks handling #####
 
@@ -402,12 +417,19 @@ class BaseDatabaseWrapper(object):
         or if it outlived its maximum age.
         """
         if self.connection is not None:
+            # If the application didn't restore the original autocommit setting,
+            # don't take chances, drop the connection.
+            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+                self.close()
+                return
+
             if self.errors_occurred:
                 if self.is_usable():
                     self.errors_occurred = False
                 else:
                     self.close()
                     return
+
             if self.close_at is not None and time.time() >= self.close_at:
                 self.close()
                 return
@@ -460,6 +482,12 @@ class BaseDatabaseWrapper(object):
             if must_close:
                 self.close()
 
+    def _start_transaction_under_autocommit(self):
+        """
+        Only required when autocommits_when_autocommit_is_off = True.
+        """
+        raise NotImplementedError
+
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
@@ -479,7 +507,6 @@ class BaseDatabaseFeatures(object):
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     has_bulk_insert = False
-    uses_autocommit = False
     uses_savepoints = False
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
@@ -563,6 +590,10 @@ class BaseDatabaseFeatures(object):
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
+    # Does the backend decide to commit before SAVEPOINT statements
+    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    autocommits_when_autocommit_is_off = False
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -574,7 +605,6 @@ class BaseDatabaseFeatures(object):
             # otherwise autocommit will cause the confimation to
             # fail.
             self.connection.enter_transaction_management()
-            self.connection.managed(True)
             cursor = self.connection.cursor()
             cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
             self.connection.commit()
@@ -883,19 +913,19 @@ class BaseDatabaseOperations(object):
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
-        raise NotImplementedError
+        return "SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_commit_sql(self, sid):
         """
         Returns the SQL for committing the given savepoint.
         """
-        raise NotImplementedError
+        return "RELEASE SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
         """
         Returns the SQL for rolling back the given savepoint.
         """
-        raise NotImplementedError
+        return "ROLLBACK TO SAVEPOINT %s" % self.quote_name(sid)
 
     def set_time_zone_sql(self):
         """
@@ -946,6 +976,9 @@ class BaseDatabaseOperations(object):
         return "BEGIN;"
 
     def end_transaction_sql(self, success=True):
+        """
+        Returns the SQL statement required to end a transaction.
+        """
         if not success:
             return "ROLLBACK;"
         return "COMMIT;"

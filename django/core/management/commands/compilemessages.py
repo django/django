@@ -5,7 +5,7 @@ import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import popen_wrapper
+from django.core.management.utils import find_command, popen_wrapper
 from django.utils._os import npath
 
 def has_bom(fn):
@@ -16,6 +16,10 @@ def has_bom(fn):
             sample.startswith(codecs.BOM_UTF16_BE)
 
 def compile_messages(stderr, locale=None):
+    program = 'msgfmt'
+    if find_command(program) is None:
+        raise CommandError("Can't find %s. Make sure you have GNU gettext tools 0.15 or newer installed." % program)
+
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
@@ -42,7 +46,6 @@ def compile_messages(stderr, locale=None):
                     if has_bom(fn):
                         raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
                     pf = os.path.splitext(fn)[0]
-                    program = 'msgfmt'
                     args = [program, '--check-format', '-o', npath(pf + '.mo'), npath(pf + '.po')]
                     output, errors, status = popen_wrapper(args)
                     if status:

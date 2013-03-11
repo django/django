@@ -576,7 +576,6 @@ class DatabaseConnectionHandlingTests(TransactionTestCase):
         # Make sure there is an open connection
         connection.cursor()
         connection.enter_transaction_management()
-        connection.managed(True)
         signals.request_finished.send(sender=response._handler_class)
         self.assertEqual(len(connection.transaction_state), 0)
 
@@ -585,7 +584,6 @@ class DatabaseConnectionHandlingTests(TransactionTestCase):
         connection.settings_dict['CONN_MAX_AGE'] = 0
 
         connection.enter_transaction_management()
-        connection.managed(True)
         connection.set_dirty()
         # Test that the rollback doesn't succeed (for example network failure
         # could cause this).

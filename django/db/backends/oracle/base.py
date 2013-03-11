@@ -612,6 +612,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _savepoint_commit(self, sid):
         pass
 
+    def _set_autocommit(self, autocommit):
+        self.connection.autocommit = autocommit
+
     def check_constraints(self, table_names=None):
         """
         To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
@@ -672,6 +675,8 @@ class OracleParam(object):
             param = "0"
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
+        elif isinstance(param, six.memoryview):
+            self.force_bytes = param
         else:
             self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)

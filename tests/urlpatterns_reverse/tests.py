@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (reverse, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
 from django.utils import unittest, six
@@ -528,6 +528,10 @@ class ResolverMatchTests(TestCase):
         response = self.client.get('/resolver_match/')
         resolver_match = response.resolver_match
         self.assertEqual(resolver_match.url_name, 'test-resolver-match')
+
+    def test_resolver_match_on_request_before_resolution(self):
+        request = HttpRequest()
+        self.assertIsNone(request.resolver_match)
 
 class ErroneousViewTests(TestCase):
     urls = 'urlpatterns_reverse.erroneous_urls'

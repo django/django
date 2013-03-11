@@ -2,6 +2,7 @@ from functools import wraps
 import os
 import pkgutil
 from threading import local
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -158,6 +159,13 @@ class ConnectionHandler(object):
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
+        conn.setdefault('ATOMIC_REQUESTS', False)
+        if settings.TRANSACTIONS_MANAGED:
+            warnings.warn(
+                "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
+                PendingDeprecationWarning, stacklevel=2)
+            conn.setdefault('AUTOCOMMIT', False)
+        conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'

@@ -30,6 +30,18 @@ prevention <clickjacking-prevention>` are turned on.
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
 
+Improved transaction management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's transaction management was overhauled. Database-level autocommit is
+now turned on by default. This makes transaction handling more explicit and
+should improve performance. The existing APIs were deprecated, and new APIs
+were introduced, as described in :doc:`/topics/db/transactions`.
+
+Please review carefully the list of :ref:`known backwards-incompatibilities
+<transactions-upgrading-from-1.5>` to determine if you need to make changes in
+your code.
+
 Persistent database connections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,8 +146,29 @@ Minor features
 * SimpleLazyObjects will now present more helpful representations in shell
   debugging situations.
 
+* Generic :class:`~django.contrib.gis.db.models.GeometryField` is now editable
+  with the OpenLayers widget in the admin.
+
 Backwards incompatible changes in 1.6
 =====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation plan </internals/deprecation>` for any features that
+    have been removed. If you haven't updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
+* Database-level autocommit is enabled by default in Django 1.6. While this
+  doesn't change the general spirit of Django's transaction management, there
+  are a few known backwards-incompatibities, described in the :ref:`transaction
+  management docs <transactions-upgrading-from-1.5>`. You should review your code
+  to determine if you're affected.
+
+* In previous versions, database-level autocommit was only an option for
+  PostgreSQL, and it was disabled by default. This option is now
+  :ref:`ignored <postgresql-autocommit-mode>`.
 
 * The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
   it is only usable as a marker class for checking if
@@ -220,17 +253,23 @@ Backwards incompatible changes in 1.6
   are silently truncated; on Oracle, an exception is generated. No database
   change is needed for SQLite or PostgreSQL databases.
 
-
-.. warning::
-
-    In addition to the changes outlined in this section, be sure to review the
-    :doc:`deprecation plan </internals/deprecation>` for any features that
-    have been removed. If you haven't updated your code within the
-    deprecation timeline for a given feature, its removal may appear as a
-    backwards incompatible change.
-
 Features deprecated in 1.6
 ==========================
+
+Transaction management APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transaction management was completely overhauled in Django 1.6, and the
+current APIs are deprecated:
+
+- ``django.middleware.transaction.TransactionMiddleware``
+- ``django.db.transaction.autocommit``
+- ``django.db.transaction.commit_on_success``
+- ``django.db.transaction.commit_manually``
+- the ``TRANSACTIONS_MANAGED`` setting
+
+The reasons for this change and the upgrade path are described in the
+:ref:`transactions documentation <transactions-upgrading-from-1.5>`.
 
 ``django.contrib.comments``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
