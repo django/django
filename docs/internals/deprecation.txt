@@ -350,6 +350,8 @@ these changes.
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
 
+* ``django.contrib.comments`` will be removed.
+
 2.0
 ---
 
