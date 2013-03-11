@@ -329,6 +329,15 @@ these changes.
 1.8
 ---
 
+* The following transaction management APIs will be removed:
+
+  - ``TransactionMiddleware``,
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``,
+  - the ``TRANSACTIONS_MANAGED`` setting.
+
+  Upgrade paths are described in :ref:`transactions-upgrading-from-1.5`.
+
 * The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
   arguments. In 1.6 and 1.7, this behavior is provided by the version of these
   tags in the ``future`` template tag library.
@@ -339,8 +348,6 @@ these changes.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 
-* The private API ``django.db.close_connection`` will be removed.
-
 * Remove the backward compatible shims introduced to rename ``get_query_set``
   and similar queryset methods. This affects the following classes:
   ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
@@ -349,6 +356,14 @@ these changes.
 
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
+
+* The following private APIs will be removed:
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
+  - ``django.db.transaction.commit_unless_managed()``
+  - ``django.db.transaction.rollback_unless_managed()``
 
 2.0
 ---

@@ -408,6 +408,30 @@ SQLite. This can be configured using the following::
 For other database backends, or more complex SQLite configurations, other options
 will be required. The following inner options are available.
 
+.. setting:: DATABASE-ATOMIC_REQUESTS
+
+ATOMIC_REQUESTS
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Set this to ``True`` to wrap each HTTP request in a transaction on this
+database. See :ref:`tying-transactions-to-http-requests`.
+
+.. setting:: DATABASE-AUTOCOMMIT
+
+AUTOCOMMIT
+~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``True``
+
+Set this to ``False`` if you want to :ref:`disable Django's transaction
+management <deactivate-transaction-management>` and implement your own.
+
 .. setting:: DATABASE-ENGINE
 
 ENGINE
@@ -1806,6 +1830,12 @@ to ensure your processes are running in the correct environment.
 
 TRANSACTIONS_MANAGED
 --------------------
+
+.. deprecated:: 1.6
+
+    This setting was deprecated because its name is very misleading. Use the
+    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
+    entries instead.
 
 Default: ``False``
 

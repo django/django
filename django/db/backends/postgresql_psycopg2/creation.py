@@ -77,14 +77,3 @@ class DatabaseCreation(BaseDatabaseCreation):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' text_pattern_ops'))
         return output
-
-    def set_autocommit(self):
-        self._prepare_for_test_db_ddl()
-
-    def _prepare_for_test_db_ddl(self):
-        """Rollback and close the active transaction."""
-        # Make sure there is an open connection.
-        self.connection.cursor()
-        self.connection.connection.rollback()
-        self.connection.connection.set_isolation_level(
-                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

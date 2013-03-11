@@ -67,7 +67,6 @@ real_commit = transaction.commit
 real_rollback = transaction.rollback
 real_enter_transaction_management = transaction.enter_transaction_management
 real_leave_transaction_management = transaction.leave_transaction_management
-real_managed = transaction.managed
 real_abort = transaction.abort
 
 def nop(*args, **kwargs):
@@ -78,7 +77,6 @@ def disable_transaction_methods():
     transaction.rollback = nop
     transaction.enter_transaction_management = nop
     transaction.leave_transaction_management = nop
-    transaction.managed = nop
     transaction.abort = nop
 
 def restore_transaction_methods():
@@ -86,7 +84,6 @@ def restore_transaction_methods():
     transaction.rollback = real_rollback
     transaction.enter_transaction_management = real_enter_transaction_management
     transaction.leave_transaction_management = real_leave_transaction_management
-    transaction.managed = real_managed
     transaction.abort = real_abort
 
 
@@ -156,14 +153,6 @@ class DocTestRunner(doctest.DocTestRunner):
     def __init__(self, *args, **kwargs):
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
         self.optionflags = doctest.ELLIPSIS
-
-    def report_unexpected_exception(self, out, test, example, exc_info):
-        doctest.DocTestRunner.report_unexpected_exception(self, out, test,
-                                                          example, exc_info)
-        # Rollback, in case of database errors. Otherwise they'd have
-        # side effects on other tests.
-        for conn in connections:
-            transaction.rollback_unless_managed(using=conn)
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
@@ -490,14 +479,10 @@ class TransactionTestCase(SimpleTestCase):
                 conn.ops.sequence_reset_by_name_sql(no_style(),
                                                     conn.introspection.sequence_list())
             if sql_list:
-                try:
+                with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
                     for sql in sql_list:
                         cursor.execute(sql)
-                except Exception:
-                    transaction.rollback_unless_managed(using=db_name)
-                    raise
-                transaction.commit_unless_managed(using=db_name)
 
     def _fixture_setup(self):
         for db_name in self._databases_names(include_mirrors=False):
@@ -537,11 +522,6 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        # Roll back any pending transactions in order to avoid a deadlock
-        # during flush when TEST_MIRROR is used (#18984).
-        for conn in connections.all():
-            conn.rollback_unless_managed()
-
         for db in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False, database=db,
                          skip_validation=True, reset_sequences=False)
@@ -831,9 +811,11 @@ class TestCase(TransactionTestCase):
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
 
+        self.atomics = {}
         for db_name in self._databases_names():
-            transaction.enter_transaction_management(using=db_name)
-            transaction.managed(True, using=db_name)
+            self.atomics[db_name] = transaction.atomic(using=db_name)
+            self.atomics[db_name].__enter__()
+        # Remove this when the legacy transaction management goes away.
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
@@ -853,10 +835,12 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
+        # Remove this when the legacy transaction management goes away.
         restore_transaction_methods()
-        for db in self._databases_names():
-            transaction.rollback(using=db)
-            transaction.leave_transaction_management(using=db)
+        for db_name in reversed(self._databases_names()):
+            # Hack to force a rollback
+            connections[db_name].needs_rollback = True
+            self.atomics[db_name].__exit__(None, None, None)
 
 
 def _deferredSkip(condition, reason):

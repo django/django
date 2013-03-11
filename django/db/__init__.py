@@ -70,6 +70,7 @@ signals.request_started.connect(reset_queries)
 # their lifetime. NB: abort() doesn't do anything outside of a transaction.
 def close_old_connections(**kwargs):
     for conn in connections.all():
+        # Remove this when the legacy transaction management goes away.
         try:
             conn.abort()
         except DatabaseError:
@@ -77,14 +78,3 @@ def close_old_connections(**kwargs):
         conn.close_if_unusable_or_obsolete()
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)
-
-# Register an event that rolls back the connections
-# when a Django request has an exception.
-def _rollback_on_exception(**kwargs):
-    from django.db import transaction
-    for conn in connections:
-        try:
-            transaction.rollback_unless_managed(using=conn)
-        except DatabaseError:
-            pass
-signals.got_request_exception.connect(_rollback_on_exception)

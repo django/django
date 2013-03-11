@@ -1,6 +1,7 @@
 import hashlib
 import sys
 import time
+import warnings
 
 from django.conf import settings
 from django.db.utils import load_backend
@@ -382,10 +383,7 @@ class BaseDatabaseCreation(object):
 
         qn = self.connection.ops.quote_name
 
-        # Create the test database and connect to it. We need to autocommit
-        # if the database supports it because PostgreSQL doesn't allow
-        # CREATE/DROP DATABASE statements within transactions.
-        self._prepare_for_test_db_ddl()
+        # Create the test database and connect to it.
         cursor = self.connection.cursor()
         try:
             cursor.execute(
@@ -453,7 +451,6 @@ class BaseDatabaseCreation(object):
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         cursor = self.connection.cursor()
-        self._prepare_for_test_db_ddl()
         # Wait to avoid "database is being accessed by other users" errors.
         time.sleep(1)
         cursor.execute("DROP DATABASE %s"
@@ -466,16 +463,10 @@ class BaseDatabaseCreation(object):
         anymore by Django code. Kept for compatibility with user code that
         might use it.
         """
-        pass
-
-    def _prepare_for_test_db_ddl(self):
-        """
-        Internal implementation - Hook for tasks that should be performed
-        before the ``CREATE DATABASE``/``DROP DATABASE`` clauses used by
-        testing code to create/ destroy test databases. Needed e.g. in
-        PostgreSQL to rollback and close any active transaction.
-        """
-        pass
+        warnings.warn(
+            "set_autocommit was moved from BaseDatabaseCreation to "
+            "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
+        return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):
         """

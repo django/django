@@ -30,6 +30,18 @@ prevention <clickjacking-prevention>` are turned on.
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
 
+Improved transaction management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's transaction management was overhauled. Database-level autocommit is
+now turned on by default. This makes transaction handling more explicit and
+should improve performance. The existing APIs were deprecated, and new APIs
+were introduced, as described in :doc:`/topics/db/transactions`.
+
+Please review carefully the list of :ref:`known backwards-incompatibilities
+<transactions-upgrading-from-1.5>` to determine if you need to make changes in
+your code.
+
 Persistent database connections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -148,6 +160,16 @@ Backwards incompatible changes in 1.6
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+* Database-level autocommit is enabled by default in Django 1.6. While this
+  doesn't change the general spirit of Django's transaction management, there
+  are a few known backwards-incompatibities, described in the :ref:`transaction
+  management docs <transactions-upgrading-from-1.5>`. You should review your code
+  to determine if you're affected.
+
+* In previous versions, database-level autocommit was only an option for
+  PostgreSQL, and it was disabled by default. This option is now
+  :ref:`ignored <postgresql-autocommit-mode>`.
+
 * The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
   it is only usable as a marker class for checking if
   :meth:`~django.db.models.query.QuerySet.none` has been called:
@@ -233,6 +255,21 @@ Backwards incompatible changes in 1.6
 
 Features deprecated in 1.6
 ==========================
+
+Transaction management APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transaction management was completely overhauled in Django 1.6, and the
+current APIs are deprecated:
+
+- ``django.middleware.transaction.TransactionMiddleware``
+- ``django.db.transaction.autocommit``
+- ``django.db.transaction.commit_on_success``
+- ``django.db.transaction.commit_manually``
+- the ``TRANSACTIONS_MANAGED`` setting
+
+The reasons for this change and the upgrade path are described in the
+:ref:`transactions documentation <transactions-upgrading-from-1.5>`.
 
 Changes to :ttag:`cycle` and :ttag:`firstof`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
