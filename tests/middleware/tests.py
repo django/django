@@ -22,6 +22,9 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
+from django.utils.unittest import expectedFailure
+
+from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Band
 
@@ -669,11 +672,12 @@ class ETagGZipMiddlewareTest(TestCase):
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
 
-class TransactionMiddlewareTest(TransactionTestCase):
+class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Test the transaction middleware.
     """
     def setUp(self):
+        super(TransactionMiddlewareTest, self).setUp()
         self.request = HttpRequest()
         self.request.META = {
             'SERVER_NAME': 'testserver',
@@ -685,33 +689,22 @@ class TransactionMiddlewareTest(TransactionTestCase):
 
     def tearDown(self):
         transaction.abort()
+        super(TransactionMiddlewareTest, self).tearDown()
 
     def test_request(self):
         TransactionMiddleware().process_request(self.request)
-        self.assertTrue(transaction.is_managed())
+        self.assertFalse(transaction.get_autocommit())
 
     def test_managed_response(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         Band.objects.create(name='The Beatles')
         self.assertTrue(transaction.is_dirty())
         TransactionMiddleware().process_response(self.request, self.response)
         self.assertFalse(transaction.is_dirty())
         self.assertEqual(Band.objects.count(), 1)
 
-    def test_unmanaged_response(self):
-        transaction.enter_transaction_management()
-        transaction.managed(False)
-        self.assertEqual(Band.objects.count(), 0)
-        TransactionMiddleware().process_response(self.request, self.response)
-        self.assertFalse(transaction.is_managed())
-        # The transaction middleware doesn't commit/rollback if management
-        # has been disabled.
-        self.assertTrue(transaction.is_dirty())
-
     def test_exception(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
         Band.objects.create(name='The Beatles')
         self.assertTrue(transaction.is_dirty())
         TransactionMiddleware().process_exception(self.request, None)
@@ -726,7 +719,6 @@ class TransactionMiddlewareTest(TransactionTestCase):
                 raise IntegrityError()
             connections[DEFAULT_DB_ALIAS].commit = raise_exception
             transaction.enter_transaction_management()
-            transaction.managed(True)
             Band.objects.create(name='The Beatles')
             self.assertTrue(transaction.is_dirty())
             with self.assertRaises(IntegrityError):

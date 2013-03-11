@@ -355,15 +355,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
-    def savepoint_create_sql(self, sid):
-        return "SAVEPOINT %s" % sid
-
-    def savepoint_commit_sql(self, sid):
-        return "RELEASE SAVEPOINT %s" % sid
-
-    def savepoint_rollback_sql(self, sid):
-        return "ROLLBACK TO SAVEPOINT %s" % sid
-
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
     operators = {
@@ -444,6 +435,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             BaseDatabaseWrapper._rollback(self)
         except Database.NotSupportedError:
             pass
+
+    def _set_autocommit(self, autocommit):
+        self.connection.autocommit(autocommit)
 
     def disable_constraint_checking(self):
         """

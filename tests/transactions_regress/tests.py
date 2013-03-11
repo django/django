@@ -6,10 +6,12 @@ from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils.unittest import skipIf, skipUnless
 
+from transactions.tests import IgnorePendingDeprecationWarningsMixin
+
 from .models import Mod, M2mA, M2mB
 
 
-class TestTransactionClosing(TransactionTestCase):
+class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure that transactions are properly closed
     when they should be, and aren't left pending after operations
@@ -166,17 +168,13 @@ class TestTransactionClosing(TransactionTestCase):
         (connection.settings_dict['NAME'] == ':memory:' or
          not connection.settings_dict['NAME']),
         'Test uses multiple connections, but in-memory sqlite does not support this')
-class TestNewConnection(TransactionTestCase):
+class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Check that new connections don't have special behaviour.
     """
     def setUp(self):
         self._old_backend = connections[DEFAULT_DB_ALIAS]
         settings = self._old_backend.settings_dict.copy()
-        opts = settings['OPTIONS'].copy()
-        if 'autocommit' in opts:
-            opts['autocommit'] = False
-        settings['OPTIONS'] = opts
         new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
         connections[DEFAULT_DB_ALIAS] = new_backend
 
@@ -193,16 +191,20 @@ class TestNewConnection(TransactionTestCase):
         """
         Users are allowed to commit and rollback connections.
         """
-        # The starting value is False, not None.
-        self.assertIs(connection._dirty, False)
-        list(Mod.objects.all())
-        self.assertTrue(connection.is_dirty())
-        connection.commit()
-        self.assertFalse(connection.is_dirty())
-        list(Mod.objects.all())
-        self.assertTrue(connection.is_dirty())
-        connection.rollback()
-        self.assertFalse(connection.is_dirty())
+        connection.set_autocommit(False)
+        try:
+            # The starting value is False, not None.
+            self.assertIs(connection._dirty, False)
+            list(Mod.objects.all())
+            self.assertTrue(connection.is_dirty())
+            connection.commit()
+            self.assertFalse(connection.is_dirty())
+            list(Mod.objects.all())
+            self.assertTrue(connection.is_dirty())
+            connection.rollback()
+            self.assertFalse(connection.is_dirty())
+        finally:
+            connection.set_autocommit(True)
 
     def test_enter_exit_management(self):
         orig_dirty = connection._dirty
@@ -210,39 +212,10 @@ class TestNewConnection(TransactionTestCase):
         connection.leave_transaction_management()
         self.assertEqual(orig_dirty, connection._dirty)
 
-    def test_commit_unless_managed(self):
-        cursor = connection.cursor()
-        cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 1)
-        self.assertTrue(connection.is_dirty())
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-
-    def test_commit_unless_managed_in_managed(self):
-        cursor = connection.cursor()
-        connection.enter_transaction_management()
-        transaction.managed(True)
-        cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
-        connection.commit_unless_managed()
-        self.assertTrue(connection.is_dirty())
-        connection.rollback()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-        connection.commit()
-        connection.leave_transaction_management()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-        self.assertTrue(connection.is_dirty())
-        connection.commit_unless_managed()
-        self.assertFalse(connection.is_dirty())
-        self.assertEqual(len(Mod.objects.all()), 0)
-
 
 @skipUnless(connection.vendor == 'postgresql',
             "This test only valid for PostgreSQL")
-class TestPostgresAutocommitAndIsolation(TransactionTestCase):
+class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure psycopg2's autocommit mode and isolation level
     is restored after entering and leaving transaction management.
@@ -261,7 +234,6 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
         self._old_backend = connections[DEFAULT_DB_ALIAS]
         settings = self._old_backend.settings_dict.copy()
         opts = settings['OPTIONS'].copy()
-        opts['autocommit'] = True
         opts['isolation_level'] = ISOLATION_LEVEL_SERIALIZABLE
         settings['OPTIONS'] = opts
         new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
@@ -275,40 +247,42 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
             connections[DEFAULT_DB_ALIAS] = self._old_backend
 
     def test_initial_autocommit_state(self):
-        self.assertTrue(connection.features.uses_autocommit)
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        # Autocommit is activated when the connection is created.
+        connection.cursor().close()
+        self.assertTrue(connection.autocommit)
 
     def test_transaction_management(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
     def test_transaction_stacking(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.enter_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
 
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
     def test_enter_autocommit(self):
         transaction.enter_transaction_management()
-        transaction.managed(True)
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
         list(Mod.objects.all())
         self.assertTrue(transaction.is_dirty())
         # Enter autocommit mode again.
         transaction.enter_transaction_management(False)
-        transaction.managed(False)
         self.assertFalse(transaction.is_dirty())
         self.assertEqual(
             connection.connection.get_transaction_status(),
@@ -316,12 +290,13 @@ class TestPostgresAutocommitAndIsolation(TransactionTestCase):
         list(Mod.objects.all())
         self.assertFalse(transaction.is_dirty())
         transaction.leave_transaction_management()
+        self.assertFalse(connection.autocommit)
         self.assertEqual(connection.isolation_level, self._serializable)
         transaction.leave_transaction_management()
-        self.assertEqual(connection.isolation_level, self._autocommit)
+        self.assertTrue(connection.autocommit)
 
 
-class TestManyToManyAddTransaction(TransactionTestCase):
+class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     def test_manyrelated_add_commit(self):
         "Test for https://code.djangoproject.com/ticket/16818"
         a = M2mA.objects.create()
@@ -336,8 +311,10 @@ class TestManyToManyAddTransaction(TransactionTestCase):
         self.assertEqual(a.others.count(), 1)
 
 
-class SavepointTest(TransactionTestCase):
+class SavepointTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
 
+    @skipIf(connection.vendor == 'sqlite',
+            "SQLite doesn't support savepoints in managed mode")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_commit(self):
         @commit_manually
@@ -353,6 +330,8 @@ class SavepointTest(TransactionTestCase):
 
         work()
 
+    @skipIf(connection.vendor == 'sqlite',
+            "SQLite doesn't support savepoints in managed mode")
     @skipIf(connection.vendor == 'mysql' and
             connection.features._mysql_storage_engine == 'MyISAM',
             "MyISAM MySQL storage engine doesn't support savepoints")
