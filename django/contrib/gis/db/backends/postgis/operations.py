@@ -402,18 +402,10 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Helper routine for calling PostGIS functions and returning their result.
         """
-        cursor = self.connection._cursor()
-        try:
-            try:
-                cursor.execute('SELECT %s()' % func)
-                row = cursor.fetchone()
-            except:
-                # Responsibility of callers to perform error handling.
-                raise
-        finally:
-            # Close out the connection.  See #9437.
-            self.connection.close()
-        return row[0]
+        # Close out the connection.  See #9437.
+        with self.connection.temporary_connection() as cursor:
+            cursor.execute('SELECT %s()' % func)
+            return cursor.fetchone()[0]
 
     def postgis_geos_version(self):
         "Returns the version of the GEOS library used with PostGIS."

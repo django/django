@@ -85,7 +85,7 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters()
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
         # It's an error for a user to have add permission but NOT change
         # permission for users. If we allowed such users to add users, they
