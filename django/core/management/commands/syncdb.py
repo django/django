@@ -121,16 +121,15 @@ class Command(NoArgsCommand):
                     if custom_sql:
                         if verbosity >= 2:
                             self.stdout.write("Installing custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
-                        with transaction.commit_on_success_unless_managed(using=db):
-                            try:
+                        try:
+                            with transaction.commit_on_success_unless_managed(using=db):
                                 for sql in custom_sql:
                                     cursor.execute(sql)
-                            except Exception as e:
-                                self.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
-                                                    (app_name, model._meta.object_name, e))
-                                if show_traceback:
-                                    traceback.print_exc()
-                                raise
+                        except Exception as e:
+                            self.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
+                                                (app_name, model._meta.object_name, e))
+                            if show_traceback:
+                                traceback.print_exc()
                     else:
                         if verbosity >= 3:
                             self.stdout.write("No custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
@@ -145,14 +144,13 @@ class Command(NoArgsCommand):
                     if index_sql:
                         if verbosity >= 2:
                             self.stdout.write("Installing index for %s.%s model\n" % (app_name, model._meta.object_name))
-                        with transaction.commit_on_success_unless_managed(using=db):
-                            try:
+                        try:
+                            with transaction.commit_on_success_unless_managed(using=db):
                                 for sql in index_sql:
                                     cursor.execute(sql)
-                            except Exception as e:
-                                self.stderr.write("Failed to install index for %s.%s model: %s\n" % \
-                                                    (app_name, model._meta.object_name, e))
-                                raise
+                        except Exception as e:
+                            self.stderr.write("Failed to install index for %s.%s model: %s\n" % \
+                                                (app_name, model._meta.object_name, e))
 
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
