@@ -5,7 +5,6 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 from __future__ import unicode_literals
 
-import datetime
 import decimal
 import re
 import sys
@@ -45,16 +44,13 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
-from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import force_bytes, force_text
-from django.utils.functional import cached_property
-from django.utils import six
-from django.utils import timezone
+
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -267,11 +263,12 @@ WHEN (new.%(col_name)s IS NULL)
     def last_executed_query(self, cursor, sql, params):
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
-        if six.PY3:
-            return cursor.statement
-        else:
-            query = cursor.statement
-            return query if isinstance(query, unicode) else query.decode("utf-8")
+        statement = cursor.statement
+        if not six.PY3 and not isinstance(statement, unicode):
+            statement = statement.decode('utf-8')
+        # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
+        # `statement` doesn't contain the query parameters. refs #20010.
+        return super(DatabaseOperations, self).last_executed_query(cursor, statement, params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
