@@ -10,7 +10,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
-from django.db import connections, router, DatabaseError
+from django.db import connections, transaction, router, DatabaseError
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
 
@@ -26,7 +26,7 @@ class Options(object):
         self.model_name = 'cacheentry'
         self.verbose_name = 'cache entry'
         self.verbose_name_plural = 'cache entries'
-        self.object_name =  'CacheEntry'
+        self.object_name = 'CacheEntry'
         self.abstract = False
         self.managed = True
         self.proxy = False
@@ -108,19 +108,20 @@ class DatabaseCache(BaseDatabaseCache):
         # string, not bytes. Refs #19274.
         if six.PY3:
             b64encoded = b64encoded.decode('latin1')
-        cursor.execute("SELECT cache_key, expires FROM %s "
-                       "WHERE cache_key = %%s" % table, [key])
         try:
-            result = cursor.fetchone()
-            if result and (mode == 'set' or
-                    (mode == 'add' and result[1] < now)):
-                cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
-                               "WHERE cache_key = %%s" % table,
-                               [b64encoded, connections[db].ops.value_to_db_datetime(exp), key])
-            else:
-                cursor.execute("INSERT INTO %s (cache_key, value, expires) "
-                               "VALUES (%%s, %%s, %%s)" % table,
-                               [key, b64encoded, connections[db].ops.value_to_db_datetime(exp)])
+            with transaction.atomic_if_autocommit(using=db):
+                cursor.execute("SELECT cache_key, expires FROM %s "
+                               "WHERE cache_key = %%s" % table, [key])
+                result = cursor.fetchone()
+                exp = connections[db].ops.value_to_db_datetime(exp)
+                if result and (mode == 'set' or (mode == 'add' and result[1] < now)):
+                    cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
+                                   "WHERE cache_key = %%s" % table,
+                                   [b64encoded, exp, key])
+                else:
+                    cursor.execute("INSERT INTO %s (cache_key, value, expires) "
+                                   "VALUES (%%s, %%s, %%s)" % table,
+                                   [key, b64encoded, exp])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
             return False
