@@ -269,19 +269,19 @@ class AtomicMergeTests(TransactionTestCase):
 class AtomicErrorsTests(TransactionTestCase):
 
     def test_atomic_requires_autocommit(self):
-        transaction.set_autocommit(autocommit=False)
+        transaction.set_autocommit(False)
         try:
             with self.assertRaises(transaction.TransactionManagementError):
                 with transaction.atomic():
                     pass
         finally:
-            transaction.set_autocommit(autocommit=True)
+            transaction.set_autocommit(True)
 
     def test_atomic_prevents_disabling_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
             with self.assertRaises(transaction.TransactionManagementError):
-                transaction.set_autocommit(autocommit=not autocommit)
+                transaction.set_autocommit(not autocommit)
         # Make sure autocommit wasn't changed.
         self.assertEqual(connection.autocommit, autocommit)
 

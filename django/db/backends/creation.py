@@ -466,7 +466,7 @@ class BaseDatabaseCreation(object):
         warnings.warn(
             "set_autocommit was moved from BaseDatabaseCreation to "
             "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
-        return self.connection.set_autocommit()
+        return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):
         """

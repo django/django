@@ -255,7 +255,7 @@ database connection, if you need to.
 
 .. function:: get_autocommit(using=None)
 
-.. function:: set_autocommit(using=None, autocommit=True)
+.. function:: set_autocommit(autocommit, using=None)
 
 These functions take a ``using`` argument which should be the name of a
 database. If it isn't provided, Django uses the ``"default"`` database.
@@ -600,11 +600,11 @@ To disable autocommit temporarily, instead of::
 
 you should now use::
 
-    transaction.set_autocommit(autocommit=False)
+    transaction.set_autocommit(False)
     try:
         # do stuff
     finally:
-        transaction.set_autocommit(autocommit=True)
+        transaction.set_autocommit(True)
 
 To enable autocommit temporarily, instead of::
 
@@ -613,11 +613,11 @@ To enable autocommit temporarily, instead of::
 
 you should now use::
 
-    transaction.set_autocommit(autocommit=True)
+    transaction.set_autocommit(True)
     try:
         # do stuff
     finally:
-        transaction.set_autocommit(autocommit=False)
+        transaction.set_autocommit(False)
 
 Disabling transaction management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

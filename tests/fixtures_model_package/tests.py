@@ -25,7 +25,7 @@ class SampleTestCase(TestCase):
 
 class TestNoInitialDataLoading(TransactionTestCase):
     def test_syncdb(self):
-        transaction.set_autocommit(autocommit=False)
+        transaction.set_autocommit(False)
         try:
             Book.objects.all().delete()
 
@@ -37,7 +37,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
             self.assertQuerysetEqual(Book.objects.all(), [])
             transaction.rollback()
         finally:
-            transaction.set_autocommit(autocommit=True)
+            transaction.set_autocommit(True)
 
 
     def test_flush(self):
@@ -49,7 +49,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
             lambda a: a.name
         )
 
-        transaction.set_autocommit(autocommit=False)
+        transaction.set_autocommit(False)
         try:
             management.call_command(
                 'flush',
@@ -61,7 +61,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
             self.assertQuerysetEqual(Book.objects.all(), [])
             transaction.rollback()
         finally:
-            transaction.set_autocommit(autocommit=True)
+            transaction.set_autocommit(True)
 
 
 class FixtureTestCase(TestCase):

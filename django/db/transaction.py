@@ -124,7 +124,7 @@ def get_autocommit(using=None):
     """
     return get_connection(using).autocommit
 
-def set_autocommit(using=None, autocommit=True):
+def set_autocommit(autocommit, using=None):
     """
     Set the autocommit status of the connection.
     """

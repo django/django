@@ -108,7 +108,7 @@ class BaseDatabaseWrapper(object):
         self.connection = self.get_new_connection(conn_params)
         self.init_connection_state()
         if self.settings_dict['AUTOCOMMIT']:
-            self.set_autocommit()
+            self.set_autocommit(True)
         connection_created.send(sender=self.__class__, connection=self)
 
     def ensure_connection(self):
@@ -314,7 +314,7 @@ class BaseDatabaseWrapper(object):
         if managed == self.autocommit:
             self.set_autocommit(not managed)
 
-    def set_autocommit(self, autocommit=True):
+    def set_autocommit(self, autocommit):
         """
         Enable or disable autocommit.
         """
