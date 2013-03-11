@@ -62,14 +62,12 @@ def get_test_modules():
 
 def setup(verbosity, test_labels):
     from django.conf import settings
+    from django.db.models.loading import get_apps, load_app
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
         'TEMPLATE_DIRS': settings.TEMPLATE_DIRS,
-        'USE_I18N': settings.USE_I18N,
-        'LOGIN_URL': settings.LOGIN_URL,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
-        'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': settings.STATIC_ROOT,
     }
@@ -80,15 +78,7 @@ def setup(verbosity, test_labels):
     settings.STATIC_URL = '/static/'
     settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
-    settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
-    settings.LOGIN_URL = 'django.contrib.auth.views.login'
-    settings.MIDDLEWARE_CLASSES = (
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.common.CommonMiddleware',
-    )
     settings.SITE_ID = 1
     # For testing comment-utils, we require the MANAGERS attribute
     # to be set, so that a test email is sent out which we catch
@@ -96,9 +86,6 @@ def setup(verbosity, test_labels):
     settings.MANAGERS = ("admin@djangoproject.com",)
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    # (This import statement is intentionally delayed until after we
-    # access settings because of the USE_I18N dependency.)
-    from django.db.models.loading import get_apps, load_app
     get_apps()
 
     # Load all the test model apps.
