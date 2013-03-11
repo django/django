@@ -245,7 +245,8 @@ class CommonMiddlewareTest(TestCase):
     # Legacy tests for the 404 error reporting via email (to be removed in 1.8)
 
     @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True)
+                       SEND_BROKEN_LINK_EMAILS=True,
+                       MANAGERS=('PHB@dilbert.com',))
     def test_404_error_reporting(self):
         request = self._get_request('regular_url/that/does/not/exist')
         request.META['HTTP_REFERER'] = '/another/url/'
@@ -257,7 +258,8 @@ class CommonMiddlewareTest(TestCase):
         self.assertIn('Broken', mail.outbox[0].subject)
 
     @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True)
+                       SEND_BROKEN_LINK_EMAILS=True,
+                       MANAGERS=('PHB@dilbert.com',))
     def test_404_error_reporting_no_referer(self):
         request = self._get_request('regular_url/that/does/not/exist')
         with warnings.catch_warnings():
@@ -267,7 +269,8 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True)
+                       SEND_BROKEN_LINK_EMAILS=True,
+                       MANAGERS=('PHB@dilbert.com',))
     def test_404_error_reporting_ignored_url(self):
         request = self._get_request('foo_url/that/does/not/exist/either')
         request.META['HTTP_REFERER'] = '/another/url/'
@@ -287,7 +290,10 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(response.status_code, 301)
 
 
-@override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),))
+@override_settings(
+    IGNORABLE_404_URLS=(re.compile(r'foo'),),
+    MANAGERS=('PHB@dilbert.com',),
+)
 class BrokenLinkEmailsMiddlewareTest(TestCase):
 
     def setUp(self):
