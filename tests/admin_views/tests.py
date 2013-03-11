@@ -3576,7 +3576,7 @@ class UserAdminTest(TestCase):
 
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(10):
             response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
             self.assertEqual(response.status_code, 200)
 
@@ -3614,7 +3614,7 @@ class GroupAdminTest(TestCase):
     def test_group_permission_performance(self):
         g = Group.objects.create(name="test_group")
 
-        with self.assertNumQueries(6):  # instead of 259!
+        with self.assertNumQueries(8):  # instead of 259!
             response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
             self.assertEqual(response.status_code, 200)
 
