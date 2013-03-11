@@ -80,10 +80,6 @@ def setup(verbosity, test_labels):
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
-    # For testing comment-utils, we require the MANAGERS attribute
-    # to be set, so that a test email is sent out which we catch
-    # in our tests.
-    settings.MANAGERS = ("admin@djangoproject.com",)
 
     # Load all the ALWAYS_INSTALLED_APPS.
     get_apps()
