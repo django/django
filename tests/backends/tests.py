@@ -336,10 +336,12 @@ class PostgresNewConnectionTest(TestCase):
                 pass
 
 
-# Unfortunately with sqlite3 the in-memory test database cannot be
-# closed, and so it cannot be re-opened during testing, and so we
-# sadly disable this test for now.
-class ConnectionCreatedSignalTest(TestCase):
+# This test needs to run outside of a transaction, otherwise closing the
+# connection would implicitly rollback and cause problems during teardown.
+class ConnectionCreatedSignalTest(TransactionTestCase):
+
+    # Unfortunately with sqlite3 the in-memory test database cannot be closed,
+    # and so it cannot be re-opened during testing.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_signal(self):
         data = {}
