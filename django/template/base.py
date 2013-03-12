@@ -611,7 +611,12 @@ class FilterExpression(object):
                 new_obj = func(obj, autoescape=context.autoescape, *arg_vals)
             else:
                 new_obj = func(obj, *arg_vals)
-            if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
+            # integer_types should be considered safe;
+            # if 'obj' is a string type, we should check it for SafeData
+            if getattr(func, 'is_safe', False) and (
+                    isinstance(obj, six.integer_types) or
+                    (isinstance(obj, six.string_types) and
+                     isinstance(obj, SafeData))):
                 obj = mark_safe(new_obj)
             elif isinstance(obj, EscapeData):
                 obj = mark_for_escaping(new_obj)
