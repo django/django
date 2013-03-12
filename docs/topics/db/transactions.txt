@@ -153,9 +153,6 @@ Django provides a single API to control database transactions.
     to commit, roll back, or change the autocommit state of the database
     connection within an ``atomic`` block will raise an exception.
 
-    ``atomic`` can only be used in autocommit mode. It will raise an exception
-    if autocommit is turned off.
-
     Under the hood, Django's transaction management code:
 
     - opens a transaction when entering the outermost ``atomic`` block;
@@ -170,6 +167,10 @@ Django provides a single API to control database transactions.
     guaranteed by the outer transaction. This option should only be used if
     the overhead of savepoints is noticeable. It has the drawback of breaking
     the error handling described above.
+
+    You may use ``atomic`` when autocommit is turned off. It will only use
+    savepoints, even for the outermost block, and it will raise an exception
+    if the outermost block is declared with ``savepoint=False``.
 
 .. admonition:: Performance considerations
 
@@ -392,8 +393,11 @@ When autocommit is enabled, savepoints don't make sense. When it's disabled,
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
 ``DELETE`` and ``REPLACE``.)
 
-As a consequence, savepoints are only usable inside a transaction ie. inside
-an :func:`atomic` block.
+This has two consequences:
+
+- The low level APIs for savepoints are only usable inside a transaction ie.
+  inside an :func:`atomic` block.
+- It's impossible to use :func:`atomic` when autocommit is turned off.
 
 Transactions in MySQL
 ---------------------

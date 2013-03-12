@@ -50,8 +50,11 @@ class BaseDatabaseWrapper(object):
         # set somewhat aggressively, as the DBAPI doesn't make it easy to
         # deduce if the connection is in transaction or not.
         self._dirty = False
-        # Tracks if the connection is in a transaction managed by 'atomic'
+        # Tracks if the connection is in a transaction managed by 'atomic'.
         self.in_atomic_block = False
+        # Tracks if the outermost 'atomic' block should commit on exit,
+        # ie. if autocommit was active on entry.
+        self.commit_on_exit = True
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
