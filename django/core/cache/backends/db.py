@@ -109,7 +109,7 @@ class DatabaseCache(BaseDatabaseCache):
         if six.PY3:
             b64encoded = b64encoded.decode('latin1')
         try:
-            with transaction.atomic_if_autocommit(using=db):
+            with transaction.atomic(using=db):
                 cursor.execute("SELECT cache_key, expires FROM %s "
                                "WHERE cache_key = %%s" % table, [key])
                 result = cursor.fetchone()
