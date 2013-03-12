@@ -300,6 +300,17 @@ class AtomicErrorsTests(TransactionTestCase):
                 transaction.leave_transaction_management()
 
 
+class AtomicMiscTests(TransactionTestCase):
+
+    def test_wrap_callable_instance(self):
+        # Regression test for #20028
+        class Callable(object):
+            def __call__(self):
+                pass
+        # Must not raise an exception
+        transaction.atomic(Callable())
+
+
 class IgnorePendingDeprecationWarningsMixin(object):
 
     def setUp(self):

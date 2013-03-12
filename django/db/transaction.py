@@ -17,6 +17,7 @@ import warnings
 from functools import wraps
 
 from django.db import connections, DatabaseError, DEFAULT_DB_ALIAS
+from django.utils.decorators import available_attrs
 
 
 class TransactionManagementError(Exception):
@@ -313,7 +314,7 @@ class Atomic(object):
 
 
     def __call__(self, func):
-        @wraps(func)
+        @wraps(func, assigned=available_attrs(func))
         def inner(*args, **kwargs):
             with self:
                 return func(*args, **kwargs)
