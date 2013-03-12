@@ -22,9 +22,12 @@ tell Django is installed and which version by running the following command:
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|. If the versions don't match,
-you can refer to the tutorial for your version of Django or update Django to
-the newest version.
+This tutorial is written for Django |version| and Python 2.x. If the Django
+version doesn't match, you can refer to the tutorial for your version of Django
+or update Django to the newest version. If you are using Python 3.x, be aware
+that your code may need to differ from what is in the tutorial and you should
+continue using the tutorial only if you know what you are doing with Python
+3.x.
 
 See :doc:`How to install Django </topics/install>` for advice on how to remove
 older versions of Django and install a newer one.
