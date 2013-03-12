@@ -588,9 +588,6 @@ During the deprecation period, it's possible to use :func:`atomic` within
 However, the reverse is forbidden, because nesting the old decorators /
 context managers breaks atomicity.
 
-If you enter :func:`atomic` while you're in managed mode, it will trigger a
-commit to start from a clean slate.
-
 Managing autocommit
 ~~~~~~~~~~~~~~~~~~~
 
@@ -627,8 +624,8 @@ Disabling transaction management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of setting ``TRANSACTIONS_MANAGED = True``, set the ``AUTOCOMMIT`` key
-to ``False`` in the configuration of each database, as explained in :ref
-:`deactivate-transaction-management`.
+to ``False`` in the configuration of each database, as explained in
+:ref:`deactivate-transaction-management`.
 
 Backwards incompatibilities
 ---------------------------

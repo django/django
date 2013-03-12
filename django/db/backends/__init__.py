@@ -60,8 +60,6 @@ class BaseDatabaseWrapper(object):
         self.needs_rollback = False
         # List of savepoints created by 'atomic'
         self.savepoint_ids = []
-        # Hack to provide compatibility with legacy transaction management
-        self._atomic_forced_unmanaged = False
 
         # Connection termination related attributes
         self.close_at = None

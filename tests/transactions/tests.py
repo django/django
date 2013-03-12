@@ -212,6 +212,8 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.set_autocommit(True)
 
 
+@skipIf(connection.features.autocommits_when_autocommit_is_off,
+        "This test requires a non-autocommit mode that doesn't autocommit.")
 class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
 
     def setUp(self):

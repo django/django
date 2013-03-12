@@ -206,27 +206,12 @@ class Atomic(object):
         self.using = using
         self.savepoint = savepoint
 
-    def _legacy_enter_transaction_management(self, connection):
-        if not connection.in_atomic_block:
-            if connection.transaction_state and connection.transaction_state[-1]:
-                connection._atomic_forced_unmanaged = True
-                connection.enter_transaction_management(managed=False)
-            else:
-                connection._atomic_forced_unmanaged = False
-
-    def _legacy_leave_transaction_management(self, connection):
-        if not connection.in_atomic_block and connection._atomic_forced_unmanaged:
-            connection.leave_transaction_management()
-
     def __enter__(self):
         connection = get_connection(self.using)
 
         # Ensure we have a connection to the database before testing
         # autocommit status.
         connection.ensure_connection()
-
-        # Remove this when the legacy transaction management goes away.
-        self._legacy_enter_transaction_management(connection)
 
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
@@ -326,13 +311,9 @@ class Atomic(object):
                     connection.autocommit = True
                 else:
                     connection.set_autocommit(True)
-
             # Outermost block exit when autocommit was disabled.
             elif not connection.savepoint_ids and not connection.commit_on_exit:
                 connection.in_atomic_block = False
-
-            # Remove this when the legacy transaction management goes away.
-            self._legacy_leave_transaction_management(connection)
 
     def __call__(self, func):
         @wraps(func, assigned=available_attrs(func))
@@ -475,9 +456,8 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
     Transitory API to preserve backwards-compatibility while refactoring.
 
     Once the legacy transaction management is fully deprecated, this should
-    simply be replaced by atomic. Until then, it's necessary to avoid making a
-    commit where Django didn't use to, since entering atomic in managed mode
-    triggers a commmit.
+    simply be replaced by atomic. Until then, it's necessary to guarantee that
+    a commit occurs on exit, which atomic doesn't do when it's nested.
 
     Unlike atomic, savepoint defaults to False because that's closer to the
     legacy behavior.
