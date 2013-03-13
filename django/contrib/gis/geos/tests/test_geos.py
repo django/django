@@ -1063,15 +1063,17 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(mls.interpolate(17), Point(10, 7))
 
     def test_geos_version(self):
-        "Testing the GEOS version regular expression."
+        """Testing the GEOS version regular expression."""
         from django.contrib.gis.geos.libgeos import version_regex
-        versions = [ ('3.0.0rc4-CAPI-1.3.3', '3.0.0'),
-                     ('3.0.0-CAPI-1.4.1', '3.0.0'),
-                     ('3.4.0dev-CAPI-1.8.0', '3.4.0') ]
-        for v, expected in versions:
-            m = version_regex.match(v)
-            self.assertTrue(m)
-            self.assertEqual(m.group('version'), expected)
+        versions = [('3.0.0rc4-CAPI-1.3.3', '3.0.0', '1.3.3'),
+                    ('3.0.0-CAPI-1.4.1', '3.0.0', '1.4.1'),
+                    ('3.4.0dev-CAPI-1.8.0', '3.4.0', '1.8.0'),
+                    ('3.4.0dev-CAPI-1.8.0 r0', '3.4.0', '1.8.0')]
+        for v_init, v_geos, v_capi in versions:
+            m = version_regex.match(v_init)
+            self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
+            self.assertEqual(m.group('version'), v_geos)
+            self.assertEqual(m.group('capi_version'), v_capi)
 
 
 def suite():
