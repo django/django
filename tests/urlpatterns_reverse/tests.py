@@ -183,6 +183,11 @@ class URLPatternReverse(TestCase):
         self.assertEqual('/bump%2520map/includes/non_path_include/',
                reverse('non_path_include', prefix='/bump%20map/'))
 
+    def test_non_urlsafe_prefix_with_args(self):
+        # Regression for #20022
+        self.assertEqual('/%7Eme/places/1/',
+                reverse('places', args=[1], prefix='/~me/'))
+
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
         """
