@@ -52,14 +52,14 @@ class BaseDatabaseWrapper(object):
         self._dirty = False
         # Tracks if the connection is in a transaction managed by 'atomic'.
         self.in_atomic_block = False
+        # List of savepoints created by 'atomic'
+        self.savepoint_ids = []
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
         self.commit_on_exit = True
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
-        # List of savepoints created by 'atomic'
-        self.savepoint_ids = []
 
         # Connection termination related attributes
         self.close_at = None
@@ -100,6 +100,9 @@ class BaseDatabaseWrapper(object):
 
     def connect(self):
         """Connects to the database. Assumes that the connection is closed."""
+        # In case the previous connection was closed while in an atomic block
+        self.in_atomic_block = False
+        self.savepoint_ids = []
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
         self.close_at = None if max_age is None else time.time() + max_age
@@ -179,6 +182,9 @@ class BaseDatabaseWrapper(object):
         Closes the connection to the database.
         """
         self.validate_thread_sharing()
+        # Don't call validate_no_atomic_block() to avoid making it difficult
+        # to get rid of a connection in an invalid state. The next connect()
+        # will reset the transaction state anyway.
         try:
             self._close()
         finally:
