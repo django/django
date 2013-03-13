@@ -388,7 +388,7 @@ class RegexURLResolver(LocaleRegexProvider):
                     if len(args) != len(params) + len(prefix_args):
                         continue
                     unicode_args = [force_text(val) for val in args]
-                    candidate = (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
+                    candidate = (prefix_norm.replace('%', '%%') + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
                     if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
