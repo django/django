@@ -15,11 +15,13 @@ from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
 
-from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
+from shared_models.models import Author, Book
+
+from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
-    Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
+    Product, TextFile, AuthorProfile, Colour, ColourfulItem,
     test_images)
 
 if test_images:
@@ -44,11 +46,13 @@ class PriceForm(forms.ModelForm):
 
 class BookForm(forms.ModelForm):
     class Meta:
-       model = Book
+        fields = ['title', 'author', 'pubdate']
+        model = Book
 
 
 class DerivedBookForm(forms.ModelForm):
     class Meta:
+        fields = ['title', 'author', 'isbn', 'suffix1', 'suffix2']
         model = DerivedBook
 
 
@@ -68,11 +72,11 @@ class DerivedPostForm(forms.ModelForm):
         model = DerivedPost
 
 
-class CustomWriterForm(forms.ModelForm):
+class CustomAuthorForm(forms.ModelForm):
    name = forms.CharField(required=False)
 
    class Meta:
-       model = Writer
+       model = Author
 
 
 class FlexDatePostForm(forms.ModelForm):
@@ -101,7 +105,7 @@ class PartialArticleForm(forms.ModelForm):
 
 class RoykoForm(forms.ModelForm):
     class Meta:
-        model = Writer
+        model = Author
 
 class TestArticleForm(forms.ModelForm):
     class Meta:
@@ -144,13 +148,13 @@ class ImprovedArticleWithParentLinkForm(forms.ModelForm):
     class Meta:
         model = ImprovedArticleWithParentLink
 
-class BetterWriterForm(forms.ModelForm):
+class BetterAuthorForm(forms.ModelForm):
     class Meta:
-        model = BetterWriter
+        model = BetterAuthor
 
-class WriterProfileForm(forms.ModelForm):
+class AuthorProfileForm(forms.ModelForm):
     class Meta:
-        model = WriterProfile
+        model = AuthorProfile
 
 class TextFileForm(forms.ModelForm):
     class Meta:
@@ -206,13 +210,13 @@ class ModelFormBaseTest(TestCase):
                                      forms.fields.BooleanField))
 
     def test_override_field(self):
-        class WriterForm(forms.ModelForm):
+        class AuthorForm(forms.ModelForm):
             book = forms.CharField(required=False)
 
             class Meta:
-                model = Writer
+                model = Author
 
-        wf = WriterForm({'name': 'Richard Lockridge'})
+        wf = AuthorForm({'name': 'Richard Lockridge'})
         self.assertTrue(wf.is_valid())
 
     def test_limit_fields(self):
@@ -411,7 +415,7 @@ class ValidationTest(TestCase):
         assert form.is_valid()
 
     def test_notrequired_overrides_notblank(self):
-        form = CustomWriterForm({})
+        form = CustomAuthorForm({})
         assert form.is_valid()
 
 
@@ -420,7 +424,7 @@ class ValidationTest(TestCase):
 # unique/unique_together validation
 class UniqueTest(TestCase):
     def setUp(self):
-        self.writer = Writer.objects.create(name='Mike Royko')
+        self.author = Author.objects.create(name='Mike Royko')
 
     def test_simple_unique(self):
         form = ProductForm({'slug': 'teddy-bear-blue'})
@@ -444,33 +448,31 @@ class UniqueTest(TestCase):
 
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
-        form = BookForm({'title': title, 'author': self.writer.pk})
+        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
         self.assertTrue(form.is_valid())
         form.save()
-        form = BookForm({'title': title, 'author': self.writer.pk})
+        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
-        form = BookForm({'title': title})
+        form = BookForm({'title': title, 'pubdate': '2012-12-12 00:00:00'})
         self.assertTrue(form.is_valid())
         form.save()
-        form = BookForm({'title': title})
+        form = BookForm({'title': title, 'pubdate': '2012-12-12 00:00:00'})
         self.assertTrue(form.is_valid())
 
     def test_inherited_unique(self):
-        title = 'Boss'
-        Book.objects.create(title=title, author=self.writer, special_id=1)
-        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'special_id': '1', 'isbn': '12345'})
+        form = BetterAuthorForm({'name': 'Mike Royko', 'score': 3})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['special_id'], ['Book with this Special id already exists.'])
+        self.assertEqual(form.errors['name'], ['Author with this Name already exists.'])
 
     def test_inherited_unique_together(self):
         title = 'Boss'
-        form = BookForm({'title': title, 'author': self.writer.pk})
+        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
         self.assertTrue(form.is_valid())
         form.save()
-        form = DerivedBookForm({'title': title, 'author': self.writer.pk, 'isbn': '12345'})
+        form = DerivedBookForm({'title': title, 'author': self.author.pk, 'isbn': '12345'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
@@ -478,8 +480,9 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
-        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': isbn})
+        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
+            pubdate='2012-12-12 00:00')
+        form = DerivedBookForm({'title': 'Other', 'author': self.author.pk, 'isbn': isbn})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['isbn'], ['Derived book with this Isbn already exists.'])
@@ -487,10 +490,11 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique_together(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
+        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
+            pubdate='2012-12-12 00:00')
         form = DerivedBookForm({
                     'title': 'Other',
-                    'author': self.writer.pk,
+                    'author': self.author.pk,
                     'isbn': '9876',
                     'suffix1': '0',
                     'suffix2': '0'
@@ -591,7 +595,7 @@ class ModelToDictTests(TestCase):
         ]
         for c in categories:
             c.save()
-        writer = Writer(name='Test writer')
+        writer = Author(name='Test writer')
         writer.save()
 
         art = Article(
@@ -700,10 +704,10 @@ class OldFormForXTests(TestCase):
         with self.assertRaises(ValueError):
             f.save()
 
-        # Create a couple of Writers.
-        w_royko = Writer(name='Mike Royko')
+        # Create a couple of Authors.
+        w_royko = Author(name='Mike Royko')
         w_royko.save()
-        w_woodward = Writer(name='Bob Woodward')
+        w_woodward = Author(name='Bob Woodward')
         w_woodward.save()
         # ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
         # fields with the 'choices' attribute are represented by a ChoiceField.
@@ -741,9 +745,9 @@ class OldFormForXTests(TestCase):
 
         # When the ModelForm is passed an instance, that instance's current values are
         # inserted as 'initial' data in each Field.
-        w = Writer.objects.get(name='Mike Royko')
+        w = Author.objects.get(name='Mike Royko')
         f = RoykoForm(auto_id=False, instance=w)
-        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
+        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="100" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
                     headline='Test article',
@@ -955,7 +959,7 @@ class OldFormForXTests(TestCase):
 
         c4 = Category.objects.create(name='Fourth', url='4th')
         self.assertEqual(c4.name, 'Fourth')
-        w_bernstein = Writer.objects.create(name='Carl Bernstein')
+        w_bernstein = Author.objects.create(name='Carl Bernstein')
         self.assertEqual(w_bernstein.name, 'Carl Bernstein')
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
@@ -1132,17 +1136,17 @@ class OldFormForXTests(TestCase):
 
         self.assertEqual(list(ImprovedArticleWithParentLinkForm.base_fields), [])
 
-        bw = BetterWriter(name='Joe Better', score=10)
+        bw = BetterAuthor(name='Joe Better', score=10)
         bw.save()
         self.assertEqual(sorted(model_to_dict(bw)),
-                         ['id', 'name', 'score', 'writer_ptr'])
+                         ['author_ptr', 'id', 'name', 'score'])
 
-        form = BetterWriterForm({'name': 'Some Name', 'score': 12})
+        form = BetterAuthorForm({'name': 'Some Name', 'score': 12})
         self.assertEqual(form.is_valid(), True)
         bw2 = form.save()
         bw2.delete()
 
-        form = WriterProfileForm()
+        form = AuthorProfileForm()
         self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1156,11 +1160,11 @@ class OldFormForXTests(TestCase):
             'writer': six.text_type(w_woodward.pk),
             'age': '65',
         }
-        form = WriterProfileForm(data)
+        form = AuthorProfileForm(data)
         instance = form.save()
         self.assertEqual(six.text_type(instance), 'Bob Woodward is 65')
 
-        form = WriterProfileForm(instance=instance)
+        form = AuthorProfileForm(instance=instance)
         self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
 <option value="%s" selected="selected">Bob Woodward</option>
