@@ -6,7 +6,7 @@ import warnings
 from django.db import connection, transaction, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.utils import six
-from django.utils.unittest import skipUnless
+from django.utils.unittest import skipIf, skipUnless
 
 from .models import Reporter
 
@@ -197,6 +197,23 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
+@skipIf(connection.features.autocommits_when_autocommit_is_off,
+        "This test requires a non-autocommit mode that doesn't autocommit.")
+class AtomicWithoutAutocommitTests(AtomicTests):
+    """All basic tests for atomic should also pass when autocommit is turned off."""
+
+    def setUp(self):
+        transaction.set_autocommit(False)
+
+    def tearDown(self):
+        # The tests access the database after exercising 'atomic', initiating
+        # a transaction ; a rollback is required before restoring autocommit.
+        transaction.rollback()
+        transaction.set_autocommit(True)
+
+
+@skipIf(connection.features.autocommits_when_autocommit_is_off,
+        "This test requires a non-autocommit mode that doesn't autocommit.")
 class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
 
     def setUp(self):
@@ -268,16 +285,7 @@ class AtomicMergeTests(TransactionTestCase):
         "'atomic' requires transactions and savepoints.")
 class AtomicErrorsTests(TransactionTestCase):
 
-    def test_atomic_requires_autocommit(self):
-        transaction.set_autocommit(False)
-        try:
-            with self.assertRaises(transaction.TransactionManagementError):
-                with transaction.atomic():
-                    pass
-        finally:
-            transaction.set_autocommit(True)
-
-    def test_atomic_prevents_disabling_autocommit(self):
+    def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
             with self.assertRaises(transaction.TransactionManagementError):
