@@ -1415,6 +1415,14 @@ The decorator can also be applied to test case classes::
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
 
+You can also simulate the absence of a setting by deleting it after settings
+have been overriden, like this::
+
+    @override_settings()
+    def test_something(self):
+        del settings.LOGIN_URL
+        ...
+
 When overriding settings, make sure to handle the cases in which your app's
 code uses a cache or similar feature that retains state even if the
 setting is changed. Django provides the
