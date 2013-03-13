@@ -35,10 +35,10 @@ transaction. Set :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` to
 ``True`` in the configuration of each database for which you want to enable
 this behavior.
 
-It works like this. When a request starts, Django starts a transaction. If the
-response is produced without problems, Django commits the transaction. If the
-view function produces an exception, Django rolls back the transaction.
-Middleware always runs outside of this transaction.
+It works like this. Before calling a view function, Django starts a
+transaction. If the response is produced without problems, Django commits the
+transaction. If the view produces an exception, Django rolls back the
+transaction.
 
 You may perfom partial commits and rollbacks in your view code, typically with
 the :func:`atomic` context manager. However, at the end of the view, either
@@ -207,13 +207,6 @@ To avoid this, you can :ref:`deactivate the transaction management
     Before Django 1.6, autocommit was turned off, and it was emulated by
     forcing a commit after write operations in the ORM.
 
-.. warning::
-
-    If you're using the database API directly — for instance, you're running
-    SQL queries with ``cursor.execute()`` — be aware that autocommit is on,
-    and consider wrapping your operations in a transaction, with
-    :func:`atomic`, to ensure consistency.
-
 .. _deactivate-transaction-management:
 
 Deactivating transaction management
@@ -251,8 +244,8 @@ Autocommit
 
 .. versionadded:: 1.6
 
-Django provides a straightforward API to manage the autocommit state of each
-database connection, if you need to.
+Django provides a straightforward API in the :mod:`django.db.transaction`
+module to manage the autocommit state of each database connection.
 
 .. function:: get_autocommit(using=None)
 
@@ -287,7 +280,7 @@ start a transaction is to disable autocommit with :func:`set_autocommit`.
 
 Once you're in a transaction, you can choose either to apply the changes
 you've performed until this point with :func:`commit`, or to cancel them with
-:func:`rollback`.
+:func:`rollback`. These functions are defined in :mod:`django.db.transaction`.
 
 .. function:: commit(using=None)
 
@@ -332,10 +325,8 @@ Savepoints are controlled by three functions in :mod:`django.db.transaction`:
 
 .. function:: savepoint(using=None)
 
-    Creates a new savepoint. This marks a point in the transaction that
-    is known to be in a "good" state.
-
-    Returns the savepoint ID (``sid``).
+    Creates a new savepoint. This marks a point in the transaction that is
+    known to be in a "good" state. Returns the savepoint ID (``sid``).
 
 .. function:: savepoint_commit(sid, using=None)
 
@@ -388,11 +379,9 @@ While SQLite ≥ 3.6.8 supports savepoints, a flaw in the design of the
 :mod:`sqlite3` makes them hardly usable.
 
 When autocommit is enabled, savepoints don't make sense. When it's disabled,
-:mod:`sqlite3` commits implicitly before savepoint-related statement. (It
+:mod:`sqlite3` commits implicitly before savepoint statements. (In fact, it
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
-``DELETE`` and ``REPLACE``.)
-
-This has two consequences:
+``DELETE`` and ``REPLACE``.) This bug has two consequences:
 
 - The low level APIs for savepoints are only usable inside a transaction ie.
   inside an :func:`atomic` block.
@@ -407,22 +396,27 @@ depends on your MySQL version and the table types you're using. (By
 peculiarities are outside the scope of this article, but the MySQL site has
 `information on MySQL transactions`_.
 
-If your MySQL setup does *not* support transactions, then Django will function
-in autocommit mode: Statements will be executed and committed as soon as
-they're called. If your MySQL setup *does* support transactions, Django will
-handle transactions as explained in this document.
+If your MySQL setup does *not* support transactions, then Django will always
+function in autocommit mode: statements will be executed and committed as soon
+as they're called. If your MySQL setup *does* support transactions, Django
+will handle transactions as explained in this document.
 
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
 
 Handling exceptions within PostgreSQL transactions
 --------------------------------------------------
 
-When a call to a PostgreSQL cursor raises an exception (typically
-``IntegrityError``), all subsequent SQL in the same transaction will fail with
-the error "current transaction is aborted, queries ignored until end of
-transaction block". Whilst simple use of ``save()`` is unlikely to raise an
-exception in PostgreSQL, there are more advanced usage patterns which
-might, such as saving objects with unique fields, saving using the
+.. note::
+    This section is relevant only if you're implementing your own transaction
+    management. This problem cannot occur in Django's default mode and
+    :func:`atomic` handles it automatically.
+
+Inside a transaction, when a call to a PostgreSQL cursor raises an exception
+(typically ``IntegrityError``), all subsequent SQL in the same transaction
+will fail with the error "current transaction is aborted, queries ignored
+until end of transaction block". Whilst simple use of ``save()`` is unlikely
+to raise an exception in PostgreSQL, there are more advanced usage patterns
+which might, such as saving objects with unique fields, saving using the
 force_insert/force_update flag, or invoking custom SQL.
 
 There are several ways to recover from this sort of error.
@@ -529,9 +523,9 @@ Django starts in auto mode. ``TransactionMiddleware``,
 Internally, Django keeps a stack of states. Activations and deactivations must
 be balanced.
 
-For example, ``commit_on_success`` switches to managed mode when entering the
-block of code it controls; when exiting the block, it commits or rollbacks,
-and switches back to auto mode.
+For example, :func:`commit_on_success` switches to managed mode when entering
+the block of code it controls; when exiting the block, it commits or
+rollbacks, and switches back to auto mode.
 
 So :func:`commit_on_success` really has two effects: it changes the
 transaction state and it defines an transaction block. Nesting will give the
@@ -568,7 +562,7 @@ you must now use this pattern::
     my_view.transactions_per_request = False
 
 The transaction middleware applied not only to view functions, but also to
-middleware modules that come after it. For instance, if you used the session
+middleware modules that came after it. For instance, if you used the session
 middleware after the transaction middleware, session creation was part of the
 transaction. :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` only
 applies to the view itself.
@@ -651,8 +645,8 @@ same "automatic transaction". If you need to enforce atomicity, you must wrap
 the sequence of queries in :func:`commit_on_success`.
 
 To check for this problem, look for calls to ``cursor.execute()``. They're
-usually followed by a call to ``transaction.commit_unless_managed``, which
-isn't necessary any more and should be removed.
+usually followed by a call to ``transaction.commit_unless_managed()``, which
+isn't useful any more and should be removed.
 
 Select for update
 ~~~~~~~~~~~~~~~~~

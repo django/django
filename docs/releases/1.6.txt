@@ -36,7 +36,8 @@ Improved transaction management
 Django's transaction management was overhauled. Database-level autocommit is
 now turned on by default. This makes transaction handling more explicit and
 should improve performance. The existing APIs were deprecated, and new APIs
-were introduced, as described in :doc:`/topics/db/transactions`.
+were introduced, as described in the :doc:`transaction management docs
+</topics/db/transactions>`.
 
 Please review carefully the list of :ref:`known backwards-incompatibilities
 <transactions-upgrading-from-1.5>` to determine if you need to make changes in
