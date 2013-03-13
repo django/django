@@ -901,7 +901,7 @@ class AggregationTests(TestCase):
 
         # There should only be one GROUP BY clause, for the `id` column.
         # `name` and `age` should not be grouped on.
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
         self.assertEqual(len(grouping), 1)
         assert 'id' in grouping[0]
         assert 'name' not in grouping[0]
@@ -930,7 +930,7 @@ class AggregationTests(TestCase):
     def test_aggregate_duplicate_columns_only(self):
         # Works with only() too.
         results = Author.objects.only('id', 'name').annotate(num_contacts=Count('book_contact_set'))
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
         self.assertEqual(len(grouping), 1)
         assert 'id' in grouping[0]
         assert 'name' not in grouping[0]
@@ -960,7 +960,7 @@ class AggregationTests(TestCase):
         # And select_related()
         results = Book.objects.select_related('contact').annotate(
             num_authors=Count('authors'))
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([])
+        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
         self.assertEqual(len(grouping), 1)
         assert 'id' in grouping[0]
         assert 'name' not in grouping[0]
