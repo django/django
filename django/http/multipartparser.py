@@ -169,6 +169,13 @@ class MultiPartParser(object):
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))
+                    
+                    for handler in handlers:
+                        try :
+                            handler.variable_complete(field_name, force_text(data, encoding, errors='replace'))
+                        except StopFutureHandlers:
+                            break
+
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
