@@ -62,7 +62,7 @@ class SettingsCollector(object):
             warnings.warn("The %s setting must be a tuple. Please fix your "
                           "settings, as auto-correction is now deprecated." % setting,
                           DeprecationWarning, stacklevel=2)
-            return (setting_value,) # In case the user forgot the comma.
+            return (setting_value,)  # In case the user forgot the comma.
 
         return setting_value
 
@@ -147,7 +147,7 @@ class LazySettings(LazyObject):
         if not issubclass(settings_class, BaseSettings):
             raise TypeError('A settings class must inherit from BaseSettings')
 
-        LazySettings._settings_class = settings_class
+        LazySettings._settings_class = settings_class  # Done to avoid infinite recursion when using self._settings_class
 
     def _setup(self, name=None):
         """
@@ -157,7 +157,7 @@ class LazySettings(LazyObject):
         """
         try:
             settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module: # If it's set but is an empty string.
+            if not settings_module:  # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
             desc = ("setting %s" % name) if name else "settings"
