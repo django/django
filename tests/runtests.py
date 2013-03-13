@@ -21,6 +21,7 @@ os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 SUBDIRS_TO_SKIP = ['templates']
 
 ALWAYS_INSTALLED_APPS = [
+    'shared_models',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
