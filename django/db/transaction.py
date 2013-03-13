@@ -206,18 +206,6 @@ class Atomic(object):
         self.using = using
         self.savepoint = savepoint
 
-    def _legacy_enter_transaction_management(self, connection):
-        if not connection.in_atomic_block:
-            if connection.transaction_state and connection.transaction_state[-1]:
-                connection._atomic_forced_unmanaged = True
-                connection.enter_transaction_management(managed=False)
-            else:
-                connection._atomic_forced_unmanaged = False
-
-    def _legacy_leave_transaction_management(self, connection):
-        if not connection.in_atomic_block and connection._atomic_forced_unmanaged:
-            connection.leave_transaction_management()
-
     def __enter__(self):
         connection = get_connection(self.using)
 
@@ -225,12 +213,31 @@ class Atomic(object):
         # autocommit status.
         connection.ensure_connection()
 
-        # Remove this when the legacy transaction management goes away.
-        self._legacy_enter_transaction_management(connection)
-
-        if not connection.in_atomic_block and not connection.autocommit:
-            raise TransactionManagementError(
-                "'atomic' cannot be used when autocommit is disabled.")
+        if not connection.in_atomic_block:
+            # Reset state when entering an outermost atomic block.
+            connection.commit_on_exit = True
+            connection.needs_rollback = False
+            if not connection.autocommit:
+                # Some database adapters (namely sqlite3) don't handle
+                # transactions and savepoints properly when autocommit is off.
+                # Turning autocommit back on isn't an option; it would trigger
+                # a premature commit. Give up if that happens.
+                if connection.features.autocommits_when_autocommit_is_off:
+                    raise TransactionManagementError(
+                        "Your database backend doesn't behave properly when "
+                        "autocommit is off. Turn it on before using 'atomic'.")
+                # When entering an atomic block with autocommit turned off,
+                # Django should only use savepoints and shouldn't commit.
+                # This requires at least a savepoint for the outermost block.
+                if not self.savepoint:
+                    raise TransactionManagementError(
+                        "The outermost 'atomic' block cannot use "
+                        "savepoint = False when autocommit is off.")
+                # Pretend we're already in an atomic block to bypass the code
+                # that disables autocommit to enter a transaction, and make a
+                # note to deal with this case in __exit__.
+                connection.in_atomic_block = True
+                connection.commit_on_exit = False
 
         if connection.in_atomic_block:
             # We're already in a transaction; create a savepoint, unless we
@@ -255,63 +262,58 @@ class Atomic(object):
             else:
                 connection.set_autocommit(False)
             connection.in_atomic_block = True
-            connection.needs_rollback = False
 
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
-        if exc_value is None and not connection.needs_rollback:
-            if connection.savepoint_ids:
-                # Release savepoint if there is one
-                sid = connection.savepoint_ids.pop()
-                if sid is not None:
+
+        if connection.savepoint_ids:
+            sid = connection.savepoint_ids.pop()
+        else:
+            # Prematurely unset this flag to allow using commit or rollback.
+            connection.in_atomic_block = False
+
+        try:
+            if exc_value is None and not connection.needs_rollback:
+                if connection.in_atomic_block:
+                    # Release savepoint if there is one
+                    if sid is not None:
+                        try:
+                            connection.savepoint_commit(sid)
+                        except DatabaseError:
+                            connection.savepoint_rollback(sid)
+                            raise
+                else:
+                    # Commit transaction
                     try:
-                        connection.savepoint_commit(sid)
+                        connection.commit()
                     except DatabaseError:
-                        connection.savepoint_rollback(sid)
-                        # Remove this when the legacy transaction management goes away.
-                        self._legacy_leave_transaction_management(connection)
+                        connection.rollback()
                         raise
             else:
-                # Commit transaction
-                connection.in_atomic_block = False
-                try:
-                    connection.commit()
-                except DatabaseError:
-                    connection.rollback()
-                    # Remove this when the legacy transaction management goes away.
-                    self._legacy_leave_transaction_management(connection)
-                    raise
-                finally:
-                    if connection.features.autocommits_when_autocommit_is_off:
-                        connection.autocommit = True
+                # This flag will be set to True again if there isn't a savepoint
+                # allowing to perform the rollback at this level.
+                connection.needs_rollback = False
+                if connection.in_atomic_block:
+                    # Roll back to savepoint if there is one, mark for rollback
+                    # otherwise.
+                    if sid is None:
+                        connection.needs_rollback = True
                     else:
-                        connection.set_autocommit(True)
-        else:
-            # This flag will be set to True again if there isn't a savepoint
-            # allowing to perform the rollback at this level.
-            connection.needs_rollback = False
-            if connection.savepoint_ids:
-                # Roll back to savepoint if there is one, mark for rollback
-                # otherwise.
-                sid = connection.savepoint_ids.pop()
-                if sid is None:
-                    connection.needs_rollback = True
+                        connection.savepoint_rollback(sid)
                 else:
-                    connection.savepoint_rollback(sid)
-            else:
-                # Roll back transaction
-                connection.in_atomic_block = False
-                try:
+                    # Roll back transaction
                     connection.rollback()
-                finally:
-                    if connection.features.autocommits_when_autocommit_is_off:
-                        connection.autocommit = True
-                    else:
-                        connection.set_autocommit(True)
 
-        # Remove this when the legacy transaction management goes away.
-        self._legacy_leave_transaction_management(connection)
-
+        finally:
+            # Outermost block exit when autocommit was enabled.
+            if not connection.in_atomic_block:
+                if connection.features.autocommits_when_autocommit_is_off:
+                    connection.autocommit = True
+                else:
+                    connection.set_autocommit(True)
+            # Outermost block exit when autocommit was disabled.
+            elif not connection.savepoint_ids and not connection.commit_on_exit:
+                connection.in_atomic_block = False
 
     def __call__(self, func):
         @wraps(func, assigned=available_attrs(func))
@@ -329,24 +331,6 @@ def atomic(using=None, savepoint=True):
     # Decorator: @atomic(...) or context manager: with atomic(...): ...
     else:
         return Atomic(using, savepoint)
-
-
-def atomic_if_autocommit(using=None, savepoint=True):
-    # This variant only exists to support the ability to disable transaction
-    # management entirely in the DATABASES setting. It doesn't care about the
-    # autocommit state at run time.
-    db = DEFAULT_DB_ALIAS if callable(using) else using
-    autocommit = get_connection(db).settings_dict['AUTOCOMMIT']
-
-    if autocommit:
-        return atomic(using, savepoint)
-    else:
-        # Bare decorator: @atomic_if_autocommit
-        if callable(using):
-            return using
-        # Decorator: @atomic_if_autocommit(...)
-        else:
-            return lambda func: func
 
 
 ############################################
@@ -472,16 +456,15 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
     Transitory API to preserve backwards-compatibility while refactoring.
 
     Once the legacy transaction management is fully deprecated, this should
-    simply be replaced by atomic_if_autocommit. Until then, it's necessary to
-    avoid making a commit where Django didn't use to, since entering atomic in
-    managed mode triggers a commmit.
+    simply be replaced by atomic. Until then, it's necessary to guarantee that
+    a commit occurs on exit, which atomic doesn't do when it's nested.
 
     Unlike atomic, savepoint defaults to False because that's closer to the
     legacy behavior.
     """
     connection = get_connection(using)
     if connection.autocommit or connection.in_atomic_block:
-        return atomic_if_autocommit(using, savepoint)
+        return atomic(using, savepoint)
     else:
         def entering(using):
             pass
