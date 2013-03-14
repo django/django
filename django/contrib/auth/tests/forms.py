@@ -7,7 +7,7 @@ from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
-from django.forms.fields import Field, EmailField, CharField
+from django.forms.fields import Field, CharField
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
@@ -322,8 +322,7 @@ class PasswordResetFormTest(TestCase):
         data = {'email': 'not valid'}
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form['email'].errors,
-                         [force_text(EmailField.default_error_messages['invalid'])])
+        self.assertEqual(form['email'].errors, [_('Enter a valid email address.')])
 
     def test_nonexistant_email(self):
         # Test nonexistant email address. This should not fail because it would

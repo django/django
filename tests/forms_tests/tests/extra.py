@@ -506,11 +506,11 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
         self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
         self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_as_ipv4_only(self):
         f = GenericIPAddressField(protocol="IPv4")
@@ -535,11 +535,11 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '256.125.1.5')
         self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
         self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors(['Enter a valid IPv6 address.'], f.clean, '1:2')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_as_generic_not_required(self):
         f = GenericIPAddressField(required=False)
@@ -552,11 +552,11 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
         self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
         self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
-        self.assertFormErrors(['Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors(['This is not a valid IPv6 address.'], f.clean, '1:2')
 
     def test_generic_ipaddress_normalization(self):
         # Test the normalising code
