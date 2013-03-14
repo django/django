@@ -61,10 +61,10 @@ class FormsRegressionsTestCase(TestCase):
         UNITS = ((b'\xd0\xbc\xd0\xb5\xd1\x81.', b'\xd0\xbc\xd0\xb5\xd1\x81.'),
                  (b'\xd1\x88\xd1\x82.', b'\xd1\x88\xd1\x82.'))
         f = ChoiceField(choices=UNITS)
-        self.assertEqual(f.clean('\u0448\u0442.'), '\u0448\u0442.')
         with warnings.catch_warnings():
             # Ignore UnicodeWarning
             warnings.simplefilter("ignore")
+            self.assertEqual(f.clean('\u0448\u0442.'), '\u0448\u0442.')
             self.assertEqual(f.clean(b'\xd1\x88\xd1\x82.'), '\u0448\u0442.')
 
         # Translated error messages used to be buggy.

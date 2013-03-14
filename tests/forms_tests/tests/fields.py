@@ -911,6 +911,11 @@ class FieldsTests(SimpleTestCase):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
         self.assertEqual(None, f.clean(''))
 
+    def test_typedchoicefield_has_changed(self):
+        # has_changed should not trigger required validation
+        f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
+        self.assertFalse(f._has_changed(None, ''))
+
     # NullBooleanField ############################################################
 
     def test_nullbooleanfield_1(self):
@@ -1059,6 +1064,11 @@ class FieldsTests(SimpleTestCase):
         # If you want cleaning an empty value to return a different type, tell the field
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
         self.assertEqual(None, f.clean([]))
+
+    def test_typedmultiplechoicefield_has_changed(self):
+        # has_changed should not trigger required validation
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
+        self.assertFalse(f._has_changed(None, ''))
 
    # ComboField ##################################################################
 

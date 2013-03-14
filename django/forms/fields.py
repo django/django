@@ -778,14 +778,15 @@ class ChoiceField(Field):
 
     def valid_value(self, value):
         "Check to see if the provided value is a valid choice"
+        text_value = force_text(value)
         for k, v in self.choices:
             if isinstance(v, (list, tuple)):
                 # This is an optgroup, so look inside the group for options
                 for k2, v2 in v:
-                    if value == smart_text(k2):
+                    if value == k2 or text_value == force_text(k2):
                         return True
             else:
-                if value == smart_text(k):
+                if value == k or text_value == force_text(k):
                     return True
         return False
 
@@ -801,7 +802,6 @@ class TypedChoiceField(ChoiceField):
         right type.
         """
         value = super(TypedChoiceField, self).to_python(value)
-        super(TypedChoiceField, self).validate(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -809,9 +809,6 @@ class TypedChoiceField(ChoiceField):
         except (ValueError, TypeError, ValidationError):
             raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return value
-
-    def validate(self, value):
-        pass
 
 
 class MultipleChoiceField(ChoiceField):
@@ -864,7 +861,6 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         right type.
         """
         value = super(TypedMultipleChoiceField, self).to_python(value)
-        super(TypedMultipleChoiceField, self).validate(value)
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         new_value = []
@@ -876,7 +872,11 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         return new_value
 
     def validate(self, value):
-        pass
+        if value != self.empty_value:
+            super(TypedMultipleChoiceField, self).validate(value)
+        elif self.required:
+            raise ValidationError(self.error_messages['required'])
+
 
 class ComboField(Field):
     """
