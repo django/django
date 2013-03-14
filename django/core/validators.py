@@ -80,7 +80,7 @@ def validate_integer(value):
 
 
 class EmailValidator(object):
-    message = _('Enter a valid e-mail address.')
+    message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
