@@ -17,7 +17,7 @@ There are three types of releases that you might need to make
 
 * Security releases, disclosing and fixing a vulnerability. This'll
   generally involve two or three simultaneous releases -- e.g.
-  1.5.X, 1.6.X, and, depending on timing, perhaps a 1.7 alpha/beta/rc.
+  1.5.x, 1.6.x, and, depending on timing, perhaps a 1.7 alpha/beta/rc.
 
 * Regular version releases, either a final release (e.g. 1.5) or a
   bugfix update (e.g. 1.5.1).
@@ -36,12 +36,11 @@ differences noted. The short version is:
 
 #. Update version numbers and create the release package(s)!
 
-#. Upload the package(s) to the the ``djangoproject.com`` server and create
-   some redirects for download/checksum links.
+#. Upload the package(s) to the ``djangoproject.com`` server.
 
 #. Unless this is a pre-release, add the new version(s) to PyPI.
 
-#. Update the home page and download page to link to the new version(s).
+#. Declare the new version in the admin on ``djangoproject.com``.
 
 #. Post the blog entry and send out the email announcements.
 
@@ -62,7 +61,7 @@ You'll need a few things hooked up to make this work:
 * Access to the ``djangoproject.com`` server to upload files and trigger a
   deploy.
 
-* Access to the admin on ``djangoproject.com``.
+* Access to the admin on ``djangoproject.com`` as a "Site maintainer".
 
 * Access to post to ``django-announce``.
 
@@ -104,31 +103,15 @@ any time leading up to the actual release:
 Preparing for release
 =====================
 
-Next, everything needs to be made ready for actually rolling the
-release. The following things should be done a few days to a few hours
-before release:
 
-#. Update the djangoproject home page and download page templates to
-   reflect the new release. There are two templates to change:
-   ``flatpages/download.html`` and ``homepage.html``; here's
-   `one example commit for the 1.4.5 / 1.3.7 releases`__
+Write the announcement blog post for the release. You can enter it into the
+admin at any time and mark it as inactive. Here are a few examples: `example
+security release announcement`__, `example regular release announcement`__,
+`example pre-release announcement`__.
 
-   __ https://github.com/django/djangoproject.com/commit/772edbc6ac5a2b8e718606b3338f2bcc429fb9b6
-
-#. Write the announcement blog post for the release. You can enter it into
-   the admin at any time and mark it as inactive. Here are a few examples:
-   `example security release announcement`__, `example regular release
-   announcement`__, `example pre-release announcement`__.
-
-   __ https://www.djangoproject.com/weblog/2013/feb/19/security/
-   __ https://www.djangoproject.com/weblog/2012/mar/23/14/
-   __ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
-
-#. Create redirects in the admin for the new downloads. For each release,
-   we create two redirects that look like::
-
-        /download/<version>/tarball/ -> /m/releases/<version>/Django-<version>.tar.gz
-        /download/<version>/checksum/ -> /m/pgp/Django-<version>.checksum.txt
+__ https://www.djangoproject.com/weblog/2013/feb/19/security/
+__ https://www.djangoproject.com/weblog/2012/mar/23/14/
+__ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
 
 Actually rolling the release
 ============================
@@ -143,7 +126,6 @@ OK, this is the fun part, where we actually push out a release!
 #. A release always begins from a release branch, so you should ``git checkout
    stable/<release>`` (e.g. checkout ``stable/1.5.x`` to issue a release in the
    1.5 series) and then ``git pull`` to make sure you're up-to-date.
-
 
 #. If this is a security release, merge the appropriate patches from
    ``django-private``. Rebase these patches as necessary to make each one a
@@ -209,7 +191,7 @@ Now you're ready to actually put the release out there. To do this:
 #. Upload the release package(s) to the djangoproject server; releases go
    in ``/home/www/djangoproject.com/src/media/releases``, under a
    directory for the appropriate version number (e.g.
-   ``/home/www/djangoproject.com/src/media/releases/1.5`` for a ``1.5.X``
+   ``/home/www/djangoproject.com/src/media/releases/1.5`` for a ``1.5.x``
    release.).
 
 #. Upload the checksum file(s); these go in
@@ -245,13 +227,10 @@ Now you're ready to actually put the release out there. To do this:
    work. *FIXME: Is there any reason to pull this file out manually rather than
    using "python setup.py register"?*
 
-#. Deploy the template changes you made a while back by running `fab deploy`
-   from the ``djangoproject.com`` repo.
+#. Go to the `Add release page in the admin`__, enter the new release number
+   exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
 
-#. Update the ``/download/`` flat page in the djangoproject.com
-   admin. For alpha/beta/RC releases, we add a temporary third section
-   to that page listing the preview package; otherwise, just update
-   the "Get the latest official version" section.
+   __ https://www.djangoproject.com/admin/releases/release/add/
 
 #. Make the blog post announcing the release live.
 
@@ -283,7 +262,8 @@ You're almost done! All that's left to do now is:
    the new version's docs, and update the ``docs/fixtures/doc_releases.json``
    JSON fixture. *FIXME: what is the purpose of maintaining this fixture?*
 
-#. Add the release in `Trac's versions list`_.
+#. Add the release in `Trac's versions list`_ if necessary. Not all versions
+   are declared; take example on previous releases.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
 
