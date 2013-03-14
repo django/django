@@ -50,6 +50,7 @@ class URLValidator(RegexValidator):
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    message = _('Enter a valid URL.')
 
     def __call__(self, value):
         try:
