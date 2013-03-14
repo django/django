@@ -55,7 +55,7 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_url_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['Enter a valid value.'])
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['Enter a valid URL.'])
 
     def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
