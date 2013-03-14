@@ -42,7 +42,6 @@ urlpatterns = patterns('',
     (r'^$', views.index_page),
 
     # Default views
-    (r'^shortcut/(\d+)/(.*)/$', 'django.views.defaults.shortcut'),
     (r'^non_existing_url/', 'django.views.defaults.page_not_found'),
     (r'^server_error/', 'django.views.defaults.server_error'),
 

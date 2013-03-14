@@ -362,6 +362,9 @@ these changes.
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
 
+* ``django.conf.urls.shortcut`` and ``django.views.defaults.shortcut`` will be
+  removed.
+
 * The following private APIs will be removed:
 
   - ``django.db.close_connection()``

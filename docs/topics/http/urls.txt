@@ -330,7 +330,6 @@ itself. It includes a number of other URLconfs::
         (r'^comments/', include('django.contrib.comments.urls')),
         (r'^community/', include('django_website.aggregator.urls')),
         (r'^contact/', include('django_website.contact.urls')),
-        (r'^r/', include('django.conf.urls.shortcut')),
         # ... snip ...
     )
 

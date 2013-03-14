@@ -352,3 +352,20 @@ private API, it will go through a regular deprecation path.
 
 Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
 ``ModelAdmin.queryset`` have been renamed to ``get_queryset``.
+
+``shortcut`` view and URLconf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``shortcut`` view was moved from ``django.views.defaults`` to
+``django.contrib.contentypes.views`` shortly after the 1.0 release, but the
+old location was never deprecated. This oversight was corrected in Django 1.6
+and you should now use the new location.
+
+The URLconf ``django.conf.urls.shortcut`` was also deprecated. If you're
+including it in an URLconf, simply replace::
+
+    (r'^prefix/', include('django.conf.urls.shortcut')),
+
+with::
+
+    (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contentypes.views'),
