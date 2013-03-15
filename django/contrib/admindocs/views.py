@@ -197,6 +197,14 @@ def model_detail(request, app_label, model_name):
 
     opts = model._meta
 
+    title, description, metadata = utils.parse_docstring(model.__doc__)
+    if title:
+      title = utils.parse_rst(title, 'model', _('model:') + model_name)
+    if description:
+      description = utils.parse_rst(description, 'model', _('model:') + model_name)
+    for key in metadata:
+      metadata[key] = utils.parse_rst(metadata[key], 'model', _('model:') + model_name)
+
     # Gather fields/field descriptions.
     fields = []
     for field in opts.fields:
@@ -267,8 +275,10 @@ def model_detail(request, app_label, model_name):
     return render_to_response('admin_doc/model_detail.html', {
         'root_path': urlresolvers.reverse('admin:index'),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
-        'summary': _("Fields on %s objects") % opts.object_name,
-        'description': model.__doc__,
+        'heading': _("Fields on %s objects") % opts.object_name,
+        'summary': title,
+        'description': description,
+        'meta': metadata,
         'fields': fields,
     }, context_instance=RequestContext(request))
 
