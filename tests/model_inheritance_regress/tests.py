@@ -8,6 +8,7 @@ from operator import attrgetter
 from django import forms
 
 from django.test import TestCase
+from django.utils.unittest import expectedFailure
 
 from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
@@ -422,3 +423,19 @@ class ModelInheritanceTest(TestCase):
         form = ProfileForm({'username': "user_with_profile", 'extra': "hello"},
                            instance=p)
         self.assertTrue(form.is_valid())
+
+    def test_inheritance_joins(self):
+        # Test for #17502 - check that filtering through two levels of
+        # inheritance chain doesn't generate extra joins.
+        qs = ItalianRestaurant.objects.all()
+        self.assertEqual(str(qs.query).count('JOIN'), 2)
+        qs = ItalianRestaurant.objects.filter(name='foo')
+        self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    @expectedFailure
+    def test_inheritance_values_joins(self):
+        # It would be nice (but not too important) to skip the middle join in
+        # this case. Skipping is possible as nothing from the middle model is
+        # used in the qs and top contains direct pointer to the bottom model.
+        qs = ItalianRestaurant.objects.values_list('serves_gnocchi').filter(name='foo')
+        self.assertEqual(str(qs.query).count('JOIN'), 1)
