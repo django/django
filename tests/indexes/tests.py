@@ -25,3 +25,10 @@ class IndexesTests(TestCase):
         # unique=True and db_index=True should only create the varchar-specific
         # index (#19441).
         self.assertIn('("slug" varchar_pattern_ops)', index_sql[4])
+
+    def test_contrib_auth_models_User_indexes(self):
+        """Test if auth.models.User has DB indexes"""
+        from django.contrib.auth.models import User
+        connection = connections[DEFAULT_DB_ALIAS]
+        index_sql = connection.creation.sql_indexes_for_model(User, no_style())
+        self.assertEqual(len(index_sql), 4)
