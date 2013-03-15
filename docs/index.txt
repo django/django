@@ -45,7 +45,8 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 2 <intro/tutorial02>` |
   :doc:`Part 3 <intro/tutorial03>` |
   :doc:`Part 4 <intro/tutorial04>` |
-  :doc:`Part 5 <intro/tutorial05>`
+  :doc:`Part 5 <intro/tutorial05>` |
+  :doc:`Part 6 <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -190,7 +191,7 @@ testing of Django applications:
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
-  :doc:`Handling static files <howto/static-files>` |
+  :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
 The admin

@@ -37,7 +37,7 @@ Based on feedback from the community this release adds two new options to the
 
 See the :doc:`staticfiles reference documentation </ref/contrib/staticfiles>`
 for more details, or learn :doc:`how to manage static files
-</howto/static-files>`.
+</howto/static-files/index>`.
 
 Translation comments
 ~~~~~~~~~~~~~~~~~~~~
