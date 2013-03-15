@@ -262,6 +262,7 @@ Django quotes column and table names behind the scenes.
     an explicit :attr:`through <ManyToManyField.through>` model.
 
 ``index_together``
+------------------
 
 .. attribute:: Options.index_together
 
