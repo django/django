@@ -8,6 +8,7 @@ a list of all possible variables.
 
 import logging
 import os
+import pkgutil
 import time     # Needed for Windows
 import warnings
 import itertools
@@ -15,7 +16,7 @@ import itertools
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils import importlib
+from django.utils import importlib, six
 from django.utils.module_loading import import_by_path
 from django.utils import six
 
@@ -36,7 +37,7 @@ class BaseSettings(object):
         object.__setattr__(self, name, value)
 
 
-class SettingsCollector(object):
+class BaseSettingsCollector(object):
     """
     Common logic for collecting settings from a module or modules.
     """
@@ -66,6 +67,39 @@ class SettingsCollector(object):
 
         return setting_value
 
+    def collect_settings_from_packages(self, packages):
+        return itertools.chain(*map(self.collect_settings_from_package, packages))
+
+    def collect_settings_from_package(self, package):
+        path = package.__path__
+        name = package.__name__
+
+        return self.collect_settings_from_package_by_path(path, name)
+
+    def collect_settings_from_package_by_path(self, package_path, package_name):
+        modules = [self._import_module(module, package_name) for _, module, __ in
+                   pkgutil.iter_modules(package_path)]
+
+        return self.collect_settings_from_modules(modules)
+
+    def _import_module(self, module, package):
+        try:
+            return importlib.import_module('.%s' % module, package)
+        except ImportError as e:
+            raise ImportError("Could not import settings '%s.%s' (Is it on sys.path?): %s" % (package, module, e))
+
+    def collect(self, sources):
+        return []
+
+
+class SettingsCollector(BaseSettingsCollector):
+    """
+    The default implementation for collecting settings from a module or modules.
+    """
+
+    def collect(self, sources):
+        return self.collect_settings_from_modules(sources)
+
 
 class Settings(BaseSettings):
     def __init__(self, settings_module, settings_collector=SettingsCollector):
@@ -78,7 +112,7 @@ class Settings(BaseSettings):
             raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
 
         collector = settings_collector()
-        collected_settings = collector.collect_settings_from_modules([global_settings, settings_module])
+        collected_settings = collector.collect([global_settings, settings_module])
 
         map(lambda setting: self.set_setting(*setting), collected_settings)
 
