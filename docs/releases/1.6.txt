@@ -114,6 +114,13 @@ Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
 A new :class:`django.db.models.BinaryField` model field allows to store raw
 binary data in the database.
 
+GeoDjango form widgets
+~~~~~~~~~~~~~~~~~~~~~~
+
+GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
+its geo-specialized fields. They are OpenLayers-based by default, but they can
+be customized to use any other JS framework.
+
 Minor features
 ~~~~~~~~~~~~~~
 
