@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.template import Template, Context, TemplateSyntaxError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -23,9 +24,6 @@ from django.test.utils import override_settings
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
     urls = 'django.contrib.flatpages.tests.urls'
-
-    def setUp(self):
-        self.me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
 
     def test_get_flatpages_tag(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -51,8 +49,10 @@ class FlatpageTemplateTagTests(TestCase):
             }))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
+    @skipIfCustomUser
     def test_get_flatpages_tag_for_user(self):
         "The flatpage template tag retrives all flatpages for an authenticated user"
+        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
                 "{% load flatpages %}"
                 "{% get_flatpages for me as flatpages %}"
@@ -60,7 +60,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context({
-                'me': self.me
+                'me': me
             }))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
 
@@ -88,8 +88,10 @@ class FlatpageTemplateTagTests(TestCase):
             }))
         self.assertEqual(out, "A Nested Flatpage,")
 
+    @skipIfCustomUser
     def test_get_flatpages_with_prefix_for_user(self):
         "The flatpage template tag retrive prefixed flatpages for an authenticated user"
+        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
                 "{% load flatpages %}"
                 "{% get_flatpages '/location/' for me as location_flatpages %}"
@@ -97,7 +99,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context({
-                'me': self.me
+                'me': me
             }))
         self.assertEqual(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
 
