@@ -15,7 +15,7 @@ def has_bom(fn):
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
 
-def compile_messages(stderr, locale=None):
+def compile_messages(stdout, locale=None):
     program = 'msgfmt'
     if find_command(program) is None:
         raise CommandError("Can't find %s. Make sure you have GNU gettext tools 0.15 or newer installed." % program)
@@ -41,7 +41,7 @@ def compile_messages(stderr, locale=None):
                 for f in filenames:
                     if not f.endswith('.po'):
                         continue
-                    stderr.write('processing file %s in %s\n' % (f, dirpath))
+                    stdout.write('processing file %s in %s\n' % (f, dirpath))
                     fn = os.path.join(dirpath, f)
                     if has_bom(fn):
                         raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
@@ -68,4 +68,4 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         locale = options.get('locale')
-        compile_messages(self.stderr, locale=locale)
+        compile_messages(self.stdout, locale=locale)
