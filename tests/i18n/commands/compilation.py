@@ -29,7 +29,7 @@ class PoFileTests(MessageCompilationTests):
 
     def test_bom_rejection(self):
         with self.assertRaises(CommandError) as cm:
-            call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
+            call_command('compilemessages', locale=self.LOCALE, stdout=StringIO())
         self.assertIn("file has a BOM (Byte Order Mark)", cm.exception.args[0])
         self.assertFalse(os.path.exists(self.MO_FILE))
 
@@ -45,7 +45,7 @@ class PoFileContentsTests(MessageCompilationTests):
         self.addCleanup(os.unlink, os.path.join(test_dir, self.MO_FILE))
 
     def test_percent_symbol_in_po_file(self):
-        call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
+        call_command('compilemessages', locale=self.LOCALE, stdout=StringIO())
         self.assertTrue(os.path.exists(self.MO_FILE))
 
 
@@ -63,7 +63,7 @@ class PercentRenderingTests(MessageCompilationTests):
     @override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
     def test_percent_symbol_escaping(self):
         from django.template import Template, Context
-        call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
+        call_command('compilemessages', locale=self.LOCALE, stdout=StringIO())
         with translation.override(self.LOCALE):
             t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
             rendered = t.render(Context({}))
@@ -88,12 +88,12 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
         self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_FR))
 
     def test_one_locale(self):
-        call_command('compilemessages', locale='hr', stderr=StringIO())
+        call_command('compilemessages', locale='hr', stdout=StringIO())
 
         self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
-        call_command('compilemessages', locale=['hr', 'fr'], stderr=StringIO())
+        call_command('compilemessages', locale=['hr', 'fr'], stdout=StringIO())
 
         self.assertTrue(os.path.exists(self.MO_FILE_HR))
         self.assertTrue(os.path.exists(self.MO_FILE_FR))
@@ -110,4 +110,4 @@ class CompilationErrorHandling(MessageCompilationTests):
 
     def test_error_reported_by_msgfmt(self):
         with self.assertRaises(CommandError):
-            call_command('compilemessages', locale=self.LOCALE, stderr=StringIO())
+            call_command('compilemessages', locale=self.LOCALE, stdout=StringIO())
