@@ -30,6 +30,8 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid email address.']
 
+.. _core-field-arguments:
+
 Core field arguments
 --------------------
 
