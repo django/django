@@ -39,8 +39,6 @@ class MockDateTime(datetime.datetime):
 class HumanizeTests(TestCase):
 
     def humanize_tester(self, test_list, result_list, method):
-        # Using max below ensures we go through both lists
-        # However, if the lists are not equal length, this raises an exception
         for test_content, result in zip(test_list, result_list):
             t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
