@@ -8,8 +8,8 @@ a list of all possible variables.
 
 import logging
 import os
-import pkgutil
 import time     # Needed for Windows
+import types
 import warnings
 import itertools
 
@@ -18,9 +18,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
 from django.utils import importlib, six
 from django.utils.module_loading import import_by_path
-from django.utils import six
-
-ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
 
 class BaseSettings(object):
@@ -67,27 +64,6 @@ class BaseSettingsCollector(object):
 
         return setting_value
 
-    def collect_settings_from_packages(self, packages):
-        return itertools.chain(*map(self.collect_settings_from_package, packages))
-
-    def collect_settings_from_package(self, package):
-        path = package.__path__
-        name = package.__name__
-
-        return self.collect_settings_from_package_by_path(path, name)
-
-    def collect_settings_from_package_by_path(self, package_path, package_name):
-        modules = [self._import_module(module, package_name) for _, module, __ in
-                   pkgutil.iter_modules(package_path)]
-
-        return self.collect_settings_from_modules(modules)
-
-    def _import_module(self, module, package):
-        try:
-            return importlib.import_module('.%s' % module, package)
-        except ImportError as e:
-            raise ImportError("Could not import settings '%s.%s' (Is it on sys.path?): %s" % (package, module, e))
-
     def collect(self, sources):
         return []
 
@@ -101,20 +77,71 @@ class SettingsCollector(BaseSettingsCollector):
         return self.collect_settings_from_modules(sources)
 
 
-class Settings(BaseSettings):
-    def __init__(self, settings_module, settings_collector=SettingsCollector):
-        # store the settings module in case someone later cares
-        self.SETTINGS_MODULE = settings_module
+class BaseSettingsSourcesLoader(object):
+    def load(self):
+        raise ImproperlyConfigured(self.get_error_message())
 
+    def get_error_message(self, *args, **kwargs):
+        return "SettingsSourcesLoader is not implemented."
+
+
+class SettingsSourcesLoader(BaseSettingsSourcesLoader):
+    """
+    The default implementation for loading settings from sources.
+    Loads the global settings and the module specified in the DJANGO_SETTINGS_MODULE environment variable.
+    """
+
+    ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+
+    def load(self):
+        if not self.ENVIRONMENT_VARIABLE:
+            raise KeyError
+
+        source = self._import_module(os.environ[self.ENVIRONMENT_VARIABLE])
+
+        return [global_settings, source]
+
+    def _import_module(self, module):
         try:
-            settings_module = importlib.import_module(self.SETTINGS_MODULE)
+            return importlib.import_module(module)
         except ImportError as e:
-            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
+            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (module, e))
+
+    def get_error_message(self, setting_name, *args, **kwargs):
+        desc = ("setting %s" % setting_name) if setting_name else "settings"
+
+        return """Requested %s, but settings are not configured.
+        You must either define the environment variable %s
+        or call settings.configure() before accessing settings.""" % (
+            desc, LazySettings._settings_sources_loader.ENVIRONMENT_VARIABLE)
+
+
+class Settings(BaseSettings):
+    def __init__(self, settings_sources, settings_collector=SettingsCollector):
+        # Support old behavior for backwards compatibility but warn for a pending deprecation.
+        if isinstance(settings_sources, six.string_types):
+            warnings.warn(
+                "Loading a setting module by supplying a string is deprecated."
+                "Use the SettingsSourcesLoader class instead.",
+                PendingDeprecationWarning,
+                stacklevel=1)
+
+            module = settings_sources
+            try:
+                settings_sources = [global_settings, importlib.import_module(module)]
+            except ImportError as e:
+                raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (module, e))
+
+        # Store the settings module in case someone later cares
+        if len(settings_sources) == 2 and isinstance(settings_sources[1], types.ModuleType):
+            self.SETTINGS_MODULE = settings_sources[1].__name__  # Again, done for backwards compatibility.
+
+        self.SETTINGS_SOURCES = settings_sources
 
         collector = settings_collector()
-        collected_settings = collector.collect([global_settings, settings_module])
+        collected_settings = collector.collect(settings_sources)
 
-        map(lambda setting: self.set_setting(*setting), collected_settings)
+        self.set_settings(collected_settings)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
@@ -131,7 +158,10 @@ class Settings(BaseSettings):
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
-    def set_setting(self, module, setting, setting_value):
+    def set_settings(self, collected_settings):
+        map(lambda setting: self.set_setting(*setting), collected_settings)
+
+    def set_setting(self, source, setting, setting_value):
         setattr(self, setting, setting_value)
 
 
@@ -175,13 +205,17 @@ class LazySettings(LazyObject):
     Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
     """
 
-    def __init__(self, settings_class=Settings):
+    def __init__(self, settings_class=Settings, settings_sources_loader=SettingsSourcesLoader):
         super(LazySettings, self).__init__()
 
         if not issubclass(settings_class, BaseSettings):
             raise TypeError('A settings class must inherit from BaseSettings')
 
+        if not issubclass(settings_sources_loader, BaseSettingsSourcesLoader):
+            raise TypeError('A settings class must inherit from BaseSettings')
+
         LazySettings._settings_class = settings_class  # Done to avoid infinite recursion when using self._settings_class
+        LazySettings._settings_sources_loader = settings_sources_loader
 
     def _setup(self, name=None):
         """
@@ -189,19 +223,17 @@ class LazySettings(LazyObject):
         is used the first time we need any settings at all, if the user has not
         previously configured the settings manually.
         """
+        sources_loader = LazySettings._settings_sources_loader()
+
         try:
-            settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module:  # If it's set but is an empty string.
+            settings_sources = sources_loader.load()
+
+            if not settings_sources:  # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
-            desc = ("setting %s" % name) if name else "settings"
-            raise ImproperlyConfigured(
-                "Requested %s, but settings are not configured. "
-                "You must either define the environment variable %s "
-                "or call settings.configure() before accessing settings."
-                % (desc, ENVIRONMENT_VARIABLE))
+            raise ImproperlyConfigured(sources_loader.get_error_message(name))
 
-        self._wrapped = LazySettings._settings_class(settings_module)
+        self._wrapped = LazySettings._settings_class(settings_sources)
         self._configure_logging()
 
     def __getattr__(self, name):
