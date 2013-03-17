@@ -1661,11 +1661,21 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
 class DiffSettings(AdminScriptTestCase):
     """Tests for diffsettings management command."""
+
     def test_basic(self):
-        "Runs without error and emits settings diff."
+        """Runs without error and emits settings diff."""
         self.write_settings('settings_to_diff.py', sdict={'FOO': '"bar"'})
         self.addCleanup(self.remove_settings, 'settings_to_diff.py')
         args = ['diffsettings', '--settings=settings_to_diff']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
+
+    def test_all(self):
+        """The all option also shows settings with the default value."""
+        self.write_settings('settings_to_diff.py', sdict={'STATIC_URL': 'None'})
+        self.addCleanup(self.remove_settings, 'settings_to_diff.py')
+        args = ['diffsettings', '--settings=settings_to_diff', '--all']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "### STATIC_URL = None")

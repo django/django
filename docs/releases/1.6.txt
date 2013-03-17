@@ -157,6 +157,8 @@ Minor features
 * The documentation contains a :doc:`deployment checklist
   </howto/deployment/checklist>`.
 
+* The :djadmin:`diffsettings` comand gained a ``--all`` option.
+
 Backwards incompatible changes in 1.6
 =====================================
 

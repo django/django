@@ -168,8 +168,11 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 :setting:`ROOT_URLCONF` is followed by ``"###"`` in the output of
 ``diffsettings``.
 
-Note that Django's default settings live in ``django/conf/global_settings.py``,
-if you're ever curious to see the full list of defaults.
+The :djadminopt:`--all` option may be provided to display all settings, even
+if they have Django's default value. Such settings are prefixed by ``"###"``.
+
+.. versionadded:: 1.6
+    The :djadminopt:`--all` option was added.
 
 dumpdata <appname appname appname.Model ...>
 --------------------------------------------
