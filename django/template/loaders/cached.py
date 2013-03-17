@@ -43,7 +43,9 @@ class Loader(BaseLoader):
             # If template directories were specified, use a hash to differentiate
             key = '-'.join([template_name, hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()])
 
-        if key not in self.template_cache:
+        try:
+            template = self.template_cache[key]
+        except KeyError:
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
                 try:
@@ -55,7 +57,7 @@ class Loader(BaseLoader):
                     # of the actual template that does not exist.
                     return template, origin
             self.template_cache[key] = template
-        return self.template_cache[key], None
+        return template, None
 
     def reset(self):
         "Empty the template cache."
