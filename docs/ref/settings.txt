@@ -557,7 +557,7 @@ backend-specific.
 Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
 
 .. setting:: TEST_COLLATION
