@@ -53,7 +53,8 @@ class HumanizeTests(TestCase):
                        '12th', '13th', '101st', '102nd', '103rd',
                        '111th', 'something else', None)
 
-        self.humanize_tester(test_list, result_list, 'ordinal')
+        with translation.override('en'):
+            self.humanize_tester(test_list, result_list, 'ordinal')
 
     def test_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -63,7 +64,8 @@ class HumanizeTests(TestCase):
                        '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
                      None)
 
-        self.humanize_tester(test_list, result_list, 'intcomma')
+        with translation.override('en'):
+            self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_l10n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -74,7 +76,8 @@ class HumanizeTests(TestCase):
                      None)
 
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
-            self.humanize_tester(test_list, result_list, 'intcomma')
+            with translation.override('en'):
+                self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_intcomma_without_number_grouping(self):
         # Regression for #17414
@@ -91,7 +94,8 @@ class HumanizeTests(TestCase):
                        '1.0 billion', '2.0 billion', '6.0 trillion',
                        '1.3 quadrillion', '3.5 sextillion',
                        '8.1 decillion', None)
-        self.humanize_tester(test_list, result_list, 'intword')
+        with translation.override('en'):
+            self.humanize_tester(test_list, result_list, 'intword')
 
     def test_i18n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -116,8 +120,8 @@ class HumanizeTests(TestCase):
         test_list.append(None)
         result_list = ('one', 'two', 'three', 'four', 'five', 'six',
                        'seven', 'eight', 'nine', '10', None)
-
-        self.humanize_tester(test_list, result_list, 'apnumber')
+        with translation.override('en'):
+            self.humanize_tester(test_list, result_list, 'apnumber')
 
     def test_naturalday(self):
         today = datetime.date.today()
@@ -157,7 +161,8 @@ class HumanizeTests(TestCase):
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
             with override_settings(TIME_ZONE="America/Chicago", USE_TZ=True):
-                self.humanize_tester([dt], ['yesterday'], 'naturalday')
+                with translation.override('en'):
+                    self.humanize_tester([dt], ['yesterday'], 'naturalday')
         finally:
             humanize.datetime = orig_humanize_datetime
 
@@ -218,8 +223,10 @@ class HumanizeTests(TestCase):
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            self.humanize_tester(test_list, result_list, 'naturaltime')
-            with override_settings(USE_TZ=True):
-                self.humanize_tester(test_list, result_list_with_tz_support, 'naturaltime')
+            with translation.override('en'):
+                self.humanize_tester(test_list, result_list, 'naturaltime')
+                with override_settings(USE_TZ=True):
+                    self.humanize_tester(
+                        test_list, result_list_with_tz_support, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime
