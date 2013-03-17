@@ -391,12 +391,7 @@ function.
 Customizations of six
 ---------------------
 
-The version of six bundled with Django includes one extra function:
-
-.. function:: iterlists(MultiValueDict)
-
-    Returns an iterator over the lists of values of a ``MultiValueDict``. This
-    replaces ``iterlists()`` on Python 2 and ``lists()`` on Python 3.
+The version of six bundled with Django includes a few extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
 
