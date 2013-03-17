@@ -93,6 +93,9 @@ connections from your application servers.
 Database connection parameters are probably different in development and in
 production.
 
+Database passwords are very sensitive. You should protect them exactly like
+:setting:`SECRET_KEY`.
+
 For maximum security, make sure database servers only accept connections from
 your application servers.
 
@@ -130,7 +133,9 @@ the login/password, the session cookie, and password reset tokens. (You can't
 do much to protect password reset tokens if you're sending them by email.)
 
 Protecting sensitive areas such as the user account or the admin isn't
-sufficient, because the same session cookie is used for HTTP and HTTPS.
+sufficient, because the same session cookie is used for HTTP and HTTPS. Your
+web server must redirect all HTTP traffic to HTTPS, and only transmit HTTPS
+requests to Django.
 
 Once you've set up HTTPS, enable the following settings.
 
