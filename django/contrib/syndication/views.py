@@ -12,6 +12,7 @@ from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import is_naive
+from django.utils import six
 
 
 def add_domain(domain, url, secure=False):
@@ -73,10 +74,10 @@ class Feed(object):
             # function and catching the TypeError, because something inside
             # the function may raise the TypeError. This technique is more
             # accurate.
-            if hasattr(attr, '__code__'):
-                argcount = attr.__code__.co_argcount
+            if hasattr(attr, six._func_code):
+                argcount = six.get_function_code(attr).co_argcount
             else:
-                argcount = attr.__call__.__code__.co_argcount
+                argcount = six.get_function_code(attr.__call__).co_argcount
             if argcount == 2: # one argument is 'self'
                 return attr(obj)
             else:
