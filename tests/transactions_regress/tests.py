@@ -199,10 +199,8 @@ class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCa
     def tearDown(self):
         try:
             connections[DEFAULT_DB_ALIAS].abort()
-        except Exception:
-            import ipdb; ipdb.set_trace()
-        finally:
             connections[DEFAULT_DB_ALIAS].close()
+        finally:
             connections[DEFAULT_DB_ALIAS] = self._old_backend
 
     def test_commit(self):
