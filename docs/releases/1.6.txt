@@ -154,6 +154,9 @@ Minor features
   ``UPDATE`` - if not updated - ``INSERT`` instead of ``SELECT`` - if not
   found ``INSERT`` else ``UPDATE`` in case the model's primary key is set.
 
+* The documentation contains a :doc:`deployment checklist
+  </howto/deployment/checklist>`.
+
 Backwards incompatible changes in 1.6
 =====================================
 
