@@ -187,7 +187,7 @@ behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
 :func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
-Django's bundled version adds :func:`~django.utils.six.iterlists` for
+It also contains an undocumented ``iterlists`` function that works well for
 ``django.utils.datastructures.MultiValueDict`` and its subclasses.
 
 :class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
