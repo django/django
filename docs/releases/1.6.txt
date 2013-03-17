@@ -165,69 +165,110 @@ Backwards incompatible changes in 1.6
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
-* Database-level autocommit is enabled by default in Django 1.6. While this
-  doesn't change the general spirit of Django's transaction management, there
-  are a few known backwards-incompatibities, described in the :ref:`transaction
-  management docs <transactions-upgrading-from-1.5>`. You should review your code
-  to determine if you're affected.
+New transaction management model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* In previous versions, database-level autocommit was only an option for
-  PostgreSQL, and it was disabled by default. This option is now
-  :ref:`ignored <postgresql-autocommit-mode>`.
+Database-level autocommit is enabled by default in Django 1.6. While this
+doesn't change the general spirit of Django's transaction management, there
+are a few known backwards-incompatibities, described in the :ref:`transaction
+management docs <transactions-upgrading-from-1.5>`. You should review your
+code to determine if you're affected.
 
-* The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
-  it is only usable as a marker class for checking if
-  :meth:`~django.db.models.query.QuerySet.none` has been called:
-  ``isinstance(qs.none(), EmptyQuerySet)``
+In previous versions, database-level autocommit was only an option for
+PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
+<postgresql-autocommit-mode>` and can be removed.
 
-* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` raises an
-  error if it's used on :class:`~django.db.models.DateTimeField` when time
-  zone support is active. Use :meth:`QuerySet.datetimes()
-  <django.db.models.query.QuerySet.datetimes>` instead.
+Addition of ``QuerySet.datetimes()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` returns a
-  list of :class:`~datetime.date`. It used to return a list of
-  :class:`~datetime.datetime`.
+When the :doc:`time zone support </topics/i18n/timezones>` added in Django 1.4
+was active, :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>`
+lookups returned unexpected results, because the aggregation was performed in
+UTC. To fix this, Django 1.6 introduces a new API, :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>`. This requires a few changes in
+your code.
 
-* The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
-  admin on a :class:`~django.db.models.DateTimeField` requires time zone
-  definitions in the database when :setting:`USE_TZ` is ``True``.
-  :ref:`Learn more <database-time-zone-definitions>`.
+``QuerySet.dates()`` returns ``date`` objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Accessing ``date_list`` in the context of a date-based generic view requires
-  time zone definitions in the database when the view is based on a
-  :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is ``True``.
-  :ref:`Learn more <database-time-zone-definitions>`.
+:meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` now returns a
+list of :class:`~datetime.date`. It used to return a list of
+:class:`~datetime.datetime`.
 
-* Model fields named ``hour``, ``minute`` or ``second`` may clash with the new
-  lookups. Append an explicit :lookup:`exact` lookup if this is an issue.
+:meth:`QuerySet.datetimes() <django.db.models.query.QuerySet.datetimes>`
+returns a list of :class:`~datetime.datetime`.
 
-* When Django establishes a connection to the database, it sets up appropriate
-  parameters, depending on the backend being used. Since `persistent database
-  connections <persistent-database-connections>`_ are enabled by default in
-  Django 1.6, this setup isn't repeated at every request any more. If you
-  modifiy parameters such as the connection's isolation level or time zone,
-  you should either restore Django's defaults at the end of each request, or
-  force an appropriate value at the beginning of each request.
+``QuerySet.dates()`` no longer usable on ``DateTimeField``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* If your CSS/Javascript code used to access HTML input widgets by type, you
-  should review it as ``type='text'`` widgets might be now output as
-  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
-  corresponding field type.
+:meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` raises an
+error if it's used on :class:`~django.db.models.DateTimeField` when time
+zone support is active. Use :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` instead.
 
-* Extraction of translatable literals from templates with the
-  :djadmin:`makemessages` command now correctly detects i18n constructs when
-  they are located after a ``{#`` / ``#}``-type comment on the same line. E.g.:
+``date_hierarchy`` requires time zone definitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  .. code-block:: html+django
+The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
+admin now relies on :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` when it's used on a
+:class:`~django.db.models.DateTimeField`.
+
+This requires time zone definitions in the database when :setting:`USE_TZ` is
+``True``. :ref:`Learn more <database-time-zone-definitions>`.
+
+``date_list`` in generic views requires time zone definitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the same reason, accessing ``date_list`` in the context of a date-based
+generic view requires time zone definitions in the database when the view is
+based on a :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is
+``True``. :ref:`Learn more <database-time-zone-definitions>`.
+
+New lookups may clash with model fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 introduces ``hour``, ``minute``, and ``second`` lookups on
+:class:`~django.db.models.DateTimeField`. If you had model fields called
+``hour``, ``minute``, or ``second``, the new lookups will clash with you field
+names. Append an explicit :lookup:`exact` lookup if this is an issue.
+
+Persistent database connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Connection setup not repeated for each request
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When Django establishes a connection to the database, it sets up appropriate
+parameters, depending on the backend being used. Since `persistent database
+connections <persistent-database-connections>`_ are enabled by default in
+Django 1.6, this setup isn't repeated at every request any more. If you
+modifiy parameters such as the connection's isolation level or time zone, you
+should either restore Django's defaults at the end of each request, force an
+appropriate value at the beginning of each request, or disable persistent
+connections.
+
+Translations and comments in templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Extraction of translations after comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Extraction of translatable literals from templates with the
+:djadmin:`makemessages` command now correctly detects i18n constructs when
+they are located after a ``{#`` / ``#}``-type comment on the same line. E.g.:
+
+.. code-block:: html+django
 
     {# A comment #}{% trans "This literal was incorrectly ignored. Not anymore" %}
 
-* (Related to the above item.) Validation of the placement of
-  :ref:`translator-comments-in-templates` specified using ``{#`` / ``#}`` is now
-  stricter. All translator comments not located at the end of their respective
-  lines in a template are ignored and a warning is generated by
-  :djadmin:`makemessages` when it finds them. E.g.:
+Location of translator comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Validation of the placement of :ref:`translator-comments-in-templates`
+specified using ``{#`` / ``#}`` is now stricter. All translator comments not
+located at the end of their respective lines in a template are ignored and a
+warning is generated by :djadmin:`makemessages` when it finds them. E.g.:
 
   .. code-block:: html+django
 
@@ -235,28 +276,45 @@ Backwards incompatible changes in 1.6
     {{ title }}{# Translators: Extracted and associated with 'Welcome' below #}
     <h1>{% trans "Welcome" %}</h1>
 
-* The :doc:`comments </ref/contrib/comments/index>` app now uses a ``GenericIPAddressField``
-  for storing commenters' IP addresses, to support comments submitted from IPv6 addresses.
-  Until now, it stored them in an ``IPAddressField``, which is only meant to support IPv4.
-  When saving a comment made from an IPv6 address, the address would be silently truncated
-  on MySQL databases, and raise an exception on Oracle.
-  You will need to change the column type in your database to benefit from this change.
+Storage of IP addresses in the comments app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  For MySQL, execute this query on your project's database:
+The :doc:`comments </ref/contrib/comments/index>` app now uses a
+``GenericIPAddressField`` for storing commenters' IP addresses, to support
+comments submitted from IPv6 addresses. Until now, it stored them in an
+``IPAddressField``, which is only meant to support IPv4. When saving a comment
+made from an IPv6 address, the address would be silently truncated on MySQL
+databases, and raise an exception on Oracle. You will need to change the
+column type in your database to benefit from this change.
 
-  .. code-block:: sql
+For MySQL, execute this query on your project's database:
+
+.. code-block:: sql
 
     ALTER TABLE django_comments MODIFY ip_address VARCHAR(39);
 
-  For Oracle, execute this query:
+For Oracle, execute this query:
 
-  .. code-block:: sql
+.. code-block:: sql
 
     ALTER TABLE DJANGO_COMMENTS MODIFY (ip_address VARCHAR2(39));
 
-  If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6 addresses
-  are silently truncated; on Oracle, an exception is generated. No database
-  change is needed for SQLite or PostgreSQL databases.
+If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6
+addresses are silently truncated; on Oracle, an exception is generated. No
+database change is needed for SQLite or PostgreSQL databases.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
+  it is only usable as a marker class for checking if
+  :meth:`~django.db.models.query.QuerySet.none` has been called:
+  ``isinstance(qs.none(), EmptyQuerySet)``
+
+* If your CSS/Javascript code used to access HTML input widgets by type, you
+  should review it as ``type='text'`` widgets might be now output as
+  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
+  corresponding field type.
 
 Features deprecated in 1.6
 ==========================
