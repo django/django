@@ -61,7 +61,7 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, PROJ.4, PostGIS           8.2+                Requires PostGIS.
+PostgreSQL          GEOS, PROJ.4, PostGIS           8.4+                Requires PostGIS.
 MySQL               GEOS                            5.x                 Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+

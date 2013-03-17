@@ -352,6 +352,17 @@ in an external repository`__.
 __ https://disqus.com/
 __ https://github.com/django/django-contrib-comments
 
+Support for PostgreSQL versions older than 8.4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in December 2011 for
+PostgreSQL 8.2 and in February 2013 for 8.3. As a consequence, Django 1.6 sets
+8.4 as the minimum PostgreSQL version it officially supports.
+
+You're strongly encouraged to use the most recent version of PostgreSQL
+available, because of performance improvements and to take advantage of the
+native streaming replication available in PostgreSQL 9.x.
+
 Changes to :ttag:`cycle` and :ttag:`firstof`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
