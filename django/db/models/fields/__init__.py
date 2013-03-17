@@ -30,7 +30,6 @@ class NOT_PROVIDED:
 # The values to use for "blank" in SelectFields. Will be appended to the start
 # of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
-BLANK_CHOICE_NONE = [("", "None")]
 
 class FieldDoesNotExist(Exception):
     pass
