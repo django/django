@@ -162,9 +162,9 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         super(_AssertNumQueriesContext, self).__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
         executed = len(self)
         self.test_case.assertEqual(
             executed, self.num, "%d queries executed, %d expected" % (
