@@ -163,6 +163,10 @@ Minor features
 
 * The :djadmin:`diffsettings` comand gained a ``--all`` option.
 
+* :func:`django.forms.fields.Field.__init__` now calls ``super()``, allowing
+  field mixins to implement ``__init__()`` methods that will reliably be
+  called.
+
 Backwards incompatible changes in 1.6
 =====================================
 
