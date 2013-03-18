@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
