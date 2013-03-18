@@ -222,6 +222,10 @@ class LazyObject(object):
     By subclassing, you have the opportunity to intercept and alter the
     instantiation. If you don't need to do that, use SimpleLazyObject.
     """
+
+    # Avoid infinite recursion when tracing __init__ (#19456).
+    _wrapped = None
+
     def __init__(self):
         self._wrapped = empty
 
