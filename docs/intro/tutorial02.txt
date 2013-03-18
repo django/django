@@ -445,8 +445,8 @@ live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
-By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
-tell Django where our templates live::
+Open your settings file (``mysite/settings.py``, remember) and  add a
+:setting:`TEMPLATE_DIRS` setting::
 
     TEMPLATE_DIRS = (
         '/path/to/mysite/templates', # Change this to your own directory.
