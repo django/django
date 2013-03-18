@@ -249,8 +249,21 @@ class LazyObject(object):
         """
         raise NotImplementedError
 
-    # introspection support:
+    # Introspection support
     __dir__ = new_method_proxy(dir)
+
+    # Dictionary methods support
+    @new_method_proxy
+    def __getitem__(self, key):
+        return self[key]
+
+    @new_method_proxy
+    def __setitem__(self, key, value):
+        self[key] = value
+
+    @new_method_proxy
+    def __delitem__(self, key):
+        del self[key]
 
 
 # Workaround for http://bugs.python.org/issue12370
