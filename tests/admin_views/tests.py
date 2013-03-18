@@ -6,7 +6,7 @@ import re
 import datetime
 try:
     from urllib.parse import urljoin
-except ImportError:     # Python 2
+except ImportError:  # Python 2
     from urlparse import urljoin
 
 from django.conf import settings, global_settings
@@ -980,6 +980,32 @@ class AdminViewPermissionsTest(TestCase):
         new_next = {REDIRECT_FIELD_NAME: redirect_url}
         login = self.client.post('/test_admin/admin/', dict(self.super_login, **new_next), QUERY_STRING=query_string)
         self.assertRedirects(login, redirect_url)
+
+    def testDoubleLoginIsNotAllowed(self):
+        """Regression test for #19327"""
+        response = self.client.get('/test_admin/admin/')
+        self.assertEqual(response.status_code, 200)
+
+        # Establish a valid admin session
+        login = self.client.post('/test_admin/admin/', self.super_login)
+        self.assertRedirects(login, '/test_admin/admin/')
+        self.assertFalse(login.context)
+
+        # Logging in with non-admin user fails
+        login = self.client.post('/test_admin/admin/', self.joepublic_login)
+        self.assertEqual(login.status_code, 200)
+        self.assertContains(login, ERROR_MESSAGE)
+
+        # Establish a valid admin session
+        login = self.client.post('/test_admin/admin/', self.super_login)
+        self.assertRedirects(login, '/test_admin/admin/')
+        self.assertFalse(login.context)
+
+        # Logging in with admin user while already logged in
+        login = self.client.post('/test_admin/admin/', self.super_login)
+        self.assertRedirects(login, '/test_admin/admin/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/admin/logout/')
 
     def testAddView(self):
         """Test add view restricts access and actually adds items."""
@@ -2547,7 +2573,7 @@ class AdminCustomQuerysetTest(TestCase):
                 self.assertNotContains(response, 'Primary key = %s' % i)
 
     def test_changelist_view_count_queries(self):
-        #create 2 Person objects
+        # create 2 Person objects
         Person.objects.create(name='person1', gender=1)
         Person.objects.create(name='person2', gender=2)
 
