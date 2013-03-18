@@ -297,6 +297,7 @@ class ModelPaginationTests(TestCase):
         self.assertIsNone(p.object_list._result_cache)
         self.assertRaises(TypeError, lambda: p['has_previous'])
         self.assertIsNone(p.object_list._result_cache)
+        self.assertNotIsInstance(p.object_list, list)
 
         # Make sure slicing the Page object with numbers and slice objects work.
         self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
@@ -305,3 +306,5 @@ class ModelPaginationTests(TestCase):
                 "<Article: Article 2>",
             ]
         )
+        # After __getitem__ is called, object_list is a list
+        self.assertIsInstance(p.object_list, list)
