@@ -18,6 +18,7 @@ try:
 except ImportError:     # Python 2
     from urlparse import urljoin
 from django.utils.six.moves import socketserver
+from io import BytesIO
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -26,6 +27,11 @@ from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
 
 __all__ = ['WSGIServer', 'WSGIRequestHandler']
+
+# If data is too large, socket will choke, so write chunks no larger than 32MB
+# at a time.
+# FIXME: Document rationale for 32MB and not some smaller or larger value.
+MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
 def get_internal_wsgi_application():
@@ -77,19 +83,9 @@ class ServerHandler(simple_server.ServerHandler, object):
             self.bytes_sent += len(data)
 
         # XXX check Content-Length and truncate if too many bytes written?
-
-        # If data is too large, socket will choke, so write chunks no larger
-        # than 32MB at a time.
-        length = len(data)
-        if length > 33554432:
-            offset = 0
-            while offset < length:
-                chunk_size = min(33554432, length)
-                self._write(data[offset:offset+chunk_size])
-                self._flush()
-                offset += chunk_size
-        else:
-            self._write(data)
+        data = BytesIO(data)
+        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), ''):
+            self._write(chunk)
             self._flush()
 
     def error_output(self, environ, start_response):

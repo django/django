@@ -53,3 +53,22 @@ class WSGIFileWrapperTests(TestCase):
         self.assertFalse(handler._used_sendfile)
         self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b'Hello World!')
         self.assertEqual(handler.stderr.getvalue(), b'')
+
+#
+# Tests for #18972: The logic that performs the math to break data into 32MB
+# chunks was flawed, BUT it didn't actually cause any problems.
+#
+
+def send_big_data_app(environ, start_response):
+    start_response(str('200 OK'), [(str('Content-Type'), str('text/plain'))])
+    # Return a blob of data that slightly exceeds chunk size.
+    return [bytes('x' * (32 * 1024 * 1024 + 5))]
+
+class ServerHandlerChunksProperly(TestCase):
+    """Test that the ServerHandler chunks data properly."""
+
+    def test_chunked_data(self):
+        env = {'SERVER_PROTOCOL': 'HTTP/1.0'}
+        handler = ServerHandler(None, BytesIO(), BytesIO(), env)
+        handler.request_handler = DummyHandler()
+        handler.run(send_big_data_app)
