@@ -121,7 +121,9 @@ class Page(collections.Sequence):
             raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
-        return list(self.object_list)[index]
+        if not isinstance(self.object_list, list):
+            self.object_list = list(self.object_list)
+        return self.object_list[index]
 
     def has_next(self):
         return self.number < self.paginator.num_pages
