@@ -70,6 +70,8 @@ urlpatterns = patterns('',
 
     (r'^edit/authors/create/naive/$',
         views.NaiveAuthorCreate.as_view()),
+    (r'^edit/authors/create/msg/$',
+        views.AuthorCreateViewWithMsg.as_view()),
     (r'^edit/authors/create/redirect/$',
         views.NaiveAuthorCreate.as_view(success_url='/edit/authors/create/')),
     (r'^edit/authors/create/interpolate_redirect/$',

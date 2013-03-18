@@ -286,6 +286,33 @@ example::
    use one of the ``add_message`` family of methods. It does not hide failures
    that may occur for other reasons.
 
+Adding messages in Class Based Views
+------------------------------------
+
+If you're writing a form processing view and want to add a success message on
+valid form submission you can use the
+``'django.contrib.messages.views.SuccessMessageMixin'``.
+For example::
+
+    # views.py
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import Author
+
+
+    class AuthorCreate(CreateView, SuccessMessageMixin):
+        model = Author
+        success_url = '/success/'
+        success_message = "{object.name} was created successfully"
+
+.. note::
+    In ``success_message`` fields from the ``model`` are available for string
+    interpolation using the ``.format()`` syntax.
+
+.. warning::
+    The order of the inherited classes matters. ``SuccessMessageMixin`` needs
+    to come after any form processing mixins
+
 Expiration of messages
 ======================
 

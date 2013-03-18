@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -107,6 +108,12 @@ class SpecializedAuthorCreate(generic.CreateView):
 
 class AuthorCreateRestricted(AuthorCreate):
     post = method_decorator(login_required)(AuthorCreate.post)
+
+
+class AuthorCreateViewWithMsg(generic.CreateView, SuccessMessageMixin):
+    model = Author
+    success_url = '/next/'
+    success_message = "{object.name} was created successfully"
 
 
 class ArtistUpdate(generic.UpdateView):

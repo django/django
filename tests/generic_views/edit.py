@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import collections
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
@@ -315,3 +317,20 @@ class DeleteViewTests(TestCase):
         except ImproperlyConfigured:
             pass
 
+class SuccessMessageMixinTests(TestCase):
+    urls = 'generic_views.urls'
+
+    def test_set_messages_success(self):
+        author = {'name': 'John Doe',
+                  'slug': 'success-msg'}
+        AuthorProxy = collections.namedtuple('AuthorProxy', author.keys())
+        author_obj = AuthorProxy(**author)
+        req = self.client.post('/edit/authors/create/msg/', author)
+        self.assertIn(views.AuthorCreateViewWithMsg
+                            .success_message.format(object=author_obj),
+                         req.cookies['messages'].value)
+
+    def test_set_message_false(self):
+        req = self.client.post('/edit/authors/create/msg/',
+                               {'name': 'John Doe'})
+        self.assertFalse('messages' in req.cookies)

@@ -7,5 +7,5 @@ from .dates import (ArchiveIndexViewTests, YearArchiveViewTests,
     DateDetailViewTests)
 from .detail import DetailViewTest
 from .edit import (FormMixinTests, BasicFormTests, ModelFormMixinTests,
-    CreateViewTests, UpdateViewTests, DeleteViewTests)
+    CreateViewTests, UpdateViewTests, DeleteViewTests, SuccessMessageMixinTests)
 from .list import ListViewTests
