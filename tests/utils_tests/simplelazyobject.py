@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import copy
 import pickle
+import sys
 
 from django.utils import six
 from django.utils.unittest import TestCase
@@ -138,3 +139,16 @@ class TestUtilsSimpleLazyObject(TestCase):
         del lazydict['one']
         with self.assertRaises(KeyError):
             lazydict['one']
+
+    def test_trace(self):
+        # See ticket #19456
+        old_trace_func = sys.gettrace()
+        try:
+            def trace_func(frame, event, arg):
+                frame.f_locals['self'].__class__
+                if old_trace_func is not None:
+                    old_trace_func(frame, event, arg)
+            sys.settrace(trace_func)
+            SimpleLazyObject(None)
+        finally:
+            sys.settrace(old_trace_func)
