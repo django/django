@@ -41,6 +41,7 @@ class AdminSite(object):
     logout_template = None
     password_change_template = None
     password_change_done_template = None
+    unauthorized_user_template = None
 
     def __init__(self, name='admin', app_name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
@@ -169,7 +170,7 @@ class AdminSite(object):
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
                 "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
-    def admin_view(self, view, cacheable=False):
+    def admin_view(self, view, cacheable=False, require_authorization=True):
         """
         Decorator to create an admin view attached to this ``AdminSite``. This
         wraps the view and provides permission checking by calling
@@ -193,12 +194,16 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
-            if not self.has_permission(request):
-                if request.path == reverse('admin:logout',
-                                           current_app=self.name):
-                    index_path = reverse('admin:index', current_app=self.name)
-                    return HttpResponseRedirect(index_path)
-                return self.login(request)
+            if require_authorization and not self.has_permission(request):
+                if not request.user.is_authenticated():
+                    response = self.login(request)
+                else:
+                    response = TemplateResponse(
+                        request=request,
+                        template=self.unauthorized_user_template or 'admin/unauthorized_user.html',
+                        current_app=self.name,
+                    )
+                return response
             return view(request, *args, **kwargs)
         if not cacheable:
             inner = never_cache(inner)
@@ -214,9 +219,9 @@ class AdminSite(object):
         if settings.DEBUG:
             self.check_dependencies()
 
-        def wrap(view, cacheable=False):
+        def wrap(view, cacheable=False, require_authorization=True):
             def wrapper(*args, **kwargs):
-                return self.admin_view(view, cacheable)(*args, **kwargs)
+                return self.admin_view(view, cacheable, require_authorization)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
@@ -225,7 +230,7 @@ class AdminSite(object):
                 wrap(self.index),
                 name='index'),
             url(r'^logout/$',
-                wrap(self.logout),
+                wrap(self.logout, require_authorization=False),
                 name='logout'),
             url(r'^password_change/$',
                 wrap(self.password_change, cacheable=True),

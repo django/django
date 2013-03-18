@@ -23,7 +23,7 @@
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
-        {% if user.is_active and user.is_staff %}
+        {% block user-tools %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
             <strong>{% firstof user.get_short_name user.get_username %}</strong>.
@@ -38,7 +38,7 @@
                 <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
             {% endblock %}
         </div>
-        {% endif %}
+        {% endblock user-tools %}
         {% block nav-global %}{% endblock %}
     </div>
     <!-- END Header -->

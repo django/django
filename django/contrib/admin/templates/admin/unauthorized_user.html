@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block user-tools %}
+<div id="user-tools">
+    {% trans 'Welcome,' %}
+    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+    {% block userlinks %}
+        <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+    {% endblock %}
+</div>
+{% endblock user-tools %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p>{% trans "You are authenticated but have no permission to see the admin." %}</p>
+</div>
+{% endblock %}
