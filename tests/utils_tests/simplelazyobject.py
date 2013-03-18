@@ -128,3 +128,13 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(unpickled, x)
         self.assertEqual(six.text_type(unpickled), six.text_type(x))
         self.assertEqual(unpickled.name, x.name)
+
+    def test_dict(self):
+        # See ticket #18447
+        lazydict = SimpleLazyObject(lambda: {'one': 1})
+        self.assertEqual(lazydict['one'], 1)
+        lazydict['one'] = -1
+        self.assertEqual(lazydict['one'], -1)
+        del lazydict['one']
+        with self.assertRaises(KeyError):
+            lazydict['one']
