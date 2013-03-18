@@ -29,8 +29,4 @@ class AdminAuthenticationForm(AuthenticationForm):
                 raise forms.ValidationError(message % {
                     'username': self.username_field.verbose_name
                 })
-            elif not self.user_cache.is_active or not self.user_cache.is_staff:
-                raise forms.ValidationError(message % {
-                    'username': self.username_field.verbose_name
-                })
         return self.cleaned_data
