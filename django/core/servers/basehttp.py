@@ -9,6 +9,7 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 from __future__ import unicode_literals
 
+from io import BytesIO
 import os
 import socket
 import sys
@@ -18,7 +19,6 @@ try:
 except ImportError:     # Python 2
     from urlparse import urljoin
 from django.utils.six.moves import socketserver
-from io import BytesIO
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -26,7 +26,7 @@ from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
 
-__all__ = ['WSGIServer', 'WSGIRequestHandler']
+__all__ = ['WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE']
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time.
