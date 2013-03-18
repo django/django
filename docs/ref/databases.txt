@@ -77,20 +77,7 @@ negating the effect of persistent connections.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 8.2 and higher.
-
-PostgreSQL 8.2 to 8.2.4
------------------------
-
-The implementation of the population statistics aggregates ``STDDEV_POP`` and
-``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
-faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
-`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
-attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
-aggregate with a database backend that falls within the affected release range.
-
-.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
-.. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
+Django supports PostgreSQL 8.4 and higher.
 
 PostgreSQL connection settings
 -------------------------------
@@ -165,7 +152,7 @@ such as ``REPEATABLE READ`` or ``SERIALIZABLE``, set it in the
     handle exceptions raised on serialization failures. This option is
     designed for advanced uses.
 
-.. _postgresql-isolation-levels: http://www.postgresql.org/docs/devel/static/transaction-iso.html
+.. _postgresql-isolation-levels: http://www.postgresql.org/docs/current/static/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -179,7 +166,7 @@ for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
-.. _PostgreSQL operator class: http://www.postgresql.org/docs/8.4/static/indexes-opclass.html
+.. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
 .. _mysql-notes:
 

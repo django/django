@@ -155,7 +155,7 @@ of people with their ages calculated by the database::
     Jane is 42.
     ...
 
-__ http://www.postgresql.org/docs/8.4/static/functions-datetime.html
+__ http://www.postgresql.org/docs/current/static/functions-datetime.html
 
 Passing parameters into ``raw()``
 ---------------------------------

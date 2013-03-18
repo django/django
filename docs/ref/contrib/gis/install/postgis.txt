@@ -28,9 +28,9 @@ Building from source
 
 First download the source archive, and extract::
 
-    $ wget http://postgis.refractions.net/download/postgis-2.0.1.tar.gz
-    $ tar xzf postgis-2.0.1.tar.gz
-    $ cd postgis-2.0.1
+    $ wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
+    $ tar xzf postgis-2.0.3.tar.gz
+    $ cd postgis-2.0.3
 
 Next, configure, make and install PostGIS::
 
