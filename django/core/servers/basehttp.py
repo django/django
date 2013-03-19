@@ -121,7 +121,7 @@ class WSGIServer(simple_server.WSGIServer, object):
         try:
             super(WSGIServer, self).server_bind()
         except Exception as e:
-            raise WSGIServerException(e)
+            raise WSGIServerException, WSGIServerException(e), sys.exc_info()[2]
         self.setup_environ()
 
 

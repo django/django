@@ -1,3 +1,4 @@
+import sys
 from ctypes.util import find_library
 from django.conf import settings
 
@@ -50,7 +51,9 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         try:
             cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
         except Exception as msg:
-            raise ImproperlyConfigured('Unable to load the SpatiaLite library extension '
-                                       '"%s" because: %s' % (self.spatialite_lib, msg))
+            new_msg = (
+                'Unable to load the SpatiaLite library extension '
+                '"%s" because: %s') % (self.spatialite_lib, msg)
+            raise ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2]
         cur.close()
         return conn

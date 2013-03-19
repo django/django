@@ -1,3 +1,4 @@
+import sys
 from optparse import make_option
 
 from django.conf import settings
@@ -62,13 +63,14 @@ Are you sure you want to do this?
                     for sql in sql_list:
                         cursor.execute(sql)
             except Exception as e:
-                raise CommandError("""Database %s couldn't be flushed. Possible reasons:
-  * The database isn't running or isn't configured correctly.
-  * At least one of the expected database tables doesn't exist.
-  * The SQL was invalid.
-Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
-The full error: %s""" % (connection.settings_dict['NAME'], e))
-
+                new_msg = (
+                    "Database %s couldn't be flushed. Possible reasons:\n"
+                    "  * The database isn't running or isn't configured correctly.\n"
+                    "  * At least one of the expected database tables doesn't exist.\n"
+                    "  * The SQL was invalid.\n"
+                    "Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.\n"
+                    "The full error: %s") % (connection.settings_dict['NAME'], e)
+                raise CommandError, CommandError(new_msg), sys.exc_info()[2]
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been
             # sync'd from scratch.
