@@ -289,9 +289,11 @@ example::
 Adding messages in Class Based Views
 ------------------------------------
 
+.. versionadded:: 1.6
+
 If you're writing a form processing view and want to add a success message on
 valid form submission you can use the
-``'django.contrib.messages.views.SuccessMessageMixin'``.
+:class:`~django.contrib.messages.views.SuccessMessageMixin`.
 For example::
 
     # views.py
@@ -299,19 +301,32 @@ For example::
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-
-    class AuthorCreate(CreateView, SuccessMessageMixin):
+    class AuthorCreate(SuccessMessageMixin, CreateView):
         model = Author
         success_url = '/success/'
         success_message = "%(name)s was created successfully"
 
-.. note::
-    In ``success_message`` fields from the ``model`` are available for string
-    interpolation using the ``%(field_name)s`` syntax.
+The cleaned data from the ``form`` is available for string interpolation using
+the ``%(field_name)s`` syntax. For ModelForms, if you need access to fields
+from the saved ``object`` override the ``get_success_message`` method.  For
+example::
 
-.. warning::
-    The order of the inherited classes matters. ``SuccessMessageMixin`` needs
-    to come after any form processing mixins
+    # views.py
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import ComplicatedModel
+
+    class ComplicatedCreate(CreateView, SuccessMessageMixin):
+        model = ComplicatedModel
+        success_url = '/success/'
+        success_message = "%(calculated_field)s was created successfully"
+
+        def get_success_message(self, cleaned_data):
+            return self.success_message % dict(cleaned_data,
+                                               calculated_field=self.object.calculated_field)
+
+Note the change in the inheritance order here. The ``CreateView`` must be first
+so that ``object`` is created before ``get_success_message`` is called.
 
 Expiration of messages
 ======================

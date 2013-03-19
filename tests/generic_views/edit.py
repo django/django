@@ -328,4 +328,4 @@ class SuccessMessageMixinTests(TestCase):
     def test_set_message_false(self):
         req = self.client.post('/edit/authors/create/msg/',
                                {'name': 'John Doe'})
-        self.assertFalse('messages' in req.cookies)
+        self.assertNotIn('messages', req.cookies)
