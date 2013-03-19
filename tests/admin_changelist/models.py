@@ -87,3 +87,6 @@ class OrderedObject(models.Model):
     number = models.IntegerField(default=0, db_column='number_val')
 
     objects = OrderedObjectManager()
+
+class CustomIdUser(models.Model):
+    uuid = models.AutoField(primary_key=True)
