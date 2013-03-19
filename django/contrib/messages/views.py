@@ -16,5 +16,5 @@ class SuccessMessageMixin(FormMixin):
 
     def get_success_message(self):
         if hasattr(self, 'object') and self.object:
-            return self.success_message.format(object=self.object)
+            return self.success_message % self.object.__dict__
         return self.success_message

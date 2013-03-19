@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-import collections
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
@@ -323,12 +321,9 @@ class SuccessMessageMixinTests(TestCase):
     def test_set_messages_success(self):
         author = {'name': 'John Doe',
                   'slug': 'success-msg'}
-        AuthorProxy = collections.namedtuple('AuthorProxy', author.keys())
-        author_obj = AuthorProxy(**author)
         req = self.client.post('/edit/authors/create/msg/', author)
-        self.assertIn(views.AuthorCreateViewWithMsg
-                            .success_message.format(object=author_obj),
-                         req.cookies['messages'].value)
+        self.assertIn(views.AuthorCreateViewWithMsg.success_message % author,
+                      req.cookies['messages'].value)
 
     def test_set_message_false(self):
         req = self.client.post('/edit/authors/create/msg/',

@@ -113,7 +113,7 @@ class AuthorCreateRestricted(AuthorCreate):
 class AuthorCreateViewWithMsg(generic.CreateView, SuccessMessageMixin):
     model = Author
     success_url = '/next/'
-    success_message = "{object.name} was created successfully"
+    success_message = "%(name)s was created successfully"
 
 
 class ArtistUpdate(generic.UpdateView):

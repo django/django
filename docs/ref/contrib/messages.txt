@@ -303,11 +303,11 @@ For example::
     class AuthorCreate(CreateView, SuccessMessageMixin):
         model = Author
         success_url = '/success/'
-        success_message = "{object.name} was created successfully"
+        success_message = "%(name)s was created successfully"
 
 .. note::
     In ``success_message`` fields from the ``model`` are available for string
-    interpolation using the ``.format()`` syntax.
+    interpolation using the ``%(field_name)s`` syntax.
 
 .. warning::
     The order of the inherited classes matters. ``SuccessMessageMixin`` needs
