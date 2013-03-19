@@ -16,8 +16,8 @@ class AdminLogNode(template.Node):
         else:
             user_id = self.user
             if not user_id.isdigit():
-                user_id = context[self.user].id
-            context[self.varname] = LogEntry.objects.filter(user__id__exact=user_id).select_related('content_type', 'user')[:int(self.limit)]
+                user_id = context[self.user].pk
+            context[self.varname] = LogEntry.objects.filter(user__pk__exact=user_id).select_related('content_type', 'user')[:int(self.limit)]
         return ''
 
 @register.tag
