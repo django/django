@@ -14,9 +14,13 @@ class CustomColumnsTests(TestCase):
 
         art = Article.objects.create(headline="Django lets you build Web apps easily")
         art.authors = [a1, a2]
+        
+        #Query Authour last name
+        query_author = Author.objects.get(last_name__exact="Smith")
 
         self.a1 = a1
         self.art = art
+        self.auth_last_name = query_author
     
     def test_query_all_available_authors(self):
         self.assertQuerysetEqual(
@@ -44,13 +48,15 @@ class CustomColumnsTests(TestCase):
         self.assertRaises(FieldError,
             lambda: Author.objects.filter(firstname__exact="John")
         )
-    def test_attribute_error(self):
-        a = Author.objects.get(last_name__exact="Smith")
-        a.first_name = "John"
-        a.last_name = "Smith"
 
-        self.assertRaises(AttributeError, lambda: a.firstname)
-        self.assertRaises(AttributeError, lambda: a.last)
+    def test_attribute_error(self):
+        #a = self.auth_last_name
+
+        with self.assertRaises(AttributeError):
+            self.a1.firstname
+
+        with self.assertRaises(AttributeError):
+            self.a1.last
    
     def test_get_all_authors_for_an_article(self):
         self.assertQuerysetEqual(
@@ -63,9 +69,9 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_get_all_articles_for_an_author(self):
-        author = Author.objects.get(last_name__exact='Smith')
+        #author = self.auth_last_name
         self.assertQuerysetEqual(
-            author.article_set.all(), [
+            self.a1.article_set.all(), [
                 "Django lets you build Web apps easily",
             ],
             lambda a: a.headline
