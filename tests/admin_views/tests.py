@@ -32,7 +32,7 @@ from django.utils import formats, translation, unittest
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
-from django.utils.http import urlencode
+from django.utils.http import urlencode, urlquote
 from django.utils._os import upath
 from django.utils import six
 from django.test.utils import override_settings
@@ -1450,8 +1450,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "Link to the changeform of the object in changelist should use reverse() and be quoted -- #18072"
         prefix = '/test_admin/admin/admin_views/modelwithstringprimarykey/'
         response = self.client.get(prefix)
-        # this URL now comes through reverse(), thus iri_to_uri encoding
-        pk_final_url = escape(iri_to_uri(quote(self.pk)))
+        # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
+        pk_final_url = escape(iri_to_uri(urlquote(quote(self.pk))))
         should_contain = """<th><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
@@ -1484,8 +1484,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
-        # this URL now comes through reverse(), thus iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
+        # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(urlquote(quote(self.pk)))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
