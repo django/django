@@ -30,7 +30,13 @@ __all__ = ['WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE']
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time.
-# FIXME: Document rationale for 32MB and not some smaller or larger value.
+#
+# eibaan's reasoning for 32MB from ticket 5596:
+# It seems to be a nice value :) 32 MB is large enough so that for typical
+# usage the optimization doesn't kick in and we stay backward compatible.
+# Uploading 32 MB is still fast and doesn't seem to stress the Python garbage
+# collector too much. Using 16 MB or even less as threshold would be fine with
+# me...
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
