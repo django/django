@@ -4,7 +4,7 @@ from django.contrib import messages
 
 class SuccessMessageMixin(FormMixin):
     """
-    A mixin that add a success message when a form is completed
+    A mixin that adds a success message on successful form submission
     """
     success_message = None
 
