@@ -110,12 +110,6 @@ class AuthorCreateRestricted(AuthorCreate):
     post = method_decorator(login_required)(AuthorCreate.post)
 
 
-class AuthorCreateViewWithMsg(SuccessMessageMixin, generic.CreateView):
-    model = Author
-    success_url = '/next/'
-    success_message = "%(name)s was created successfully"
-
-
 class ArtistUpdate(generic.UpdateView):
     model = Artist
 

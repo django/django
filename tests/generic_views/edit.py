@@ -315,17 +315,3 @@ class DeleteViewTests(TestCase):
         except ImproperlyConfigured:
             pass
 
-class SuccessMessageMixinTests(TestCase):
-    urls = 'generic_views.urls'
-
-    def test_set_messages_success(self):
-        author = {'name': 'John Doe',
-                  'slug': 'success-msg'}
-        req = self.client.post('/edit/authors/create/msg/', author)
-        self.assertIn(views.AuthorCreateViewWithMsg.success_message % author,
-                      req.cookies['messages'].value)
-
-    def test_set_message_false(self):
-        req = self.client.post('/edit/authors/create/msg/',
-                               {'name': 'John Doe'})
-        self.assertNotIn('messages', req.cookies)

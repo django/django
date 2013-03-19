@@ -291,12 +291,18 @@ Adding messages in Class Based Views
 
 .. versionadded:: 1.6
 
-If you're writing a form processing view and want to add a success message on
-valid form submission you can use the
-:class:`~django.contrib.messages.views.SuccessMessageMixin`.
-For example::
+.. class:: django.contrib.messages.views.SuccessMessageMixin
 
-    # views.py
+    Adds a success message attribute to
+    :class:`~django.views.generic.edit.FormView` based classes
+
+    .. method:: get_success_message(cleaned_data)
+
+        ``cleaned_data`` is the cleaned data from the form which is used for
+        string formatting
+
+**Example views.py**::
+
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
     from myapp.models import Author
@@ -308,10 +314,12 @@ For example::
 
 The cleaned data from the ``form`` is available for string interpolation using
 the ``%(field_name)s`` syntax. For ModelForms, if you need access to fields
-from the saved ``object`` override the ``get_success_message`` method.  For
-example::
+from the saved ``object`` override the
+:meth:`~django.contrib.messages.views.SuccessMessageMixin.get_success_message`
+method.
 
-    # views.py
+**Example views.py for ModelForms**::
+
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
     from myapp.models import ComplicatedModel

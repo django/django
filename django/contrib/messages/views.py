@@ -1,4 +1,4 @@
-from django.views.generic.edit import FormMixin, ModelFormMixin
+from django.views.generic.edit import FormMixin
 from django.contrib import messages
 
 
