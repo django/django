@@ -9,6 +9,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import sql_flush, emit_post_sync_signal
 from django.utils.importlib import import_module
 from django.utils.six.moves import input
+from django.utils import six
 
 
 class Command(NoArgsCommand):
@@ -70,7 +71,7 @@ Are you sure you want to do this?
                     "  * The SQL was invalid.\n"
                     "Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.\n"
                     "The full error: %s") % (connection.settings_dict['NAME'], e)
-                raise CommandError, CommandError(new_msg), sys.exc_info()[2]
+                six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been
             # sync'd from scratch.

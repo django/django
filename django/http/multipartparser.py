@@ -211,7 +211,7 @@ class MultiPartParser(object):
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     msg = "Could not decode base64 data: %r" % e
-                                    raise MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2]
+                                    six.reraise(MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2])
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)

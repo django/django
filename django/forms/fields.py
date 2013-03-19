@@ -620,7 +620,7 @@ class ImageField(FileField):
             # raised. Catch and re-raise.
             raise
         except Exception: # Python Imaging Library doesn't recognize it as an image
-            raise ValidationError, ValidationError(self.error_messages['invalid_image']), sys.exc_info()[2]
+            six.reraise(ValidationError, ValidationError(self.error_messages['invalid_image']), sys.exc_info()[2])
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f

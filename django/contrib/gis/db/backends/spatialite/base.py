@@ -9,6 +9,7 @@ from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
+from django.utils import six
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
@@ -54,6 +55,6 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
             new_msg = (
                 'Unable to load the SpatiaLite library extension '
                 '"%s" because: %s') % (self.spatialite_lib, msg)
-            raise ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2]
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
         cur.close()
         return conn

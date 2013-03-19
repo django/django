@@ -131,7 +131,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 'Cannot determine the SpatiaLite version for the "%s" '
                 'database (error was "%s").  Was the SpatiaLite initialization '
                 'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
-            raise ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2]
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
         if version < (2, 3, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
                                        '2.3.0 and above')

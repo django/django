@@ -428,7 +428,7 @@ def do_block_translate(parser, token):
                 msg = (
                     '"context" in %r tag expected '
                     'exactly one argument.') % bits[0]
-                raise TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2]
+                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
                                       (bits[0], option))

@@ -1119,7 +1119,7 @@ class LiveServerTestCase(TransactionTestCase):
                     for port in range(extremes[0], extremes[1] + 1):
                         possible_ports.append(port)
         except Exception:
-            raise ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2]
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
         cls.server_thread = LiveServerThread(
             host, possible_ports, connections_override)
         cls.server_thread.daemon = True

@@ -72,4 +72,4 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        raise DeserializationError, DeserializationError(e), sys.exc_info()[2]
+        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
