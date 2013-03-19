@@ -24,6 +24,7 @@ from wsgiref.util import FileWrapper   # for backwards compatibility
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
+from django.utils import six
 
 __all__ = ['WSGIServer', 'WSGIRequestHandler']
 
@@ -121,7 +122,7 @@ class WSGIServer(simple_server.WSGIServer, object):
         try:
             super(WSGIServer, self).server_bind()
         except Exception as e:
-            raise WSGIServerException(e)
+            six.reraise(WSGIServerException, WSGIServerException(e), sys.exc_info()[2])
         self.setup_environ()
 
 

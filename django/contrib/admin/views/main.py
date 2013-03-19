@@ -1,4 +1,5 @@
 import operator
+import sys
 import warnings
 from functools import reduce
 
@@ -173,7 +174,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                                 lookup_needs_distinct(self.lookup_opts, key))
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
-            raise IncorrectLookupParameters(e)
+            six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None: new_params = {}

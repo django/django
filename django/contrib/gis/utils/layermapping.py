@@ -429,7 +429,8 @@ class LayerMapping(object):
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
         except Exception as msg:
-            raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
+            new_msg = 'Could not translate between the data source and model geometry: %s' % msg
+            six.reraise(LayerMapError, LayerMapError(new_msg), sys.exc_info()[2])
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."

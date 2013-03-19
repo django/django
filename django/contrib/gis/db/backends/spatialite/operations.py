@@ -1,4 +1,5 @@
 import re
+import sys
 from decimal import Decimal
 
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
@@ -126,10 +127,11 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         try:
             version = self.spatialite_version_tuple()[1:]
         except Exception as msg:
-            raise ImproperlyConfigured('Cannot determine the SpatiaLite version for the "%s" '
-                                       'database (error was "%s").  Was the SpatiaLite initialization '
-                                       'SQL loaded on this database?' %
-                                       (self.connection.settings_dict['NAME'], msg))
+            new_msg = (
+                'Cannot determine the SpatiaLite version for the "%s" '
+                'database (error was "%s").  Was the SpatiaLite initialization '
+                'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
         if version < (2, 3, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
                                        '2.3.0 and above')
