@@ -2385,6 +2385,15 @@ class AdminActionsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
+    def test_custom_function_mail_change_action(self):
+        "Tests a custom action defined in a function"
+        action_data = {
+            'external_mail': 'External mail (Another awesome action)',
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/1/', action_data)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
+
     def test_custom_function_action_with_redirect(self):
         "Tests a custom action defined in a function"
         action_data = {
@@ -2393,6 +2402,14 @@ class AdminActionsTest(TestCase):
             'index': 0,
         }
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.assertEqual(response.status_code, 302)
+
+    def test_custom_function_change_action_with_redirect(self):
+        "Tests a custom action defined in a function"
+        action_data = {
+            'redirect_to': 'Redirect to (Awesome action)',
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/1/', action_data)
         self.assertEqual(response.status_code, 302)
 
     def test_default_redirect(self):

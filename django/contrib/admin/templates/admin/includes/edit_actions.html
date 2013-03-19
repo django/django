@@ -1,0 +1,7 @@
+{% if actions %}
+<div class="actions">
+    {% for action in actions.values %}
+    <input type="submit" name="{{action.1}}" value="{{action.2}}">
+    {% endfor %}
+</div>
+{% endif %}

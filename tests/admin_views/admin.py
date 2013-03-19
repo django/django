@@ -240,6 +240,7 @@ redirect_to.short_description = 'Redirect to (Awesome action)'
 
 class ExternalSubscriberAdmin(admin.ModelAdmin):
     actions = [redirect_to, external_mail]
+    change_actions = [redirect_to, external_mail]
 
 
 class Podcast(Media):

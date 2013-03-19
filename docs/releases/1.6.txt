@@ -159,6 +159,10 @@ Minor features
 
 * The :djadmin:`diffsettings` comand gained a ``--all`` option.
 
+* :doc:`Admin actions </ref/contrib/admin/actions>` can now be added to the
+  "change" pages of the admin
+
+
 Backwards incompatible changes in 1.6
 =====================================
 

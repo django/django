@@ -140,6 +140,19 @@ That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
 advanced techniques.
 
+Adding edit actions to the :class:`ModelAdmin`
+----------------------------------------------
+
+.. versionadded:: 1.6
+You can also make actions available on the "change" pages. From the example
+above, if you make the following addition to the :class:`ModelAdmin`::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        #...
+        change_actions = [make_published]
+
+Actions will appear as buttons at the top of the "change" page.
+
 Handling errors in actions
 --------------------------
 
@@ -336,7 +349,7 @@ Conditionally enabling or disabling actions
 
 .. method:: ModelAdmin.get_actions(request)
 
-    Finally, you can conditionally enable or disable actions on a per-request
+    You can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
     This returns a dictionary of actions allowed. The keys are action names, and
@@ -356,3 +369,8 @@ Conditionally enabling or disabling actions
                     if 'delete_selected' in actions:
                         del actions['delete_selected']
                 return actions
+
+.. method:: ModelAdmin.get_change_actions(request)
+    Change actions can be enabled or disabled on a per request basis similar to
+    .. :meth:`~ModelAdmin.get_actions` which has returns an identical
+    datastructure.
