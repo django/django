@@ -2287,6 +2287,12 @@ The domain to use for session cookies. Set this to a string such as
 ``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
 
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies will be set to the old
+domain. This may result in them being unable to log in as long as these cookies
+persist.
+
 .. setting:: SESSION_COOKIE_HTTPONLY
 
 SESSION_COOKIE_HTTPONLY
