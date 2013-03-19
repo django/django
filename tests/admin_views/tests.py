@@ -902,6 +902,10 @@ class AdminViewPermissionsTest(TestCase):
             LOGIN_FORM_KEY: 1,
             'password': 'secret',
         }
+        self.no_username_or_password_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+        }
 
     def testLogin(self):
         """
