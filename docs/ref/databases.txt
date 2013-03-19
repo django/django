@@ -241,6 +241,14 @@ required for full MySQL support in Django.
     1.2.1p2 or newer, then delete the ``sets.py`` file in the MySQLdb
     directory that was left by an earlier version.
 
+.. note::
+    There are known issues with the way MySQLdb converts date strings into
+    datetime objects. Specifically, date strings with value 0000-00-00 are valid for
+    MySQL but will be converted into None by MySQLdb.
+
+    This means you should be careful while using loaddata/dumpdata with rows
+    that may have 0000-00-00 values, as they will be converted to None.
+
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 
 Creating your database
