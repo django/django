@@ -20,7 +20,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     SwallowAdmin, DynamicListFilterChildAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
-    UnorderedObject, OrderedObject)
+    UnorderedObject, OrderedObject, CustomIdUser)
 
 
 class ChangeListTests(TestCase):
@@ -563,3 +563,22 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))
+
+class AdminLogNodeTestCase(TestCase):
+
+    def test_get_admin_log_templatetag_custom_user(self):
+        """
+        Regression test for ticket #20088: admin log depends on User model
+        having id field as primary key.
+
+        The old implementation raised an AttributeError when trying to use
+        the id field.
+        """
+        context = Context({'user': CustomIdUser()})
+        template_string = '{% load log %}{% get_admin_log 10 as admin_log for_user user %}'
+
+        template = Template(template_string)
+
+        # Rendering should be u'' since this templatetag just logs,
+        # it doesn't render any string.
+        self.assertEquals(template.render(context), u'')
