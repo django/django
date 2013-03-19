@@ -362,3 +362,12 @@ body.popup .submit-row {
 .empty-form {
     display: none;
 }
+
+.actions {
+    color: #999;
+    padding: 3px;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    background: white url(../img/nav-bg-reverse.gif) 0 -10px repeat-x;
+}

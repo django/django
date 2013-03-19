@@ -596,6 +596,32 @@ class ModelAdmin(BaseModelAdmin):
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
     action_checkbox.allow_tags = True
 
+    def get_change_actions(self, request):
+        """
+        Return a dictionary mapping the names of all edit actions for this
+        ModelAdmin to a tuple of (callable, name, description) for each action.
+        """
+        actions = []
+        # Then gather them from the model admin and all parent classes,
+        # starting with self and working back up.
+        for klass in self.__class__.mro()[::-1]:
+            class_actions = getattr(klass, 'change_actions', [])
+            # Avoid trying to iterate over None
+            if not class_actions:
+                continue
+            actions.extend([self.get_action(action) for action in class_actions])
+
+        # get_action might have returned None, so filter any of those out.
+        actions = filter(None, actions)
+
+        # Convert the actions into a SortedDict keyed by name.
+        actions = SortedDict([
+            (name, (func, name, desc))
+            for func, name, desc in actions
+        ])
+
+        return actions
+
     def get_actions(self, request):
         """
         Return a dictionary mapping the names of all actions for this
@@ -1095,7 +1121,20 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = self.get_form(request, obj)
         formsets = []
         inline_instances = self.get_inline_instances(request, obj)
+
+        actions = self.get_change_actions(request)
         if request.method == 'POST':
+            for name in actions:
+                if name in request.POST:
+                    func, name, desc = actions[name]
+                    response = func(self, request, obj._default_manager.filter(pk=obj.pk))
+                    msg = _('Executed action "%s"' % desc)
+                    self.message_user(request, msg)
+                    if isinstance(response, HttpResponse):
+                        return response
+                    else:
+                        return HttpResponseRedirect(request.get_full_path())
+
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
                 form_validated = True
@@ -1151,6 +1190,7 @@ class ModelAdmin(BaseModelAdmin):
             media = media + inline_admin_formset.media
 
         context = {
+            'actions': actions,
             'title': _('Change %s') % force_text(opts.verbose_name),
             'adminform': adminForm,
             'object_id': object_id,
