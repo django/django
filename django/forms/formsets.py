@@ -97,7 +97,11 @@ class BaseFormSet(object):
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
         if self.is_bound:
-            return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
+            # return absolute_max if it is lower than the actual total form
+            # count in the data; this is DoS protection to prevent clients
+            # from forcing the server to instantiate arbitrary numbers of
+            # forms
+            return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
             total_forms = initial_forms + self.extra
@@ -119,12 +123,9 @@ class BaseFormSet(object):
         return initial_forms
 
     def _construct_forms(self):
-        # DoS protection (this has to happen here and not in .is_valid() to
-        # prevent unbounded memory usage when forms are instantiated)
-        if self.total_form_count() > self.absolute_max:
-            raise ValidationError("Too many forms")
         # instantiate all the forms and put them in self.forms
         self.forms = []
+        # DoS protection is included in total_form_count()
         for i in xrange(self.total_form_count()):
             self.forms.append(self._construct_form(i))
 
@@ -299,8 +300,9 @@ class BaseFormSet(object):
             form = self.forms[i]
             self._errors.append(form.errors)
         try:
-            if self.validate_max and self.total_form_count() > self.max_num:
-                raise ValidationError("Too many forms")
+            if (self.validate_max and self.total_form_count() > self.max_num) or \
+                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                raise ValidationError(_("Please submit %s or fewer forms." % self.max_num))
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
@@ -378,8 +380,9 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
-    # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
-    absolute_max = max(DEFAULT_MAX_NUM, max_num)
+    # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
+    # if max_num is None in the first place)
+    absolute_max = max_num + DEFAULT_MAX_NUM
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num, 'absolute_max': absolute_max,
