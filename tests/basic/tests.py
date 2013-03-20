@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from datetime import datetime
 import threading
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import Field, FieldDoesNotExist
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
@@ -688,11 +688,6 @@ class ModelTest(TestCase):
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)
-
-    def test_invalid_qs_list(self):
-        qs = Article.objects.order_by('invalid_column')
-        self.assertRaises(FieldError, list, qs)
-        self.assertRaises(FieldError, list, qs)
 
 class ConcurrentSaveTests(TransactionTestCase):
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
