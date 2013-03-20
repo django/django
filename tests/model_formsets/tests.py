@@ -905,7 +905,6 @@ class ModelFormsetTest(TestCase):
         # irrelevant here (it's output as a hint for the client but its
         # value in the returned data is not checked)
 
-        FormSet = modelformset_factory(Price, extra=1, max_num=1, validate_max=True)
         data = {
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '0',
@@ -915,8 +914,17 @@ class ModelFormsetTest(TestCase):
             'form-1-price': '24.00',
             'form-1-quantity': '2',
         }
+
+        FormSet = modelformset_factory(Price, extra=1, max_num=1, validate_max=True)
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
+
+        # Now test the same thing without the validate_max flag to ensure
+        # default behavior is unchanged
+        FormSet = modelformset_factory(Price, extra=1, max_num=1)
+        formset = FormSet(data)
+        self.assertTrue(formset.is_valid())
+
 
     def test_unique_together_validation(self):
         FormSet = modelformset_factory(Price, extra=1)
