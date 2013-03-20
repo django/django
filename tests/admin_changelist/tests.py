@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 
@@ -581,4 +581,4 @@ class AdminLogNodeTestCase(TestCase):
 
         # Rendering should be u'' since this templatetag just logs,
         # it doesn't render any string.
-        self.assertEquals(template.render(context), u'')
+        self.assertEqual(template.render(context), '')
