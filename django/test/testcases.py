@@ -704,7 +704,7 @@ class TransactionTestCase(SimpleTestCase):
         """
         self.client = self.client_class()
         self._fixture_setup()
-        self._urlconf_setup()
+        super(TransactionTestCase, self)._urlconf_setup()
         mail.outbox = []
 
     def _databases_names(self, include_mirrors=True):
@@ -748,7 +748,7 @@ class TransactionTestCase(SimpleTestCase):
               a clean cursor.
         """
         self._fixture_teardown()
-        self._urlconf_teardown()
+        super(TransactionTestCase, self)._urlconf_teardown()
         # Some DB cursors include SQL statements as part of cursor
         # creation. If you have a test that does rollback, the effect
         # of these statements is lost, which can effect the operation
