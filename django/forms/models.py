@@ -682,7 +682,7 @@ class BaseModelFormSet(BaseFormSet):
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
                          can_order=False, max_num=None, fields=None,
-                         exclude=None, widgets=None):
+                         exclude=None, widgets=None, validate_max=False):
     """
     Returns a FormSet class for the given Django model class.
     """
@@ -690,7 +690,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              formfield_callback=formfield_callback,
                              widgets=widgets)
     FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
-                              can_order=can_order, can_delete=can_delete)
+                              can_order=can_order, can_delete=can_delete,
+                              validate_max=validate_max)
     FormSet.model = model
     return FormSet
 
