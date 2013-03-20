@@ -4,7 +4,6 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 
 from __future__ import absolute_import
 
-import collections
 import datetime
 from itertools import repeat
 
@@ -12,6 +11,7 @@ from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.aggregates import Aggregate
+from django.utils.itercompat import is_iterator
 from django.utils.six.moves import xrange
 
 # Connection types
@@ -51,7 +51,7 @@ class WhereNode(tree.Node):
             return
 
         obj, lookup_type, value = data
-        if isinstance(value, collections.Iterator):
+        if is_iterator(value):
             # Consume any generators immediately, so that we can determine
             # emptiness and transform any non-empty values correctly.
             value = list(value)

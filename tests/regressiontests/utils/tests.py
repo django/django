@@ -19,6 +19,7 @@ from .functional import FunctionalTestCase
 from .html import TestUtilsHtml
 from .http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
 from .ipv6 import TestUtilsIPv6
+from .itercompat import TestIsIterator
 from .jslex import JsToCForGettextTest, JsTokensTest
 from .module_loading import CustomLoader, DefaultLoader, EggLoader
 from .numberformat import TestNumberFormat
