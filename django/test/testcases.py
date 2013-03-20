@@ -10,7 +10,7 @@ import re
 import sys
 try:
     from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
+except ImportError:  # Python 2
     from urlparse import urlsplit, urlunsplit
 import select
 import socket
@@ -38,7 +38,7 @@ from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml, strip_quotes)
 from django.utils import six, unittest as ut2
 from django.utils.encoding import force_text
-from django.utils.unittest import skipIf # Imported here for backward compatibility
+from django.utils.unittest import skipIf  # Imported here for backward compatibility
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
@@ -254,10 +254,21 @@ class SimpleTestCase(ut2.TestCase):
                 return
 
     def _pre_setup(self):
-        pass
+        self._urlconf_setup()
 
     def _post_teardown(self):
-        pass
+        self._urlconf_teardown()
+
+    def _urlconf_setup(self):
+        if hasattr(self, 'urls'):
+            self._old_root_urlconf = settings.ROOT_URLCONF
+            settings.ROOT_URLCONF = self.urls
+            clear_url_caches()
+
+    def _urlconf_teardown(self):
+        if hasattr(self, '_old_root_urlconf'):
+            settings.ROOT_URLCONF = self._old_root_urlconf
+            clear_url_caches()
 
     def save_warnings_state(self):
         """
@@ -379,7 +390,7 @@ class SimpleTestCase(ut2.TestCase):
                 safe_repr(dom1, True), safe_repr(dom2, True))
             self.fail(self._formatMessage(msg, standardMsg))
 
-    def assertInHTML(self, needle, haystack, count = None, msg_prefix=''):
+    def assertInHTML(self, needle, haystack, count=None, msg_prefix=''):
         needle = assert_and_parse_html(self, needle, None,
             'First argument is not valid HTML:')
         haystack = assert_and_parse_html(self, haystack, None,
@@ -436,100 +447,6 @@ class SimpleTestCase(ut2.TestCase):
             if result:
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
-
-
-class TransactionTestCase(SimpleTestCase):
-
-    # The class we'll use for the test client self.client.
-    # Can be overridden in derived classes.
-    client_class = Client
-
-    # Subclasses can ask for resetting of auto increment sequence before each
-    # test case
-    reset_sequences = False
-
-    def _pre_setup(self):
-        """Performs any pre-test setup. This includes:
-
-            * Flushing the database.
-            * If the Test Case class has a 'fixtures' member, installing the
-              named fixtures.
-            * If the Test Case class has a 'urls' member, replace the
-              ROOT_URLCONF with it.
-            * Clearing the mail test outbox.
-        """
-        self.client = self.client_class()
-        self._fixture_setup()
-        self._urlconf_setup()
-        mail.outbox = []
-
-    def _databases_names(self, include_mirrors=True):
-        # If the test case has a multi_db=True flag, act on all databases,
-        # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(self, 'multi_db', False):
-            return [alias for alias in connections
-                    if include_mirrors or not connections[alias].settings_dict['TEST_MIRROR']]
-        else:
-            return [DEFAULT_DB_ALIAS]
-
-    def _reset_sequences(self, db_name):
-        conn = connections[db_name]
-        if conn.features.supports_sequence_reset:
-            sql_list = \
-                conn.ops.sequence_reset_by_name_sql(no_style(),
-                                                    conn.introspection.sequence_list())
-            if sql_list:
-                with transaction.commit_on_success_unless_managed(using=db_name):
-                    cursor = conn.cursor()
-                    for sql in sql_list:
-                        cursor.execute(sql)
-
-    def _fixture_setup(self):
-        for db_name in self._databases_names(include_mirrors=False):
-            # Reset sequences
-            if self.reset_sequences:
-                self._reset_sequences(db_name)
-
-            if hasattr(self, 'fixtures'):
-                # We have to use this slightly awkward syntax due to the fact
-                # that we're using *args and **kwargs together.
-                call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
-
-    def _urlconf_setup(self):
-        if hasattr(self, 'urls'):
-            self._old_root_urlconf = settings.ROOT_URLCONF
-            settings.ROOT_URLCONF = self.urls
-            clear_url_caches()
-
-    def _post_teardown(self):
-        """ Performs any post-test things. This includes:
-
-            * Putting back the original ROOT_URLCONF if it was changed.
-            * Force closing the connection, so that the next test gets
-              a clean cursor.
-        """
-        self._fixture_teardown()
-        self._urlconf_teardown()
-        # Some DB cursors include SQL statements as part of cursor
-        # creation. If you have a test that does rollback, the effect
-        # of these statements is lost, which can effect the operation
-        # of tests (e.g., losing a timezone setting causing objects to
-        # be created with the wrong time).
-        # To make sure this doesn't happen, get a clean connection at the
-        # start of every test.
-        for conn in connections.all():
-            conn.close()
-
-    def _fixture_teardown(self):
-        for db in self._databases_names(include_mirrors=False):
-            call_command('flush', verbosity=0, interactive=False, database=db,
-                         skip_validation=True, reset_sequences=False)
-
-    def _urlconf_teardown(self):
-        if hasattr(self, '_old_root_urlconf'):
-            settings.ROOT_URLCONF = self._old_root_urlconf
-            clear_url_caches()
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None, msg_prefix=''):
@@ -681,7 +598,7 @@ class TransactionTestCase(SimpleTestCase):
 
         # Search all contexts for the error.
         found_form = False
-        for i,context in enumerate(contexts):
+        for i, context in enumerate(contexts):
             if form not in context:
                 continue
             found_form = True
@@ -763,6 +680,89 @@ class TransactionTestCase(SimpleTestCase):
         self.assertFalse(template_name in template_names,
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
+
+
+class TransactionTestCase(SimpleTestCase):
+
+    # The class we'll use for the test client self.client.
+    # Can be overridden in derived classes.
+    client_class = Client
+
+    # Subclasses can ask for resetting of auto increment sequence before each
+    # test case
+    reset_sequences = False
+
+    def _pre_setup(self):
+        """Performs any pre-test setup. This includes:
+
+            * Flushing the database.
+            * If the Test Case class has a 'fixtures' member, installing the
+              named fixtures.
+            * If the Test Case class has a 'urls' member, replace the
+              ROOT_URLCONF with it.
+            * Clearing the mail test outbox.
+        """
+        self.client = self.client_class()
+        self._fixture_setup()
+        self._urlconf_setup()
+        mail.outbox = []
+
+    def _databases_names(self, include_mirrors=True):
+        # If the test case has a multi_db=True flag, act on all databases,
+        # including mirrors or not. Otherwise, just on the default DB.
+        if getattr(self, 'multi_db', False):
+            return [alias for alias in connections
+                    if include_mirrors or not connections[alias].settings_dict['TEST_MIRROR']]
+        else:
+            return [DEFAULT_DB_ALIAS]
+
+    def _reset_sequences(self, db_name):
+        conn = connections[db_name]
+        if conn.features.supports_sequence_reset:
+            sql_list = \
+                conn.ops.sequence_reset_by_name_sql(no_style(),
+                                                    conn.introspection.sequence_list())
+            if sql_list:
+                with transaction.commit_on_success_unless_managed(using=db_name):
+                    cursor = conn.cursor()
+                    for sql in sql_list:
+                        cursor.execute(sql)
+
+    def _fixture_setup(self):
+        for db_name in self._databases_names(include_mirrors=False):
+            # Reset sequences
+            if self.reset_sequences:
+                self._reset_sequences(db_name)
+
+            if hasattr(self, 'fixtures'):
+                # We have to use this slightly awkward syntax due to the fact
+                # that we're using *args and **kwargs together.
+                call_command('loaddata', *self.fixtures,
+                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
+
+    def _post_teardown(self):
+        """ Performs any post-test things. This includes:
+
+            * Putting back the original ROOT_URLCONF if it was changed.
+            * Force closing the connection, so that the next test gets
+              a clean cursor.
+        """
+        self._fixture_teardown()
+        self._urlconf_teardown()
+        # Some DB cursors include SQL statements as part of cursor
+        # creation. If you have a test that does rollback, the effect
+        # of these statements is lost, which can effect the operation
+        # of tests (e.g., losing a timezone setting causing objects to
+        # be created with the wrong time).
+        # To make sure this doesn't happen, get a clean connection at the
+        # start of every test.
+        for conn in connections.all():
+            conn.close()
+
+    def _fixture_teardown(self):
+        for db in self._databases_names(include_mirrors=False):
+            call_command('flush', verbosity=0, interactive=False, database=db,
+                         skip_validation=True, reset_sequences=False)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
