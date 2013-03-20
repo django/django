@@ -256,6 +256,26 @@ class FormsFormsetTestCase(TestCase):
         self.assertTrue(formset.is_valid())
         self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': 'Calexico'}, {}, {}])
 
+    def test_formset_validate_max_flag(self):
+        # If validate_max is set and max_num is less than TOTAL_FORMS in the
+        # data, then throw an exception. MAX_NUM_FORMS in the data is
+        # irrelevant here (it's output as a hint for the client but its
+        # value in the returned data is not checked)
+
+        data = {
+            'choices-TOTAL_FORMS': '2', # the number of forms rendered
+            'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MAX_NUM_FORMS': '2', # max number of forms - should be ignored
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '0',
+            'choices-1-choice': 'One',
+            'choices-1-votes': '1',
+        }
+
+        ChoiceFormSet = formset_factory(Choice, extra=1, max_num=1, validate_max=True)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(formset.is_valid())
+
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.
 
@@ -885,25 +905,24 @@ class FormsFormsetTestCase(TestCase):
         try:
             formsets.DEFAULT_MAX_NUM = 3
             ChoiceFormSet = formset_factory(Choice)
-            # someone fiddles with the mgmt form data...
-            formset = ChoiceFormSet(
-                {
-                    'choices-TOTAL_FORMS': '4',
-                    'choices-INITIAL_FORMS': '0',
-                    'choices-MAX_NUM_FORMS': '4',
-                    'choices-0-choice': 'Zero',
-                    'choices-0-votes': '0',
-                    'choices-1-choice': 'One',
-                    'choices-1-votes': '1',
-                    'choices-2-choice': 'Two',
-                    'choices-2-votes': '2',
-                    'choices-3-choice': 'Three',
-                    'choices-3-votes': '3',
-                    },
-                prefix='choices',
-                )
-            # But we still only instantiate 3 forms
-            self.assertEqual(len(formset.forms), 3)
+            with self.assertRaises(ValidationError):
+                # someone fiddles with the mgmt form data...
+                formset = ChoiceFormSet(
+                    {
+                        'choices-TOTAL_FORMS': '4',
+                        'choices-INITIAL_FORMS': '0',
+                        'choices-MAX_NUM_FORMS': '4',
+                        'choices-0-choice': 'Zero',
+                        'choices-0-votes': '0',
+                        'choices-1-choice': 'One',
+                        'choices-1-votes': '1',
+                        'choices-2-choice': 'Two',
+                        'choices-2-votes': '2',
+                        'choices-3-choice': 'Three',
+                        'choices-3-votes': '3',
+                        },
+                    prefix='choices',
+                    )
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
@@ -931,7 +950,7 @@ class FormsFormsetTestCase(TestCase):
                     },
                 prefix='choices',
                 )
-            # This time four forms are instantiated
+            # Four forms are instantiated and no exception is raised
             self.assertEqual(len(formset.forms), 4)
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
