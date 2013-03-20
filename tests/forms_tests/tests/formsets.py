@@ -740,8 +740,20 @@ class FormsFormsetTestCase(TestCase):
 <tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
 
     def test_max_num_zero(self):
-        # If max_num is 0 then no form is rendered at all, even if extra and initial
-        # are specified.
+        # If max_num is 0 then no form is rendered at all, regardless of extra,
+        # unless initial data is present. (This changed in the patch for bug
+        # 20084 -- previously max_num=0 trumped initial data)
+
+        LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1, max_num=0)
+        formset = LimitedFavoriteDrinkFormSet()
+        form_output = []
+
+        for form in formset.forms:
+            form_output.append(str(form))
+
+        self.assertEqual('\n'.join(form_output), "")
+
+        # test that initial trumps max_num
 
         initial = [
             {'name': 'Fernet and Coke'},
@@ -753,12 +765,13 @@ class FormsFormsetTestCase(TestCase):
 
         for form in formset.forms:
             form_output.append(str(form))
-
-        self.assertEqual('\n'.join(form_output), "")
+        self.assertEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" name="form-0-name" type="text" value="Fernet and Coke" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>""")
 
     def test_more_initial_than_max_num(self):
-        # More initial forms than max_num will result in only the first max_num of
-        # them to be displayed with no extra forms.
+        # More initial forms than max_num now results in all initial forms
+        # being displayed (but no extra forms).  This behavior was changed
+        # from max_num taking precedence in the patch for #20084
 
         initial = [
             {'name': 'Gin Tonic'},
@@ -771,9 +784,9 @@ class FormsFormsetTestCase(TestCase):
 
         for form in formset.forms:
             form_output.append(str(form))
-
-        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" value="Bloody Mary" id="id_form-1-name" /></td></tr>""")
+        self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic" /></td></tr>
+<tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary" /></td></tr>
+<tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" name="form-2-name" type="text" value="Jack and Coke" /></td></tr>""")
 
         # One form from initial and extra=3 with max_num=2 should result in the one
         # initial form and one extra.

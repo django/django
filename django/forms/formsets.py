@@ -116,8 +116,6 @@ class BaseFormSet(object):
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num >= 0:
-                initial_forms = self.max_num
         return initial_forms
 
     def _construct_forms(self):
