@@ -393,6 +393,16 @@ class HttpResponseRedirectBase(HttpResponse):
         self['Location'] = iri_to_uri(redirect_to)
 
     url = property(lambda self: self['Location'])
+    
+    
+class JsonHttpResponse(HttpResponse):
+    """
+    Return a JSON serialized HTTP response
+    """
+    def __init__(self, data):
+        import json
+        serialized = json.dumps(data, sort_keys=settings.DEBUG)
+        super(JsonHttpResponse, self).__init__(content=serialized, content_type='application/json')
 
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
