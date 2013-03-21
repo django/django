@@ -435,7 +435,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   fields=None, exclude=None,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None,
-                                  formfield_callback=None):
+                                  formfield_callback=None, validate_max=False):
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 
@@ -457,7 +457,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                    formfield_callback=formfield_callback,
                                    formset=formset,
                                    extra=extra, can_delete=can_delete, can_order=can_order,
-                                   fields=fields, exclude=exclude, max_num=max_num)
+                                   fields=fields, exclude=exclude, max_num=max_num,
+                                   validate_max=validate_max)
     FormSet.ct_field = ct_field
     FormSet.ct_fk_field = fk_field
     return FormSet

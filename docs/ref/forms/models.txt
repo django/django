@@ -25,7 +25,7 @@ Model Form Functions
 
     See :ref:`modelforms-factory` for example usage.
 
-.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None)
+.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False)
 
     Returns a ``FormSet`` class for the given ``model`` class.
 
@@ -33,17 +33,18 @@ Model Form Functions
     ``formfield_callback`` and ``widgets`` are all passed through to
     :func:`~django.forms.models.modelform_factory`.
 
-    Arguments ``formset``, ``extra``, ``max_num``, ``can_order``, and
-    ``can_delete`` are passed through to ``formset_factory``. See
-    :ref:`formsets` for details.
+    Arguments ``formset``, ``extra``, ``max_num``, ``can_order``,
+    ``can_delete`` and ``validate_max`` are passed through to
+    :func:`~django.forms.formsets.formset_factory`. See :ref:`formsets` for
+    details.
 
     See :ref:`model-formsets` for example usage.
 
     .. versionchanged:: 1.6
 
-    The widgets parameter was added.
+    The ``widgets`` and the ``validate_max`` parameters were added.
 
-.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None)
+.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
     defaults of ``formset=BaseInlineFormSet``, ``can_delete=True``, and
@@ -56,4 +57,4 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-    The widgets parameter was added.
+    The ``widgets`` and the ``validate_max`` parameters were added.
