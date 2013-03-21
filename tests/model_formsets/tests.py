@@ -918,13 +918,13 @@ class ModelFormsetTest(TestCase):
         FormSet = modelformset_factory(Price, extra=1, max_num=1, validate_max=True)
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), [u'Please submit 1 or fewer forms.'])
 
         # Now test the same thing without the validate_max flag to ensure
         # default behavior is unchanged
         FormSet = modelformset_factory(Price, extra=1, max_num=1)
         formset = FormSet(data)
         self.assertTrue(formset.is_valid())
-
 
     def test_unique_together_validation(self):
         FormSet = modelformset_factory(Price, extra=1)
