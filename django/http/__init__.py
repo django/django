@@ -5,6 +5,7 @@ from django.http.response import (HttpResponse, StreamingHttpResponse,
     CompatibleStreamingHttpResponse, HttpResponsePermanentRedirect,
     HttpResponseRedirect, HttpResponseNotModified, HttpResponseBadRequest,
     HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotAllowed,
-    HttpResponseGone, HttpResponseServerError, Http404, BadHeaderError)
+    HttpResponseGone, HttpResponseServerError, Http404, BadHeaderError,
+    JsonHttpResponse)
 from django.http.utils import (fix_location_header, conditional_content_removal,
     fix_IE_for_attach, fix_IE_for_vary)
