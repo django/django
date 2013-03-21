@@ -1912,7 +1912,7 @@ and 500 pages.
 
 .. note::
 
-    Some of the admin templates, such as ``change_list_request.html`` are used
+    Some of the admin templates, such as ``change_list_results.html`` are used
     to render custom inclusion tags. These may be overridden, but in such cases
     you are probably better off creating your own version of the tag in
     question and giving it a different name. That way you can use it
