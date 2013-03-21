@@ -12,5 +12,4 @@ Formset Functions
     See :ref:`formsets` for example usage.
 
     .. versionchanged:: 1.6
-
-    The validate_max parameter was added.
+       The ``validate_max`` parameter was added.
