@@ -18,6 +18,9 @@ class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+
+    searched_locations = []
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
@@ -77,6 +80,7 @@ class FileSystemFinder(BaseFinder):
         matches = []
         for prefix, root in self.locations:
             matched_path = self.find_location(root, path, prefix)
+            self.searched_locations.append(root)
             if matched_path:
                 if not all:
                     return matched_path
@@ -145,6 +149,9 @@ class AppDirectoriesFinder(BaseFinder):
         matches = []
         for app in self.apps:
             match = self.find_in_app(app, path)
+            storage = self.storages.get(app, None)
+            if storage:
+                self.searched_locations.append(storage.location)
             if match:
                 if not all:
                     return match
@@ -199,6 +206,7 @@ class BaseStorageFinder(BaseFinder):
         else:
             if self.storage.exists(path):
                 match = self.storage.path(path)
+                self.searched_locations.append(self.storage.location)
                 if all:
                     match = [match]
                 return match
@@ -235,17 +243,22 @@ def find(path, all=False):
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
     matches = []
+    locations = []
+    
     for finder in get_finders():
+        locations.extend(finder.searched_locations)
         result = finder.find(path, all=all)
         if not all and result:
             return result
         if not isinstance(result, (list, tuple)):
             result = [result]
         matches.extend(result)
+
     if matches:
-        return matches
+        return dict(matches=matches, locations=locations)
+
     # No match.
-    return all and [] or None
+    return all and dict(matches=[], locations=locations) or None
 
 
 def get_finders():
