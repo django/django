@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import re
+import sys
 
 from django.conf import settings
 from django.template import (Node, Variable, TemplateSyntaxError,
@@ -424,8 +425,10 @@ def do_block_translate(parser, token):
                 value = remaining_bits.pop(0)
                 value = parser.compile_filter(value)
             except Exception:
-                raise TemplateSyntaxError('"context" in %r tag expected '
-                                          'exactly one argument.' % bits[0])
+                msg = (
+                    '"context" in %r tag expected '
+                    'exactly one argument.') % bits[0]
+                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
                                       (bits[0], option))

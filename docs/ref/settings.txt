@@ -557,7 +557,7 @@ backend-specific.
 Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
 
 .. setting:: TEST_COLLATION
@@ -2286,6 +2286,12 @@ Default: ``None``
 The domain to use for session cookies. Set this to a string such as
 ``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
+
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies will be set to the old
+domain. This may result in them being unable to log in as long as these cookies
+persist.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 

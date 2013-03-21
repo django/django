@@ -8,6 +8,7 @@ import copy
 import datetime
 import os
 import re
+import sys
 try:
     from urllib.parse import urlsplit, urlunsplit
 except ImportError:     # Python 2
@@ -119,6 +120,7 @@ class Field(object):
         self.error_messages = messages
 
         self.validators = self.default_validators + validators
+        super(Field, self).__init__()
 
     def prepare_value(self, value):
         return value
@@ -619,7 +621,7 @@ class ImageField(FileField):
             # raised. Catch and re-raise.
             raise
         except Exception: # Python Imaging Library doesn't recognize it as an image
-            raise ValidationError(self.error_messages['invalid_image'])
+            six.reraise(ValidationError, ValidationError(self.error_messages['invalid_image']), sys.exc_info()[2])
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f
