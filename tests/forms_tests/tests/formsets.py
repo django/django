@@ -275,7 +275,7 @@ class FormsFormsetTestCase(TestCase):
         ChoiceFormSet = formset_factory(Choice, extra=1, max_num=1, validate_max=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), [u'Please submit 1 or fewer forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or fewer forms.'])
 
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.

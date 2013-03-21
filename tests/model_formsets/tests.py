@@ -918,7 +918,7 @@ class ModelFormsetTest(TestCase):
         FormSet = modelformset_factory(Price, extra=1, max_num=1, validate_max=True)
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), [u'Please submit 1 or fewer forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or fewer forms.'])
 
         # Now test the same thing without the validate_max flag to ensure
         # default behavior is unchanged
