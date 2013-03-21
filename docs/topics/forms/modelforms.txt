@@ -597,9 +597,10 @@ with the ``Author`` model. It works just like a regular formset::
 
 .. note::
 
-    :func:`~django.forms.models.modelformset_factory` uses ``formset_factory``
-    to generate formsets. This means that a model formset is just an extension
-    of a basic formset that knows how to interact with a particular model.
+    :func:`~django.forms.models.modelformset_factory` uses
+    :func:`~django.forms.formsets.formset_factory` to generate formsets. This
+    means that a model formset is just an extension of a basic formset that
+    knows how to interact with a particular model.
 
 Changing the queryset
 ---------------------
