@@ -1385,7 +1385,7 @@ For example, to dump data from the database with the alias ``master``::
 .. django-admin-option:: --exclude
 
 Exclude a specific application from the applications whose contents is
-output. For example, to specifically exclude the `auth` application from
+output. For example, to specifically exclude the ``auth`` application from
 the output of dumpdata, you would call::
 
     django-admin.py dumpdata --exclude=auth

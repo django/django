@@ -123,9 +123,9 @@ Support for multiple databases
 
 Django 1.2 adds the ability to use :doc:`more than one database
 </topics/db/multi-db>` in your Django project. Queries can be issued at a
-specific database with the `using()` method on ``QuerySet`` objects. Individual
-objects can be saved to a specific database by providing a ``using`` argument
-when you call ``save()``.
+specific database with the ``using()`` method on ``QuerySet`` objects.
+Individual objects can be saved to a specific database by providing a ``using``
+argument when you call ``save()``.
 
 Model validation
 ----------------
@@ -765,7 +765,7 @@ over the next few release cycles.
 Code taking advantage of any of the features below will raise a
 ``PendingDeprecationWarning`` in Django 1.2. This warning will be
 silent by default, but may be turned on using Python's :mod:`warnings`
-module, or by running Python with a ``-Wd`` or `-Wall` flag.
+module, or by running Python with a ``-Wd`` or ``-Wall`` flag.
 
 In Django 1.3, these warnings will become a ``DeprecationWarning``,
 which is *not* silent. In Django 1.4 support for these features will

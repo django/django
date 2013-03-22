@@ -634,8 +634,8 @@ systems and coordinate transformation::
    or any other input accepted by :class:`SpatialReference` (including
    spatial reference WKT and PROJ.4 strings, or an integer SRID).
    By default nothing is returned and the geometry is transformed in-place.
-   However, if the `clone` keyword is set to ``True`` then a transformed clone
-   of this geometry is returned instead.
+   However, if the ``clone`` keyword is set to ``True`` then a transformed
+   clone of this geometry is returned instead.
 
    .. method:: intersects(other)
 

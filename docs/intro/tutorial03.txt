@@ -107,7 +107,7 @@ with::
         url(r'^admin/', include(admin.site.urls)),
     )
 
-You have now wired an `index` view into the URLconf. Go to
+You have now wired an ``index`` view into the URLconf. Go to
 http://localhost:8000/polls/ in your browser, and you should see the text
 "*Hello, world. You're at the poll index.*", which you defined in the
 ``index`` view.
@@ -119,7 +119,7 @@ At this point, it's worth reviewing what these arguments are for.
 :func:`~django.conf.urls.url` argument: regex
 ---------------------------------------------
 
-The term `regex` is a commonly used short form meaning `regular expression`,
+The term "regex" is a commonly used short form meaning "regular expression",
 which is a syntax for matching patterns in strings, or in this case, url
 patterns. Django starts at the first regular expression and makes its way down
 the list,  comparing the requested URL against each regular expression until it

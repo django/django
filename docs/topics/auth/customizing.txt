@@ -103,12 +103,14 @@ the time, it'll just look like this::
     class MyBackend(object):
         def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
+            ...
 
 But it could also authenticate a token, like so::
 
     class MyBackend(object):
         def authenticate(self, token=None):
             # Check the token and return a User.
+            ...
 
 Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
@@ -183,9 +185,7 @@ The simple backend above could implement permissions for the magic admin
 fairly simply::
 
     class SettingsBackend(object):
-
-        # ...
-
+        ...
         def has_perm(self, user_obj, perm, obj=None):
             if user_obj.username == settings.ADMIN_LOGIN:
                 return True
@@ -482,7 +482,7 @@ Django expects your custom User model to meet some minimum requirements.
 The easiest way to construct a compliant custom User model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
 :class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
-implementation of a `User` model, including hashed passwords and tokenized
+implementation of a ``User`` model, including hashed passwords and tokenized
 password resets. You must then provide some key implementation details:
 
 .. currentmodule:: django.contrib.auth
@@ -497,7 +497,7 @@ password resets. You must then provide some key implementation details:
         identifier. The field *must* be unique (i.e., have ``unique=True``
         set in it's definition).
 
-        In the following example, the field `identifier` is used
+        In the following example, the field ``identifier`` is used
         as the identifying field::
 
             class MyUser(AbstractBaseUser):
@@ -605,11 +605,11 @@ The following methods are available on any subclass of
         :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
         been called for this user.
 
-You should also define a custom manager for your User model. If your User
-model defines `username` and `email` fields the same as Django's default User,
-you can just install Django's
-:class:`~django.contrib.auth.models.UserManager`; however, if your User model
-defines different fields, you will need to define a custom manager that
+You should also define a custom manager for your ``User`` model. If your
+``User`` model defines ``username`` and ``email`` fields the same as Django's
+default ``User``, you can just install Django's
+:class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
+model defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
 additional methods:
 
@@ -617,26 +617,28 @@ additional methods:
 
     .. method:: models.CustomUserManager.create_user(*username_field*, password=None, \**other_fields)
 
-        The prototype of `create_user()` should accept the username field,
+        The prototype of ``create_user()`` should accept the username field,
         plus all required fields as arguments. For example, if your user model
-        uses `email` as the username field, and has `date_of_birth` as a required
-        fields, then create_user should be defined as::
+        uses ``email`` as the username field, and has ``date_of_birth`` as a
+        required fields, then ``create_user`` should be defined as::
 
             def create_user(self, email, date_of_birth, password=None):
                 # create user here
+                ...
 
     .. method:: models.CustomUserManager.create_superuser(*username_field*, password, \**other_fields)
 
-        The prototype of `create_superuser()` should accept the username field,
-        plus all required fields as arguments. For example, if your user model
-        uses `email` as the username field, and has `date_of_birth` as a required
-        fields, then create_superuser should be defined as::
+        The prototype of ``create_superuser()`` should accept the username
+        field, plus all required fields as arguments. For example, if your user
+        model uses ``email`` as the username field, and has ``date_of_birth``
+        as a required fields, then ``create_superuser`` should be defined as::
 
             def create_superuser(self, email, date_of_birth, password):
                 # create superuser here
+                ...
 
-        Unlike `create_user()`, `create_superuser()` *must* require the caller
-        to provider a password.
+        Unlike ``create_user()``, ``create_superuser()`` *must* require the
+        caller to provider a password.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
@@ -705,7 +707,7 @@ auth views.
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
   Assumes that the user model has an integer primary key, has a field named
-  `email` that can be used to identify the user, and a boolean field
+  ``email`` that can be used to identify the user, and a boolean field
   named `is_active` to prevent password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
@@ -721,8 +723,8 @@ auth views.
   Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
 
 
-Custom users and django.contrib.admin
--------------------------------------
+Custom users and :mod:`django.contrib.admin`
+--------------------------------------------
 
 If you want your custom User model to also work with Admin, your User model must
 define some additional attributes and methods. These methods allow the admin to
@@ -732,21 +734,21 @@ control access of the User to admin content:
 
 .. attribute:: is_staff
 
-    Returns True if the user is allowed to have access to the admin site.
+    Returns ``True`` if the user is allowed to have access to the admin site.
 
 .. attribute:: is_active
 
-    Returns True if the user account is currently active.
+    Returns ``True`` if the user account is currently active.
 
 .. method:: has_perm(perm, obj=None):
 
-    Returns True if the user has the named permission. If `obj` is
+    Returns ``True`` if the user has the named permission. If ``obj`` is
     provided, the permission needs to be checked against a specific object
     instance.
 
 .. method:: has_module_perms(app_label):
 
-    Returns True if the user has permission to access models in
+    Returns ``True`` if the user has permission to access models in
     the given app.
 
 You will also need to register your custom User model with the admin. If
@@ -911,7 +913,7 @@ A full example
 
 Here is an example of an admin-compliant custom user app. This user model uses
 an email address as the username, and has a required date of birth; it
-provides no permission checking, beyond a simple `admin` flag on the user
+provides no permission checking, beyond a simple ``admin`` flag on the user
 account. This model would be compatible with all the built-in auth forms and
 views, except for the User creation forms. This example illustrates how most of
 the components work together, but is not intended to be copied directly into

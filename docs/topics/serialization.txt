@@ -90,11 +90,11 @@ If you only serialize the Restaurant model::
 
     data = serializers.serialize('xml', Restaurant.objects.all())
 
-the fields on the serialized output will only contain the `serves_hot_dogs`
-attribute. The `name` attribute of the base class will be ignored.
+the fields on the serialized output will only contain the ``serves_hot_dogs``
+attribute. The ``name`` attribute of the base class will be ignored.
 
-In order to fully serialize your Restaurant instances, you will need to
-serialize the Place models as well::
+In order to fully serialize your ``Restaurant`` instances, you will need to
+serialize the ``Place`` models as well::
 
     all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
     data = serializers.serialize('xml', all_objects)
@@ -176,7 +176,7 @@ XML
 ~~~
 
 The basic XML serialization format is quite simple::
-    
+
     <?xml version="1.0" encoding="utf-8"?>
     <django-objects version="1.0">
         <object pk="123" model="sessions.session">
@@ -196,7 +196,7 @@ fields "type" and "name". The text content of the element represents the value
 that should be stored.
 
 Foreign keys and other relational fields are treated a little bit differently::
-    
+
     <object pk="27" model="auth.permission">
         <!-- ... -->
         <field to="contenttypes.contenttype" name="content_type" rel="ManyToOneRel">9</field>
@@ -208,7 +208,7 @@ a foreign key to the contenttypes.ContentType instance with the PK 9.
 
 ManyToMany-relations are exported for the model that binds them. For instance,
 the auth.User model has such a relation to the auth.Permission model::
-    
+
     <object pk="1" model="auth.user">
         <!-- ... -->
         <field to="auth.permission" name="user_permissions" rel="ManyToManyRel">
@@ -224,7 +224,7 @@ JSON
 
 When staying with the same example data as before it would be serialized as
 JSON in the following way::
-    
+
     [
         {
             "pk": "4b678b301dfd8a4e0dad910de3ae245b",
@@ -242,7 +242,7 @@ with three properties: "pk", "model" and "fields". "fields" is again an object
 containing each field's name and value as property and property-value
 respectively.
 
-Foreign keys just have the PK of the linked object as property value. 
+Foreign keys just have the PK of the linked object as property value.
 ManyToMany-relations are serialized for the model that defines them and are
 represented as a list of PKs.
 
@@ -273,7 +273,7 @@ YAML
 YAML serialization looks quite similar to JSON. The object list is serialized
 as a sequence mappings with the keys "pk", "model" and "fields". Each field is
 again a mapping with the key being name of the field and the value the value::
-    
+
     -   fields: {expire_date: !!timestamp '2013-01-16 08:16:59.844560+00:00'}
         model: sessions.session
         pk: 4b678b301dfd8a4e0dad910de3ae245b
@@ -439,7 +439,7 @@ When ``use_natural_keys=True`` is specified, Django will use the
 type that defines the method.
 
 If you are using :djadmin:`dumpdata` to generate serialized data, you
-use the `--natural` command line flag to generate natural keys.
+use the :djadminopt:`--natural` command line flag to generate natural keys.
 
 .. note::
 
@@ -458,7 +458,7 @@ Dependencies during serialization
 
 Since natural keys rely on database lookups to resolve references, it
 is important that the data exists before it is referenced. You can't make
-a `forward reference` with natural keys -- the data you're referencing
+a "forward reference" with natural keys -- the data you're referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use

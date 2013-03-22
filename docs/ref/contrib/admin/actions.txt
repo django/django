@@ -175,7 +175,7 @@ That's easy enough to do::
         make_published.short_description = "Mark selected stories as published"
 
 Notice first that we've moved ``make_published`` into a method and renamed the
-`modeladmin` parameter to `self`, and second that we've now put the string
+``modeladmin`` parameter to ``self``, and second that we've now put the string
 ``'make_published'`` in ``actions`` instead of a direct function reference. This
 tells the :class:`ModelAdmin` to look up the action as a method.
 
