@@ -1420,7 +1420,7 @@ Example: ``"http://media.example.com/"``
 MESSAGE_LEVEL
 -------------
 
-Default: `messages.INFO`
+Default: ``messages.INFO``
 
 Sets the minimum message level that will be recorded by the messages
 framework. See the :doc:`messages documentation </ref/contrib/messages>` for

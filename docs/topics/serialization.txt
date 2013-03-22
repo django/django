@@ -90,11 +90,11 @@ If you only serialize the Restaurant model::
 
     data = serializers.serialize('xml', Restaurant.objects.all())
 
-the fields on the serialized output will only contain the `serves_hot_dogs`
-attribute. The `name` attribute of the base class will be ignored.
+the fields on the serialized output will only contain the ``serves_hot_dogs``
+attribute. The ``name`` attribute of the base class will be ignored.
 
-In order to fully serialize your Restaurant instances, you will need to
-serialize the Place models as well::
+In order to fully serialize your ``Restaurant`` instances, you will need to
+serialize the ``Place`` models as well::
 
     all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
     data = serializers.serialize('xml', all_objects)
@@ -343,7 +343,7 @@ When ``use_natural_keys=True`` is specified, Django will use the
 type that defines the method.
 
 If you are using :djadmin:`dumpdata` to generate serialized data, you
-use the `--natural` command line flag to generate natural keys.
+use the :djadminopt:`--natural` command line flag to generate natural keys.
 
 .. note::
 
@@ -362,7 +362,7 @@ Dependencies during serialization
 
 Since natural keys rely on database lookups to resolve references, it
 is important that the data exists before it is referenced. You can't make
-a `forward reference` with natural keys -- the data you're referencing
+a "forward reference" with natural keys -- the data you're referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use

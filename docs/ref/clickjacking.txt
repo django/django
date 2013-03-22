@@ -33,10 +33,10 @@ Preventing clickjacking
 
 Modern browsers honor the `X-Frame-Options`_ HTTP header that indicates whether
 or not a resource is allowed to load within a frame or iframe. If the response
-contains the header with a value of SAMEORIGIN then the browser will only load
-the resource in a frame if the request originated from the same site. If the
-header is set to DENY then the browser will block the resource from loading in a
-frame no matter which site made the request.
+contains the header with a value of ``SAMEORIGIN`` then the browser will only
+load the resource in a frame if the request originated from the same site. If
+the header is set to ``DENY`` then the browser will block the resource from
+loading in a frame no matter which site made the request.
 
 .. _X-Frame-Options: https://developer.mozilla.org/en/The_X-FRAME-OPTIONS_response_header
 
@@ -64,15 +64,16 @@ To set the same X-Frame-Options value for all responses in your site, add
         ...
     )
 
-By default, the middleware will set the X-Frame-Options header to SAMEORIGIN for
-every outgoing ``HttpResponse``. If you want DENY instead, set the
-:setting:`X_FRAME_OPTIONS` setting::
+
+By default, the middleware will set the ``X-Frame-Options`` header to
+``SAMEORIGIN`` for every outgoing ``HttpResponse``. If you want ``DENY``
+instead, set the :setting:`X_FRAME_OPTIONS` setting::
 
     X_FRAME_OPTIONS = 'DENY'
 
 When using the middleware there may be some views where you do **not** want the
-X-Frame-Options header set. For those cases, you can use a view decorator that
-tells the middleware not to set the header::
+``X-Frame-Options`` header set. For those cases, you can use a view decorator
+that tells the middleware not to set the header::
 
     from django.http import HttpResponse
     from django.views.decorators.clickjacking import xframe_options_exempt
@@ -85,7 +86,7 @@ tells the middleware not to set the header::
 Setting X-Frame-Options per view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To set the X-Frame-Options header on a per view basis, Django provides these
+To set the ``X-Frame-Options`` header on a per view basis, Django provides these
 decorators::
 
     from django.http import HttpResponse
@@ -106,8 +107,8 @@ a decorator overrides the middleware.
 Limitations
 ===========
 
-The `X-Frame-Options` header will only protect against clickjacking in a modern
-browser. Older browsers will quietly ignore the header and need `other
+The ``X-Frame-Options`` header will only protect against clickjacking in a
+modern browser. Older browsers will quietly ignore the header and need `other
 clickjacking prevention techniques`_.
 
 Browsers that support X-Frame-Options
@@ -122,7 +123,7 @@ Browsers that support X-Frame-Options
 See also
 ~~~~~~~~
 
-A `complete list`_ of browsers supporting X-Frame-Options.
+A `complete list`_ of browsers supporting ``X-Frame-Options``.
 
 .. _complete list: https://developer.mozilla.org/en/The_X-FRAME-OPTIONS_response_header#Browser_compatibility
 .. _other clickjacking prevention techniques: http://en.wikipedia.org/wiki/Clickjacking#Prevention

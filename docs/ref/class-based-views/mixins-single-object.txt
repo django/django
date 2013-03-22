@@ -63,7 +63,7 @@ SingleObjectMixin
         this view will display. By default, :meth:`get_queryset` returns the
         value of the :attr:`queryset` attribute if it is set, otherwise
         it constructs a :class:`~django.db.models.query.QuerySet` by calling
-        the `all()` method on the :attr:`model` attribute's default manager.
+        the ``all()`` method on the :attr:`model` attribute's default manager.
 
     .. method:: get_context_object_name(obj)
 

@@ -13,7 +13,7 @@ but some of it you may want to use separately. For instance, you may
 want to write a view that renders a template to make the HTTP
 response, but you can't use
 :class:`~django.views.generic.base.TemplateView`; perhaps you need to
-render a template only on `POST`, with `GET` doing something else
+render a template only on ``POST``, with ``GET`` doing something else
 entirely. While you could use
 :class:`~django.template.response.TemplateResponse` directly, this
 will likely result in duplicate code.
