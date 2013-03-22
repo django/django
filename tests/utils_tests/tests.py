@@ -18,6 +18,7 @@ from .feedgenerator import FeedgeneratorTest
 from .functional import FunctionalTestCase
 from .html import TestUtilsHtml
 from .http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
+from .itercompat import TestIsIterator
 from .ipv6 import TestUtilsIPv6
 from .jslex import JsToCForGettextTest, JsTokensTest
 from .module_loading import (CustomLoader, DefaultLoader, EggLoader,
