@@ -362,7 +362,7 @@ class -- e.g., :class:`~django.db.models.CharField` for character fields and
 type of data each field holds.
 
 The name of each :class:`~django.db.models.Field` instance (e.g. ``question`` or
-``pub_date`` ) is the field's name, in machine-friendly format. You'll use this
+``pub_date``) is the field's name, in machine-friendly format. You'll use this
 value in your Python code, and your database will use it as the column name.
 
 You can use an optional first positional argument to a
