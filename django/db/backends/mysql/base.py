@@ -269,7 +269,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return cursor._last_executed.decode('utf-8')
+        encoding = cursor.connection.unicode_literal.charset
+        return cursor._last_executed.decode(encoding)
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
