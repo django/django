@@ -157,7 +157,7 @@ Doing the following is potentially quite slow:
 
   >>> entry = Entry.objects.get(headline__startswith="News")
 
-First of all, `headline` is not indexed, which will make the underlying
+First of all, ``headline`` is not indexed, which will make the underlying
 database fetch slower.
 
 Second, the lookup doesn't guarantee that only one object will be returned.

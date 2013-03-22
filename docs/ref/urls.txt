@@ -23,12 +23,12 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
 :ref:`Passing extra options to view functions <views-extra-options>`.
 
 .. note::
-    Because `patterns()` is a function call, it accepts a maximum of 255
+    Because ``patterns()`` is a function call, it accepts a maximum of 255
     arguments (URL patterns, in this case). This is a limit for all Python
     function calls. This is rarely a problem in practice, because you'll
-    typically structure your URL patterns modularly by using `include()`
+    typically structure your URL patterns modularly by using ``include()``
     sections. However, on the off-chance you do hit the 255-argument limit,
-    realize that `patterns()` returns a Python list, so you can split up the
+    realize that ``patterns()`` returns a Python list, so you can split up the
     construction of the list.
 
     ::

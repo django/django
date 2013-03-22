@@ -191,7 +191,7 @@ by the default manager.
 
 If the normal plain manager class (:class:`django.db.models.Manager`) is not
 appropriate for your circumstances, you can force Django to use the same class
-as the default manager for your model by setting the `use_for_related_fields`
+as the default manager for your model by setting the ``use_for_related_fields``
 attribute on the manager class. This is documented fully below_.
 
 .. _below: manager-types_
@@ -369,7 +369,7 @@ it will use :class:`django.db.models.Manager`.
 Writing correct Managers for use in automatic Manager instances
 ---------------------------------------------------------------
 
-As already suggested by the `django.contrib.gis` example, above, the
+As already suggested by the :mod:`django.contrib.gis` example, above, the
 ``use_for_related_fields`` feature is primarily for managers that need to
 return a custom ``QuerySet`` subclass. In providing this functionality in your
 manager, there are a couple of things to remember.
@@ -413,4 +413,3 @@ used in a model, since the attribute's value is processed when the model class
 is created and not subsequently reread. Set the attribute on the manager class
 when it is first defined, as in the initial example of this section and
 everything will work smoothly.
-

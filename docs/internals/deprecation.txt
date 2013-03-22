@@ -111,7 +111,7 @@ See the :doc:`Django 1.3 release notes</releases/1.3>` for more details on
 these changes.
 
 * Starting Django without a :setting:`SECRET_KEY` will result in an exception
-  rather than a `DeprecationWarning`. (This is accelerated from the usual
+  rather than a ``DeprecationWarning``. (This is accelerated from the usual
   deprecation path; see the :doc:`Django 1.4 release notes</releases/1.4>`.)
 
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``

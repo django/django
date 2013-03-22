@@ -297,8 +297,8 @@ the query - in this case, it will be a
 :class:`~django.db.models.query.QuerySet` containing a single element.
 
 If you know there is only one object that matches your query, you can use the
-:meth:`~django.db.models.query.QuerySet.get` method on a `Manager` which
-returns the object directly::
+:meth:`~django.db.models.query.QuerySet.get` method on a
+:class:`~django.db.models.Manager` which returns the object directly::
 
     >>> one_entry = Entry.objects.get(pk=1)
 

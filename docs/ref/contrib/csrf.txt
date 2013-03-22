@@ -181,7 +181,7 @@ protecting the CSRF token from being sent to other domains.
     correctly on that version. Make sure you are running at least jQuery 1.5.1.
 
 You can use `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in
-jQuery 1.5 and newer in order to replace the `sameOrigin` logic above:
+jQuery 1.5 and newer in order to replace the ``sameOrigin`` logic above:
 
 .. code-block:: javascript
 

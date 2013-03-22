@@ -975,8 +975,8 @@ This class provides some additional capabilities that can be useful for testing
 Web sites.
 
 Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
-easy: Just change the base class of your test from `'unittest.TestCase'` to
-`'django.test.TestCase'`. All of the standard Python unit test functionality
+easy: Just change the base class of your test from ``'unittest.TestCase'`` to
+``'django.test.TestCase'``. All of the standard Python unit test functionality
 will continue to be available, but it will be augmented with some useful
 additions, including:
 
@@ -1010,7 +1010,7 @@ This allows the use of automated test clients other than the
 client, to execute a series of functional tests inside a browser and simulate a
 real user's actions.
 
-By default the live server's address is `'localhost:8081'` and the full URL
+By default the live server's address is ``'localhost:8081'`` and the full URL
 can be accessed during the tests with ``self.live_server_url``. If you'd like
 to change the default address (in the case, for example, where the 8081 port is
 already taken) then you may pass a different one to the :djadmin:`test` command
@@ -1117,7 +1117,7 @@ out the `full reference`_ for more details.
     (for example, just after clicking a link or submitting a form), you might
     need to check that a response is received by Selenium and that the next
     page is loaded before proceeding with further test execution.
-    Do this, for example, by making Selenium wait until the `<body>` HTML tag
+    Do this, for example, by making Selenium wait until the ``<body>`` HTML tag
     is found in the response (requires Selenium > 2.13):
 
     .. code-block:: python
@@ -1134,7 +1134,7 @@ out the `full reference`_ for more details.
     The tricky thing here is that there's really no such thing as a "page load,"
     especially in modern Web apps that generate HTML dynamically after the
     server generates the initial document. So, simply checking for the presence
-    of `<body>` in the response might not necessarily be appropriate for all
+    of ``<body>`` in the response might not necessarily be appropriate for all
     use cases. Please refer to the `Selenium FAQ`_ and
     `Selenium documentation`_ for more information.
 
