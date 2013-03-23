@@ -35,11 +35,14 @@ class CursorWrapper(object):
 
 class CursorDebugWrapper(CursorWrapper):
 
-    def execute(self, sql, params=()):
+    def execute(self, sql, params=None):
         self.db.set_dirty()
         start = time()
         try:
             with self.db.wrap_database_errors():
+                if params is None:
+                    # params default might be backend specific
+                    return self.cursor.execute(sql)
                 return self.cursor.execute(sql, params)
         finally:
             stop = time()

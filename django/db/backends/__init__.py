@@ -815,6 +815,8 @@ class BaseDatabaseOperations(object):
         to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_unicode(val) for val in params)
+        elif params is None:
+            u_params = ()
         else:
             u_params = dict((to_unicode(k), to_unicode(v)) for k, v in params.items())
 
