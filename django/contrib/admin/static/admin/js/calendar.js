@@ -2,10 +2,6 @@
 calendar.js - Calendar functions by Adrian Holovaty
 */
 
-function removeChildren(a) { // "a" is reference to an object
-    while (a.hasChildNodes()) a.removeChild(a.lastChild);
-}
-
 // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
 var CalendarNamespace = {
     monthsOfYear: gettext('January February March April May June July August September October November December').split(' '),

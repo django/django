@@ -50,6 +50,11 @@ function quickElement() {
     return obj;
 }
 
+// "a" is reference to an object
+function removeChildren(a) {
+    while (a.hasChildNodes()) a.removeChild(a.lastChild);
+}
+
 // ----------------------------------------------------------------------------
 // Cross-browser xmlhttp object
 // from http://jibbering.com/2002/4/httprequest.html
