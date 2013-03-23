@@ -29,6 +29,12 @@ function removeEvent(obj, evType, fn) {
     }
 }
 
+function cancelEventPropagation(e) {
+    if (!e) e = window.event;
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+}
+
 // quickElement(tagType, parentReference, textInChildNode, [, attribute, attributeValue ...]);
 function quickElement() {
     var obj = document.createElement(arguments[0]);
