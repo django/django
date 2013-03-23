@@ -1,10 +1,7 @@
 /*
 calendar.js - Calendar functions by Adrian Holovaty
+depends on core.js for utility functions like removeChildren or quickElement
 */
-
-function removeChildren(a) { // "a" is reference to an object
-    while (a.hasChildNodes()) a.removeChild(a.lastChild);
-}
 
 // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
 var CalendarNamespace = {
