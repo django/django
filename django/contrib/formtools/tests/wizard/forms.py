@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django import forms, http
 from django.conf import settings
+from django.db import models
 from django.test import TestCase
 from django.template.response import TemplateResponse
 from django.utils.importlib import import_module
@@ -29,14 +30,18 @@ def get_request(*args, **kwargs):
     request.session = engine.SessionStore(None)
     return request
 
+
 class Step1(forms.Form):
     name = forms.CharField()
+
 
 class Step2(forms.Form):
     name = forms.CharField()
 
+
 class Step3(forms.Form):
     data = forms.CharField()
+
 
 class CustomKwargsStep1(Step1):
 
@@ -44,11 +49,21 @@ class CustomKwargsStep1(Step1):
         self.test = test
         return super(CustomKwargsStep1, self).__init__(*args, **kwargs)
 
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
 
-UserFormSet = forms.models.modelformset_factory(User, form=UserForm, extra=2)
+class TestModel(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        app_label = 'formtools'
+
+
+class TestModelForm(forms.ModelForm):
+    class Meta:
+        model = TestModel
+
+
+TestModelFormSet = forms.models.modelformset_factory(TestModel, form=TestModelForm, extra=2)
+
 
 class TestWizard(WizardView):
     storage_name = 'django.contrib.formtools.wizard.storage.session.SessionStorage'
@@ -149,8 +164,8 @@ class FormTests(TestCase):
 
     def test_form_instance(self):
         request = get_request()
-        the_instance = User()
-        testform = TestWizard.as_view([('start', UserForm), ('step2', Step2)],
+        the_instance = TestModel()
+        testform = TestWizard.as_view([('start', TestModelForm), ('step2', Step2)],
             instance_dict={'start': the_instance})
         response, instance = testform(request)
 
@@ -163,12 +178,12 @@ class FormTests(TestCase):
 
     def test_formset_instance(self):
         request = get_request()
-        the_instance1, created = User.objects.get_or_create(
-            username='testuser1')
-        the_instance2, created = User.objects.get_or_create(
-            username='testuser2')
-        testform = TestWizard.as_view([('start', UserFormSet), ('step2', Step2)],
-            instance_dict={'start': User.objects.filter(username='testuser1')})
+        the_instance1, created = TestModel.objects.get_or_create(
+            name='test object 1')
+        the_instance2, created = TestModel.objects.get_or_create(
+            name='test object 2')
+        testform = TestWizard.as_view([('start', TestModelFormSet), ('step2', Step2)],
+            instance_dict={'start': TestModel.objects.filter(name='test object 1')})
         response, instance = testform(request)
 
         self.assertEqual(list(instance.get_form_instance('start')), [the_instance1])

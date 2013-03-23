@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
@@ -38,6 +39,7 @@ class FlatpageCSRFTests(TestCase):
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
+    @skipIfCustomUser
     def test_view_authenticated_flatpage(self):
         "A flatpage served through a view can require authentication"
         response = self.client.get('/flatpage_root/sekrit/')

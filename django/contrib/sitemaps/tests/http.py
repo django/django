@@ -4,7 +4,6 @@ import os
 from datetime import date
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
@@ -14,7 +13,7 @@ from django.utils.formats import localize
 from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 
-from .base import SitemapTestsBase
+from .base import TestModel, SitemapTestsBase
 
 
 class HTTPSitemapTests(SitemapTestsBase):
@@ -128,10 +127,10 @@ class HTTPSitemapTests(SitemapTestsBase):
         Check to make sure that the raw item is included with each
         Sitemap.get_url() url result.
         """
-        user_sitemap = GenericSitemap({'queryset': User.objects.all()})
-        def is_user(url):
-            return isinstance(url['item'], User)
-        item_in_url_info = all(map(is_user, user_sitemap.get_urls()))
+        test_sitemap = GenericSitemap({'queryset': TestModel.objects.all()})
+        def is_testmodel(url):
+            return isinstance(url['item'], TestModel)
+        item_in_url_info = all(map(is_testmodel, test_sitemap.get_urls()))
         self.assertTrue(item_in_url_info)
 
     def test_cached_sitemap_index(self):
