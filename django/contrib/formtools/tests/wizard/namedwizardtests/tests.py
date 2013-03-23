@@ -5,6 +5,7 @@ from django.http import QueryDict
 from django.test import TestCase
 
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 
 from django.contrib.formtools.wizard.views import (NamedUrlSessionWizardView,
                                                    NamedUrlCookieWizardView)
@@ -276,6 +277,7 @@ class NamedWizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form1')
 
 
+@skipIfCustomUser
 class NamedSessionWizardTests(NamedWizardTests, TestCase):
     wizard_urlname = 'nwiz_session'
     wizard_step_1_data = {
@@ -307,6 +309,7 @@ class NamedSessionWizardTests(NamedWizardTests, TestCase):
     )
 
 
+@skipIfCustomUser
 class NamedCookieWizardTests(NamedWizardTests, TestCase):
     wizard_urlname = 'nwiz_cookie'
     wizard_step_1_data = {
@@ -367,11 +370,13 @@ class TestNamedUrlCookieWizardView(NamedUrlCookieWizardView):
         return response, self
 
 
+@skipIfCustomUser
 class NamedSessionFormTests(NamedFormTests, TestCase):
     formwizard_class = TestNamedUrlSessionWizardView
     wizard_urlname = 'nwiz_session'
 
 
+@skipIfCustomUser
 class NamedCookieFormTests(NamedFormTests, TestCase):
     formwizard_class = TestNamedUrlCookieWizardView
     wizard_urlname = 'nwiz_cookie'
