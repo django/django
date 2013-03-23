@@ -115,6 +115,7 @@ class CursorWrapper(object):
 
     def execute(self, query, args=None):
         try:
+            # args is None means no string interpolation
             return self.cursor.execute(query, args)
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be

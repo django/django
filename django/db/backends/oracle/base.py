@@ -757,18 +757,19 @@ class FormatStylePlaceholderCursor(object):
         return [p.force_bytes for p in params]
 
     def execute(self, query, params=None):
-        if params is None:
-            params = []
-        else:
-            params = self._format_params(params)
-        args = [(':arg%d' % i) for i in range(len(params))]
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.
         if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
-        query = convert_unicode(query % tuple(args), self.charset)
+        if params is None:
+            params = []
+            query = convert_unicode(query, self.charset)
+        else:
+            params = self._format_params(params)
+            args = [(':arg%d' % i) for i in range(len(params))]
+            query = convert_unicode(query % tuple(args), self.charset)
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))

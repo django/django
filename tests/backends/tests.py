@@ -361,17 +361,33 @@ class ConnectionCreatedSignalTest(TransactionTestCase):
 
 
 class EscapingChecks(TestCase):
+    """
+    All tests in this test case are also run with settings.DEBUG=True in
+    EscapingChecksDebug test case, to also test CursorDebugWrapper.
+    """
+    def test_paramless_no_escaping(self):
+        cursor = connection.cursor()
+        cursor.execute("SELECT '%s'")
+        self.assertEqual(cursor.fetchall()[0][0], '%s')
+
+    def test_parameter_escaping(self):
+        cursor = connection.cursor()
+        cursor.execute("SELECT '%%', %s", ('%d',))
+        self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This is a sqlite-specific issue")
-    def test_parameter_escaping(self):
+    def test_sqlite_parameter_escaping(self):
         #13648: '%s' escaping support for sqlite3
         cursor = connection.cursor()
-        response = cursor.execute(
-            "select strftime('%%s', date('now'))").fetchall()[0][0]
-        self.assertNotEqual(response, None)
+        cursor.execute("select strftime('%s', date('now'))")
+        response = cursor.fetchall()[0][0]
         # response should be an non-zero integer
         self.assertTrue(int(response))
+
+@override_settings(DEBUG=True)
+class EscapingChecksDebug(EscapingChecks):
+    pass
 
 
 class SqlliteAggregationTests(TestCase):

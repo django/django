@@ -227,6 +227,12 @@ For example::
     were committed to the database. Since Django now defaults to database-level
     autocommit, this isn't necessary any longer.
 
+Note that if you want to include literal percent signs in the query, you have to
+double them in the case you are passing parameters::
+
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
+
 If you are using :doc:`more than one database </topics/db/multi-db>`, you can
 use ``django.db.connections`` to obtain the connection (and cursor) for a
 specific database. ``django.db.connections`` is a dictionary-like
