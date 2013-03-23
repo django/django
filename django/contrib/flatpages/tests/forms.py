@@ -58,11 +58,12 @@ class FlatpageAdminFormTests(TestCase):
 
         f = FlatpageForm(data=data)
 
-        self.assertFalse(f.is_valid())
+        with translation.override('en'):
+            self.assertFalse(f.is_valid())
 
-        self.assertEqual(
-            f.errors,
-            {'__all__': ['Flatpage with url /myflatpage1/ already exists for site example.com']})
+            self.assertEqual(
+                f.errors,
+                {'__all__': ['Flatpage with url /myflatpage1/ already exists for site example.com']})
 
     def test_flatpage_admin_form_edit(self):
         """
