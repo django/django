@@ -6,21 +6,6 @@ function removeChildren(a) { // "a" is reference to an object
     while (a.hasChildNodes()) a.removeChild(a.lastChild);
 }
 
-// quickElement(tagType, parentReference, textInChildNode, [, attribute, attributeValue ...]);
-function quickElement() {
-    var obj = document.createElement(arguments[0]);
-    if (arguments[2] != '' && arguments[2] != null) {
-        var textNode = document.createTextNode(arguments[2]);
-        obj.appendChild(textNode);
-    }
-    var len = arguments.length;
-    for (var i = 3; i < len; i += 2) {
-        obj.setAttribute(arguments[i], arguments[i+1]);
-    }
-    arguments[1].appendChild(obj);
-    return obj;
-}
-
 // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
 var CalendarNamespace = {
     monthsOfYear: gettext('January February March April May June July August September October November December').split(' '),
