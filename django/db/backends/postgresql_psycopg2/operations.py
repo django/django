@@ -202,7 +202,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://initd.org/psycopg/docs/cursor.html#cursor.query
         # The query attribute is a Psycopg extension to the DB API 2.0.
         if cursor.query is not None:
-            return cursor.query.decode('utf-8')
+            return cursor.query.decode(cursor.connection.encoding)
         return None
 
     def return_insert_id(self):
