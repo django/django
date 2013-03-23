@@ -76,7 +76,7 @@ var DateTimeShortcuts = {
         clock_box.className = 'clockbox module';
         clock_box.setAttribute('id', DateTimeShortcuts.clockDivName + num);
         document.body.appendChild(clock_box);
-        addEvent(clock_box, 'click', DateTimeShortcuts.cancelEventPropagation);
+        addEvent(clock_box, 'click', cancelEventPropagation);
 
         quickElement('h2', clock_box, gettext('Choose a time'));
         var time_list = quickElement('ul', clock_box, '');
@@ -174,7 +174,7 @@ var DateTimeShortcuts = {
         cal_box.className = 'calendarbox module';
         cal_box.setAttribute('id', DateTimeShortcuts.calendarDivName1 + num);
         document.body.appendChild(cal_box);
-        addEvent(cal_box, 'click', DateTimeShortcuts.cancelEventPropagation);
+        addEvent(cal_box, 'click', cancelEventPropagation);
 
         // next-prev links
         var cal_nav = quickElement('div', cal_box, '');
@@ -277,11 +277,6 @@ var DateTimeShortcuts = {
        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
        DateTimeShortcuts.calendarInputs[num].focus();
        DateTimeShortcuts.dismissCalendar(num);
-    },
-    cancelEventPropagation: function(e) {
-        if (!e) e = window.event;
-        e.cancelBubble = true;
-        if (e.stopPropagation) e.stopPropagation();
     }
 }
 
