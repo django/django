@@ -140,6 +140,12 @@ thead th.sorted .text {
     border-left: 1px solid #ddd;
 }
 
+#changelist .icon-boolean-yes,
+#changelist .icon-boolean-no,
+#changelist .icon-booolean-unknown {
+    float: right;
+}
+
 /* FORMS */
 
 .aligned label {
@@ -190,6 +196,13 @@ fieldset .field-box {
     padding: 4px 25px 4px 5px;
 }
 
+th span.help-tooltip,
+.selector h2 span.help-tooltip {
+    padding-left: 16px;
+    padding-right: 0;
+    background-position: 0% 50%;
+}
+
 /* WIDGETS */
 
 .calendarnav-previous {
@@ -218,6 +231,12 @@ fieldset .field-box {
 
 .inline-deletelink {
     float: left;
+}
+
+.selector-filter label {
+    background-position: 100% 50%;
+    margin: 2px 0 0 2px;
+    float: right;
 }
 
 /* MISC */

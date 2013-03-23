@@ -57,7 +57,42 @@
 }
 
 /* IE7 doesn't support inline-block */
-.change-list ul.toplinks li {
-    zoom: 1;
+.change-list ul.toplinks li,
+a.add-another,
+a.related-lookup {
     *display: inline;
+    *zoom: 1;
+}
+
+#changelist .icon-boolean-yes,
+#changelist .icon-boolean-no,
+#changelist .icon-boolean-unknown,
+a.add-another,
+a.related-lookup {
+    overflow: visible;
+}
+
+#changelist .icon-boolean-yes span,
+#changelist .icon-boolean-no span,
+#changelist .icon-boolean-unknown span,
+a.add-another span,
+a.related-lookup span {
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    text-indent: 1000px;
+}
+
+.field-groups {
+    position: relative;
+}
+.field-groups .add-another {
+    position: absolute;
+    left: 955px;
+    bottom: 265px;
+}
+
+html[dir="rtl"] .field-groups .add-another {
+    left: auto;
+    right: 955px;
 }

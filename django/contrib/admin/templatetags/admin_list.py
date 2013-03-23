@@ -167,10 +167,13 @@ def result_headers(cl):
                             if th_classes else '',
         }
 
+
 def _boolean_icon(field_val):
-    icon_url = static('admin/img/icon-%s.gif' %
-                      {True: 'yes', False: 'no', None: 'unknown'}[field_val])
-    return format_html('<img src="{0}" alt="{1}" />', icon_url, field_val)
+    icon_code = {True: 'yes', False: 'no', None: 'unknown'}[field_val]
+    icon_label = _(icon_code)
+    return format_html('<span class="icon-boolean-{0}"><span>{1}</span></span>',
+                       icon_code, icon_label)
+
 
 def items_for_result(cl, result, form):
     """

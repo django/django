@@ -121,10 +121,10 @@ class TestInline(TestCase):
         """
         response = self.client.get('/admin/admin_inlines/holder4/add/')
         self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
-        self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Awesome tabular help text is awesome.)" title="Awesome tabular help text is awesome." />', 1)
+        self.assertContains(response, '<span class="help help-tooltip" title="Awesome tabular help text is awesome.">', 1)
         # ReadOnly fields
         response = self.client.get('/admin/admin_inlines/capofamiglia/add/')
-        self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Help text for ReadOnlyInline)" title="Help text for ReadOnlyInline" />', 1)
+        self.assertContains(response, '<span class="help help-tooltip" title="Help text for ReadOnlyInline">', 1)
 
 
     def test_non_related_name_inline(self):

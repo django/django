@@ -189,7 +189,7 @@ p.mini {
     color: #999;
 }
 
-img.help-tooltip {
+.help-tooltip {
     cursor: help;
 }
 
@@ -837,4 +837,3 @@ table#change-history tbody th {
     background: #eee url(../img/nav-bg.gif) bottom left repeat-x;
     color: #666;
 }
-
