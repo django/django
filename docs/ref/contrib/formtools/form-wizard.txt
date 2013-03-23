@@ -456,7 +456,7 @@ Advanced ``WizardView`` methods
 
 .. method:: WizardView.render_goto_step(step, goto_step, **kwargs)
 
-    .. versionchanged:: 1.6
+    .. versionadded:: 1.6
 
     This method is called when the step should be changed to something else
     than the next step. By default, this method just stores the requested
