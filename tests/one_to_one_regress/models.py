@@ -24,14 +24,14 @@ class Restaurant(models.Model):
 @python_2_unicode_compatible
 class Bar(models.Model):
     place = models.OneToOneField(Place)
-    serves_cocktails = models.BooleanField()
+    serves_cocktails = models.BooleanField(default=True)
 
     def __str__(self):
         return "%s the bar" % self.place.name
 
 class UndergroundBar(models.Model):
     place = models.OneToOneField(Place, null=True)
-    serves_cocktails = models.BooleanField()
+    serves_cocktails = models.BooleanField(default=True)
 
 @python_2_unicode_compatible
 class Favorites(models.Model):

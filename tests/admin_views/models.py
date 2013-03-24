@@ -184,7 +184,7 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
     gender = models.IntegerField(choices=GENDER_CHOICES)
     age = models.IntegerField(default=21)
-    alive = models.BooleanField()
+    alive = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -196,7 +196,7 @@ class Persona(models.Model):
     A simple persona associated with accounts, to test inlining of related
     accounts which inherit from a common accounts class.
     """
-    name = models.CharField(blank=False,  max_length=80)
+    name = models.CharField(blank=False, max_length=80)
     def __str__(self):
         return self.name
 
@@ -207,7 +207,7 @@ class Account(models.Model):
     A simple, generic account encapsulating the information shared by all
     types of accounts.
     """
-    username = models.CharField(blank=False,  max_length=80)
+    username = models.CharField(blank=False, max_length=80)
     persona = models.ForeignKey(Persona, related_name="accounts")
     servicename = 'generic service'
 
