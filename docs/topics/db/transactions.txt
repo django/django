@@ -372,11 +372,13 @@ The following example demonstrates the use of savepoints::
 Database-specific notes
 =======================
 
+.. _savepoints-in-sqlite:
+
 Savepoints in SQLite
 --------------------
 
 While SQLite ≥ 3.6.8 supports savepoints, a flaw in the design of the
-:mod:`sqlite3` makes them hardly usable.
+:mod:`sqlite3` module makes them hardly usable.
 
 When autocommit is enabled, savepoints don't make sense. When it's disabled,
 :mod:`sqlite3` commits implicitly before savepoint statements. (In fact, it
