@@ -134,7 +134,7 @@ Minor features
 
 * Added :class:`~django.contrib.messages.views.SuccessMessageMixin` which
   provides a ``success_message`` attribute for
-  :class:`~django.view.generic.edit.FormView` based classes.
+  :class:`~django.views.generic.edit.FormView` based classes.
 
 * Added the :attr:`django.db.models.ForeignKey.db_constraint` and
   :attr:`django.db.models.ManyToManyField.db_constraint` options.
@@ -169,7 +169,7 @@ Minor features
 
 * The :djadmin:`diffsettings` comand gained a ``--all`` option.
 
-* :func:`django.forms.fields.Field.__init__` now calls ``super()``, allowing
+* ``django.forms.fields.Field.__init__`` now calls ``super()``, allowing
   field mixins to implement ``__init__()`` methods that will reliably be
   called.
 
