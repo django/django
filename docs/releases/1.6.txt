@@ -292,6 +292,20 @@ should either restore Django's defaults at the end of each request, force an
 appropriate value at the beginning of each request, or disable persistent
 connections.
 
+``BooleanField`` no longer defaults to ``False``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a :class:`~django.db.models.BooleanField` doesn't have an explicit
+:attr:`~django.db.models.Field.default`, the implicit default value is
+``None``. In previous version of Django, it was ``False``, but that didn't
+represent accurantely the lack of a value.
+
+Code that relies on the default value being ``False`` may raise an exception
+when saving new model instances to the database, because ``None`` isn't an
+acceptable value for a :class:`~django.db.models.BooleanField`. You should
+either specify ``default=False`` explicitly on the field definition, or ensure
+the field is set to ``True`` or ``False`` before saving the object.
+
 Translations and comments in templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
