@@ -620,8 +620,6 @@ class BooleanField(Field):
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
-        if 'default' not in kwargs and not kwargs.get('null'):
-            kwargs['default'] = False
         Field.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):

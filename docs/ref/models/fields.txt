@@ -377,6 +377,10 @@ The default form widget for this field is a
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
 
+.. versionchanged:: 1.6
+    The default value of ``BooleanField`` was changed from ``False`` to
+    ``None`` when :attr:`Field.default` isn't defined.
+
 ``CharField``
 -------------
 

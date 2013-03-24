@@ -6,7 +6,7 @@ from decimal import Decimal
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.fields.files import FieldFile
 from django.utils import six
 from django.utils import unittest
@@ -265,6 +265,18 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertEqual(mc.bf.bfield, False)
         self.assertEqual(mc.nbf.nbfield, False)
 
+    def test_null_default(self):
+        """
+        Check that a BooleanField defaults to None -- which isn't
+        a valid value (#15124).
+        """
+        b = BooleanModel()
+        self.assertIsNone(b.bfield)
+        with self.assertRaises(IntegrityError):
+            b.save()
+        nb = NullBooleanModel()
+        self.assertIsNone(nb.nbfield)
+        nb.save()           # no error
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
