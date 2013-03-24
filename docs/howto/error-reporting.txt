@@ -98,6 +98,11 @@ crawlers often request::
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
 
+If you'd like to customize the behavior of
+:class:`django.middleware.common.BrokenLinkEmailsMiddleware` further (for
+example to ignore requests coming from web crawlers), you should subclass it
+and override its methods.
+
 .. seealso::
 
    404 errors are logged using the logging framework. By default, these log
