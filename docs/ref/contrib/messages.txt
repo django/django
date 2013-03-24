@@ -291,7 +291,7 @@ Adding messages in Class Based Views
 
 .. versionadded:: 1.6
 
-.. class:: django.contrib.messages.views.SuccessMessageMixin
+.. class:: views.SuccessMessageMixin
 
     Adds a success message attribute to
     :class:`~django.views.generic.edit.FormView` based classes
