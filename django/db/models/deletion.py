@@ -1,4 +1,3 @@
-from functools import wraps
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
@@ -196,17 +195,13 @@ class Collector(object):
                     self.fast_deletes.append(sub_objs)
                 elif sub_objs:
                     field.rel.on_delete(self, field, sub_objs, self.using)
-
-            # TODO This entire block is only needed as a special case to
-            # support cascade-deletes for GenericRelation. It should be
-            # removed/fixed when the ORM gains a proper abstraction for virtual
-            # or composite fields, and GFKs are reworked to fit into that.
-            for relation in model._meta.many_to_many:
-                if not relation.rel.through:
-                    sub_objs = relation.bulk_related_objects(new_objs, self.using)
+            for field in model._meta.virtual_fields:
+                if hasattr(field, 'bulk_related_objects'):
+                    # Its something like generic foreign key.
+                    sub_objs = field.bulk_related_objects(new_objs, self.using)
                     self.collect(sub_objs,
                                  source=model,
-                                 source_attr=relation.rel.related_name,
+                                 source_attr=field.rel.related_name,
                                  nullable=True)
 
     def related_objects(self, related, objs):
