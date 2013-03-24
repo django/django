@@ -462,6 +462,59 @@ class RequestURLconfTests(TestCase):
         )
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
 
+    def test_reverse_inner_in_response_middleware(self):
+        """
+        Test reversing an URL from the *overridden* URLconf from inside
+        a response middleware.
+        """
+        settings.MIDDLEWARE_CLASSES += (
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
+        )
+        response = self.client.get('/second_test/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'/second_test/')
+
+    def test_reverse_outer_in_response_middleware(self):
+        """
+        Test reversing an URL from the *default* URLconf from inside
+        a response middleware.
+        """
+        settings.MIDDLEWARE_CLASSES += (
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
+        )
+        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        with self.assertRaisesMessage(NoReverseMatch, message):
+            self.client.get('/second_test/')
+
+    def test_reverse_inner_in_streaming(self):
+        """
+        Test reversing an URL from the *overridden* URLconf from inside
+        a streaming response.
+        """
+        settings.MIDDLEWARE_CLASSES += (
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInStreaming' % middleware.__name__,
+        )
+        response = self.client.get('/second_test/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b''.join(response), b'/second_test/')
+
+    def test_reverse_outer_in_streaming(self):
+        """
+        Test reversing an URL from the *default* URLconf from inside
+        a streaming response.
+        """
+        settings.MIDDLEWARE_CLASSES += (
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInStreaming' % middleware.__name__,
+        )
+        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        with self.assertRaisesMessage(NoReverseMatch, message):
+            self.client.get('/second_test/')
+            b''.join(self.client.get('/second_test/'))
+
 class ErrorHandlerResolutionTests(TestCase):
     """Tests for handler404 and handler500"""
 

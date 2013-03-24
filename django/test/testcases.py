@@ -26,7 +26,7 @@ from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
-from django.core.urlresolvers import clear_url_caches
+from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -497,6 +497,7 @@ class TransactionTestCase(SimpleTestCase):
                              **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
 
     def _urlconf_setup(self):
+        set_urlconf(None)
         if hasattr(self, 'urls'):
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
@@ -527,6 +528,7 @@ class TransactionTestCase(SimpleTestCase):
                          skip_validation=True, reset_sequences=False)
 
     def _urlconf_teardown(self):
+        set_urlconf(None)
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
