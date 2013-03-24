@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import (ManyToOneRel,
+from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
@@ -333,12 +333,12 @@ class Model(six.with_metaclass(ModelBase)):
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and instantiation for iteration is 33% faster.
         args_len = len(args)
-        if args_len > len(self._meta.fields):
+        if args_len > len(self._meta.concrete_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
-        fields_iter = iter(self._meta.fields)
         if not kwargs:
+            fields_iter = iter(self._meta.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
@@ -347,6 +347,7 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
+            fields_iter = iter(self._meta.fields)
             for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
@@ -363,11 +364,12 @@ class Model(six.with_metaclass(ModelBase)):
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
             if (field.attname not in kwargs and
-                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
+                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
+                     or field.column is None)):
                 # This field will be populated on request.
                 continue
             if kwargs:
-                if isinstance(field.rel, ManyToOneRel):
+                if isinstance(field.rel, ForeignObjectRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
@@ -394,6 +396,7 @@ class Model(six.with_metaclass(ModelBase)):
                         val = field.get_default()
             else:
                 val = field.get_default()
+
             if is_related_object:
                 # If we are passed a related instance, set it using the
                 # field.name instead of field.attname (e.g. "user" instead of
@@ -528,7 +531,7 @@ class Model(six.with_metaclass(ModelBase)):
         # automatically do a "update_fields" save on the loaded fields.
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set()
-            for field in self._meta.fields:
+            for field in self._meta.concrete_fields:
                 if not field.primary_key and not hasattr(field, 'through'):
                     field_names.add(field.attname)
             deferred_fields = [
@@ -614,7 +617,7 @@ class Model(six.with_metaclass(ModelBase)):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_fields if not f.primary_key]
+        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
 
         if update_fields:
             non_pks = [f for f in non_pks
@@ -652,7 +655,7 @@ class Model(six.with_metaclass(ModelBase)):
                     **{field.name: getattr(self, field.attname)}).count()
                 self._order = order_value
 
-            fields = meta.local_fields
+            fields = meta.local_concrete_fields
             if not pk_set:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
 

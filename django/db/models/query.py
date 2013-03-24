@@ -261,13 +261,13 @@ class QuerySet(object):
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
-            fields = self.model._meta.fields
+            fields = self.model._meta.concrete_fields
 
         load_fields = []
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_fields_with_model():
+            for field, model in self.model._meta.get_concrete_fields_with_model():
                 if model is None:
                     model = self.model
                 try:
@@ -280,7 +280,7 @@ class QuerySet(object):
                     load_fields.append(field.name)
 
         index_start = len(extra_select)
-        aggregate_start = index_start + len(load_fields or self.model._meta.fields)
+        aggregate_start = index_start + len(load_fields or self.model._meta.concrete_fields)
 
         skip = None
         if load_fields and not fill_cache:
@@ -312,7 +312,11 @@ class QuerySet(object):
                 if skip:
                     obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
-                    obj = model(*row_data)
+                    try:
+                        obj = model(*row_data)
+                    except IndexError:
+                        import ipdb; ipdb.set_trace()
+                        pass
 
                 # Store the source database of the object
                 obj._state.db = db
@@ -962,7 +966,7 @@ class QuerySet(object):
         """
         opts = self.model._meta
         if self.query.group_by is None:
-            field_names = [f.attname for f in opts.fields]
+            field_names = [f.attname for f in opts.concrete_fields]
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
@@ -1055,7 +1059,7 @@ class ValuesQuerySet(QuerySet):
         else:
             # Default to all fields.
             self.extra_names = None
-            self.field_names = [f.attname for f in self.model._meta.fields]
+            self.field_names = [f.attname for f in self.model._meta.concrete_fields]
             self.aggregate_names = None
 
         self.query.select = []
@@ -1266,7 +1270,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_fields_with_model():
+        for field, model in klass._meta.get_concrete_fields_with_model():
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1285,22 +1289,22 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     else:
         # Load all fields on klass
 
-        field_count = len(klass._meta.fields)
+        field_count = len(klass._meta.concrete_fields)
         # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_fields) != len(klass._meta.fields):
+        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
                                if not issubclass(from_parent, p)]
             # Load local fields, too...
             non_seen_models.append(klass)
-            field_names = [f.attname for f in klass._meta.fields
+            field_names = [f.attname for f in klass._meta.concrete_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
         # Try to avoid populating field_names variable for perfomance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
-        if field_count == len(klass._meta.fields):
+        if field_count == len(klass._meta.concrete_fields):
             field_names = ()
 
     restricted = requested is not None

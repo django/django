@@ -55,13 +55,14 @@ class SQLEvaluator(object):
             self.cols.append((node, query.aggregate_select[node.name]))
         else:
             try:
-                field, source, opts, join_list, path = query.setup_joins(
+                field, sources, opts, join_list, path = query.setup_joins(
                     field_list, query.get_meta(),
                     query.get_initial_alias(), self.reuse)
-                target, _, join_list = query.trim_joins(source, join_list, path)
+                targets, _, join_list = query.trim_joins(sources, join_list, path)
                 if self.reuse is not None:
                     self.reuse.update(join_list)
-                self.cols.append((node, (join_list[-1], target.column)))
+                for t in targets:
+                    self.cols.append((node, (join_list[-1], t.column)))
             except FieldDoesNotExist:
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (self.name,

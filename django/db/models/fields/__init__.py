@@ -292,10 +292,13 @@ class Field(object):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls
-        cls._meta.add_field(self)
+        if virtual_only:
+            cls._meta.add_virtual_field(self)
+        else:
+            cls._meta.add_field(self)
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))

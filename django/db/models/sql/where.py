@@ -382,3 +382,28 @@ class Constraint(object):
             new.__class__ = self.__class__
             new.alias, new.col, new.field = change_map[self.alias], self.col, self.field
             return new
+
+class SubqueryConstraint(object):
+    def __init__(self, alias, columns, targets, query_object):
+        self.alias = alias
+        self.columns = columns
+        self.targets = targets
+        self.query_object = query_object
+
+    def as_sql(self, qn, connection):
+        query = self.query_object
+
+        # QuerySet was sent
+        if hasattr(query, 'values'):
+            # as_sql should throw if we are using a
+            # connection on another database
+            query._as_sql(connection=connection)
+            query = query.values(*self.targets).query
+
+        query_compiler = query.get_compiler(connection=connection)
+        return query_compiler.as_subquery_condition(self.alias, self.columns)
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(
+            relabels.get(self.alias, self.alias),
+            self.columns, self.query_object)
