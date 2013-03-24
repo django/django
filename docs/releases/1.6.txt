@@ -66,6 +66,12 @@ UTC. This limitation was lifted in Django 1.6. Use :meth:`QuerySet.datetimes()
 <django.db.models.query.QuerySet.datetimes>` to perform time zone aware
 aggregation on a :class:`~django.db.models.DateTimeField`.
 
+Support for savepoints in SQLite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
+<savepoints-in-sqlite>`.
+
 ``BinaryField`` model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -189,11 +195,28 @@ Backwards incompatible changes in 1.6
 New transaction management model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Behavior changes
+^^^^^^^^^^^^^^^^
+
 Database-level autocommit is enabled by default in Django 1.6. While this
 doesn't change the general spirit of Django's transaction management, there
 are a few known backwards-incompatibities, described in the :ref:`transaction
 management docs <transactions-upgrading-from-1.5>`. You should review your
 code to determine if you're affected.
+
+Savepoints and ``assertNumQueries``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The changes in transaction management may result in additional statements to
+create, release or rollback savepoints. This is more likely to happen with
+SQLite, since it didn't support savepoints until this release.
+
+If tests using :meth:`~django.test.TestCase.assertNumQueries` fail because of
+a higher number of queries than expected, check that the extra queries are
+related to savepoints, and adjust the expected number of queries accordingly.
+
+Autocommit option for PostgreSQL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In previous versions, database-level autocommit was only an option for
 PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
