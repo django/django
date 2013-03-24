@@ -395,10 +395,10 @@ class SubqueryConstraint(object):
 
         # QuerySet was sent
         if hasattr(query, 'values'):
-            # as_sql should throw if we are using a
-            # connection on another database
-            query._as_sql(connection=connection)
+            if query._db and connection.alias != query._db:
+                raise ValueError("Can't do subqueries with queries on different DBs.")
             query = query.values(*self.targets).query
+            query.clear_ordering(True)
 
         query_compiler = query.get_compiler(connection=connection)
         return query_compiler.as_subquery_condition(self.alias, self.columns)
