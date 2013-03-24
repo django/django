@@ -1785,7 +1785,6 @@ class Queries6Tests(TestCase):
 
         # Nested queries are possible (although should be used with care, since
         # they have performance problems on backends like MySQL.
-
         self.assertQuerysetEqual(
             Annotation.objects.filter(notes__in=Note.objects.filter(note="n1")),
             ['<Annotation: a1>']
@@ -2824,3 +2823,11 @@ class Ticket20101Tests(TestCase):
         self.assertTrue(n in qs1)
         self.assertFalse(n in qs2)
         self.assertTrue(n in (qs1 | qs2))
+
+class EmptyStringPromotionTests(TestCase):
+    def test_empty_string_promotion(self):
+        qs = RelatedObject.objects.filter(single__name='')
+        if connection.features.interprets_empty_strings_as_nulls:
+            self.assertIn('LEFT OUTER JOIN', str(qs.query))
+        else:
+            self.assertNotIn('LEFT OUTER JOIN', str(qs.query))
