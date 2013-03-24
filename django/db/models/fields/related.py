@@ -295,8 +295,9 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
             if None in val:
                 rel_obj = None
             else:
-                params = {rh_field.attname: getattr(instance, lh_field.attname)
-                          for lh_field, rh_field in self.field.related_fields}
+                params = dict(
+                    (rh_field.attname, getattr(instance, lh_field.attname))
+                    for lh_field, rh_field in self.field.related_fields)
                 params.update(self.field.get_extra_descriptor_filter(instance))
                 qs = self.get_query_set(instance=instance)
                 # Assuming the database enforces foreign keys, this won't fail.
@@ -556,8 +557,9 @@ def create_many_related_manager(superclass, rel):
             join_table = self.through._meta.db_table
             connection = connections[db]
             qn = connection.ops.quote_name
-            qs = qs.extra(select={'_prefetch_related_val_%s' % f.attname:
-                                      '%s.%s' % (qn(join_table), qn(f.column)) for f in fk.local_related_fields})
+            qs = qs.extra(select=dict(
+                ('_prefetch_related_val_%s' % f.attname,
+                '%s.%s' % (qn(join_table), qn(f.column))) for f in fk.local_related_fields))
             return (qs,
                     lambda result: tuple([getattr(result, '_prefetch_related_val_%s' % f.attname) for f in fk.local_related_fields]),
                     lambda inst: tuple([getattr(inst, f.attname) for f in fk.foreign_related_fields]),
