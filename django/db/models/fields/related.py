@@ -126,6 +126,7 @@ class RelatedField(Field):
         self.name = self.name or (self.rel.to._meta.model_name + '_' + self.rel.to._meta.pk.name)
         if self.verbose_name is None:
             self.verbose_name = self.rel.to._meta.verbose_name
+        self.rel.set_field_name()
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
@@ -863,6 +864,16 @@ class ForeignObjectRel(object):
     def get_extra_restriction(self, where_class, alias, related_alias):
         return self.field.get_extra_restriction(where_class, related_alias, alias)
 
+    def set_field_name(self):
+        """
+        Sets the related field's name, this is not available until later stages
+        of app loading, so set_field_name is called from
+        set_attributes_from_rel()
+        """
+        # By default foreign object doesn't relate to any remote field (for
+        # example custom multicolumn joins currently have no remote field).
+        self.field_name = None
+
 class ManyToOneRel(ForeignObjectRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
                  parent_link=False, on_delete=None):
@@ -881,6 +892,9 @@ class ManyToOneRel(ForeignObjectRel):
             raise FieldDoesNotExist("No related field named '%s'" %
                     self.field_name)
         return data[0]
+
+    def set_field_name(self):
+        self.field_name = self.field_name or self.to._meta.pk.name
 
 
 class OneToOneRel(ManyToOneRel):
