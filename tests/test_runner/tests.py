@@ -299,7 +299,8 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     def test_runner_deprecation_verbosity_default(self):
         args = ['test', '--settings=test_project.settings']
         out, err = self.run_django_admin(args)
-        self.assertTrue("DeprecationWarning: warning from test" in err)
+        self.assertIn("DeprecationWarning: warning from test", err)
+        self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
 
     @unittest.skipIf(sys.version_info[:2] == (2, 6),
         "On Python 2.6, DeprecationWarnings are visible anyway")
