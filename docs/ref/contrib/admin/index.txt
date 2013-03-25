@@ -18,6 +18,7 @@ The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
 .. versionchanged:: 1.6
+
     In previous versions, the admin wasn't enabled by default.
 
 For reference, here are the requirements:
@@ -1341,6 +1342,7 @@ templates used by the :class:`ModelAdmin` views:
                 return qs.filter(author=request.user)
 
     .. versionchanged:: 1.6
+
         The ``get_queryset`` method was previously named ``queryset``.
 
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
@@ -1348,7 +1350,9 @@ templates used by the :class:`ModelAdmin` views:
     Sends a message to the user using the :mod:`django.contrib.messages`
     backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
 
-    .. versionadded:: 1.5
+    .. versionchanged:: 1.5
+
+        Keyword arguments were added in Django 1.5.
 
     Keyword arguments allow you to change the message level, add extra CSS
     tags, or fail silently if the ``contrib.messages`` framework is not
@@ -1451,6 +1455,7 @@ in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.6
+
     The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need

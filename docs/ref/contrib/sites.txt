@@ -252,6 +252,7 @@ Enabling the sites framework
 ============================
 
 .. versionchanged:: 1.6
+
     In previous versions, the sites framework was enabled by default.
 
 To enable the sites framework, follow these steps:

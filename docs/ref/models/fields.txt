@@ -378,6 +378,7 @@ If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
 
 .. versionchanged:: 1.6
+
     The default value of ``BooleanField`` was changed from ``False`` to
     ``None`` when :attr:`Field.default` isn't defined.
 
@@ -956,8 +957,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 
 .. versionadded:: 1.5
 
-The current value of the field will be displayed as a clickable link above the
-input widget.
+    The current value of the field will be displayed as a clickable link above the
+    input widget.
 
 
 Relationship fields

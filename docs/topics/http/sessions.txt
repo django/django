@@ -71,6 +71,7 @@ default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
 .. versionchanged:: 1.5
+
     The :setting:`SESSION_CACHE_ALIAS` setting was added.
 
 Once your cache is configured, you've got two choices for how to store data in
@@ -451,6 +452,7 @@ Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
 .. versionchanged:: 1.5
+
   The session is not saved if the response's status code is 500.
 
 .. _browser-length-vs-persistent-sessions:

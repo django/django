@@ -256,7 +256,7 @@ All attributes can be set in your derived class and can be used in
 
 .. versionadded:: 1.6
 
-The ``leave_locale_alone`` option was added in Django 1.6.
+    The ``leave_locale_alone`` option was added in Django 1.6.
 
 Methods
 -------

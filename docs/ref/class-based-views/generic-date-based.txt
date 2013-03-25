@@ -142,7 +142,7 @@ YearArchiveView
 
       .. versionchanged:: 1.5
 
-      Previously, this returned a string.
+         Previously, this returned a string.
 
     * ``next_year``: A :class:`~datetime.date` object
       representing the first day of the next year, according to

@@ -191,19 +191,19 @@ call to ``{% cycle %}`` doesn't specify silent::
 
 .. versionchanged:: 1.6
 
-To improve safety, future versions of ``cycle`` will automatically escape
-their output. You're encouraged to activate this behavior by loading
-``cycle`` from the ``future`` template library::
+    To improve safety, future versions of ``cycle`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``cycle`` from the ``future`` template library::
 
-    {% load cycle from future %}
+        {% load cycle from future %}
 
-When using the ``future`` version, you can disable auto-escaping with::
+    When using the ``future`` version, you can disable auto-escaping with::
 
-    {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
-            ...
-        </tr>
-    {% endfor %}
+        {% for o in some_list %}
+            <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
+                ...
+            </tr>
+        {% endfor %}
 
 .. templatetag:: debug
 
@@ -294,21 +294,21 @@ to escape the variables in the firstof tag, you must do so explicitly::
 
 .. versionchanged:: 1.6
 
-To improve safety, future versions of ``firstof`` will automatically escape
-their output. You're encouraged to activate this behavior by loading
-``firstof`` from the ``future`` template library::
+    To improve safety, future versions of ``firstof`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``firstof`` from the ``future`` template library::
 
-    {% load firstof from future %}
+        {% load firstof from future %}
 
-When using the ``future`` version, you can disable auto-escaping with::
+    When using the ``future`` version, you can disable auto-escaping with::
 
-    {% autoescape off %}
-        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
-    {% endautoescape %}
+        {% autoescape off %}
+            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+        {% endautoescape %}
 
-Or if only some variables should be escaped, you can use::
+    Or if only some variables should be escaped, you can use::
 
-    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
@@ -1065,6 +1065,7 @@ by the context as to the current application.
     Don't forget to put quotes around the function path or pattern name!
 
     .. versionchanged:: 1.5
+
         The first parameter used not to be quoted, which was inconsistent with
         other template tags. Since Django 1.5, it is evaluated according to
         the usual rules: it can be a quoted string or a variable that will be
