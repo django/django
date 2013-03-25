@@ -111,6 +111,7 @@ affect validation.  If ``validate_max=True`` is passed to the
 validation.  See :ref:`validate_max`.
 
 .. versionchanged:: 1.6
+
    The ``validate_max`` parameter was added to
    :func:`~django.forms.formsets.formset_factory`.  Also, the behavior of
    ``FormSet`` was brought in line with that of ``ModelFormSet`` so that it
@@ -310,6 +311,7 @@ should use custom formset validation.
     using forged POST requests.
 
 .. versionchanged:: 1.6
+
    The ``validate_max`` parameter was added to
    :func:`~django.forms.formsets.formset_factory`.
 

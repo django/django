@@ -235,6 +235,7 @@ the Django test runner reorders tests in the following way:
   restoring it to its original state are run.
 
 .. versionchanged:: 1.5
+
     Before Django 1.5, the only guarantee was that
     :class:`~django.test.TestCase` tests were always ran first, before any other
     tests.
@@ -612,6 +613,7 @@ Use the ``django.test.client.Client`` class to make requests.
         a ``Content-Type`` header is set to ``content_type``.
 
         .. versionchanged:: 1.5
+
             :meth:`Client.options` used to process ``data`` like
             :meth:`Client.get`.
 
@@ -627,6 +629,7 @@ Use the ``django.test.client.Client`` class to make requests.
         a ``Content-Type`` header is set to ``content_type``.
 
         .. versionchanged:: 1.5
+
             :meth:`Client.put` used to process ``data`` like
             :meth:`Client.post`.
 
@@ -650,6 +653,7 @@ Use the ``django.test.client.Client`` class to make requests.
         a ``Content-Type`` header is set to ``content_type``.
 
         .. versionchanged:: 1.5
+
             :meth:`Client.delete` used to process ``data`` like
             :meth:`Client.get`.
 
@@ -940,6 +944,7 @@ to test the effects of commit and rollback:
     the test has been properly updated.
 
 .. versionchanged:: 1.5
+
     The order in which tests are run has changed. See `Order in which tests are
     executed`_.
 
@@ -990,6 +995,7 @@ additions, including:
   errors.
 
 .. versionchanged:: 1.5
+
     The order in which tests are run has changed. See `Order in which tests are
     executed`_.
 
@@ -1581,6 +1587,7 @@ your test suite.
     ``False``, which turns the comparison into a Python set comparison.
 
     .. versionchanged:: 1.6
+
         The method now checks for undefined order and raises ``ValueError``
         if undefined order is spotted. The ordering is seen as undefined if
         the given ``qs`` isn't ordered and the comparison is against more

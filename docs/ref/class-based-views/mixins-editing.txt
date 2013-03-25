@@ -206,10 +206,10 @@ ProcessFormView
 
         .. versionadded:: 1.6
 
-        ``success_url`` may contain dictionary string formatting, which
-        will be interpolated against the object's field attributes. For
-        example, you could use ``success_url="/parent/%(parent_id)s/"`` to
-        redirect to a URL composed out of the ``parent_id`` field on a model.
+            ``success_url`` may contain dictionary string formatting, which
+            will be interpolated against the object's field attributes. For
+            example, you could use ``success_url="/parent/%(parent_id)s/"`` to
+            redirect to a URL composed out of the ``parent_id`` field on a model.
 
     .. method:: get_success_url()
 

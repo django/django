@@ -182,6 +182,7 @@ Django supports MySQL 5.0.3 and higher.
 data on all database schema. Django's ``inspectdb`` feature uses it.
 
 .. versionchanged:: 1.5
+
     The minimum version requirement of MySQL 5.0.3 was set in Django 1.5.
 
 Django expects the database to support Unicode (UTF-8 encoding) and delegates to
