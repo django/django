@@ -181,6 +181,10 @@ Minor features
   and the undocumented limit of the higher of 1000 or ``max_num`` forms
   was changed so it is always 1000 more than ``max_num``.
 
+* The middleware :class:`~django.middleware.locale.LocaleMiddleware` now
+  stores active language in session if it is not present there. This
+  prevents loss of language settings after session flush, e.g. logout.
+
 Backwards incompatible changes in 1.6
 =====================================
 
