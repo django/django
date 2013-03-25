@@ -1265,9 +1265,9 @@ see the current list of translated languages by looking in
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format ``(language code, language
-name)``, the ``language code`` part should be a
-:term:`language name<language code>` -- for example, ``('ja', 'Japanese')``.
+The list is a tuple of two-tuples in the format 
+(:term:`language code<language code>`, ``language name``) -- for example, 
+``('ja', 'Japanese')``. 
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
