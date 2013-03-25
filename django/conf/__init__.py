@@ -8,6 +8,7 @@ a list of all possible variables.
 
 import logging
 import os
+import sys
 import time     # Needed for Windows
 import warnings
 
@@ -56,14 +57,15 @@ class LazySettings(LazyObject):
         """
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
-        try:
-            # Route warnings through python logging
-            logging.captureWarnings(True)
-            # Allow DeprecationWarnings through the warnings filters
-            warnings.simplefilter("default", DeprecationWarning)
-        except AttributeError:
-            # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
-            pass
+        if not sys.warnoptions:
+            try:
+                # Route warnings through python logging
+                logging.captureWarnings(True)
+                # Allow DeprecationWarnings through the warnings filters
+                warnings.simplefilter("default", DeprecationWarning)
+            except AttributeError:
+                # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
+                pass
 
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING

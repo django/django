@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import os
 import shutil
 import subprocess
@@ -105,6 +106,14 @@ def setup(verbosity, test_labels):
     # to be set, so that a test email is sent out which we catch
     # in our tests.
     settings.MANAGERS = ("admin@djangoproject.com",)
+
+    if verbosity > 0:
+        # Ensure any warnings captured to logging are piped through a verbose
+        # logging handler.  If any -W options were passed explicitly on command
+        # line, warnings are not captured, and this has no effect.
+        logger = logging.getLogger('py.warnings')
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
