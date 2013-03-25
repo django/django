@@ -935,7 +935,7 @@ class ModelChoiceField(ChoiceField):
 
     def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
-                 help_text=None, to_field_name=None, *args, **kwargs):
+                 help_text='', to_field_name=None, *args, **kwargs):
         if required and (initial is not None):
             self.empty_label = None
         else:
@@ -1031,7 +1031,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def __init__(self, queryset, cache_choices=False, required=True,
                  widget=None, label=None, initial=None,
-                 help_text=None, *args, **kwargs):
+                 help_text='', *args, **kwargs):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
             cache_choices, required, widget, label, initial, help_text,
             *args, **kwargs)

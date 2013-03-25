@@ -952,12 +952,12 @@ class FormsTestCase(TestCase):
         class UserRegistration(Form):
             username = CharField(max_length=10, label='Your username')
             password1 = CharField(widget=PasswordInput)
-            password2 = CharField(widget=PasswordInput, label='Password (again)')
+            password2 = CharField(widget=PasswordInput, label='Contraseña (de nuevo)')
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Your username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
-<li>Password (again): <input type="password" name="password2" /></li>""")
+<li>Contraseña (de nuevo): <input type="password" name="password2" /></li>""")
 
         # Labels for as_* methods will only end in a colon if they don't end in other
         # punctuation already.
@@ -978,14 +978,6 @@ class FormsTestCase(TestCase):
 <p><label for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
 <p><label for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
 <p><label for="id_q5">The last question. Period.</label> <input type="text" name="q5" id="id_q5" /></p>""")
-
-        # A label can be a Unicode object or a bytestring with special characters.
-        class UserRegistration(Form):
-            username = CharField(max_length=10, label='ŠĐĆŽćžšđ')
-            password = CharField(widget=PasswordInput, label='\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-
-        p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(), '<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>')
 
         # If a label is set to the empty string for a field, that field won't get a label.
         class UserRegistration(Form):
@@ -1246,20 +1238,20 @@ class FormsTestCase(TestCase):
         # You can specify descriptive text for a field by using the 'help_text' argument)
         class UserRegistration(Form):
             username = CharField(max_length=10, help_text='e.g., user@example.com')
-            password = CharField(widget=PasswordInput, help_text='Choose wisely.')
+            password = CharField(widget=PasswordInput, help_text='Wählen Sie mit Bedacht.')
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
-<li>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>""")
+<li>Password: <input type="password" name="password" /> <span class="helptext">Wählen Sie mit Bedacht.</span></li>""")
         self.assertHTMLEqual(p.as_p(), """<p>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></p>
-<p>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></p>""")
+<p>Password: <input type="password" name="password" /> <span class="helptext">Wählen Sie mit Bedacht.</span></p>""")
         self.assertHTMLEqual(p.as_table(), """<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br /><span class="helptext">e.g., user@example.com</span></td></tr>
-<tr><th>Password:</th><td><input type="password" name="password" /><br /><span class="helptext">Choose wisely.</span></td></tr>""")
+<tr><th>Password:</th><td><input type="password" name="password" /><br /><span class="helptext">Wählen Sie mit Bedacht.</span></td></tr>""")
 
         # The help text is displayed whether or not data is provided for the form.
         p = UserRegistration({'username': 'foo'}, auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>""")
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> <span class="helptext">Wählen Sie mit Bedacht.</span></li>""")
 
         # help_text is not displayed for hidden fields. It can be used for documentation
         # purposes, though.
@@ -1271,13 +1263,6 @@ class FormsTestCase(TestCase):
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>""")
-
-        # Help text can include arbitrary Unicode characters.
-        class UserRegistration(Form):
-            username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
-
-        p = UserRegistration(auto_id=False)
-        self.assertHTMLEqual(p.as_ul(), '<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</span></li>')
 
     def test_subclassing_forms(self):
         # You can subclass a Form to add fields. The resulting form subclass will have
