@@ -74,5 +74,5 @@ class LogEntry(models.Model):
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
-            return reverse(url_name, args=(self.object_id,))
+            return reverse(url_name, args=(quote(self.object_id),))
         return None

@@ -25,6 +25,7 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
@@ -1484,13 +1485,15 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_recentactions_link(self):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
+        link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
+        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
+        link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
+        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key"  # capitalized in Recent Actions
         self.assertContains(response, should_contain)
