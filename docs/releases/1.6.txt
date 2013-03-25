@@ -266,6 +266,10 @@ Minor features
   ``False`` allows the field to reference proxy models. The default is ``True``
   to retain the old behavior.
 
+* The middleware :class:`~django.middleware.locale.LocaleMiddleware` now
+  stores active language in session if it is not present there. This
+  prevents loss of language settings after session flush, e.g. logout.
+
 Backwards incompatible changes in 1.6
 =====================================
 

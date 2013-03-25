@@ -1152,6 +1152,38 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
         response = self.client.get('/en/streaming/')
         self.assertContains(response, "Yes/No")
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+        ),
+    )
+    def test_session_language(self):
+        """
+        Check that language is stored in session if missing.
+        """
+        # Create an empty session
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session.save()
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+
+        # Clear the session data before request
+        session.save()
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['django_language'], 'en')
+
+        # Clear the session data before request
+        session.save()
+        response = self.client.get('/fr/simple/')
+        self.assertEqual(self.client.session['django_language'], 'fr')
+
+        # Check that language is not changed in session
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['django_language'], 'fr')
+
+
 @override_settings(
     USE_I18N=True,
     LANGUAGES=(
