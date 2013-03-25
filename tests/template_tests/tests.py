@@ -441,6 +441,11 @@ class Templates(TestCase):
         output1 = template.render(Context({'foo': range(3), 'get_value': lambda: next(gen1)}))
         self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {0}'.format(output1))
 
+    def test_cache_regression_20130(self):
+        t = Template('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')
+        cachenode = t.nodelist[1]
+        self.assertEqual(cachenode.fragment_name, 'regression_20130')
+
     def test_ifchanged_render_once(self):
         """ Test for ticket #19890. The content of ifchanged template tag was
         rendered twice."""
