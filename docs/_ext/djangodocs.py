@@ -64,21 +64,25 @@ class VersionDirective(Directive):
     option_spec = {}
 
     def run(self):
+        if len(self.arguments) > 1:
+            msg = """Only one argument accepted for directive '{directive_name}::'.
+            Comments should be provided as content,
+            not as an extra argument.""".format(directive_name=self.name)
+            raise ValueError(msg)
+
         env = self.state.document.settings.env
         ret = []
         node = addnodes.versionmodified()
         ret.append(node)
+
         if self.arguments[0] == env.config.django_next_version:
             node['version'] = "Development version"
         else:
             node['version'] = self.arguments[0]
+
         node['type'] = self.name
-        if len(self.arguments) == 2:
-            inodes, messages = self.state.inline_text(self.arguments[1], self.lineno+1)
-            node.extend(inodes)
-            if self.content:
-                self.state.nested_parse(self.content, self.content_offset, node)
-            ret = ret + messages
+        if self.content:
+            self.state.nested_parse(self.content, self.content_offset, node)
         env.note_versionchange(node['type'], node['version'], node, self.lineno)
         return ret
 
