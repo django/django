@@ -75,19 +75,19 @@ MultipleObjectMixin
 
         .. versionadded:: 1.6
 
-        An integer specifying the number of "overflow" objects the last page
-        can contain. This extends the :attr:`paginate_by` limit on the last
-        page by up to ``paginate_orphans``, in order to keep the last page from
-        having a very small number of objects.
+            An integer specifying the number of "overflow" objects the last page
+            can contain. This extends the :attr:`paginate_by` limit on the last
+            page by up to ``paginate_orphans``, in order to keep the last page from
+            having a very small number of objects.
 
     .. attribute:: page_kwarg
 
         .. versionadded:: 1.5
 
-        A string specifying the name to use for the page parameter.
-        The view will expect this prameter to be available either as a query
-        string parameter (via ``request.GET``) or as a kwarg variable specified
-        in the URLconf. Defaults to ``page``.
+            A string specifying the name to use for the page parameter.
+            The view will expect this prameter to be available either as a query
+            string parameter (via ``request.GET``) or as a kwarg variable specified
+            in the URLconf. Defaults to ``page``.
 
     .. attribute:: paginator_class
 
@@ -131,9 +131,9 @@ MultipleObjectMixin
 
         .. versionadded:: 1.6
 
-        An integer specifying the number of "overflow" objects the last page
-        can contain. By default this simply returns the value of
-        :attr:`paginate_orphans`.
+            An integer specifying the number of "overflow" objects the last page
+            can contain. By default this simply returns the value of
+            :attr:`paginate_orphans`.
 
     .. method:: get_allow_empty()
 

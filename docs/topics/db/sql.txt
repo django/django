@@ -222,6 +222,7 @@ For example::
         return row
 
 .. versionchanged:: 1.6
+
     In Django 1.5 and earlier, after performing a data changing operation, you
     had to call ``transaction.commit_unless_managed()`` to ensure your changes
     were committed to the database. Since Django now defaults to database-level

@@ -134,7 +134,7 @@ to.
 
 .. versionchanged:: 1.5
 
-The ability to pass a list of signals was added.
+    The ability to pass a list of signals was added.
 
 .. admonition:: Where should this code live?
 

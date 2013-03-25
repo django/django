@@ -359,7 +359,7 @@ considering aren't valid, we must remember to remove them from the
 
 .. versionchanged:: 1.5
 
-Django used to remove the ``cleaned_data`` attribute entirely if there were
-any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
-the form doesn't validate, but it contains only field values that did
-validate.
+    Django used to remove the ``cleaned_data`` attribute entirely if there were
+    any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
+    the form doesn't validate, but it contains only field values that did
+    validate.

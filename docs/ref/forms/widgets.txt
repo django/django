@@ -522,6 +522,7 @@ Selector and checkbox widgets
         ``True`` if the checkbox should be checked for that value.
 
         .. versionchanged:: 1.5
+
             Exceptions from ``check_test`` used to be silenced by its caller,
             this is no longer the case, they will propagate upwards.
 

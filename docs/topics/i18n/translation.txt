@@ -1529,6 +1529,7 @@ selection based on data from the request. It customizes content for each user.
 ``'django.middleware.locale.LocaleMiddleware'``.
 
 .. versionchanged:: 1.6
+
     In previous versions, ``LocaleMiddleware``  wasn't enabled by default.
 
 Because middleware order matters, you should follow these guidelines:

@@ -681,6 +681,7 @@ In addition, some objects are automatically created just after
   database).
 
 .. versionchanged:: 1.5
+
     Previously, ``ContentType`` and ``Permission`` instances were created only
     in the default database.
 
