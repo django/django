@@ -181,6 +181,9 @@ Minor features
   and the undocumented limit of the higher of 1000 or ``max_num`` forms
   was changed so it is always 1000 more than ``max_num``.
 
+* Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
+  with bcrypt.
+
 Backwards incompatible changes in 1.6
 =====================================
 
