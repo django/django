@@ -520,6 +520,35 @@ Use the ``--keep-pot`` option to prevent django from deleting the temporary
 .pot file it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
+.. django-admin-option:: --extra-keyword
+
+.. versionadded:: 1.6
+
+When you import the ``ugettext`` and ``ugettext_lazy`` functions as aliases,
+``makemessages`` may not find translatable strings in your python source code.
+With the ``--extra-keyword`` option, you can force it to look for other aliases
+you may choose.
+
+Example usage:
+
+If you want ``makemessages`` to find translatable strings in the following
+python code.
+
+.. code-block:: python
+
+   from django.utils.translation import ugettext as tr, ugettext_lazy as tr_lazy
+
+   tr('some translatable string')
+   tr_lazy('some lazy translatable string')
+
+You will need to add the option ``--extra-keyword`` twice::
+
+    django-admin.py makemessages --locale=fr_FR --extra-keyword=tr --extra-keyword=tr_lazy
+
+.. note:: The default alias ``'_'`` will always be detected by ``makemessages`` 
+   whether you use the ``--extra-keyword`` option or not.
+
+
 runfcgi [options]
 -----------------
 
