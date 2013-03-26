@@ -37,6 +37,7 @@ class UploadedFile(File):
         return self._name
 
     def _set_name(self, name):
+        self._original_name = name
         # Sanitize the file name so that it can't be dangerous.
         if name is not None:
             # Just use the basename of the file -- anything else is dangerous.
