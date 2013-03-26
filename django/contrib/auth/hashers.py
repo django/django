@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
+import binascii
 import hashlib
 
 from django.dispatch import receiver
@@ -257,7 +258,7 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     digest = hashlib.sha1
 
 
-class BCryptPasswordHasher(BasePasswordHasher):
+class BCryptSHA256PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the bcrypt algorithm (recommended)
 
@@ -266,7 +267,8 @@ class BCryptPasswordHasher(BasePasswordHasher):
     this library depends on native C code and might cause portability
     issues.
     """
-    algorithm = "bcrypt"
+    algorithm = "bcrypt_sha256"
+    digest = hashlib.sha256
     library = ("py-bcrypt", "bcrypt")
     rounds = 12
 
@@ -278,14 +280,34 @@ class BCryptPasswordHasher(BasePasswordHasher):
         bcrypt = self._load_library()
         # Need to reevaluate the force_bytes call once bcrypt is supported on
         # Python 3
-        data = bcrypt.hashpw(force_bytes(password), salt)
+
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        data = bcrypt.hashpw(password, salt)
         return "%s$%s" % (self.algorithm, data)
 
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
         bcrypt = self._load_library()
-        return constant_time_compare(data, bcrypt.hashpw(force_bytes(password), data))
+
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        return constant_time_compare(data, bcrypt.hashpw(password, data))
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -297,6 +319,25 @@ class BCryptPasswordHasher(BasePasswordHasher):
             (_('salt'), mask_hash(salt)),
             (_('checksum'), mask_hash(checksum)),
         ])
+
+
+class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
+    """
+    Secure password hashing using the bcrypt algorithm
+
+    This is considered by many to be the most secure algorithm but you
+    must first install the py-bcrypt library.  Please be warned that
+    this library depends on native C code and might cause portability
+    issues.
+
+    This hasher does not first hash the password which means it is subject to
+    the 72 character bcrypt password truncation, most use cases should prefer
+    the BCryptSha512PasswordHasher.
+
+    See: https://code.djangoproject.com/ticket/20138
+    """
+    algorithm = "bcrypt"
+    digest = None
 
 
 class SHA1PasswordHasher(BasePasswordHasher):
