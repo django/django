@@ -462,6 +462,17 @@ To use Bcrypt as your default storage algorithm, do the following:
 That's it -- now your Django install will use Bcrypt as the default storage
 algorithm.
 
+.. admonition:: Password truncation with BCryptPasswordHasher
+
+    The designers of bcrypt truncate all passwords at 72 characters which means
+    that ``bcrypt(password_with_100_chars) == bcrypt(password_with_100_chars[:72])``.
+    ``BCryptPasswordHasher`` does not have any special handling and
+    thus is also subject to this hidden password length limit. The practical
+    ramification of this truncation is pretty marginal as the average user does
+    not have a password greater than 72 characters in length and even being
+    truncated at 72 the compute powered required to brute force bcrypt in any
+    useful amount of time is still astronomical.
+
 .. admonition:: Other bcrypt implementations
 
    There are several other implementations that allow bcrypt to be
