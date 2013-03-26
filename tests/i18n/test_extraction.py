@@ -569,3 +569,30 @@ class CustomLayoutExtractionTests(ExtractorTests):
         with open(app_de_locale, 'r') as fp:
             po_contents = force_text(fp.read())
             self.assertMsgId('This app has a locale directory', po_contents)
+
+
+class UgettextAliasesTests(ExtractorTests):
+
+    def test_missing_keyword(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./ugettext-aliases.sample', './ugettext_aliases.py')
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
+                                extensions=['py'])
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertNotMsgId('Should be found only with the --extra-keyword option', po_contents)
+            self.assertNotMsgId('Lazy, should be found only with the --extra-keyword option', po_contents)
+        os.remove('./ugettext_aliases.py')
+
+    def test_added_keywords(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./ugettext-aliases.sample', './ugettext_aliases.py')
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
+                                extensions=['py'], extra_keywords=['tr', 'tr_lazy'])
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgId('Should be found only with the --extra-keyword option', po_contents)
+            self.assertMsgId('Lazy, should be found only with the --extra-keyword option', po_contents)
+        os.remove('./ugettext_aliases.py')

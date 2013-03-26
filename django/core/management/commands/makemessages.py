@@ -48,7 +48,7 @@ class TranslatableFile(object):
     def path(self):
         return os.path.join(self.dirpath, self.file)
 
-    def process(self, command, domain):
+    def process(self, command, domain, extra_keywords=None):
         """
         Extract translatable literals from self.file for :param domain:,
         creating or updating the POT file.
@@ -80,6 +80,11 @@ class TranslatableFile(object):
                 '--keyword=ngettext_lazy:1,2',
                 '--keyword=pgettext:1c,2',
                 '--keyword=npgettext:1c,2,3',
+            ]
+            if extra_keywords:
+                for kw in extra_keywords:
+                    args.append('--keyword=%s' % kw)
+            args += [
                 '--from-code=UTF-8',
                 '--add-comments=Translators',
                 '--output=-'
@@ -115,6 +120,11 @@ class TranslatableFile(object):
                 '--keyword=npgettext:1c,2,3',
                 '--keyword=pgettext_lazy:1c,2',
                 '--keyword=npgettext_lazy:1c,2,3',
+            ]
+            if extra_keywords:
+                for kw in extra_keywords:
+                    args.append('--keyword=%s' % kw)
+            args += [
                 '--from-code=UTF-8',
                 '--add-comments=Translators',
                 '--output=-'
@@ -196,6 +206,10 @@ class Command(NoArgsCommand):
             default=False, help="Remove obsolete message strings."),
         make_option('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging."),
+        make_option('--extra-keyword', dest='extra_keywords', action='append',
+            help='If you use import aliases for ugettext and its variations, '
+                 'you can specify it here to make sure that xgettext will find '
+                 'your translatable strings.'),
     )
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
@@ -221,6 +235,7 @@ class Command(NoArgsCommand):
         self.location = '--no-location' if options.get('no_location') else ''
         self.no_obsolete = options.get('no_obsolete')
         self.keep_pot = options.get('keep_pot')
+        self.extra_keywords = options.get('extra_keywords')
 
         if self.domain not in ('django', 'djangojs'):
             raise CommandError("currently makemessages only supports domains "
@@ -298,7 +313,7 @@ class Command(NoArgsCommand):
         self.remove_potfiles()
         for f in file_list:
             try:
-                f.process(self, self.domain)
+                f.process(self, self.domain, self.extra_keywords)
             except UnicodeDecodeError:
                 self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
 
