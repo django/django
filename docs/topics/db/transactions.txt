@@ -409,6 +409,7 @@ Handling exceptions within PostgreSQL transactions
 --------------------------------------------------
 
 .. note::
+
     This section is relevant only if you're implementing your own transaction
     management. This problem cannot occur in Django's default mode and
     :func:`atomic` handles it automatically.
