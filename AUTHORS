@@ -35,6 +35,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Bryan Veloso
     * Preston Holmes
     * Simon Charette
+    * Donald Stufft
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
