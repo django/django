@@ -2,6 +2,7 @@
 #
 # Translators:
 # angularcircle <angular.circle@gmail.com>, 2011.
+#  <angular.circle@gmail.com>, 2013.
 #   <angular.circle@gmail.com>, 2012-2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Karol  <kfuks2@o2.pl>, 2012.
@@ -14,7 +15,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-05 23:30+0000\n"
+"PO-Revision-Date: 2013-02-28 13:10+0000\n"
 "Last-Translator: angularcircle <angular.circle@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
@@ -27,7 +28,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afryknerski"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -43,7 +44,7 @@ msgstr "bułgarski"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "białoruski"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -51,7 +52,7 @@ msgstr "bengalski"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "bretoński"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -111,7 +112,7 @@ msgstr "hiszpański nikaraguański"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "hiszpański wenezuelski"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -163,7 +164,7 @@ msgstr "węgierski"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "interlingua"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -203,7 +204,7 @@ msgstr "koreański"
 
 #: conf/global_settings.py:92
 msgid "Luxembourgish"
-msgstr ""
+msgstr "luksemburski"
 
 #: conf/global_settings.py:93
 msgid "Lithuanian"
@@ -315,7 +316,7 @@ msgstr "tatarski"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "udmurcki"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"
@@ -1260,7 +1261,7 @@ msgstr ""
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Nieprawidłowy numer strony (%(page_number)s): %(message)s "
 
 #: views/generic/list.py:137
 #, python-format

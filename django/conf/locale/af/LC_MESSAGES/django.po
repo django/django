@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Piet Delport <pjdelport@gmail.com>, 2012.
+# Piet Delport <pjdelport@gmail.com>, 2012-2013.
 # Stephen Cox <scox@rems2.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"PO-Revision-Date: 2013-03-26 06:50+0000\n"
 "Last-Translator: Piet Delport <pjdelport@gmail.com>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/projects/p/django/"
 "language/af/)\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -36,7 +36,7 @@ msgstr "Bulgaars"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "Wit-Russies"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -44,7 +44,7 @@ msgstr "Bengali"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "Bretons"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -84,7 +84,7 @@ msgstr "Britse Engels"
 
 #: conf/global_settings.py:64
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 #: conf/global_settings.py:65
 msgid "Spanish"
@@ -104,7 +104,7 @@ msgstr "Nicaraguaanse Spaans"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venezolaanse Spaans"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -116,7 +116,7 @@ msgstr "Baskies"
 
 #: conf/global_settings.py:72
 msgid "Persian"
-msgstr "Persiese"
+msgstr "Persies"
 
 #: conf/global_settings.py:73
 msgid "Finnish"
@@ -132,7 +132,7 @@ msgstr "Fries"
 
 #: conf/global_settings.py:76
 msgid "Irish"
-msgstr "Ierse"
+msgstr "Iers"
 
 #: conf/global_settings.py:77
 msgid "Galician"
@@ -144,7 +144,7 @@ msgstr "Hebreeus"
 
 #: conf/global_settings.py:79
 msgid "Hindi"
-msgstr "Hindi"
+msgstr "Hindoe"
 
 #: conf/global_settings.py:80
 msgid "Croatian"
@@ -156,7 +156,7 @@ msgstr "Hongaars"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "Interlingua"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -180,7 +180,7 @@ msgstr "Georgian"
 
 #: conf/global_settings.py:88
 msgid "Kazakh"
-msgstr ""
+msgstr "Kazakh"
 
 #: conf/global_settings.py:89
 msgid "Khmer"
@@ -196,7 +196,7 @@ msgstr "Koreaanse"
 
 #: conf/global_settings.py:92
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgs"
 
 #: conf/global_settings.py:93
 msgid "Lithuanian"
@@ -224,7 +224,7 @@ msgstr "Noors Bokmal"
 
 #: conf/global_settings.py:99
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalees"
 
 #: conf/global_settings.py:100
 msgid "Dutch"
@@ -284,7 +284,7 @@ msgstr "Sweeds"
 
 #: conf/global_settings.py:114
 msgid "Swahili"
-msgstr ""
+msgstr "Swahili"
 
 #: conf/global_settings.py:115
 msgid "Tamil"
@@ -304,11 +304,11 @@ msgstr "Turkish"
 
 #: conf/global_settings.py:119
 msgid "Tatar"
-msgstr ""
+msgstr "Tataars"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "Oedmoerts"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"
@@ -336,7 +336,7 @@ msgstr "Sleutel 'n geldige waarde in."
 
 #: core/validators.py:104 forms/fields.py:464
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Sleutel 'n geldige e-pos adres in."
 
 #: core/validators.py:107 forms/fields.py:1013
 msgid ""
@@ -508,7 +508,7 @@ msgstr "Desimale getal"
 
 #: db/models/fields/__init__.py:908
 msgid "Email address"
-msgstr ""
+msgstr "E-pos adres"
 
 #: db/models/fields/__init__.py:927
 msgid "File path"
@@ -1255,7 +1255,7 @@ msgstr ""
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Ongeldige bladsy (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:137
 #, python-format

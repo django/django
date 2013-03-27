@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # avsd05 <avsd05@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 11:40+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -29,11 +31,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"ეს არის მისაწვდომი %s-ის სია. ზოგიერთი მათგანის ასარჩევად,  მონიშვნით ისინი "
+"ქვედა სარკმელში და დააწკაპუნეთ  ორ სარკმელს შორის მდებარე ისარზე \"არჩევა\" ."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "აკრიფეთ ამ სარკმელში მისაწვდომი %s-ის სიის გასაფილტრად."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -46,11 +50,11 @@ msgstr "ავირჩიოთ ყველა"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "დააწკაპუნეთ ერთდროულად ყველა %s-ის ასარჩევად."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "არჩევა"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -67,15 +71,18 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"ეს არის არჩეული %s-ის სია. ზოგიერთი მათგანის მოსაშორებლად,  მონიშვნით ისინი "
+"ქვედა სარკმელში და დააწკაპუნეთ  ორ სარკმელს შორის მდებარე ისარზე \"მოშორება"
+"\" ."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "ყველას მოშორება"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "დააწკაპუნეთ ყველა არჩეული %s-ის ერთდროულად მოსაშორებლად."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

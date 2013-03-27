@@ -1,7 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 #   <bart@dispectu.com>, 2012-2013.
+# Erik Romijn <eromijn@solidlinks.nl>, 2013.
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011, 2012.
@@ -11,8 +13,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-01-03 11:14+0000\n"
-"Last-Translator: bartdegoede <bart@dispectu.com>\n"
+"PO-Revision-Date: 2013-03-19 15:55+0000\n"
+"Last-Translator: erikr <eromijn@solidlinks.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -100,8 +102,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Voer de correcte %(username)s en wachtwoord voor een stafaccount in. Let op "
-"dat beide velden hoofdlettergevoelig zijn."
+"Voer een correcte %(username)s en wachtwoord in. Let op dat beide velden "
+"hoofdlettergevoelig zijn."
 
 #: forms.py:153
 msgid ""

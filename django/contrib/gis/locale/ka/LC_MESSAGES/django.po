@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # avsd05 <avsd05@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 07:50+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +22,12 @@ msgstr ""
 
 #: views.py:9
 msgid "No feeds are registered."
-msgstr ""
+msgstr "არცერთი ფიდი არ არის რეგისტრირებული."
 
 #: views.py:19
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "სლაგი %r არ არის რეგისტრირებული."
 
 #: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -80,14 +82,14 @@ msgstr "ველიდან გეომეტრიის SRID-ში გა�
 #: sitemaps/views.py:46
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "არ არსებობს საიტის რუკა სექციისთვის: %r"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "გვერდი %s ცარიელია"
 
 #: sitemaps/views.py:62
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "გვერდი '%s' არ არსებობს"
