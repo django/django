@@ -516,3 +516,18 @@ class LogoutTest(AuthViewsTestCase):
             self.assertTrue(good_url in response['Location'],
                             "%s should be allowed" % good_url)
             self.confirm_logged_out()
+
+@skipIfCustomUser
+class ChangelistTests(AuthViewsTestCase):
+    urls = 'django.contrib.auth.tests.urls_admin'
+
+    # #20078 - users shouldn't be allowed to guess password hashes via
+    # repeated password__startswith queries.
+    def test_changelist_disallows_password_lookups(self):
+        # Make me a superuser before loging in.
+        User.objects.filter(username='testclient').update(is_staff=True, is_superuser=True)
+        self.login()
+
+        # A lookup that tries to filter on password isn't OK
+        with self.assertRaises(SuspiciousOperation):
+            response = self.client.get('/admin/auth/user/?password__startswith=sha1$')
