@@ -1,8 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2011, 2012.
+# Kowit Charoenratchatabhan <kowito@gmail.com>, 2011-2013.
 # Piti Ongmongkolkul <piti118@gmail.com>, 2012.
 # Suteepat Damrongyingsupab <monkeycrew_topza@hotmail.com>, 2011, 2012.
 msgid ""
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Piti Ongmongkolkul <piti118@gmail.com>\n"
+"PO-Revision-Date: 2013-03-04 22:30+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +81,7 @@ msgstr "ปีนี้"
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
-msgstr ""
+msgstr "กรุณาใส่  %(username)s และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -180,7 +181,7 @@ msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล�
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
-msgstr ""
+msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว เพิ่ม  %(name)s ได้อีกที่ด้านล่าง"
 
 #: options.py:839
 #, python-format
@@ -192,14 +193,14 @@ msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล�
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
-msgstr ""
+msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
 
 #: options.py:867
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
-msgstr ""
+msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว เพิ่ม %(name)s ได้อีกที่ด้านล่าง"
 
 #: options.py:873
 #, python-format
@@ -525,7 +526,7 @@ msgstr " โดย %(filter_title)s "
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "โมเดลในแอป %(name)s"
 
 #: templates/admin/index.html:39
 msgid "Change"

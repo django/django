@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 08:10+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -32,14 +34,14 @@ msgstr "კონტენტის ტიპები"
 #: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "კონტენტის ტიპის %(ct_id)s ობიექტს არ გააჩნია ასოცირებული მოდელი"
 
 #: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "კონტენტის ტიპის %(ct_id)s ობიექტი %(obj_id)s არ არსებობს"
 
 #: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "%(ct_name)s ობიექტებს არ გააჩნიათ მეთოდი get_absolute_url()"

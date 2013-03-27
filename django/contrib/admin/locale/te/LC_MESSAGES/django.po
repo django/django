@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # bhaskar teja yerneni <prudhviy@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Veeven  <veeven@gmail.com>, 2011.
-# ప్రవీణ్ ఇళ్ళ <mail2ipn@gmail.com>, 2011.
+# ప్రవీణ్ ఇళ్ళ <mail2ipn@gmail.com>, 2011,2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"PO-Revision-Date: 2013-03-01 20:10+0000\n"
+"Last-Translator: ప్రవీణ్ ఇళ్ళ <mail2ipn@gmail.com>\n"
 "Language-Team: Telugu (http://www.transifex.com/projects/p/django/language/"
 "te/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgstr "%(count)d %(items)s జయప్రదముగా తీసేవేయ
 #: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s తొలగించుట వీలుకాదు"
 
 #: actions.py:62 options.py:1349
 msgid "Are you sure?"
@@ -350,7 +351,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "ఎంచుకున్న చర్యను నడుపు"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -367,7 +368,7 @@ msgstr ""
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "ఎంపికను తుడిచివేయి"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
@@ -556,7 +557,7 @@ msgstr "సంకేతపదం:"
 
 #: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "మీ సంకేతపదం లేదా వాడుకరిపేరును మర్చిపోయారా?"
 
 #: templates/admin/object_history.html:23
 msgid "Date/time"

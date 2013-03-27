@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 16:20+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +42,11 @@ msgstr "შევცვალოთ პაროლი: %s"
 
 #: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
 msgid "No password set."
-msgstr ""
+msgstr "არ არის დაყენებული პაროლი."
 
 #: forms.py:37 tests/forms.py:261 tests/forms.py:267
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "არასწორი პაროლის ფორმატი ან უცნობი ჰეშირების ალგორითმი."
 
 #: forms.py:67
 msgid "A user with that username already exists."
@@ -87,6 +89,9 @@ msgid ""
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"დაუმუშავებელი პაროლები არ ინახება, ასე რომ, არ არსებობს ამ მომხმარებლის "
+"პაროლის ნახვის საშუალება, მაგრამ თქვენ შეგიძლიათ შეცვალოთ პაროლი <a href="
+"\"password/\">ამ ფორმის</a> მეშვეობით."
 
 #: forms.py:151
 #, python-format
@@ -94,6 +99,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"გთხოვთ, შეიყვანოთ სწორი %(username)s და პაროლი. იქონიეთ მხედველობაში, რომ "
+"ორივე ველი ითვალისწინებს მთავრულს."
 
 #: forms.py:153
 msgid ""
@@ -111,16 +118,20 @@ msgid ""
 "That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
+"ამ ელ. ფოსტის მისამართს არ გააჩნია ასოცირებული მომხმარებლის ანგარიში. "
+"დარწმუნებული ხართ, რომ დარეგისტრირდით?"
 
 #: forms.py:208 tests/forms.py:374
 msgid ""
 "The user account associated with this email address cannot reset the "
 "password."
 msgstr ""
+"ამ ელ. ფოსტასთან ასოცირებულ მომხმარებლის ანგარიშს არ გააჩნია პაროლის თავიდან "
+"დაყენების უფლება."
 
 #: forms.py:211
 msgid "Email"
-msgstr ""
+msgstr "ელ. ფოსტა"
 
 #: forms.py:271
 msgid "New password"
@@ -145,27 +156,27 @@ msgstr "პაროლი (განმეორებით)"
 #: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
 #: hashers.py:412
 msgid "algorithm"
-msgstr ""
+msgstr "ალგორითმი"
 
 #: hashers.py:242
 msgid "iterations"
-msgstr ""
+msgstr "იტერაციები"
 
 #: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
 msgid "salt"
-msgstr ""
+msgstr "მარილი"
 
 #: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
 msgid "hash"
-msgstr ""
+msgstr "ჰეში"
 
 #: hashers.py:293
 msgid "work factor"
-msgstr ""
+msgstr "სამუშაო ფაქტორი"
 
 #: hashers.py:295
 msgid "checksum"
-msgstr ""
+msgstr "საკონტროლო ჯამი"
 
 #: models.py:72 models.py:121
 msgid "name"
@@ -214,6 +225,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
+"ჯგუფები, რომლებსაც მიეკუთვნება ეს მომხმარებელი. მომხმარებელს ენიჭება მისი "
+"ყოველი ჯგუფის ყველა უფლება."
 
 #: models.py:306
 msgid "user permissions"
@@ -232,7 +245,7 @@ msgstr ""
 
 #: models.py:381
 msgid "Enter a valid username."
-msgstr ""
+msgstr "შეიყვანეთ სწორი მომხმარებლის სახელი."
 
 #: models.py:383
 msgid "first name"
@@ -244,7 +257,7 @@ msgstr "გვარი"
 
 #: models.py:385
 msgid "email address"
-msgstr ""
+msgstr "ელ. ფოსტის მისამართი"
 
 #: models.py:386
 msgid "staff status"
@@ -286,4 +299,4 @@ msgstr "გამოსული ხართ"
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "პაროლის თავიდან დაყენება %(site_name)s-ზე"

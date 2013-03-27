@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # avsd05 <avsd05@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
@@ -8,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"PO-Revision-Date: 2013-03-01 16:20+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -79,6 +81,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"გთხოვთ, შეიყვანოთ სწორი %(username)s და პაროლი პერსონალის ანგარიშისთვის. "
+"იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს მთავრულს."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
@@ -119,21 +123,21 @@ msgstr "ლოგის ერთეულები"
 #: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr ""
+msgstr "დამატებულია \"%(object)s\"."
 
 #: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr ""
+msgstr "შეცვლილია \"%(object)s\" - %(changes)s"
 
 #: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr ""
+msgstr "წაშლილია \"%(object)s.\""
 
 #: models.py:54
 msgid "LogEntry Object"
-msgstr ""
+msgstr "ჟურნალის ჩანაწერის ობიექტი"
 
 #: options.py:156 options.py:172
 msgid "None"
@@ -181,6 +185,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" წარმატებით იქნა დამატებული. თქვენ შეგიძლიათ დაამატოთ "
+"სხვა %(name)s ქვემოთ."
 
 #: options.py:839
 #, python-format
@@ -193,6 +199,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"%(name)s \"%(obj)s\" წარმატებით შეიცვალა. თქვენ შეგიძლიათ ისევ დაარედაქტიროთ "
+"ის ქვემოთ."
 
 #: options.py:867
 #, python-format
@@ -200,6 +208,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" წარმატებით შეიცვალა. თქვენ შეგიძლიათ დაამატოთ სხვა "
+"%(name)s ქვემოთ."
 
 #: options.py:873
 #, python-format
@@ -297,11 +307,11 @@ msgstr "ახლის დამატება"
 
 #: widgets.py:316
 msgid "Currently:"
-msgstr ""
+msgstr "ამჟამად:"
 
 #: widgets.py:317
 msgid "Change:"
-msgstr ""
+msgstr "შეცვლა:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -345,6 +355,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"მოხდა შეცდომა. ინფორმაცია მასზე გადაეცა საიტის ადმინისტრატორებს ელ. ფოსტით "
+"და ის უნდა შესწორდეს უმოკლეს ვადებში. გმადლობთ მოთმინებისთვის."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -437,16 +449,16 @@ msgstr "ფილტრი"
 
 #: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
-msgstr ""
+msgstr "დალაგებიდან მოშორება"
 
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "დალაგების პრიორიტეტი: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "დალაგების გადართვა"
 
 #: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
@@ -527,7 +539,7 @@ msgstr " %(filter_title)s მიხედვით "
 #: templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "მოდელები %(name)s აპლიკაციაში"
 
 #: templates/admin/index.html:39
 msgid "Change"
@@ -569,7 +581,7 @@ msgstr "პაროლი:"
 
 #: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "დაგავიწყდათ თქვენი პაროლი ან მომხმარებლის სახელი?"
 
 #: templates/admin/object_history.html:23
 msgid "Date/time"
@@ -783,6 +795,8 @@ msgid ""
 "We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"ჩვენ გამოვაგზავნეთ მითითებები პაროლის დასაყენებლად ელ. ფოსტის მისამართზე, "
+"რომელიც თქვენ შეიყვანეთ. თქვენ მალე უნდა მიიღოთ ისინი."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -790,6 +804,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"თქვენ მიიღეთ ეს წერილი იმიტომ, რომ გააკეთეთ პაროლის თავიდან დაყენების "
+"მოთხოვნა თქვენი მომხმარებლის ანგარიშისთვის %(site_name)s-ზე."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -813,10 +829,12 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"დაგავიწყდათ თქვენი პაროლი? შეიყვანეთ თქვენი ელ. ფოსტის მისამართი ქვემოთ და "
+"ჩვენ გამოგიგზავნით მითითებებს ახალი პაროლის დასაყენებლად."
 
 #: templates/registration/password_reset_form.html:21
 msgid "Email address:"
-msgstr ""
+msgstr "ელ. ფოსტის მისამართი:"
 
 #: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
@@ -828,7 +846,7 @@ msgstr "ყველა თარიღი"
 
 #: views/main.py:33
 msgid "(None)"
-msgstr ""
+msgstr "(არცერთი)"
 
 #: views/main.py:76
 #, python-format

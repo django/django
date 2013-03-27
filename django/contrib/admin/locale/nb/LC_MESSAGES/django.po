@@ -1,7 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#  <jonklo@gmail.com>, 2013.
 #   <jonklo@gmail.com>, 2012-2013.
 # jonklo <jonklo@gmail.com>, 2011.
 #   <sigurdga-transifex@sigurdga.no>, 2012.
@@ -10,7 +12,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-09 22:55+0000\n"
+"PO-Revision-Date: 2013-03-06 17:00+0000\n"
 "Last-Translator: jonklo <jonklo@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
@@ -783,7 +785,7 @@ msgstr ""
 #: templates/registration/password_reset_done.html:11
 #: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
-msgstr "Passordet ble nullstilt"
+msgstr "Passord-nullstilling klar"
 
 #: templates/registration/password_reset_done.html:17
 msgid ""
