@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from calendar import timegm
 
 from django.conf import settings
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.models import RequestSite
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext
@@ -115,7 +115,10 @@ class Feed(object):
         Returns a feedgenerator.DefaultFeed object, fully populated, for
         this feed. Raises FeedDoesNotExist for invalid parameters.
         """
-        current_site = get_current_site(request)
+        
+        # Fixed: if a site has more than one domains, the rss links should use the domain that
+        # user actually used, not the one set in database.
+        current_site = RequestSite(request)
 
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link, request.is_secure())
