@@ -14,8 +14,9 @@ Journal-World`_ of Lawrence, Kansas, USA.
     programming", and in technical circles as "the guy who invented Django."
 
     He was lead developer at World Online for 2.5 years, during which time
-    Django was developed and implemented on World Online's sites. He's now the
-    leader and founder of EveryBlock_, a "news feed for your block".
+    Django was developed and implemented on World Online's sites. He was the
+    leader and founder of EveryBlock_, a "news feed for your block." He now 
+    develops for Soundslice_.
 
     Adrian lives in Chicago, USA.
 
@@ -40,13 +41,15 @@ Journal-World`_ of Lawrence, Kansas, USA.
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
     Web site you're looking at right now, as well as Django's acclaimed admin
-    interface. Wilson is the designer for EveryBlock_.
+    interface. Wilson was the designer for EveryBlock and Rdio_. He now 
+    designs for Facebook.
 
     Wilson lives in San Francisco, USA.
 
 .. _lawrence journal-world: http://ljworld.com/
 .. _adrian holovaty: http://holovaty.com/
 .. _everyblock: http://everyblock.com/
+.. _soundslice: http://www.soundslice.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
 .. _jacob kaplan-moss: http://jacobian.org/
@@ -100,9 +103,9 @@ Malcolm Tredinnick
 .. _russell keith-magee: http://cecinestpasun.com/
 
 Joseph Kocherhans
-    Joseph is currently a developer at EveryBlock_, and previously worked for
-    the Lawrence Journal-World where he built most of the backend for their
-    Marketplace site. He often disappears for several days into the woods,
+    Joseph was the director of lead development at EveryBlock and previously 
+    developed at the Lawrence Journal-World. He is treasurer of the `Django 
+    Software Foundation`_. He often disappears for several days into the woods,
     attempts to teach himself computational linguistics, and annoys his
     neighbors with his Charango_ playing.
 
@@ -113,6 +116,7 @@ Joseph Kocherhans
 
     Joseph lives in Chicago, USA.
 
+.. _django software foundation: https://www.djangoproject.com/foundation/
 .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Luke Plant`_
