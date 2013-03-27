@@ -315,6 +315,15 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         if instance is None:
             raise AttributeError("%s must be accessed via instance" % self.field.name)
 
+        # When self.field.rel.to is a string at this point - the related model
+        # has not yet been imported, so get_model must be called to
+        # actually to the import. When the model is imported,
+        # self.rel.to will be resolved to the real model
+        # See https://code.djangoproject.com/ticket/20143
+        if not hasattr(self.field.rel.to, '_meta'):
+            app_label, model_name = self.field.rel.to.split(".")
+            get_model(app_label, model_name)
+
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.field.null == False:
@@ -1203,6 +1212,16 @@ class ForeignKey(ForeignObject):
 
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."
+
+        # When self.rel.to is a string at this point - the related model
+        # has not yet been imported, so get_model must be called to
+        # actually to the import. When the model is imported,
+        # self.rel.to will be resolved to the real model
+        # See https://code.djangoproject.com/ticket/20143
+        if not hasattr(self.rel.to, '_meta'):
+            app_label, model_name = self.rel.to.split(".")
+            get_model(app_label, model_name)
+
         field_default = super(ForeignKey, self).get_default()
         if isinstance(field_default, self.rel.to):
             return getattr(field_default, self.related_field.attname)
