@@ -108,7 +108,7 @@ class BaseHandler(object):
 
                 while response is None:
                     callback, callback_args, callback_kwargs = resolver.resolve(
-                            request.path_info)
+                            request.path_info, reset=False)
 
                     # Apply view middleware
                     for middleware_method in self._view_middleware:

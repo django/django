@@ -246,6 +246,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._reverse_dict = {}
         self._namespace_dict = {}
         self._app_dict = {}
+        self._tried = []
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
@@ -313,8 +314,10 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
-    def resolve(self, path):
-        tried = []
+    def resolve(self, path, reset=True):
+        if reset:
+            self._tried = []
+        tried = self._tried
         match = self.regex.search(path)
         if match:
             new_path = path[match.end():]
