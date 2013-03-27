@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 08:00+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -19,15 +21,15 @@ msgstr ""
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
-msgstr ""
+msgstr "პირველი ეტაპი"
 
 #: templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
-msgstr ""
+msgstr "წინა ეტაპი"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr ""
+msgstr "გაგზავნა"
 
 #: wizard/legacy.py:159
 msgid ""

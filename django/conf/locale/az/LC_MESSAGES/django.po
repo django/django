@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Ismayilov <ali@ismailov.info>, 2011-2012.
+# Ali Ismayilov <ali@ismailov.info>, 2011-2013.
 # Metin Amiroff <amiroff@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"PO-Revision-Date: 2013-03-05 06:00+0000\n"
 "Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
 "language/az/)\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaansca"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -36,7 +36,7 @@ msgstr "Bolqarca"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusca"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -44,7 +44,7 @@ msgstr "Benqalca"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "Bretonca"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -104,7 +104,7 @@ msgstr "Nikaraqua İspancası"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venesuela İspancası"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -156,7 +156,7 @@ msgstr "Macarca"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "İnterlinqua"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -196,7 +196,7 @@ msgstr "Koreyca"
 
 #: conf/global_settings.py:92
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Lüksemburqca"
 
 #: conf/global_settings.py:93
 msgid "Lithuanian"
@@ -308,7 +308,7 @@ msgstr "Tatar"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "Udmurtca"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"
@@ -1245,7 +1245,7 @@ msgstr "Səhifə nə \"axırıncı\"dır, nə də tam ədədə çevirmək mümk�
 #: views/generic/list.py:56
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Qeyri-düzgün səhifə (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:137
 #, python-format

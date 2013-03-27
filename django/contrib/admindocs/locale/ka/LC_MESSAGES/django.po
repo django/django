@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2013-03-01 08:40+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
 "Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
@@ -168,24 +170,24 @@ msgstr "იგივე, ოღონდ ხსნის ადმინის�
 #: templates/admin_doc/model_detail.html:16
 #: templates/admin_doc/model_index.html:10
 msgid "Models"
-msgstr ""
+msgstr "მოდელები"
 
 #: templates/admin_doc/template_detail.html:8
 msgid "Templates"
-msgstr ""
+msgstr "შაბლონები"
 
 #: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
-msgstr ""
+msgstr "ფილტრები"
 
 #: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr ""
+msgstr "ტეგები"
 
 #: templates/admin_doc/view_detail.html:8
 #: templates/admin_doc/view_index.html:9
 msgid "Views"
-msgstr ""
+msgstr "წარმოდგენები"
 
 #: tests/__init__.py:23
 msgid "Boolean (Either True or False)"

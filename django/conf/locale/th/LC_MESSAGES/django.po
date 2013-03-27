@@ -2,7 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012.
+# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012-2013.
 # Suteepat Damrongyingsupab <monkeycrew_topza@hotmail.com>, 2011, 2012.
 # Vichai Vongvorakul <vongvichai@gmail.com>, 2013.
 msgid ""
@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-13 08:02+0000\n"
-"Last-Translator: Vichai Vongvorakul <vongvichai@gmail.com>\n"
+"PO-Revision-Date: 2013-03-04 22:30+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
 "MIME-Version: 1.0\n"
@@ -158,7 +158,7 @@ msgstr "ฮังการี"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "ภาษากลาง"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
@@ -310,7 +310,7 @@ msgstr "ตาตาร์"
 
 #: conf/global_settings.py:120
 msgid "Udmurt"
-msgstr ""
+msgstr "อัดเมิร์ท"
 
 #: conf/global_settings.py:121
 msgid "Ukrainian"

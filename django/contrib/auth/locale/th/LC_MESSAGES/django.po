@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012.
+# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012-2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowito@gmail.com>\n"
+"PO-Revision-Date: 2013-03-04 22:30+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
 "MIME-Version: 1.0\n"
@@ -41,11 +42,11 @@ msgstr "เปลี่ยนรหัสผ่าน: %s "
 
 #: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
 msgid "No password set."
-msgstr ""
+msgstr "ไม่ได้ตั้งค่ารหัสผ่าน"
 
 #: forms.py:37 tests/forms.py:261 tests/forms.py:267
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "รูปแบบรหัสผ่านไม่ถูกต้อง หรือไม่รู้จักแฮชอัลกอริทึมนี้"
 
 #: forms.py:67
 msgid "A user with that username already exists."
@@ -94,7 +95,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr ""
+msgstr "กรุณาใส่  %(username)s  และรหัสผ่านที่ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
 #: forms.py:153
 msgid ""
@@ -110,17 +111,17 @@ msgstr "บัญชีนี้ไม่ทำงาน"
 msgid ""
 "That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr ""
+msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
 
 #: forms.py:208 tests/forms.py:374
 msgid ""
 "The user account associated with this email address cannot reset the "
 "password."
-msgstr ""
+msgstr "บัญชีผู้ใช้ที่เกี่ยวข้องกับที่อยู่อีเมล์นี้ไม่สามารถตั้งค่ารหัสผ่าน"
 
 #: forms.py:211
 msgid "Email"
-msgstr ""
+msgstr "อีเมล"
 
 #: forms.py:271
 msgid "New password"
@@ -230,7 +231,7 @@ msgstr "จำเป็น ต้องการไม่เกิน 30 ตั�
 
 #: models.py:381
 msgid "Enter a valid username."
-msgstr ""
+msgstr "กรุณาใส่ชื่อผู้ใช้ที่ถูกต้อง"
 
 #: models.py:383
 msgid "first name"
@@ -242,7 +243,7 @@ msgstr "นามสกุล"
 
 #: models.py:385
 msgid "email address"
-msgstr ""
+msgstr "ที่อยู่อีเมล"
 
 #: models.py:386
 msgid "staff status"
