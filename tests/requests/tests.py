@@ -286,12 +286,21 @@ class RequestsTests(SimpleTestCase):
         }
         self.assertEqual(request.get_host(), 'example.com')
 
+        # Invalid hostnames would normally raise a SuspiciousOperation,
+        # but we have DEBUG=True, so this check is disabled.
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': "invalid_hostname.com",
+        }
+        self.assertEqual(request.get_host(), "invalid_hostname.com")
+
 
     @override_settings(ALLOWED_HOSTS=[])
     def test_get_host_suggestion_of_allowed_host(self):
         """get_host() makes helpful suggestions if a valid-looking host is not in ALLOWED_HOSTS."""
         msg_invalid_host = "Invalid HTTP_HOST header: %r."
         msg_suggestion = msg_invalid_host + "You may need to add %r to ALLOWED_HOSTS."
+        msg_suggestion2 = msg_invalid_host + "The domain name provided is not valid according to RFC 1034/1035"
 
         for host in [ # Valid-looking hosts
             'example.com',
@@ -335,6 +344,14 @@ class RequestsTests(SimpleTestCase):
                 msg_invalid_host % host,
                 request.get_host
             )
+
+        request = HttpRequest()
+        request.META = {'HTTP_HOST': "invalid_hostname.com"}
+        self.assertRaisesMessage(
+            SuspiciousOperation,
+            msg_suggestion2 % "invalid_hostname.com",
+            request.get_host
+        )
 
 
     def test_near_expiration(self):
