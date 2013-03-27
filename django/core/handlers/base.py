@@ -118,6 +118,7 @@ class BaseHandler(object):
                     else:
                         try:
                             response = callback(request, *callback_args, **callback_kwargs)
+                            break
                         except urlresolvers.DoesNotResolve:
                             # Continue resolve URLs if the view raises 
                             # urlresolvers.DoesNotResolve exception to indicate
