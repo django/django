@@ -118,7 +118,7 @@ class BaseFormSet(object):
         if self.is_bound:
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
-            # Use the length of the inital data if it's there, 0 otherwise.
+            # Use the length of the initial data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
         return initial_forms
 
