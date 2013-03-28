@@ -248,7 +248,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             parts.pop()
 
         # Special case -- foo__id__exact and foo__id queries are implied
-        # if foo has been specificially included in the lookup list; so
+        # if foo has been specifically included in the lookup list; so
         # drop __id if it is the last part. However, first we need to find
         # the pk attribute name.
         rel_name = None
@@ -256,7 +256,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             try:
                 field, _, _, _ = model._meta.get_field_by_name(part)
             except FieldDoesNotExist:
-                # Lookups on non-existants fields are ok, since they're ignored
+                # Lookups on non-existent fields are ok, since they're ignored
                 # later.
                 return True
             if hasattr(field, 'rel'):
@@ -278,7 +278,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     def has_add_permission(self, request):
         """
         Returns True if the given request has permission to add an object.
-        Can be overriden by the user in subclasses.
+        Can be overridden by the user in subclasses.
         """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
@@ -289,7 +289,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         Django model instance, the default implementation doesn't examine the
         `obj` parameter.
 
-        Can be overriden by the user in subclasses. In such case it should
+        Can be overridden by the user in subclasses. In such case it should
         return True if the given request has permission to change the `obj`
         model instance. If `obj` is None, this should return True if the given
         request has permission to change *any* object of the given type.
@@ -303,7 +303,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         Django model instance, the default implementation doesn't examine the
         `obj` parameter.
 
-        Can be overriden by the user in subclasses. In such case it should
+        Can be overridden by the user in subclasses. In such case it should
         return True if the given request has permission to delete the `obj`
         model instance. If `obj` is None, this should return True if the given
         request has permission to delete *any* object of the given type.
@@ -575,7 +575,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
         """
-        # If self.actions is explicitally set to None that means that we don't
+        # If self.actions is explicitly set to None that means that we don't
         # want *any* actions enabled on this page.
         from django.contrib.admin.views.main import IS_POPUP_VAR
         if self.actions is None or IS_POPUP_VAR in request.GET:

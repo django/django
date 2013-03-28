@@ -217,7 +217,7 @@ def parse_etags(etag_str):
 
 def quote_etag(etag):
     """
-    Wraps a string in double quotes escaping contents as necesary.
+    Wraps a string in double quotes escaping contents as necessary.
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 

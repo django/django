@@ -129,7 +129,7 @@ class AdminSite(object):
 
     def get_action(self, name):
         """
-        Explicitally get a registered global action wheather it's enabled or
+        Explicitly get a registered global action whether it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]

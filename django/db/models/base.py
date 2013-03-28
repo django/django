@@ -895,7 +895,7 @@ class Model(six.with_metaclass(ModelBase)):
     def full_clean(self, exclude=None):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
-        and raises a ``ValidationError`` for any errors that occured.
+        and raises a ``ValidationError`` for any errors that occurred.
         """
         errors = {}
         if exclude is None:
