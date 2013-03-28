@@ -6,6 +6,7 @@ var DateTimeShortcuts = {
     calendars: [],
     calendarInputs: [],
     clockInputs: [],
+    dismissClockFunc: [],
     calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
     calendarDivName2: 'calendarin',  // name of <div> that contains calendar
     calendarLinkName: 'calendarlink',// name of the link that is used to toggle
@@ -39,6 +40,7 @@ var DateTimeShortcuts = {
     addClock: function(inp) {
         var num = DateTimeShortcuts.clockInputs.length;
         DateTimeShortcuts.clockInputs[num] = inp;
+        DateTimeShortcuts.dismissClockFunc[num] = function() { DateTimeShortcuts.dismissClock(num); return true; };
 
         // Shortcut links (clock icon and "Now" link)
         var shortcuts_span = document.createElement('span');
@@ -118,11 +120,11 @@ var DateTimeShortcuts = {
 
         // Show the clock box
         clock_box.style.display = 'block';
-        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
+        addEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
     },
     dismissClock: function(num) {
        document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
-       window.document.onclick = null;
+       removeEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
     },
     handleClockQuicklink: function(num, val) {
        DateTimeShortcuts.clockInputs[num].value = val;
