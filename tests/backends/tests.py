@@ -157,18 +157,18 @@ class DateQuotingTest(TestCase):
 class LastExecutedQueryTest(TestCase):
 
     def test_debug_sql(self):
-        list(models.Tag.objects.filter(name="test"))
+        list(models.Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]['sql'].lower()
         self.assertIn("select", sql)
-        self.assertIn(models.Tag._meta.db_table, sql)
+        self.assertIn(models.Reporter._meta.db_table, sql)
 
     def test_query_encoding(self):
         """
         Test that last_executed_query() returns an Unicode string
         """
-        tags = models.Tag.objects.extra(select={'föö': 1})
-        sql, params = tags.query.sql_with_params()
-        cursor = tags.query.get_compiler('default').execute_sql(None)
+        persons = models.Reporter.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
+        sql, params = persons.query.sql_with_params()
+        cursor = persons.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertTrue(isinstance(last_sql, six.text_type))
 
