@@ -335,6 +335,12 @@ LANG_INFO = {
         'name': 'Norwegian',
         'name_local': 'norsk',
     },
+    'os': {
+        'bidi': False,
+        'code': 'os',
+        'name': 'Ossetic',
+        'name_local': 'Ирон',
+    },
     'pa': {
         'bidi': False,
         'code': 'pa',
