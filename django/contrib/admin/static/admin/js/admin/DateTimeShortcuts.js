@@ -7,6 +7,7 @@ var DateTimeShortcuts = {
     calendarInputs: [],
     clockInputs: [],
     dismissClockFunc: [],
+    dismissCalendarFunc: [],
     calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
     calendarDivName2: 'calendarin',  // name of <div> that contains calendar
     calendarLinkName: 'calendarlink',// name of the link that is used to toggle
@@ -136,6 +137,7 @@ var DateTimeShortcuts = {
         var num = DateTimeShortcuts.calendars.length;
 
         DateTimeShortcuts.calendarInputs[num] = inp;
+        DateTimeShortcuts.dismissCalendarFunc[num] = function() { DateTimeShortcuts.dismissCalendar(num); return true; };
 
         // Shortcut links (calendar icon and "Today" link)
         var shortcuts_span = document.createElement('span');
@@ -243,11 +245,11 @@ var DateTimeShortcuts = {
         cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
 
         cal_box.style.display = 'block';
-        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
+        addEvent(document, 'click', DateTimeShortcuts.dismissCalendarFunc[num]);
     },
     dismissCalendar: function(num) {
         document.getElementById(DateTimeShortcuts.calendarDivName1+num).style.display = 'none';
-        window.document.onclick = null;
+        removeEvent(document, 'click', DateTimeShortcuts.dismissCalendarFunc[num]);
     },
     drawPrev: function(num) {
         DateTimeShortcuts.calendars[num].drawPreviousMonth();
