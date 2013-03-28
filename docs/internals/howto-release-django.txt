@@ -53,8 +53,8 @@ Prerequisites
 
 You'll need a few things hooked up to make this work:
 
-* A GPG key. *FIXME: sort out exactly whose keys are acceptable for a
-  release.*
+* A GPG key recorded as an acceptable releaser in the `Django releasers`__
+  document.
 
 * Access to Django's record on PyPI.
 
@@ -68,8 +68,10 @@ You'll need a few things hooked up to make this work:
 * If this is a security release, access to the pre-notification distribution
   list.
 
-If this is your first release, you'll need to coordinate with James and Jacob
-to get all these things ready to go.
+If this is your first release, you'll need to coordinate with James and/or
+Jacob to get all these things lined up.
+
+__ https://www.djangoproject.com/m/pgp/django-releasers.txt
 
 Pre-release tasks
 =================
@@ -103,7 +105,6 @@ any time leading up to the actual release:
 Preparing for release
 =====================
 
-
 Write the announcement blog post for the release. You can enter it into the
 admin at any time and mark it as inactive. Here are a few examples: `example
 security release announcement`__, `example regular release announcement`__,
@@ -123,22 +124,30 @@ OK, this is the fun part, where we actually push out a release!
 
    __ http://ci.djangoproject.com
 
-#. A release always begins from a release branch, so you should ``git checkout
-   stable/<release>`` (e.g. checkout ``stable/1.5.x`` to issue a release in the
-   1.5 series) and then ``git pull`` to make sure you're up-to-date.
+#. A release always begins from a release branch, so you should make sure
+   you're on a stable branch and up-to-date. For example::
+
+        git checkout stable/1.5.x
+        git pull
 
 #. If this is a security release, merge the appropriate patches from
    ``django-private``. Rebase these patches as necessary to make each one a
    simple commit on the release branch rather than a merge commit. To ensure
-   this, merge them with the ``--ff-only`` flag; for example, ``git checkout
-   stable/1.5.x; git merge --ff-only security/1.5.x``, if ``security/1.5.x`` is
-   a branch in the ``django-private`` repo containing the necessary security
-   patches for the next release in the 1.5 series. If git refuses to merge with
-   ``--ff-only``, switch to the security-patch branch and rebase it on the
-   branch you are about to merge it into (``git checkout security/1.5.x; git
-   rebase stable/1.5.x``) and then switch back and do the merge. Make sure the
-   commit message for each security fix explains that the commit is a security
-   fix and that an announcement will follow (`example security commit`__)
+   this, merge them with the ``--ff-only`` flag; for example::
+
+        git checkout stable/1.5.x
+        git merge --ff-only security/1.5.x
+
+   (this assumes ``security/1.5.x`` is a branch in the ``django-private`` repo
+   containing the necessary security patches for the next release in the 1.5
+   series.
+
+   If git refuses to merge with ``--ff-only``, switch to the security-patch
+   branch and rebase it on the branch you are about to merge it into (``git
+   checkout security/1.5.x; git rebase stable/1.5.x``) and then switch back and
+   do the merge. Make sure the commit message for each security fix explains
+   that the commit is a security fix and that an announcement will follow
+   (`example security commit`__)
 
    __ https://github.com/django/django/commit/3ef4bbf495cc6c061789132e3d50a8231a89406b
 
@@ -157,19 +166,25 @@ OK, this is the fun part, where we actually push out a release!
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
-#. Tag the release by running ``git tag -s`` *FIXME actual commands*.
+#. Tag the release using ``git tag``. For example::
 
-#. ``git push`` your work.
+        git tag --sign --message="Django 1.5.1" 1.5.1
+
+   You can check your work by running ``git tag --verify <tag>``.
+
+#. Push your work, including the tag: ``git push --tags``.
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``python setup.py sdist`` to generate the release package. This will
    create the release package in a ``dist/`` directory.
 
-#. Generate the MD5 and SHA1 hashes of the release package::
+#. Generate the hashes of the release package::
 
         $ md5sum dist/Django-<version>.tar.gz
         $ sha1sum dist/Django-<version>.tar.gz
+
+   *FIXME: perhaps we should switch to sha256?*
 
 #. Create a "checksums" file containing the hashes and release information.
    You can start with `a previous checksums file`__ and replace the
@@ -178,8 +193,9 @@ OK, this is the fun part, where we actually push out a release!
    __ https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt
 
 #. Sign the checksum file using the release key (``gpg
-   --clearsign``), then verify the signature (``gpg --verify``). *FIXME:
-   full, actual commands here*.
+   --clearsign Django-<version>.checksum.txt``). This generates a signed
+   document, ``Django-<version>.checksum.txt.asc`` which you can then verify
+   using ``gpg --verify Django-<version>.checksum.txt.asc``.
 
 If you're issuing multiple releases, repeat these steps for each release.
 
@@ -201,15 +217,14 @@ Now you're ready to actually put the release out there. To do this:
    and ``pip``. Here's one method (which requires `virtualenvwrapper`__)::
 
         $ mktmpenv
-        $ easy_install https://www.djangoproject.com/download/<version>/tarball/
+        $ easy_install https://www.djangoproject.com/m/releases/1.5/Django-1.5.1.tar.gz
         $ deactivate
         $ mktmpenv
-        $ pip install https://www.djangoproject.com/download/<version>/tarball/
+        $ pip install https://www.djangoproject.com/m/releases/1.5/Django-1.5.1.tar.gz
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
-   that they install correctly, but it'll catch silly mistakes. *FIXME:
-   buildout too?*
+   that they install correctly, but it'll catch silly mistakes.
 
    __ https://pypi.python.org/pypi/virtualenvwrapper
 
@@ -220,15 +235,28 @@ Now you're ready to actually put the release out there. To do this:
    correct (proper version numbers, no stray ``.pyc`` or other undesirable
    files).
 
-#. If this is a security or regular release, register the new package with PyPI
-   by uploading the ``PGK-INFO`` file generated in the release package.  This
-   file's *in* the distribution tarball, so you'll need to pull it out. ``tar
-   xzf dist/Django-<version>.tar.gz Django-<version>/PKG-INFO`` ought to
-   work. *FIXME: Is there any reason to pull this file out manually rather than
-   using "python setup.py register"?*
+#. If this is a release that should land on PyPI (i.e. anything except for
+   a pre-release), register the new package with PyPI by running
+   ``python setup.py register``.
+
+#. Upload the sdist you generated a few steps back through the PyPI web
+   interface. You'll log into PyPI, click "Django" in the right sidebar,
+   find the release you just registered, and click "files" to upload the
+   sdist.
+
+   .. note::
+
+        Why can't we just use ``setup.py sdist upload``? Well, if we do it above
+        that pushes the sdist to PyPI before we've had a chance to sign, review
+        and test it. And we can't just ``setup.py upload`` without ``sdist``
+        because ``setup.py`` prevents that. Nor can we ``sdist upload`` because
+        that would generate a *new* sdist that might not match the file we just
+        signed. Finally, uploading through the web interface is somewhat more
+        secure: it sends the file over HTTPS.
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
+   So for example enter "1.5.1" or "1.4-rc-2", etc.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -243,8 +271,7 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Post the release announcement to the django-announce,
    django-developers and django-users mailing lists. This should
-   include links to both the announcement blog post and the release
-   notes. *FIXME: make some templates with example text*.
+   include links to the announcement blog post and the release notes.
 
 Post-release
 ============
@@ -253,8 +280,8 @@ You're almost done! All that's left to do now is:
 
 #. Update the ``VERSION`` tuple in ``django/__init__.py`` again,
    incrementing to whatever the next expected release will be. For
-   example, after releasing 1.2.1, update ``VERSION`` to report "1.2.2
-   pre-alpha". *FIXME: Is this correct? Do we still do this?*
+   example, after releasing 1.5.1, update ``VERSION`` to
+   ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
 #. For the first alpha release of a new version (when we create the
    ``stable/1.?.x`` git branch), you'll want to create a new
