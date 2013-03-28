@@ -222,7 +222,7 @@ def parse_html(html):
     """
     Takes a string that contains *valid* HTML and turns it into a Python object
     structure that can be easily compared against other HTML on semantic
-    equivilance. Syntactical differences like which quotation is used on
+    equivalence. Syntactical differences like which quotation is used on
     arguments will be ignored.
 
     """
