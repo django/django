@@ -54,7 +54,10 @@ Prerequisites
 You'll need a few things hooked up to make this work:
 
 * A GPG key recorded as an acceptable releaser in the `Django releasers`__
-  document.
+  document. (If this key is not your default signing key, you'll need to add
+  ``-u you@example.com`` to every GPG signing command below, where
+  ``you@example.com`` is the email address associated with the key you want to
+  use.)
 
 * Access to Django's record on PyPI.
 
@@ -138,9 +141,9 @@ OK, this is the fun part, where we actually push out a release!
         git checkout stable/1.5.x
         git merge --ff-only security/1.5.x
 
-   (this assumes ``security/1.5.x`` is a branch in the ``django-private`` repo
+   (This assumes ``security/1.5.x`` is a branch in the ``django-private`` repo
    containing the necessary security patches for the next release in the 1.5
-   series.
+   series.)
 
    If git refuses to merge with ``--ff-only``, switch to the security-patch
    branch and rebase it on the branch you are about to merge it into (``git
@@ -192,10 +195,10 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt
 
-#. Sign the checksum file using the release key (``gpg
-   --clearsign Django-<version>.checksum.txt``). This generates a signed
-   document, ``Django-<version>.checksum.txt.asc`` which you can then verify
-   using ``gpg --verify Django-<version>.checksum.txt.asc``.
+#. Sign the checksum file (``gpg --clearsign
+   Django-<version>.checksum.txt``). This generates a signed document,
+   ``Django-<version>.checksum.txt.asc`` which you can then verify using ``gpg
+   --verify Django-<version>.checksum.txt.asc``.
 
 If you're issuing multiple releases, repeat these steps for each release.
 
