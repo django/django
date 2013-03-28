@@ -36,7 +36,7 @@ The Git repository includes several `branches`_:
   activity is focused.
 
 * ``stable/A.B.x`` are the branches where release preparation work happens. They
-  are also used to host maintenance after the release happens.
+  are also used to host maintenance after the release.
 
 * ``soc20XX/<project>`` branches were used by students who worked on Django
   during the 2009 and 2010 Google Summer of Code programs.
