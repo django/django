@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"POT-Creation-Date: 2013-03-28 10:04+0100\n"
 "PO-Revision-Date: 2012-03-08 12:32+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: English <en@li.org>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: views.py:9
@@ -29,47 +29,47 @@ msgstr "Slug %r isn't registered."
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
-#: db/models/fields.py:271
+#: db/models/fields.py:270
 msgid "Point"
 msgstr "Point"
 
-#: db/models/fields.py:275
+#: db/models/fields.py:274
 msgid "Line string"
 msgstr "Line string"
 
-#: db/models/fields.py:279
+#: db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polygon"
 
-#: db/models/fields.py:283
+#: db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Multi-point"
 
-#: db/models/fields.py:287
+#: db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Multi-line string"
 
-#: db/models/fields.py:291
+#: db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Multi polygon"
 
-#: db/models/fields.py:295
+#: db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Geometry collection"
 
-#: forms/fields.py:19
+#: forms/fields.py:23
 msgid "No geometry value provided."
 msgstr "No geometry value provided."
 
-#: forms/fields.py:20
+#: forms/fields.py:24
 msgid "Invalid geometry value."
 msgstr "Invalid geometry value."
 
-#: forms/fields.py:21
+#: forms/fields.py:25
 msgid "Invalid geometry type."
 msgstr "Invalid geometry type."
 
-#: forms/fields.py:22
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
