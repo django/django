@@ -305,6 +305,12 @@ LANG_INFO = {
         'name': 'Mongolian',
         'name_local': 'Mongolian',
     },
+    'my': {
+        'bidi': False,
+        'code': 'my',
+        'name': 'Burmese',
+        'name_local': 'မြန်မာဘာသာ',
+    },
     'nb': {
         'bidi': False,
         'code': 'nb',
