@@ -6,16 +6,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
-def standalone_number(self):
+def standalone_number():
     return 1
 
 class Numbers(object):
     @staticmethod
-    def get_static_number(self):
+    def get_static_number():
         return 2
 
     @classmethod
-    def get_class_number(self):
+    def get_class_number(cls):
         return 3
 
     def get_member_number(self):
