@@ -34,7 +34,7 @@ TemplateView
 
 * :attr:`~django.views.generic.base.TemplateResponseMixin.content_type`
 * :attr:`~django.views.generic.base.View.http_method_names`
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 
 **Methods**
@@ -86,7 +86,7 @@ DetailView
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_url_kwarg`
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
@@ -121,7 +121,7 @@ ListView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 
@@ -150,7 +150,7 @@ FormView
 * :attr:`~django.views.generic.edit.FormMixin.form_class` [:meth:`~django.views.generic.edit.FormMixin.get_form_class`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.edit.FormMixin.initial` [:meth:`~django.views.generic.edit.FormMixin.get_initial`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.edit.FormMixin.success_url` [:meth:`~django.views.generic.edit.FormMixin.get_success_url`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 
@@ -164,11 +164,9 @@ FormView
 * :meth:`~django.views.generic.edit.FormMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`
-* ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
-* ``post()``
-* ``put()``
-* :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.edit.ProcessFormView.post`
+* :meth:`~django.views.generic.edit.ProcessFormView.put`
 
 CreateView
 ~~~~~~~~~~
@@ -184,7 +182,7 @@ CreateView
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.success_url` [:meth:`~django.views.generic.edit.FormMixin.get_success_url`]
@@ -223,7 +221,7 @@ UpdateView
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.success_url` [:meth:`~django.views.generic.edit.FormMixin.get_success_url`]
@@ -260,7 +258,7 @@ DeleteView
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_url_kwarg`
 * :attr:`~django.views.generic.edit.DeletionMixin.success_url` [:meth:`~django.views.generic.edit.DeletionMixin.get_success_url`]
@@ -300,7 +298,7 @@ ArchiveIndexView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 
@@ -336,7 +334,7 @@ YearArchiveView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 * :attr:`~django.views.generic.dates.YearMixin.year` [:meth:`~django.views.generic.dates.YearMixin.get_year`]
@@ -375,7 +373,7 @@ MonthArchiveView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 * :attr:`~django.views.generic.dates.YearMixin.year` [:meth:`~django.views.generic.dates.YearMixin.get_year`]
@@ -414,7 +412,7 @@ WeekArchiveView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 * :attr:`~django.views.generic.dates.WeekMixin.week` [:meth:`~django.views.generic.dates.WeekMixin.get_week`]
@@ -457,7 +455,7 @@ DayArchiveView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 * :attr:`~django.views.generic.dates.YearMixin.year` [:meth:`~django.views.generic.dates.YearMixin.get_year`]
@@ -502,7 +500,7 @@ TodayArchiveView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_by`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 * :attr:`~django.views.generic.dates.YearMixin.year` [:meth:`~django.views.generic.dates.YearMixin.get_year`]
@@ -545,7 +543,7 @@ DateDetailView
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
-* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class`
+* :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_url_kwarg`
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]

@@ -193,7 +193,10 @@ ProcessFormView
         Constructs a form, checks the form for validity, and handles it
         accordingly.
 
-    The PUT action is also handled, as an analog of POST.
+    .. method:: put(*args, **kwargs)
+
+        The ``PUT`` action is also handled and just passes all parameters
+        through to :meth:`post`.
 
 .. class:: django.views.generic.edit.DeletionMixin
 
