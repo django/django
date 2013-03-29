@@ -85,7 +85,7 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
         objects = PollManager()
 
     class Response(models.Model):
-        poll = models.ForeignKey(Poll)
+        poll = models.ForeignKey(OpinionPoll)
         person_name = models.CharField(max_length=50)
         response = models.TextField()
 
