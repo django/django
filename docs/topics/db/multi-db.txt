@@ -324,7 +324,7 @@ from::
             in the master/slave pool.
             """
             db_list = ('master', 'slave1', 'slave2')
-            if obj1.state.db in db_list and obj2.state.db in db_list:
+            if obj1._state.db in db_list and obj2._state.db in db_list:
                 return True
             return None
 
