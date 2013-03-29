@@ -2159,5 +2159,5 @@ To allow easier reversing of the admin urls in templates, Django provides an
 
 The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
-object which has an ``app_label`` and ``module_name`` and is usually supplied
-by the admin views for the current model.
+object which has an ``app_label`` and ``model_name`` attributes and is usually
+supplied by the admin views for the current model.
