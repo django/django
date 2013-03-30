@@ -9,7 +9,7 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import simple, TransactionTestCase, skipUnlessDBFeature
+from django.test import runner, simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
@@ -36,7 +36,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -56,7 +56,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -83,7 +83,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'delta': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,aliases in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -110,7 +110,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'alpha': ['bravo'],
         }
 
-        self.assertRaises(ImproperlyConfigured, simple.dependency_ordered, raw, dependencies=dependencies)
+        self.assertRaises(ImproperlyConfigured, runner.dependency_ordered, raw, dependencies=dependencies)
 
     def test_own_alias_dependency(self):
         raw = [
@@ -121,7 +121,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         with self.assertRaises(ImproperlyConfigured):
-            simple.dependency_ordered(raw, dependencies=dependencies)
+            runner.dependency_ordered(raw, dependencies=dependencies)
 
         # reordering aliases shouldn't matter
         raw = [
@@ -129,7 +129,7 @@ class DependencyOrderingTests(unittest.TestCase):
         ]
 
         with self.assertRaises(ImproperlyConfigured):
-            simple.dependency_ordered(raw, dependencies=dependencies)
+            runner.dependency_ordered(raw, dependencies=dependencies)
 
 
 class MockTestRunner(object):

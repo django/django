@@ -6,6 +6,8 @@ import subprocess
 import sys
 import tempfile
 
+from os.path import dirname, realpath
+
 from django import contrib
 from django.utils._os import upath
 from django.utils import six
@@ -147,12 +149,16 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
-    if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+    settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
-    test_runner = TestRunner(verbosity=verbosity, interactive=interactive,
-        failfast=failfast)
+    root = realpath(dirname(__file__))
+    test_runner = TestRunner(
+        verbosity=verbosity,
+        interactive=interactive,
+        failfast=failfast,
+        root=root,
+    )
     failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
 
     teardown(state)

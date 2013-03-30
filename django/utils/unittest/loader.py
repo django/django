@@ -125,7 +125,7 @@ class TestLoader(unittest.TestLoader):
             return self.loadTestsFromTestCase(obj)
         elif (isinstance(obj, types.UnboundMethodType) and
               isinstance(parent, type) and
-              issubclass(parent, case.TestCase)):
+              issubclass(parent, unittest.TestCase)):
             return self.suiteClass([parent(obj.__name__)])
         elif isinstance(obj, unittest.TestSuite):
             return obj

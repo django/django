@@ -372,6 +372,10 @@ these changes.
   - ``django.db.transaction.is_managed()``
   - ``django.db.transaction.managed()``
 
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
+  `django.test.runner.DiscoverRunner`.
+
 2.0
 ---
 

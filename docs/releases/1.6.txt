@@ -78,6 +78,25 @@ Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
 A new :class:`django.db.models.BinaryField` model field allows to store raw
 binary data in the database.
 
+Discovery of tests in any test module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+Django 1.6 ships with a new test runner that allows more flexibility in the
+location of tests. With the previous runner
+(``django.test.simple.DjangoTestSuiteRunner``), Django would look for tests
+only in the ``models.py`` and ``tests.py`` modules of any Python package in
+:setting:`INSTALLED_APPS`, and specific tests to be run had to be specified
+by app-label and testcase-class name.
+ 
+The new runner (``django.test.runner.DjangoTestDiscoverRunner``) uses
+Python's unittest2 discovery. That means tests can be run using either
+full dotted path names, or by specifying a root directory. By default,
+discovery will find tests in any module that starts with ``tests`` beneath
+the root directory. The default root directory is the current working
+directory.
+
+For more information, see :doc:`topics/testing`.
+
 Minor features
 ~~~~~~~~~~~~~~
 

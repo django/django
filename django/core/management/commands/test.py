@@ -10,6 +10,15 @@ from django.test.utils import get_runner
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
+        make_option('--installed', action='store_true', default=False,
+            help='Discover tests for INSTALLED_APPS.'),
+        make_option('--root', action='store', dest='root', default='.',
+            help='Root directory for unittest discovery.'),
+        make_option('--top-level', action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.'),
+        make_option('--pattern', action='store', dest='pattern',
+            default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.'),
         make_option('--noinput',
             action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
