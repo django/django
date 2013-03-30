@@ -247,7 +247,7 @@ wizard's ``as_view()`` method takes a list of your
 
 .. versionchanged:: 1.6
 
-You can also pass the form list as a class attribute named ``form_list``.
+You can also pass the form list as a class attribute named ``form_list``::
 
     class ContactWizard(WizardView):
         form_list = [ContactForm1, ContactForm2]
@@ -304,8 +304,8 @@ The ``urls.py`` file would contain something like::
 
 .. versionchanged:: 1.6
 
-The ``condiction_dict`` can be passed as attribute for the ``as_view()``
-method or as a class attribute named ``condition_dict``.
+The ``condiction_dict`` can be passed as attribute for the ``as_view()`
+method or as a class attribute named ``condition_dict``::
 
     class OrderWizard(WizardView):
         condition_dict = {'cc': pay_by_credit_card}
