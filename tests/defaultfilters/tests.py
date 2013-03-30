@@ -313,7 +313,10 @@ class DefaultFiltersTests(TestCase):
         # Check urlize doesn't crash when square bracket is prepended to url (#19070)
         self.assertEqual(urlize('see test[at[example.com'),
             'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
-
+      
+        # Check urlize works with IPv6
+        self.assertEqual(urlize('http://[2001:db8:cafe::2]/api/nodes/9'),
+            '<a href="http://[2001:db8:cafe::2]/api/nodes/9" rel="nofollow">http://[2001:db8:cafe::2]/api/nodes/9</a>')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
