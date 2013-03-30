@@ -824,21 +824,25 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         pk_value = obj._get_pk_val()
 
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        if post_url_continue is None:
+            post_url_continue = reverse('admin:%s_%s_change' %
+                                        (opts.app_label, opts.model_name),
+                                        args=(pk_value,),
+                                        current_app=self.admin_site.name)
+
+        msg_dict = {
+            'name': escape(opts.verbose_name),
+            'obj': force_text('<a href="{0}">{1}</a>').format(escape(post_url_continue), escape(obj))
+        }
+
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
         if "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
-            if post_url_continue is None:
-                post_url_continue = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.model_name),
-                                            args=(pk_value,),
-                                            current_app=self.admin_site.name)
+            self.message_user(request, mark_safe(msg))
             if "_popup" in request.POST:
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue)
-
         if "_popup" in request.POST:
             return HttpResponse(
                 '<!DOCTYPE html><html><head><title></title></head><body>'
@@ -847,11 +851,11 @@ class ModelAdmin(BaseModelAdmin):
                 (escape(pk_value), escapejs(obj)))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, mark_safe(msg))
             return HttpResponseRedirect(request.path)
         else:
             msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, mark_safe(msg))
             return self.response_post_save_add(request, obj)
 
     def response_change(self, request, obj):
@@ -862,30 +866,36 @@ class ModelAdmin(BaseModelAdmin):
 
         pk_value = obj._get_pk_val()
 
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        edit_again_url = reverse('admin:%s_%s_change' %
+                                    (opts.app_label, opts.model_name),
+                                    args=(pk_value,),
+                                    current_app=self.admin_site.name)
+
+        msg_dict = {
+            'name': escape(opts.verbose_name),
+            'obj': force_text('<a href="{0}">{1}</a>').format(escape(edit_again_url), escape(obj))
+        }
+
         if "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, mark_safe(msg))
             if "_popup" in request.REQUEST:
                 return HttpResponseRedirect(request.path + "?_popup=1")
             else:
                 return HttpResponseRedirect(request.path)
         elif "_saveasnew" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
-            return HttpResponseRedirect(reverse('admin:%s_%s_change' %
-                                        (opts.app_label, opts.model_name),
-                                        args=(pk_value,),
-                                        current_app=self.admin_site.name))
+            self.message_user(request, mark_safe(msg))
+            return HttpResponseRedirect(edit_again_url)
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, mark_safe(msg))
             return HttpResponseRedirect(reverse('admin:%s_%s_add' %
                                         (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
         else:
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, mark_safe(msg))
             return self.response_post_save_change(request, obj)
 
     def response_post_save_add(self, request, obj):
