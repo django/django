@@ -42,7 +42,7 @@ class TranslatableFile(object):
             return self.file < other.file
         return self.dirpath < other.dirpath
 
-    def process(self, command, potfile, domain, keep_pot=False):
+    def process(self, command, potfile, domain, keep_pot=False, extra_keywords=None):
         """
         Extract translatable literals from self.file for :param domain:
         creating or updating the :param potfile: POT file.
@@ -73,7 +73,12 @@ class TranslatableFile(object):
                 '--keyword=gettext_lazy',
                 '--keyword=ngettext_lazy:1,2',
                 '--keyword=pgettext:1c,2',
-                '--keyword=npgettext:1c,2,3',
+                '--keyword=npgettext:1c,2,3'
+            ]
+            if extra_keywords:
+                for kw in extra_keywords:
+                    args.append('--keyword=%s' % kw)
+            args += [
                 '--from-code=UTF-8',
                 '--add-comments=Translators',
                 '--output=-'
@@ -108,7 +113,12 @@ class TranslatableFile(object):
                 '--keyword=pgettext:1c,2',
                 '--keyword=npgettext:1c,2,3',
                 '--keyword=pgettext_lazy:1c,2',
-                '--keyword=npgettext_lazy:1c,2,3',
+                '--keyword=npgettext_lazy:1c,2,3'
+            ]
+            if extra_keywords:
+                for kw in extra_keywords:
+                    args.append('--keyword=%s' % kw)
+            args += [
                 '--from-code=UTF-8',
                 '--add-comments=Translators',
                 '--output=-'
@@ -182,6 +192,10 @@ class Command(NoArgsCommand):
             default=False, help="Remove obsolete message strings."),
         make_option('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging."),
+        make_option('--extra-keyword', dest='extra_keywords', action='append',
+            help='If you use import aliases for ugettext and its variations, '
+                 'you can specify it here to make sure that xgettext will find '
+                 'your translatable strings.'),
     )
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
@@ -207,6 +221,7 @@ class Command(NoArgsCommand):
         self.location = '--no-location' if options.get('no_location') else ''
         self.no_obsolete = options.get('no_obsolete')
         self.keep_pot = options.get('keep_pot')
+        self.extra_keywords = options.get('extra_keywords')
 
         if self.domain not in ('django', 'djangojs'):
             raise CommandError("currently makemessages only supports domains "
@@ -294,7 +309,7 @@ class Command(NoArgsCommand):
             os.unlink(potfile)
 
         for f in file_list:
-            f.process(self, potfile, self.domain, self.keep_pot)
+            f.process(self, potfile, self.domain, self.keep_pot, self.extra_keywords)
         return potfile
 
     def find_files(self, root):

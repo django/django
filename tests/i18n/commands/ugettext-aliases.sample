@@ -1,0 +1,4 @@
+from django.utils.translation import ugettext as tr, ugettext_lazy as tr_lazy
+
+tr('Should be found only with the --extra-keyword option')
+tr_lazy('Lazy, should be found only with the --extra-keyword option')
