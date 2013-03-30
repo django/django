@@ -820,9 +820,6 @@ class TestCase(TransactionTestCase):
         # Remove this when the legacy transaction management goes away.
         disable_transaction_methods()
 
-        from django.contrib.sites.models import Site
-        Site.objects.clear_cache()
-
         for db in self._databases_names(include_mirrors=False):
             if hasattr(self, 'fixtures'):
                 call_command('loaddata', *self.fixtures,
