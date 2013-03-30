@@ -1035,7 +1035,8 @@ through the template engine: the files whose extensions match the
 with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
-- Any option passed to the startproject command
+- Any option passed to the startapp command (among the command's supported
+  options)
 - ``project_name`` -- the project name as passed to the command
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
