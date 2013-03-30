@@ -350,6 +350,16 @@ This view function serves static files in development.
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
 
+.. note::
+
+    To guess the served files' content types, this view relies on the
+    :py:mod:`mimetypes` module from the Python standard library, which itself
+    relies on the underlying platform's map files. If you find that this view
+    doesn't return proper content types for certain files, it is most likely
+    that the platform's map files need to be updated. This can be achieved, for
+    example, by installing or updating the ``mailcap`` package on a Red Hat
+    distribution, or ``mime-support`` on a Debian distribution.
+
 This view is automatically enabled by :djadmin:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different
 local development server, add the following snippet to the end of your
