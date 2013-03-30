@@ -737,6 +737,8 @@ class ChoiceField(Field):
                  initial=None, help_text='', *args, **kwargs):
         super(ChoiceField, self).__init__(required=required, widget=widget, label=label,
                                         initial=initial, help_text=help_text, *args, **kwargs)
+        if isinstance(choices, dict):
+            choices = choices.items()
         self.choices = choices
 
     def __deepcopy__(self, memo):
