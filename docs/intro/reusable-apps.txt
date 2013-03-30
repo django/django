@@ -220,6 +220,7 @@ Create a file ``django-polls/setup.py`` with the following contents::
    ``django-polls/MANIFEST.in`` with the following contents::
 
     include LICENSE
+    include README.txt
     recursive-include polls/templates *
 
 7. It's optional, but recommended, to include detailed documentation with your
