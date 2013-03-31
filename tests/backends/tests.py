@@ -3,6 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+from decimal import Decimal
 import threading
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
+from django.db.backends.util import format_number
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
@@ -794,3 +796,42 @@ class DBConstraintTestCase(TransactionTestCase):
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
+
+
+class BackendUtilTests(TestCase):
+
+    def test_format_number(self):
+        """
+        Test the format_number converter utility
+        """
+        def equal(value, max_d, places, result):
+            self.assertEqual(format_number(Decimal(value), max_d, places), result)
+
+        equal('0', 12, 3,
+              '0.000')
+        equal('0', 12, 8,
+              '0.00000000')
+        equal('1', 12, 9,
+              '1.000000000')
+        equal('0.00000000', 12, 8,
+              '0.00000000')
+        equal('0.000000004', 12, 8,
+              '0.00000000')
+        equal('0.000000008', 12, 8,
+              '0.00000001')
+        equal('0.000000000000000000999', 10, 8,
+              '0.00000000')
+        equal('0.1234567890', 12, 10,
+              '0.1234567890')
+        equal('0.1234567890', 12, 9,
+              '0.123456789')
+        equal('0.1234567890', 12, 8,
+              '0.12345679')
+        equal('0.1234567890', 12, 5,
+              '0.12346')
+        equal('0.1234567890', 12, 3,
+              '0.123')
+        equal('0.1234567890', 12, 1,
+              '0.1')
+        equal('0.1234567890', 12, 0,
+              '0')
