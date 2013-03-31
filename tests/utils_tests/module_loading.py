@@ -124,7 +124,7 @@ class ModuleImportTestCase(unittest.TestCase):
         """Test preserving the original traceback on an ImportError."""
         try:
             import_by_path('test_module.bad_module.content')
-        except ImproperlyConfigured, e:
+        except ImproperlyConfigured:
             traceback = sys.exc_info()[2]
 
         self.assertIsNotNone(traceback.tb_next.tb_next,
