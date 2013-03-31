@@ -50,6 +50,34 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
 
+    def test_wsgirequest_path_with_script_name(self):
+        """
+        Ensure that the request's path is correctly assembled regarless of
+        whether or not the SCRIPT_NAME has a trailing slash.
+        Refs #20169.
+        """
+        # With trailing slash
+        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        self.assertEqual(request.path, '/PREFIX/somepath/')
+        # Without trailing slash
+        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        self.assertEqual(request.path, '/PREFIX/somepath/')
+
+    def test_wsgirequest_path_with_force_script_name(self):
+        """
+        Ensure that the request's path is correctly assembled regarless of
+        whether or not the FORCE_SCRIPT_NAME setting has a trailing slash.
+        Refs #20169.
+        """
+        # With trailing slash
+        with override_settings(FORCE_SCRIPT_NAME='/PREFIX/'):
+            request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+            self.assertEqual(request.path, '/PREFIX/somepath/')
+        # Without trailing slash
+        with override_settings(FORCE_SCRIPT_NAME='/PREFIX'):
+            request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+            self.assertEqual(request.path, '/PREFIX/somepath/')
+
     def test_wsgirequest_repr(self):
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         request.GET = {'get-key': 'get-value'}
