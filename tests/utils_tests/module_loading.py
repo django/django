@@ -120,6 +120,16 @@ class ModuleImportTestCase(unittest.TestCase):
             import_by_path('unexistent.module.path', error_prefix="Foo")
         self.assertTrue(str(cm.exception).startswith('Foo'))
 
+    def test_import_error_traceback(self):
+        """Test preserving the original traceback on an ImportError."""
+        try:
+            import_by_path('test_module.bad_module.content')
+        except ImproperlyConfigured:
+            traceback = sys.exc_info()[2]
+
+        self.assertIsNotNone(traceback.tb_next.tb_next,
+            'Should have more than the calling frame in the traceback.')
+
 
 class ProxyFinder(object):
     def __init__(self):
