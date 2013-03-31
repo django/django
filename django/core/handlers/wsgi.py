@@ -140,7 +140,7 @@ class WSGIRequest(http.HttpRequest):
             path_info = '/'
         self.environ = environ
         self.path_info = path_info
-        self.path = '%s%s' % (script_name, path_info)
+        self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
