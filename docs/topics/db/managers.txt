@@ -70,8 +70,8 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
                 SELECT p.id, p.question, p.poll_date, COUNT(*)
                 FROM polls_opinionpoll p, polls_response r
                 WHERE p.id = r.poll_id
-                GROUP BY 1, 2, 3
-                ORDER BY 3 DESC""")
+                GROUP BY p.id, p.question, p.poll_date
+                ORDER BY p.poll_date DESC""")
             result_list = []
             for row in cursor.fetchall():
                 p = self.model(id=row[0], question=row[1], poll_date=row[2])
