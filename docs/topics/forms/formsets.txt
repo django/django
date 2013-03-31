@@ -193,7 +193,10 @@ this management data, an exception will be raised::
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
-in this form as well.
+in this form as well. On the other hand, if you are using JavaScript to allow
+deletion of existing objects, then you need to ensure the ones being removed
+are properly marked for deletion by including ``form-#-DELETE`` in the ``POST``
+data. It is expected that all forms are present in the ``POST`` data regardless.
 
 The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
