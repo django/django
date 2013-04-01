@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import re
@@ -6,7 +7,7 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.unittest import expectedFailure
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 
 if connection.vendor == 'oracle':
     expectedFailureOnOracle = expectedFailure
@@ -146,6 +147,11 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
+        if PY3:
+            # Python 3 allows non-ascii identifiers
+            self.assertIn("tamaño = models.IntegerField()", output)
+        else:
+            self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)
 
     def test_managed_models(self):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
