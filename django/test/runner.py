@@ -1,13 +1,12 @@
-from os.path import join, realpath
-from unittest import TestSuite
+from optparse import make_option
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.utils.importlib import import_module
 from django.utils import unittest
 from django.utils.unittest.loader import defaultTestLoader
+from django.utils.unittest import TestSuite
 
 
 class DiscoverRunner(object):
@@ -17,20 +16,25 @@ class DiscoverRunner(object):
 
     test_loader = defaultTestLoader
     reorder_by = (TestCase, )
+    option_list = (
+        make_option('-t', '--top-level-directory',
+            action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.'),
+        make_option('-p', '--pattern', action='store', dest='pattern',
+            default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.'),
+        )
 
-    def __init__(self, root=None, pattern="test*.py", top_level=None,
-            verbosity=1, interactive=True, failfast=False, 
-                installed=False, **kwargs):
+    def __init__(self, pattern=None, top_level=None,
+                 verbosity=1, interactive=True, failfast=False,
+                 **kwargs):
 
-        self.root = root
         self.pattern = pattern
-        self.top_level = top_level or root
+        self.top_level = top_level
 
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
-
-        self.installed = installed
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -39,41 +43,21 @@ class DiscoverRunner(object):
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         suite = TestSuite()
-        root = self.root
-        top_level = self.top_level
-        test_labels = test_labels or []
+        test_labels = test_labels or ['.']
+        extra_tests = extra_tests or []
 
-        if self.installed:
-            test_labels = settings.INSTALLED_APPS
+        discover_kwargs = {}
+        if self.pattern is not None:
+            discover_kwargs['pattern'] = self.pattern
+        if self.top_level is not None:
+            discover_kwargs['top_level_dir'] = self.top_level
 
-        apps = [x for x in test_labels if "." not in x]
-        labels = [x for x in test_labels if "." in x]
+        for label in test_labels:
+            suite.addTests(
+                self.test_loader.discover(start_dir=label, **discover_kwargs))
 
-        for app in apps:
-            root = import_module(app).__path__[0]
-            top_level = realpath(join(root, ".."))
-
-            suite.addTests(discover(
-                loader=self.test_loader,
-                root=import_module(app).__path__[0],
-                pattern=self.pattern,
-                top_level=top_level,
-            ))
-
-        if labels:
-            suite.addTests(self.test_loader.loadTestsFromNames(labels))
-
-        if not (apps or labels):
-            suite.addTests(discover(
-                loader=self.test_loader,
-                root=self.root,
-                pattern=self.pattern,
-                top_level=self.top_level,
-            ))
-
-        if extra_tests:
-            for test in extra_tests:
-                suite.addTest(test)
+        for test in extra_tests:
+            suite.addTest(test)
 
         return reorder_suite(suite, self.reorder_by)
 
@@ -121,16 +105,6 @@ class DiscoverRunner(object):
         self.teardown_databases(old_config)
         self.teardown_test_environment()
         return self.suite_result(suite, result)
-
-
-def discover(loader, root, pattern=None, top_level=None):
-    args = {}
-    args["start_dir"] = root
-    args["top_level_dir"] = top_level or root
-    if pattern:
-        args["pattern"] = pattern
-        
-    return loader.discover(**args)
 
 
 def dependency_ordered(test_databases, dependencies):

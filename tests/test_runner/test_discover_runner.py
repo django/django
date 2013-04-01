@@ -5,21 +5,6 @@ from django.test.runner import DiscoverRunner
 
 
 class DiscoverRunnerTest(TestCase):
-
-    def test_single_app_with_discovery(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample"],
-        ).countTestCases()
-
-        self.assertEqual(count, 4)
-
-    def test_multiple_apps_with_discovery(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample", "test_discovery_sample2"],
-        ).countTestCases()
-
-        self.assertEqual(count, 5)
-
     def test_dotted_test_module(self):
         count = DiscoverRunner().build_suite(
             ["test_discovery_sample.tests_sample"],
@@ -40,14 +25,6 @@ class DiscoverRunnerTest(TestCase):
         ).countTestCases()
 
         self.assertEqual(count, 1)
-
-    def test_mixed(self):
-        count = DiscoverRunner().build_suite([
-            "test_discovery_sample.tests_sample.Test1.test_sample",
-            "test_discovery_sample2",
-        ]).countTestCases()
-
-        self.assertEqual(count, 2)
 
     def test_pattern(self):
         root = realpath(join(dirname(__file__), "../test_discovery_sample"))
@@ -78,10 +55,3 @@ class DiscoverRunnerTest(TestCase):
         ).build_suite().countTestCases()
 
         self.assertEqual(count, 1)
-
-    def test_installed(self):
-        count = DiscoverRunner(
-            installed=True,
-        ).build_suite().countTestCases()
-
-        self.assertTrue(count > 50)

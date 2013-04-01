@@ -152,12 +152,10 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
-    root = realpath(dirname(__file__))
     test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
         failfast=failfast,
-        root=root,
     )
     failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
 
