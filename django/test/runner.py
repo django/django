@@ -5,8 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils import unittest
-from django.utils.unittest.loader import defaultTestLoader
-from django.utils.unittest import TestSuite
+from django.utils.unittest import TestSuite, defaultTestLoader
 
 
 class DiscoverRunner(object):
