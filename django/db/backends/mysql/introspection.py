@@ -47,8 +47,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 AND character_maximum_length IS NOT NULL""", [table_name])
         length_map = dict(cursor.fetchall())
 
+        # Also getting precision and scale from information_schema (see #5014)
+        cursor.execute("""
+            SELECT column_name, numeric_precision, numeric_scale FROM information_schema.columns
+            WHERE table_name = %s AND table_schema = DATABASE()
+                AND data_type='decimal'""", [table_name])
+        numeric_map = dict([(line[0], tuple([int(n) for n in line[1:]])) for line in cursor.fetchall()])
+
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*(line[:3] + (length_map.get(line[0], line[3]),) + line[4:]))
+        return [FieldInfo(*(line[:3] + (length_map.get(line[0], line[3]),)
+                                     + numeric_map.get(line[0], line[4:6])
+                                     + (line[6],)))
             for line in cursor.description]
 
     def _name_to_index(self, cursor, table_name):
