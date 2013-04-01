@@ -2,6 +2,7 @@ import re
 from .base import FIELD_TYPE
 
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
@@ -55,9 +56,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         numeric_map = dict([(line[0], tuple([int(n) for n in line[1:]])) for line in cursor.fetchall()])
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*(line[:3] + (length_map.get(line[0], line[3]),)
-                                     + numeric_map.get(line[0], line[4:6])
-                                     + (line[6],)))
+        return [FieldInfo(*((force_text(line[0]),)
+                            + line[1:3]
+                            + (length_map.get(line[0], line[3]),)
+                            + numeric_map.get(line[0], line[4:6])
+                            + (line[6],)))
             for line in cursor.description]
 
     def _name_to_index(self, cursor, table_name):
