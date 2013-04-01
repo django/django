@@ -1,3 +1,6 @@
+# -*- encoding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -29,6 +32,7 @@ class SpecialColumnName(models.Model):
     field_field_2 = models.IntegerField(db_column='__field')
     # Other chars
     prc_x = models.IntegerField(db_column='prc(%) x')
+    non_ascii = models.IntegerField(db_column='tamaño')
 
 class ColumnTypes(models.Model):
     id = models.AutoField(primary_key=True)
