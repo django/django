@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 import os
-import unittest
 
 from django.utils import html
 from django.utils._os import upath
+from django.utils.unittest import TestCase
 
 
-class TestUtilsHtml(unittest.TestCase):
+class TestUtilsHtml(TestCase):
 
     def check_output(self, function, value, output=None):
         """
