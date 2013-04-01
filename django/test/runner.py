@@ -53,8 +53,14 @@ class DiscoverRunner(object):
             discover_kwargs['top_level_dir'] = self.top_level
 
         for label in test_labels:
-            suite.addTests(
-                self.test_loader.discover(start_dir=label, **discover_kwargs))
+            try:
+                # try discovery if its a module/package
+                tests = self.test_loader.discover(
+                    start_dir=label, **discover_kwargs)
+            except ImportError:
+                # handle "module.ClassName[.method_name]"
+                tests = self.test_loader.loadTestsFromName(label)
+            suite.addTests(tests)
 
         for test in extra_tests:
             suite.addTest(test)
