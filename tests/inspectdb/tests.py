@@ -57,8 +57,6 @@ class InspectDBTestCase(TestCase):
         if connection.vendor == 'sqlite':
             # Ticket #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=None, decimal_places=None)")
-        elif connection.vendor == 'mysql':
-            pass # Ticket #5014
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
         assertFieldType('email_field', "models.CharField(max_length=75)")
