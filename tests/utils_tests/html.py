@@ -85,7 +85,6 @@ class TestUtilsHtml(TestCase):
                 stripped = html.strip_tags(fp.read())
                 elapsed = datetime.now() - start
             self.assertEqual(elapsed.seconds, 0)
-            self.assertLess(elapsed.microseconds, 100000)
             self.assertIn("Please try again.", stripped)
             self.assertNotIn('<', stripped)
 
