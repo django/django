@@ -171,7 +171,7 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         query = {'%s__in' % self.related.field.name: instances}
-        qs = self.get_query_set(instance=instances[0]).filter(**query)
+        qs = self.get_queryset(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         rel_obj_cache_name = self.related.field.get_cache_name()
@@ -271,12 +271,12 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         else:
             return QuerySet(self.field.rel.to).using(db)
 
-    def get_prefetch_query_set(self, instances):
+    def get_prefetch_queryset(self, instances):
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         query = {'%s__in' % self.field.related_query_name(): instances}
-        qs = self.get_query_set(instance=instances[0]).filter(**query)
+        qs = self.get_queryset(instance=instances[0]).filter(**query)
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
         if not self.field.rel.multiple:
@@ -300,7 +300,7 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                     (rh_field.attname, getattr(instance, lh_field.attname))
                     for lh_field, rh_field in self.field.related_fields)
                 params.update(self.field.get_extra_descriptor_filter(instance))
-                qs = self.get_query_set(instance=instance)
+                qs = self.get_queryset(instance=instance)
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get(**params)
                 if not self.field.rel.multiple:
@@ -429,8 +429,8 @@ class ForeignRelatedObjectsDescriptor(object):
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
                 query = {'%s__in' % rel_field.name: instances}
-                qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
-                # Since we just bypassed this class' get_query_set(), we must manage
+                qs = super(RelatedManager, self).get_queryset().using(db).filter(**query)
+                # Since we just bypassed this class' get_queryset(), we must manage
                 # the reverse relation manually.
                 for rel_obj in qs:
                     instance = instances_dict[rel_obj_attr(rel_obj)]
@@ -545,7 +545,7 @@ def create_many_related_manager(superclass, rel):
             instance = instances[0]
             db = self._db or router.db_for_read(instance.__class__, instance=instance)
             query = {'%s__in' % self.query_field_name: instances}
-            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
+            qs = super(ManyRelatedManager, self).get_queryset().using(db)._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
