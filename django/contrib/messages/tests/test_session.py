@@ -1,5 +1,5 @@
 from django.contrib.messages import constants
-from django.contrib.messages.tests.base import BaseTest
+from django.contrib.messages.tests.test_base import BaseTest
 from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.session import SessionStorage
 from django.utils.safestring import SafeData, mark_safe
