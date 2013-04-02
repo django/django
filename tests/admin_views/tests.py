@@ -467,7 +467,11 @@ class AdminViewBasicTest(TestCase):
         self.assertContains(response, '4 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'false'})
         self.assertContains(response, '3 articles')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '0'})
+        self.assertContains(response, '3 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'true'})
+        self.assertContains(response, '1 article')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '1'})
         self.assertContains(response, '1 article')
 
     def testLogoutAndPasswordChangeURLs(self):
@@ -3513,6 +3517,25 @@ class RawIdFieldsTest(TestCase):
         response2 = self.client.get(popup_url)
         self.assertContains(response2, "Spain")
         self.assertNotContains(response2, "England")
+
+    def test_limit_choices_to_isnull(self):
+        """Regression test for 20182"""
+        # This includes tests integers, strings and booleans in the lookup query string
+        actor = Actor.objects.create(name="Palin", age=27)
+        actor = Actor.objects.create(name="Kilbraken", age=50, title="Judge")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant"', response.content)
+        self.assertTrue(m)  # Got a match
+        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup
+        response2 = self.client.get(popup_url)
+        self.assertContains(response2, "Kilbraken")
+        self.assertNotContains(response2, "Palin")
+
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
