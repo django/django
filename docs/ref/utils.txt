@@ -643,6 +643,28 @@ escaping HTML.
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than :data:`sys.maxint`.
 
+``django.utils.module_loading``
+===============================
+
+.. module:: django.utils.module_loading
+   :synopsis: Functions for working with Python modules.
+
+Functions for working with Python modules.
+
+.. function:: import_by_path(dotted_path, error_prefix='')
+
+    Imports a dotted module path and returns the attribute/class designated by
+    the last name in the path. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes
+    wrong. For example::
+
+        from django.utils.module_loading import import_by_path
+        import_by_path = import_by_path('django.utils.module_loading.import_by_path')
+
+    is equivalent to::
+
+        from django.utils.module_loading import import_by_path
+
 ``django.utils.safestring``
 ===========================
 
