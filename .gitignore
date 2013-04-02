@@ -1,7 +1,6 @@
 *.egg-info
 *.pot
 *.py[co]
-*.swp
 MANIFEST
 dist/
 docs/_build/
