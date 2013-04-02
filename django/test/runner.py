@@ -53,16 +53,44 @@ class DiscoverRunner(object):
             discover_kwargs['top_level_dir'] = self.top_level
 
         for label in test_labels:
+            kwargs = discover_kwargs.copy()
             tests = None
 
+            label_as_path = os.path.abspath(label)
+
             # if a module, or "module.ClassName[.method_name]", just run those
-            if not os.path.exists(label):
+            if not os.path.exists(label_as_path):
                 tests = self.test_loader.loadTestsFromName(label)
+            elif os.path.isdir(label_as_path) and not self.top_level:
+                # Try to be a bit smarter than unittest about finding the
+                # default top-level for a given directory path, to avoid
+                # breaking relative imports. (Unittest's default is to set
+                # top-level equal to the path, which means relative imports
+                # will result in "Attempted relative import in non-package.").
+
+                # We'd be happy to skip this and require dotted module paths
+                # (which don't cause this problem) instead of file paths (which
+                # do), but in the case of a directory in the cwd, which would
+                # be equally valid if considered as a top-level module or as a
+                # directory path, unittest unfortunately prefers the latter.
+
+                top_level = label_as_path
+                while True:
+                    init_py = os.path.join(top_level, '__init__.py')
+                    if os.path.exists(init_py):
+                        try_next = os.path.dirname(top_level)
+                        if try_next == top_level:
+                            # __init__.py all the way down? give up.
+                            break
+                        top_level = try_next
+                        continue
+                    break
+                kwargs['top_level_dir'] = top_level
+
 
             if not (tests and tests.countTestCases()):
                 # if no tests found, it's probably a package; try discovery
-                tests = self.test_loader.discover(
-                    start_dir=label, **discover_kwargs)
+                tests = self.test_loader.discover(start_dir=label, **kwargs)
 
                 # make unittest forget the top-level dir it calculated from this
                 # run, to support running tests from two different top-levels.
