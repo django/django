@@ -149,7 +149,7 @@ class InquisitionAdmin(admin.ModelAdmin):
 
 
 class SketchAdmin(admin.ModelAdmin):
-    raw_id_fields = ('inquisition',)
+    raw_id_fields = ('inquisition', 'defendant0', 'defendant1')
 
 
 class FabricAdmin(admin.ModelAdmin):
