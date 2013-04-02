@@ -39,7 +39,7 @@ def prepare_lookup_value(key, value):
         value = value.split(',')
     # if key ends with __isnull, special case '' and false
     if key.endswith('__isnull'):
-        if value.lower() in ('', 'false'):
+        if value.lower() in ('', 'false', '0'):
             value = False
         else:
             value = True
