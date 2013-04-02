@@ -1,3 +1,4 @@
+import os
 from optparse import make_option
 
 from django.conf import settings
@@ -52,13 +53,21 @@ class DiscoverRunner(object):
             discover_kwargs['top_level_dir'] = self.top_level
 
         for label in test_labels:
-            try:
-                # try discovery if its a module/package
+            tests = None
+
+            # if a module, or "module.ClassName[.method_name]", just run those
+            if not os.path.exists(label):
+                tests = self.test_loader.loadTestsFromName(label)
+
+            if not (tests and tests.countTestCases()):
+                # if no tests found, it's probably a package; try discovery
                 tests = self.test_loader.discover(
                     start_dir=label, **discover_kwargs)
-            except ImportError:
-                # handle "module.ClassName[.method_name]"
-                tests = self.test_loader.loadTestsFromName(label)
+
+                # make unittest forget the top-level dir it calculated from this
+                # run, to support running tests from two different top-levels.
+                self.test_loader._top_level_dir = None
+
             suite.addTests(tests)
 
         for test in extra_tests:
