@@ -9,7 +9,7 @@ from django.contrib.auth.tests.utils import skipIfCustomUser
 
 from django.contrib.formtools.wizard.views import (NamedUrlSessionWizardView,
                                                    NamedUrlCookieWizardView)
-from django.contrib.formtools.tests.wizard.forms import get_request, Step1, Step2
+from django.contrib.formtools.tests.wizard.test_forms import get_request, Step1, Step2
 
 
 class NamedWizardTests(object):
