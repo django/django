@@ -159,7 +159,8 @@ class Sketch(models.Model):
                                                                    'leader__age': 27,
                                                                    'expected': False,
                                                                    })
-    defendant = models.ForeignKey(Actor, limit_choices_to={'title__isnull': False})    
+    defendant0 = models.ForeignKey(Actor, limit_choices_to={'title__isnull': False})    
+    defendant1 = models.ForeignKey(Actor, limit_choices_to={'title__isnull': True})    
 
     def __str__(self):
         return self.title
