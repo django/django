@@ -3556,7 +3556,7 @@ class RawIdFieldsTest(TestCase):
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
         # Get the popup and verify the correct objects show up in the resulting
-        # page. This step tests field__isnull=0 gets parsed correctly from the
+        # page. This step tests field__isnull=1 gets parsed correctly from the
         # lookup query string; in model we define defendant1 field to have a
         # limit_choices_to option that includes "actor__title__isnull=True".
         response2 = self.client.get(popup_url)
