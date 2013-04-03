@@ -4,7 +4,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
+from django.contrib.auth.tests.test_custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.contrib.auth import authenticate
@@ -263,7 +263,7 @@ class RowlevelBackendTest(TestCase):
     """
     Tests for auth backend that supports object level permissions
     """
-    backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
+    backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
@@ -304,7 +304,7 @@ class AnonymousUserBackendTest(TestCase):
     Tests for AnonymousUser delegating to backend.
     """
 
-    backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
+    backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
@@ -348,7 +348,7 @@ class InActiveUserBackendTest(TestCase):
     """
     Tests for a inactive user
     """
-    backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
+    backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
@@ -386,7 +386,7 @@ class PermissionDeniedBackendTest(TestCase):
     """
     Tests that other backends are not checked once a backend raises PermissionDenied
     """
-    backend = 'django.contrib.auth.tests.auth_backends.PermissionDeniedBackend'
+    backend = 'django.contrib.auth.tests.test_auth_backends.PermissionDeniedBackend'
 
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
