@@ -62,7 +62,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     the values returned from sys.exc_info() and friends.
     """
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-    if request.is_ajax():
+    if request.is_ajax() and settings.NERF_DEBUG_ON_AJAX:
         text = reporter.get_traceback_text()
         return HttpResponseServerError(text, content_type='text/plain')
     else:
