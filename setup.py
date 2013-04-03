@@ -93,7 +93,7 @@ setup(
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
-    download_url = 'https://www.djangoproject.com/m/releases/1.4/Django-1.4.tar.gz',
+    download_url = 'https://www.djangoproject.com/m/releases/1.5/Django-1.5.1.tar.gz',
     license = "BSD",
     packages = packages,
     cmdclass = cmdclasses,
