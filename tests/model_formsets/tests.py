@@ -1261,7 +1261,7 @@ class ModelFormsetTest(TestCase):
             ['Please correct the duplicate data for subtitle which must be unique for the month in posted.'])
 
 
-class TestModelFormsetWidgets(TestCase):
+class TestModelFormsetOverridesTroughFormMeta(TestCase):
     def test_modelformset_factory_widgets(self):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'poet'})
@@ -1283,3 +1283,53 @@ class TestModelFormsetWidgets(TestCase):
             "%s" % form['title'],
             '<input class="book" id="id_title" maxlength="100" name="title" type="text" />'
         )
+
+    def test_modelformset_factory_labels_overrides(self):
+        BookFormSet = modelformset_factory(Book, fields="__all__", labels={
+            'title': 'Name'
+        })
+        form = BookFormSet.form()
+        self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+
+    def test_inlineformset_factory_labels_overrides(self):
+        BookFormSet = inlineformset_factory(Author, Book, fields="__all__", labels={
+            'title': 'Name'
+        })
+        form = BookFormSet.form()
+        self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+
+    def test_modelformset_factory_help_text_overrides(self):
+        BookFormSet = modelformset_factory(Book, fields="__all__", help_texts={
+            'title': 'Choose carefully.'
+        })
+        form = BookFormSet.form()
+        self.assertEqual(form['title'].help_text, 'Choose carefully.')
+
+    def test_inlineformset_factory_help_text_overrides(self):
+        BookFormSet = inlineformset_factory(Author, Book, fields="__all__", help_texts={
+            'title': 'Choose carefully.'
+        })
+        form = BookFormSet.form()
+        self.assertEqual(form['title'].help_text, 'Choose carefully.')
+
+    def test_modelformset_factory_error_messages_overrides(self):
+        author = Author.objects.create(pk=1, name='Charles Baudelaire')
+        BookFormSet = modelformset_factory(Book, fields="__all__", error_messages={
+            'title': {
+                'max_length': 'Title too long!!'
+            }
+        })
+        form = BookFormSet.form(data={'title': 'Foo ' * 30, 'author': author.id})
+        form.full_clean()
+        self.assertEqual(form.errors, {'title': ['Title too long!!']})
+
+    def test_inlineformset_factory_error_messages_overrides(self):
+        author = Author.objects.create(pk=1, name='Charles Baudelaire')
+        BookFormSet = inlineformset_factory(Author, Book, fields="__all__", error_messages={
+            'title': {
+                'max_length': 'Title too long!!'
+            }
+        })
+        form = BookFormSet.form(data={'title': 'Foo ' * 30, 'author': author.id})
+        form.full_clean()
+        self.assertEqual(form.errors, {'title': ['Title too long!!']})
