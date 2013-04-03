@@ -1,8 +1,9 @@
 from django.contrib.messages import constants
-from django.contrib.messages.tests.test_base import BaseTest
+from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.session import SessionStorage
 from django.utils.safestring import SafeData, mark_safe
+from django.test import TestCase
 
 
 def set_session_data(storage, messages):
@@ -20,7 +21,7 @@ def stored_session_messages_count(storage):
     return len(data)
 
 
-class SessionTest(BaseTest):
+class SessionTest(BaseTests, TestCase):
     storage_class = SessionStorage
 
     def get_request(self):
