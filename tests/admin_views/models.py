@@ -137,6 +137,7 @@ class Thing(models.Model):
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
+    title = models.CharField(max_length=50, null=True)
     def __str__(self):
         return self.name
 
@@ -158,6 +159,7 @@ class Sketch(models.Model):
                                                                    'leader__age': 27,
                                                                    'expected': False,
                                                                    })
+    defendant = models.ForeignKey(Actor, limit_choices_to={'title__isnull': False})    
 
     def __str__(self):
         return self.title
