@@ -16,7 +16,7 @@ class ModelErrorCollection:
 
     def add(self, context, error):
         self.errors.append((context, error))
-        self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
+        self.outfile.write(self.style.ERROR(u"%s: %s\n" % (context, error)))
 
 
 def get_validation_errors(outfile, app=None):
