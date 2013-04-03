@@ -137,7 +137,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     """
 
     backend =\
-        'django.contrib.auth.tests.remote_user.RemoteUserNoCreateBackend'
+        'django.contrib.auth.tests.test_remote_user.RemoteUserNoCreateBackend'
 
     def test_unknown_user(self):
         num_users = User.objects.count()
@@ -174,7 +174,7 @@ class RemoteUserCustomTest(RemoteUserTest):
     """
 
     backend =\
-        'django.contrib.auth.tests.remote_user.CustomRemoteUserBackend'
+        'django.contrib.auth.tests.test_remote_user.CustomRemoteUserBackend'
     # REMOTE_USER strings with email addresses for the custom backend to
     # clean.
     known_user = 'knownuser@example.com'
