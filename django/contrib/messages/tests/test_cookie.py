@@ -1,10 +1,11 @@
 import json
 
 from django.contrib.messages import constants
-from django.contrib.messages.tests.test_base import BaseTest
+from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.safestring import SafeData, mark_safe
 
@@ -41,7 +42,7 @@ def stored_cookie_messages_count(storage, response):
 
 
 @override_settings(SESSION_COOKIE_DOMAIN='.example.com')
-class CookieTest(BaseTest):
+class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
     def stored_messages_count(self, storage, response):
