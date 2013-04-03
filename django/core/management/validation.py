@@ -3,7 +3,6 @@ import sys
 
 from django.conf import settings
 from django.core.management.color import color_style
-from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
 from django.utils import six
 
