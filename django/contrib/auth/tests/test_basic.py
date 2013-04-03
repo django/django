@@ -6,15 +6,27 @@ import locale
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.tests.custom_user import CustomUser
+from django.contrib.auth.tests.test_custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.dispatch import receiver
 from django.test import TestCase
+from django.test.signals import setting_changed
 from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.encoding import force_str
 from django.utils.six import binary_type, PY3, StringIO
+
+
+@receiver(setting_changed)
+def user_model_swapped(**kwargs):
+    if kwargs['setting'] == 'AUTH_USER_MODEL':
+        from django.db.models.manager import ensure_default_manager
+        from django.contrib.auth.models import User
+        # Reset User manager
+        setattr(User, 'objects', User._default_manager)
+        ensure_default_manager(User)
 
 
 def mock_inputs(inputs):
