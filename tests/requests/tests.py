@@ -11,16 +11,16 @@ from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
-from django.test import TransactionTestCase
+from django.test import SimpleTestCase, TransactionTestCase
 from django.test.client import FakePayload
 from django.test.utils import override_settings, str_prefix
 from django.utils import six
-from django.utils import unittest
+from django.utils.unittest import skipIf
 from django.utils.http import cookie_date, urlencode
 from django.utils.timezone import utc
 
 
-class RequestsTests(unittest.TestCase):
+class RequestsTests(SimpleTestCase):
     def test_httprequest(self):
         request = HttpRequest()
         self.assertEqual(list(request.GET.keys()), [])
@@ -285,6 +285,56 @@ class RequestsTests(unittest.TestCase):
             'HTTP_HOST': 'example.com',
         }
         self.assertEqual(request.get_host(), 'example.com')
+
+
+    @override_settings(ALLOWED_HOSTS=[])
+    def test_get_host_suggestion_of_allowed_host(self):
+        """get_host() makes helpful suggestions if a valid-looking host is not in ALLOWED_HOSTS."""
+        msg_invalid_host = "Invalid HTTP_HOST header: %r."
+        msg_suggestion = msg_invalid_host + "You may need to add %r to ALLOWED_HOSTS."
+
+        for host in [ # Valid-looking hosts
+            'example.com',
+            '12.34.56.78',
+            '[2001:19f0:feee::dead:beef:cafe]',
+            'xn--4ca9at.com', # Punnycode for öäü.com
+        ]:
+            request = HttpRequest()
+            request.META = {'HTTP_HOST': host}
+            self.assertRaisesMessage(
+                SuspiciousOperation,
+                msg_suggestion % (host, host),
+                request.get_host
+            )
+
+        for domain, port in [ # Valid-looking hosts with a port number
+            ('example.com', 80),
+            ('12.34.56.78', 443),
+            ('[2001:19f0:feee::dead:beef:cafe]', 8080),
+        ]:
+            host = '%s:%s' % (domain, port)
+            request = HttpRequest()
+            request.META = {'HTTP_HOST': host}
+            self.assertRaisesMessage(
+                SuspiciousOperation,
+                msg_suggestion % (host, domain),
+                request.get_host
+            )
+
+        for host in [ # Invalid hosts
+            'example.com@evil.tld',
+            'example.com:dr.frankenstein@evil.tld',
+            'example.com:dr.frankenstein@evil.tld:80',
+            'example.com:80/badpath',
+            'example.com: recovermypassword.com',
+        ]:
+            request = HttpRequest()
+            request.META = {'HTTP_HOST': host}
+            self.assertRaisesMessage(
+                SuspiciousOperation,
+                msg_invalid_host % host,
+                request.get_host
+            )
 
 
     def test_near_expiration(self):
@@ -587,7 +637,7 @@ class RequestsTests(unittest.TestCase):
             request.body
 
 
-@unittest.skipIf(connection.vendor == 'sqlite'
+@skipIf(connection.vendor == 'sqlite'
         and connection.settings_dict['NAME'] in ('', ':memory:'),
         "Cannot establish two connections to an in-memory SQLite database.")
 class DatabaseConnectionHandlingTests(TransactionTestCase):

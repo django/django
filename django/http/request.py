@@ -66,11 +66,14 @@ class HttpRequest(object):
                 host = '%s:%s' % (host, server_port)
 
         allowed_hosts = ['*'] if settings.DEBUG else settings.ALLOWED_HOSTS
-        if validate_host(host, allowed_hosts):
+        domain, port = split_domain_port(host)
+        if validate_host(domain, allowed_hosts):
             return host
         else:
-            raise SuspiciousOperation(
-                "Invalid HTTP_HOST header (you may need to set ALLOWED_HOSTS): %s" % host)
+            msg = "Invalid HTTP_HOST header: %r." % host
+            if domain:
+                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+            raise SuspiciousOperation(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -454,6 +457,23 @@ def bytes_to_text(s, encoding):
         return s
 
 
+def split_domain_port(host):
+    """
+    Return a (domain, port) tuple from a given host.
+    If the host is invalid, the domain will be empty.
+    """
+    if not host_validation_re.match(host):
+        return '', ''
+
+    if host[-1] == ']':
+        # It's an IPv6 address without a port.
+        return host, ''
+    bits = host.rsplit(':', 1)
+    if len(bits) == 2:
+        return tuple(bits)
+    return bits[0], ''
+
+
 def validate_host(host, allowed_hosts):
     """
     Validate the given host header value for this site.
@@ -464,31 +484,25 @@ def validate_host(host, allowed_hosts):
     ``example.com`` and any subdomain), ``*`` matches anything, and anything
     else must match exactly.
 
+    Note: This function assumes that the port has been stripped off the host.
+
     Return ``True`` for a valid host, ``False`` otherwise.
 
     """
     # All validation is case-insensitive
     host = host.lower()
 
-    # Basic sanity check
-    if not host_validation_re.match(host):
+    if not host: # Fails basic sanity check
         return False
-
-    # Validate only the domain part.
-    if host[-1] == ']':
-        # It's an IPv6 address without a port.
-        domain = host
-    else:
-        domain = host.rsplit(':', 1)[0]
 
     for pattern in allowed_hosts:
         pattern = pattern.lower()
         match = (
             pattern == '*' or
             pattern.startswith('.') and (
-                domain.endswith(pattern) or domain == pattern[1:]
+                host.endswith(pattern) or host == pattern[1:]
                 ) or
-            pattern == domain
+            pattern == host
             )
         if match:
             return True
