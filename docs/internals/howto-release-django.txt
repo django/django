@@ -175,13 +175,13 @@ OK, this is the fun part, where we actually push out a release!
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
-#. Run ``python setup.py sdist`` to generate the release package. This will
-   create the release package in a ``dist/`` directory.
+#. Run ``make -f extras/Makefile`` to generate the release packages. This will
+   create the release packages in a ``dist/`` directory.
 
-#. Generate the hashes of the release package::
+#. Generate the hashes of the release packages::
 
-        $ md5sum dist/Django-<version>.tar.gz
-        $ sha1sum dist/Django-<version>.tar.gz
+        $ md5sum dist/Django-*
+        $ sha1sum dist/Django-*
 
    *FIXME: perhaps we should switch to sha256?*
 
@@ -220,6 +220,9 @@ Now you're ready to actually put the release out there. To do this:
         $ deactivate
         $ mktmpenv
         $ pip install https://www.djangoproject.com/m/releases/1.5/Django-1.5.1.tar.gz
+        $ deactivate
+        $ mktmpenv
+        $ pip install https://www.djangoproject.com/m/releases/1.5/Django-1.5.1-py2.py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
