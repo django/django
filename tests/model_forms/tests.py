@@ -495,7 +495,7 @@ class ModelFormBaseTest(TestCase):
                          ['slug', 'name'])
 
 
-class TestWidgetForm(forms.ModelForm):
+class FieldOverridesTroughFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'url', 'slug']
@@ -503,24 +503,73 @@ class TestWidgetForm(forms.ModelForm):
             'name': forms.Textarea,
             'url': forms.TextInput(attrs={'class': 'url'})
         }
+        labels = {
+            'name': 'Title',
+        }
+        help_texts = {
+            'slug': 'Watch out! Letters, numbers, underscores and hyphens only.',
+        }
+        error_messages = {
+            'slug': {
+                'invalid': (
+                    "Didn't you read the help text? "
+                    "We said letters, numbers, underscores and hyphens only!"
+                )
+            }
+        }
 
 
+class TestFieldOverridesTroughFormMeta(TestCase):
+    def test_widget_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
+        self.assertHTMLEqual(
+            str(form['name']),
+            '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>',
+        )
+        self.assertHTMLEqual(
+            str(form['url']),
+            '<input id="id_url" type="text" class="url" name="url" maxlength="40" />',
+        )
+        self.assertHTMLEqual(
+            str(form['slug']),
+            '<input id="id_slug" type="text" name="slug" maxlength="20" />',
+        )
 
-class TestWidgets(TestCase):
-    def test_base_widgets(self):
-        frm = TestWidgetForm()
+    def test_label_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
         self.assertHTMLEqual(
-            str(frm['name']),
-            '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>'
+            str(form['name'].label_tag()),
+            '<label for="id_name">Title</label>',
         )
         self.assertHTMLEqual(
-            str(frm['url']),
-            '<input id="id_url" type="text" class="url" name="url" maxlength="40" />'
+            str(form['url'].label_tag()),
+            '<label for="id_url">The URL</label>',
         )
         self.assertHTMLEqual(
-            str(frm['slug']),
-            '<input id="id_slug" type="text" name="slug" maxlength="20" />'
+            str(form['slug'].label_tag()),
+            '<label for="id_slug">Slug</label>',
         )
+
+    def test_help_text_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
+        self.assertHTMLEqual(
+            form['slug'].help_text,
+            'Watch out! Letters, numbers, underscores and hyphens only.',
+        )
+
+    def test_error_messages_overrides(self):
+        form = FieldOverridesTroughFormMetaForm(data={
+            'name': 'Category',
+            'url': '/category/',
+            'slug': '!%#*@',
+        })
+        form.full_clean()
+
+        error = [
+            "Didn't you read the help text? "
+            "We said letters, numbers, underscores and hyphens only!",
+        ]
+        self.assertEqual(form.errors, {'slug': error})
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):

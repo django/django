@@ -303,6 +303,9 @@ Minor features
   :class:`~django.contrib.admin.InlineModelAdmin` may be overridden to
   customize the extra and maximum number of inline forms.
 
+* ``ModelForm`` inner ``Meta`` now accepts ``labels``, ``help_texts``
+  and ``error_messages`` to customize the default fields.
+
 Backwards incompatible changes in 1.6
 =====================================
 
