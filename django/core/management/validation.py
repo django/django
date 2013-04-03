@@ -3,7 +3,6 @@ import sys
 
 from django.conf import settings
 from django.core.management.color import color_style
-from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
 from django.utils import six
 
@@ -16,7 +15,7 @@ class ModelErrorCollection:
 
     def add(self, context, error):
         self.errors.append((context, error))
-        self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
+        self.outfile.write(self.style.ERROR(u"%s: %s\n" % (context, error)))
 
 
 def get_validation_errors(outfile, app=None):
