@@ -202,6 +202,9 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* ``ModelForm`` inner ``Meta`` now accepts ``labels``, ``help_texts``
+  and ``error_messages`` to customize the default fields.
+
 Backwards incompatible changes in 1.6
 =====================================
 

@@ -130,7 +130,8 @@ def model_to_dict(instance, fields=None, exclude=None):
             data[f.name] = f.value_from_object(instance)
     return data
 
-def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=None):
+def fields_for_model(model, fields=None, exclude=None, widgets=None, labels=None,
+                     help_texts=None, error_messages=None, formfield_callback=None):
     """
     Returns a ``SortedDict`` containing form fields for the given model.
 
@@ -141,7 +142,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     fields will be excluded from the returned fields, even if they are listed
     in the ``fields`` argument.
 
-    ``widgets`` is a dictionary of model field names mapped to a widget
+    ``widgets`` is a dictionary of model field names mapped to a widget.
+
+    ``labels`` is a dictionary of model field names mapped to a label.
+
+    ``help_texts`` is a dictionary of model field names mapped to a help text.
+
+    ``error_messages`` is a dictionary of model field names mapped to
+    a directory of error messages.
 
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
@@ -156,10 +164,15 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
             continue
         if exclude and f.name in exclude:
             continue
+        kwargs = {}
         if widgets and f.name in widgets:
-            kwargs = {'widget': widgets[f.name]}
-        else:
-            kwargs = {}
+            kwargs['widget'] = widgets[f.name]
+        if labels and f.name in labels:
+            kwargs['label'] = labels[f.name]
+        if help_texts and f.name in help_texts:
+            kwargs['help_text'] = help_texts[f.name]
+        if error_messages and f.name in error_messages:
+            kwargs['error_messages'] = error_messages[f.name]
 
         if formfield_callback is None:
             formfield = f.formfield(**kwargs)
@@ -186,6 +199,9 @@ class ModelFormOptions(object):
         self.fields = getattr(options, 'fields', None)
         self.exclude = getattr(options, 'exclude', None)
         self.widgets = getattr(options, 'widgets', None)
+        self.labels = getattr(options, 'labels', None)
+        self.help_texts = getattr(options, 'help_texts', None)
+        self.error_messages = getattr(options, 'error_messages', None)
 
 
 class ModelFormMetaclass(type):
@@ -222,8 +238,9 @@ class ModelFormMetaclass(type):
 
         if opts.model:
             # If a model is defined, extract form fields from it.
-            fields = fields_for_model(opts.model, opts.fields,
-                                      opts.exclude, opts.widgets, formfield_callback)
+            fields = fields_for_model(
+                opts.model, opts.fields, opts.exclude, opts.widgets, opts.labels,
+                opts.help_texts, opts.error_messages, formfield_callback)
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in six.iteritems(fields) if not v]
             missing_fields = set(none_model_fields) - \
