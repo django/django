@@ -551,7 +551,7 @@ def slice_filter(value, arg):
     Returns a slice of the list.
 
     Uses the same syntax as Python's list slicing; see
-    http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
+    http://www.diveintopython3.net/native-datatypes.html#slicinglists
     for an introduction.
     """
     try:

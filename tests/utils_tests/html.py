@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
-import unittest
+from datetime import datetime
+import os
 
 from django.utils import html
+from django.utils._os import upath
+from django.utils.unittest import TestCase
 
-class TestUtilsHtml(unittest.TestCase):
+
+class TestUtilsHtml(TestCase):
 
     def check_output(self, function, value, output=None):
         """
@@ -72,6 +76,17 @@ class TestUtilsHtml(unittest.TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+        # Test with more lengthy content (also catching performance regressions)
+        for filename in ('strip_tags1.html', 'strip_tags2.txt'):
+            path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
+            with open(path, 'r') as fp:
+                start = datetime.now()
+                stripped = html.strip_tags(fp.read())
+                elapsed = datetime.now() - start
+            self.assertEqual(elapsed.seconds, 0)
+            self.assertIn("Please try again.", stripped)
+            self.assertNotIn('<', stripped)
 
     def test_strip_spaces_between_tags(self):
         f = html.strip_spaces_between_tags

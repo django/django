@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import re
@@ -6,7 +7,7 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.unittest import expectedFailure
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 
 if connection.vendor == 'oracle':
     expectedFailureOnOracle = expectedFailure
@@ -55,10 +56,9 @@ class InspectDBTestCase(TestCase):
         assertFieldType('date_field', "models.DateField()")
         assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.vendor == 'sqlite':
-            # Ticket #5014
-            assertFieldType('decimal_field', "models.DecimalField(max_digits=None, decimal_places=None)")
-        elif connection.vendor == 'mysql':
-            pass # Ticket #5014
+            # Guessed arguments, see #5014
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5) "
+                "# max_digits and decimal_places have been guessed, as this database handles decimal fields as float")
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
         assertFieldType('email_field', "models.CharField(max_length=75)")
@@ -147,6 +147,11 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
+        if PY3:
+            # Python 3 allows non-ascii identifiers
+            self.assertIn("tamaño = models.IntegerField()", output)
+        else:
+            self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)
 
     def test_managed_models(self):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""

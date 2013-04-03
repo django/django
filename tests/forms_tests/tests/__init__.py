@@ -12,7 +12,7 @@ from .input_formats import (LocalizedTimeTests, CustomTimeInputFormatsTests,
     SimpleDateFormatTests, LocalizedDateTimeTests,
     CustomDateTimeInputFormatsTests, SimpleDateTimeFormatTests)
 from .media import FormsMediaTestCase, StaticFormsMediaTestCase
-from .models import (TestTicket12510, ModelFormCallableModelDefault,
+from .tests import (TestTicket12510, ModelFormCallableModelDefault,
     FormsModelTestCase, RelatedModelFormTests)
 from .regressions import FormsRegressionsTestCase
 from .util import FormsUtilTestCase

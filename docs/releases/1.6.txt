@@ -2,6 +2,24 @@
 Django 1.6 release notes - UNDER DEVELOPMENT
 ============================================
 
+.. note::
+
+    Dedicated to Malcolm Tredinnick
+
+    On March 17, 2013, the Django project and the free software community lost
+    a very dear friend and developer.
+
+    Malcolm was a long-time contributor to Django, a model community member, a
+    brilliant mind, and a friend. His contributions to Django — and to many other
+    open source projects — are nearly impossible to enumerate. Many on the core
+    Django team had their first patches reviewed by him; his mentorship enriched
+    us. His consideration, patience, and dedication will always be an inspiration
+    to us.
+
+    This release of Django is for Malcolm.
+
+    -- The Django Developers
+
 Welcome to Django 1.6!
 
 These release notes cover the `new features`_, as well as some `backwards
