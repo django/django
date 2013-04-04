@@ -208,12 +208,9 @@ class Field(object):
                 v(value)
             except exceptions.ValidationError as e:
                 if hasattr(e, 'code') and e.code in self.error_messages:
-                    message = self.error_messages[e.code]
-                    if e.params:
-                        message = message % e.params
-                    errors.append(message)
-                else:
-                    errors.extend(e.messages)
+                    e.message = self.error_messages[e.code]
+                errors.extend(e.error_list)
+
         if errors:
             raise exceptions.ValidationError(errors)
 

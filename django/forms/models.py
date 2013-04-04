@@ -389,17 +389,11 @@ class BaseModelForm(BaseForm):
             if isinstance(field, InlineForeignKeyField):
                 exclude.append(f_name)
 
-        # Clean the model instance's fields.
         try:
-            self.instance.clean_fields(exclude=exclude)
+            self.instance.full_clean(exclude=exclude,
+                validate_unique=False)
         except ValidationError as e:
-            self._update_errors(e.message_dict)
-
-        # Call the model instance's clean method.
-        try:
-            self.instance.clean()
-        except ValidationError as e:
-            self._update_errors({NON_FIELD_ERRORS: e.messages})
+            self._update_errors(e)
 
         # Validate uniqueness if needed.
         if self._validate_unique:
@@ -414,7 +408,7 @@ class BaseModelForm(BaseForm):
         try:
             self.instance.validate_unique(exclude=exclude)
         except ValidationError as e:
-            self._update_errors(e.message_dict)
+            self._update_errors(e)
 
     def save(self, commit=True):
         """

@@ -910,7 +910,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'field_label': six.text_type(field_labels)
             }
 
-    def full_clean(self, exclude=None):
+    def full_clean(self, exclude=None, validate_unique=True):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
         and raises a ``ValidationError`` for any errors that occurred.
@@ -932,13 +932,14 @@ class Model(six.with_metaclass(ModelBase)):
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
-        for name in errors.keys():
-            if name != NON_FIELD_ERRORS and name not in exclude:
-                exclude.append(name)
-        try:
-            self.validate_unique(exclude=exclude)
-        except ValidationError as e:
-            errors = e.update_error_dict(errors)
+        if validate_unique:
+            for name in errors.keys():
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.append(name)
+            try:
+                self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
 
         if errors:
             raise ValidationError(errors)
@@ -963,7 +964,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
             except ValidationError as e:
-                errors[f.name] = e.messages
+                errors[f.name] = e.error_list
 
         if errors:
             raise ValidationError(errors)
