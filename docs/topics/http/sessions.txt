@@ -453,6 +453,8 @@ session cookie is sent.
 .. versionchanged:: 1.5
   The session is not saved if the response's status code is 500.
 
+.. _browser-length-vs-persistent-sessions:
+
 Browser-length sessions vs. persistent sessions
 ===============================================
 
