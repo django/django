@@ -161,10 +161,6 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/18d920ea4839fb54f9d2a5dcb555b6a5666ee469
 
-   Make sure the ``download_url`` in ``setup.py`` is the actual URL you'll
-   use for the new release package, not the redirect URL (some tools can't
-   properly follow redirects).
-
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
