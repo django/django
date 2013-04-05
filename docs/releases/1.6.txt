@@ -392,6 +392,24 @@ If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6
 addresses are silently truncated; on Oracle, an exception is generated. No
 database change is needed for SQLite or PostgreSQL databases.
 
+Percent literals in ``cursor.execute`` queries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you are running raw SQL queries through the
+:ref:`cursor.execute <executing-custom-sql>` method, the rule about doubling
+percent literals (``%``) inside the query has been unified. Past behavior
+depended on the database backend. Now, across all backends, you only need to
+double literal percent characters if you are also providing replacement
+parameters. For example::
+
+    # No parameters, no percent doubling
+    cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
+
+    # Parameters passed, non-placeholders have to be doubled
+    cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
+
+``SQLite`` users need to check and update such queries.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
