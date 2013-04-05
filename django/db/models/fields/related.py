@@ -1172,7 +1172,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
     })
     # Construct and return the new class.
-    return type(name, (models.Model,), {
+    return type(str(name), (models.Model,), {
         'Meta': meta,
         '__module__': klass.__module__,
         from_: models.ForeignKey(klass, related_name='%s+' % name, db_tablespace=field.db_tablespace),
