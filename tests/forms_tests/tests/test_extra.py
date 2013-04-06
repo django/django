@@ -12,7 +12,7 @@ from django.utils import six
 from django.utils import translation
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 
-from .error_messages import AssertFormErrorsMixin
+from .test_error_messages import AssertFormErrorsMixin
 
 
 class GetDate(Form):
