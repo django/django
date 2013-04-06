@@ -15,7 +15,7 @@ from django.utils._os import upath
 
 def test_processor(request):
     return {'processors': 'yes'}
-test_processor_name = 'template_tests.response.test_processor'
+test_processor_name = 'template_tests.test_response.test_processor'
 
 
 # A test middleware that installs a temporary URLConf
@@ -303,7 +303,7 @@ class CustomURLConfTest(TestCase):
     def setUp(self):
         self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
         settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES) + [
-            'template_tests.response.CustomURLConfMiddleware'
+            'template_tests.test_response.CustomURLConfMiddleware'
         ]
 
     def tearDown(self):
