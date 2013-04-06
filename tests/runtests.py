@@ -20,7 +20,11 @@ CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-SUBDIRS_TO_SKIP = ['templates']
+SUBDIRS_TO_SKIP = [
+    'templates',
+    'test_runner_deprecation_app',
+    'test_runner_invalid_app',
+]
 
 ALWAYS_INSTALLED_APPS = [
     'shared_models',

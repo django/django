@@ -20,7 +20,7 @@ from .models import Person
 
 
 TEST_APP_OK = 'test_runner.valid_app.models'
-TEST_APP_ERROR = 'test_runner.invalid_app.models'
+TEST_APP_ERROR = 'test_runner_invalid_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -289,7 +289,7 @@ class DummyBackendTest(unittest.TestCase):
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
-        settings = {'INSTALLED_APPS': '("test_runner.deprecation_app",)',
+        settings = {'INSTALLED_APPS': '("test_runner_deprecation_app",)',
                     'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
         self.write_settings('settings.py', sdict=settings)
 
