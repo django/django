@@ -21,6 +21,7 @@ TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
+    'gis',
     'templates',
     'test_runner_deprecation_app',
     'test_runner_invalid_app',
