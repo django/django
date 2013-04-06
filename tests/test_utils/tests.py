@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
+from StringIO import StringIO
 import warnings
 
 from django.db import connection
@@ -8,8 +9,10 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
+from django.test.simple import make_doctest
 from django.test.utils import CaptureQueriesContext
 from django.utils import six
+from django.utils import unittest
 from django.utils.unittest import skip
 
 from .models import Person
@@ -621,79 +624,10 @@ class AssertFieldOutputTests(SimpleTestCase):
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
-__test__ = {"API_TEST": r"""
-# Some checks of the doctest output normalizer.
-# Standard doctests do fairly
->>> import json
->>> from django.utils.xmlutils import SimplerXMLGenerator
->>> from django.utils.six import StringIO
 
->>> def produce_json():
-...     return json.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
+class DoctestNormalizerTest(SimpleTestCase):
 
->>> def produce_xml():
-...     stream = StringIO()
-...     xml = SimplerXMLGenerator(stream, encoding='utf-8')
-...     xml.startDocument()
-...     xml.startElement("foo", {"aaa" : "1.0", "bbb": "2.0"})
-...     xml.startElement("bar", {"ccc" : "3.0"})
-...     xml.characters("Hello")
-...     xml.endElement("bar")
-...     xml.startElement("whiz", {})
-...     xml.characters("Goodbye")
-...     xml.endElement("whiz")
-...     xml.endElement("foo")
-...     xml.endDocument()
-...     return stream.getvalue()
-
->>> def produce_xml_fragment():
-...     stream = StringIO()
-...     xml = SimplerXMLGenerator(stream, encoding='utf-8')
-...     xml.startElement("foo", {"aaa": "1.0", "bbb": "2.0"})
-...     xml.characters("Hello")
-...     xml.endElement("foo")
-...     xml.startElement("bar", {"ccc": "3.0", "ddd": "4.0"})
-...     xml.endElement("bar")
-...     return stream.getvalue()
-
-# JSON output is normalized for field order, so it doesn't matter
-# which order json dictionary attributes are listed in output
->>> produce_json()
-'["foo", {"bar": ["baz", null, 1.0, 2], "whiz": 42}]'
-
->>> produce_json()
-'["foo", {"whiz": 42, "bar": ["baz", null, 1.0, 2]}]'
-
-# XML output is normalized for attribute order, so it doesn't matter
-# which order XML element attributes are listed in output
->>> produce_xml()
-'<?xml version="1.0" encoding="UTF-8"?>\n<foo aaa="1.0" bbb="2.0"><bar ccc="3.0">Hello</bar><whiz>Goodbye</whiz></foo>'
-
->>> produce_xml()
-'<?xml version="1.0" encoding="UTF-8"?>\n<foo bbb="2.0" aaa="1.0"><bar ccc="3.0">Hello</bar><whiz>Goodbye</whiz></foo>'
-
->>> produce_xml_fragment()
-'<foo aaa="1.0" bbb="2.0">Hello</foo><bar ccc="3.0" ddd="4.0"></bar>'
-
->>> produce_xml_fragment()
-'<foo bbb="2.0" aaa="1.0">Hello</foo><bar ddd="4.0" ccc="3.0"></bar>'
-
-"""}
-
-if not six.PY3:
-    __test__["API_TEST"] += """
->>> def produce_long():
-...     return 42L
-
->>> def produce_int():
-...     return 42
-
-# Long values are normalized and are comparable to normal integers ...
->>> produce_long()
-42
-
-# ... and vice versa
->>> produce_int()
-42L
-
-"""
+    def test_normalizer(self):
+        suite = make_doctest("test_utils.doctest_output")
+        failures = unittest.TextTestRunner(stream=StringIO()).run(suite)
+        self.assertEqual(failures.failures, [])
