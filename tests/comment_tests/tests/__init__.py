@@ -85,11 +85,11 @@ class CommentTestCase(TestCase):
         d.update(f.initial)
         return d
 
-from comment_tests.tests.app_api_tests import *
-from comment_tests.tests.feed_tests import *
-from comment_tests.tests.model_tests import *
-from comment_tests.tests.comment_form_tests import *
-from comment_tests.tests.templatetag_tests import *
-from comment_tests.tests.comment_view_tests import *
-from comment_tests.tests.moderation_view_tests import *
-from comment_tests.tests.comment_utils_moderators_tests import *
+from comment_tests.tests.test_app_api import *
+from comment_tests.tests.test_feeds import *
+from comment_tests.tests.test_models import *
+from comment_tests.tests.test_comment_form import *
+from comment_tests.tests.test_templatetags import *
+from comment_tests.tests.test_comment_view import *
+from comment_tests.tests.test_comment_utils_moderators import *
+from comment_tests.tests.test_moderation_views import *

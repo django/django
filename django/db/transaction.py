@@ -196,7 +196,7 @@ class Atomic(object):
     connection. None denotes the absence of a savepoint.
 
     This allows reentrancy even if the same AtomicWrapper is reused. For
-    example, it's possible to define `oa = @atomic('other')` and use `@ao` or
+    example, it's possible to define `oa = @atomic('other')` and use `@oa` or
     `with oa:` multiple times.
 
     Since database connections are thread-local, this is thread-safe.

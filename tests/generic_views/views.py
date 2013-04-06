@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .forms import AuthorForm, ContactForm
+from .test_forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, Page, BookSigning
 
 

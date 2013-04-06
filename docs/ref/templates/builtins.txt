@@ -171,7 +171,7 @@ just declare the cycle, but not output the first value, you can add a
 
     {% for obj in some_list %}
         {% cycle 'row1' 'row2' as rowcolors silent %}
-        <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
     {% endfor %}
 
 This will output a list of ``<tr>`` elements with ``class``
