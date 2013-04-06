@@ -15,7 +15,7 @@ from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
 
-from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+from .test_imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
     TwoImageFieldTests, ImageFieldNoDimensionsTests,
     ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
     ImageFieldUsingFileTests)
