@@ -3,32 +3,32 @@ Tests for django.utils.
 """
 from __future__ import absolute_import
 
-from .archive import TestBzip2Tar, TestGzipTar, TestTar, TestZip
-from .baseconv import TestBaseConv
-from .checksums import TestUtilsChecksums
-from .crypto import TestUtilsCryptoMisc, TestUtilsCryptoPBKDF2
-from .datastructures import (DictWrapperTests, ImmutableListTests,
+from .test_archive import TestBzip2Tar, TestGzipTar, TestTar, TestZip
+from .test_baseconv import TestBaseConv
+from .test_checksums import TestUtilsChecksums
+from .test_crypto import TestUtilsCryptoMisc, TestUtilsCryptoPBKDF2
+from .test_datastructures import (DictWrapperTests, ImmutableListTests,
     MergeDictTests, MultiValueDictTests, SortedDictTests)
-from .dateformat import DateFormatTests
-from .dateparse import DateParseTests
-from .datetime_safe import DatetimeTests
-from .decorators import DecoratorFromMiddlewareTests
-from .encoding import TestEncodingUtils
-from .feedgenerator import FeedgeneratorTest
-from .functional import FunctionalTestCase
-from .html import TestUtilsHtml
-from .http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
-from .itercompat import TestIsIterator
-from .ipv6 import TestUtilsIPv6
-from .jslex import JsToCForGettextTest, JsTokensTest
-from .module_loading import (CustomLoader, DefaultLoader, EggLoader,
+from .test_dateformat import DateFormatTests
+from .test_dateparse import DateParseTests
+from .test_datetime_safe import DatetimeTests
+from .test_decorators import DecoratorFromMiddlewareTests
+from .test_encoding import TestEncodingUtils
+from .test_feedgenerator import FeedgeneratorTest
+from .test_functional import FunctionalTestCase
+from .test_html import TestUtilsHtml
+from .test_http import TestUtilsHttp, ETagProcessingTests, HttpDateProcessingTests
+from .test_itercompat import TestIsIterator
+from .test_ipv6 import TestUtilsIPv6
+from .test_jslex import JsToCForGettextTest, JsTokensTest
+from .test_module_loading import (CustomLoader, DefaultLoader, EggLoader,
     ModuleImportTestCase)
-from .numberformat import TestNumberFormat
-from .os_utils import SafeJoinTests
-from .regex_helper import NormalizeTests
-from .simplelazyobject import TestUtilsSimpleLazyObject
-from .termcolors import TermColorTests
-from .text import TestUtilsText
-from .timesince import TimesinceTests
-from .timezone import TimezoneTests
-from .tzinfo import TzinfoTests
+from .test_numberformat import TestNumberFormat
+from .test_os_utils import SafeJoinTests
+from .test_regex_helper import NormalizeTests
+from .test_simplelazyobject import TestUtilsSimpleLazyObject
+from .test_termcolors import TermColorTests
+from .test_text import TestUtilsText
+from .test_timesince import TimesinceTests
+from .test_timezone import TimezoneTests
+from .test_tzinfo import TzinfoTests
