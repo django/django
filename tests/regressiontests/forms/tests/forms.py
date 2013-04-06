@@ -1612,23 +1612,6 @@ class FormsTestCase(TestCase):
 </form>""")
         self.assertEqual(Template('{{ form.password1.help_text }}').render(Context({'form': UserRegistration(auto_id=False)})), '')
 
-        # The label_tag() method takes an optional attrs argument: a dictionary of HTML
-        # attributes to add to the <label> tag.
-        f = UserRegistration(auto_id='id_%s')
-        form_output = []
-
-        for bf in f:
-            form_output.append(bf.label_tag(attrs={'class': 'pretty'}))
-
-        expected_form_output = [
-            '<label for="id_username" class="pretty">Username</label>',
-            '<label for="id_password1" class="pretty">Password1</label>',
-            '<label for="id_password2" class="pretty">Password2</label>',
-        ]
-        self.assertEqual(len(form_output), len(expected_form_output))
-        for i in range(len(form_output)):
-            self.assertHTMLEqual(form_output[i], expected_form_output[i])
-
         # To display the errors that aren't associated with a particular field -- e.g.,
         # the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
         # template. If used on its own, it is displayed as a <ul> (or an empty string, if
@@ -1797,3 +1780,38 @@ class FormsTestCase(TestCase):
         form = NameForm(data={'name' : ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
+
+    def test_boundfield_label_tag(self):
+        class SomeForm(Form):
+            field = CharField()
+        boundfield = SomeForm()['field']
+
+        testcases = [  # (args, kwargs, expected)
+            # without anything: just print the <label>
+            ((), {}, '<label for="id_field">Field</label>'),
+
+            # passing just one argument: overrides the field's label
+            (('custom',), {}, '<label for="id_field">custom</label>'),
+
+            # the overriden label is escaped
+            (('custom&',), {}, '<label for="id_field">custom&amp;</label>'),
+            ((mark_safe('custom&'),), {}, '<label for="id_field">custom&</label>'),
+
+            # Passing attrs to add extra attributes on the <label>
+            ((), {'attrs': {'class': 'pretty'}}, '<label for="id_field" class="pretty">Field</label>')
+        ]
+
+        for args, kwargs, expected in testcases:
+            self.assertHTMLEqual(boundfield.label_tag(*args, **kwargs), expected)
+
+    def test_boundfield_label_tag_no_id(self):
+        """
+        If a widget has no id, label_tag just returns the text with no
+        surrounding <label>.
+        """
+        class SomeForm(Form):
+            field = CharField()
+        boundfield = SomeForm(auto_id='')['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(), 'Field')
+        self.assertHTMLEqual(boundfield.label_tag('Custom&'), 'Custom&amp;')

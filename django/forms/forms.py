@@ -503,7 +503,7 @@ class BoundField(object):
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
         """
-        contents = contents or conditional_escape(self.label)
+        contents = contents or self.label
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
@@ -511,6 +511,8 @@ class BoundField(object):
             contents = format_html('<label for="{0}"{1}>{2}</label>',
                                    widget.id_for_label(id_), attrs, contents
                                    )
+        else:
+            contents = conditional_escape(contents)
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):
