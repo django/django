@@ -5,6 +5,7 @@ import os
 from decimal import Decimal
 
 from django import forms
+from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
@@ -228,6 +229,22 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(list(LimitFields.base_fields),
                          ['url'])
 
+    def test_limit_nonexistent_field(self):
+        expected_msg = 'Unknown field(s) (nonexistent) specified for Category'
+        with self.assertRaisesMessage(FieldError, expected_msg):
+            class InvalidCategoryForm(forms.ModelForm):
+                class Meta:
+                    model = Category
+                    fields = ['nonexistent']
+
+    def test_limit_fields_with_string(self):
+        expected_msg = "CategoryForm.Meta.fields cannot be a string. Did you mean to type: ('url',)?"
+        with self.assertRaisesMessage(TypeError, expected_msg):
+            class CategoryForm(forms.ModelForm):
+                class Meta:
+                    model = Category
+                    fields = ('url') # note the missing comma
+
     def test_exclude_fields(self):
         class ExcludeFields(forms.ModelForm):
             class Meta:
@@ -236,6 +253,23 @@ class ModelFormBaseTest(TestCase):
 
         self.assertEqual(list(ExcludeFields.base_fields),
                          ['name', 'slug'])
+
+    def test_exclude_nonexistent_field(self):
+        class ExcludeFields(forms.ModelForm):
+            class Meta:
+                model = Category
+                exclude = ['nonexistent']
+
+        self.assertEqual(list(ExcludeFields.base_fields),
+                         ['name', 'slug', 'url'])
+
+    def test_exclude_fields_with_string(self):
+        expected_msg = "CategoryForm.Meta.exclude cannot be a string. Did you mean to type: ('url',)?"
+        with self.assertRaisesMessage(TypeError, expected_msg):
+            class CategoryForm(forms.ModelForm):
+                class Meta:
+                    model = Category
+                    exclude = ('url') # note the missing comma
 
     def test_confused_form(self):
         class ConfusedForm(forms.ModelForm):
