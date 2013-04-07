@@ -202,6 +202,8 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* ``ModelForm`` fields can now override error messages defined in model fields.
+
 Backwards incompatible changes in 1.6
 =====================================
 

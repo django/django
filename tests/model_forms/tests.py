@@ -22,7 +22,7 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
-    Product, TextFile, AuthorProfile, Colour, ColourfulItem,
+    Product, TextFile, AuthorProfile, Colour, ColourfulItem, CustomErrorMessage,
     test_images)
 
 if test_images:
@@ -186,6 +186,12 @@ class PriceFormWithoutQuantity(forms.ModelForm):
 class ColourfulItemForm(forms.ModelForm):
     class Meta:
         model = ColourfulItem
+
+class CustomErrorMessageForm(forms.ModelForm):
+    name1 = forms.CharField(error_messages={'invalid': 'Form custom error message.'})
+
+    class Meta:
+        model = CustomErrorMessage
 
 
 class ModelFormBaseTest(TestCase):
@@ -1590,3 +1596,9 @@ class OldFormForXTests(TestCase):
         <option value="%(blue_pk)s">Blue</option>
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
+
+    def test_custom_error_messages(self) :
+        data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(unicode(errors['name1']), '<ul class="errorlist"><li>Form custom error message.</li></ul>')
+        self.assertHTMLEqual(unicode(errors['name2']), '<ul class="errorlist"><li>Model custom error message.</li></ul>')

@@ -266,7 +266,17 @@ class BaseModelForm(BaseForm):
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
 
-    def _update_errors(self, message_dict):
+    def _update_errors(self, errors):
+        for field, messages in errors.error_dict.items():
+            if field not in self.fields:
+                continue
+            field = self.fields[field]
+            for message in messages:
+                if isinstance(message, ValidationError):
+                    if message.code in field.error_messages:
+                        message.message = field.error_messages[message.code]
+
+        message_dict = errors.message_dict
         for k, v in message_dict.items():
             if k != NON_FIELD_ERRORS:
                 self._errors.setdefault(k, self.error_class()).extend(v)
