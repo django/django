@@ -23,6 +23,8 @@ os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 SUBDIRS_TO_SKIP = [
     'gis',
     'templates',
+    'test_discovery_sample',
+    'test_discovery_sample2',
     'test_runner_deprecation_app',
     'test_runner_invalid_app',
 ]
