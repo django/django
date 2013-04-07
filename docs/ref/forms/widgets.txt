@@ -648,6 +648,11 @@ Selector and checkbox widgets
           ...
         </ul>
 
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
 .. _file-upload-widgets:
 
 File upload widgets
