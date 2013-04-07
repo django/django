@@ -205,6 +205,21 @@ class ModelFormMetaclass(type):
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
+
+        # We check if a string was passed to `fields` or `exclude`,
+        # which is likely to be a mistake where the user typed ('foo') instead
+        # of ('foo',)
+        for opt in ['fields', 'exclude']:
+            value = getattr(opts, opt)
+            if isinstance(value, six.string_types):
+                msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
+                       "Did you mean to type: ('%(value)s',)?" % {
+                           'model': new_class.__name__,
+                           'opt': opt,
+                           'value': value,
+                       })
+                raise TypeError(msg)
+
         if opts.model:
             # If a model is defined, extract form fields from it.
             fields = fields_for_model(opts.model, opts.fields,
