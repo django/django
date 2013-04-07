@@ -182,9 +182,6 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         verbosity=verbosity,
         interactive=interactive,
         failfast=failfast,
-        # Use a pattern without .py so "tests" packages can match, allowing us
-        # to use the load_tests protocol in tests/__init__.py files
-        pattern='test*',
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(), extra_tests=extra_tests)

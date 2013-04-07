@@ -97,6 +97,8 @@ def build_suite(app_module):
             except ValueError:
                 # No doc tests in tests.py
                 pass
+
+    print app_module.__name__, suite.countTestCases()
     return suite
 
 
@@ -178,6 +180,7 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
                     suite.addTest(build_test(label))
                 else:
                     app = get_app(label)
+                    tests = build_suite(app)
                     suite.addTest(build_suite(app))
         else:
             for app in get_apps():
@@ -187,4 +190,5 @@ class DjangoTestSuiteRunner(runner.DiscoverRunner):
             for test in extra_tests:
                 suite.addTest(test)
 
+        print "total", suite.countTestCases()
         return runner.reorder_suite(suite, (unittest.TestCase,))

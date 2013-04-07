@@ -96,10 +96,13 @@ class DiscoverRunner(object):
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
+            print label, tests.countTestCases()
             suite.addTests(tests)
 
         for test in extra_tests:
             suite.addTest(test)
+
+        print "Total", suite.countTestCases()
 
         return reorder_suite(suite, self.reorder_by)
 
