@@ -533,7 +533,7 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
 
         f = SongForm(auto_id='%s_id')
-        self.assertHTMLEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul id="composers_id">
 <li><label for="composers_id_0"><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
 <li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>""")

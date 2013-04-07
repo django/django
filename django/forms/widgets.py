@@ -690,7 +690,8 @@ class CheckboxSelectMultiple(SelectMultiple):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
         id_ = final_attrs.get('id', None)
-        output = ['<ul>']
+        start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
+        output = [start_tag]
         # Normalize to strings
         str_values = set([force_text(v) for v in value])
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
