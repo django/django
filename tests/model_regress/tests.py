@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils import tzinfo
+from django.db import router
+from django.db.models.sql import InsertQuery
 
 from .models import (Worker, Article, Party, Event, Department,
     BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)
@@ -26,6 +28,16 @@ class ModelTests(TestCase):
         Regression test for #10153: foreign key __lte lookups.
         """
         Worker.objects.filter(department__lte=0)
+
+    def test_sql_insert_compiler_return_id_attribute(self):
+        """
+        Regression test for #14019: SQLInsertCompiler.as_sql() failure
+        """
+        db = router.db_for_write(Party)
+        query = InsertQuery(Party)
+        query.insert_values([Party._meta.fields[0]], [], raw=False)
+        # this line will raise an AttributeError without the accompanying fix
+        query.get_compiler(using=db).as_sql()
 
     def test_empty_choice(self):
         # NOTE: Part of the regression test here is merely parsing the model
