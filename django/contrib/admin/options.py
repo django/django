@@ -829,7 +829,7 @@ class ModelAdmin(BaseModelAdmin):
         # the presence of keys in request.POST.
         if "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             if post_url_continue is None:
                 post_url_continue = reverse('admin:%s_%s_change' %
                                             (opts.app_label, opts.model_name),
@@ -847,11 +847,11 @@ class ModelAdmin(BaseModelAdmin):
                 (escape(pk_value), escapejs(obj)))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             return HttpResponseRedirect(request.path)
         else:
             msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_add(request, obj)
 
     def response_change(self, request, obj):
@@ -865,27 +865,27 @@ class ModelAdmin(BaseModelAdmin):
         msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
         if "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             if "_popup" in request.REQUEST:
                 return HttpResponseRedirect(request.path + "?_popup=1")
             else:
                 return HttpResponseRedirect(request.path)
         elif "_saveasnew" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             return HttpResponseRedirect(reverse('admin:%s_%s_change' %
                                         (opts.app_label, opts.model_name),
                                         args=(pk_value,),
                                         current_app=self.admin_site.name))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             return HttpResponseRedirect(reverse('admin:%s_%s_add' %
                                         (opts.app_label, opts.model_name),
                                         current_app=self.admin_site.name))
         else:
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
 
     def response_post_save_add(self, request, obj):
@@ -964,7 +964,7 @@ class ModelAdmin(BaseModelAdmin):
                 # Reminder that something needs to be selected or nothing will happen
                 msg = _("Items must be selected in order to perform "
                         "actions on them. No items have been changed.")
-                self.message_user(request, msg)
+                self.message_user(request, msg, messages.WARNING)
                 return None
 
             if not select_across:
@@ -982,7 +982,7 @@ class ModelAdmin(BaseModelAdmin):
                 return HttpResponseRedirect(request.get_full_path())
         else:
             msg = _("No action selected.")
-            self.message_user(request, msg)
+            self.message_user(request, msg, messages.WARNING)
             return None
 
     @csrf_protect_m
@@ -1224,7 +1224,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 msg = _("Items must be selected in order to perform "
                         "actions on them. No items have been changed.")
-                self.message_user(request, msg)
+                self.message_user(request, msg, messages.WARNING)
                 action_failed = True
 
         # Actions with confirmation
@@ -1269,7 +1269,7 @@ class ModelAdmin(BaseModelAdmin):
                                     changecount) % {'count': changecount,
                                                     'name': name,
                                                     'obj': force_text(obj)}
-                    self.message_user(request, msg)
+                    self.message_user(request, msg, messages.SUCCESS)
 
                 return HttpResponseRedirect(request.get_full_path())
 
@@ -1346,7 +1346,11 @@ class ModelAdmin(BaseModelAdmin):
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
-            self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
+            self.message_user(request, _(
+                'The %(name)s "%(obj)s" was deleted successfully.') % {
+                                       'name': force_text(opts.verbose_name),
+                                       'obj': force_text(obj_display)},
+                              messages.SUCCESS)
 
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect(reverse('admin:index',
