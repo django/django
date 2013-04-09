@@ -2628,7 +2628,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name
         self.assertContains(
             response,
-            '<li class="info">The cover letter &quot;Candidate, Best&quot; was added successfully.</li>',
+            '<li class="success">The cover letter &quot;Candidate, Best&quot; was added successfully.</li>',
             html=True
         )
 
@@ -2646,7 +2646,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name
         self.assertContains(
             response,
-            '<li class="info">The short message &quot;ShortMessage object&quot; was added successfully.</li>',
+            '<li class="success">The short message &quot;ShortMessage object&quot; was added successfully.</li>',
             html=True
         )
 
@@ -2667,7 +2667,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name
         self.assertContains(
             response,
-            '<li class="info">The telegram &quot;Urgent telegram&quot; was added successfully.</li>',
+            '<li class="success">The telegram &quot;Urgent telegram&quot; was added successfully.</li>',
             html=True
         )
 
@@ -2685,7 +2685,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name
         self.assertContains(
             response,
-            '<li class="info">The paper &quot;Paper object&quot; was added successfully.</li>',
+            '<li class="success">The paper &quot;Paper object&quot; was added successfully.</li>',
             html=True
         )
 
@@ -2710,7 +2710,7 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>',
+            '<li class="success">The cover letter &quot;John Doe II&quot; was changed successfully.</li>',
             html=True
         )
 
@@ -2732,7 +2732,7 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="info">The short message &quot;ShortMessage_Deferred_timestamp object&quot; was changed successfully.</li>',
+            '<li class="success">The short message &quot;ShortMessage_Deferred_timestamp object&quot; was changed successfully.</li>',
             html=True
         )
 
@@ -2757,7 +2757,7 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="info">The telegram &quot;Telegram without typo&quot; was changed successfully.</li>',
+            '<li class="success">The telegram &quot;Telegram without typo&quot; was changed successfully.</li>',
             html=True
         )
 
@@ -2779,7 +2779,7 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
+            '<li class="success">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
             html=True
         )
 

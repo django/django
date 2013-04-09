@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tests.test_views import AuthViewsTestCase
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -27,11 +28,13 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             pass
         login_required(normal_view)
 
-    def testLoginRequired(self, view_url='/login_required/', login_url='/login/'):
+    def testLoginRequired(self, view_url='/login_required/', login_url=None):
         """
         Check that login_required works on a simple view wrapped in a
         login_required decorator.
         """
+        if login_url is None:
+            login_url = settings.LOGIN_URL
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(login_url in response.url)

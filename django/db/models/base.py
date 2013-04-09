@@ -163,7 +163,7 @@ class ModelBase(type):
                 else:
                     base = parent
             if base is None:
-                    raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
+                raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             if (new_class._meta.local_fields or
                     new_class._meta.local_many_to_many):
                 raise FieldError("Proxy model '%s' contains model fields." % name)
