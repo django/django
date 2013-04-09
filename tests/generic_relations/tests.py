@@ -247,6 +247,22 @@ class GenericRelationsTests(TestCase):
         TaggedItem.objects.create(content_object=granite, tag="countertop")
         self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
 
+    def test_generic_inline_formsets_initial(self):
+        """
+        Test for #17927 Initial values support for BaseGenericInlineFormSet.
+        """
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+
+        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
+        ctype = ContentType.objects.get_for_model(quartz)
+        initial_data = [{
+            'tag': 'lizard',
+            'content_type': ctype.pk,
+            'object_id': quartz.pk,
+        }]
+        formset = GenericFormSet(initial=initial_data)
+        self.assertEqual(formset.forms[0].initial, initial_data[0])
+
 
 class CustomWidget(forms.TextInput):
     pass

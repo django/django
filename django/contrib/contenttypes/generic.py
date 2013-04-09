@@ -384,7 +384,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     """
 
     def __init__(self, data=None, files=None, instance=None, save_as_new=None,
-                 prefix=None, queryset=None):
+                 prefix=None, queryset=None, **kwargs):
         opts = self.model._meta
         self.instance = instance
         self.rel_name = '-'.join((
@@ -403,7 +403,8 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             })
         super(BaseGenericInlineFormSet, self).__init__(
             queryset=qs, data=data, files=files,
-            prefix=prefix
+            prefix=prefix,
+            **kwargs
         )
 
     @classmethod
