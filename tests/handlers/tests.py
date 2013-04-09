@@ -1,4 +1,6 @@
-from django.core.handlers.wsgi import WSGIHandler
+from io import BytesIO
+
+from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from django.core.signals import request_started, request_finished
 from django.db import close_old_connections, connection
 from django.test import RequestFactory, TestCase, TransactionTestCase
@@ -89,3 +91,68 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started'])
         self.assertEqual(b''.join(response.streaming_content), b"streaming content")
         self.assertEqual(self.signals, ['started', 'finished'])
+
+
+class TestWSGIRoutingArgsAccessors(TestCase):
+    
+    base_environ = {'REQUEST_METHOD': 'GET', 'wsgi.input': BytesIO(b'')}
+    
+    def test_no_routing_args(self):
+        request = WSGIRequest(self.base_environ.copy())
+        self.assertEqual((), request.POSITIONAL_PATH_ARGS)
+        self.assertEqual({}, request.NAMED_PATH_ARGS)
+    
+    def test_setting_first_time(self):
+        # Positional args
+        request1 = WSGIRequest(self.base_environ.copy())
+        positional_args = ("hello-world", 33)
+        request1.POSITIONAL_PATH_ARGS = positional_args
+        self.assertEqual(
+            positional_args,
+            request1.environ['wsgiorg.routing_args'][0],
+            )
+        
+        # Named args
+        request2 = WSGIRequest(self.base_environ.copy())
+        named_args = {'article-slug': "hello-world", 'comment-id': 33}
+        request2.NAMED_PATH_ARGS = named_args
+        self.assertEqual(
+            named_args,
+            request2.environ['wsgiorg.routing_args'][1],
+            )
+    
+    def test_setting_subsequent_times(self):
+        original_routing_args = (("hello-world", ), {'comment-id': 33})
+        environ = self.base_environ.copy()
+        environ['wsgiorg.routing_args'] = original_routing_args
+        request = WSGIRequest(environ)
+        
+        # Override positional arguments; named ones must be preserved
+        new_positional_args = ("international", "hello-world")
+        request.POSITIONAL_PATH_ARGS = new_positional_args
+        self.assertEqual(
+            (new_positional_args, original_routing_args[1]),
+            request.environ['wsgiorg.routing_args'],
+            )
+        
+        # Override named arguments; positional ones must be preserved
+        new_named_args = {'article-slug': "hello-world"}
+        request.NAMED_PATH_ARGS = new_named_args
+        self.assertEqual(
+            (new_positional_args, new_named_args),
+            request.environ['wsgiorg.routing_args'],
+            )
+    
+    def test_getting_when_set(self):
+        original_routing_args = (("hello-world", ), {'comment-id': 33})
+        environ = self.base_environ.copy()
+        environ['wsgiorg.routing_args'] = original_routing_args
+        request = WSGIRequest(environ)
+        
+        self.assertEqual(original_routing_args[0], request.POSITIONAL_PATH_ARGS)
+        self.assertEqual(original_routing_args[1], request.NAMED_PATH_ARGS)
+    
+    def test_getting_when_not_set(self):
+        request = WSGIRequest(self.base_environ.copy())
+        self.assertEqual((), request.POSITIONAL_PATH_ARGS)
+        self.assertEqual({}, request.NAMED_PATH_ARGS)
