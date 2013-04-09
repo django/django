@@ -70,6 +70,17 @@ Minor features
   :class:`~django.contrib.auth.views.LogoutView` class-based views supersede the
   deprecated ``login()`` and ``logout()`` function-based views.
 
+* The :class:`~django.contrib.auth.views.PasswordChangeView`,
+  :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetView`,
+  :class:`~django.contrib.auth.views.PasswordResetDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
+  :class:`~django.contrib.auth.views.PasswordResetCompleteView` class-based
+  views supersede the deprecated ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
+  views.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -354,3 +365,14 @@ Miscellaneous
   deprecated in favor of new class-based views
   :class:`~django.contrib.auth.views.LoginView` and
   :class:`~django.contrib.auth.views.LogoutView`.
+
+* ``contrib.auth``’s ``password_change()``, ``password_change_done()``,
+  ``password_reset()``, ``password_reset_done()``, ``password_reset_confirm()``,
+  and ``password_reset_complete()`` function-based views are deprecated in favor
+  of new class-based views
+  :class:`~django.contrib.auth.views.PasswordChangeView`,
+  :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetView`,
+  :class:`~django.contrib.auth.views.PasswordResetDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
+  :class:`~django.contrib.auth.views.PasswordResetCompleteView`.

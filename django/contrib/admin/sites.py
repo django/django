@@ -289,30 +289,30 @@ class AdminSite(object):
         Handles the "change password" task -- both form display and validation.
         """
         from django.contrib.admin.forms import AdminPasswordChangeForm
-        from django.contrib.auth.views import password_change
+        from django.contrib.auth.views import PasswordChangeView
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
-            'password_change_form': AdminPasswordChangeForm,
-            'post_change_redirect': url,
+            'form_class': AdminPasswordChangeForm,
+            'success_url': url,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
         request.current_app = self.name
-        return password_change(request, **defaults)
+        return PasswordChangeView.as_view(**defaults)(request)
 
     def password_change_done(self, request, extra_context=None):
         """
         Displays the "success" page after a password change.
         """
-        from django.contrib.auth.views import password_change_done
+        from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
         request.current_app = self.name
-        return password_change_done(request, **defaults)
+        return PasswordChangeDoneView.as_view(**defaults)(request)
 
     def i18n_javascript(self, request, extra_context=None):
         """
