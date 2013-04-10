@@ -647,7 +647,7 @@ class AdminViewFormUrlTest(TestCase):
             os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
         with self.settings(TEMPLATE_DIRS=template_dirs):
             response = self.client.get("/test_admin/admin/admin_views/color2/")
-            self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
+            self.assertTemplateUsed(response, 'custom_filter_template.html')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -3982,7 +3982,7 @@ class AdminViewLogoutTest(TestCase):
     def test_client_logout_url_can_be_used_to_login(self):
         response = self.client.get('/test_admin/admin/logout/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, 'registration/logged_out.html')
+        self.assertTemplateUsed(response, 'registration/logged_out.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/logout/')
 
         # we are now logged out
@@ -3992,7 +3992,7 @@ class AdminViewLogoutTest(TestCase):
         # follow the redirect and test results.
         response = self.client.get('/test_admin/admin/logout/', follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, 'admin/login.html')
+        self.assertTemplateUsed(response, 'admin/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
 
