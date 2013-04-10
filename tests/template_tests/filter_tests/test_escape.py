@@ -1,5 +1,7 @@
 from django.template.defaultfilters import escape
 from django.test import SimpleTestCase
+from django.utils import six
+from django.utils.functional import Promise, lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -38,3 +40,9 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(escape(123), '123')
+
+    def test_escape_lazy_string(self):
+        add_html = lazy(lambda string: string + 'special characters > here', six.text_type)
+        escaped = escape(add_html('<some html & '))
+        self.assertIsInstance(escaped, Promise)
+        self.assertEqual(escaped, '&lt;some html &amp; special characters &gt; here')

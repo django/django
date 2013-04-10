@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
+from django.utils import six
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -244,6 +246,13 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             urlize('http://[2001:db8:cafe::2]/api/9'),
             '<a href="http://[2001:db8:cafe::2]/api/9" rel="nofollow">http://[2001:db8:cafe::2]/api/9</a>',
+        )
+
+    def test_lazystring(self):
+        prepend_www = lazy(lambda url: 'www.' + url, six.text_type)
+        self.assertEqual(
+            urlize(prepend_www('google.com')),
+            '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
         )
 
     def test_quotation_marks(self):

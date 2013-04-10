@@ -6,10 +6,13 @@ from datetime import datetime
 from unittest import TestCase
 
 from django.test import ignore_warnings
-from django.utils import html, safestring
+from django.utils import html, safestring, six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
+from django.utils.functional import lazy
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class TestUtilsHtml(TestCase):
@@ -37,6 +40,7 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             for pattern in patterns:
                 self.check_output(f, pattern % value, pattern % output)
+                self.check_output(f, lazystr(pattern % value), pattern % output)
             # Check repeated values.
             self.check_output(f, value * 2, output * 2)
         # Verify it doesn't double replace &.
@@ -63,6 +67,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_strip_tags(self):
         f = html.strip_tags
@@ -85,6 +90,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
         # Some convoluted syntax for which parsing may differ between python versions
         output = html.strip_tags('<sc<!-- -->ript>test<<!-- -->/script>')
@@ -112,6 +118,7 @@ class TestUtilsHtml(TestCase):
         items = (' <adf>', '<adf> ', ' </adf> ', ' <f> x</f>')
         for value in items:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value), value)
         # Strings that have spaces to strip.
         items = (
             ('<d> </d>', '<d></d>'),
@@ -120,6 +127,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_strip_entities(self):
@@ -128,6 +136,7 @@ class TestUtilsHtml(TestCase):
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value), value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -139,6 +148,7 @@ class TestUtilsHtml(TestCase):
         for entity in entities:
             for in_pattern, output in patterns:
                 self.check_output(f, in_pattern % {'entity': entity}, output)
+                self.check_output(f, lazystr(in_pattern % {'entity': entity}), output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -151,6 +161,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_remove_tags(self):
