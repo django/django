@@ -26,7 +26,7 @@ class TestUtilsHtml(TestCase):
         self.assertEqual(function(value), output)
 
     def test_escape(self):
-        f = html.escape
+        f = lambda x: force_text(html.escape(x))
         items = (
             ('&','&amp;'),
             ('<', '&lt;'),
@@ -45,6 +45,27 @@ class TestUtilsHtml(TestCase):
         # Verify it doesn't double replace &.
         self.check_output(f, '<&', '&lt;&amp;')
 
+    def test_conditional_escape(self):
+        f = lambda x: force_text(html.conditional_escape(x))
+        ff = lambda x: force_text(html.conditional_escape(html.conditional_escape(x))) # applied twice
+
+        # safe data comes out unchanged
+        self.check_output(f, 'safe')
+        # unsafe data is escaped
+        self.check_output(f, '<unsafe>', '&lt;unsafe&gt;')
+        # applying twice only escapes once
+        self.check_output(ff, '<unsafe>', '&lt;unsafe&gt;')
+
+        # works on lazy strings too
+        self.check_output(lambda x: force_text(f(x)),
+            lazystr('<unsafe>'), '&lt;unsafe&gt;')
+        # lazy strings don't get escaped twice (see #20221)
+        self.check_output(lambda x: force_text(ff(x)),
+            lazystr('<unsafe>'), '&lt;unsafe&gt;')
+
+        # strings that have been marked safe are not escaped
+        self.check_output(f, mark_safe('<unsafe>'), '<unsafe>')
+
     def test_format_html(self):
         self.assertEqual(
             html.format_html("{0} {1} {third} {fourth}",
@@ -57,7 +78,7 @@ class TestUtilsHtml(TestCase):
             )
 
     def test_linebreaks(self):
-        f = html.linebreaks
+        f = lambda x: force_text(html.linebreaks(x))
         items = (
             ("para1\n\npara2\r\rpara3", "<p>para1</p>\n\n<p>para2</p>\n\n<p>para3</p>"),
             ("para1\nsub1\rsub2\n\npara2", "<p>para1<br />sub1<br />sub2</p>\n\n<p>para2</p>"),
@@ -69,7 +90,7 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, lazystr(value), output)
 
     def test_strip_tags(self):
-        f = html.strip_tags
+        f = lambda x: force_text(html.strip_tags(x))
         items = (
             ('<adf>a', 'a'),
             ('</adf>a', 'a'),
@@ -98,7 +119,7 @@ class TestUtilsHtml(TestCase):
             self.assertNotIn('<', stripped)
 
     def test_strip_spaces_between_tags(self):
-        f = html.strip_spaces_between_tags
+        f = lambda x: force_text(html.strip_spaces_between_tags(x))
         # Strings that should come out untouched.
         items = (' <adf>', '<adf> ', ' </adf> ', ' <f> x</f>')
         for value in items:
@@ -115,7 +136,7 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, lazystr(value), output)
 
     def test_strip_entities(self):
-        f = html.strip_entities
+        f = lambda x: force_text(html.strip_entities(x))
         # Strings that should come out untouched.
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
@@ -135,7 +156,7 @@ class TestUtilsHtml(TestCase):
                 self.check_output(f, lazystr(in_pattern % {'entity': entity}), output)
 
     def test_fix_ampersands(self):
-        f = html.fix_ampersands
+        f = lambda x: force_text(html.fix_ampersands(x))
         # Strings without ampersands or with ampersands already encoded.
         values = ("a&#1;", "b", "&a;", "&amp; &x; ", "asdf")
         patterns = (
@@ -158,7 +179,7 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, lazystr(value), output)
 
     def test_escapejs(self):
-        f = html.escapejs
+        f = lambda x: force_text(html.escapejs(x))
         items = (
             ('"double quotes" and \'single quotes\'', '\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
             (r'\ : backslashes, too', '\\u005C : backslashes, too'),
@@ -171,7 +192,7 @@ class TestUtilsHtml(TestCase):
             self.check_output(f, lazystr(value), output)
 
     def test_clean_html(self):
-        f = html.clean_html
+        f = lambda x: force_text(html.clean_html(x))
         items = (
             ('<p>I <i>believe</i> in <b>semantic markup</b>!</p>', '<p>I <em>believe</em> in <strong>semantic markup</strong>!</p>'),
             ('I escape & I don\'t <a href="#" target="_blank">target</a>', 'I escape &amp; I don\'t <a href="#" >target</a>'),
@@ -191,4 +212,4 @@ class TestUtilsHtml(TestCase):
         )
         for value, tags, output in items:
             self.assertEqual(f(value, tags), output)
-            self.assertEqual(f(lazystr(value), tags), output)
+            self.assertEqual(force_text(f(lazystr(value), tags)), output)

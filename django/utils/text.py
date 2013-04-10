@@ -11,7 +11,7 @@ from django.utils.functional import keep_lazy_text, SimpleLazyObject
 from django.utils import six
 from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
-from django.utils.safestring import mark_safe
+from django.utils.safestring import safe
 
 if not six.PY3:
     # Import force_unicode even though this module doesn't use it, because some
@@ -401,6 +401,7 @@ def unescape_string_literal(s):
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
+@safe
 @keep_lazy_text
 def slugify(value):
     """
@@ -411,4 +412,4 @@ def slugify(value):
     value = force_text(value)
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    return re.sub('[-\s]+', '-', value)

@@ -10,7 +10,7 @@ except ImportError:     # Python 2
     from urllib import quote
     from urlparse import urlsplit, urlunsplit
 
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, mark_safe, safe
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import keep_lazy_text
 from django.utils import six
@@ -35,13 +35,13 @@ hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
-
+@safe
 @keep_lazy_text
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
     """
-    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -60,10 +60,11 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32.
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
+@safe
 @keep_lazy_text
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
-    return mark_safe(force_text(value).translate(_js_escapes))
+    return force_text(value).translate(_js_escapes)
 
 def conditional_escape(text):
     """
@@ -74,17 +75,19 @@ def conditional_escape(text):
     else:
         return escape(text)
 
+@safe
 def format_html(format_string, *args, **kwargs):
     """
-    Similar to str.format, but passes all arguments through conditional_escape,
-    and calls 'mark_safe' on the result. This function should be used instead
-    of str.format or % interpolation to build up small HTML fragments.
+    Similar to str.format, but passes all arguments through conditional_escape.
+    This function should be used instead of str.format or % interpolation
+    to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
     kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
                         six.iteritems(kwargs)])
-    return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+    return format_string.format(*args_safe, **kwargs_safe)
 
+@safe
 def format_html_join(sep, format_string, args_generator):
     """
     A wrapper of format_html, for the common case of a group of arguments that
@@ -100,9 +103,9 @@ def format_html_join(sep, format_string, args_generator):
                                                   for u in users))
 
     """
-    return mark_safe(conditional_escape(sep).join(
+    return conditional_escape(sep).join(
             format_html(format_string, *tuple(args))
-            for args in args_generator))
+            for args in args_generator)
 
 
 @keep_lazy_text
