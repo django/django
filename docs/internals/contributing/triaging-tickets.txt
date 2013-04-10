@@ -119,7 +119,14 @@ Beyond that there are several considerations:
 * **Accepted + No Flags**
 
   The ticket is valid, but no one has submitted a patch for it yet. Often this
-  means you could safely start writing a patch for it.
+  means you could safely start writing a patch for it. This is generally more
+  true for the case of accepted bugs than accepted features. A ticket for a bug
+  that has been accepted means that the issue has been verified by at least one
+  triager as a legitimate bug - and should probably be fixed if possible. An
+  accepted new feature may only mean that one triager thought the feature would
+  be good to have, but this alone does not represent a consensus view or imply
+  with any certainty that a patch will be accepted for that feature. Seek more
+  feedback before writing an extensive patch if you are in doubt.
 
 * **Accepted + Has Patch**
 
