@@ -2,6 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from django.utils import six
 
@@ -187,21 +188,42 @@ def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
 
 
 def allow_lazy(func, *resultclasses):
+    warnings.warn(
+        "django.utils.functional.allow_lazy will be removed in Django 1.8. "
+        "You should use django.utils.functional.keep_lazy instead.",
+        PendingDeprecationWarning)
+    return keep_lazy(*resultclasses)(func)
+
+
+def keep_lazy(*resultclasses):
     """
     A decorator that allows a function to be called with one or more lazy
     arguments. If none of the args are lazy, the function is evaluated
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        for arg in list(args) + list(six.itervalues(kwargs)):
-            if isinstance(arg, Promise):
-                break
-        else:
-            return func(*args, **kwargs)
-        return lazy(func, *resultclasses)(*args, **kwargs)
-    return wrapper
+    if not resultclasses:
+        raise TypeError("You must pass at least one argument to keep_lazy.")
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for arg in list(args) + list(six.itervalues(kwargs)):
+                if isinstance(arg, Promise):
+                    break
+            else:
+                return func(*args, **kwargs)
+            return lazy(func, *resultclasses)(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def keep_lazy_text(func):
+    """
+    A decorator for functions that want to accept lazy arguments and return text.
+    """
+    return keep_lazy(six.text_type)(func)
+
 
 empty = object()
 

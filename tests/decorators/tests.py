@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.utils.decorators import method_decorator
-from django.utils.functional import allow_lazy, lazy, memoize
+from django.utils.functional import keep_lazy, lazy, memoize
 from django.utils.unittest import TestCase
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
@@ -58,8 +58,7 @@ full_decorator = compose(
 
     # django.utils.functional
     lambda f: memoize(f, {}, 1),
-    allow_lazy,
-    lazy,
+    keep_lazy(HttpResponse),
 )
 
 fully_decorated = full_decorator(fully_decorated)

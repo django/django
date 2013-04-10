@@ -12,7 +12,7 @@ except ImportError:     # Python 2
 
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import force_bytes, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy_text
 from django.utils import six
 from django.utils.text import normalize_newlines
 
@@ -36,12 +36,12 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
+@keep_lazy_text
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type)
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -60,10 +60,10 @@ _js_escapes = {
 # Escape every ASCII character with a value less than 32.
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
+@keep_lazy_text
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type)
 
 def conditional_escape(text):
     """
@@ -105,8 +105,10 @@ def format_html_join(sep, format_string, args_generator):
             for args in args_generator))
 
 
+@keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
+    value = force_text(value)
     value = normalize_newlines(value)
     paras = re.split('\n{2,}', value)
     if autoescape:
@@ -114,38 +116,38 @@ def linebreaks(value, autoescape=False):
     else:
         paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, six.text_type)
 
+@keep_lazy_text
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     return strip_tags_re.sub('', force_text(value))
-strip_tags = allow_lazy(strip_tags)
 
+@keep_lazy_text
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
     tags = [re.escape(tag) for tag in tags.split()]
     tags_re = '(%s)' % '|'.join(tags)
     starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
     endtag_re = re.compile('</%s>' % tags_re)
+    html = force_text(html)
     html = starttag_re.sub('', html)
     html = endtag_re.sub('', html)
     return html
-remove_tags = allow_lazy(remove_tags, six.text_type)
 
+@keep_lazy_text
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
-strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
+@keep_lazy_text
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
-strip_entities = allow_lazy(strip_entities, six.text_type)
 
+@keep_lazy_text
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
     return unencoded_ampersands_re.sub('&amp;', force_text(value))
-fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
@@ -170,6 +172,7 @@ def smart_urlquote(url):
 
     return force_text(url)
 
+@keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
@@ -243,8 +246,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         elif autoescape:
             words[i] = escape(word)
     return ''.join(words)
-urlize = allow_lazy(urlize, six.text_type)
 
+@keep_lazy_text
 def clean_html(text):
     """
     Clean the given HTML.  Specifically, do the following:
@@ -277,4 +280,3 @@ def clean_html(text):
     # of the text.
     text = trailing_empty_content_re.sub('', text)
     return text
-clean_html = allow_lazy(clean_html, six.text_type)

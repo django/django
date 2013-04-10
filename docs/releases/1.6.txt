@@ -545,3 +545,9 @@ including it in an URLconf, simply replace::
 with::
 
     (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+
+``django.utils.functional.allow_lazy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This function has been deprecated in favor of a new :func:`keep_lazy<django.utils.functional.keep_lazy>` one which can
+be used with a more natural decorator syntax.

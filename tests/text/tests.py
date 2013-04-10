@@ -27,6 +27,8 @@ class TextTests(TestCase):
         with override('ar'):
             self.assertEqual(get_text_list(['a', 'b', 'c']), "a، b أو c")
 
+        self.assertEqual(get_text_list(list(map(lazystr, ['a', 'b', 'c', 'd']))), 'a, b, c or d')
+
     def test_smart_split(self):
 
         testdata = [
@@ -65,21 +67,31 @@ class TextTests(TestCase):
             'Paris%20%26%20Orl%C3%A9ans')
         self.assertEqual(urlquote('Paris & Orl\xe9ans', safe="&"),
             'Paris%20&%20Orl%C3%A9ans')
+        self.assertEqual(urlquote(lazystr('Paris & Orl\xe9ans')),  # lazy
+            'Paris%20%26%20Orl%C3%A9ans')
         self.assertEqual(
             urlunquote('Paris%20%26%20Orl%C3%A9ans'),
             'Paris & Orl\xe9ans')
         self.assertEqual(
             urlunquote('Paris%20&%20Orl%C3%A9ans'),
             'Paris & Orl\xe9ans')
+        self.assertEqual(
+            urlunquote(lazystr('Paris%20%26%20Orl%C3%A9ans')),  # lazy
+            'Paris & Orl\xe9ans')
         self.assertEqual(urlquote_plus('Paris & Orl\xe9ans'),
             'Paris+%26+Orl%C3%A9ans')
         self.assertEqual(urlquote_plus('Paris & Orl\xe9ans', safe="&"),
             'Paris+&+Orl%C3%A9ans')
+        self.assertEqual(urlquote_plus(lazystr('Paris & Orl\xe9ans')),  # lazy
+            'Paris+%26+Orl%C3%A9ans')
         self.assertEqual(
             urlunquote_plus('Paris+%26+Orl%C3%A9ans'),
             'Paris & Orl\xe9ans')
         self.assertEqual(
             urlunquote_plus('Paris+&+Orl%C3%A9ans'),
+            'Paris & Orl\xe9ans')
+        self.assertEqual(
+            urlunquote_plus(lazystr('Paris+%26+Orl%C3%A9ans')),  # lazy
             'Paris & Orl\xe9ans')
 
     def test_cookie_date(self):

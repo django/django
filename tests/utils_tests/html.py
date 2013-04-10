@@ -3,9 +3,15 @@ from __future__ import unicode_literals
 from datetime import datetime
 import os
 
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
 from django.utils import html
 from django.utils._os import upath
+from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.unittest import TestCase
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class TestUtilsHtml(TestCase):
@@ -33,6 +39,7 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             for pattern in patterns:
                 self.check_output(f, pattern % value, pattern % output)
+                self.check_output(f, lazystr(pattern % value), pattern % output)
             # Check repeated values.
             self.check_output(f, value * 2, output * 2)
         # Verify it doesn't double replace &.
@@ -59,6 +66,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_strip_tags(self):
         f = html.strip_tags
@@ -76,6 +84,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
         # Test with more lengthy content (also catching performance regressions)
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
@@ -94,6 +103,7 @@ class TestUtilsHtml(TestCase):
         items = (' <adf>', '<adf> ', ' </adf> ', ' <f> x</f>')
         for value in items:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value), value)
         # Strings that have spaces to strip.
         items = (
             ('<d> </d>', '<d></d>'),
@@ -102,6 +112,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_strip_entities(self):
         f = html.strip_entities
@@ -109,6 +120,7 @@ class TestUtilsHtml(TestCase):
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
             self.check_output(f, value)
+            self.check_output(f, lazystr(value), value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -120,6 +132,7 @@ class TestUtilsHtml(TestCase):
         for entity in entities:
             for in_pattern, output in patterns:
                 self.check_output(f, in_pattern % {'entity': entity}, output)
+                self.check_output(f, lazystr(in_pattern % {'entity': entity}), output)
 
     def test_fix_ampersands(self):
         f = html.fix_ampersands
@@ -133,6 +146,7 @@ class TestUtilsHtml(TestCase):
         for value in values:
             for in_pattern, out_pattern in patterns:
                 self.check_output(f, in_pattern % value, out_pattern % value)
+                self.check_output(f, lazystr(in_pattern % value), out_pattern % value)
         # Strings with ampersands that need encoding.
         items = (
             ("&#;", "&amp;#;"),
@@ -141,6 +155,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -153,6 +168,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_clean_html(self):
         f = html.clean_html
@@ -165,6 +181,7 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+            self.check_output(f, lazystr(value), output)
 
     def test_remove_tags(self):
         f = html.remove_tags
@@ -174,3 +191,4 @@ class TestUtilsHtml(TestCase):
         )
         for value, tags, output in items:
             self.assertEqual(f(value, tags), output)
+            self.assertEqual(f(lazystr(value), tags), output)
