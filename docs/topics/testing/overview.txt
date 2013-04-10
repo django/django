@@ -65,13 +65,15 @@ between tests::
 
     class AnimalTestCase(TestCase):
         def setUp(self):
-            self.lion = Animal(name="lion", sound="roar")
-            self.cat = Animal(name="cat", sound="meow")
+            Animal.objects.create(name="lion", sound="roar")
+            Animal.objects.create(name="cat", sound="meow")
 
         def test_animals_can_speak(self):
             """Animals that can speak are correctly identified"""
-            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
-            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
+            lion = Animal.objects.get(name="lion")
+            cat = Animal.objects.get(name="cat")
+            self.assertEqual(lion.speak(), 'The lion says "roar"')
+            self.assertEqual(cat.speak(), 'The cat says "meow"')
 
 When you :ref:`run your tests <running-tests>`, the default behavior of the test
 utility is to find all the test cases (that is, subclasses of
@@ -95,17 +97,10 @@ For more details about :mod:`unittest`, see the Python documentation.
     be sure to create your test classes as subclasses of
     :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
 
-    In the example above, we instantiate some models but do not save them to
-    the database. This example could have used
-    :class:`unittest.TestCase` and avoided the cost of running
-    each test in a transaction and flushing the database. However, if you use
-    :class:`unittest.TestCase` and your tests do interact with
+    If you use :class:`unittest.TestCase` and your tests do interact with
     the database, the behavior of the tests will vary based on the order that
     the test runner executes them. This can lead to unit tests that pass
     when run in isolation but fail when run in a suite.
-
-    Therefore, the simplest and less error-prone approach is to always use
-    :class:`django.test.TestCase`.
 
 
 .. _running-tests:
