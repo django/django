@@ -168,28 +168,41 @@ Other triage attributes
 
 A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
 
-* Has patch
-    This means the ticket has an associated
-    :doc:`patch<writing-code/submitting-patches>`. These will be reviewed
-    to see if the patch is "good".
+Has patch
+~~~~~~~~~
 
-* Needs documentation:
-    This flag is used for tickets with patches that need associated
-    documentation. Complete documentation of features is a prerequisite
-    before we can check them into the codebase.
+This means the ticket has an associated
+:doc:`patch<writing-code/submitting-patches>`. These will be reviewed
+to see if the patch is "good".
 
-* Needs tests
-    This flags the patch as needing associated unit tests. Again, this
-    is a required part of a valid patch.
+Needs documentation
+~~~~~~~~~~~~~~~~~~~
 
-* Patch needs improvement
-    This flag means that although the ticket *has* a patch, it's not quite
-    ready for checkin. This could mean the patch no longer applies
-    cleanly, there is a flaw in the implementation, or that the code
-    doesn't meet our standards.
+This flag is used for tickets with patches that need associated
+documentation. Complete documentation of features is a prerequisite
+before we can check them into the codebase.
 
-* Easy pickings
-    Tickets that would require small, easy, patches.
+Needs tests
+~~~~~~~~~~~
+
+This flags the patch as needing associated unit tests. Again, this
+is a required part of a valid patch.
+
+Patch needs improvement
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This flag means that although the ticket *has* a patch, it's not quite
+ready for checkin. This could mean the patch no longer applies
+cleanly, there is a flaw in the implementation, or that the code
+doesn't meet our standards.
+
+Easy pickings
+~~~~~~~~~~~~~
+
+Tickets that would require small, easy, patches.
+
+Type
+~~~~
 
 Tickets should be categorized by *type* between:
 
@@ -203,9 +216,15 @@ Tickets should be categorized by *type* between:
     For when nothing is broken but something could be made cleaner,
     better, faster, stronger.
 
-Tickets should also be classified into *components* indicating which area of
+Component
+~~~~~~~~~
+
+Tickets should be classified into *components* indicating which area of
 the Django codebase they belong to. This makes tickets better organized and
 easier to find.
+
+Severity
+~~~~~~~~
 
 The *severity* attribute is used to identify blockers, that is, issues which
 should get fixed before releasing the next version of Django. Typically those
@@ -213,8 +232,30 @@ issues are bugs causing regressions from earlier versions or potentially
 causing severe data losses. This attribute is quite rarely used and the vast
 majority of tickets have a severity of "Normal".
 
-Finally, it is possible to use the *version* attribute to indicate in which
+Version
+~~~~~~~
+
+It is possible to use the *version* attribute to indicate in which
 version the reported bug was identified.
+
+UI/UX
+~~~~~
+
+This flag is used for tickets that relate to User Interface and User
+Experiences questions. For example, this flag would be appropriate for
+user-facing features in forms or the admin interface.
+
+Cc
+~~
+
+You may add your username or email address to this field to be notified when
+new contributions are made to the ticket.
+
+Keywords
+~~~~~~~~
+
+With this field you may label a ticket with multiple keywords. This can be
+useful, for example, to group several tickets of a same theme.
 
 .. _closing-tickets:
 
