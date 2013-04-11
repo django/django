@@ -35,6 +35,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Bryan Veloso
     * Preston Holmes
     * Simon Charette
+    * Donald Stufft
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -98,6 +99,7 @@ answer newbie questions, and generally made Django that much better:
     Natalia Bidart <nataliabidart@gmail.com>
     Mark Biggers <biggers@utsl.com>
     Paul Bissex <http://e-scribe.com/>
+    Loïc Bistuer <loic.bistuer@sixmedia.com>
     Simon Blanchard
     Craig Blaszczyk <masterjakul@gmail.com>
     David Blewett <david@dawninglight.net>
@@ -142,7 +144,9 @@ answer newbie questions, and generally made Django that much better:
     colin@owlfish.com
     crankycoder@gmail.com
     Paul Collier <paul@paul-collier.com>
+    Paul Collins <paul.collins.iii@gmail.com>
     Robert Coup
+    Deric Crago <deric.crago@gmail.com>
     David Cramer <dcramer@gmail.com>
     Pete Crosier <pete.crosier@gmail.com>
     Matt Croydon <http://www.postneo.com/>
@@ -165,6 +169,7 @@ answer newbie questions, and generally made Django that much better:
     Matt Dennenbaum
     deric@monowerks.com
     Max Derkachev <mderk@yandex.ru>
+    Carlos Matías de la Torre <cmdelatorre@gmail.com>
     Rajesh Dhawan <rajesh.dhawan@gmail.com>
     Sander Dijkhuis <sander.dijkhuis@gmail.com>
     Jordan Dimov <s3x3y1@gmail.com>
@@ -205,6 +210,7 @@ answer newbie questions, and generally made Django that much better:
     Stefane Fermgier <sf@fermigier.com>
     J. Pablo Fernandez <pupeno@pupeno.com>
     Maciej Fijalkowski
+    Juan Pedro Fisanotti <fisadev@gmail.com>
     Ben Firshman <ben@firshman.co.uk>
     Matthew Flanagan <http://wadofstuff.blogspot.com>
     Eric Floehr <eric@intellovations.com>
@@ -363,6 +369,7 @@ answer newbie questions, and generally made Django that much better:
     Mike Malone <mjmalone@gmail.com>
     Martin Maney <http://www.chipy.org/Martin_Maney>
     Michael Manfre <mmanfre@gmail.com>
+    Javier Mansilla <javimansilla@gmail.com>
     masonsimon+django@gmail.com
     Manuzhai
     Petr Marhoun <petr.marhoun@gmail.com>
@@ -430,6 +437,7 @@ answer newbie questions, and generally made Django that much better:
     Andreas Pelme <andreas@pelme.se>
     permonik@mesias.brnonet.cz
     peter@mymart.com
+    Christophe Pettus <xof@thebuild.com>
     pgross@thoughtworks.com
     phaedo <http://phaedo.cx/>
     phil@produxion.net
@@ -521,6 +529,7 @@ answer newbie questions, and generally made Django that much better:
     Johan C. Stöver <johan@nilling.nl>
     Nowell Strite <http://nowell.strite.org/>
     Thomas Stromberg <tstromberg@google.com>
+    Hannes Struß <x@hannesstruss.de>
     Ben Sturmfels <ben@sturm.com.au>
     Travis Swicegood <travis@domain51.com>
     Pascal Varet
@@ -600,7 +609,6 @@ answer newbie questions, and generally made Django that much better:
     Gasper Zejn <zejn@kiberpipa.org>
     Jarek Zgoda <jarek.zgoda@gmail.com>
     Cheng Zhang
-    Hannes Struß <x@hannesstruss.de>
 
 A big THANK YOU goes to:
 
@@ -611,6 +619,7 @@ A big THANK YOU goes to:
 
     Ian Bicking for convincing Adrian to ditch code generation.
 
-    Mark Pilgrim for diveintopython.org. (RIP!)
+    Mark Pilgrim for "Dive Into Python" (http://diveintopython.net,
+    http://www.diveintopython3.net).
 
     Guido van Rossum for creating Python.

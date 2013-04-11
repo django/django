@@ -19,7 +19,7 @@ _format_modules_cache = {}
 
 ISO_INPUT_FORMATS = {
     'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
-    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M'),
+    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M:%S.%f', '%H:%M'),
     'DATETIME_INPUT_FORMATS': (
         '%Y-%m-%d %H:%M:%S',
         '%Y-%m-%d %H:%M:%S.%f',

@@ -2,7 +2,7 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
@@ -129,7 +129,7 @@ class AdminSite(object):
 
     def get_action(self, name):
         """
-        Explicitally get a registered global action wheather it's enabled or
+        Explicitly get a registered global action whether it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]
@@ -193,6 +193,8 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
+            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
+                auth_logout(request)
             if not self.has_permission(request):
                 if request.path == reverse('admin:logout',
                                            current_app=self.name):

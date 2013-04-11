@@ -6,22 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-02-14 13:39+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Galician (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Galician (http://www.transifex.com/projects/p/django/language/"
 "gl/)\n"
-"Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:7
+#: models.py:9
 msgid "redirect from"
 msgstr "orixe da redirección"
 
-#: models.py:8
+#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -29,11 +29,11 @@ msgstr ""
 "Debe ser unha ruta absoluta, sen o nome de dominio. Exemplo: '/events/"
 "search/'"
 
-#: models.py:9
+#: models.py:11
 msgid "redirect to"
 msgstr "destino da redirección"
 
-#: models.py:10
+#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -41,10 +41,10 @@ msgstr ""
 "Pode ser unha ruta absoluta (coma a de enriba) ou un URL completo que empece "
 "por 'http://'"
 
-#: models.py:13
+#: models.py:15
 msgid "redirect"
 msgstr "redirección"
 
-#: models.py:14
+#: models.py:16
 msgid "redirects"
 msgstr "redireccións"

@@ -144,7 +144,7 @@ def parse_http_date(date):
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception:
-        raise ValueError("%r is not a valid date" % date)
+        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
 
 def parse_http_date_safe(date):
     """
@@ -217,7 +217,7 @@ def parse_etags(etag_str):
 
 def quote_etag(etag):
     """
-    Wraps a string in double quotes escaping contents as necesary.
+    Wraps a string in double quotes escaping contents as necessary.
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 

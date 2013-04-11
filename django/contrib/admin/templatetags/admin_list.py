@@ -306,8 +306,8 @@ def date_hierarchy(cl):
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
-            date_range = cl.query_set.aggregate(first=models.Min(field_name),
-                                                last=models.Max(field_name))
+            date_range = cl.queryset.aggregate(first=models.Min(field_name),
+                                               last=models.Max(field_name))
             if date_range['first'] and date_range['last']:
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
@@ -325,7 +325,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup})
+            days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
             days = getattr(days, dates_or_datetimes)(field_name, 'day')
             return {
                 'show': True,
@@ -339,7 +339,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.query_set.filter(**{year_field: year_lookup})
+            months = cl.queryset.filter(**{year_field: year_lookup})
             months = getattr(months, dates_or_datetimes)(field_name, 'month')
             return {
                 'show': True,
@@ -353,7 +353,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = getattr(cl.query_set, dates_or_datetimes)(field_name, 'year')
+            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{

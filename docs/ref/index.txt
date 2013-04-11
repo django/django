@@ -25,3 +25,4 @@ API Reference
    urls
    utils
    validators
+   views

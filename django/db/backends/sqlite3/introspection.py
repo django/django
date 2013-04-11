@@ -30,6 +30,7 @@ class FlexibleFieldLookupDict(object):
         'real': 'FloatField',
         'text': 'TextField',
         'char': 'CharField',
+        'blob': 'BinaryField',
         'date': 'DateField',
         'datetime': 'DateTimeField',
         'time': 'TimeField',

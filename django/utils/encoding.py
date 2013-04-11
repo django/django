@@ -142,6 +142,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    if isinstance(s, six.memoryview):
+        s = bytes(s)
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
@@ -232,13 +234,19 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(force_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
+    return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
 
-# The encoding of the default system locale but falls back to the
-# given fallback encoding if the encoding is unsupported by python or could
-# not be determined.  See tickets #10335 and #5846
-try:
-    DEFAULT_LOCALE_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
-    codecs.lookup(DEFAULT_LOCALE_ENCODING)
-except:
-    DEFAULT_LOCALE_ENCODING = 'ascii'
+def get_system_encoding():
+    """
+    The encoding of the default system locale but falls back to the given
+    fallback encoding if the encoding is unsupported by python or could
+    not be determined.  See tickets #10335 and #5846
+    """
+    try:
+        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        codecs.lookup(encoding)
+    except Exception:
+        encoding = 'ascii'
+    return encoding
+
+DEFAULT_LOCALE_ENCODING = get_system_encoding()

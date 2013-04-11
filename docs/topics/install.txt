@@ -148,7 +148,7 @@ database queries, Django will need permission to create a test database.
 .. _Oracle: http://www.oracle.com/
 .. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Microsoft SQL Server 2005: https://bitbucket.org/Manfre/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
 .. _ODBC: http://code.google.com/p/django-pyodbc/
 .. _removing-old-versions-of-django:

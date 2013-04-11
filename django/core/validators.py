@@ -50,6 +50,7 @@ class URLValidator(RegexValidator):
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    message = _('Enter a valid URL.')
 
     def __call__(self, value):
         try:
@@ -79,7 +80,7 @@ def validate_integer(value):
 
 
 class EmailValidator(object):
-    message = _('Enter a valid e-mail address.')
+    message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom

@@ -9,6 +9,14 @@ container server coded in pure C.
 
 .. _uWSGI: http://projects.unbit.it/uwsgi/
 
+.. seealso::
+
+    The uWSGI docs offer a `tutorial`_ covering Django, nginx, and uWSGI (one
+    possible deployment setup of many). The docs below are focused on how to
+    integrate Django with uWSGI.
+
+    .. _tutorial: https://uwsgi.readthedocs.org/en/latest/tutorials/Django_and_nginx.html
+
 Prerequisite: uWSGI
 ===================
 

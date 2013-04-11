@@ -286,6 +286,53 @@ example::
    use one of the ``add_message`` family of methods. It does not hide failures
    that may occur for other reasons.
 
+Adding messages in Class Based Views
+------------------------------------
+
+.. versionadded:: 1.6
+
+.. class:: views.SuccessMessageMixin
+
+    Adds a success message attribute to
+    :class:`~django.views.generic.edit.FormView` based classes
+
+    .. method:: get_success_message(cleaned_data)
+
+        ``cleaned_data`` is the cleaned data from the form which is used for
+        string formatting
+
+**Example views.py**::
+
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import Author
+
+    class AuthorCreate(SuccessMessageMixin, CreateView):
+        model = Author
+        success_url = '/success/'
+        success_message = "%(name)s was created successfully"
+
+The cleaned data from the ``form`` is available for string interpolation using
+the ``%(field_name)s`` syntax. For ModelForms, if you need access to fields
+from the saved ``object`` override the
+:meth:`~django.contrib.messages.views.SuccessMessageMixin.get_success_message`
+method.
+
+**Example views.py for ModelForms**::
+
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import ComplicatedModel
+
+    class ComplicatedCreate(SuccessMessageMixin, CreateView):
+        model = ComplicatedModel
+        success_url = '/success/'
+        success_message = "%(calculated_field)s was created successfully"
+
+        def get_success_message(self, cleaned_data):
+            return self.success_message % dict(cleaned_data,
+                                               calculated_field=self.object.calculated_field)
+
 Expiration of messages
 ======================
 

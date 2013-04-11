@@ -3,6 +3,7 @@ import os
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
 from django.utils.importlib import import_module
 
 
@@ -19,8 +20,10 @@ def import_by_path(dotted_path, error_prefix=''):
     try:
         module = import_module(module_path)
     except ImportError as e:
-        raise ImproperlyConfigured('%sError importing module %s: "%s"' % (
-            error_prefix, module_path, e))
+        msg = '%sError importing module %s: "%s"' % (
+            error_prefix, module_path, e)
+        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
+                    sys.exc_info()[2])
     try:
         attr = getattr(module, class_name)
     except AttributeError:

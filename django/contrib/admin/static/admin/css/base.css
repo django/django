@@ -424,7 +424,8 @@ textarea {
     vertical-align: top !important;
 }
 
-input[type=text], input[type=password], textarea, select, .vTextField {
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number],
+textarea, select, .vTextField {
     border: 1px solid #ccc;
 }
 

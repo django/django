@@ -408,6 +408,30 @@ SQLite. This can be configured using the following::
 For other database backends, or more complex SQLite configurations, other options
 will be required. The following inner options are available.
 
+.. setting:: DATABASE-ATOMIC_REQUESTS
+
+ATOMIC_REQUESTS
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Set this to ``True`` to wrap each HTTP request in a transaction on this
+database. See :ref:`tying-transactions-to-http-requests`.
+
+.. setting:: DATABASE-AUTOCOMMIT
+
+AUTOCOMMIT
+~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``True``
+
+Set this to ``False`` if you want to :ref:`disable Django's transaction
+management <deactivate-transaction-management>` and implement your own.
+
 .. setting:: DATABASE-ENGINE
 
 ENGINE
@@ -463,6 +487,19 @@ Default: ``''`` (Empty string)
 The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+
+.. setting:: CONN_MAX_AGE
+
+CONN_MAX_AGE
+~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``600``
+
+The lifetime of a database connection, in seconds. Use ``0`` to close database
+connections at the end of each request — Django's historical behavior — and
+``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 
@@ -520,7 +557,7 @@ backend-specific.
 Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
 
 .. setting:: TEST_COLLATION
@@ -1228,9 +1265,9 @@ see the current list of translated languages by looking in
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format ``(language code, language
-name)``, the ``language code`` part should be a
-:term:`language name<language code>` -- for example, ``('ja', 'Japanese')``.
+The list is a tuple of two-tuples in the format 
+(:term:`language code<language code>`, ``language name``) -- for example, 
+``('ja', 'Japanese')``. 
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
@@ -1718,6 +1755,7 @@ Default::
 
     (
         '%H:%M:%S',     # '14:30:59'
+        '%H:%M:%S.%f',  # '14:30:59.000200'
         '%H:%M',        # '14:30'
     )
 
@@ -1730,6 +1768,10 @@ When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
+
+.. versionchanged:: 1.6
+
+Input format with microseconds has been added.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -1788,6 +1830,12 @@ to ensure your processes are running in the correct environment.
 
 TRANSACTIONS_MANAGED
 --------------------
+
+.. deprecated:: 1.6
+
+    This setting was deprecated because its name is very misleading. Use the
+    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
+    entries instead.
 
 Default: ``False``
 
@@ -2126,7 +2174,7 @@ Settings for :mod:`django.contrib.messages`.
 MESSAGE_LEVEL
 -------------
 
-Default: `messages.INFO`
+Default: ``messages.INFO``
 
 Sets the minimum message level that will be recorded by the messages
 framework. See :ref:`message levels <message-level>` for more details.
@@ -2239,6 +2287,12 @@ The domain to use for session cookies. Set this to a string such as
 ``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
 
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies will be set to the old
+domain. This may result in them being unable to log in as long as these cookies
+persist.
+
 .. setting:: SESSION_COOKIE_HTTPONLY
 
 SESSION_COOKIE_HTTPONLY
@@ -2318,7 +2372,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 Default: ``False``
 
 Whether to expire the session when the user closes his or her browser. See
-"Browser-length sessions vs. persistent sessions" above.
+:ref:`browser-length-vs-persistent-sessions`.
 
 .. setting:: SESSION_FILE_PATH
 
@@ -2383,7 +2437,7 @@ Example: ``"/var/www/example.com/static/"``
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default) the :djadmin:`collectstatic` management command will collect static
 files into this directory. See the howto on :doc:`managing static
-files</howto/static-files>` for more details about usage.
+files</howto/static-files/index>` for more details about usage.
 
 .. warning::
 

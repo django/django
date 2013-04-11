@@ -171,7 +171,7 @@ just declare the cycle, but not output the first value, you can add a
 
     {% for obj in some_list %}
         {% cycle 'row1' 'row2' as rowcolors silent %}
-        <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
     {% endfor %}
 
 This will output a list of ``<tr>`` elements with ``class``
@@ -1936,7 +1936,7 @@ slice
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-http://diveintopython.net/native_data_types/lists.html#odbchelper.list.slice
+http://www.diveintopython3.net/native-datatypes.html#slicinglists
 for an introduction.
 
 Example::
@@ -2418,8 +2418,10 @@ slightly different call::
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path. Use that instead if you have an advanced use case such as
-    :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
+    given path (rather than simply using :func:`urlparse.urljoin` with the
+    :setting:`STATIC_URL` setting and the given path). Use that instead if you
+    have an advanced use case such as :ref:`using a cloud service to serve
+    static files<staticfiles-from-cdn>`::
 
         {% load static from staticfiles %}
         <img src="{% static "images/hi.jpg" %}" alt="Hi!" />

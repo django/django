@@ -213,8 +213,15 @@ class Command(NoArgsCommand):
             field_params['max_length'] = int(row[3])
 
         if field_type == 'DecimalField':
-            field_params['max_digits'] = row[4]
-            field_params['decimal_places'] = row[5]
+            if row[4] is None or row[5] is None:
+                field_notes.append(
+                    'max_digits and decimal_places have been guessed, as this '
+                    'database handles decimal fields as float')
+                field_params['max_digits'] = row[4] if row[4] is not None else 10
+                field_params['decimal_places'] = row[5] if row[5] is not None else 5
+            else:
+                field_params['max_digits'] = row[4]
+                field_params['decimal_places'] = row[5]
 
         return field_type, field_params, field_notes
 

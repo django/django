@@ -691,7 +691,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
-    {% blocktrans %}Ambiguous translatable block of text{% endtransblock %}
+    {% blocktrans %}Ambiguous translatable block of text{% endblocktrans %}
 
 .. note:: Just for completeness, these are the corresponding fragments of the
     resulting ``.po`` file:

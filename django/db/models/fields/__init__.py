@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
-import collections
 import copy
 import datetime
 import decimal
 import math
 import warnings
+from base64 import b64decode, b64encode
 from itertools import tee
 
 from django.db import connection
+from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -16,12 +17,16 @@ from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import curry, total_ordering
+from django.utils.itercompat import is_iterator
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
+
+class Empty(object):
+    pass
 
 class NOT_PROVIDED:
     pass
@@ -29,7 +34,9 @@ class NOT_PROVIDED:
 # The values to use for "blank" in SelectFields. Will be appended to the start
 # of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
-BLANK_CHOICE_NONE = [("", "None")]
+
+def _load_field(app_label, model_name, field_name):
+    return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
 class FieldDoesNotExist(Exception):
     pass
@@ -49,6 +56,11 @@ class FieldDoesNotExist(Exception):
 #
 #     getattr(obj, opts.pk.attname)
 
+def _empty(of_cls):
+    new = Empty()
+    new.__class__ = of_cls
+    return new
+
 @total_ordering
 class Field(object):
     """Base class for all field types"""
@@ -56,6 +68,7 @@ class Field(object):
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
     empty_strings_allowed = True
+    empty_values = list(validators.EMPTY_VALUES)
 
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
@@ -147,6 +160,34 @@ class Field(object):
         memodict[id(self)] = obj
         return obj
 
+    def __copy__(self):
+        # We need to avoid hitting __reduce__, so define this
+        # slightly weird copy construct.
+        obj = Empty()
+        obj.__class__ = self.__class__
+        obj.__dict__ = self.__dict__.copy()
+        return obj
+
+    def __reduce__(self):
+        """
+        Pickling should return the model._meta.fields instance of the field,
+        not a new copy of that field. So, we use the app cache to load the
+        model and then the field back.
+        """
+        if not hasattr(self, 'model'):
+            # Fields are sometimes used without attaching them to models (for
+            # example in aggregation). In this case give back a plain field
+            # instance. The code below will create a new empty instance of
+            # class self.__class__, then update its dict with self.__dict__
+            # values - so, this is very close to normal pickle.
+            return _empty, (self.__class__,), self.__dict__
+        if self.model._deferred:
+            # Deferred model will not be found from the app cache. This could
+            # be fixed by reconstructing the deferred model on unpickle.
+            raise RuntimeError("Fields of deferred models can't be reduced")
+        return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
+                             self.name)
+
     def to_python(self, value):
         """
         Converts the input value into the expected Python data type, raising
@@ -156,7 +197,7 @@ class Field(object):
         return value
 
     def run_validators(self, value):
-        if value in validators.EMPTY_VALUES:
+        if value in self.empty_values:
             return
 
         errors = []
@@ -183,7 +224,7 @@ class Field(object):
             # Skip validation for non-editable fields.
             return
 
-        if self._choices and value not in validators.EMPTY_VALUES:
+        if self._choices and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -199,7 +240,7 @@ class Field(object):
         if value is None and not self.null:
             raise exceptions.ValidationError(self.error_messages['null'])
 
-        if not self.blank and value in validators.EMPTY_VALUES:
+        if not self.blank and value in self.empty_values:
             raise exceptions.ValidationError(self.error_messages['blank'])
 
     def clean(self, value, model_instance):
@@ -251,10 +292,13 @@ class Field(object):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls
-        cls._meta.add_field(self)
+        if virtual_only:
+            cls._meta.add_virtual_field(self)
+        else:
+            cls._meta.add_field(self)
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
@@ -342,9 +386,9 @@ class Field(object):
         if hasattr(value, 'get_compiler'):
             value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
-            # If the value has a relabel_aliases method, it will need to
-            # be invoked before the final SQL is evaluated
-            if hasattr(value, 'relabel_aliases'):
+            # If the value has a relabeled_clone method it means the
+            # value will be handled later on.
+            if hasattr(value, 'relabeled_clone'):
                 return value
             if hasattr(value, 'as_sql'):
                 sql, params = value.as_sql()
@@ -447,7 +491,7 @@ class Field(object):
         return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
-        if isinstance(self._choices, collections.Iterator):
+        if is_iterator(self._choices):
             choices, self._choices = tee(self._choices)
             return choices
         else:
@@ -579,8 +623,6 @@ class BooleanField(Field):
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
-        if 'default' not in kwargs and not kwargs.get('null'):
-            kwargs['default'] = False
         Field.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
@@ -1291,3 +1333,41 @@ class URLField(CharField):
         }
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
+
+class BinaryField(Field):
+    description = _("Raw binary data")
+    empty_values = [None, b'']
+
+    def __init__(self, *args, **kwargs):
+        kwargs['editable'] = False
+        super(BinaryField, self).__init__(*args, **kwargs)
+        if self.max_length is not None:
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def get_internal_type(self):
+        return "BinaryField"
+
+    def get_default(self):
+        if self.has_default() and not callable(self.default):
+            return self.default
+        default = super(BinaryField, self).get_default()
+        if default == '':
+            return b''
+        return default
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super(BinaryField, self
+            ).get_db_prep_value(value, connection, prepared)
+        if value is not None:
+            return connection.Database.Binary(value)
+        return value
+
+    def value_to_string(self, obj):
+        """Binary data is serialized as base64"""
+        return b64encode(force_bytes(self._get_val_from_obj(obj))).decode('ascii')
+
+    def to_python(self, value):
+        # If it's a string, it should be base64-encoded data
+        if isinstance(value, six.text_type):
+            return six.memoryview(b64decode(force_bytes(value)))
+        return value

@@ -6,29 +6,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-02-14 13:49+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Dutch (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:37
+#: models.py:39
 msgid "domain name"
 msgstr "domeinnaam"
 
-#: models.py:38
+#: models.py:40
 msgid "display name"
 msgstr "weergavenaam"
 
-#: models.py:43
+#: models.py:45
 msgid "site"
 msgstr "site"
 
-#: models.py:44
+#: models.py:46
 msgid "sites"
 msgstr "sites"

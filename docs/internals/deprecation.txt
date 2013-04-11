@@ -111,7 +111,7 @@ See the :doc:`Django 1.3 release notes</releases/1.3>` for more details on
 these changes.
 
 * Starting Django without a :setting:`SECRET_KEY` will result in an exception
-  rather than a `DeprecationWarning`. (This is accelerated from the usual
+  rather than a ``DeprecationWarning``. (This is accelerated from the usual
   deprecation path; see the :doc:`Django 1.4 release notes</releases/1.4>`.)
 
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
@@ -329,6 +329,20 @@ these changes.
 1.8
 ---
 
+* ``django.contrib.comments`` will be removed.
+
+* The following transaction management APIs will be removed:
+
+  - ``TransactionMiddleware``,
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``, defined in ``django.db.transaction``,
+  - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
+    also defined in ``django.db.transaction``,
+  - the ``TRANSACTIONS_MANAGED`` setting.
+
+  Upgrade paths are described in the :ref:`transaction management docs
+  <transactions-upgrading-from-1.5>`.
+
 * The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
   arguments. In 1.6 and 1.7, this behavior is provided by the version of these
   tags in the ``future`` template tag library.
@@ -338,6 +352,25 @@ these changes.
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
+
+* Remove the backward compatible shims introduced to rename ``get_query_set``
+  and similar queryset methods. This affects the following classes:
+  ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
+  ``GenericForeignKey``, ``Manager``, ``SingleRelatedObjectDescriptor`` and
+  ``ReverseSingleRelatedObjectDescriptor``.
+
+* Remove the backward compatible shims introduced to rename the attributes
+  ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
+
+* ``django.conf.urls.shortcut`` and ``django.views.defaults.shortcut`` will be
+  removed.
+
+* The following private APIs will be removed:
+
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
 
 2.0
 ---

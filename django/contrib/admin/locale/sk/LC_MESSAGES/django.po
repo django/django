@@ -2,34 +2,35 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Marian Andre <marian@andre.sk>, 2011, 2012.
+# Juraj Bubniak <translations@jbub.eu>, 2012.
+# Marian Andre <marian@andre.sk>, 2011-2013.
 # Martin Kosír <martin@martinkosir.net>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:34+0100\n"
-"PO-Revision-Date: 2012-03-08 12:29+0000\n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 15:40+0000\n"
 "Last-Translator: Marian Andre <marian@andre.sk>\n"
-"Language-Team: Slovak (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Úspešne zmazaných %(count)d %(items)s."
 
-#: actions.py:60 options.py:1295
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nedá sa vymazať %(name)s"
 
-#: actions.py:62 options.py:1297
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "Ste si istý?"
 
@@ -38,164 +39,139 @@ msgstr "Ste si istý?"
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Zmazať označené %(verbose_name_plural)s"
 
-#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
 msgstr "Všetko"
 
-#: filters.py:232
+#: filters.py:238
 msgid "Yes"
 msgstr "Áno"
 
-#: filters.py:233
+#: filters.py:239
 msgid "No"
 msgstr "Nie"
 
-#: filters.py:247
+#: filters.py:253
 msgid "Unknown"
 msgstr "Neznámy"
 
-#: filters.py:306
+#: filters.py:308
 msgid "Any date"
 msgstr "Ľubovoľný dátum"
 
-#: filters.py:307
+#: filters.py:309
 msgid "Today"
 msgstr "Dnes"
 
-#: filters.py:311
+#: filters.py:313
 msgid "Past 7 days"
 msgstr "Posledných 7 dní"
 
-#: filters.py:315
+#: filters.py:317
 msgid "This month"
 msgstr "Tento mesiac"
 
-#: filters.py:319
+#: filters.py:321
 msgid "This year"
 msgstr "Tento rok"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
-"Zadajte prosím správne užívateľské meno a heslo pre účet zamestnanca. "
-"Všimnite si, že obe polia sú case-sensitive."
+"Zadajte prosím správne %(username)s a heslo pre účet personálu - \"staff "
+"account\". Obe polia môžu obsahovať veľké a malé písmená."
 
-#: forms.py:18
+#: forms.py:19
 msgid "Please log in again, because your session has expired."
 msgstr "Vaše prihlásenie vypršalo. Prosím, prihláste sa znovu."
 
-#: forms.py:37
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Vaša e-mailová adresa nie je vašim používateľským menom. Skúste namiesto "
-"toho použiť '%s'."
-
-#: helpers.py:20
+#: helpers.py:23
 msgid "Action:"
 msgstr "Akcia:"
 
-#: models.py:19
+#: models.py:24
 msgid "action time"
 msgstr "čas akcie"
 
-#: models.py:22
+#: models.py:27
 msgid "object id"
 msgstr "identifikátor objektu"
 
-#: models.py:23
+#: models.py:28
 msgid "object repr"
 msgstr "reprezentácia objektu"
 
-#: models.py:24
+#: models.py:29
 msgid "action flag"
 msgstr "príznak akcie"
 
-#: models.py:25
+#: models.py:30
 msgid "change message"
 msgstr "zmeniť správu"
 
-#: models.py:30
+#: models.py:35
 msgid "log entry"
 msgstr "položka záznamu"
 
-#: models.py:31
+#: models.py:36
 msgid "log entries"
 msgstr "položky záznamu"
 
-#: models.py:40
+#: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Pridané \"%(object)s\"."
 
-#: models.py:42
+#: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Zmenené \" %(object)s \" - %(changes)s "
 
-#: models.py:44
+#: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Odstránené \"%(object)s.\""
 
-#: models.py:46
+#: models.py:54
 msgid "LogEntry Object"
 msgstr "Objekt LogEntry"
 
-#: options.py:150 options.py:166
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "Žiadne"
 
-#: options.py:671
+#: options.py:684
 #, python-format
 msgid "Changed %s."
 msgstr "Zmenené %s."
 
-#: options.py:671 options.py:681
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "a"
 
-#: options.py:676
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Pridaný %(name)s \"%(object)s\"."
 
-#: options.py:680
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmenený %(list)s pre %(name)s \"%(object)s\"."
 
-#: options.py:685
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Zmazaný %(name)s \"%(object)s\"."
 
-#: options.py:689
+#: options.py:702
 msgid "No fields changed."
 msgstr "Polia nezmenené."
 
-#: options.py:772
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný."
-
-#: options.py:776 options.py:824
-msgid "You may edit it again below."
-msgstr "Nižšie môžete znova robiť úpravy."
-
-#: options.py:788 options.py:837
-#, python-format
-msgid "You may add another %s below."
-msgstr "Nižšie môžete pridať ďalšie %s."
-
-#: options.py:822
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne zmenený."
-
-#: options.py:830
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -203,7 +179,43 @@ msgstr ""
 "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný. Ďalšie zmeny môžete urobiť "
 "nižšie."
 
-#: options.py:899 options.py:1159
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" bol úspešne pridaný. Môžete pridať ďaľší %(name)s "
+"nižšie."
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+"%(name)s \"%(obj)s\" bol úspešne zmenený. Môžete ho znovu upraviť nižšie."
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"%(name)s \"%(obj)s\" bol úspešne zmenený. Môžete pridať ďaľšie %(name)s "
+"nižšie."
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne zmenený."
+
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -211,30 +223,30 @@ msgstr ""
 "Položky musia byť vybrané, ak chcete na nich vykonať akcie. Neboli vybrané "
 "žiadne položky."
 
-#: options.py:918
+#: options.py:970
 msgid "No action selected."
 msgstr "Nebola vybraná žiadna akcia."
 
-#: options.py:998
+#: options.py:1050
 #, python-format
 msgid "Add %s"
 msgstr "Pridať %s"
 
-#: options.py:1023 options.py:1267
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
 
-#: options.py:1089
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "Zmeniť %s"
 
-#: options.py:1138
+#: options.py:1190
 msgid "Database error"
 msgstr "Chyba databázy"
 
-#: options.py:1201
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -242,7 +254,7 @@ msgstr[0] "%(count)s %(name)s bola úspešne zmenená."
 msgstr[1] "%(count)s %(name)s boli úspešne zmenené."
 msgstr[2] "%(count)s %(name)s bolo úspešne zmenených."
 
-#: options.py:1228
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -250,51 +262,59 @@ msgstr[0] "%(total_count)s vybraná"
 msgstr[1] "Všetky %(total_count)s vybrané"
 msgstr[2] "Všetkých %(total_count)s vybraných"
 
-#: options.py:1233
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 z %(cnt)s vybraných"
 
-#: options.py:1283
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
-#: options.py:1330
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "Zmeniť históriu: %s"
 
-#: sites.py:315 tests.py:61 templates/admin/login.html:49
-#: templates/registration/password_reset_complete.html:20
-#: views/decorators.py:23
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
 msgid "Log in"
 msgstr "Prihlásenie"
 
-#: sites.py:380
+#: sites.py:388
 msgid "Site administration"
 msgstr "Správa stránky"
 
-#: sites.py:432
+#: sites.py:440
 #, python-format
 msgid "%s administration"
 msgstr "%s správa"
 
-#: widgets.py:87
+#: widgets.py:90
 msgid "Date:"
 msgstr "Dátum:"
 
-#: widgets.py:87
+#: widgets.py:91
 msgid "Time:"
 msgstr "Čas:"
 
-#: widgets.py:161
+#: widgets.py:165
 msgid "Lookup"
 msgstr "Vyhľadanie"
 
-#: widgets.py:267
+#: widgets.py:271
 msgid "Add Another"
 msgstr "Pridať ďalší"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr "Aktuálne:"
+
+#: widgets.py:317
+msgid "Change:"
+msgstr "Zmeniť:"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -304,42 +324,42 @@ msgstr "Stránka nenájdená"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Ľutujeme, ale požadovanú stránku nie je možné nájsť."
 
-#: templates/admin/500.html:7 templates/admin/app_index.html:8
-#: templates/admin/base.html:45 templates/admin/change_form.html:21
-#: templates/admin/change_list.html:43
-#: templates/admin/delete_confirmation.html:8
-#: templates/admin/delete_selected_confirmation.html:8
-#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
-#: templates/admin/auth/user/change_password.html:15
-#: templates/registration/logged_out.html:5
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:7
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Domov"
 
-#: templates/admin/500.html:8
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "Chyba servera"
 
-#: templates/admin/500.html:12
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Chyba servera (500)"
 
-#: templates/admin/500.html:15
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Chyba servera <em>(500)</em>"
 
-#: templates/admin/500.html:16
+#: templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Vyskytla sa chyba. Bola oznámená správcovi stránky e-mailom a mala by byť "
-"čoskoro opravená. Ďakujeme za pochopenie."
+"Došlo k chybe. Chyba bola nahlásená správcovi webu prostredníctvom e-mailu a "
+"zanedlho by mala byť odstránená. Ďakujeme za vašu trpezlivosť."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -362,7 +382,7 @@ msgstr "Vybrať všetkých %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Zrušiť výber"
 
-#: templates/admin/app_index.html:11 templates/admin/index.html:19
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -372,22 +392,22 @@ msgid "Welcome,"
 msgstr "Vitajte,"
 
 #: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "Dokumentácia"
 
-#: templates/admin/base.html:35
-#: templates/admin/auth/user/change_password.html:19
-#: templates/admin/auth/user/change_password.html:53
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Zmeniť heslo"
 
-#: templates/admin/base.html:36
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Odhlásiť"
 
@@ -399,36 +419,36 @@ msgstr "Správa Django stránky"
 msgid "Django administration"
 msgstr "Správa Django"
 
-#: templates/admin/change_form.html:24 templates/admin/index.html:29
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
 msgid "Add"
 msgstr "Pridať"
 
-#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
 msgid "History"
 msgstr "História"
 
-#: templates/admin/change_form.html:35
+#: templates/admin/change_form.html:33
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Pozrieť na stránke"
 
-#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
-#: templates/admin/login.html:18
-#: templates/admin/auth/user/change_password.html:29
-#: templates/registration/password_change_form.html:21
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Prosím, opravte chybu uvedenú nižšie."
 msgstr[1] "Prosím, opravte chyby uvedené nižšie."
 msgstr[2] "Prosím, opravte chyby uvedené nižšie."
 
-#: templates/admin/change_list.html:60
+#: templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Pridať %(name)s"
 
-#: templates/admin/change_list.html:80
+#: templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtrovať"
 
@@ -445,12 +465,12 @@ msgstr "Triedenie priority: %(priority_number)s "
 msgid "Toggle sorting"
 msgstr "Prepnúť triedenie"
 
-#: templates/admin/delete_confirmation.html:12
+#: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Odstrániť"
 
-#: templates/admin/delete_confirmation.html:19
+#: templates/admin/delete_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -461,7 +481,7 @@ msgstr ""
 "aj odstránenie súvisiacich objektov. Váš účet však nemá oprávnenie na "
 "odstránenie nasledujúcich typov objektov:"
 
-#: templates/admin/delete_confirmation.html:27
+#: templates/admin/delete_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -470,7 +490,7 @@ msgstr ""
 "Vymazanie %(object_name)s '%(escaped_object)s' vyžaduje vymazanie "
 "nasledovných súvisiacich chránených objektov:"
 
-#: templates/admin/delete_confirmation.html:35
+#: templates/admin/delete_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -479,16 +499,16 @@ msgstr ""
 "Ste si istý, že chcete odstrániť objekt %(object_name)s \"%(escaped_object)s"
 "\"? Všetky nasledujúce súvisiace objekty budú odstránené:"
 
-#: templates/admin/delete_confirmation.html:40
-#: templates/admin/delete_selected_confirmation.html:45
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
 msgid "Yes, I'm sure"
 msgstr "Áno, som si istý"
 
-#: templates/admin/delete_selected_confirmation.html:11
+#: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
 msgstr "Zmazať viacero objektov"
 
-#: templates/admin/delete_selected_confirmation.html:18
+#: templates/admin/delete_selected_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -499,7 +519,7 @@ msgstr ""
 "objektov, ale váš účet nemá oprávnenie na vymazanie nasledujúcich typov "
 "objektov:"
 
-#: templates/admin/delete_selected_confirmation.html:26
+#: templates/admin/delete_selected_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -508,7 +528,7 @@ msgstr ""
 "Vymazanie označených %(objects_name)s vyžaduje vymazanie nasledujúcich "
 "chránených súvisiacich objektov:"
 
-#: templates/admin/delete_selected_confirmation.html:34
+#: templates/admin/delete_selected_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -522,36 +542,36 @@ msgstr ""
 msgid " By %(filter_title)s "
 msgstr "Podľa %(filter_title)s "
 
-#: templates/admin/index.html:18
+#: templates/admin/index.html:20
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Modely dostupné v aplikácii %(name)s."
+msgid "Models in the %(name)s application"
+msgstr "Modely v %(name)s aplikácii"
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:39
 msgid "Change"
 msgstr "Zmeniť"
 
-#: templates/admin/index.html:45
+#: templates/admin/index.html:49
 msgid "You don't have permission to edit anything."
 msgstr "Nemáte právo na vykonávanie zmien."
 
-#: templates/admin/index.html:53
+#: templates/admin/index.html:57
 msgid "Recent Actions"
 msgstr "Posledné akcie"
 
-#: templates/admin/index.html:54
+#: templates/admin/index.html:58
 msgid "My Actions"
 msgstr "Moje akcie"
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "None available"
 msgstr "Nedostupné"
 
-#: templates/admin/index.html:72
+#: templates/admin/index.html:76
 msgid "Unknown content"
 msgstr "Neznámy obsah"
 
-#: templates/admin/invalid_setup.html:13
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -561,31 +581,27 @@ msgstr ""
 "vytvorené potrebné databázové tabuľky a taktiež skontrolujte, či príslušný "
 "používateľ môže databázu čítať."
 
-#: templates/admin/login.html:34
-msgid "Username:"
-msgstr "Meno používateľa:"
-
-#: templates/admin/login.html:38
+#: templates/admin/login.html:37
 msgid "Password:"
 msgstr "Heslo:"
 
-#: templates/admin/login.html:45
+#: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Zabudli ste heslo alebo používateľské meno?"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:23
 msgid "Date/time"
 msgstr "Dátum a čas"
 
-#: templates/admin/object_history.html:25
+#: templates/admin/object_history.html:24
 msgid "User"
 msgstr "Používateľ"
 
-#: templates/admin/object_history.html:26
+#: templates/admin/object_history.html:25
 msgid "Action"
 msgstr "Akcia"
 
-#: templates/admin/object_history.html:40
+#: templates/admin/object_history.html:39
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -642,64 +658,64 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "Zadajte používateľské meno a heslo."
 
-#: templates/admin/auth/user/change_password.html:33
+#: templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Zadajte nové heslo pre používateľa <strong>%(username)s</strong>."
 
-#: templates/admin/auth/user/change_password.html:40
+#: templates/admin/auth/user/change_password.html:38
 msgid "Password"
 msgstr "Heslo"
 
-#: templates/admin/auth/user/change_password.html:46
-#: templates/registration/password_change_form.html:43
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
 msgid "Password (again)"
 msgstr "Heslo (znova)"
 
-#: templates/admin/auth/user/change_password.html:47
+#: templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
 msgstr "Kvôli overeniu zadajte rovnaké heslo ako vyššie."
 
-#: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:115
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Odstrániť"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Pridať ďalší %(verbose_name)s"
-
-#: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:118
-msgid "Remove"
-msgstr "Odstrániť"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Zmazať?"
 
-#: templates/registration/logged_out.html:9
+#: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ďakujeme za čas strávený na našich stránkach."
 
-#: templates/registration/logged_out.html:11
+#: templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Znova sa prihlásiť"
 
-#: templates/registration/password_change_done.html:8
-#: templates/registration/password_change_form.html:9
-#: templates/registration/password_change_form.html:13
-#: templates/registration/password_change_form.html:25
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
 msgid "Password change"
 msgstr "Zmena hesla"
 
-#: templates/registration/password_change_done.html:12
-#: templates/registration/password_change_done.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
 msgid "Password change successful"
 msgstr "Zmena hesla úspešná"
 
-#: templates/registration/password_change_done.html:18
+#: templates/registration/password_change_done.html:17
 msgid "Your password was changed."
 msgstr "Vaše heslo bolo zmenené."
 
-#: templates/registration/password_change_form.html:27
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -707,65 +723,65 @@ msgstr ""
 "Z bezpečnostných dôvodov zadajte staré heslo a potom nové heslo dvakrát, aby "
 "sme mohli overiť, že ste ho zadali správne."
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "Staré heslo"
 
-#: templates/registration/password_change_form.html:38
+#: templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "Nové heslo"
 
-#: templates/registration/password_change_form.html:49
-#: templates/registration/password_reset_confirm.html:27
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
 msgid "Change my password"
 msgstr "Zmeniť moje heslo"
 
-#: templates/registration/password_reset_complete.html:8
-#: templates/registration/password_reset_confirm.html:12
-#: templates/registration/password_reset_done.html:8
-#: templates/registration/password_reset_form.html:8
-#: templates/registration/password_reset_form.html:12
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
 msgid "Password reset"
 msgstr "Obnovenie hesla"
 
-#: templates/registration/password_reset_complete.html:12
-#: templates/registration/password_reset_complete.html:16
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
 msgid "Password reset complete"
 msgstr "Obnovenie hesla ukončené"
 
-#: templates/registration/password_reset_complete.html:18
+#: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Vaše heslo bolo nastavené. Môžete pokračovať a prihlásiť sa."
 
-#: templates/registration/password_reset_confirm.html:8
+#: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Potvrdenie obnovenia hesla"
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:17
 msgid "Enter new password"
 msgstr "Zadajte nové heslo"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:19
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
 "Zadajte nové heslo dvakrát, aby sme mohli overiť, že ste ho zadali správne."
 
-#: templates/registration/password_reset_confirm.html:24
+#: templates/registration/password_reset_confirm.html:23
 msgid "New password:"
 msgstr "Nové heslo:"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:25
 msgid "Confirm password:"
 msgstr "Potvrdenie hesla:"
 
-#: templates/registration/password_reset_confirm.html:32
+#: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
 msgstr "Obnova hesla sa nepodarila"
 
-#: templates/registration/password_reset_confirm.html:34
+#: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -773,27 +789,27 @@ msgstr ""
 "Odkaz na obnovenie hesla je neplatný, pretože už bol pravdepodobne raz "
 "použitý. Prosím, požiadajte znovu o obnovu hesla."
 
-#: templates/registration/password_reset_done.html:12
-#: templates/registration/password_reset_done.html:16
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
 msgstr "Obnovenie hesla úspešné"
 
-#: templates/registration/password_reset_done.html:18
+#: templates/registration/password_reset_done.html:17
 msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
+"We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Na uvedenú e-mailovú adresu sme vám poslali návod na obnovenie hesla. Mali "
-"by ste ho zakrátko dostať."
+"Na e-mailovú adresu, ktorú ste zadali, sme odoslali pokyny pre nastavenie "
+"hesla. Mali by ste ho dostať čoskoro."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your "
+"You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Obdržali ste tento e-mail, pretože ste požiadali o obnovu hesla vášho účtu "
-"na %(site_name)s."
+"Tento e-mail ste dostali preto, lebo ste požiadali o obnovenie hesla pre "
+"užívateľský účet na %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -812,36 +828,36 @@ msgstr "Ďakujeme, že používate našu stránku!"
 msgid "The %(site_name)s team"
 msgstr "Tím %(site_name)s"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:17
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Zabudli ste heslo? Zadajte svoju e-mail adresu a my Vám pošleme inštrukcie "
-"pre nastavenie nového."
+"Zabudli ste heslo? Zadajte svoju e-mailovú adresu a my vám pošleme "
+"inštrukcie pre nastavenie nového hesla."
 
-#: templates/registration/password_reset_form.html:22
-msgid "E-mail address:"
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
 msgstr "E-mailová adresa:"
 
-#: templates/registration/password_reset_form.html:22
+#: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "Obnova môjho hesla"
 
-#: templatetags/admin_list.py:336
+#: templatetags/admin_list.py:344
 msgid "All dates"
 msgstr "Všetky dátumy"
 
-#: views/main.py:31
+#: views/main.py:33
 msgid "(None)"
 msgstr "(Žiadne)"
 
-#: views/main.py:74
+#: views/main.py:76
 #, python-format
 msgid "Select %s"
 msgstr "Vybrať %s"
 
-#: views/main.py:76
+#: views/main.py:78
 #, python-format
 msgid "Select %s to change"
 msgstr "Vybrať \"%s\" na úpravu"

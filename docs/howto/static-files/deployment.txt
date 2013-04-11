@@ -1,0 +1,159 @@
+======================
+Deploying static files
+======================
+
+.. seealso::
+
+    For an introduction to the use of :mod:`django.contrib.staticfiles`, see
+    :doc:`/howto/static-files/index`.
+
+.. _staticfiles-production:
+
+Serving static files in production
+==================================
+
+The basic outline of putting static files into production is simple: run the
+:djadmin:`collectstatic` command when static files change, then arrange for
+the collected static files directory (:setting:`STATIC_ROOT`) to be moved to
+the static file server and served. Depending on :setting:`STATICFILES_STORAGE`,
+files may need to be moved to a new location manually or the :func:`post_process
+<django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method
+of the ``Storage`` class might take care of that.
+
+Of course, as with all deployment tasks, the devil's in the details. Every
+production setup will be a bit different, so you'll need to adapt the basic
+outline to fit your needs. Below are a few common patterns that might help.
+
+Serving the site and your static files from the same server
+-----------------------------------------------------------
+
+If you want to serve your static files from the same server that's already
+serving your site, the process may look something like:
+
+* Push your code up to the deployment server.
+* On the server, run :djadmin:`collectstatic` to copy all the static files
+  into :setting:`STATIC_ROOT`.
+* Configure your web server to serve the files in :setting:`STATIC_ROOT`
+  under the URL :setting:`STATIC_URL`. For example, here's
+  :ref:`how to do this with Apache and mod_wsgi <serving-files>`.
+
+You'll probably want to automate this process, especially if you've got
+multiple web servers. There's any number of ways to do this automation, but
+one option that many Django developers enjoy is `Fabric
+<http://fabfile.org/>`_.
+
+Below, and in the following sections, we'll show off a few example fabfiles
+(i.e. Fabric scripts) that automate these file deployment options. The syntax
+of a fabfile is fairly straightforward but won't be covered here; consult
+`Fabric's documentation <http://docs.fabfile.org/>`_, for a complete
+explanation of the syntax.
+
+So, a fabfile to deploy static files to a couple of web servers might look
+something like::
+
+    from fabric.api import *
+
+    # Hosts to deploy onto
+    env.hosts = ['www1.example.com', 'www2.example.com']
+
+    # Where your project code lives on the server
+    env.project_root = '/home/www/myproject'
+
+    def deploy_static():
+        with cd(env.project_root):
+            run('./manage.py collectstatic -v0 --noinput')
+
+Serving static files from a dedicated server
+--------------------------------------------
+
+Most larger Django sites use a separate Web server -- i.e., one that's not also
+running Django -- for serving static files. This server often runs a different
+type of web server -- faster but less full-featured. Some common choices are:
+
+* lighttpd_
+* Nginx_
+* TUX_
+* Cherokee_
+* A stripped-down version of Apache_
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.nginx.org/Main
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
+
+Configuring these servers is out of scope of this document; check each
+server's respective documentation for instructions.
+
+Since your static file server won't be running Django, you'll need to modify
+the deployment strategy to look something like:
+
+* When your static files change, run :djadmin:`collectstatic` locally.
+
+* Push your local :setting:`STATIC_ROOT` up to the static file server into the
+  directory that's being served. `rsync <https://rsync.samba.org/>`_ is a
+  common choice for this step since it only needs to transfer the bits of
+  static files that have changed.
+
+Here's how this might look in a fabfile::
+
+    from fabric.api import *
+    from fabric.contrib import project
+
+    # Where the static files get collected locally. Your STATIC_ROOT setting.
+    env.local_static_root = '/tmp/static'
+
+    # Where the static files should go remotely
+    env.remote_static_root = '/home/www/static.example.com'
+
+    @roles('static')
+    def deploy_static():
+        local('./manage.py collectstatic')
+        project.rsync_project(
+            remote_dir = env.remote_static_root,
+            local_dir = env.local_static_root,
+            delete = True
+        )
+
+.. _staticfiles-from-cdn:
+
+Serving static files from a cloud service or CDN
+------------------------------------------------
+
+Another common tactic is to serve static files from a cloud storage provider
+like Amazon's S3 and/or a CDN (content delivery network). This lets you
+ignore the problems of serving static files and can often make for
+faster-loading webpages (especially when using a CDN).
+
+When using these services, the basic workflow would look a bit like the above,
+except that instead of using ``rsync`` to transfer your static files to the
+server you'd need to transfer the static files to the storage provider or CDN.
+
+There's any number of ways you might do this, but if the provider has an API a
+:doc:`custom file storage backend </howto/custom-file-storage>` will make the
+process incredibly simple. If you've written or are using a 3rd party custom
+storage backend, you can tell :djadmin:`collectstatic` to use it by setting
+:setting:`STATICFILES_STORAGE` to the storage engine.
+
+For example, if you've written an S3 storage backend in
+``myproject.storage.S3Storage`` you could use it with::
+
+    STATICFILES_STORAGE = 'myproject.storage.S3Storage'
+
+Once that's done, all you have to do is run :djadmin:`collectstatic` and your
+static files would be pushed through your storage package up to S3. If you
+later needed to switch to a different storage provider, it could be as simple
+as changing your :setting:`STATICFILES_STORAGE` setting.
+
+For details on how you'd write one of these backends, see
+:doc:`/howto/custom-file-storage`. There are 3rd party apps available that
+provide storage backends for many common file storage APIs. A good starting
+point is the `overview at djangopackages.com
+<https://www.djangopackages.com/grids/g/storage-backends/>`_.
+
+Learn more
+==========
+
+For complete details on all the settings, commands, template tags, and other
+pieces included in :mod:`django.contrib.staticfiles`, see :doc:`the
+staticfiles reference </ref/contrib/staticfiles>`.

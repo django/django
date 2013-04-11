@@ -120,7 +120,7 @@ Methods
     rendered :class:`~django.template.response.SimpleTemplateResponse`
     instance.
 
-    If the callback returns a value that is not `None`, this will be
+    If the callback returns a value that is not ``None``, this will be
     used as the response instead of the original response object (and
     will be passed to the next post rendering callback etc.)
 

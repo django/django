@@ -7,9 +7,17 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.formtools.wizard.views import CookieWizardView
-from django.contrib.formtools.tests.wizard.forms import UserForm, UserFormSet
 from django.utils._os import upath
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+
+
+UserFormSet = forms.models.modelformset_factory(User, form=UserForm, extra=2)
 
 
 class WizardTests(object):
@@ -75,7 +83,7 @@ class WizardTests(object):
 
         # ticket #19025: `form` should be included in context
         form = response.context_data['wizard']['form']
-        self.assertEqual(response.context_data['form'], form)            
+        self.assertEqual(response.context_data['form'], form)
 
     def test_form_finish(self):
         response = self.client.get(self.wizard_url)
@@ -196,6 +204,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
 
+@skipIfCustomUser
 class SessionWizardTests(WizardTests, TestCase):
     wizard_url = '/wiz_session/'
     wizard_step_1_data = {
@@ -226,6 +235,8 @@ class SessionWizardTests(WizardTests, TestCase):
         }
     )
 
+
+@skipIfCustomUser
 class CookieWizardTests(WizardTests, TestCase):
     wizard_url = '/wiz_cookie/'
     wizard_step_1_data = {
@@ -256,6 +267,8 @@ class CookieWizardTests(WizardTests, TestCase):
         }
     )
 
+
+@skipIfCustomUser
 class WizardTestKwargs(TestCase):
     wizard_url = '/wiz_other_template/'
     wizard_step_1_data = {
@@ -347,6 +360,7 @@ class WizardTestGenericViewInterface(TestCase):
         self.assertEqual(response.context_data['another_key'], 'another_value')
 
 
+@skipIfCustomUser
 class WizardFormKwargsOverrideTests(TestCase):
     def setUp(self):
         super(WizardFormKwargsOverrideTests, self).setUp()

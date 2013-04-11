@@ -5,7 +5,6 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 from __future__ import unicode_literals
 
-import datetime
 import decimal
 import re
 import sys
@@ -45,16 +44,13 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
-from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import force_bytes, force_text
-from django.utils.functional import cached_property
-from django.utils import six
-from django.utils import timezone
+
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -267,11 +263,12 @@ WHEN (new.%(col_name)s IS NULL)
     def last_executed_query(self, cursor, sql, params):
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
-        if six.PY3:
-            return cursor.statement
-        else:
-            query = cursor.statement
-            return query if isinstance(query, unicode) else query.decode("utf-8")
+        statement = cursor.statement
+        if not six.PY3 and not isinstance(statement, unicode):
+            statement = statement.decode('utf-8')
+        # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
+        # `statement` doesn't contain the query parameters. refs #20010.
+        return super(DatabaseOperations, self).last_executed_query(cursor, statement, params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
@@ -501,6 +498,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
     })
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
@@ -512,14 +511,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
-
-    def check_constraints(self, table_names=None):
-        """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
-        """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
 
     def _connect_string(self):
         settings_dict = self.settings_dict
@@ -533,9 +524,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             dsn = settings_dict['NAME']
         return "%s/%s@%s" % (settings_dict['USER'],
                              settings_dict['PASSWORD'], dsn)
-
-    def create_cursor(self):
-        return FormatStylePlaceholderCursor(self.connection)
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -596,18 +584,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # stmtcachesize is available only in 4.3.2 and up.
             pass
 
-    # Oracle doesn't support savepoint commits.  Ignore them.
-    def _savepoint_commit(self, sid):
-        pass
+    def create_cursor(self):
+        return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
         if self.connection is not None:
             try:
                 return self.connection.commit()
-            except Database.IntegrityError as e:
-                # In case cx_Oracle implements (now or in a future version)
-                # raising this specific exception
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             except Database.DatabaseError as e:
                 # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
                 # with the following attributes and values:
@@ -620,7 +603,34 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 if hasattr(x, 'code') and hasattr(x, 'message') \
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-                six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+                raise
+
+    # Oracle doesn't support savepoint commits.  Ignore them.
+    def _savepoint_commit(self, sid):
+        pass
+
+    def _set_autocommit(self, autocommit):
+        self.connection.autocommit = autocommit
+
+    def check_constraints(self, table_names=None):
+        """
+        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
+        are returned to deferred.
+        """
+        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
+        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+
+    def is_usable(self):
+        try:
+            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
+                self.connection.ping()
+            else:
+                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
+                self.connection.cursor().execute("SELECT 1 FROM DUAL")
+        except DatabaseError:
+            return False
+        else:
+            return True
 
     @cached_property
     def oracle_version(self):
@@ -662,6 +672,8 @@ class OracleParam(object):
             param = "0"
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
+        elif isinstance(param, six.memoryview):
+            self.force_bytes = param
         else:
             self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)
@@ -745,28 +757,27 @@ class FormatStylePlaceholderCursor(object):
         return [p.force_bytes for p in params]
 
     def execute(self, query, params=None):
-        if params is None:
-            params = []
-        else:
-            params = self._format_params(params)
-        args = [(':arg%d' % i) for i in range(len(params))]
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.
         if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
-        query = convert_unicode(query % tuple(args), self.charset)
+        if params is None:
+            params = []
+            query = convert_unicode(query, self.charset)
+        else:
+            params = self._format_params(params)
+            args = [(':arg%d' % i) for i in range(len(params))]
+            query = convert_unicode(query % tuple(args), self.charset)
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def executemany(self, query, params=None):
         # cx_Oracle doesn't support iterators, convert them to lists
@@ -789,13 +800,11 @@ class FormatStylePlaceholderCursor(object):
         try:
             return self.cursor.executemany(query,
                                 [self._param_generator(p) for p in formatted])
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def fetchone(self):
         row = self.cursor.fetchone()

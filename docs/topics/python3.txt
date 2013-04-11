@@ -187,7 +187,7 @@ behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
 :func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
-Django's bundled version adds :func:`~django.utils.six.iterlists` for
+It also contains an undocumented ``iterlists`` function that works well for
 ``django.utils.datastructures.MultiValueDict`` and its subclasses.
 
 :class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
@@ -238,7 +238,7 @@ under Python 3, use the :func:`str` builtin::
     str('my string')
 
 In Python 3, there aren't any automatic conversions between ``str`` and
-``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.decode`
+``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.encode`
 always returns ``bytes``, and ``bytes.decode`` always returns ``str``. As a
 consequence, the following pattern is sometimes necessary::
 
@@ -391,12 +391,7 @@ function.
 Customizations of six
 ---------------------
 
-The version of six bundled with Django includes one extra function:
-
-.. function:: iterlists(MultiValueDict)
-
-    Returns an iterator over the lists of values of a ``MultiValueDict``. This
-    replaces ``iterlists()`` on Python 2 and ``lists()`` on Python 3.
+The version of six bundled with Django includes a few extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
 

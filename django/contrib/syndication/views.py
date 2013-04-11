@@ -11,6 +11,7 @@ from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
+from django.utils import six
 from django.utils.timezone import is_naive
 
 
@@ -69,15 +70,14 @@ class Feed(object):
         except AttributeError:
             return default
         if callable(attr):
-            # Check __code__.co_argcount rather than try/excepting the
-            # function and catching the TypeError, because something inside
-            # the function may raise the TypeError. This technique is more
-            # accurate.
-            if hasattr(attr, '__code__'):
-                argcount = attr.__code__.co_argcount
-            else:
-                argcount = attr.__call__.__code__.co_argcount
-            if argcount == 2: # one argument is 'self'
+            # Check co_argcount rather than try/excepting the function and
+            # catching the TypeError, because something inside the function
+            # may raise the TypeError. This technique is more accurate.
+            try:
+                code = six.get_function_code(attr)
+            except AttributeError:
+                code = six.get_function_code(attr.__call__)
+            if code.co_argcount == 2:       # one argument is 'self'
                 return attr(obj)
             else:
                 return attr()

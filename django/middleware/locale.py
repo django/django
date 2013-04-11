@@ -51,7 +51,7 @@ class LocaleMiddleware(object):
                     request.is_secure() and 'https' or 'http',
                     request.get_host(), language, request.get_full_path())
                 return HttpResponseRedirect(language_url)
-        translation.deactivate()
+
         if not (self.is_language_prefix_patterns_used()
                 and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))

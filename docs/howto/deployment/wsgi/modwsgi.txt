@@ -18,8 +18,8 @@ The `official mod_wsgi documentation`_ is fantastic; it's your source for all
 the details about how to use mod_wsgi. You'll probably want to start with the
 `installation and configuration documentation`_.
 
-.. _official mod_wsgi documentation: http://www.modwsgi.org/
-.. _installation and configuration documentation: http://www.modwsgi.org/wiki/InstallationInstructions
+.. _official mod_wsgi documentation: http://code.google.com/p/modwsgi/
+.. _installation and configuration documentation: http://code.google.com/p/modwsgi/wiki/InstallationInstructions
 
 Basic configuration
 ===================

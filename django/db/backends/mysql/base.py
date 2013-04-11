@@ -37,7 +37,7 @@ from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
@@ -115,31 +115,24 @@ class CursorWrapper(object):
 
     def execute(self, query, args=None):
         try:
+            # args is None means no string interpolation
             return self.cursor.execute(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+            raise
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -277,7 +270,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return cursor._last_executed.decode('utf-8')
+        return force_text(cursor._last_executed, errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -363,15 +356,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
-    def savepoint_create_sql(self, sid):
-        return "SAVEPOINT %s" % sid
-
-    def savepoint_commit_sql(self, sid):
-        return "RELEASE SAVEPOINT %s" % sid
-
-    def savepoint_rollback_sql(self, sid):
-        return "ROLLBACK TO SAVEPOINT %s" % sid
-
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
     operators = {
@@ -390,6 +374,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': 'LIKE %s',
         'iendswith': 'LIKE %s',
     }
+
+    Database = Database
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -451,14 +437,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         except Database.NotSupportedError:
             pass
 
-    @cached_property
-    def mysql_version(self):
-        with self.temporary_connection():
-            server_info = self.connection.get_server_info()
-        match = server_version_re.match(server_info)
-        if not match:
-            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
+    def _set_autocommit(self, autocommit):
+        self.connection.autocommit(autocommit)
 
     def disable_constraint_checking(self):
         """
@@ -508,3 +488,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0],
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
+
+    def is_usable(self):
+        try:
+            self.connection.ping()
+        except DatabaseError:
+            return False
+        else:
+            return True
+
+    @cached_property
+    def mysql_version(self):
+        with self.temporary_connection():
+            server_info = self.connection.get_server_info()
+        match = server_version_re.match(server_info)
+        if not match:
+            raise Exception('Unable to determine MySQL version from version string %r' % server_info)
+        return tuple([int(x) for x in match.groups()])
