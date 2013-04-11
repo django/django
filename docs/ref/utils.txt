@@ -447,7 +447,7 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. function:: allow_lazy(func, *resultclasses)
+.. function:: keep_lazy(*resultclasses)
 
     Django offers many utility functions (particularly in ``django.utils``) that
     take a string as their first argument and do something to that string. These
@@ -459,28 +459,56 @@ Atom1Feed
     be using this function outside of a view (and hence the current thread's locale
     setting will not be correct).
 
-    For cases like this, use the ``django.utils.functional.allow_lazy()``
-    decorator. It modifies the function so that *if* it's called with a lazy
-    translation as the first argument, the function evaluation is delayed until it
-    needs to be converted to a string.
+    For cases like this, use the ``django.utils.functional.keep_lazy()``
+    decorator. It modifies the function so that *if* any of its arguments is a
+    lazy object (like the kind returned by `ugettext_lazy`), the function
+    evaluation is delayed as long as possible (until you display the string in
+    a template for example).
 
     For example::
 
-        from django.utils.functional import allow_lazy
+        from django.utils.functional import keep_lazy, keep_lazy_text
 
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
-        fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
+        fancy_utility_function = keep_lazy(unicode)(fancy_utility_function)
 
-    The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-    a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode`` here
-    and ensure that your function returns only Unicode strings.
+        # Or more succintly:
+        @keep_lazy(unicode)
+        def fancy_utility_function(s, ...):
+            ...
+
+    ``keep_lazy()`` requires that you pass at least one argument that specifies
+    the type of object return by the function you're decorating.
+    If the function can return different types, you need to pass them all.
+
+    A common use-case is to have functions that return text. For these, you can
+    just pass the ``unicode`` type to ``keep_lazy`` (or even simpler, use the
+    ``keep_lazy_text`` decorator described in the next section).
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at the
     end.
+
+.. function:: keep_lazy_text(func)
+
+    A shortcut for ``keep_lazy(unicode)``.
+
+    If you have a function that returns text and you want to be able to take
+    lazy arguments while delaying their evaluation, simply use this decorator::
+
+        from django.utils.functional import keep_lazy, keep_lazy_text
+
+        # Our previous example was:
+        @keep_lazy(unicode)
+        def fancy_utility_function(s, ...):
+            ...
+
+        # Which can be rewritten as:
+        @keep_lazy_text
+        def fancy_utility_function(s, ...):
+            ...
 
 ``django.utils.html``
 =====================

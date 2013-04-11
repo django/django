@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 import warnings
 
 from django.test import SimpleTestCase
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
+from django.utils import six
 from django.utils import text
+
+lazystr = lazy(force_text, six.text_type)
 
 class TestUtilsText(SimpleTestCase):
 
@@ -99,6 +104,8 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap('a %s word' % long_word, 10),
                          'a\n%s\nword' % long_word)
 
+        self.assertEqual(text.wrap(lazystr(digits), 100), '1234 67 9')
+
     def test_slugify(self):
         items = (
             ('Hello, World!', 'hello-world'),
@@ -106,3 +113,4 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)
+            self.assertEqual(text.slugify(lazystr(value)), output)

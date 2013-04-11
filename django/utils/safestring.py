@@ -4,6 +4,8 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
+from functools import wraps
+
 from django.utils.functional import curry, Promise
 from django.utils import six
 
@@ -132,3 +134,9 @@ def mark_for_escaping(s):
         return EscapeText(s)
     return EscapeBytes(bytes(s))
 
+def safe(func):
+    """A decorator that marks that output of the given function as safe."""
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        return mark_safe(func(*args, **kwargs))
+    return wrapped

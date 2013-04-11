@@ -9,7 +9,10 @@ from django.test import TestCase
 from django.utils import six
 from django.utils import unittest, translation
 from django.utils.safestring import SafeData
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_text
+from django.utils.functional import lazy
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class DefaultFiltersTests(TestCase):
@@ -320,6 +323,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('http://[2001:db8:cafe::2]/api/9'),
             '<a href="http://[2001:db8:cafe::2]/api/9" rel="nofollow">http://[2001:db8:cafe::2]/api/9</a>')
 
+        # Check urlize with a lazy string
+        self.assertEqual(urlize(lazystr('http://google.com')),
+            '<a href="http://google.com" rel="nofollow">http://google.com</a>')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount('oneword'), 1)
@@ -629,6 +636,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_phone2numeric(self):
         self.assertEqual(phone2numeric_filter('0800 flowers'), '0800 3569377')
+        self.assertEqual(phone2numeric_filter(lazystr('0800 flowers')), '0800 3569377')
 
     def test_non_string_input(self):
         # Filters shouldn't break if passed non-strings
