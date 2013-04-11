@@ -67,7 +67,7 @@ def notice_h(fmt, lst):
         warn_msg = fmt % lst
     except:
         warn_msg = fmt
-    logger.warn('GEOS_NOTICE: %s\n' % warn_msg)
+    logger.warning('GEOS_NOTICE: %s\n' % warn_msg)
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
