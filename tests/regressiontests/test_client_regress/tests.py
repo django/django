@@ -131,6 +131,13 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(r, 'はたけ')
         self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
 
+    def test_binary_contains(self):
+        r = self.client.get('/test_client_regress/check_binary/')
+        self.assertContains(r, b'PDF document')
+        with self.assertRaises(AssertionError):
+            self.assertContains(r, b'PDF document', count=2)
+        self.assertNotContains(r, b'ODF document')
+
     def test_nontext_contains(self):
         r = self.client.get('/test_client_regress/no_template_view/')
         self.assertContains(r, ugettext_lazy('once'))

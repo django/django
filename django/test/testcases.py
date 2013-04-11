@@ -638,12 +638,14 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        text = force_text(text, encoding=response._charset)
+
         if response.streaming:
             content = b''.join(response.streaming_content)
         else:
             content = response.content
-        content = content.decode(response._charset)
+        if not isinstance(text, bytes) or html:
+            text = force_text(text, encoding=response._charset)
+            content = content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")
@@ -678,8 +680,11 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        text = force_text(text, encoding=response._charset)
-        content = response.content.decode(response._charset)
+
+        content = response.content
+        if not isinstance(text, bytes) or html:
+            text = force_text(text, encoding=response._charset)
+            content = content.decode(response._charset)
         if html:
             content = assert_and_parse_html(self, content, None,
                 'Response\'s content is not valid HTML:')
