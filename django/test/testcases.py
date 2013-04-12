@@ -646,6 +646,9 @@ class TransactionTestCase(SimpleTestCase):
         if not isinstance(text, bytes) or html:
             text = force_text(text, encoding=response._charset)
             content = content.decode(response._charset)
+            text_repr = "'%s'" % text
+        else:
+            text_repr = repr(text)
         if html:
             content = assert_and_parse_html(self, content, None,
                 "Response's content is not valid HTML:")
@@ -654,11 +657,11 @@ class TransactionTestCase(SimpleTestCase):
         real_count = content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
-                msg_prefix + "Found %d instances of '%s' in response"
-                " (expected %d)" % (real_count, text, count))
+                msg_prefix + "Found %d instances of %s in response"
+                " (expected %d)" % (real_count, text_repr, count))
         else:
             self.assertTrue(real_count != 0,
-                msg_prefix + "Couldn't find '%s' in response" % text)
+                msg_prefix + "Couldn't find %s in response" % text_repr)
 
     def assertNotContains(self, response, text, status_code=200,
                           msg_prefix='', html=False):
@@ -685,13 +688,16 @@ class TransactionTestCase(SimpleTestCase):
         if not isinstance(text, bytes) or html:
             text = force_text(text, encoding=response._charset)
             content = content.decode(response._charset)
+            text_repr = "'%s'" % text
+        else:
+            text_repr = repr(text)
         if html:
             content = assert_and_parse_html(self, content, None,
                 'Response\'s content is not valid HTML:')
             text = assert_and_parse_html(self, text, None,
                 'Second argument is not valid HTML:')
         self.assertEqual(content.count(text), 0,
-            msg_prefix + "Response should not contain '%s'" % text)
+            msg_prefix + "Response should not contain %s" % text_repr)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
