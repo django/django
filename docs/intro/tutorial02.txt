@@ -78,8 +78,8 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: we need to tell the admin that ``Poll``
-objects have an admin interface. To do this, open the file called
-``admin.py`` in your ``polls`` directory, and edit it to look like this::
+objects have an admin interface. To do this, open the :file:`polls/admin.py`
+file, and edit it to look like this::
 
     from django.contrib import admin
     from polls.models import Poll
@@ -339,7 +339,7 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by giving that method (in ``models.py``) a few
+You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
 
     class Poll(models.Model):
@@ -350,8 +350,8 @@ attributes, as follows::
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
-Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
-following line to ``PollAdmin``::
+Edit your :file:`polls/admin.py` file again and add an improvement to the Poll
+change list page: Filters. Add the following line to ``PollAdmin``::
 
     list_filter = ['pub_date']
 
@@ -409,7 +409,7 @@ live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
-Open your settings file (``mysite/settings.py``, remember) and  add a
+Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`TEMPLATE_DIRS` setting::
 
     TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
