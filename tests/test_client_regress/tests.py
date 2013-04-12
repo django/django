@@ -133,10 +133,15 @@ class AssertContainsTests(TestCase):
 
     def test_binary_contains(self):
         r = self.client.get('/test_client_regress/check_binary/')
-        self.assertContains(r, b'PDF document')
+        self.assertContains(r, b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e')
         with self.assertRaises(AssertionError):
-            self.assertContains(r, b'PDF document', count=2)
-        self.assertNotContains(r, b'ODF document')
+            self.assertContains(r, b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e', count=2)
+
+    def test_binary_not_contains(self):
+        r = self.client.get('/test_client_regress/check_binary/')
+        self.assertNotContains(r, b'%ODF-1.4\r\n%\x93\x8c\x8b\x9e')
+        with self.assertRaises(AssertionError):
+            self.assertNotContains(r, b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e')
 
     def test_nontext_contains(self):
         r = self.client.get('/test_client_regress/no_template_view/')
