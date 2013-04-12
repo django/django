@@ -633,6 +633,11 @@ Selector and checkbox widgets
     If you decide not to loop over the radio buttons -- e.g., if your template simply includes
     ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with ``<li>`` tags, as above.
 
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
