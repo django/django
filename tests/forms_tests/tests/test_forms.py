@@ -407,7 +407,7 @@ class FormsTestCase(TestCase):
         # gets a distinct ID, formed by appending an underscore plus the button's
         # zero-based index.
         f = FrameworkForm(auto_id='id_%s')
-        self.assertHTMLEqual(str(f['language']), """<ul>
+        self.assertHTMLEqual(str(f['language']), """<ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul>""")
@@ -416,17 +416,17 @@ class FormsTestCase(TestCase):
         # either as_table() or as_ul(), the label for the RadioSelect will point to the
         # ID of the *first* radio button.
         self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul>
+<tr><th><label for="id_language_0">Language:</label></th><td><ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></td></tr>""")
         self.assertHTMLEqual(f.as_ul(), """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
-<li><label for="id_language_0">Language:</label> <ul>
+<li><label for="id_language_0">Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>""")
         self.assertHTMLEqual(f.as_p(), """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
-<p><label for="id_language_0">Language:</label> <ul>
+<p><label for="id_language_0">Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></p>""")
