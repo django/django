@@ -646,10 +646,13 @@ class RadioFieldRenderer(object):
 
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul>\n{0}\n</ul>',
-                           format_html_join('\n', '<li>{0}</li>',
-                                            [(force_text(w),) for w in self]
-                                            ))
+        id_ = self.attrs.get('id', None)
+        start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
+        output = [start_tag]
+        for widget in self:
+            output.append(format_html('<li>{0}</li>', force_text(widget)))
+        output.append('</ul>')
+        return mark_safe('\n'.join(output))
 
 class RadioSelect(Select):
     renderer = RadioFieldRenderer
