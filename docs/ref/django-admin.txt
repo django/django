@@ -25,9 +25,10 @@ copy ``django-admin.py`` to a location on your existing path or edit the
 Environment...``) to point to its installed location.
 
 Generally, when working on a single Django project, it's easier to use
-``manage.py``. Use ``django-admin.py`` with ``DJANGO_SETTINGS_MODULE``, or the
-``--settings`` command line option, if you need to switch between multiple
-Django settings files.
+``manage.py`` than ``django-admin.py``. If you need to switch between multiple
+Django settings files, use ``django-admin.py`` with
+:envvar:`DJANGO_SETTINGS_MODULE` or the :djadminopt:`--settings` command line
+option.
 
 The command-line examples throughout this document use ``django-admin.py`` to
 be consistent, but any example can use ``manage.py`` just as well.
