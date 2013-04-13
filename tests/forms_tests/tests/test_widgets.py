@@ -15,7 +15,7 @@ from django.utils import six
 from django.utils.translation import activate, deactivate
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_text
 
 from ..models import Article
 
@@ -656,7 +656,7 @@ beatle J R Ringo False""")
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
 <label><input type="radio" name="beatle" value="R" /> Ringo</label>""")
 
-        # A RadioFieldRenderer object also allows index access to individual RadioInput
+        # A RadioFieldRenderer object also allows index access to individual RadioChoiceInput
         w = RadioSelect()
         r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
         self.assertHTMLEqual(str(r[1]), '<label><input type="radio" name="beatle" value="P" /> Paul</label>')
@@ -665,11 +665,8 @@ beatle J R Ringo False""")
         self.assertFalse(r[1].is_checked())
         self.assertEqual((r[1].name, r[1].value, r[1].choice_value, r[1].choice_label), ('beatle', 'J', 'P', 'Paul'))
 
-        try:
+        with self.assertRaises(IndexError):
             r[10]
-            self.fail("This offset should not exist.")
-        except IndexError:
-            pass
 
         # Choices are escaped correctly
         w = RadioSelect()
@@ -816,6 +813,25 @@ beatle J R Ringo False""")
 <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
 <li><label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label></li>
 </ul>""")
+
+        w = CheckboxSelectMultiple()
+        r = w.get_renderer('abc', 'b', choices=[(c, c.upper()) for c in 'abc'])
+        # You can iterate over the CheckboxFieldRenderer to get individual elements
+        expected = [
+            '<label><input type="checkbox" name="abc" value="a" /> A</label>',
+            '<label><input checked="checked" type="checkbox" name="abc" value="b" /> B</label>',
+            '<label><input type="checkbox" name="abc" value="c" /> C</label>',
+        ]
+        for output, expected in zip(r, expected):
+            self.assertHTMLEqual(force_text(output), expected)
+
+        # You can access individual elements
+        self.assertHTMLEqual(force_text(r[1]),
+            '<label><input checked="checked" type="checkbox" name="abc" value="b" /> B</label>')
+
+        # Out-of-range errors are propagated
+        with self.assertRaises(IndexError):
+            r[42]
 
     def test_multi(self):
         class MyMultiWidget(MultiWidget):

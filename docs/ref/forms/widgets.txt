@@ -658,6 +658,9 @@ the widget.
 The outer ``<ul>`` container will now receive the ``id`` attribute defined on
 the widget.
 
+Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
+up the lists. See the documentation of :class:`RadioSelect` for more details.
+
 .. _file-upload-widgets:
 
 File upload widgets

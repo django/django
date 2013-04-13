@@ -372,6 +372,9 @@ these changes.
   - ``django.db.transaction.is_managed()``
   - ``django.db.transaction.managed()``
 
+* ``django.forms.widgets.RadioInput`` will be removed in favor of
+  ``django.forms.widgets.RadioChoiceInput``.
+
 2.0
 ---
 
