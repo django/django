@@ -16,14 +16,8 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
 
-class AppCache(object):
-    """
-    A cache that stores installed applications and their models. Used to
-    provide reverse-relations and for app introspection (e.g. admin).
-    """
-    # Use the Borg pattern to share state between all instances. Details at
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
-    __shared_state = dict(
+def _initial_appcache_state():
+    return dict(
         # Keys of app_store are the model modules for each application.
         app_store=SortedDict(),
 
@@ -44,6 +38,16 @@ class AppCache(object):
         nesting_level=0,
         _get_models_cache={},
     )
+
+
+class AppCache(object):
+    """
+    A cache that stores installed applications and their models. Used to
+    provide reverse-relations and for app introspection (e.g. admin).
+    """
+    # Use the Borg pattern to share state between all instances. Details at
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
+    __shared_state = _initial_appcache_state()
 
     def __init__(self):
         self.__dict__ = self.__shared_state
