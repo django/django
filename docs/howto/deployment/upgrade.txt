@@ -1,0 +1,13 @@
+---------------------------------------------------------------
+A Short Checklist for Upgrading Your Django Project
+---------------------------------------------------------------
+
+When upgrading your Django project from an older to a newer version, you might run into some hiccups. Here is a checklist of some issues to keep in mind: 
+
+* First, you will need to :ref:`uninstall the old Django version before installing the new version <removing-old-versions-of-django>`. Then, proceed with installing the new version of Django.
+
+* Depending on which release you're upgrading to, you may or may not have to refactor existing code in your Django project to make it compatible with the newer version. This is a :doc:`guide </internals/release-process>` on the different release processes and the type of releases: major, minor, micro. Read the features of the :doc:`various releases </releases/index>` to understand the changes in the new version you're upgrading to. You will need to check all the backwards-incompatible changes and deprecated features for each ‘final’ release from the one after your current Django version, up to and including the new version. 
+
+* Check if the current tests in your Django project are compatible with the new release. Run full test suites on your upgraded Django project and test as many feaures as you can to see where the newly upgraded version is breaking any existing features. 
+
+* It's a good idea to run your tests with Python warnings enabled using the command ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to display deprecation warnings. Django, like many other Python libraries, uses these warnings to flag when features are going away. It also might flag areas in your code that aren't strictly wrong but could benefit from a better implementation. 
