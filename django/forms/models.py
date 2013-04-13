@@ -1039,9 +1039,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
         'list': _('Enter a list of values.'),
-        'invalid_choice': _('Select a valid choice. %s is not one of the'
+        'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
-        'invalid_pk_value': _('"%s" is not a valid value for a primary key.')
+        'invalid_pk_value': _('"%(pk)s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,
@@ -1063,12 +1063,12 @@ class ModelMultipleChoiceField(ModelChoiceField):
             try:
                 self.queryset.filter(**{key: pk})
             except ValueError:
-                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
+                raise ValidationError(self.error_messages['invalid_pk_value'] % {'pk': pk})
         qs = self.queryset.filter(**{'%s__in' % key: value})
         pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
             if force_text(val) not in pks:
-                raise ValidationError(self.error_messages['invalid_choice'] % val)
+                raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
         self.run_validators(value)

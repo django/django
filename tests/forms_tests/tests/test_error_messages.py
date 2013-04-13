@@ -60,9 +60,9 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID',
             'min_value': 'MIN VALUE IS %(limit_value)s',
             'max_value': 'MAX VALUE IS %(limit_value)s',
-            'max_digits': 'MAX DIGITS IS %s',
-            'max_decimal_places': 'MAX DP IS %s',
-            'max_whole_digits': 'MAX DIGITS BEFORE DP IS %s',
+            'max_digits': 'MAX DIGITS IS %(max)s',
+            'max_decimal_places': 'MAX DP IS %(max)s',
+            'max_whole_digits': 'MAX DIGITS BEFORE DP IS %(max)s',
         }
         f = DecimalField(min_value=5, max_value=10, error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
@@ -254,7 +254,7 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         # ModelMultipleChoiceField
         e = {
             'required': 'REQUIRED',
-            'invalid_choice': '%s IS INVALID CHOICE',
+            'invalid_choice': '%(value)s IS INVALID CHOICE',
             'list': 'NOT A LIST OF VALUES',
         }
         f = ModelMultipleChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
