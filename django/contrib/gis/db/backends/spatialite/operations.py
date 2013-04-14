@@ -10,6 +10,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.utils import DatabaseError
 from django.utils import six
+from django.utils.functional import cached_property
+
 
 class SpatiaLiteOperator(SpatialOperation):
     "For SpatiaLite operators (e.g. `&&`, `~`)."
@@ -146,8 +148,10 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             except DatabaseError:
                 # we are using < 2.4.0-RC4
                 pass
-        if version >= (3, 0, 0):
-            self.geojson = 'AsGeoJSON'
+
+    @cached_property
+    def geojson(self):
+        return 'AsGeoJSON' if self.spatialite_version_tuple()[1:] >= (3, 0, 0) else None
 
     def check_aggregate_support(self, aggregate):
         """
