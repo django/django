@@ -56,15 +56,15 @@ class OGRInspectTest(TestCase):
         # complains about permissions, and SpatiaLite/Oracle are
         # insanely difficult to get support compiled in for in GDAL.
         if not connections['default'].ops.postgis:
-            return
+            self.skipTest("This database does not support 'ogrinspect'ion")
 
         # Getting the database identifier used by OGR, if None returned
         # GDAL does not have the support compiled in.
         ogr_db = get_ogr_db_string()
         if not ogr_db:
-            return
+            self.skipTest("Your GDAL installation does not support PostGIS databases")
 
-        # writing shapefules via GDAL currently does not support writing OGRTime
+        # Writing shapefiles via GDAL currently does not support writing OGRTime
         # fields, so we need to actually use a database
         model_def = ogrinspect(ogr_db, 'Measurement',
                                layer_key=AllOGRFields._meta.db_table,
