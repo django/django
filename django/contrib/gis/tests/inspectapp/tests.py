@@ -93,21 +93,24 @@ class OGRInspectTest(TestCase):
 
 
 def get_ogr_db_string():
-    # Construct the DB string that GDAL will use to inspect the database.
-    # GDAL will create its own connection to the database, so we re-use the
-    # connection settings from the Django test.  This approach is a bit fragile
-    # and cannot work on any other database other than PostgreSQL at the moment.
+    """
+    Construct the DB string that GDAL will use to inspect the database.
+    GDAL will create its own connection to the database, so we re-use the
+    connection settings from the Django test.
+    """
     db = connections.databases['default']
 
     # Map from the django backend into the OGR driver name and database identifier
     # http://www.gdal.org/ogr/ogr_formats.html
     #
-    # TODO: Support Oracle (OCI), MySQL, and SpatiaLite.
+    # TODO: Support Oracle (OCI).
     drivers = {
-        'django.contrib.gis.db.backends.postgis': ('PostgreSQL', 'PG'),
+        'django.contrib.gis.db.backends.postgis': ('PostgreSQL', "PG:dbname='%(db_name)s'", ' '),
+        'django.contrib.gis.db.backends.mysql': ('MySQL', 'MYSQL:"%(db_name)s"', ','),
+        'django.contrib.gis.db.backends.spatialite': ('SQLite', '%(db_name)s', '')
     }
 
-    drv_name, db_str = drivers[db['ENGINE']]
+    drv_name, db_str, param_sep = drivers[db['ENGINE']]
 
     # Ensure that GDAL library has driver support for the database.
     try:
@@ -115,10 +118,12 @@ def get_ogr_db_string():
     except:
         return None
 
+    # SQLite/Spatialite in-memory databases
+    if db['NAME'] == ":memory:":
+        return None
+
     # Build the params of the OGR database connection string
-    # TODO: connection strings are database-dependent, thus if
-    #       we ever test other backends, this will need to change.
-    params = ["dbname='%s'" % db['NAME']]
+    params = [db_str % {'db_name': db['NAME']}]
     def add(key, template):
         value = db.get(key, None)
         # Don't add the parameter if it is not in django's settings
@@ -129,4 +134,4 @@ def get_ogr_db_string():
     add('USER', "user='%s'")
     add('PASSWORD', "password='%s'")
 
-    return '%s:%s' % (db_str, ' '.join(params))
+    return param_sep.join(params)
