@@ -481,6 +481,44 @@ parameters. For example::
 
 ``SQLite`` users need to check and update such queries.
 
+.. _m2m-help_text:
+
+Help text of model form fields for ManyToManyField fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+HTML rendering of model form fields corresponding to
+:class:`~django.db.models.ManyToManyField` ORM model fields used to get the
+hard-coded sentence
+
+  *Hold down "Control", or "Command" on a Mac, to select more than one.*
+
+(or its translation to the active locale) imposed as the help legend shown along
+them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
+<django.forms.Field.help_text>` ``help_text`` attribute was specified by the
+user (or appended to, if ``help_text`` was provided.)
+
+This happened always, possibly even with form fields implementing user
+interactions that don't involve a keyboard and/or a mouse and was handled at the
+model field layer.
+
+Starting with Django 1.6 this doesn't happen anymore.
+
+The change can affect you in a backward incompatible way if you employ custom
+model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
+do rely on the automatic provision of the mentioned hard-coded sentence. These
+form field implementations need to adapt to the new scenario by providing their
+own handling of the ``help_text`` attribute.
+
+Applications that use Django :doc:`model form </topics/forms/modelforms>`
+facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
+and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
+what's described in :ref:`m2m-help_text-deprecation` below.
+
+This is because, as an temporary backward-compatible provision, the described
+non-standard behavior has been preserved but moved to the model form field layer
+and occurs only when the associated widget is
+:class:`~django.forms.SelectMultiple` or a subclass.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -707,3 +745,16 @@ you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
 defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
 subclass to be used with a model but without an explicit list of fields is
 deprecated.
+
+.. _m2m-help_text-deprecation:
+
+Munging of help text of model form fields for ManyToManyField fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All special handling of the ``help_text`` attibute of ManyToManyField model
+fields performed by standard model or model form fields as described in
+:ref:`m2m-help_text` above is deprecated and will be removed in Django 1.8.
+
+Help text of these fields will need to be handled either by applications, custom
+form fields or widgets, just like happens with the rest of the model field
+types.

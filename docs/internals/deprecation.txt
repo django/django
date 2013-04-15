@@ -392,6 +392,11 @@ these changes.
 
 * The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
 
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ManyToMany model fields will not be performed by Django anymore
+  either at the model or forms layer.
+
 2.0
 ---
 

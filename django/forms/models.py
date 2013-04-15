@@ -18,7 +18,7 @@ from django.utils.encoding import smart_text, force_text
 from django.utils.datastructures import SortedDict
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _, ugettext, string_concat
 
 
 __all__ = (
@@ -1104,6 +1104,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
             cache_choices, required, widget, label, initial, help_text,
             *args, **kwargs)
+        if isinstance(self.widget, SelectMultiple):
+            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            self.help_text = string_concat(self.help_text, ' ', msg) if self.help_text else msg
 
     def clean(self, value):
         if self.required and not value:
