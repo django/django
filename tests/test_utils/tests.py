@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-from StringIO import StringIO
 import warnings
 
 from django.db import connection
@@ -629,5 +628,5 @@ class DoctestNormalizerTest(SimpleTestCase):
 
     def test_normalizer(self):
         suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=StringIO()).run(suite)
+        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
         self.assertEqual(failures.failures, [])

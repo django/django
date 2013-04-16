@@ -262,7 +262,7 @@ that, run the following command:
 
 The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
-in your :file:`mysqlite/settings.py` file. You'll see a message for each
+in your :file:`mysite/settings.py` file. You'll see a message for each
 database table it creates, and you'll get a prompt asking you if you'd like to
 create a superuser account for the authentication system. Go ahead and do
 that.
@@ -525,7 +525,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
-the Python import path to your :file:`settings.py` file.
+the Python import path to your :file:`mysite/settings.py` file.
 
 .. admonition:: Bypassing manage.py
 

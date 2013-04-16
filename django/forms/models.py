@@ -205,6 +205,21 @@ class ModelFormMetaclass(type):
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
+
+        # We check if a string was passed to `fields` or `exclude`,
+        # which is likely to be a mistake where the user typed ('foo') instead
+        # of ('foo',)
+        for opt in ['fields', 'exclude']:
+            value = getattr(opts, opt)
+            if isinstance(value, six.string_types):
+                msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
+                       "Did you mean to type: ('%(value)s',)?" % {
+                           'model': new_class.__name__,
+                           'opt': opt,
+                           'value': value,
+                       })
+                raise TypeError(msg)
+
         if opts.model:
             # If a model is defined, extract form fields from it.
             fields = fields_for_model(opts.model, opts.fields,
@@ -1024,9 +1039,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
         'list': _('Enter a list of values.'),
-        'invalid_choice': _('Select a valid choice. %s is not one of the'
+        'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
-        'invalid_pk_value': _('"%s" is not a valid value for a primary key.')
+        'invalid_pk_value': _('"%(pk)s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,
@@ -1048,12 +1063,12 @@ class ModelMultipleChoiceField(ModelChoiceField):
             try:
                 self.queryset.filter(**{key: pk})
             except ValueError:
-                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
+                raise ValidationError(self.error_messages['invalid_pk_value'] % {'pk': pk})
         qs = self.queryset.filter(**{'%s__in' % key: value})
         pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
             if force_text(val) not in pks:
-                raise ValidationError(self.error_messages['invalid_choice'] % val)
+                raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
         self.run_validators(value)

@@ -70,6 +70,11 @@ def request_methods_view(request):
 def return_unicode(request):
     return render_to_response('unicode.html')
 
+def return_undecodable_binary(request):
+    return HttpResponse(
+        b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e ReportLab Generated PDF document http://www.reportlab.com'
+    )
+
 def return_json_file(request):
     "A view that parses and returns a JSON string as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])

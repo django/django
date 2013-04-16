@@ -46,7 +46,8 @@ class TestTicket14567(TestCase):
     """
     def test_empty_queryset_return(self):
         "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
-        form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': ['1']})
+        option = ChoiceOptionModel.objects.create(name='default')
+        form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': [option.pk]})
         self.assertTrue(form.is_valid())
         # Check that the empty value is a QuerySet
         self.assertTrue(isinstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet))

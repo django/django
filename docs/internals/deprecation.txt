@@ -372,9 +372,12 @@ these changes.
   - ``django.db.transaction.is_managed()``
   - ``django.db.transaction.managed()``
 
+* ``django.forms.widgets.RadioInput`` will be removed in favor of
+  ``django.forms.widgets.RadioChoiceInput``.
+
 * The module ``django.test.simple`` and the class
   ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
-  `django.test.runner.DiscoverRunner`.
+  ``django.test.runner.DiscoverRunner``.
 
 2.0
 ---

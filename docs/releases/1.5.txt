@@ -696,6 +696,10 @@ Miscellaneous
   longer. If you're using ``django.contrib.redirects``, make sure
   :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
 
+* :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
+  escapes its ``contents`` argument. To avoid the HTML escaping, use
+  :func:`django.utils.safestring.mark_safe` on the argument before passing it.
+
 Features deprecated in 1.5
 ==========================
 

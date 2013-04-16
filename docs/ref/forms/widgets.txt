@@ -633,6 +633,11 @@ Selector and checkbox widgets
     If you decide not to loop over the radio buttons -- e.g., if your template simply includes
     ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with ``<li>`` tags, as above.
 
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -647,6 +652,14 @@ Selector and checkbox widgets
           <li><input type='checkbox' ...></li>
           ...
         </ul>
+
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
+Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
+up the lists. See the documentation of :class:`RadioSelect` for more details.
 
 .. _file-upload-widgets:
 

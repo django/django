@@ -36,6 +36,7 @@ from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.tzinfo import LocalTimezone
 
+
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
 except ImportError as e:

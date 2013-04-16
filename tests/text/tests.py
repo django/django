@@ -2,11 +2,15 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from django.utils.encoding import iri_to_uri
+from django.utils.encoding import iri_to_uri, force_text
+from django.utils.functional import lazy
 from django.utils.http import (cookie_date, http_date,
     urlquote, urlquote_plus, urlunquote, urlunquote_plus)
+from django.utils import six
 from django.utils.text import get_text_list, smart_split
 from django.utils.translation import override
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class TextTests(TestCase):
@@ -25,40 +29,36 @@ class TextTests(TestCase):
 
     def test_smart_split(self):
 
-        self.assertEqual(list(smart_split(r'''This is "a person" test.''')),
-            ['This', 'is', '"a person"', 'test.'])
-
-        self.assertEqual(list(smart_split(r'''This is "a person's" test.'''))[2],
-            '"a person\'s"')
-
-        self.assertEqual(list(smart_split(r'''This is "a person\"s" test.'''))[2],
-            '"a person\\"s"')
-
-        self.assertEqual(list(smart_split('''"a 'one''')), ['"a', "'one"])
-
-        self.assertEqual(list(smart_split(r'''all friends' tests'''))[1],
-            "friends'")
-
-        self.assertEqual(list(smart_split('url search_page words="something else"')),
-            ['url', 'search_page', 'words="something else"'])
-
-        self.assertEqual(list(smart_split("url search_page words='something else'")),
-            ['url', 'search_page', "words='something else'"])
-
-        self.assertEqual(list(smart_split('url search_page words "something else"')),
-            ['url', 'search_page', 'words', '"something else"'])
-
-        self.assertEqual(list(smart_split('url search_page words-"something else"')),
-            ['url', 'search_page', 'words-"something else"'])
-
-        self.assertEqual(list(smart_split('url search_page words=hello')),
-            ['url', 'search_page', 'words=hello'])
-
-        self.assertEqual(list(smart_split('url search_page words="something else')),
-            ['url', 'search_page', 'words="something', 'else'])
-
-        self.assertEqual(list(smart_split("cut:','|cut:' '")),
-            ["cut:','|cut:' '"])
+        testdata = [
+            ('This is "a person" test.',
+                ['This', 'is', '"a person"', 'test.']),
+            ('This is "a person\'s" test.',
+                ['This', 'is', '"a person\'s"', 'test.']),
+            ('This is "a person\\"s" test.',
+                ['This', 'is', '"a person\\"s"', 'test.']),
+            ('"a \'one',
+                ['"a', "'one"]),
+            ('all friends\' tests',
+                ['all', 'friends\'', 'tests']),
+            ('url search_page words="something else"',
+                ['url', 'search_page', 'words="something else"']),
+            ("url search_page words='something else'",
+                ['url', 'search_page', "words='something else'"]),
+            ('url search_page words "something else"',
+                ['url', 'search_page', 'words', '"something else"']),
+            ('url search_page words-"something else"',
+                ['url', 'search_page', 'words-"something else"']),
+            ('url search_page words=hello',
+                ['url', 'search_page', 'words=hello']),
+            ('url search_page words="something else',
+                ['url', 'search_page', 'words="something', 'else']),
+            ("cut:','|cut:' '",
+                ["cut:','|cut:' '"]),
+            (lazystr("a b c d"),  # Test for #20231
+                ['a', 'b', 'c', 'd']),
+        ]
+        for test, expected in testdata:
+            self.assertEqual(list(smart_split(test)), expected)
 
     def test_urlquote(self):
         self.assertEqual(urlquote('Paris & Orl\xe9ans'),

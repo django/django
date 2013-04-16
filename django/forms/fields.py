@@ -292,9 +292,18 @@ class FloatField(IntegerField):
 class DecimalField(IntegerField):
     default_error_messages = {
         'invalid': _('Enter a number.'),
-        'max_digits': _('Ensure that there are no more than %s digits in total.'),
-        'max_decimal_places': _('Ensure that there are no more than %s decimal places.'),
-        'max_whole_digits': _('Ensure that there are no more than %s digits before the decimal point.')
+        'max_digits': ungettext_lazy(
+            'Ensure that there are no more than %(max)s digit in total.',
+            'Ensure that there are no more than %(max)s digits in total.',
+            'max'),
+        'max_decimal_places': ungettext_lazy(
+            'Ensure that there are no more than %(max)s decimal place.',
+            'Ensure that there are no more than %(max)s decimal places.',
+            'max'),
+        'max_whole_digits': ungettext_lazy(
+            'Ensure that there are no more than %(max)s digit before the decimal point.',
+            'Ensure that there are no more than %(max)s digits before the decimal point.',
+            'max'),
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
@@ -341,11 +350,15 @@ class DecimalField(IntegerField):
         whole_digits = digits - decimals
 
         if self.max_digits is not None and digits > self.max_digits:
-            raise ValidationError(self.error_messages['max_digits'] % self.max_digits)
+            raise ValidationError(self.error_messages['max_digits'] % {
+                                  'max': self.max_digits})
         if self.decimal_places is not None and decimals > self.decimal_places:
-            raise ValidationError(self.error_messages['max_decimal_places'] % self.decimal_places)
-        if self.max_digits is not None and self.decimal_places is not None and whole_digits > (self.max_digits - self.decimal_places):
-            raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
+            raise ValidationError(self.error_messages['max_decimal_places'] % {
+                                  'max': self.decimal_places})
+        if (self.max_digits is not None and self.decimal_places is not None
+                and whole_digits > (self.max_digits - self.decimal_places)):
+            raise ValidationError(self.error_messages['max_whole_digits'] % {
+                                  'max': (self.max_digits - self.decimal_places)})
         return value
 
     def widget_attrs(self, widget):

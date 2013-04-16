@@ -804,6 +804,11 @@ class SQLCompiler(object):
 
 
 class SQLInsertCompiler(SQLCompiler):
+
+    def __init__(self, *args, **kwargs):
+        self.return_id = False
+        super(SQLInsertCompiler, self).__init__(*args, **kwargs)
+
     def placeholder(self, field, val):
         if field is None:
             # A field value of None means the value is raw.
