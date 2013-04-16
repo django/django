@@ -130,7 +130,7 @@ Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
     urlpatterns = patterns('',
-        (r'^about/', MyView.as_view(greeting="G'day")),
+        (r'^about/', GreetingView.as_view(greeting="G'day")),
     )
 
 .. note::
