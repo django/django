@@ -7,6 +7,7 @@ from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
+from django.utils.translation import ugettext as _
 from django.utils import six
 
 from django.contrib.formtools.wizard.storage import get_storage
@@ -271,7 +272,9 @@ class WizardView(TemplateView):
         management_form = ManagementForm(self.request.POST, prefix=self.prefix)
         if not management_form.is_valid():
             raise ValidationError(
-                'ManagementForm data is missing or has been tampered.')
+                _('ManagementForm data is missing or has been tampered.'),
+                code='missing_management_form',
+            )
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and

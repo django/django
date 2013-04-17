@@ -911,7 +911,7 @@ class InlineForeignKeyField(Field):
         else:
             orig = self.parent_instance.pk
         if force_text(value) != force_text(orig):
-            raise ValidationError(self.error_messages['invalid_choice'])
+            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return self.parent_instance
 
     def _has_changed(self, initial, data):
@@ -1026,7 +1026,7 @@ class ModelChoiceField(ChoiceField):
             key = self.to_field_name or 'pk'
             value = self.queryset.get(**{key: value})
         except (ValueError, self.queryset.model.DoesNotExist):
-            raise ValidationError(self.error_messages['invalid_choice'])
+            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return value
 
     def validate(self, value):
@@ -1057,22 +1057,30 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def clean(self, value):
         if self.required and not value:
-            raise ValidationError(self.error_messages['required'])
+            raise ValidationError(self.error_messages['required'], code='required')
         elif not self.required and not value:
             return self.queryset.none()
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(self.error_messages['list'])
+            raise ValidationError(self.error_messages['list'], code='list')
         key = self.to_field_name or 'pk'
         for pk in value:
             try:
                 self.queryset.filter(**{key: pk})
             except ValueError:
-                raise ValidationError(self.error_messages['invalid_pk_value'] % {'pk': pk})
+                raise ValidationError(
+                    self.error_messages['invalid_pk_value'],
+                    code='invalid_pk_value',
+                    params={'pk': pk},
+                )
         qs = self.queryset.filter(**{'%s__in' % key: value})
         pks = set([force_text(getattr(o, key)) for o in qs])
         for val in value:
             if force_text(val) not in pks:
-                raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
+                raise ValidationError(
+                    self.error_messages['invalid_choice'],
+                    code='invalid_choice',
+                    params={'value': val},
+                )
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
         self.run_validators(value)

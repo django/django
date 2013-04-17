@@ -76,7 +76,7 @@ def validate_integer(value):
     try:
         int(value)
     except (ValueError, TypeError):
-        raise ValidationError('')
+        raise ValidationError(_('Enter a valid integer.'), code='invalid')
 
 
 class EmailValidator(object):
@@ -188,11 +188,7 @@ class BaseValidator(object):
         cleaned = self.clean(value)
         params = {'limit_value': self.limit_value, 'show_value': cleaned}
         if self.compare(cleaned, self.limit_value):
-            raise ValidationError(
-                self.message % params,
-                code=self.code,
-                params=params,
-            )
+            raise ValidationError(self.message, code=self.code, params=params)
 
 
 class MaxValueValidator(BaseValidator):
