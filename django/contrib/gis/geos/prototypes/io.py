@@ -45,6 +45,18 @@ wkt_writer_write.argtypes = [WKT_WRITE_PTR, GEOM_PTR]
 wkt_writer_write.restype = geos_char_p
 wkt_writer_write.errcheck = check_string
 
+try:
+    wkt_writer_get_outdim = GEOSFunc('GEOSWKTWriter_getOutputDimension')
+    wkt_writer_get_outdim.argtypes = [WKT_WRITE_PTR]
+    wkt_writer_get_outdim.restype = c_int
+    wkt_writer_set_outdim = GEOSFunc('GEOSWKTWriter_setOutputDimension')
+    wkt_writer_set_outdim.argtypes = [WKT_WRITE_PTR, c_int]
+except AttributeError:
+    # GEOSWKTWriter_get/setOutputDimension has been introduced in GEOS 3.3.0
+    # Always return 2 if not available
+    wkt_writer_get_outdim = lambda ptr: 2
+    wkt_writer_set_outdim = lambda ptr, dim: None
+
 ### WKBReader routines ###
 wkb_reader_create = GEOSFunc('GEOSWKBReader_create')
 wkb_reader_create.restype = WKB_READ_PTR
@@ -151,6 +163,17 @@ class WKTWriter(IOBase):
         "Returns the WKT representation of the given geometry."
         return wkt_writer_write(self.ptr, geom.ptr)
 
+    @property
+    def outdim(self):
+        return wkt_writer_get_outdim(self.ptr)
+
+    @outdim.setter
+    def outdim(self, new_dim):
+        if not new_dim in (2, 3):
+            raise ValueError('WKT output dimension must be 2 or 3')
+        wkt_writer_set_outdim(self.ptr, new_dim)
+
+
 class WKBWriter(IOBase):
     _constructor = wkb_writer_create
     _destructor = wkb_writer_destroy
@@ -217,9 +240,10 @@ def wkt_r():
         thread_context.wkt_r = _WKTReader()
     return thread_context.wkt_r
 
-def wkt_w():
+def wkt_w(dim=2):
     if not thread_context.wkt_w:
         thread_context.wkt_w = WKTWriter()
+    thread_context.wkt_w.outdim = dim
     return thread_context.wkt_w
 
 def wkb_r():

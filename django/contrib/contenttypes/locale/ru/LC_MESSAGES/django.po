@@ -8,43 +8,43 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-03-08 11:45+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
-"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: models.py:123
+#: models.py:130
 msgid "python model class name"
 msgstr "имя класса модели"
 
-#: models.py:127
+#: models.py:134
 msgid "content type"
 msgstr "тип содержимого"
 
-#: models.py:128
+#: models.py:135
 msgid "content types"
 msgstr "типы содержимого"
 
-#: views.py:15
+#: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Тип содержимого %(ct_id)s не имеет связанной модели"
 
-#: views.py:19
+#: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr ""
 "Объект с идентификатором %(obj_id)s, имеющий тип содержимого %(ct_id)s, не "
 "существует"
 
-#: views.py:25
+#: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Объекты типа \"%(ct_name)s\" не имеют метода get_absolute_url()"

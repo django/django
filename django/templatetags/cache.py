@@ -1,18 +1,15 @@
 from __future__ import unicode_literals
 
-import hashlib
-from django.template import Library, Node, TemplateSyntaxError, Variable, VariableDoesNotExist
-from django.template import resolve_variable
+from django.core.cache.utils import make_template_fragment_key
+from django.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
 from django.core.cache import cache
-from django.utils.encoding import force_bytes
-from django.utils.http import urlquote
 
 register = Library()
 
 class CacheNode(Node):
     def __init__(self, nodelist, expire_time_var, fragment_name, vary_on):
         self.nodelist = nodelist
-        self.expire_time_var = Variable(expire_time_var)
+        self.expire_time_var = expire_time_var
         self.fragment_name = fragment_name
         self.vary_on = vary_on
 
@@ -25,10 +22,8 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
-        # Build a key for this fragment and all vary-on's.
-        key = ':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on])
-        args = hashlib.md5(force_bytes(key))
-        cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
+        vary_on = [var.resolve(context) for var in self.vary_on]
+        cache_key = make_template_fragment_key(self.fragment_name, vary_on)
         value = cache.get(cache_key)
         if value is None:
             value = self.nodelist.render(context)
@@ -59,7 +54,10 @@ def do_cache(parser, token):
     """
     nodelist = parser.parse(('endcache',))
     parser.delete_first_token()
-    tokens = token.contents.split()
+    tokens = token.split_contents()
     if len(tokens) < 3:
         raise TemplateSyntaxError("'%r' tag requires at least 2 arguments." % tokens[0])
-    return CacheNode(nodelist, tokens[1], tokens[2], tokens[3:])
+    return CacheNode(nodelist,
+        parser.compile_filter(tokens[1]),
+        tokens[2], # fragment_name can't be a variable.
+        [parser.compile_filter(token) for token in tokens[3:]])

@@ -110,7 +110,7 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns, url
     from books.views import PublisherList
 
     urlpatterns = patterns('',
@@ -172,7 +172,7 @@ context using the lower cased version of the model class' name. This is
 provided in addition to the default ``object_list`` entry, but contains exactly
 the same data, i.e. ``publisher_list``.
 
-If the this still isn't a good match, you can manually set the name of the
+If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
@@ -187,6 +187,8 @@ specifies the context variable to use::
 Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
 
+
+.. _adding-extra-context:
 
 Adding extra context
 --------------------
@@ -228,7 +230,7 @@ more::
     get_context_data on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
-    to super), any children of that class will also need to explictly set it
+    to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 
@@ -257,9 +259,9 @@ Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
-for more information about :class:`QuerySet` objects, and see the
-:doc:`class-based views reference </ref/class-based-views/index>` for the
-complete details).
+for more information about :class:`~django.db.models.query.QuerySet` objects,
+and see the :doc:`class-based views reference </ref/class-based-views/index>`
+for the complete details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
@@ -312,9 +314,9 @@ what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
 Handily, the ``ListView`` has a
-:meth:`~django.views.generic.detail.ListView.get_queryset` method we can
-override. Previously, it has just been returning the value of the ``queryset``
-attribute, but now we can add more logic.
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method we
+can override. Previously, it has just been returning the value of the
+``queryset`` attribute, but now we can add more logic.
 
 The key part to making this work is that when class-based views are called,
 various useful things are stored on ``self``; as well as the request

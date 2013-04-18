@@ -6,7 +6,7 @@ from django.forms.models import (BaseModelForm, BaseModelFormSet, fields_for_mod
 from django.contrib.admin import ListFilter, FieldListFilter
 from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.contrib.admin.options import (flatten_fieldsets, BaseModelAdmin,
-    HORIZONTAL, VERTICAL)
+    ModelAdmin, HORIZONTAL, VERTICAL)
 
 
 __all__ = ['validate']
@@ -388,12 +388,14 @@ def check_formfield(cls, model, opts, label, field):
             raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
                 "is missing from the form." % (cls.__name__, label, field))
     else:
-        fields = fields_for_model(model)
-        try:
-            fields[field]
-        except KeyError:
-            raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
-                "is missing from the form." % (cls.__name__, label, field))
+        get_form_is_overridden = hasattr(cls, 'get_form') and cls.get_form != ModelAdmin.get_form
+        if not get_form_is_overridden:
+            fields = fields_for_model(model)
+            try:
+                fields[field]
+            except KeyError:
+                raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
+                    "is missing from the form." % (cls.__name__, label, field))
 
 def fetch_attr(cls, model, opts, label, field):
     try:

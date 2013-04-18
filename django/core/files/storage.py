@@ -8,12 +8,12 @@ import itertools
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
 
@@ -37,12 +37,16 @@ class Storage(object):
 
     def save(self, name, content):
         """
-        Saves new content to the file specified by name. The content should be a
-        proper File object, ready to be read from the beginning.
+        Saves new content to the file specified by name. The content should be
+        a proper File object or any python file-like object, ready to be read
+        from the beginning.
         """
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name
+
+        if not hasattr(content, 'chunks'):
+            content = File(content)
 
         name = self.get_available_name(name)
         name = self._save(name, content)
@@ -277,21 +281,7 @@ class FileSystemStorage(Storage):
         return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
 def get_storage_class(import_path=None):
-    if import_path is None:
-        import_path = settings.DEFAULT_FILE_STORAGE
-    try:
-        dot = import_path.rindex('.')
-    except ValueError:
-        raise ImproperlyConfigured("%s isn't a storage module." % import_path)
-    module, classname = import_path[:dot], import_path[dot+1:]
-    try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured('Error importing storage module %s: "%s"' % (module, e))
-    try:
-        return getattr(mod, classname)
-    except AttributeError:
-        raise ImproperlyConfigured('Storage module "%s" does not define a "%s" class.' % (module, classname))
+    return import_by_path(import_path or settings.DEFAULT_FILE_STORAGE)
 
 class DefaultStorage(LazyObject):
     def _setup(self):

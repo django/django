@@ -21,6 +21,11 @@ __all__ = [
     'npgettext', 'npgettext_lazy',
 ]
 
+
+class TranslatorCommentWarning(SyntaxWarning):
+    pass
+
+
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
 # settings.USE_I18N, as late as possible, so that modules can be imported
@@ -80,11 +85,46 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 gettext_lazy = lazy(gettext, str)
-ngettext_lazy = lazy(ngettext, str)
 ugettext_lazy = lazy(ugettext, six.text_type)
-ungettext_lazy = lazy(ungettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
-npgettext_lazy = lazy(npgettext, six.text_type)
+
+def lazy_number(func, resultclass, number=None, **kwargs):
+    if isinstance(number, int):
+        kwargs['number'] = number
+        proxy = lazy(func, resultclass)(**kwargs)
+    else:
+        class NumberAwareString(resultclass):
+            def __mod__(self, rhs):
+                if isinstance(rhs, dict) and number:
+                    try:
+                        number_value = rhs[number]
+                    except KeyError:
+                        raise KeyError('Your dictionary lacks key \'%s\'. '
+                            'Please provide it, because it is required to '
+                            'determine whether string is singular or plural.'
+                            % number)
+                else:
+                    number_value = rhs
+                kwargs['number'] = number_value
+                translated = func(**kwargs)
+                try:
+                    translated = translated % rhs
+                except TypeError:
+                    # String doesn't contain a placeholder for the number
+                    pass
+                return translated
+
+        proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+    return proxy
+
+def ngettext_lazy(singular, plural, number=None):
+    return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
+
+def ungettext_lazy(singular, plural, number=None):
+    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+
+def npgettext_lazy(context, singular, plural, number=None):
+    return lazy_number(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
 
 def activate(language):
     return _trans.activate(language)
@@ -125,8 +165,8 @@ def to_locale(language):
 def get_language_from_request(request, check_path=False):
     return _trans.get_language_from_request(request, check_path)
 
-def get_language_from_path(path):
-    return _trans.get_language_from_path(path)
+def get_language_from_path(path, supported=None):
+    return _trans.get_language_from_path(path, supported=supported)
 
 def templatize(src, origin=None):
     return _trans.templatize(src, origin)
@@ -147,4 +187,10 @@ def get_language_info(lang_code):
     try:
         return LANG_INFO[lang_code]
     except KeyError:
-        raise KeyError("Unknown language code %r." % lang_code)
+        if '-' not in lang_code:
+            raise KeyError("Unknown language code %s." % lang_code)
+        generic_lang_code = lang_code.split('-')[0]
+        try:
+            return LANG_INFO[generic_lang_code]
+        except KeyError:
+            raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))

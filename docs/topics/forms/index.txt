@@ -197,6 +197,14 @@ context variable ``form``. Here's a simple example template::
 The form only outputs its own fields; it is up to you to provide the surrounding
 ``<form>`` tags and the submit button.
 
+If your form includes uploaded files, be sure to include
+``enctype="multipart/form-data"`` in the ``form`` element. If you wish to write
+a generic template that will work whether or not the form has files, you can
+use the :meth:`~django.forms.Form.is_multipart` attribute on the form::
+
+    <form action="/contact/" method="post"
+        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+
 .. admonition:: Forms and Cross Site Request Forgery protection
 
    Django ships with an easy-to-use :doc:`protection against Cross Site Request
@@ -215,7 +223,7 @@ wrapped in a paragraph. Here's the output for our example template::
    <p><label for="id_message">Message:</label>
        <input type="text" name="message" id="id_message" /></p>
    <p><label for="id_sender">Sender:</label>
-       <input type="text" name="sender" id="id_sender" /></p>
+       <input type="email" name="sender" id="id_sender" /></p>
    <p><label for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit" />
@@ -300,9 +308,9 @@ loop::
         <p><input type="submit" value="Send message" /></p>
     </form>
 
-Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
-``BoundField`` also has the following attributes, which can be useful in your
-templates:
+Within this loop, ``{{ field }}`` is an instance of
+:class:`~django.forms.BoundField`. ``BoundField`` also has the following
+attributes, which can be useful in your templates:
 
 ``{{ field.label }}``
     The label of the field, e.g. ``Email address``.
@@ -328,7 +336,7 @@ templates:
     case, each object in the loop is a simple string containing the error
     message.
 
-``field.is_hidden``
+``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
     ``False`` otherwise. It's not particularly useful as a template
     variable, but could be useful in conditional tests such as::
@@ -336,6 +344,12 @@ templates:
         {% if field.is_hidden %}
            {# Do something special #}
         {% endif %}
+
+``{{ field.field }}``
+    The :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps. You can use it to access
+    :class:`~django.forms.Field` attributes , e.g.
+    ``{{ char_field.field.max_length }}``.
 
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

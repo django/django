@@ -85,14 +85,15 @@ Django quotes column and table names behind the scenes.
 
     The name of an orderable field in the model, typically a :class:`DateField`,
     :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`'s :class:`~QuerySet.latest`
-    method.
+    field to use in your model :class:`Manager`'s
+    :meth:`~django.db.models.query.QuerySet.latest` and
+    :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
     Example::
 
         get_latest_by = "order_date"
 
-    See the docs for :meth:`~django.db.models.query.QuerySet.latest` for more.
+    See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
 ``managed``
 -----------
@@ -100,7 +101,7 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.managed
 
     Defaults to ``True``, meaning Django will create the appropriate database
-    tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
+    tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`flush`
     management command. That is, Django *manages* the database tables'
     lifecycles.
 
@@ -209,10 +210,6 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
-    .. versionchanged:: 1.4
-       The Django admin honors all elements in the list/tuple; before 1.4, only
-       the first one was respected.
-
 ``permissions``
 ---------------
 
@@ -262,6 +259,7 @@ Django quotes column and table names behind the scenes.
     an explicit :attr:`through <ManyToManyField.through>` model.
 
 ``index_together``
+------------------
 
 .. attribute:: Options.index_together
 

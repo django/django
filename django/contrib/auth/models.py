@@ -263,22 +263,15 @@ def _user_get_all_permissions(user, obj):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            if obj is not None:
-                permissions.update(backend.get_all_permissions(user, obj))
-            else:
-                permissions.update(backend.get_all_permissions(user))
+            permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
 def _user_has_perm(user, perm, obj):
     for backend in auth.get_backends():
         if hasattr(backend, "has_perm"):
-            if obj is not None:
-                if backend.has_perm(user, perm, obj):
-                    return True
-            else:
-                if backend.has_perm(user, perm):
-                    return True
+            if backend.has_perm(user, perm, obj):
+                return True
     return False
 
 
@@ -318,11 +311,7 @@ class PermissionsMixin(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if obj is not None:
-                    permissions.update(backend.get_group_permissions(self,
-                                                                     obj))
-                else:
-                    permissions.update(backend.get_group_permissions(self))
+                permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
     def get_all_permissions(self, obj=None):
@@ -427,7 +416,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
@@ -461,7 +450,7 @@ class User(AbstractUser):
 
     Username, password and email are required. Other fields are optional.
     """
-    class Meta:
+    class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
 
@@ -473,8 +462,8 @@ class AnonymousUser(object):
     is_staff = False
     is_active = False
     is_superuser = False
-    _groups = EmptyManager()
-    _user_permissions = EmptyManager()
+    _groups = EmptyManager(Group)
+    _user_permissions = EmptyManager(Permission)
 
     def __init__(self):
         pass

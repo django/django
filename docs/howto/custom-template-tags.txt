@@ -114,6 +114,8 @@ your function. Example:
 Registering custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. method:: django.template.Library.filter
+
 Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language:
 
@@ -150,6 +152,8 @@ are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
 
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: django.template.defaultfilters.stringfilter
 
 If you're writing a template filter that only expects a string as the first
 argument, you should use the decorator ``stringfilter``. This will
@@ -328,32 +332,10 @@ Template filter code falls into one of two situations:
    handle the auto-escaping issues and return a safe string, the
    ``is_safe`` flag won't change anything either way.
 
-.. versionchanged:: 1.4
-
-``is_safe`` and ``needs_autoescape`` used to be attributes of the filter
-function; this syntax is deprecated.
-
-.. code-block:: python
-
-    @register.filter
-    def myfilter(value):
-        return value
-    myfilter.is_safe = True
-
-.. code-block:: python
-
-    @register.filter
-    def initial_letter_filter(text, autoescape=None):
-        # ...
-        return mark_safe(result)
-    initial_letter_filter.needs_autoescape = True
-
 .. _filters-timezones:
 
 Filters and time zones
 ~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.4
 
 If you write a custom filter that operates on :class:`~datetime.datetime`
 objects, you'll usually register it with the ``expects_localtime`` flag set to
@@ -722,6 +704,8 @@ cannot resolve the string passed to it in the current context of the page.
 Simple tags
 ~~~~~~~~~~~
 
+.. method:: django.template.Library.simple_tag
+
 Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on
 the input arguments and some external information. For example, the
@@ -784,8 +768,6 @@ Or, using decorator syntax:
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
-.. versionadded:: 1.4
-
 If you need to rename your tag, you can provide a custom name for it:
 
 .. code-block:: python
@@ -795,8 +777,6 @@ If you need to rename your tag, you can provide a custom name for it:
     @register.simple_tag(name='minustwo')
     def some_function(value):
         return value - 2
-
-.. versionadded:: 1.4
 
 ``simple_tag`` functions may accept any number of positional or keyword
 arguments. For example:
@@ -885,16 +865,14 @@ template loader, we'd register the tag like this:
     # Here, register is a django.template.Library instance, as before
     register.inclusion_tag('results.html')(show_results)
 
-.. versionchanged:: 1.4
+Alternatively it is possible to register the inclusion tag using a
+:class:`django.template.Template` instance:
 
-    Alternatively it is possible to register the inclusion tag using a
-    :class:`django.template.Template` instance:
+.. code-block:: python
 
-    .. code-block:: python
-
-        from django.template.loader import get_template
-        t = get_template('results.html')
-        register.inclusion_tag(t)(show_results)
+    from django.template.loader import get_template
+    t = get_template('results.html')
+    register.inclusion_tag(t)(show_results)
 
 As always, decorator syntax works as well, so we could have written:
 
@@ -951,8 +929,6 @@ arguments to the template tag. It automatically gets access to the context.
 The ``takes_context`` parameter defaults to ``False``. When it's set to
 ``True``, the tag is passed the context object, as in this example. That's the
 only difference between this case and the previous ``inclusion_tag`` example.
-
-.. versionadded:: 1.4
 
 ``inclusion_tag`` functions may accept any number of positional or keyword
 arguments. For example:
@@ -1065,8 +1041,6 @@ context-updating template tag, you might want to consider using an
 
 Assignment tags
 ~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.4
 
 To ease the creation of tags setting a variable in the context, Django provides
 a helper function, ``assignment_tag``. This function works the same way as

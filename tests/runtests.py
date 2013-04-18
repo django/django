@@ -1,35 +1,28 @@
 #!/usr/bin/env python
+import logging
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
-import warnings
 
 from django import contrib
 from django.utils._os import upath
 from django.utils import six
 
-# databrowse is deprecated, but we still want to run its tests
-warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
-                        DeprecationWarning, 'django.contrib.databrowse')
-
 CONTRIB_DIR_NAME = 'django.contrib'
-MODEL_TESTS_DIR_NAME = 'modeltests'
-REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
-RUNTESTS_DIR = os.path.dirname(upath(__file__))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
-MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
-REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-REGRESSION_SUBDIRS_TO_SKIP = []
+SUBDIRS_TO_SKIP = ['templates']
 
 ALWAYS_INSTALLED_APPS = [
+    'shared_models',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -40,12 +33,11 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.comments',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'django.contrib.databrowse',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'regressiontests.staticfiles_tests',
-    'regressiontests.staticfiles_tests.apps.test',
-    'regressiontests.staticfiles_tests.apps.no_label',
+    'staticfiles_tests',
+    'staticfiles_tests.apps.test',
+    'staticfiles_tests.apps.no_label',
 ]
 
 def geodjango(settings):
@@ -57,30 +49,27 @@ def geodjango(settings):
 def get_test_modules():
     modules = []
     for loc, dirpath in (
-        (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR),
-        (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR),
+        (None, RUNTESTS_DIR),
         (CONTRIB_DIR_NAME, CONTRIB_DIR)):
         for f in os.listdir(dirpath):
-            if (f.startswith('__init__') or
-                f.startswith('.') or
+            if ('.' in f or
                 # Python 3 byte code dirs (PEP 3147)
                 f == '__pycache__' or
                 f.startswith('sql') or
-                os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
+                os.path.basename(f) in SUBDIRS_TO_SKIP or
+                os.path.isfile(f)):
                 continue
             modules.append((loc, f))
     return modules
 
 def setup(verbosity, test_labels):
     from django.conf import settings
+    from django.db.models.loading import get_apps, load_app
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
         'TEMPLATE_DIRS': settings.TEMPLATE_DIRS,
-        'USE_I18N': settings.USE_I18N,
-        'LOGIN_URL': settings.LOGIN_URL,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
-        'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': settings.STATIC_ROOT,
     }
@@ -91,25 +80,18 @@ def setup(verbosity, test_labels):
     settings.STATIC_URL = '/static/'
     settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
-    settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
-    settings.LOGIN_URL = 'django.contrib.auth.views.login'
-    settings.MIDDLEWARE_CLASSES = (
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.common.CommonMiddleware',
-    )
     settings.SITE_ID = 1
-    # For testing comment-utils, we require the MANAGERS attribute
-    # to be set, so that a test email is sent out which we catch
-    # in our tests.
-    settings.MANAGERS = ("admin@djangoproject.com",)
+
+    if verbosity > 0:
+        # Ensure any warnings captured to logging are piped through a verbose
+        # logging handler.  If any -W options were passed explicitly on command
+        # line, warnings are not captured, and this has no effect.
+        logger = logging.getLogger('py.warnings')
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    # (This import statement is intentionally delayed until after we
-    # access settings because of the USE_I18N dependency.)
-    from django.db.models.loading import get_apps, load_app
     get_apps()
 
     # Load all the test model apps.
@@ -124,7 +106,10 @@ def setup(verbosity, test_labels):
         settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for module_dir, module_name in test_modules:
-        module_label = '.'.join([module_dir, module_name])
+        if module_dir:
+            module_label = '.'.join([module_dir, module_name])
+        else:
+            module_label = module_name
         # if the module was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to the list to test.
@@ -306,7 +291,11 @@ if __name__ == "__main__":
         '--liveserver', action='store', dest='liveserver', default=None,
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081.'),
+             'is localhost:8081.')
+    parser.add_option(
+        '--selenium', action='store_true', dest='selenium',
+        default=False,
+        help='Run the Selenium tests as well (if Selenium is installed)')
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -318,6 +307,9 @@ if __name__ == "__main__":
 
     if options.liveserver is not None:
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
+
+    if options.selenium:
+        os.environ['DJANGO_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
         bisect_tests(options.bisect, options, args)

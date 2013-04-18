@@ -1,6 +1,6 @@
-============================================
-Django 1.5 release notes - UNDER DEVELOPMENT
-============================================
+==============================
+Django 1.5 alpha release notes
+==============================
 
 October 25, 2012.
 
@@ -227,7 +227,9 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
-* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+* The ``wkb`` and ``hex`` properties of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
@@ -283,8 +285,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
-* By default, all logging messages reaching the `django` logger when
-  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+* By default, all logging messages reaching the ``django`` logger when
+  :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
 * When using :class:`~django.template.RequestContext`, it is now possible to
@@ -301,8 +303,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an `ignorenonexistent` option to
-  ignore data for fields that no longer exist.
+* The loaddata management command now supports an
+  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
+  longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -391,12 +394,12 @@ System version of :mod:`simplejson` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As explained below, Django 1.5 deprecates
-:mod:`django.utils.simplejson` in favor of Python 2.6's built-in :mod:`json`
+``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of :mod:`simplejson`, it may trigger errors
 in some circumstances.
 
-JSON-related features in Django 1.4 always used :mod:`django.utils.simplejson`.
+JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
 - A system version of :mod:`simplejson`, if one was available (ie. ``import
@@ -423,7 +426,7 @@ More information on these incompatibilities is available in `ticket #18023`_.
 
 The net result is that, if you have installed :mod:`simplejson` and your code
 uses Django's serialization internals directly -- for instance
-:class:`django.core.serializers.json.DjangoJSONEncoder`, the switch from
+``django.core.serializers.json.DjangoJSONEncoder``, the switch from
 :mod:`simplejson` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
@@ -449,8 +452,8 @@ When using :doc:`object pagination </topics/pagination>`,
 the ``previous_page_number()`` and ``next_page_number()`` methods of the
 :class:`~django.core.paginator.Page` object did not check if the returned
 number was inside the existing page range.
-It does check it now and raises an :exc:`InvalidPage` exception when the number
-is either too low or too high.
+It does check it now and raises an :exc:`~django.core.paginator.InvalidPage`
+exception when the number is either too low or too high.
 
 Behavior of autocommit database option on PostgreSQL changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -546,8 +549,9 @@ Miscellaneous
 * :class:`django.forms.ModelMultipleChoiceField` now returns an empty
   ``QuerySet`` as the empty value instead of an empty list.
 
-* :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
-  instead of :exc:`ValueError` for non-integer inputs.
+* :func:`~django.utils.http.int_to_base36` properly raises a
+  :exc:`~exceptions.TypeError` instead of :exc:`~exceptions.ValueError` for
+  non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
@@ -555,7 +559,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is `0666` (octal) and the current umask value
+  needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by
@@ -584,8 +588,8 @@ the :setting:`AUTH_PROFILE_MODULE` setting, and the
 :meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
 the user profile model, should not be used any longer.
 
-Streaming behavior of :class:`HttpResponse`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Streaming behavior of :class:`~django.http.HttpResponse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.5 deprecates the ability to stream a response by passing an iterator
 to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
@@ -600,7 +604,7 @@ In Django 1.7 and above, the iterator will be consumed immediately by
 Since Django 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
 removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
-instead :mod:`django.utils.simplejson`.
+instead of ``django.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
 incompatibilities between versions of :mod:`simplejson` -- see the backwards-
@@ -618,9 +622,8 @@ Define a ``__str__`` method and apply the
 ``django.utils.itercompat.product``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+The ``django.utils.itercompat.product`` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
-
 
 ``django.utils.markup``
 ~~~~~~~~~~~~~~~~~~~~~~~

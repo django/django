@@ -1,4 +1,4 @@
-{% load admin_static %}<!DOCTYPE html>
+{% load admin_static %}{% load firstof from future %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 <title>{% block title %}{% endblock %}</title>
@@ -26,7 +26,7 @@
         {% if user.is_active and user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
-            <strong>{% filter force_escape %}{% firstof user.get_short_name user.get_username %}{% endfilter %}</strong>.
+            <strong>{% firstof user.get_short_name user.get_username %}</strong>.
             {% block userlinks %}
                 {% url 'django-admindocs-docroot' as docsroot %}
                 {% if docsroot %}
@@ -53,7 +53,7 @@
     {% block messages %}
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
         {% endfor %}</ul>
         {% endif %}
     {% endblock messages %}

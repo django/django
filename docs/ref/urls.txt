@@ -4,14 +4,6 @@
 
 .. module:: django.conf.urls
 
-.. versionchanged:: 1.4
-    Starting with Django 1.4 functions ``patterns``, ``url``, ``include`` plus
-    the ``handler*`` symbols described below live in the ``django.conf.urls``
-    module.
-
-    Until Django 1.3 they were located in ``django.conf.urls.defaults``. You
-    still can import them from there but it will be removed in Django 1.6.
-
 patterns()
 ----------
 
@@ -31,12 +23,12 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
 :ref:`Passing extra options to view functions <views-extra-options>`.
 
 .. note::
-    Because `patterns()` is a function call, it accepts a maximum of 255
+    Because ``patterns()`` is a function call, it accepts a maximum of 255
     arguments (URL patterns, in this case). This is a limit for all Python
     function calls. This is rarely a problem in practice, because you'll
-    typically structure your URL patterns modularly by using `include()`
+    typically structure your URL patterns modularly by using ``include()``
     sections. However, on the off-chance you do hit the 255-argument limit,
-    realize that `patterns()` returns a Python list, so you can split up the
+    realize that ``patterns()`` returns a Python list, so you can split up the
     construction of the list.
 
     ::
@@ -51,6 +43,20 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
     Python lists have unlimited size, so there's no limit to how many URL
     patterns you can construct. The only limit is that you can only create 254
     at a time (the 255th argument is the initial prefix argument).
+
+static()
+--------
+
+.. function:: static.static(prefix, view='django.views.static.serve', **kwargs)
+
+Helper function to return a URL pattern for serving files in debug mode::
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = patterns('',
+        # ... the rest of your URLconf goes here ...
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 url()
 -----
@@ -94,7 +100,6 @@ include()
     application and instance namespaces.
 
     :arg module: URLconf module (or module name)
-    :type module: Module or string
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
     :arg app_name: Application namespace for the URL entries being included
@@ -121,9 +126,6 @@ value should suffice.
 
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
-
-.. versionadded:: 1.4
-    ``handler403`` is new in Django 1.4.
 
 handler404
 ----------
@@ -153,4 +155,3 @@ value should suffice.
 
 See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
 <http_internal_server_error_view>` for more information.
-

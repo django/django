@@ -5,6 +5,18 @@ Generic comment moderation
 .. module:: django.contrib.comments.moderation
    :synopsis: Support for automatic comment moderation.
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 Django's bundled comments application is extremely useful on its own,
 but the amount of comment spam circulating on the Web today
 essentially makes it necessary to have some sort of automatic
@@ -81,8 +93,8 @@ Built-in moderation options
     .. attribute:: auto_close_field
 
         If this is set to the name of a
-        :class:`~django.db.models.fields.DateField` or
-        :class:`~django.db.models.fields.DateTimeField` on the model for which
+        :class:`~django.db.models.DateField` or
+        :class:`~django.db.models.DateTimeField` on the model for which
         comments are being moderated, new comments for objects of that model
         will be disallowed (immediately deleted) when a certain number of days
         have passed after the date specified in that field. Must be
@@ -117,7 +129,7 @@ Built-in moderation options
     .. attribute:: enable_field
 
         If this is set to the name of a
-        :class:`~django.db.models.fields.BooleanField` on the model
+        :class:`~django.db.models.BooleanField` on the model
         for which comments are being moderated, new comments on
         objects of that model will be disallowed (immediately deleted)
         whenever the value of that field is ``False`` on the object
@@ -185,15 +197,14 @@ via two methods:
     be moderated using the options defined in the
     ``CommentModerator`` subclass. If any of the models are
     already registered for moderation, the exception
-    :exc:`AlreadyModerated` will be raised.
+    ``AlreadyModerated`` will be raised.
 
 .. function:: moderator.unregister(model_or_iterable)
 
     Takes one argument: a model class or list of model classes,
     and removes the model or models from the set of models which
     are being moderated. If any of the models are not currently
-    being moderated, the exception
-    :exc:`NotModerated` will be raised.
+    being moderated, the exception ``NotModerated`` will be raised.
 
 
 Customizing the moderation system
@@ -207,8 +218,8 @@ models with an instance of the subclass.
 
 .. class:: Moderator
 
-    In addition to the :meth:`Moderator.register` and
-    :meth:`Moderator.unregister` methods detailed above, the following methods
+    In addition to the :func:`moderator.register` and
+    :func:`moderator.unregister` methods detailed above, the following methods
     on :class:`Moderator` can be overridden to achieve customized behavior:
 
     .. method:: connect

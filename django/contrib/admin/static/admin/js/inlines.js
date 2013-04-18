@@ -22,8 +22,8 @@
     var updateElementIndex = function(el, prefix, ndx) {
       var id_regex = new RegExp("(" + prefix + "-(\\d+|__prefix__))");
       var replacement = prefix + "-" + ndx;
-      if ($(el).attr("for")) {
-        $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+      if ($(el).prop("for")) {
+        $(el).prop("for", $(el).prop("for").replace(id_regex, replacement));
       }
       if (el.id) {
         el.id = el.id.replace(id_regex, replacement);
@@ -32,9 +32,9 @@
         el.name = el.name.replace(id_regex, replacement);
       }
     };
-    var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").attr("autocomplete", "off");
+    var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
     var nextIndex = parseInt(totalForms.val(), 10);
-    var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
+    var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
     // only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
     var showAddButton = maxForms.val() === '' || (maxForms.val()-totalForms.val()) > 0;
@@ -43,7 +43,7 @@
     });
     if ($this.length && showAddButton) {
       var addButton;
-      if ($this.attr("tagName") == "TR") {
+      if ($this.prop("tagName") == "TR") {
         // If forms are laid out as table rows, insert the
         // "add" button in a new table row:
         var numCols = this.eq(-1).children().length;

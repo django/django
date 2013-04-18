@@ -116,7 +116,7 @@ Practicality beats purity, so it is up to each committer to decide how much
 history mangling to do for a pull request. The main points are engaging the
 community, getting work done, and having a usable commit history.
 
-.. _committing-guidlines:
+.. _committing-guidelines:
 
 Committing guidelines
 ---------------------

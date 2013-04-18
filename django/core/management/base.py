@@ -143,6 +143,23 @@ class BaseCommand(object):
         ``self.validate(app)`` from ``handle()``, where ``app`` is the
         application's Python module.
 
+    ``leave_locale_alone``
+        A boolean indicating whether the locale set in settings should be
+        preserved during the execution of the command instead of being
+        forcibly set to 'en-us'.
+
+        Default value is ``False``.
+
+        Make sure you know what you are doing if you decide to change the value
+        of this option in your custom command if it creates database content
+        that is locale-sensitive and such content shouldn't contain any
+        translations (like it happens e.g. with django.contrim.auth
+        permissions) as making the locale differ from the de facto default
+        'en-us' might cause unintended effects.
+
+        This option can't be False when the can_import_settings option is set
+        to False too because attempting to set the locale needs access to
+        settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     option_list = (
@@ -163,6 +180,7 @@ class BaseCommand(object):
     can_import_settings = True
     requires_model_validation = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
+    leave_locale_alone = False
 
     def __init__(self):
         self.style = color_style()
@@ -221,9 +239,12 @@ class BaseCommand(object):
         try:
             self.execute(*args, **options.__dict__)
         except Exception as e:
-            if options.traceback:
-                self.stderr.write(traceback.format_exc())
-            self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            # self.stderr is not guaranteed to be set here
+            stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
+            if options.traceback or not isinstance(e, CommandError):
+                stderr.write(traceback.format_exc())
+            else:
+                stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -232,18 +253,28 @@ class BaseCommand(object):
         needed (as controlled by the attribute
         ``self.requires_model_validation``, except if force-skipped).
         """
-
-        # Switch to English, because django-admin.py creates database content
-        # like permissions, and those shouldn't contain any translations.
-        # But only do this if we can assume we have a working settings file,
-        # because django.utils.translation requires settings.
-        saved_lang = None
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
         self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
+            from django.conf import settings
+
+        saved_locale = None
+        if not self.leave_locale_alone:
+            # Only mess with locales if we can assume we have a working
+            # settings file, because django.utils.translation requires settings
+            # (The final saying about whether the i18n machinery is active will be
+            # found in the value of the USE_I18N setting)
+            if not self.can_import_settings:
+                raise CommandError("Incompatible values of 'leave_locale_alone' "
+                                   "(%s) and 'can_import_settings' (%s) command "
+                                   "options." % (self.leave_locale_alone,
+                                                 self.can_import_settings))
+            # Switch to US English, because django-admin.py creates database
+            # content like permissions, and those shouldn't contain any
+            # translations.
             from django.utils import translation
-            saved_lang = translation.get_language()
+            saved_locale = translation.get_language()
             translation.activate('en-us')
 
         try:
@@ -262,8 +293,8 @@ class BaseCommand(object):
                 if self.output_transaction:
                     self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;"))
         finally:
-            if saved_lang is not None:
-                translation.activate(saved_lang)
+            if saved_locale is not None:
+                translation.activate(saved_locale)
 
     def validate(self, app=None, display_num_errors=False):
         """

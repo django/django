@@ -140,12 +140,3 @@ FAQ
    Short answer: No. It's always better to get another set of eyes on a
    ticket. If you're having trouble getting that second set of eyes, see
    question 1, above.
-
-3. **My ticket has been in DDN forever! What should I do?**
-
-   Design Decision Needed requires consensus about the right solution.  At the
-   very least it needs consensus among the core developers, and ideally it has
-   consensus from the community as well. The best way to accomplish this is to
-   start a thread on the django-developers mailing list, and for very complex
-   issues to start a wiki page summarizing the problem and the possible
-   solutions.

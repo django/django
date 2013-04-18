@@ -1,22 +1,14 @@
-from django.utils.importlib import import_module
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_by_path
 
 from django.contrib.formtools.wizard.storage.base import BaseStorage
 from django.contrib.formtools.wizard.storage.exceptions import (
-    MissingStorageModule, MissingStorageClass, NoFileStorageConfigured)
+    MissingStorage, NoFileStorageConfigured)
 
 
 def get_storage(path, *args, **kwargs):
-    i = path.rfind('.')
-    module, attr = path[:i], path[i+1:]
     try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise MissingStorageModule(
-            'Error loading storage %s: "%s"' % (module, e))
-    try:
-        storage_class = getattr(mod, attr)
-    except AttributeError:
-        raise MissingStorageClass(
-            'Module "%s" does not define a storage named "%s"' % (module, attr))
+        storage_class = import_by_path(path)
+    except ImproperlyConfigured as e:
+        raise MissingStorage('Error loading storage: %s' % e)
     return storage_class(*args, **kwargs)
-

@@ -10,6 +10,7 @@ except ImportError:
     from urlparse import urlparse
 
 from django.conf import settings
+from django.core import signals
 from django.core import signing
 from django.core.exceptions import SuspiciousOperation
 from django.http.cookie import SimpleCookie
@@ -40,9 +41,13 @@ class HttpResponseBase(six.Iterator):
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
         self._closable_objects = []
+        # This parameter is set by the handler. It's necessary to preserve the
+        # historical behavior of request_finished.
+        self._handler_class = None
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead", PendingDeprecationWarning)
+                          " content_type instead",
+                          DeprecationWarning, stacklevel=2)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
@@ -225,7 +230,11 @@ class HttpResponseBase(six.Iterator):
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            closable.close()
+            try:
+                closable.close()
+            except Exception:
+                pass
+        signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
         raise Exception("This %s instance is not writable" % self.__class__.__name__)
@@ -296,7 +305,7 @@ class HttpResponse(HttpResponseBase):
                 'Creating streaming responses with `HttpResponse` is '
                 'deprecated. Use `StreamingHttpResponse` instead '
                 'if you need the streaming behavior.',
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_iterator'):
             self._iterator = iter(self._container)
         return self
@@ -352,14 +361,14 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
 
     These responses will stream only if no middleware attempts to access the
     `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a `PendingDeprecationWarning`.
+    and raise a `DeprecationWarning`.
     """
     @property
     def content(self):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         content = b''.join(self)
         self.streaming_content = [content]
         return content
@@ -369,7 +378,7 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         self.streaming_content = [content]
 
 
@@ -382,6 +391,8 @@ class HttpResponseRedirectBase(HttpResponse):
             raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
+
+    url = property(lambda self: self['Location'])
 
 
 class HttpResponseRedirect(HttpResponseRedirectBase):

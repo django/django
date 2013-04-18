@@ -1,5 +1,6 @@
 import decimal
 import datetime
+import unicodedata
 
 from django.conf import settings
 from django.utils import dateformat, numberformat, datetime_safe
@@ -18,7 +19,7 @@ _format_modules_cache = {}
 
 ISO_INPUT_FORMATS = {
     'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
-    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M'),
+    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M:%S.%f', '%H:%M'),
     'DATETIME_INPUT_FORMATS': (
         '%Y-%m-%d %H:%M:%S',
         '%Y-%m-%d %H:%M:%S.%f',
@@ -192,16 +193,17 @@ def sanitize_separators(value):
     Sanitizes a value according to the current decimal and
     thousand separator setting. Used with form field input.
     """
-    if settings.USE_L10N:
+    if settings.USE_L10N and isinstance(value, six.string_types):
+        parts = []
         decimal_separator = get_format('DECIMAL_SEPARATOR')
-        if isinstance(value, six.string_types):
-            parts = []
-            if decimal_separator in value:
-                value, decimals = value.split(decimal_separator, 1)
-                parts.append(decimals)
-            if settings.USE_THOUSAND_SEPARATOR:
-                parts.append(value.replace(get_format('THOUSAND_SEPARATOR'), ''))
-            else:
-                parts.append(value)
-            value = '.'.join(reversed(parts))
+        if decimal_separator in value:
+            value, decimals = value.split(decimal_separator, 1)
+            parts.append(decimals)
+        if settings.USE_THOUSAND_SEPARATOR:
+            thousand_sep = get_format('THOUSAND_SEPARATOR')
+            for replacement in set([
+                    thousand_sep, unicodedata.normalize('NFKD', thousand_sep)]):
+                value = value.replace(replacement, '')
+        parts.append(value)
+        value = '.'.join(reversed(parts))
     return value

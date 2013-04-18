@@ -3,11 +3,20 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import comments
+from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import smart_text
 
 register = template.Library()
 
-class BaseCommentNode(template.Node):
+
+class RenameBaseCommentNodeMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+    )
+
+
+class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.Node)):
     """
     Base helper class (abstract) for handling the get_comment_* template tags.
     Looks a bit strange, but the subclasses below should make this a bit more
@@ -17,7 +26,7 @@ class BaseCommentNode(template.Node):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse get_comment_list/count/form and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
@@ -64,11 +73,11 @@ class BaseCommentNode(template.Node):
         self.comment = comment
 
     def render(self, context):
-        qs = self.get_query_set(context)
+        qs = self.get_queryset(context)
         context[self.as_varname] = self.get_context_value_from_queryset(context, qs)
         return ''
 
-    def get_query_set(self, context):
+    def get_queryset(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
         if not object_pk:
             return self.comment_model.objects.none()
@@ -146,7 +155,7 @@ class RenderCommentFormNode(CommentFormNode):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_form and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
@@ -182,7 +191,7 @@ class RenderCommentListNode(CommentListNode):
     @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_list and return a Node."""
-        tokens = token.contents.split()
+        tokens = token.split_contents()
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
@@ -205,7 +214,7 @@ class RenderCommentListNode(CommentListNode):
                 "comments/%s/list.html" % ctype.app_label,
                 "comments/list.html"
             ]
-            qs = self.get_query_set(context)
+            qs = self.get_queryset(context)
             context.push()
             liststr = render_to_string(template_search_list, {
                 "comment_list" : self.get_context_value_from_queryset(context, qs)

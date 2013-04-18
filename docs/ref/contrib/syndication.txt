@@ -77,7 +77,7 @@ latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = patterns('',
@@ -136,6 +136,51 @@ into those elements.
     <requestsite-objects>` for more.
 
   See `a complex example`_ below that uses a description template.
+
+  There is also a way to pass additional information to title and description
+  templates, if you need to supply more than the two variables mentioned
+  before. You can provide your implementation of ``get_context_data`` method
+  in your Feed subclass. For example::
+
+    from mysite.models import Article
+    from django.contrib.syndication.views import Feed
+
+    class ArticlesFeed(Feed):
+        title = "My articles"
+        description_template = "feeds/articles.html"
+
+        def items(self):
+            return Article.objects.order_by('-pub_date')[:5]
+
+        def get_context_data(self, **kwargs):
+            context = super(ArticlesFeed, self).get_context_data(**kwargs)
+            context['foo'] = 'bar'
+            return context
+
+  And the template:
+
+  .. code-block:: html+django
+
+    Something about {{ foo }}: {{ obj.description }}
+
+  This method will be called once per each item in the list returned by
+  ``items()`` with the following keyword arguments:
+
+  * ``item``: the current item. For backward compatibility reasons, the name
+    of this context variable is ``{{ obj }}``.
+
+  * ``obj``: the object returned by ``get_object()``. By default this is not
+    exposed to the templates to avoid confusion with ``{{ obj }}`` (see above),
+    but you can use it in your implementation of ``get_context_data()``.
+
+  * ``site``: current site as described above.
+
+  * ``request``: current request.
+
+  The behavior of ``get_context_data()`` mimics that of
+  :ref:`generic views <adding-extra-context>` - you're supposed to call
+  ``super()`` to retrieve context data from parent class, add your data
+  and return the modified dictionary.
 
 * To specify the contents of ``<link>``, you have two options. For each item
   in ``items()``, Django first tries calling the
@@ -321,7 +366,7 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
     from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
 
     urlpatterns = patterns('',
@@ -334,7 +379,7 @@ And the accompanying URLconf::
 Feed class reference
 --------------------
 
-.. class:: django.contrib.syndication.views.Feed
+.. class:: views.Feed
 
 This example illustrates all possible attributes and methods for a
 :class:`~django.contrib.syndication.views.Feed` class::
@@ -599,6 +644,15 @@ This example illustrates all possible attributes and methods for a
 
         item_description = 'A description of the item.' # Hard-coded description.
 
+        def get_context_data(self, **kwargs):
+            """
+            Returns a dictionary to use as extra context if either
+            description_template or item_template are used.
+
+            Default implementation preserves the old behavior
+            of using {'obj': item, 'site': current_site} as the context.
+            """
+
         # ITEM LINK -- One of these three is required. The framework looks for
         # them in this order.
 
@@ -623,6 +677,18 @@ This example illustrates all possible attributes and methods for a
             """
             Takes an item, as return by items(), and returns the item's ID.
             """
+
+        # ITEM_GUID_IS_PERMALINK -- The following method is optional. If
+        # provided, it sets the 'isPermaLink' attribute of an item's
+        # GUID element. This method is used only when 'item_guid' is
+        # specified.
+
+        def item_guid_is_permalink(self, obj):
+            """
+            Takes an item, as returned by items(), and returns a boolean.
+            """
+
+        item_guid_is_permalink = False  # Hard coded value
 
         # ITEM AUTHOR NAME -- One of the following three is optional. The
         # framework looks for them in this order.

@@ -2,22 +2,23 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
+from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import DateField, FieldDoesNotExist
+from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import *
-from django.db.models.sql.datastructures import Date
+from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
-from django.utils.datastructures import SortedDict
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils import timezone
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
-        'AggregateQuery']
+        'DateTimeQuery', 'AggregateQuery']
 
 class DeleteQuery(Query):
     """
@@ -44,7 +45,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
-                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
+                       pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
 
     def delete_qs(self, query, using):
@@ -116,8 +117,8 @@ class UpdateQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
-                    AND)
+                            pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
+                           AND)
             self.get_compiler(using).execute_sql(None)
 
     def add_update_values(self, values):
@@ -223,26 +224,24 @@ class DateQuery(Query):
 
     compiler = 'SQLDateCompiler'
 
-    def add_date_select(self, field_name, lookup_type, order='ASC'):
+    def add_select(self, field_name, lookup_type, order='ASC'):
         """
-        Converts the query into a date extraction query.
+        Converts the query into an extraction query.
         """
         try:
             result = self.setup_joins(
                 field_name.split(LOOKUP_SEP),
                 self.get_meta(),
                 self.get_initial_alias(),
-                False
             )
         except FieldError:
             raise FieldDoesNotExist("%s has no field named '%s'" % (
                 self.model._meta.object_name, field_name
             ))
         field = result[0]
-        assert isinstance(field, DateField), "%r isn't a DateField." \
-                % field.name
+        self._check_field(field)                # overridden in DateTimeQuery
         alias = result[3][-1]
-        select = Date((alias, field.column), lookup_type)
+        select = self._get_select((alias, field.column), lookup_type)
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]
         self.distinct = True
@@ -250,6 +249,36 @@ class DateQuery(Query):
 
         if field.null:
             self.add_filter(("%s__isnull" % field_name, False))
+
+    def _check_field(self, field):
+        assert isinstance(field, DateField), \
+            "%r isn't a DateField." % field.name
+        if settings.USE_TZ:
+            assert not isinstance(field, DateTimeField), \
+                "%r is a DateTimeField, not a DateField." % field.name
+
+    def _get_select(self, col, lookup_type):
+        return Date(col, lookup_type)
+
+class DateTimeQuery(DateQuery):
+    """
+    A DateTimeQuery is like a DateQuery but for a datetime field. If time zone
+    support is active, the tzinfo attribute contains the time zone to use for
+    converting the values before truncating them. Otherwise it's set to None.
+    """
+
+    compiler = 'SQLDateTimeCompiler'
+
+    def _check_field(self, field):
+        assert isinstance(field, DateTimeField), \
+                "%r isn't a DateTimeField." % field.name
+
+    def _get_select(self, col, lookup_type):
+        if self.tzinfo is None:
+            tzname = None
+        else:
+            tzname = timezone._get_timezone_name(self.tzinfo)
+        return DateTime(col, lookup_type, tzname)
 
 class AggregateQuery(Query):
     """

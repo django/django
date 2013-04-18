@@ -71,9 +71,9 @@ class LocalTimezone(tzinfo):
             return timedelta(0)
 
     def tzname(self, dt):
+        is_dst = False if dt is None else self._isdst(dt)
         try:
-            return force_text(time.tzname[self._isdst(dt)],
-                                 DEFAULT_LOCALE_ENCODING)
+            return force_text(time.tzname[is_dst], DEFAULT_LOCALE_ENCODING)
         except UnicodeDecodeError:
             return None
 

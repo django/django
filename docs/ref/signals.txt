@@ -12,7 +12,7 @@ A list of all the signals that Django sends.
     The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
     of comment-related signals </ref/contrib/comments/signals>`.
 
-    The :doc:`authentication framework </topics/auth>` sends :ref:`signals when
+    The :doc:`authentication framework </topics/auth/index>` sends :ref:`signals when
     a user is logged in / out <topics-auth-signals>`.
 
 Model signals
@@ -27,9 +27,8 @@ module system.
 .. warning::
 
     Many of these signals are sent by various model methods like
-    :meth:`~django.db.models.Model.__init__` or
-    :meth:`~django.db.models.Model.save` that you can overwrite in your own
-    code.
+    ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
+    override in your own code.
 
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
@@ -47,7 +46,7 @@ pre_init
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
 Whenever you instantiate a Django model, this signal is sent at the beginning
-of the model's :meth:`~django.db.models.Model.__init__` method.
+of the model's ``__init__()`` method.
 
 Arguments sent with this signal:
 
@@ -55,12 +54,10 @@ Arguments sent with this signal:
     The model class that just had an instance created.
 
 ``args``
-    A list of positional arguments passed to
-    :meth:`~django.db.models.Model.__init__`:
+    A list of positional arguments passed to ``__init__()``:
 
 ``kwargs``
-    A dictionary of keyword arguments passed to
-    :meth:`~django.db.models.Model.__init__`:.
+    A dictionary of keyword arguments passed to ``__init__()``:
 
 For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
@@ -74,7 +71,7 @@ Argument    Value
 ``sender``  ``Poll`` (the class itself)
 
 ``args``    ``[]`` (an empty list because there were no positional
-            arguments passed to ``__init__``.)
+            arguments passed to ``__init__()``.)
 
 ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
 ==========  ===============================================================
@@ -85,7 +82,7 @@ post_init
 .. data:: django.db.models.signals.post_init
    :module:
 
-Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__init__`: method finishes.
+Like pre_init, but this one is sent when the ``__init__()`` method finishes.
 
 Arguments sent with this signal:
 
@@ -212,24 +209,24 @@ m2m_changed
 .. data:: django.db.models.signals.m2m_changed
    :module:
 
-Sent when a :class:`ManyToManyField` is changed on a model instance.
-Strictly speaking, this is not a model signal since it is sent by the
-:class:`ManyToManyField`, but since it complements the
+Sent when a :class:`~django.db.models.ManyToManyField` is changed on a model
+instance. Strictly speaking, this is not a model signal since it is sent by the
+:class:`~django.db.models.ManyToManyField`, but since it complements the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
 Arguments sent with this signal:
 
 ``sender``
-    The intermediate model class describing the :class:`ManyToManyField`.
-    This class is automatically created when a many-to-many field is
-    defined; you can access it using the ``through`` attribute on the
-    many-to-many field.
+    The intermediate model class describing the
+    :class:`~django.db.models.ManyToManyField`. This class is automatically
+    created when a many-to-many field is defined; you can access it using the
+    ``through`` attribute on the many-to-many field.
 
 ``instance``
     The instance whose many-to-many relation is updated. This can be an
-    instance of the ``sender``, or of the class the :class:`ManyToManyField`
-    is related to.
+    instance of the ``sender``, or of the class the
+    :class:`~django.db.models.ManyToManyField` is related to.
 
 ``action``
     A string indicating the type of update that is done on the relation.
@@ -303,8 +300,9 @@ Argument        Value
 
 ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
-``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the forward relation)
+``reverse``     ``False`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the forward relation)
 
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
@@ -329,8 +327,9 @@ Argument        Value
 
 ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
-``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the reverse relation)
+``reverse``     ``True`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the reverse relation)
 
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)
@@ -407,6 +406,10 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database.
+
 For example, ``yourapp/management/__init__.py`` could be written like::
 
     from django.db.models.signals import post_syncdb
@@ -437,9 +440,8 @@ Sent when Django begins processing an HTTP request.
 Arguments sent with this signal:
 
 ``sender``
-    The handler class -- e.g.
-    :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
-    the request.
+    The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
+    handled the request.
 
 request_finished
 ----------------
@@ -448,6 +450,18 @@ request_finished
    :module:
 
 Sent when Django finishes processing an HTTP request.
+
+.. note::
+
+    When a view returns a :ref:`streaming response <httpresponse-streaming>`,
+    this signal is sent only after the entire response is consumed by the
+    client (strictly speaking, by the WSGI gateway).
+
+.. versionchanged:: 1.5
+
+    Before Django 1.5, this signal was fired before sending the content to the
+    client. In order to accomodate streaming responses, it is now fired after
+    sending the content.
 
 Arguments sent with this signal:
 
@@ -476,18 +490,16 @@ Test signals
 .. module:: django.test.signals
    :synopsis: Signals sent during testing.
 
-Signals only sent when :doc:`running tests </topics/testing>`.
+Signals only sent when :ref:`running tests <running-tests>`.
 
 setting_changed
 ---------------
-
-.. versionadded:: 1.4
 
 .. data:: django.test.signals.setting_changed
    :module:
 
 This signal is sent when the value of a setting is changed through the
-:meth:`django.test.TestCase.setting` context manager or the
+``django.test.TestCase.settings()`` context manager or the
 :func:`django.test.utils.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
@@ -549,8 +561,8 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
-    :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
+    ``django.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
+    ``django.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``
     The database connection that was opened. This can be used in a

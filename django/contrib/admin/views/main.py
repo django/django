@@ -1,4 +1,6 @@
 import operator
+import sys
+import warnings
 from functools import reduce
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
@@ -6,7 +8,9 @@ from django.core.paginator import InvalidPage
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
+from django.utils import six
 from django.utils.datastructures import SortedDict
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
@@ -33,14 +37,20 @@ IGNORED_PARAMS = (
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 
-class ChangeList(object):
+class RenameChangeListMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+    )
+
+
+class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
-        self.root_query_set = model_admin.queryset(request)
+        self.root_queryset = model_admin.get_queryset(request)
         self.list_display = list_display
         self.list_display_links = list_display_links
         self.list_filter = list_filter
@@ -70,7 +80,7 @@ class ChangeList(object):
         else:
             self.list_editable = list_editable
         self.query = request.GET.get(SEARCH_VAR, '')
-        self.query_set = self.get_query_set(request)
+        self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
             title = ugettext('Select %s')
@@ -79,15 +89,37 @@ class ChangeList(object):
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
-    def get_filters(self, request):
-        lookup_params = self.params.copy() # a dictionary of the query string
-        use_distinct = False
+    @property
+    def root_query_set(self):
+        warnings.warn("`ChangeList.root_query_set` is deprecated, "
+                      "use `root_queryset` instead.",
+                      PendingDeprecationWarning, 2)
+        return self.root_queryset
 
+    @property
+    def query_set(self):
+        warnings.warn("`ChangeList.query_set` is deprecated, "
+                      "use `queryset` instead.",
+                      PendingDeprecationWarning, 2)
+        return self.queryset
+
+    def get_filters_params(self, params=None):
+        """
+        Returns all params except IGNORED_PARAMS
+        """
+        if not params:
+            params = self.params
+        lookup_params = params.copy() # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
         for ignored in IGNORED_PARAMS:
             if ignored in lookup_params:
                 del lookup_params[ignored]
+        return lookup_params
+
+    def get_filters(self, request):
+        lookup_params = self.get_filters_params()
+        use_distinct = False
 
         # Normalize the types of keys
         for key, value in lookup_params.items():
@@ -142,7 +174,7 @@ class ChangeList(object):
                                 lookup_needs_distinct(self.lookup_opts, key))
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
-            raise IncorrectLookupParameters(e)
+            six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None: new_params = {}
@@ -158,28 +190,27 @@ class ChangeList(object):
                     del p[k]
             else:
                 p[k] = v
-        return '?%s' % urlencode(p)
+        return '?%s' % urlencode(sorted(p.items()))
 
     def get_results(self, request):
-        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.queryset, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
-        # Perform a slight optimization: Check to see whether any filters were
-        # given. If not, use paginator.hits to calculate the number of objects,
-        # because we've already done paginator.hits and the value is cached.
-        if not self.query_set.query.where:
-            full_result_count = result_count
+        # Perform a slight optimization:
+        # full_result_count is equal to paginator.count if no filters
+        # were applied
+        if self.get_filters_params():
+            full_result_count = self.root_queryset.count()
         else:
-            full_result_count = self.root_query_set.count()
-
+            full_result_count = result_count
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
         # Get the list of objects to display on this page.
         if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.query_set._clone()
+            result_list = self.queryset._clone()
         else:
             try:
                 result_list = paginator.page(self.page_num+1).object_list
@@ -297,13 +328,13 @@ class ChangeList(object):
                 ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 
-    def get_query_set(self, request):
+    def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
          use_distinct) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
-        qs = self.root_query_set
+        qs = self.root_queryset
         for filter_spec in self.filter_specs:
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
@@ -379,6 +410,6 @@ class ChangeList(object):
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
         return reverse('admin:%s_%s_change' % (self.opts.app_label,
-                                               self.opts.module_name),
+                                               self.opts.model_name),
                        args=(quote(pk),),
                        current_app=self.model_admin.admin_site.name)

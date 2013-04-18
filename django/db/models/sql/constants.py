@@ -11,7 +11,8 @@ import re
 QUERY_TERMS = set([
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
-    'month', 'day', 'week_day', 'isnull', 'search', 'regex', 'iregex',
+    'month', 'day', 'week_day', 'hour', 'minute', 'second', 'isnull', 'search',
+    'regex', 'iregex',
 ])
 
 # Size of each "chunk" for get_iterator calls.
@@ -24,13 +25,7 @@ GET_ITERATOR_CHUNK_SIZE = 100
 # dictionary in the Query class).
 JoinInfo = namedtuple('JoinInfo',
                       'table_name rhs_alias join_type lhs_alias '
-                      'lhs_join_col rhs_join_col nullable join_field')
-
-# PathInfo is used when converting lookups (fk__somecol). The contents
-# describe the join in Model terms (model Options and Fields for both
-# sides of the join. The rel_field is the field we are joining along.
-PathInfo = namedtuple('PathInfo',
-                      'from_field to_field from_opts to_opts join_field')
+                      'join_cols nullable join_field')
 
 # Pairs of column clauses to select, and (possibly None) field for the clause.
 SelectInfo = namedtuple('SelectInfo', 'col field')
@@ -44,6 +39,3 @@ ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC'),
 }
-
-# A marker for join-reusability.
-REUSE_ALL = object()

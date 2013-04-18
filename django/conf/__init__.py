@@ -8,6 +8,7 @@ a list of all possible variables.
 
 import logging
 import os
+import sys
 import time     # Needed for Windows
 import warnings
 
@@ -15,6 +16,7 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
 from django.utils import importlib
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -56,29 +58,25 @@ class LazySettings(LazyObject):
         """
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
-        try:
-            # Route warnings through python logging
-            logging.captureWarnings(True)
-            # Allow DeprecationWarnings through the warnings filters
-            warnings.simplefilter("default", DeprecationWarning)
-        except AttributeError:
-            # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
-            pass
+        if not sys.warnoptions:
+            try:
+                # Route warnings through python logging
+                logging.captureWarnings(True)
+                # Allow DeprecationWarnings through the warnings filters
+                warnings.simplefilter("default", DeprecationWarning)
+            except AttributeError:
+                # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
+                pass
 
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING
             # First find the logging configuration function ...
-            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
-            logging_config_module = importlib.import_module(logging_config_path)
-            logging_config_func = getattr(logging_config_module, logging_config_func_name)
+            logging_config_func = import_by_path(self.LOGGING_CONFIG)
 
             logging_config_func(DEFAULT_LOGGING)
 
+            # ... then invoke it with the logging settings
             if self.LOGGING:
-                # Backwards-compatibility shim for #16288 fix
-                compat_patch_logging_config(self.LOGGING)
-
-                # ... then invoke it with the logging settings
                 logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
@@ -142,7 +140,7 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types):
                     warnings.warn("The %s setting must be a tuple. Please fix your "
                                   "settings, as auto-correction is now deprecated." % setting,
-                        PendingDeprecationWarning)
+                                  DeprecationWarning, stacklevel=2)
                     setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
@@ -195,37 +193,3 @@ class UserSettingsHolder(BaseSettings):
         return list(self.__dict__) + dir(self.default_settings)
 
 settings = LazySettings()
-
-
-
-def compat_patch_logging_config(logging_config):
-    """
-    Backwards-compatibility shim for #16288 fix. Takes initial value of
-    ``LOGGING`` setting and patches it in-place (issuing deprecation warning)
-    if "mail_admins" logging handler is configured but has no filters.
-
-    """
-    #  Shim only if LOGGING["handlers"]["mail_admins"] exists,
-    #  but has no "filters" key
-    if "filters" not in logging_config.get(
-        "handlers", {}).get(
-        "mail_admins", {"filters": []}):
-
-        warnings.warn(
-            "You have no filters defined on the 'mail_admins' logging "
-            "handler: adding implicit debug-false-only filter. "
-            "See http://docs.djangoproject.com/en/dev/releases/1.4/"
-            "#request-exceptions-are-now-always-logged",
-            DeprecationWarning)
-
-        filter_name = "require_debug_false"
-
-        filters = logging_config.setdefault("filters", {})
-        while filter_name in filters:
-            filter_name = filter_name + "_"
-
-        filters[filter_name] = {
-            "()": "django.utils.log.RequireDebugFalse",
-        }
-
-        logging_config["handlers"]["mail_admins"]["filters"] = [filter_name]

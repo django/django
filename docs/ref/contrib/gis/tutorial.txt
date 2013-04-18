@@ -115,13 +115,12 @@ In addition, modify the :setting:`INSTALLED_APPS` setting to include
 and ``world`` (your newly created application)::
 
     INSTALLED_APPS = (
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'django.contrib.admin',
         'django.contrib.gis',
         'world'
     )
@@ -226,7 +225,7 @@ model to represent this data::
 
     class WorldBorder(models.Model):
         # Regular Django fields corresponding to the attributes in the
-	# world borders shapefile.
+        # world borders shapefile.
         name = models.CharField(max_length=50)
         area = models.IntegerField()
         pop2005 = models.IntegerField('Population 2005')
@@ -236,13 +235,13 @@ model to represent this data::
         un = models.IntegerField('United Nations Code')
         region = models.IntegerField('Region Code')
         subregion = models.IntegerField('Sub-Region Code')
-    	lon = models.FloatField()
-    	lat = models.FloatField()
+        lon = models.FloatField()
+        lat = models.FloatField()
 
-	# GeoDjango-specific: a geometry field (MultiPolygonField), and
+        # GeoDjango-specific: a geometry field (MultiPolygonField), and
         # overriding the default manager with a GeoManager instance.
-	mpoly = models.MultiPolygonField()
-	objects = models.GeoManager()
+        mpoly = models.MultiPolygonField()
+        objects = models.GeoManager()
 
         # Returns the string representation of the model.
         def __unicode__(self):
@@ -250,7 +249,7 @@ model to represent this data::
 
 Please note two important things:
 
-1. The ``models`` module is imported from :mod:`django.contrib.gis.db`.
+1. The ``models`` module is imported from ``django.contrib.gis.db``.
 2. You must override the model's default manager with
    :class:`~django.contrib.gis.db.models.GeoManager` to perform spatial queries.
 

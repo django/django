@@ -72,10 +72,10 @@ def get_random_string(length=12,
         # is better than absolute predictability.
         random.seed(
             hashlib.sha256(
-                "%s%s%s" % (
+                ("%s%s%s" % (
                     random.getstate(),
                     time.time(),
-                    settings.SECRET_KEY)
+                    settings.SECRET_KEY)).encode('utf-8')
                 ).digest())
     return ''.join([random.choice(allowed_chars) for i in range(length)])
 
@@ -85,6 +85,11 @@ def constant_time_compare(val1, val2):
     Returns True if the two strings are equal, False otherwise.
 
     The time taken is independent of the number of characters that match.
+
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths. Since Django only uses it to compare hashes of
+    known expected length, this is acceptable.
     """
     if len(val1) != len(val2):
         return False

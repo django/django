@@ -222,11 +222,6 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
 
-    # Create a form to edit an existing Article.
-    >>> a = Article.objects.get(pk=1)
-    >>> f = ArticleForm(instance=a)
-    >>> f.save()
-
     # Create a form to edit an existing Article, but use
     # POST data to populate the form.
     >>> a = Article.objects.get(pk=1)
@@ -544,10 +539,39 @@ for more on how field cleaning and validation work. Also, your model's
 :ref:`Validating objects <validating-objects>` for more information on the
 model's ``clean()`` hook.
 
+.. _modelforms-factory:
+
+ModelForm factory function
+--------------------------
+
+You can create forms from a given model using the standalone function
+:func:`~django.forms.models.modelform_factory`, instead of using a class
+definition. This may be more convenient if you do not have many customizations
+to make::
+
+    >>> from django.forms.models import modelform_factory
+    >>> BookForm = modelform_factory(Book)
+
+This can also be used to make simple modifications to existing forms, for
+example by specifying which fields should be displayed::
+
+    >>> Form = modelform_factory(Book, form=BookForm, fields=("author",))
+
+... or which fields should be excluded::
+
+    >>> Form = modelform_factory(Book, form=BookForm, exclude=("title",))
+
+You can also specify the widgets to be used for a given field::
+
+    >>> from django.forms import Textarea
+    >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
+
 .. _model-formsets:
 
 Model formsets
 ==============
+
+.. class:: models.BaseModelFormSet
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes that make it easy to work with Django models. Let's
@@ -572,9 +596,11 @@ with the ``Author`` model. It works just like a regular formset::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    ``modelformset_factory`` uses ``formset_factory`` to generate formsets.
-    This means that a model formset is just an extension of a basic formset
-    that knows how to interact with a particular model.
+
+    :func:`~django.forms.models.modelformset_factory` uses
+    :func:`~django.forms.formsets.formset_factory` to generate formsets. This
+    means that a model formset is just an extension of a basic formset that
+    knows how to interact with a particular model.
 
 Changing the queryset
 ---------------------
@@ -620,16 +646,28 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Specifying widgets to use in the form with ``widgets``
+------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``widgets`` parameter, you can specify a dictionary of values to
+customize the ``ModelForm``'s widget class for a particular field. This
+works the same way as the ``widgets`` dictionary on the inner ``Meta``
+class of a ``ModelForm`` works::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
+
 Providing initial values
 ------------------------
-
-.. versionadded:: 1.4
 
 As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
-``modelformset_factory``. However, with model formsets, the initial values only
-apply to extra forms, those that aren't bound to an existing object instance.
+:func:`~django.forms.models.modelformset_factory`. However, with model
+formsets, the initial values only apply to extra forms, those that aren't bound
+to an existing object instance.
 
 .. _saving-objects-in-the-formset:
 
@@ -675,7 +713,8 @@ Limiting the number of editable objects
 ---------------------------------------
 
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
-to ``modelformset_factory`` to limit the number of extra forms displayed.
+to :func:`~django.forms.models.modelformset_factory` to limit the number of
+extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed::
 
@@ -700,8 +739,8 @@ so long as the total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
 
 Using a model formset in a view
 -------------------------------
@@ -827,6 +866,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 
 .. highlight:: python
 
+.. _inline-formsets:
+
 Inline formsets
 ===============
 
@@ -850,7 +891,9 @@ a particular author, you could do this::
     >>> formset = BookFormSet(instance=author)
 
 .. note::
-    ``inlineformset_factory`` uses ``modelformset_factory`` and marks
+
+    :func:`~django.forms.models.inlineformset_factory` uses
+    :func:`~django.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
 .. seealso::
@@ -869,7 +912,8 @@ the following model::
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
+To resolve this, you can use ``fk_name`` to
+:func:`~django.forms.models.inlineformset_factory`::
 
     >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
@@ -895,3 +939,13 @@ of a model. Here's how you can do that::
         })
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
+
+Specifying widgets to use in the inline form
+--------------------------------------------
+
+.. versionadded:: 1.6
+
+``inlineformset_factory`` uses ``modelformset_factory`` and passes most
+of its arguments to ``modelformset_factory``. This means you can use
+the ``widgets`` parameter in much the same way as passing it to
+``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.

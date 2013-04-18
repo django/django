@@ -88,8 +88,7 @@ def flatten_fieldsets(fieldsets):
     field_names = []
     for name, opts in fieldsets:
         for field in opts['fields']:
-            # type checking feels dirty, but it seems like the best way here
-            if type(field) == tuple:
+            if isinstance(field, (list, tuple)):
                 field_names.extend(field)
             else:
                 field_names.append(field)
@@ -117,7 +116,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             admin_url = reverse('%s:%s_%s_change'
                                 % (admin_site.name,
                                    opts.app_label,
-                                   opts.object_name.lower()),
+                                   opts.model_name),
                                 None, (quote(obj._get_pk_val()),))
             p = '%s.%s' % (opts.app_label,
                            opts.get_delete_permission())
@@ -155,6 +154,9 @@ class NestedObjects(Collector):
             if source_attr:
                 self.add_edge(getattr(obj, source_attr), obj)
             else:
+                if obj._meta.proxy:
+                    # Take concrete model's instance to avoid mismatch in edges
+                    obj = obj._meta.concrete_model(pk=obj.pk)
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)

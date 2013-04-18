@@ -37,7 +37,7 @@ class BaseStorage(object):
     current_step = lazy_property(_get_current_step, _set_current_step)
 
     def _get_extra_data(self):
-        return self.data[self.extra_data_key] or {}
+        return self.data[self.extra_data_key]
 
     def _set_extra_data(self, extra_data):
         self.data[self.extra_data_key] = extra_data

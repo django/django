@@ -21,7 +21,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     # They all have the same app_label, get the first one.
     app_label = app_models[0]._meta.app_label
     app_models = dict(
-        (model._meta.object_name.lower(), model)
+        (model._meta.model_name, model)
         for model in app_models
     )
 

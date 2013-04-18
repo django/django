@@ -1,28 +1,28 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2011, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
 "Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
-"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "گزینه‌های پیشرفته"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
 msgstr "نشانی اینترنتی"
 
@@ -30,7 +30,7 @@ msgstr "نشانی اینترنتی"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"مثال: '/about/contact/'. مطمئن شوید که خط اریب را هم در ابتدا و هم در انتها "
+"مثال: '/about/contact/'. مطمئن شوید که اسلش را هم در ابتدا و هم در انتها "
 "گذاشته‌اید."
 
 #: forms.py:10
@@ -41,34 +41,34 @@ msgstr "این مقدار فقط باید حاوی حروف، اعداد، خط 
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "در آدرس اسلش آغازین فراموش شده است."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "در آدرس اسلش پایانی فراموش شده است."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "صفحه تخت با آدرس %(url)s برای سایت %(site)s وجود دارد "
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "عنوان"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "محتوا"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
 msgstr "فعال کردن نظرات"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "نام قالب"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -76,20 +76,24 @@ msgstr ""
 "مثال: 'flatpages/contact_page.html'. اگر این مشخص نشود، سیستم از 'flatpages/"
 "default.html' استفاده خواهد کرد."
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
 msgstr "عضویت لازم است"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "اگر این انتخاب شود، فقط کاربران وارد شده خواهند توانست این صفحه را مشاهده "
 "نمایند."
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "صفحه تخت"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "صفحات تخت"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "این فیلد لازم است."

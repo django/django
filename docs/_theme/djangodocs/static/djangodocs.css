@@ -90,8 +90,8 @@ table.docutils thead th p { margin: 0; padding: 0; }
 table.docutils { border-collapse:collapse; }
 
 /*** code blocks ***/
-.literal { white-space:nowrap; }
-.literal { color:#234f32; }
+.literal { color:#234f32; white-space:nowrap; }
+dt > tt.literal { white-space: normal; }
 #sidebar .literal { color:white; background:transparent; font-size:11px; }
 h4 .literal { color: #234f32; font-size: 13px; }
 pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-width:1px 0; margin: 1em 0; padding: .3em .4em; overflow: hidden; line-height: 1.3em;}
@@ -115,7 +115,7 @@ div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-be
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
-div.versionadded span.title, div.versionchanged span.title { font-weight: bold; }
+div.versionadded span.title, div.versionchanged span.title, div.deprecated span.title { font-weight: bold; }
 
 /*** p-links ***/
 a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }

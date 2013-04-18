@@ -1,4 +1,7 @@
 import datetime
+
+from django.db.models.aggregates import refs_aggregate
+from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
 class ExpressionNode(tree.Node):
@@ -36,6 +39,18 @@ class ExpressionNode(tree.Node):
             obj = node or ExpressionNode([self], connector)
             obj.add(other, connector)
         return obj
+
+    def contains_aggregate(self, existing_aggregates):
+        if self.children:
+            return any(child.contains_aggregate(existing_aggregates)
+                       for child in self.children
+                       if hasattr(child, 'contains_aggregate'))
+        else:
+            return refs_aggregate(self.name.split(LOOKUP_SEP),
+                                  existing_aggregates)
+
+    def prepare_database_save(self, unused):
+        return self
 
     ###################
     # VISITOR METHODS #
@@ -112,9 +127,6 @@ class ExpressionNode(tree.Node):
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
-
-    def prepare_database_save(self, unused):
-        return self
 
 class F(ExpressionNode):
     """

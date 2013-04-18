@@ -47,7 +47,7 @@ should be updated to use the new :ref:`class-based runners
 Syndication feeds
 -----------------
 
-The :class:`django.contrib.syndication.feeds.Feed` class is being
+The ``django.contrib.syndication.feeds.Feed`` class is being
 replaced by the :class:`django.contrib.syndication.views.Feed` class.
 The old ``feeds.Feed`` class is deprecated. The new class has an
 almost identical API, but allows instances to be used as views.
@@ -91,7 +91,7 @@ added in Django 1.2 alpha but not documented with the alpha release.
 
 The default authentication backends shipped with Django do not
 currently make use of this, but third-party authentication backends
-are free to do so. See the :doc:`authentication docs </topics/auth>`
+are free to do so. See the :doc:`authentication docs </topics/auth/index>`
 for more information.
 
 
@@ -104,7 +104,7 @@ class will check the backend for permissions, just as the normal
 ``User`` does. This is intended to help centralize permission
 handling; apps can always delegate the question of whether something
 is allowed or not to the authorization/authentication system. See the
-:doc:`authentication docs </topics/auth>` for more details.
+:doc:`authentication docs </topics/auth/index>` for more details.
 
 
 ``select_related()`` improvements

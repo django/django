@@ -123,9 +123,9 @@ Support for multiple databases
 
 Django 1.2 adds the ability to use :doc:`more than one database
 </topics/db/multi-db>` in your Django project. Queries can be issued at a
-specific database with the `using()` method on ``QuerySet`` objects. Individual
-objects can be saved to a specific database by providing a ``using`` argument
-when you call ``save()``.
+specific database with the ``using()`` method on ``QuerySet`` objects.
+Individual objects can be saved to a specific database by providing a ``using``
+argument when you call ``save()``.
 
 Model validation
 ----------------
@@ -165,7 +165,7 @@ A foundation for specifying permissions at the per-object level has been added.
 Although there is no implementation of this in core, a custom authentication
 backend can provide this implementation and it will be used by
 :class:`django.contrib.auth.models.User`. See the :doc:`authentication docs
-</topics/auth>` for more information.
+</topics/auth/index>` for more information.
 
 Permissions for anonymous users
 -------------------------------
@@ -175,7 +175,7 @@ If you provide a custom auth backend with ``supports_anonymous_user`` set to
 User already did.  This is useful for centralizing permission handling - apps
 can always delegate the question of whether something is allowed or not to
 the authorization/authentication backend. See the :doc:`authentication
-docs </topics/auth>` for more details.
+docs </topics/auth/index>` for more details.
 
 Relaxed requirements for usernames
 ----------------------------------
@@ -345,10 +345,10 @@ in 1.2 is support for multiple spatial databases.  As a result,
 the following :ref:`spatial database backends <spatial-backends>`
 are now included:
 
-* :mod:`django.contrib.gis.db.backends.postgis`
-* :mod:`django.contrib.gis.db.backends.mysql`
-* :mod:`django.contrib.gis.db.backends.oracle`
-* :mod:`django.contrib.gis.db.backends.spatialite`
+* ``django.contrib.gis.db.backends.postgis``
+* ``django.contrib.gis.db.backends.mysql``
+* ``django.contrib.gis.db.backends.oracle``
+* ``django.contrib.gis.db.backends.spatialite``
 
 GeoDjango now supports the rich capabilities added
 in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
@@ -765,7 +765,7 @@ over the next few release cycles.
 Code taking advantage of any of the features below will raise a
 ``PendingDeprecationWarning`` in Django 1.2. This warning will be
 silent by default, but may be turned on using Python's :mod:`warnings`
-module, or by running Python with a ``-Wd`` or `-Wall` flag.
+module, or by running Python with a ``-Wd`` or ``-Wall`` flag.
 
 In Django 1.3, these warnings will become a ``DeprecationWarning``,
 which is *not* silent. In Django 1.4 support for these features will
@@ -819,16 +819,16 @@ This affects the following settings:
 =========================================  ==========================
  Old setting                                New Setting
 =========================================  ==========================
-:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-:setting:`DATABASE_HOST`                   :setting:`HOST`
-:setting:`DATABASE_NAME`                   :setting:`NAME`
-:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-:setting:`DATABASE_PORT`                   :setting:`PORT`
-:setting:`DATABASE_USER`                   :setting:`USER`
-:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+`DATABASE_ENGINE`                          :setting:`ENGINE <DATABASE-ENGINE>`
+`DATABASE_HOST`                            :setting:`HOST`
+`DATABASE_NAME`                            :setting:`NAME`
+`DATABASE_OPTIONS`                         :setting:`OPTIONS`
+`DATABASE_PASSWORD`                        :setting:`PASSWORD`
+`DATABASE_PORT`                            :setting:`PORT`
+`DATABASE_USER`                            :setting:`USER`
+`TEST_DATABASE_CHARSET`                    :setting:`TEST_CHARSET`
+`TEST_DATABASE_COLLATION`                  :setting:`TEST_COLLATION`
+`TEST_DATABASE_NAME`                       :setting:`TEST_NAME`
 =========================================  ==========================
 
 These changes are also required if you have manually created a database
@@ -850,7 +850,7 @@ has been deprecated.
 If you are currently using the ``postgresql`` backend, you should
 migrate to using the ``postgresql_psycopg2`` backend. To update your
 code, install the ``psycopg2`` library and change the
-:setting:`DATABASE_ENGINE` setting to use
+:setting:`ENGINE <DATABASE-ENGINE>` setting to use
 ``django.db.backends.postgresql_psycopg2``.
 
 CSRF response-rewriting middleware
@@ -986,7 +986,7 @@ should be updated to use the new :ref:`class-based runners
 ``Feed`` in ``django.contrib.syndication.feeds``
 ------------------------------------------------
 
-The :class:`django.contrib.syndication.feeds.Feed` class has been
+The ``django.contrib.syndication.feeds.Feed`` class has been
 replaced by the :class:`django.contrib.syndication.views.Feed` class.
 The old ``feeds.Feed`` class is deprecated, and will be removed in
 Django 1.4.

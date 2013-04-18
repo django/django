@@ -37,7 +37,7 @@ If you are using a 32-bit platform, you're off the hook; you'll observe no
 differences as a result of this change.
 
 However, **users on 64-bit platforms may experience some problems** using the
-:djadmin:`reset` management command. Prior to this change, 64-bit platforms
+``reset`` management command. Prior to this change, 64-bit platforms
 would generate a 64-bit, 16 character digest in the constraint name; for
 example::
 
@@ -48,14 +48,14 @@ Following this change, all platforms, regardless of word size, will generate a
 
     ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_32091d1e FOREIGN KEY ...
 
-As a result of this change, you will not be able to use the :djadmin:`reset`
+As a result of this change, you will not be able to use the ``reset``
 management command on any table made by a 64-bit machine. This is because the
 the new generated name will not match the historically generated name; as a
 result, the SQL constructed by the reset command will be invalid.
 
 If you need to reset an application that was created with 64-bit constraints,
 you will need to manually drop the old constraint prior to invoking
-:djadmin:`reset`.
+``reset``.
 
 Test cases are now run in a transaction
 ---------------------------------------
@@ -120,9 +120,8 @@ has been saved.
 Changes to how model formsets are saved
 ---------------------------------------
 
-.. currentmodule:: django.forms.models
-
-In Django 1.1, :class:`BaseModelFormSet` now calls :meth:`ModelForm.save()`.
+In Django 1.1, :class:`~django.forms.models.BaseModelFormSet` now calls
+``ModelForm.save()``.
 
 This is backwards-incompatible if you were modifying ``self.initial`` in a model
 formset's ``__init__``, or if you relied on the internal ``_total_form_count``
@@ -132,7 +131,7 @@ public methods.
 Fixed the ``join`` filter's escaping behavior
 ---------------------------------------------
 
-The :ttag:`join` filter no longer escapes the literal value that is
+The :tfilter:`join` filter no longer escapes the literal value that is
 passed in for the connector.
 
 This is backwards incompatible for the special situation of the literal string
@@ -146,7 +145,7 @@ Permanent redirects and the ``redirect_to()`` generic view
 ----------------------------------------------------------
 
 Django 1.1 adds a ``permanent`` argument to the
-:func:`django.views.generic.simple.redirect_to()` view. This is technically
+``django.views.generic.simple.redirect_to()`` view. This is technically
 backwards-incompatible if you were using the ``redirect_to`` view with a
 format-string key called 'permanent', which is highly unlikely.
 
@@ -198,19 +197,21 @@ Aggregate support
 It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``,
 ``MIN()``, etc.) from within Django's ORM. You can choose to either return the
 results of the aggregate directly, or else annotate the objects in a
-:class:`QuerySet` with the results of the aggregate query.
+:class:`~django.db.models.query.QuerySet` with the results of the aggregate
+query.
 
-This feature is available as new :meth:`QuerySet.aggregate()`` and
-:meth:`QuerySet.annotate()`` methods, and is covered in detail in :doc:`the ORM
-aggregation documentation </topics/db/aggregation>`.
+This feature is available as new
+:meth:`~django.db.models.query.QuerySet.aggregate` and
+:meth:`~django.db.models.query.QuerySet.annotate` methods, and is covered in
+detail in :doc:`the ORM aggregation documentation </topics/db/aggregation>`.
 
 Query expressions
 ~~~~~~~~~~~~~~~~~
 
 Queries can now refer to a another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
-new :class:`F` object; for full details, including examples, consult the
-:ref:`documentation for F expressions <query-expressions>`.
+new :class:`~django.db.models.F` object; for full details, including examples,
+consult the :ref:`documentation for F expressions <query-expressions>`.
 
 Model improvements
 ------------------
@@ -223,7 +224,7 @@ A number of features have been added to Django's model layer:
 You can now control whether or not Django manages the life-cycle of the database
 tables for a model using the :attr:`~Options.managed` model option. This
 defaults to ``True``, meaning that Django will create the appropriate database
-tables in :djadmin:`syncdb` and remove them as part of the :djadmin:`reset`
+tables in :djadmin:`syncdb` and remove them as part of the ``reset``
 command. That is, Django *manages* the database table's lifecycle.
 
 If you set this to ``False``, however, no database table creating or deletion
@@ -264,14 +265,14 @@ Testing improvements
 --------------------
 
 A few notable improvements have been made to the :doc:`testing framework
-</topics/testing>`.
+</topics/testing/index>`.
 
 Test performance improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.test
 
-Tests written using Django's :doc:`testing framework </topics/testing>` now run
+Tests written using Django's :doc:`testing framework </topics/testing/index>` now run
 dramatically faster (as much as 10 times faster in many cases).
 
 This was accomplished through the introduction of transaction-based tests: when

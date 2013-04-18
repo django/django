@@ -25,7 +25,7 @@ class QueryWrapper(object):
     parameters. Can be used to pass opaque data to a where-clause, for example.
     """
     def __init__(self, sql, params):
-        self.data = sql, params
+        self.data = sql, list(params)
 
     def as_sql(self, qn=None, connection=None):
         return self.data
@@ -47,6 +47,7 @@ class Q(tree.Node):
         if not isinstance(other, Q):
             raise TypeError(other)
         obj = type(self)()
+        obj.connector = conn
         obj.add(self, conn)
         obj.add(other, conn)
         return obj
@@ -62,6 +63,16 @@ class Q(tree.Node):
         obj.add(self, self.AND)
         obj.negate()
         return obj
+
+    def clone(self):
+        clone = self.__class__._new_instance(
+            children=[], connector=self.connector, negated=self.negated)
+        for child in self.children:
+            if hasattr(child, 'clone'):
+                clone.children.append(child.clone())
+            else:
+                clone.children.append(child)
+        return clone
 
 class DeferredAttribute(object):
     """

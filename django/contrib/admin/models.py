@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.util import quote
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.encoding import smart_text
 from django.utils.encoding import python_2_unicode_compatible
@@ -72,5 +73,6 @@ class LogEntry(models.Model):
         This is relative to the Django admin index page.
         """
         if self.content_type and self.object_id:
-            return "%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, quote(self.object_id))
+            url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
+            return reverse(url_name, args=(quote(self.object_id),))
         return None

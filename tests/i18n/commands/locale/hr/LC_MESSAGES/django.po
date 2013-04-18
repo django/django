@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-04 04:59-0600\n"
+"PO-Revision-Date: 2013-01-16 22:53-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#. Translators: Django template comment for translators
+#: templates/test.html:9
+#, python-format
+msgid "I think that 100%% is more that 50%% of anything."
+msgstr ""
+
+#: templates/test.html:10
+#, python-format
+msgid "I think that 100%% is more that 50%% of %(obj)s."
+msgstr ""
+
+#: templates/test.html:70
+#, python-format
+msgid "Literal with a percent symbol at the end %%"
+msgstr ""
+
+#: templates/test.html:71
+#, python-format
+msgid "Literal with a percent %% symbol in the middle"
+msgstr ""
+
+#: templates/test.html:72
+#, python-format
+msgid "Completed 50%% of all the tasks"
+msgstr ""
+
+#: templates/test.html:73
+#, python-format
+msgctxt "ctx0"
+msgid "Completed 99%% of all the tasks"
+msgstr ""
+
+#: templates/test.html:74
+#, python-format
+msgid "Shouldn't double escape this sequence: %% (two percent signs)"
+msgstr ""
+
+#: templates/test.html:75
+#, python-format
+msgctxt "ctx1"
+msgid "Shouldn't double escape this sequence %% either"
+msgstr ""
+
+#: templates/test.html:76
+#, python-format
+msgid "Looks like a str fmt spec %%s but shouldn't be interpreted as such"
+msgstr "Translation of the above string"
+
+#: templates/test.html:77
+#, python-format
+msgid "Looks like a str fmt spec %% o but shouldn't be interpreted as such"
+msgstr "Translation contains %% for the above string"

@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import base64
 import cgi
+import sys
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -209,7 +210,8 @@ class MultiPartParser(object):
                                     chunk = base64.b64decode(chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
-                                    raise MultiPartParserError("Could not decode base64 data: %r" % e)
+                                    msg = "Could not decode base64 data: %r" % e
+                                    six.reraise(MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2])
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
@@ -439,11 +441,6 @@ class BoundaryIter(six.Iterator):
         if not unused_char:
             raise InputStreamExhausted()
         self._stream.unget(unused_char)
-        try:
-            from mx.TextTools import FS
-            self._fs = FS(boundary).find
-        except ImportError:
-            self._fs = lambda data: data.find(boundary)
 
     def __iter__(self):
         return self
@@ -499,7 +496,7 @@ class BoundaryIter(six.Iterator):
          * the end of current encapsulation
          * the start of the next encapsulation
         """
-        index = self._fs(data)
+        index = data.find(self._boundary)
         if index < 0:
             return None
         else:

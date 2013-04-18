@@ -1,79 +1,81 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Denis Darii <sinednx@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Алексей Борискин <sun.void@gmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Denis Darii <sinednx@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2013-02-05 20:10+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
-"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Содержание"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "выбран"
-msgstr[1] "выбраны"
-msgstr[2] "выбраны"
+msgstr[0] "помечен"
+msgstr[1] "помечены"
+msgstr[2] "помечены"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
-msgstr "Отметить выбранные комментарии"
+msgstr "Пометить выбранные комментарии"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "одобренный"
-msgstr[1] "одобренные"
-msgstr[2] "одобренные"
+msgstr[0] "одобрен"
+msgstr[1] "одобрены"
+msgstr[2] "одобрены"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
-msgstr "Подтвердить выбранные комментарии"
+msgstr "Одобрить выбранные комментарии"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "удален"
 msgstr[1] "удалены"
 msgstr[2] "удалены"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Удалить выбранные комментарии"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s комментарий был успешно %(action)s."
-msgstr[1] "%(count)s комментариев были успешно %(action)s."
+msgstr[1] "%(count)s комментария были успешно %(action)s."
 msgstr[2] "%(count)s комментариев были успешно %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "Комментарии %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Последние комментарии на %(site_name)s"
@@ -98,9 +100,12 @@ msgstr "Комментарий"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Следите за своими словами! Слово %s не позволенно здесь."
-msgstr[1] "Следите за своими словами! Слова %s не позволенны здесь."
-msgstr[2] "Следите за своими словами! Слова %s не позволенны здесь."
+msgstr[0] ""
+"Следите за своими словами! Употребление слова \"%s\" здесь запрещено."
+msgstr[1] ""
+"Следите за своими словами! Употребление слов \"%s\" здесь запрещено."
+msgstr[2] ""
+"Следите за своими словами! Употребление слов \"%s\" здесь запрещено."
 
 #: forms.py:181 templates/comments/preview.html:16
 msgid "and"
@@ -110,58 +115,58 @@ msgstr "и"
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
-"Если что-нибудь введете в это поле, то ваш комментарий будет признан спамом"
+"Если вы что-то введете в это поле, то ваш комментарий будет помечен как спам"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "тип содержимого"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "идентификатор объекта"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "пользователь"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "имя пользователя"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "адрес электронной почты пользователя"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "URL пользователя"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "комментарий"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "дата и время добавления"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP-адрес"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "публичный"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Снимите выделение, чтобы убрать комментарий с сайта."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
-msgstr "удален"
+msgstr "удалён"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -169,11 +174,11 @@ msgstr ""
 "Отметьте, если комментарий нежелателен. Взамен будет показано сообщение "
 "\"Этот комментарий был удален\"."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "Комментарии"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -181,7 +186,7 @@ msgstr ""
 "Комментарий был добавлен зарегистрированным пользователем, поэтому имя "
 "пользователя доступно только для чтения."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -189,7 +194,7 @@ msgstr ""
 "Комментарий был добавлен зарегистрированным пользователем, поэтому адрес "
 "электронной почты доступен только для чтения."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -204,25 +209,25 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "отметка"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "дата"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "отметка комментария"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "отметки комментариев"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr "Подтвердить комментарий"
+msgstr "Одобрить комментарий"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -230,11 +235,11 @@ msgstr "Вы уверены, что хотите опубликовать это
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr "Подтвердить"
+msgstr "Одобрить"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr "Спасибо за подтверждение"
+msgstr "Спасибо, что одобрили комментарий"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7

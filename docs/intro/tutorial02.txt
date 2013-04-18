@@ -21,49 +21,11 @@ automatically-generated admin site.
     The admin isn't intended to be used by site visitors. It's for site
     managers.
 
-Activate the admin site
-=======================
-
-The Django admin site is not activated by default -- it's an opt-in thing. To
-activate the admin site for your installation, do these three things:
-
-* Uncomment ``"django.contrib.admin"`` in the :setting:`INSTALLED_APPS` setting.
-
-* Run ``python manage.py syncdb``. Since you have added a new application
-  to :setting:`INSTALLED_APPS`, the database tables need to be updated.
-
-* Edit your ``mysite/urls.py`` file and uncomment the lines that reference
-  the admin -- there are three lines in total to uncomment. This file is a
-  URLconf; we'll dig into URLconfs in the next tutorial. For now, all you
-  need to know is that it maps URL roots to applications. In the end, you
-  should have a ``urls.py`` file that looks like this:
-
-  .. parsed-literal::
-
-      from django.conf.urls import patterns, include, url
-
-      # Uncomment the next two lines to enable the admin:
-      **from django.contrib import admin**
-      **admin.autodiscover()**
-
-      urlpatterns = patterns('',
-          # Examples:
-          # url(r'^$', '{{ project_name }}.views.home', name='home'),
-          # url(r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
-
-          # Uncomment the admin/doc line below to enable admin documentation:
-          # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-          # Uncomment the next line to enable the admin:
-          **url(r'^admin/', include(admin.site.urls)),**
-      )
-
-  (The bold lines are the ones that needed to be uncommented.)
-
 Start the development server
 ============================
 
-Let's start the development server and explore the admin site.
+The Django admin site is activated by default. Let's start the development
+server and explore it.
 
 Recall from Tutorial 1 that you start the development server like so:
 
@@ -76,6 +38,10 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: _images/admin01.png
    :alt: Django admin login screen
+
+Since :doc:`translation </topics/i18n/translation>` is turned on by default,
+the login screen may be displayed in your own language, depending on your
+browser's settings and on whether Django has a translation for this language.
 
 .. admonition:: Doesn't match what you see?
 
@@ -93,34 +59,32 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 Enter the admin site
 ====================
 
-Now, try logging in. (You created a superuser account in the first part of this
+Now, try logging in. You created a superuser account in the first part of this
 tutorial, remember?  If you didn't create one or forgot the password you can
-:ref:`create another one <topics-auth-creating-superusers>`.) You should see
-the Django admin index page:
+:ref:`create another one <topics-auth-creating-superusers>`.
+
+You should see the Django admin index page:
 
 .. image:: _images/admin02t.png
    :alt: Django admin index page
 
-You should see a few types of editable content, including groups, users
-and sites. These are core features Django ships with by default.
+You should see a few types of editable content: groups and users. They are
+provided by :mod:`django.contrib.auth`, the authentication framework shipped
+by Django.
 
 Make the poll app modifiable in the admin
 =========================================
 
 But where's our poll app? It's not displayed on the admin index page.
 
-Just one thing to do: We need to tell the admin that ``Poll``
-objects have an admin interface. To do this, create a file called
-``admin.py`` in your ``polls`` directory, and edit it to look like this::
+Just one thing to do: we need to tell the admin that ``Poll``
+objects have an admin interface. To do this, open the :file:`polls/admin.py`
+file, and edit it to look like this::
 
     from django.contrib import admin
     from polls.models import Poll
 
     admin.site.register(Poll)
-
-You'll need to restart the development server to see your changes. Normally,
-the server auto-reloads code every time you modify a file, but the action of
-creating a new file doesn't trigger the auto-reloading logic.
 
 Explore the free admin functionality
 ====================================
@@ -145,7 +109,7 @@ Click the "What's up?" poll to edit it:
 
 Things to note here:
 
-* The form is automatically generated from the Poll model.
+* The form is automatically generated from the ``Poll`` model.
 
 * The different model field types (:class:`~django.db.models.DateTimeField`,
   :class:`~django.db.models.CharField`) correspond to the appropriate HTML
@@ -302,7 +266,7 @@ registration code to read::
 This tells Django: "``Choice`` objects are edited on the ``Poll`` admin page. By
 default, provide enough fields for 3 choices."
 
-Load the "Add poll" page to see how that looks, you may need to restart your development server:
+Load the "Add poll" page to see how that looks:
 
 .. image:: _images/admin11t.png
    :alt: Add poll page now has choices on it
@@ -375,7 +339,7 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by giving that method (in ``models.py``) a few
+You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
 
     class Poll(models.Model):
@@ -386,8 +350,8 @@ attributes, as follows::
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
-Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
-following line to ``PollAdmin``::
+Edit your :file:`polls/admin.py` file again and add an improvement to the Poll
+change list page: Filters. Add the following line to ``PollAdmin``::
 
     list_filter = ['pub_date']
 
@@ -398,9 +362,9 @@ That adds a "Filter" sidebar that lets people filter the change list by the
    :alt: Polls change list page, updated
 
 The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a :class:`~django.db.models.fields.DateTimeField`,
-Django knows to give appropriate filter options: "Any date," "Today," "Past 7
-days," "This month," "This year."
+Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
+knows to give appropriate filter options: "Any date," "Today," "Past 7 days,"
+"This month," "This year."
 
 This is shaping up well. Let's add some search capability::
 
@@ -435,31 +399,28 @@ That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
 system.
 
-Open your settings file (``mysite/settings.py``, remember) and look at the
-:setting:`TEMPLATE_DIRS` setting. :setting:`TEMPLATE_DIRS` is a tuple of
-filesystem directories to check when loading Django templates. It's a search
-path.
+.. _ref-customizing-your-projects-templates:
 
-Create a ``mytemplates`` directory in your project directory. Templates can
+Customizing your *project's* templates
+--------------------------------------
+
+Create a ``templates`` directory in your project directory. Templates can
 live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
-By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
-tell Django where our templates live::
+Open your settings file (:file:`mysite/settings.py`, remember) and add a
+:setting:`TEMPLATE_DIRS` setting::
 
-    TEMPLATE_DIRS = (
-        '/path/to/mysite/mytemplates', # Change this to your own directory.
-    )
+    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-Now copy the template ``admin/base_site.html`` from within the default Django
-admin template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into an ``admin`` subdirectory of
-whichever directory you're using in :setting:`TEMPLATE_DIRS`. For example, if
-your :setting:`TEMPLATE_DIRS` includes ``'/path/to/mysite/mytemplates'``, as
-above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
-``/path/to/mysite/mytemplates/admin/base_site.html``. Don't forget that
-``admin`` subdirectory.
+:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
+loading Django templates; it's a search path.
+
+Now create a directory called ``admin`` inside ``templates``, and copy the
+template ``admin/base_site.html`` from within the default Django admin
+template directory in the source code of Django itself
+(``django/contrib/admin/templates``) into that directory.
 
 .. admonition:: Where are the Django source files?
 
@@ -489,11 +450,24 @@ override a template, just do the same thing you did with ``base_site.html`` --
 copy it from the default directory into your custom directory, and make
 changes.
 
+Customizing your *application's* templates
+------------------------------------------
+
 Astute readers will ask: But if :setting:`TEMPLATE_DIRS` was empty by default,
 how was Django finding the default admin templates? The answer is that, by
 default, Django automatically looks for a ``templates/`` subdirectory within
-each app package, for use as a fallback. See the :ref:`template loader
-documentation <template-loaders>` for full information.
+each application package, for use as a fallback (don't forget that
+``django.contrib.admin`` is an application).
+
+Our poll application is not very complex and doesn't need custom admin
+templates. But if it grew more sophisticated and required modification of
+Django's standard admin templates for some of its functionality, it would be
+more sensible to modify the *application's* templates, rather than those in the
+*project*. That way, you could include the polls application in any new project
+and be assured that it would find the custom templates it needed.
+
+See the :ref:`template loader documentation <template-loaders>` for more
+information about how Django finds its templates.
 
 Customize the admin index page
 ==============================

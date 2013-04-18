@@ -64,9 +64,7 @@ class BaseDatabaseSchemaEditor(object):
         Marks the start of a schema-altering run.
         """
         self.deferred_sql = []
-        self.connection.commit_unless_managed()
-        self.connection.enter_transaction_management()
-        self.connection.managed(True)
+        self.connection.set_autocommit(False)
 
     def commit(self):
         """
@@ -75,7 +73,7 @@ class BaseDatabaseSchemaEditor(object):
         for sql in self.deferred_sql:
             self.execute(sql)
         self.connection.commit()
-        self.connection.leave_transaction_management()
+        self.connection.set_autocommit(True)
 
     def rollback(self):
         """
@@ -84,7 +82,7 @@ class BaseDatabaseSchemaEditor(object):
         if not self.connection.features.can_rollback_ddl:
             raise RuntimeError("Cannot rollback schema changes on this backend")
         self.connection.rollback()
-        self.connection.leave_transaction_management()
+        self.connection.set_autocommit(True)
 
     # Core utility functions
 

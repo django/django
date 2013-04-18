@@ -16,7 +16,6 @@ from django.contrib.gis.gdal import (CoordTransform, DataSource,
 from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
-from django.contrib.localflavor.us.models import USStateField
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -55,16 +54,10 @@ class LayerMapping(object):
         models.SlugField : OFTString,
         models.TextField : OFTString,
         models.URLField : OFTString,
-        USStateField : OFTString,
         models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
         }
-
-    # The acceptable transaction modes.
-    TRANSACTION_MODES = {'autocommit' : transaction.autocommit,
-                         'commit_on_success' : transaction.commit_on_success,
-                         }
 
     def __init__(self, model, data, mapping, layer=0,
                  source_srs=None, encoding='utf-8',
@@ -129,9 +122,11 @@ class LayerMapping(object):
 
         # Setting the transaction decorator with the function in the
         # transaction modes dictionary.
-        if transaction_mode in self.TRANSACTION_MODES:
-            self.transaction_decorator = self.TRANSACTION_MODES[transaction_mode]
-            self.transaction_mode = transaction_mode
+        self.transaction_mode = transaction_mode
+        if transaction_mode == 'autocommit':
+            self.transaction_decorator = None
+        elif transaction_mode == 'commit_on_success':
+            self.transaction_decorator = transaction.atomic
         else:
             raise LayerMapError('Unrecognized transaction mode: %s' % transaction_mode)
 
@@ -434,7 +429,8 @@ class LayerMapping(object):
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
         except Exception as msg:
-            raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
+            new_msg = 'Could not translate between the data source and model geometry: %s' % msg
+            six.reraise(LayerMapError, LayerMapError(new_msg), sys.exc_info()[2])
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."
@@ -503,9 +499,6 @@ class LayerMapping(object):
             else:
                 progress_interval = progress
 
-        # Defining the 'real' save method, utilizing the transaction
-        # decorator created during initialization.
-        @self.transaction_decorator
         def _save(feat_range=default_range, num_feat=0, num_saved=0):
             if feat_range:
                 layer_iter = self.layer[feat_range]
@@ -557,10 +550,6 @@ class LayerMapping(object):
                     except SystemExit:
                         raise
                     except Exception as msg:
-                        if self.transaction_mode == 'autocommit':
-                            # Rolling back the transaction so that other model saves
-                            # will work.
-                            transaction.rollback_unless_managed()
                         if strict:
                             # Bailing out if the `strict` keyword is set.
                             if not silent:
@@ -577,6 +566,9 @@ class LayerMapping(object):
             # Only used for status output purposes -- incremental saving uses the
             # values returned here.
             return num_saved, num_feat
+
+        if self.transaction_decorator is not None:
+            _save = self.transaction_decorator(_save)
 
         nfeat = self.layer.num_feat
         if step and isinstance(step, int) and step < nfeat:

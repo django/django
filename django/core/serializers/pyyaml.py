@@ -6,6 +6,7 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 
 import decimal
 import yaml
+import sys
 from io import StringIO
 
 from django.db import models
@@ -14,8 +15,15 @@ from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils import six
 
+# Use the C (faster) implementation if possible
+try:
+    from yaml import CSafeLoader as SafeLoader
+    from yaml import CSafeDumper as SafeDumper
+except ImportError:
+    from yaml import SafeLoader, SafeDumper
 
-class DjangoSafeDumper(yaml.SafeDumper):
+
+class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
         return self.represent_scalar('tag:yaml.org,2002:str', str(data))
 
@@ -58,10 +66,10 @@ def Deserializer(stream_or_string, **options):
     else:
         stream = stream_or_string
     try:
-        for obj in PythonDeserializer(yaml.safe_load(stream), **options):
+        for obj in PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options):
             yield obj
     except GeneratorExit:
         raise
     except Exception as e:
         # Map to deserializer error
-        raise DeserializationError(e)
+        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])

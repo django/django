@@ -126,12 +126,6 @@ pages along with any interesting information from the objects themselves::
         </span>
     </div>
 
-.. versionchanged:: 1.4
-    Previously, you would need to use
-    ``{% for contact in contacts.object_list %}``, since the ``Page``
-    object was not iterable.
-
-
 ``Paginator`` objects
 =====================
 
@@ -205,8 +199,8 @@ Attributes
 
 .. exception:: InvalidPage
 
-	A base class for exceptions raised when a paginator is passed an invalid
-	page number.
+    A base class for exceptions raised when a paginator is passed an invalid
+    page number.
 
 The :meth:`Paginator.page` method raises an exception if the requested page is
 invalid (i.e., not an integer) or contains no objects. Generally, it's enough
@@ -234,7 +228,6 @@ using :meth:`Paginator.page`.
 
 .. class:: Page(object_list, number, paginator)
 
-.. versionadded:: 1.4
     A page acts like a sequence of :attr:`Page.object_list` when using
     ``len()`` or iterating it directly.
 

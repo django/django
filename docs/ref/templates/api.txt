@@ -221,13 +221,12 @@ straight lookups. Here are some things to keep in mind:
         self.database_record.delete()
     sensitive_function.alters_data = True
 
-* .. versionadded:: 1.4
-     Occasionally you may want to turn off this feature for other reasons,
-     and tell the template system to leave a variable un-called no matter
-     what.  To do so, set a ``do_not_call_in_templates`` attribute on the
-     callable with the value ``True``.  The template system then will act as
-     if your variable is not callable (allowing you to access attributes of
-     the callable, for example).
+* Occasionally you may want to turn off this feature for other reasons,
+  and tell the template system to leave a variable un-called no matter
+  what.  To do so, set a ``do_not_call_in_templates`` attribute on the
+  callable with the value ``True``.  The template system then will act as
+  if your variable is not callable (allowing you to access attributes of
+  the callable, for example).
 
 .. _invalid-template-variables:
 
@@ -558,15 +557,17 @@ Note that these paths should use Unix-style forward slashes, even on Windows.
 The Python API
 ~~~~~~~~~~~~~~
 
-Django has two ways to load templates from files:
+.. module:: django.template.loader
 
-.. function:: django.template.loader.get_template(template_name)
+``django.template.loader`` has two functions to load templates from files:
+
+.. function:: get_template(template_name)
 
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
     ``django.template.TemplateDoesNotExist``.
 
-.. function:: django.template.loader.select_template(template_name_list)
+.. function:: select_template(template_name_list)
 
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
@@ -631,11 +632,19 @@ by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
 should be a tuple of strings, where each string represents a template loader
 class. Here are the template loaders that come with Django:
 
+.. currentmodule:: django.template.loaders
+
 ``django.template.loaders.filesystem.Loader``
+
+.. class:: filesystem.Loader
+
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
     This loader is enabled by default.
 
 ``django.template.loaders.app_directories.Loader``
+
+.. class:: app_directories.Loader
+
     Loads templates from Django apps on the filesystem. For each app in
     :setting:`INSTALLED_APPS`, the loader looks for a ``templates``
     subdirectory. If the directory exists, Django looks for templates in there.
@@ -670,12 +679,18 @@ class. Here are the template loaders that come with Django:
     This loader is enabled by default.
 
 ``django.template.loaders.eggs.Loader``
+
+.. class:: eggs.Loader
+
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
 
     This loader is disabled by default.
 
 ``django.template.loaders.cached.Loader``
+
+.. class:: cached.Loader
+
     By default, the templating system will read and compile your templates every
     time they need to be rendered. While the Django templating system is quite
     fast, the overhead from reading and compiling templates can add up.

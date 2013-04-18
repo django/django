@@ -242,8 +242,9 @@ class DeletionMixin(object):
         redirects to the success URL.
         """
         self.object = self.get_object()
+        success_url = self.get_success_url()
         self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(success_url)
 
     # Add support for browsers which only accept GET and POST for now.
     def post(self, *args, **kwargs):
@@ -251,7 +252,7 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            return self.success_url
+            return self.success_url % self.object.__dict__
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

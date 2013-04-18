@@ -132,6 +132,8 @@ Customizing error views
 The 404 (page not found) view
 -----------------------------
 
+.. function:: django.views.defaults.page_not_found(request, template_name='404.html')
+
 When you raise an ``Http404`` exception, Django loads a special view devoted
 to handling 404 errors. By default, it's the view
 ``django.views.defaults.page_not_found``, which either produces a very simple
@@ -198,8 +200,6 @@ One thing to note about 500 views:
 
 The 403 (HTTP Forbidden) view
 -----------------------------
-
-.. versionadded:: 1.4
 
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by

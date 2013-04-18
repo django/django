@@ -4,8 +4,6 @@
 Time zones
 ==========
 
-.. versionadded:: 1.4
-
 .. _time-zones-overview:
 
 Overview
@@ -312,7 +310,7 @@ time zone is unset, the default time zone applies.
 get_current_timezone
 ~~~~~~~~~~~~~~~~~~~~
 
-When the :func:`django.core.context_processors.tz` context processor is
+When the ``django.core.context_processors.tz`` context processor is
 enabled -- by default, it is -- each :class:`~django.template.RequestContext`
 contains a ``TIME_ZONE`` variable that provides the name of the current time
 zone.
@@ -456,8 +454,9 @@ zone support.
 
 Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
 "naive" format. If your project contains such fixtures, after you enable time
-zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
-rid of the warnings, you must convert your fixtures to the "aware" format.
+zone support, you'll see :exc:`~exceptions.RuntimeWarning`\ s when you load
+them. To get rid of the warnings, you must convert your fixtures to the "aware"
+format.
 
 You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
 Or, if they're small enough, you can simply edit them to add the UTC offset
@@ -660,7 +659,7 @@ Usage
        datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
 
    Note that ``localize`` is a pytz extension to the :class:`~datetime.tzinfo`
-   API. Also, you may want to catch :exc:`~pytz.InvalidTimeError`. The
+   API. Also, you may want to catch ``pytz.InvalidTimeError``. The
    documentation of pytz contains `more examples`_. You should review it
    before attempting to manipulate aware datetimes.
 

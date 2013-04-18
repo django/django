@@ -1,0 +1,76 @@
+[
+    {
+        "pk": 1,
+        "model": "known_related_objects.tournament",
+        "fields": {
+            "name": "Tourney 1"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "known_related_objects.tournament",
+        "fields": {
+            "name": "Tourney 2"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "known_related_objects.organiser",
+        "fields": {
+            "name": "Organiser 1"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "known_related_objects.pool",
+        "fields": {
+            "tournament": 1,
+            "organiser": 1,
+            "name": "T1 Pool 1"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "known_related_objects.pool",
+        "fields": {
+            "tournament": 1,
+            "organiser": 1,
+            "name": "T1 Pool 2"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "known_related_objects.pool",
+        "fields": {
+            "tournament": 2,
+            "organiser": 1,
+            "name": "T2 Pool 1"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "known_related_objects.pool",
+        "fields": {
+            "tournament": 2,
+            "organiser": 1,
+            "name": "T2 Pool 2"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "known_related_objects.poolstyle",
+        "fields": {
+            "name": "T1 Pool 2 Style",
+            "pool": 2
+        }
+    },
+    {
+        "pk": 2,
+        "model": "known_related_objects.poolstyle",
+        "fields": {
+            "name": "T2 Pool 1 Style",
+            "pool": 3
+        }
+    }
+]
+

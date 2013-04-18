@@ -20,7 +20,7 @@ Here's an example::
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
         writer = csv.writer(response)
@@ -92,7 +92,7 @@ Here's an example, which generates the same CSV file as above::
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
         # The data is hard-coded here, but you could load it from a database or
@@ -111,7 +111,7 @@ Here's an example, which generates the same CSV file as above::
 
 The only difference between this example and the previous example is that this
 one uses template loading instead of the CSV module. The rest of the code --
-such as the ``mimetype='text/csv'`` -- is the same.
+such as the ``content_type='text/csv'`` -- is the same.
 
 Then, create the template ``my_template_name.txt``, with this template code:
 

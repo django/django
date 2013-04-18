@@ -10,9 +10,12 @@ import sys
 # still present in site-packages. See #18115.
 overlay_warning = False
 if "install" in sys.argv:
-    # We have to try also with an explicit prefix of /usr/local in order to
-    # catch Debian's custom user site-packages directory.
-    for lib_path in get_python_lib(), get_python_lib(prefix="/usr/local"):
+    lib_paths = [get_python_lib()]
+    if lib_paths[0].startswith("/usr/lib/"):
+        # We have to try also with an explicit prefix of /usr/local in order to
+        # catch Debian's custom user site-packages directory.
+        lib_paths.append(get_python_lib(prefix="/usr/local"))
+    for lib_path in lib_paths:
         existing_path = os.path.abspath(os.path.join(lib_path, "django"))
         if os.path.exists(existing_path):
             # We note the need for the warning here, but present it after the
@@ -68,9 +71,7 @@ django_dir = 'django'
 
 for dirpath, dirnames, filenames in os.walk(django_dir):
     # Ignore PEP 3147 cache dirs and those whose names start with '.'
-    for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.') or dirname == '__pycache__':
-            del dirnames[i]
+    dirnames[:] = [d for d in dirnames if not d.startswith('.') and d != '__pycache__']
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)))
     elif filenames:
@@ -92,7 +93,7 @@ setup(
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
-    download_url = 'https://www.djangoproject.com/m/releases/1.4/Django-1.4.tar.gz',
+    license = "BSD",
     packages = packages,
     cmdclass = cmdclasses,
     data_files = data_files,
@@ -107,6 +108,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: WSGI',

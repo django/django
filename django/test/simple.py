@@ -10,7 +10,7 @@ from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-__all__ = ('DjangoTestSuiteRunner')
+__all__ = ('DjangoTestSuiteRunner',)
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
@@ -42,6 +42,13 @@ def get_tests(app_module):
     return test_module
 
 
+def make_doctest(module):
+    return doctest.DocTestSuite(module,
+       checker=doctestOutputChecker,
+       runner=DocTestRunner,
+    )
+
+
 def build_suite(app_module):
     """
     Create a complete Django test suite for the provided application module.
@@ -56,9 +63,7 @@ def build_suite(app_module):
         suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
             app_module))
         try:
-            suite.addTest(doctest.DocTestSuite(app_module,
-                                               checker=doctestOutputChecker,
-                                               runner=DocTestRunner))
+            suite.addTest(make_doctest(app_module))
         except ValueError:
             # No doc tests in models.py
             pass
@@ -75,9 +80,7 @@ def build_suite(app_module):
             suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
                 test_module))
             try:
-                suite.addTest(doctest.DocTestSuite(
-                    test_module, checker=doctestOutputChecker,
-                    runner=DocTestRunner))
+                suite.addTest(make_doctest(test_module))
             except ValueError:
                 # No doc tests in tests.py
                 pass
@@ -130,9 +133,7 @@ def build_test(label):
     tests = []
     for module in app_module, test_module:
         try:
-            doctests = doctest.DocTestSuite(module,
-                                            checker=doctestOutputChecker,
-                                            runner=DocTestRunner)
+            doctests = make_doctest(module)
             # Now iterate over the suite, looking for doctests whose name
             # matches the pattern that was given
             for test in doctests:

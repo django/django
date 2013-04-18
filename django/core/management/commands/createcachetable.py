@@ -53,14 +53,13 @@ class Command(LabelCommand):
         for i, line in enumerate(table_output):
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
-        curs = connection.cursor()
-        try:
-            curs.execute("\n".join(full_statement))
-        except DatabaseError as e:
-            transaction.rollback_unless_managed(using=db)
-            raise CommandError(
-                "Cache table '%s' could not be created.\nThe error was: %s." %
-                    (tablename, force_text(e)))
-        for statement in index_output:
-            curs.execute(statement)
-        transaction.commit_unless_managed(using=db)
+        with transaction.commit_on_success_unless_managed():
+            curs = connection.cursor()
+            try:
+                curs.execute("\n".join(full_statement))
+            except DatabaseError as e:
+                raise CommandError(
+                    "Cache table '%s' could not be created.\nThe error was: %s." %
+                        (tablename, force_text(e)))
+            for statement in index_output:
+                curs.execute(statement)
