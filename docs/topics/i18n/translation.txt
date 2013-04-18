@@ -1030,11 +1030,11 @@ prepend the current active language code to all url patterns defined within
     from django.conf.urls import patterns, include, url
     from django.conf.urls.i18n import i18n_patterns
 
-    urlpatterns = patterns(''
+    urlpatterns = patterns('',
         url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
     )
 
-    news_patterns = patterns(''
+    news_patterns = patterns('',
         url(r'^$', 'news.views.index', name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
         url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
