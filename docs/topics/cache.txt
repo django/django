@@ -39,6 +39,8 @@ Django also works well with "upstream" caches, such as `Squid
 caches that you don't directly control but to which you can provide hints (via
 HTTP headers) about which parts of your site should be cached, and how.
 
+.. _setting-up-the-cache:
+
 Setting up the cache
 ====================
 
@@ -151,6 +153,8 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. _database-caching:
 
 Database caching
 ----------------
