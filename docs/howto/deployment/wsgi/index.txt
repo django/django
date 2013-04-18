@@ -71,7 +71,7 @@ Applying WSGI middleware
 ------------------------
 
 To apply `WSGI middleware`_ you can simply wrap the application object. For
-istance you could add these lines at the bottom of :file:`wsgi.py`::
+instance you could add these lines at the bottom of :file:`wsgi.py`::
 
     from helloworld.wsgi import HelloWorldApplication
     application = HelloWorldApplication(application)
