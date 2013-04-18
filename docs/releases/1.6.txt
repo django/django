@@ -423,6 +423,13 @@ Miscellaneous
   ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
   corresponding field type.
 
+* Form field's :attr:`~django.forms.Field.error_messages` that contain a
+  placeholder should now always use a named placeholder (``"Value '%(value)s' is
+  too big"`` instead of ``"Value '%s' is too big"``). See the corresponding
+  field documentation for details about the names of the placeholders. The
+  changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
+  :class:`~django.forms.ModelMultipleChoiceField`.
+
 Features deprecated in 1.6
 ==========================
 
