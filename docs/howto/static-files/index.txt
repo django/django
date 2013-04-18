@@ -32,7 +32,7 @@ Configuring static files
         {% load staticfiles %}
         <img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
 
-3. Store your static files in a folder called ``static`` in your app. For
+4. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/myimage.jpg``.
 
 Now, if you use ``./manage.py runserver``, all static files should be served
