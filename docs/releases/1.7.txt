@@ -30,6 +30,14 @@ In addition, the widgets now display a help message when the browser and
 server time zone are different, to clarify how the value inserted in the field
 will be interpreted.
 
+Minor features
+~~~~~~~~~~~~~~
+
+* The new :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -40,6 +48,14 @@ Backwards incompatible changes in 1.7
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file()`
+  method is now passed an additional ``content_type_extra`` parameter. If you
+  have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
+  that implements ``new_file()``, be sure it accepts this new parameter.
 
 Features deprecated in 1.7
 ==========================

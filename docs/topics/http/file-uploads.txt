@@ -240,6 +240,18 @@ In addition to those inherited from :class:`~django.core.files.File`, all
     need to validate that the file contains the content that the content-type
     header claims -- "trust but verify."
 
+.. attribute:: UploadedFile.content_type_extra
+
+    .. versionadded:: 1.7
+
+    A dictionary containing extra parameters passed to the ``content-type``
+    header. This is typically provided by services, such as Google App Engine,
+    that intercept and handle file uploads on your behalf. As a result your
+    handler may not receive the uploaded file content, but instead a URL or
+    other pointer to the file. (see `RFC 2388`_ section 5.3).
+
+    .. _RFC 2388: http://www.ietf.org/rfc/rfc2388.txt
+
 .. attribute:: UploadedFile.charset
 
     For :mimetype:`text/*` content-types, the character set (i.e. ``utf8``)
@@ -350,6 +362,10 @@ list::
 Writing custom upload handlers
 ------------------------------
 
+.. currentmodule:: django.core.files.uploadhandler
+
+.. class:: FileUploadHandler
+
 All file upload handlers should be subclasses of
 ``django.core.files.uploadhandler.FileUploadHandler``. You can define upload
 handlers wherever you wish.
@@ -359,7 +375,8 @@ Required methods
 
 Custom file upload handlers **must** define the following methods:
 
-``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
+.. method:: FileUploadHandler.receive_data_chunk(self, raw_data, start)
+
     Receives a "chunk" of data from the file upload.
 
     ``raw_data`` is a byte string containing the uploaded data.
@@ -379,7 +396,8 @@ Custom file upload handlers **must** define the following methods:
     If you raise a ``StopUpload`` or a ``SkipFile`` exception, the upload
     will abort or the file will be completely skipped.
 
-``FileUploadHandler.file_complete(self, file_size)``
+.. method:: FileUploadHandler.file_complete(self, file_size)
+
     Called when a file has finished uploading.
 
     The handler should return an ``UploadedFile`` object that will be stored
@@ -392,7 +410,8 @@ Optional methods
 Custom upload handlers may also define any of the following optional methods or
 attributes:
 
-``FileUploadHandler.chunk_size``
+.. attribute:: FileUploadHandler.chunk_size
+
     Size, in bytes, of the "chunks" Django should store into memory and feed
     into the handler. That is, this attribute controls the size of chunks
     fed into ``FileUploadHandler.receive_data_chunk``.
@@ -404,7 +423,8 @@ attributes:
 
     The default is 64*2\ :sup:`10` bytes, or 64 KB.
 
-``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
+.. method:: FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset, content_type_extra)
+
     Callback signaling that a new file upload is starting. This is called
     before any data has been fed to any upload handlers.
 
@@ -421,13 +441,23 @@ attributes:
     ``charset`` is the character set (i.e. ``utf8``) given by the browser.
     Like ``content_length``, this sometimes won't be provided.
 
+    ``content_type_extra`` is extra information about the file from the
+    ``content-type`` header. See :attr:`UploadedFile.content_type_extra
+    <django.core.files.uploadedfile.UploadedFile.content_type_extra>`.
+
     This method may raise a ``StopFutureHandlers`` exception to prevent
     future handlers from handling this file.
 
-``FileUploadHandler.upload_complete(self)``
+    .. versionadded:: 1.7
+
+        The ``content_type_extra`` parameter was added.
+
+.. method:: FileUploadHandler.upload_complete(self)
+
     Callback signaling that the entire upload (all files) has completed.
 
-``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
+.. method:: FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)
+
     Allows the handler to completely override the parsing of the raw
     HTTP input.
 
