@@ -165,6 +165,29 @@ class SettingsTests(TestCase):
             del settings.USE_I18N
             self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
         self.assertEqual(settings.USE_I18N, previous_i18n)
+    
+    def test_override_settings_nested(self):
+        """
+        Test that override_settings uses the actual _wrapped attribute at
+        runtime, not when it was instatiated.
+        """
+        
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+        
+        inner = override_settings(TEST2='override')
+        with override_settings(TEST='override'):
+            self.assertEqual('override', settings.TEST)
+            with inner:
+                self.assertEqual('override', settings.TEST)
+                self.assertEqual('override', settings.TEST2)
+            # inner's __exit__ should have restored the settings of the outer
+            # context manager, not those when the class was instantiated
+            self.assertEqual('override', settings.TEST)
+            self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+        
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
     def test_allowed_include_roots_string(self):
         """
