@@ -453,7 +453,7 @@ class SchemaTests(TransactionTestCase):
         Tag.objects.create(title="foo", slug="foo")
         Tag.objects.create(title="bar", slug="foo")
         connection.rollback()
-        # Alter the slug field to be non-unique
+        # Alter the slug field to be unique
         new_new_field = SlugField(unique=True)
         new_new_field.set_attributes_from_name("slug")
         editor = connection.schema_editor()
