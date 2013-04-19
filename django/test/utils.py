@@ -207,7 +207,6 @@ class override_settings(object):
     """
     def __init__(self, **kwargs):
         self.options = kwargs
-        self.wrapped = settings._wrapped
 
     def __enter__(self):
         self.enable()
@@ -246,6 +245,7 @@ class override_settings(object):
         override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
             setattr(override, key, new_value)
+        self.wrapped = settings._wrapped
         settings._wrapped = override
         for key, new_value in self.options.items():
             setting_changed.send(sender=settings._wrapped.__class__,
@@ -253,6 +253,7 @@ class override_settings(object):
 
     def disable(self):
         settings._wrapped = self.wrapped
+        del self.wrapped
         for key in self.options:
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
