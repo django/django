@@ -317,6 +317,9 @@ Division
         def __idiv__(self, other):  # Python 2 compatibility
             return type(self).__itruediv__(self, other)
 
+Special methods are looked up on the class and not on the instance to reflect
+the behavior of the Python interpreter.
+
 .. module: django.utils.six
 
 Writing compatible code with six
