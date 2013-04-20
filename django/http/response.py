@@ -14,7 +14,7 @@ from django.core import signing
 from django.core.exceptions import DisallowedRedirect
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, iri_to_uri
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
 
@@ -393,7 +393,7 @@ class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
-        parsed = urlparse(redirect_to)
+        parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
