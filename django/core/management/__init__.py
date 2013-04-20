@@ -3,13 +3,11 @@ import os
 import sys
 from optparse import OptionParser, NO_DEFAULT
 import imp
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
 from django.utils.importlib import import_module
-from django.utils._os import upath
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
@@ -45,6 +43,7 @@ def find_management_module(app_name):
     parts.reverse()
     part = parts.pop()
     path = None
+    paths = []
 
     # When using manage.py, the project module is added to the path,
     # loaded, then removed from the path. This means that
@@ -61,9 +60,23 @@ def find_management_module(app_name):
         if f:
             f.close()
 
+    paths.append(path)
+
+    for sys_path in sys.path:
+        try:
+            f, path, descr = imp.find_module(part, [sys_path])
+        except ImportError:
+            pass
+        else:
+            if f:
+                f.close()
+            if path not in paths:
+                paths.append(path)
+
     while parts:
         part = parts.pop()
-        f, path, descr = imp.find_module(part, path and [path] or None)
+        f, path, descr = imp.find_module(part, paths or None)
+        paths.append(path)
         if f:
             f.close()
     return path
