@@ -15,10 +15,13 @@ from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
 from django.test import TestCase
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, force_text
+from django.utils.functional import lazy
 from django.utils._os import upath
 from django.utils import six
 from django.utils import unittest
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class QueryDictTests(unittest.TestCase):
@@ -379,6 +382,10 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(list(i), [b'abc'])
         self.assertEqual(list(i), [])
 
+    def test_lazy_content(self):
+        r = HttpResponse(lazystr('helloworld'))
+        self.assertEqual(r.content, b'helloworld')
+
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")
@@ -414,6 +421,11 @@ class HttpResponseSubclassesTests(TestCase):
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
         # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
+
+    def test_redirect_lazy(self):
+        """Make sure HttpResponseRedirect works with lazy strings."""
+        r = HttpResponseRedirect(lazystr('/redirected/'))
+        self.assertEqual(r.url, '/redirected/')
 
     def test_not_modified(self):
         response = HttpResponseNotModified()
