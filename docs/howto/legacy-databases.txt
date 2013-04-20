@@ -75,8 +75,8 @@ access to your precious data on a model by model basis.
 
 .. versionchanged:: 1.6
 
-The behavior by which introspected models are created as unmanaged ones is new
-in Django 1.6.
+    The behavior by which introspected models are created as unmanaged ones is new
+    in Django 1.6.
 
 Install the core Django tables
 ==============================

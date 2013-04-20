@@ -206,6 +206,7 @@ Transaction middleware
 .. class:: TransactionMiddleware
 
 .. versionchanged:: 1.6
+
     ``TransactionMiddleware`` is deprecated. The documentation of transactions
     contains :ref:`upgrade instructions <transactions-upgrading-from-1.5>`.
 

@@ -234,18 +234,18 @@ lookup::
 
 .. versionadded:: 1.5
 
-Prior to Django 1.5,
-:meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model` and
-:meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
-always returned the :class:`~django.contrib.contenttypes.models.ContentType`
-associated with the concrete model of the specified one(s). That means there
-was no way to retrieve the
-:class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
-using those methods. As of Django 1.5 you can now pass a boolean flag –
-``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
-wether or not you want to retrieve the
-:class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
-direct model.
+    Prior to Django 1.5,
+    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model` and
+    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
+    always returned the :class:`~django.contrib.contenttypes.models.ContentType`
+    associated with the concrete model of the specified one(s). That means there
+    was no way to retrieve the
+    :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
+    using those methods. As of Django 1.5 you can now pass a boolean flag –
+    ``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
+    wether or not you want to retrieve the
+    :class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
+    direct model.
 
 Generic relations
 =================
