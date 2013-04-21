@@ -66,16 +66,17 @@ After the previous tutorials, our project should look like this::
             admin.py
             __init__.py
             models.py
-            tests.py
             static/
-                style.css
-                images/
-                    background.gif
+                polls
+                    images/
+                        background.gif
+                    style.css
             templates/
                 polls/
                     detail.html
                     index.html
                     results.html
+            tests.py
             urls.py
             views.py
         templates/
