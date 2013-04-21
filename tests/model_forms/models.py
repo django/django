@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import os
 import tempfile
 
+from django.core import validators
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
@@ -261,3 +262,12 @@ class Colour(models.Model):
 class ColourfulItem(models.Model):
     name = models.CharField(max_length=50)
     colours = models.ManyToManyField(Colour)
+
+class CustomErrorMessage(models.Model):
+    name1 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})
+
+    name2 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})
