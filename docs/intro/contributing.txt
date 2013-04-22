@@ -389,8 +389,8 @@ This is a new feature, so it should be documented.  Add the following on line
 
     .. versionadded:: 1.5
 
-    The current value of the field will be displayed as a clickable link above the
-    input widget.
+        The current value of the field will be displayed as a clickable link above the
+        input widget.
 
 For more information on writing documentation, including an explanation of what
 the ``versionadded`` bit is all about, see

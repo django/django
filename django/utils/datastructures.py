@@ -14,6 +14,12 @@ class MergeDict(object):
     def __init__(self, *dicts):
         self.dicts = dicts
 
+    def __bool__(self):
+        return any(self.dicts)
+
+    def __nonzero__(self):
+        return type(self).__bool__(self)
+
     def __getitem__(self, key):
         for dict_ in self.dicts:
             try:

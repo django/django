@@ -1486,6 +1486,7 @@ randomly-generated ``SECRET_KEY`` to each new project.
     execution vulnerabilities.
 
 .. versionchanged:: 1.5
+
     Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
@@ -1771,7 +1772,7 @@ See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
 .. versionchanged:: 1.6
 
-Input format with microseconds has been added.
+    Input format with microseconds has been added.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -2055,11 +2056,11 @@ decorator, for example.
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGIN_URL
 
@@ -2073,11 +2074,11 @@ The URL where requests are redirected for login, especially when using the
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGOUT_URL
 

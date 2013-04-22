@@ -51,6 +51,7 @@ Optional arguments
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
     .. versionchanged:: 1.5
+
         This parameter used to be called ``mimetype``.
 
 ``status``
@@ -129,6 +130,7 @@ Optional arguments
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
     .. versionchanged:: 1.5
+
         This parameter used to be called ``mimetype``.
 
 

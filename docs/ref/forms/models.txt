@@ -42,7 +42,7 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-    The ``widgets`` and the ``validate_max`` parameters were added.
+        The ``widgets`` and the ``validate_max`` parameters were added.
 
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False)
 
@@ -57,4 +57,4 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-    The ``widgets`` and the ``validate_max`` parameters were added.
+        The ``widgets`` and the ``validate_max`` parameters were added.

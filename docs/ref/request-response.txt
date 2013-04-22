@@ -94,6 +94,7 @@ All attributes should be considered read-only, unless stated otherwise below.
     :attr:`HttpRequest.body` attribute instead.
 
     .. versionchanged:: 1.5
+
         Before Django 1.5, HttpRequest.POST contained non-form data.
 
     It's possible that a request can come in via POST with an empty ``POST``
@@ -563,19 +564,19 @@ streaming response if (and only if) no middleware accesses the
 
 .. versionchanged:: 1.5
 
-This technique is fragile and was deprecated in Django 1.5. If you need the
-response to be streamed from the iterator to the client, you should use the
-:class:`StreamingHttpResponse` class instead.
+    This technique is fragile and was deprecated in Django 1.5. If you need the
+    response to be streamed from the iterator to the client, you should use the
+    :class:`StreamingHttpResponse` class instead.
 
-As of Django 1.7, when :class:`HttpResponse` is instantiated with an
-iterator, it will consume it immediately, store the response content as a
-string, and discard the iterator.
+    As of Django 1.7, when :class:`HttpResponse` is instantiated with an
+    iterator, it will consume it immediately, store the response content as a
+    string, and discard the iterator.
 
 .. versionchanged:: 1.5
 
-You can now use :class:`HttpResponse` as a file-like object even if it was
-instantiated with an iterator. Django will consume and save the content of
-the iterator on first access.
+    You can now use :class:`HttpResponse` as a file-like object even if it was
+    instantiated with an iterator. Django will consume and save the content of
+    the iterator on first access.
 
 Setting headers
 ~~~~~~~~~~~~~~~

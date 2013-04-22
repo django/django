@@ -124,8 +124,8 @@ Calling ``DeserializedObject.save()`` saves the object to the database.
 
 .. versionchanged:: 1.6
 
-In previous versions of Django, the ``pk`` attribute had to be present
-on the serialized data or a ``DeserializationError`` would be raised.
+    In previous versions of Django, the ``pk`` attribute had to be present
+    on the serialized data or a ``DeserializationError`` would be raised.
 
 This ensures that deserializing is a non-destructive operation even if the
 data in your serialized representation doesn't match what's currently in the
@@ -144,11 +144,11 @@ The Django object itself can be inspected as ``deserialized_object.object``.
 
 .. versionadded:: 1.5
 
-If fields in the serialized data do not exist on a model,
-a ``DeserializationError`` will be raised unless the ``ignorenonexistent``
-argument is passed in as True::
+    If fields in the serialized data do not exist on a model,
+    a ``DeserializationError`` will be raised unless the ``ignorenonexistent``
+    argument is passed in as True::
 
-    serializers.deserialize("xml", data, ignorenonexistent=True)
+        serializers.deserialize("xml", data, ignorenonexistent=True)
 
 .. _serialization-formats:
 

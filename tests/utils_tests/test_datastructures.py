@@ -203,6 +203,13 @@ class MergeDictTests(SimpleTestCase):
                            ('key2', ['value2', 'value3']),
                            ('key4', ['value5', 'value6'])])
 
+    def test_bool_casting(self):
+        empty = MergeDict({}, {}, {})
+        not_empty = MergeDict({}, {}, {"key": "value"})
+        self.assertFalse(empty)
+        self.assertTrue(not_empty)
+
+
 class MultiValueDictTests(SimpleTestCase):
 
     def test_multivaluedict(self):

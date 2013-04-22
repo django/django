@@ -204,6 +204,7 @@ Dealing with streaming responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionchanged:: 1.5
+
     ``response`` may also be an :class:`~django.http.StreamingHttpResponse`
     object.
 

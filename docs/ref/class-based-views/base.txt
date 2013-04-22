@@ -105,6 +105,7 @@ TemplateView
     in the URL.
 
     .. versionchanged:: 1.5
+
         The context used to be populated with a ``{{ params }}`` dictionary of
         the parameters captured in the URL. Now those parameters are first-level
         context variables.

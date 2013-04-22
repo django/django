@@ -83,9 +83,9 @@ processing at the first positive match.
 
 .. versionadded:: 1.6
 
-If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-exception, authentication will immediately fail. Django won't check the
-backends that follow.
+    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+    exception, authentication will immediately fail. Django won't check the
+    backends that follow.
 
 Writing an authentication backend
 ---------------------------------
