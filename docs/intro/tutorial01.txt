@@ -589,27 +589,33 @@ Wait a minute. ``<Poll: Poll object>`` is, utterly, an unhelpful representation
 of this object. Let's fix that by editing the polls model (in the
 ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__unicode__` method to both ``Poll`` and
-``Choice``::
+``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
+following example::
 
     class Poll(models.Model):
         # ...
-        def __unicode__(self):
+        def __unicode__(self):  # Python 3: def __str__(self):
             return self.question
 
     class Choice(models.Model):
         # ...
-        def __unicode__(self):
+        def __unicode__(self):  # Python 3: def __str__(self):
             return self.choice_text
 
-It's important to add :meth:`~django.db.models.Model.__unicode__` methods to
-your models, not only for your own sanity when dealing with the interactive
-prompt, but also because objects' representations are used throughout Django's
-automatically-generated admin.
+It's important to add :meth:`~django.db.models.Model.__unicode__` methods (or
+:meth:`~django.db.models.Model.__str__` on Python 3) to your models, not only
+for your own sanity when dealing with the interactive prompt, but also because
+objects' representations are used throughout Django's automatically-generated
+admin.
 
-.. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not
+.. admonition:: :meth:`~django.db.models.Model.__unicode__` or
                 :meth:`~django.db.models.Model.__str__`?
 
-    If you're familiar with Python, you might be in the habit of adding
+    On Python 3, things are simpler, just use
+    :meth:`~django.db.models.Model.__str__` and forget about
+    :meth:`~django.db.models.Model.__unicode__`.
+
+    If you're familiar with Python 2, you might be in the habit of adding
     :meth:`~django.db.models.Model.__str__` methods to your classes, not
     :meth:`~django.db.models.Model.__unicode__` methods. We use
     :meth:`~django.db.models.Model.__unicode__` here because Django models deal
