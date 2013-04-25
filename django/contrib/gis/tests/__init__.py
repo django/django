@@ -1,12 +1,3 @@
-from django.conf import settings
-from django.test.simple import build_suite, DjangoTestSuiteRunner
-from django.utils import unittest
-
-from .test_geoforms import GeometryFieldTest
-from .test_measure import DistanceTest, AreaTest
-from .test_spatialrefsys import SpatialRefSysTest
-
-
 def geo_apps(namespace=True, runtests=False):
     """
     Returns a list of GeoDjango test applications that reside in
