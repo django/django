@@ -18,6 +18,12 @@ from .models import Country, City, PennsylvaniaCity, State, Track
 if not spatialite:
     from .models import Feature, MinusOneSRID
 
+
+def postgis_bug_version():
+    spatial_version = getattr(connection.ops, "spatial_version", (0,0,0))
+    return (2, 0, 0) <= spatial_version <= (2, 0, 1)
+
+
 class GeoModelTest(TestCase):
 
     def test_fixtures(self):
@@ -292,7 +298,7 @@ class GeoLookupTest(TestCase):
 
     # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
     # http://trac.osgeo.org/postgis/ticket/2035
-    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+    if postgis_bug_version():
         test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
