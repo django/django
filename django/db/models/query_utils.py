@@ -194,7 +194,7 @@ def deferred_class_factory(model, attrs):
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
     name = util.truncate_name(name, 80, 32)
 
-    overrides = dict([(attr, DeferredAttribute(attr, model)) for attr in attrs])
+    overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
     overrides["Meta"] = Meta
     overrides["__module__"] = model.__module__
     overrides["_deferred"] = True
