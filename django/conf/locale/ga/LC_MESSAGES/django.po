@@ -837,15 +837,15 @@ msgstr "nóin"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "Luan"
+msgstr "Dé Luain"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "Máirt"
+msgstr "Dé Máirt"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "Céadaoin"
+msgstr "Dé Céadaoin"
 
 #: utils/dates.py:6
 msgid "Thursday"
@@ -853,15 +853,15 @@ msgstr "Déardaoin"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "Aoine"
+msgstr "Dé hAoine"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "Satharn"
+msgstr "Dé Sathairn"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "Domhnach"
+msgstr "Dé Domhnaigh"
 
 #: utils/dates.py:10
 msgid "Mon"
