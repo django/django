@@ -30,11 +30,3 @@ class DriverTest(unittest.TestCase):
         for alias, full_name in aliases.items():
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DriverTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

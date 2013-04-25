@@ -111,12 +111,3 @@ class GeoIPTest(unittest.TestCase):
         g = GeoIP()
         d = g.country('whitehouse.gov')
         self.assertEqual('US', d['country_code'])
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GeoIPTest))
-    return s
-
-def run(verbosity=1):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

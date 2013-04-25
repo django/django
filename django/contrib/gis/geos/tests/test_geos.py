@@ -1091,12 +1091,3 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

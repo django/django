@@ -476,11 +476,3 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing equivalence methods with non-OGRGeometry instances."
         self.assertNotEqual(None, OGRGeometry('POINT(0 0)'))
         self.assertEqual(False, OGRGeometry('LINESTRING(0 0, 1 1)') == 3)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(OGRGeomTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

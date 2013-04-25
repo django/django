@@ -85,11 +85,3 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual((-1, 0, 5, 5), self.e)
         self.e.expand_to_include(TestPoint(10, 10))
         self.assertEqual((-1, 0, 10, 10), self.e)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(EnvelopeTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

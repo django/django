@@ -155,11 +155,3 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertEqual(None, s1['FOOBAR'])
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(SpatialRefTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

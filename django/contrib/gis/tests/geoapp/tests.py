@@ -15,11 +15,6 @@ from django.utils import six, unittest
 
 from .models import Country, City, PennsylvaniaCity, State, Track
 
-from .test_feeds import GeoFeedTest
-from .test_regress import GeoRegressionTests
-from .test_sitemaps import GeoSitemapTest
-
-
 if not spatialite:
     from .models import Feature, MinusOneSRID
 

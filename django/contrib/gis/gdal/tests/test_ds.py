@@ -236,11 +236,3 @@ class DataSourceTest(unittest.TestCase):
         feat = ds[0][0]
         # Reference value obtained using `ogrinfo`.
         self.assertEqual(676586997978, feat.get('ALAND10'))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DataSourceTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

@@ -109,11 +109,3 @@ class GEOSIOTest(unittest.TestCase):
             wkb_w.srid = True
             self.assertEqual(hex3d_srid, wkb_w.write_hex(g))
             self.assertEqual(wkb3d_srid, wkb_w.write(g))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSIOTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

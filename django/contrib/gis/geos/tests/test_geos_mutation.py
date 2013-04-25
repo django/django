@@ -122,14 +122,3 @@ class GEOSMutationTest(unittest.TestCase):
             lsa = MultiPoint(*map(Point,((5,5),(3,-2),(8,1))))
             for f in geos_function_tests:
                 self.assertEqual(f(lsa), f(mp), 'MultiPoint ' + f.__name__)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSMutationTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-if __name__ == '__main__':
-    run()
