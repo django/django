@@ -47,9 +47,9 @@ def _get_locale_dirs(include_core=True):
 def _tx_resource_for_name(name):
     """ Return the Transifex resource name """
     if name == 'core':
-        return "django.core"
+        return "django-core.core"
     else:
-        return "django.contrib-%s" % name
+        return "django-core.contrib-%s" % name
 
 def _check_diff(cat_name, base_path):
     """
