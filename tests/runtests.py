@@ -48,11 +48,6 @@ ALWAYS_INSTALLED_APPS = [
     'staticfiles_tests.apps.no_label',
 ]
 
-def geodjango(settings):
-    # All databases must have spatial backends to run GeoDjango tests.
-    spatial_dbs = [name for name, db_dict in settings.DATABASES.items()
-                   if db_dict['ENGINE'].startswith('django.contrib.gis')]
-    return len(spatial_dbs) == len(settings.DATABASES)
 
 def get_test_modules():
     modules = []
@@ -122,7 +117,8 @@ def setup(verbosity, test_labels):
 
     # If GeoDjango, then we'll want to add in the test applications
     # that are a part of its test suite.
-    if geodjango(settings):
+    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+    if HAS_SPATIAL_DB:
         from django.contrib.gis.tests import geo_apps
         test_modules.extend(geo_apps(runtests=True))
         settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
