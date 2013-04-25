@@ -2,15 +2,23 @@
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
 
-from django.contrib.gis.geos import *
-from django.contrib.gis.geos.error import GEOSIndexError
 from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+from .. import HAS_GEOS
+
+if HAS_GEOS:
+    from .. import *
+    from ..error import GEOSIndexError
+
 
 def getItem(o,i): return o[i]
 def delItem(o,i): del o[i]
 def setItem(o,i,v): o[i] = v
 
-def api_get_distance(x): return x.distance(Point(-200,-200))
+if HAS_GEOS:
+    def api_get_distance(x): return x.distance(Point(-200,-200))
+
 def api_get_buffer(x): return x.buffer(10)
 def api_get_geom_typeid(x): return x.geom_typeid
 def api_get_num_coords(x): return x.num_coords
@@ -29,6 +37,8 @@ geos_function_tests =  [ val for name, val in vars().items()
                         if hasattr(val, '__call__')
                         and name.startswith('api_get_') ]
 
+
+@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSMutationTest(unittest.TestCase):
     """
     Tests Pythonic Mutability of Python GEOS geometry wrappers
