@@ -209,6 +209,14 @@ class MergeDictTests(SimpleTestCase):
         self.assertFalse(empty)
         self.assertTrue(not_empty)
 
+    def test_key_error(self):
+        """
+        Test that the message of KeyError contains the missing key name.
+        """
+        d1 = MergeDict({'key1': 42})
+        with six.assertRaisesRegex(self, KeyError, 'key2'):
+            d1['key2']
+
 
 class MultiValueDictTests(SimpleTestCase):
 
