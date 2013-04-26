@@ -26,7 +26,7 @@ class MergeDict(object):
                 return dict_[key]
             except KeyError:
                 pass
-        raise KeyError
+        raise KeyError(key)
 
     def __copy__(self):
         return self.__class__(*self.dicts)
