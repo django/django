@@ -141,6 +141,19 @@ class Template(object):
         finally:
             context.render_context.pop()
 
+    def _stream(self, context):
+        "Wraps the generator"
+        context.render_context.push()
+        try:
+            for chunk in self.nodelist.stream(context):
+                yield chunk
+        finally:
+            context.render_context.pop()
+
+    def stream(self, context):
+        "Display stage -- can be called many times"
+        return self._stream(context)
+
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
     if settings.TEMPLATE_DEBUG:
@@ -808,6 +821,12 @@ class Node(object):
         """
         pass
 
+    def stream(self, context):
+        """
+        Return a generator that progressively renders the node
+        """
+        yield self.render(context)
+
     def __iter__(self):
         yield self
 
@@ -831,14 +850,20 @@ class NodeList(list):
     contains_nontext = False
 
     def render(self, context):
-        bits = []
+        return mark_safe(''.join(self.stream(context)))
+
+    def stream(self, context):
         for node in self:
-            if isinstance(node, Node):
-                bit = self.render_node(node, context)
-            else:
-                bit = node
-            bits.append(force_text(bit))
-        return mark_safe(''.join(bits))
+            try:
+                if isinstance(node, Node):
+                    for bit in self.stream_node(node, context):
+                        yield mark_safe(force_text(bit))
+                else:
+                    yield mark_safe(force_text(node))
+            except Exception as e:
+                if not hasattr(e, 'django_template_source') and hasattr(node, 'source'):
+                    e.django_template_source = node.source
+                raise
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -849,6 +874,9 @@ class NodeList(list):
 
     def render_node(self, node, context):
         return node.render(context)
+
+    def stream_node(self, node, context):
+        return node.stream(context)
 
 class TextNode(Node):
     def __init__(self, s):

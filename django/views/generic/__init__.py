@@ -1,4 +1,4 @@
-from django.views.generic.base import View, TemplateView, RedirectView
+from django.views.generic.base import View, TemplateView, StreamingTemplateView, RedirectView
 from django.views.generic.dates import (ArchiveIndexView, YearArchiveView, MonthArchiveView,
                                      WeekArchiveView, DayArchiveView, TodayArchiveView,
                                      DateDetailView)

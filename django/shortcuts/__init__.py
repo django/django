@@ -4,26 +4,45 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 from django.template import loader, RequestContext
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, StreamingHttpResponse, Http404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
+from django.utils import six
+
+def http_response_using(func, *args, **kwargs):
+    """
+    Returns a HttpResponse whose content is filled with the result of calling
+    func() with the passed arguments.
+    """
+    httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
+
+    value = func(*args, **kwargs)
+    response_class = HttpResponse
+    if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
+        response_class = StreamingHttpResponse
+    return response_class(value, **httpresponse_kwargs)
 
 def render_to_response(*args, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
+    return http_response_using(loader.render_to_string, *args, **kwargs)
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
-
-def render(request, *args, **kwargs):
+def stream_to_response(*args, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
-    django.template.loader.render_to_string() with the passed arguments.
+    django.template.loader.stream() with the passed arguments.
+    """
+    return http_response_using(loader.stream, *args, **kwargs)
+
+def request_context_response_using(func, request, *args, **kwargs):
+    """
+    Returns a HttpResponse whose content is filled with the result of calling
+    func() with the passed arguments.
     Uses a RequestContext by default.
     """
     httpresponse_kwargs = {
@@ -42,8 +61,24 @@ def render(request, *args, **kwargs):
 
     kwargs['context_instance'] = context_instance
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs),
+    return HttpResponse(func(*args, **kwargs),
                         **httpresponse_kwargs)
+
+def render(request, *args, **kwargs):
+    """
+    Returns a HttpResponse whose content is filled with the result of calling
+    django.template.loader.render_to_string() with the passed arguments.
+    Uses a RequestContext by default.
+    """
+    return request_context_response_using(loader.render_to_string, request, *args, **kwargs)
+
+def stream(request, *args, **kwargs):
+    """
+    Returns a HttpResponse whose content is filled with the result of calling
+    django.template.loader.stream() with the passed arguments.
+    Uses a RequestContext by default.
+    """
+    return request_context_response_using(loader.stream, request, *args, **kwargs)
 
 def redirect(to, *args, **kwargs):
     """

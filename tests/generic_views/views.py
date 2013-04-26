@@ -19,6 +19,15 @@ class CustomTemplateView(generic.TemplateView):
         return context
 
 
+class CustomStreamingTemplateView(generic.StreamingTemplateView):
+    template_name = 'generic_views/about.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CustomStreamingTemplateView, self).get_context_data(**kwargs)
+        context.update({'key': 'value'})
+        return context
+
+
 class ObjectDetail(generic.DetailView):
     template_name = 'generic_views/detail.html'
 

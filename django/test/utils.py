@@ -81,6 +81,15 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
+def instrumented_test_stream(self, context):
+    """
+    An instrumented Template stream method, providing a signal
+    that can be intercepted by the test system Client
+    """
+    template_rendered.send(sender=self, template=self, context=context)
+    return self.nodelist.stream(context)
+
+
 def setup_test_environment():
     """Perform any global pre-test setup. This involves:
 
@@ -90,6 +99,8 @@ def setup_test_environment():
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
+    Template._original_stream = Template._stream
+    Template._stream = instrumented_test_stream
 
     # Storing previous values in the settings module itself is problematic.
     # Store them in arbitrary (but related) modules instead. See #20636.
@@ -114,6 +125,8 @@ def teardown_test_environment():
     """
     Template._render = Template._original_render
     del Template._original_render
+    Template._stream = Template._original_stream
+    del Template._original_stream
 
     settings.EMAIL_BACKEND = mail._original_email_backend
     del mail._original_email_backend

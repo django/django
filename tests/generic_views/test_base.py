@@ -6,7 +6,7 @@ import unittest
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.views.generic import View, TemplateView, RedirectView
+from django.views.generic import View, TemplateView, StreamingTemplateView, RedirectView
 
 from . import views
 
@@ -56,6 +56,14 @@ class AboutTemplateAttributeView(TemplateView):
 
     def get(self, request):
         return self.render_to_response(context={})
+
+
+class AboutStreamingTemplateView(StreamingTemplateView):
+    def get(self, request):
+        return self.render_to_response({})
+
+    def get_template_names(self):
+        return ['generic_views/about.html']
 
 
 class InstanceView(View):
@@ -314,6 +322,58 @@ class TemplateViewTest(TestCase):
 
     def test_content_type(self):
         response = self.client.get('/template/content_type/')
+        self.assertEqual(response['Content-Type'], 'text/plain')
+
+
+class StreamingTemplateViewTest(TestCase):
+    urls = 'generic_views.urls'
+
+    rf = RequestFactory()
+
+    def _assert_about(self, response):
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<h1>About</h1>')
+
+    def test_get(self):
+        """
+        Test a view that simply renders a template on GET
+        """
+        self._assert_about(AboutStreamingTemplateView.as_view()(self.rf.get('/about/')))
+
+    def test_get_generic_template(self):
+        """
+        Test a completely generic view that renders a template on GET
+        with the template name as an argument at instantiation.
+        """
+        self._assert_about(StreamingTemplateView.as_view(template_name='generic_views/about.html')(self.rf.get('/about/')))
+
+    def test_template_name_required(self):
+        """
+        A template view must provide a template name
+        """
+        self.assertRaises(ImproperlyConfigured, self.client.get, '/template/streaming/no_template/')
+
+    def test_template_params(self):
+        """
+        A generic template view passes kwargs as context.
+        """
+        response = self.client.get('/template/streaming/simple/bar/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['foo'], 'bar')
+        self.assertTrue(isinstance(response.context['view'], View))
+
+    def test_extra_template_params(self):
+        """
+        A template view can be customized to return extra context.
+        """
+        response = self.client.get('/template/streaming/custom/bar/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['foo'], 'bar')
+        self.assertEqual(response.context['key'], 'value')
+        self.assertTrue(isinstance(response.context['view'], View))
+
+    def test_content_type(self):
+        response = self.client.get('/template/streaming/content_type/')
         self.assertEqual(response['Content-Type'], 'text/plain')
 
 

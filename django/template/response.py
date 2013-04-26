@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template import loader, Context, RequestContext
 from django.utils import six
 
@@ -6,9 +6,12 @@ from django.utils import six
 class ContentNotRenderedError(Exception):
     pass
 
-
-class SimpleTemplateResponse(HttpResponse):
-    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+class AbstractTemplateResponse(object):
+    """ 
+    An abstract base type allowing subclasses to implement either rendering 
+    or streaming of content
+    """
+    rendering_attrs = ['template_name', 'context_data']
 
     def __init__(self, template, context=None, content_type=None, status=None):
         # It would seem obvious to call these next two members 'template' and
@@ -17,12 +20,37 @@ class SimpleTemplateResponse(HttpResponse):
         self.template_name = template
         self.context_data = context
 
-        self._post_render_callbacks = []
-
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status)
+        super(AbstractTemplateResponse, self).__init__('', content_type, status)
+
+    def resolve_template(self, template):
+        "Accepts a template object, path-to-template or list of paths"
+        if isinstance(template, (list, tuple)):
+            return loader.select_template(template)
+        elif isinstance(template, six.string_types):
+            return loader.get_template(template)
+        else:
+            return template
+
+    def resolve_context(self, context):
+        """Converts context data into a full Context object
+        (assuming it isn't already a Context object).
+        """
+        if isinstance(context, Context):
+            return context
+        else:
+            return Context(context)
+
+class SimpleTemplateResponse(AbstractTemplateResponse, HttpResponse):
+    rendering_attrs = AbstractTemplateResponse.rendering_attrs + \
+        ['_post_render_callbacks']
+
+    def __init__(self, template, context=None, content_type=None, status=None):
+        self._post_render_callbacks = []
+        super(SimpleTemplateResponse, self).__init__(template, context,
+            content_type, status)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -47,24 +75,6 @@ class SimpleTemplateResponse(HttpResponse):
                 del obj_dict[attr]
 
         return obj_dict
-
-    def resolve_template(self, template):
-        "Accepts a template object, path-to-template or list of paths"
-        if isinstance(template, (list, tuple)):
-            return loader.select_template(template)
-        elif isinstance(template, six.string_types):
-            return loader.get_template(template)
-        else:
-            return template
-
-    def resolve_context(self, context):
-        """Converts context data into a full Context object
-        (assuming it isn't already a Context object).
-        """
-        if isinstance(context, Context):
-            return context
-        else:
-            return Context(context)
 
     @property
     def rendered_content(self):
@@ -131,8 +141,7 @@ class SimpleTemplateResponse(HttpResponse):
         HttpResponse.content.fset(self, value)
         self._is_rendered = True
 
-
-class TemplateResponse(SimpleTemplateResponse):
+class RequestContextMixin(object):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + \
         ['_request', '_current_app']
 
@@ -145,7 +154,7 @@ class TemplateResponse(SimpleTemplateResponse):
         # As a convenience we'll allow callers to provide current_app without
         # having to avoid needing to create the RequestContext directly
         self._current_app = current_app
-        super(TemplateResponse, self).__init__(
+        super(RequestContextMixin, self).__init__(
             template, context, content_type, status)
 
     def resolve_context(self, context):
@@ -155,3 +164,25 @@ class TemplateResponse(SimpleTemplateResponse):
         if isinstance(context, Context):
             return context
         return RequestContext(self._request, context, current_app=self._current_app)
+
+class TemplateResponse(RequestContextMixin, SimpleTemplateResponse):
+    pass
+
+class SimpleStreamingTemplateResponse(AbstractTemplateResponse, StreamingHttpResponse):
+    @property
+    def streaming_content(self):
+        """Returns a generator for the content given the template and context
+        described by the TemplateResponse.
+
+        """
+        template = self.resolve_template(self.template_name)
+        context = self.resolve_context(self.context_data)
+        streaming_content = template.stream(context)
+        return streaming_content
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._iterator = iter(value)
+
+class StreamingTemplateResponse(RequestContextMixin, SimpleStreamingTemplateResponse):
+    pass

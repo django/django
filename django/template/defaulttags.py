@@ -29,15 +29,19 @@ class AutoEscapeControlNode(Node):
     def __init__(self, setting, nodelist):
         self.setting, self.nodelist = setting, nodelist
 
-    def render(self, context):
+    def stream(self, context):
         old_setting = context.autoescape
         context.autoescape = self.setting
-        output = self.nodelist.render(context)
-        context.autoescape = old_setting
         if self.setting:
-            return mark_safe(output)
+            for chunk in self.nodelist.stream(context):
+                yield mark_safe(chunk)
         else:
-            return output
+            for chunk in self.nodelist.stream(context):
+                yield chunk
+        context.autoescape = old_setting
+
+    def render(self, context):
+        ''.join(self.stream(context))
 
 class CommentNode(Node):
     def render(self, context):
@@ -93,12 +97,15 @@ class FilterNode(Node):
         self.filter_expr, self.nodelist = filter_expr, nodelist
 
     def render(self, context):
-        output = self.nodelist.render(context)
-        # Apply filters.
-        context.update({'var': output})
-        filtered = self.filter_expr.resolve(context)
-        context.pop()
-        return filtered
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
+        for output in self.nodelist.stream(context):
+            # Apply filters.
+            context.update({'var': output})
+            filtered = self.filter_expr.resolve(context)
+            yield filtered
+            context.pop()
 
 class FirstOfNode(Node):
     def __init__(self, variables, escape=False):
@@ -139,6 +146,9 @@ class ForNode(Node):
             yield node
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         if 'forloop' in context:
             parentloop = context['forloop']
         else:
@@ -150,23 +160,39 @@ class ForNode(Node):
             values = []
         if values is None:
             values = []
-        if not hasattr(values, '__len__'):
-            values = list(values)
-        len_values = len(values)
-        if len_values < 1:
-            context.pop()
-            return self.nodelist_empty.render(context)
-        nodelist = NodeList()
-        if self.is_reversed:
-            values = reversed(values)
+        if 'generator' == values.__class__.__name__:
+            if self.is_reversed:
+                values = list(values)
+                len_values = len(values)
+                values = reversed(values)
+            else:
+                # generators have unknown len, but if the len is needed, convert the generator to list
+                len_values = 0
+                for node in self.nodelist_loop:
+                    try:
+                        token = node.filter_expression.token
+                    except AttributeError:
+                        continue
+                    else:
+                        if token.startswith('forloop.revcounter') or token.startswith('forloop.last'):
+                            values = list(values)
+                            len_values = len(values)
+                            break
+        else: # not generator
+            if not hasattr(values, '__len__'):
+                values = list(values)
+            len_values = len(values)
+            if self.is_reversed:
+                values = reversed(values)
         unpack = len(self.loopvars) > 1
         # Create a forloop value in the context.  We'll update counters on each
         # iteration just below.
         loop_dict = context['forloop'] = {'parentloop': parentloop}
+        i = None
         for i, item in enumerate(values):
             # Shortcuts for current loop iteration number.
             loop_dict['counter0'] = i
-            loop_dict['counter'] = i+1
+            loop_dict['counter'] = i + 1
             # Reverse counter iteration numbers.
             loop_dict['revcounter'] = len_values - i
             loop_dict['revcounter0'] = len_values - i - 1
@@ -187,19 +213,10 @@ class ForNode(Node):
                     context.update(unpacked_vars)
             else:
                 context[self.loopvars[0]] = item
-            # In TEMPLATE_DEBUG mode provide source of the node which
-            # actually raised the exception
-            if settings.TEMPLATE_DEBUG:
-                for node in self.nodelist_loop:
-                    try:
-                        nodelist.append(node.render(context))
-                    except Exception as e:
-                        if not hasattr(e, 'django_template_source'):
-                            e.django_template_source = node.source
-                        raise
-            else:
-                for node in self.nodelist_loop:
-                    nodelist.append(node.render(context))
+
+            for chunk in self.nodelist_loop.stream(context):
+                yield chunk
+
             if pop_context:
                 # The loop variables were pushed on to the context so pop them
                 # off again. This is necessary because the tag lets the length
@@ -208,7 +225,9 @@ class ForNode(Node):
                 # context.
                 context.pop()
         context.pop()
-        return nodelist.render(context)
+        if i is None: # values was empty
+            for chunk in self.nodelist_empty.stream(context):
+                yield chunk
 
 class IfChangedNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
@@ -218,6 +237,9 @@ class IfChangedNode(Node):
         self._varlist = varlist
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
         if self not in state_frame:
@@ -237,10 +259,16 @@ class IfChangedNode(Node):
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
-            return nodelist_true_output or self.nodelist_true.render(context)  # render true block if not already rendered
+            # stream true block if not already rendered
+            if nodelist_true_output:
+                yield nodelist_true_output
+            else:
+                for chunk in self.nodelist_true.stream(context):
+                    yield chunk
         elif self.nodelist_false:
-            return self.nodelist_false.render(context)
-        return ''
+            for chunk in self.nodelist_false.stream(context):
+                yield chunk
+        yield ''
 
     def _get_context_stack_frame(self, context):
         # The Context object behaves like a stack where each template tag can create a new scope.
@@ -266,11 +294,17 @@ class IfEqualNode(Node):
         return "<IfEqualNode>"
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         val1 = self.var1.resolve(context, True)
         val2 = self.var2.resolve(context, True)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
+            for chunk in self.nodelist_true.stream(context):
+                yield chunk
+        else:
+            for chunk in self.nodelist_false.stream(context):
+                yield chunk
 
 class IfNode(Node):
 
@@ -290,6 +324,9 @@ class IfNode(Node):
         return NodeList(node for _, nodelist in self.conditions_nodelists for node in nodelist)
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         for condition, nodelist in self.conditions_nodelists:
 
             if condition is not None:           # if / elif clause
@@ -301,9 +338,9 @@ class IfNode(Node):
                 match = True
 
             if match:
-                return nodelist.render(context)
-
-        return ''
+                for chunk in nodelist.stream(context):
+                    yield chunk
+                break
 
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
@@ -343,13 +380,17 @@ class SsiNode(Node):
         self.parsed = parsed
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         filepath = self.filepath.resolve(context)
 
         if not include_is_allowed(filepath):
             if settings.DEBUG:
-                return "[Didn't have permission to include file]"
+                yield "[Didn't have permission to include file]"
             else:
-                return '' # Fail silently for invalid includes.
+                yield '' # Fail silently for invalid includes.
+            return
         try:
             with open(filepath, 'r') as fp:
                 output = fp.read()
@@ -358,13 +399,15 @@ class SsiNode(Node):
         if self.parsed:
             try:
                 t = Template(output, name=filepath)
-                return t.render(context)
+                for chunk in t.stream(context):
+                    yield chunk
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
-                    return "[Included template had syntax error: %s]" % e
+                    yield "[Included template had syntax error: %s]" % e
                 else:
-                    return '' # Fail silently for invalid included templates.
-        return output
+                    yield '' # Fail silently for invalid included templates.
+        else:
+            yield output
 
 class LoadNode(Node):
     def render(self, context):
@@ -498,12 +541,15 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
                        six.iteritems(self.extra_context)])
         context.update(values)
-        output = self.nodelist.render(context)
+        for chunk in self.nodelist.stream(context):
+            yield chunk
         context.pop()
-        return output
 
 @register.tag
 def autoescape(parser, token):
@@ -800,7 +846,7 @@ def do_for(parser, token):
             raise TemplateSyntaxError("'for' tag received an invalid argument:"
                                       " %s" % token.contents)
 
-    sequence = parser.compile_filter(bits[in_index+1])
+    sequence = parser.compile_filter(bits[in_index + 1])
     nodelist_loop = parser.parse(('empty', 'endfor',))
     token = parser.next_token()
     if token.contents == 'empty':

@@ -29,5 +29,6 @@ class UnicodeTests(TestCase):
         # they all render the same (and are returned as unicode objects and
         # "safe" objects as well, for auto-escaping purposes).
         self.assertEqual(t1.render(c3), t2.render(c3))
+        self.assertEqual(''.join(t1.stream(c3)), t1.render(c3))
         self.assertIsInstance(t1.render(c3), six.text_type)
         self.assertIsInstance(t1.render(c3), SafeData)

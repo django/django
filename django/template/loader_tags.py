@@ -46,11 +46,15 @@ class BlockNode(Node):
         return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
         context.push()
         if block_context is None:
             context['block'] = self
-            result = self.nodelist.render(context)
+            for chunk in self.nodelist.stream(context):
+                yield chunk
         else:
             push = block = block_context.pop(self.name)
             if block is None:
@@ -59,11 +63,11 @@ class BlockNode(Node):
             block = BlockNode(block.name, block.nodelist)
             block.context = context
             context['block'] = block
-            result = block.nodelist.render(context)
+            for chunk in block.nodelist.stream(context):
+                yield chunk
             if push is not None:
                 block_context.push(self.name, push)
         context.pop()
-        return result
 
     def super(self):
         render_context = self.context.render_context
@@ -98,6 +102,9 @@ class ExtendsNode(Node):
         return get_template(parent)
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         compiled_parent = self.get_parent(context)
 
         if BLOCK_CONTEXT_KEY not in context.render_context:
@@ -118,9 +125,9 @@ class ExtendsNode(Node):
                     block_context.add_blocks(blocks)
                 break
 
-        # Call Template._render explicitly so the parser context stays
+        # Call Template._stream explicitly so the parser context stays
         # the same.
-        return compiled_parent._render(context)
+        return compiled_parent._stream(context)
 
 class BaseIncludeNode(Node):
     def __init__(self, *args, **kwargs):
@@ -129,14 +136,19 @@ class BaseIncludeNode(Node):
         super(BaseIncludeNode, self).__init__(*args, **kwargs)
 
     def render_template(self, template, context):
+        return ''.join(self.stream_template(context))
+
+    def stream_template(self, template, context):
         values = dict([(name, var.resolve(context)) for name, var
                        in six.iteritems(self.extra_context)])
         if self.isolated_context:
-            return template.render(context.new(values))
-        context.update(values)
-        output = template.render(context)
-        context.pop()
-        return output
+            for chunk in template.stream(context.new(values)):
+                yield chunk
+        else:
+            context.update(values)
+            for chunk in template.stream(context):
+                yield chunk
+            context.pop()
 
 class ConstantIncludeNode(BaseIncludeNode):
     def __init__(self, template_path, *args, **kwargs):
@@ -150,9 +162,12 @@ class ConstantIncludeNode(BaseIncludeNode):
             self.template = None
 
     def render(self, context):
-        if not self.template:
-            return ''
-        return self.render_template(self.template, context)
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
+        if self.template:
+            for chunk in self.stream_template(self.template, context):
+                yield chunk
 
 class IncludeNode(BaseIncludeNode):
     def __init__(self, template_name, *args, **kwargs):
@@ -160,14 +175,18 @@ class IncludeNode(BaseIncludeNode):
         self.template_name = template_name
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         try:
             template_name = self.template_name.resolve(context)
             template = get_template(template_name)
-            return self.render_template(template, context)
+            for chunk in self.stream_template(template, context):
+                yield chunk
         except:
             if settings.TEMPLATE_DEBUG:
                 raise
-            return ''
+            yield ''
 
 @register.tag('block')
 def do_block(parser, token):
