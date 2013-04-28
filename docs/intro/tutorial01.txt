@@ -23,7 +23,8 @@ If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
 This tutorial is written for Django |version| and Python 2.x. If the Django
-version doesn't match, you can refer to the tutorial for your version of Django
+version doesn't match, you can refer to the tutorial for your version of
+Django by using the version switcher at the bottom right corner of this page,
 or update Django to the newest version. If you are using Python 3.x, be aware
 that your code may need to differ from what is in the tutorial and you should
 continue using the tutorial only if you know what you are doing with Python
