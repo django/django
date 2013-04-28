@@ -244,7 +244,7 @@ class TestCollection(CollectionTestCase, TestDefaults):
 
 class TestCollectionClear(CollectionTestCase):
     """
-    Test the ``--clear`` option of the ``collectstatic`` managemenet command.
+    Test the ``--clear`` option of the ``collectstatic`` management command.
     """
     def run_collectstatic(self, **kwargs):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
@@ -549,6 +549,21 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+
+    @override_settings(
+        STATICFILES_DIRS=(os.path.join(TEST_ROOT, 'project', 'faulty'),),
+        STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+    )
+    def test_post_processing_failure(self):
+        """
+        Test that post_processing indicates the origin of the error when it
+        fails. Regression test for #18986.
+        """
+        finders._finders.clear()
+        err = six.StringIO()
+        with self.assertRaises(Exception) as cm:
+            call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+        self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
