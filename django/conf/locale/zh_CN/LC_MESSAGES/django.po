@@ -339,7 +339,7 @@ msgstr "输入一个有效的值。"
 
 #: core/validators.py:104 forms/fields.py:464
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "请输入一个有效电子邮件地址"
 
 #: core/validators.py:107 forms/fields.py:1013
 msgid ""
