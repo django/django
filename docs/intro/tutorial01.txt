@@ -123,7 +123,7 @@ These files are:
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
 
-* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible webservers to
+* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages

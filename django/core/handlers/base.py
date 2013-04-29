@@ -237,7 +237,7 @@ def get_path_info(environ):
     """
     path_info = environ.get('PATH_INFO', str('/'))
     # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the webserver.
+    # re-encode to recover the original bytestring provided by the web server.
     if six.PY3:
         path_info = path_info.encode('iso-8859-1')
     # It'd be better to implement URI-to-IRI decoding, see #19508.
@@ -266,7 +266,7 @@ def get_script_name(environ):
     else:
         script_name = environ.get('SCRIPT_NAME', str(''))
     # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the webserver.
+    # re-encode to recover the original bytestring provided by the web server.
     if six.PY3:
         script_name = script_name.encode('iso-8859-1')
     # It'd be better to implement URI-to-IRI decoding, see #19508.

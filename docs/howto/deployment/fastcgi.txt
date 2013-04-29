@@ -112,7 +112,7 @@ Running a preforked server on a Unix domain socket::
 
 .. admonition:: Socket security
 
-    Django's default umask requires that the webserver and the Django fastcgi
+    Django's default umask requires that the web server and the Django fastcgi
     process be run with the same group **and** user. For increased security,
     you can run them under the same group but as different users. If you do
     this, you will need to set the umask to 0002 using the ``umask`` argument
