@@ -67,7 +67,7 @@ A list of strings representing the host/domain names that this Django site can
 serve. This is a security measure to prevent an attacker from poisoning caches
 and password reset emails with links to malicious hosts by submitting requests
 with a fake HTTP ``Host`` header, which is possible even under many
-seemingly-safe webserver configurations.
+seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
 in which case they will be matched against the request's ``Host`` header
@@ -1265,9 +1265,9 @@ see the current list of translated languages by looking in
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format 
-(:term:`language code<language code>`, ``language name``) -- for example, 
-``('ja', 'Japanese')``. 
+The list is a tuple of two-tuples in the format
+(:term:`language code<language code>`, ``language name``) -- for example,
+``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
