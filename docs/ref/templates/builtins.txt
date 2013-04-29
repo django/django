@@ -176,7 +176,7 @@ just declare the cycle, but not output the first value, you can add a
 
 This will output a list of ``<tr>`` elements with ``class``
 alternating between ``row1`` and ``row2``; the subtemplate will have
-access to ``rowcolors`` in it's context that matches the class of the
+access to ``rowcolors`` in its context that matches the class of the
 ``<tr>`` that encloses it. If the ``silent`` keyword were to be
 omitted, ``row1`` would be emitted as normal text, outside the
 ``<tr>`` element.
