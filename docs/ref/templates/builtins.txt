@@ -657,11 +657,6 @@ The arguments can be hard-coded strings, so the following is valid::
         ...
     {% endifequal %}
 
-It is only possible to compare an argument to template variables or strings.
-You cannot check for equality with Python objects such as ``True`` or
-``False``.  If you need to test if something is true or false, use the
-:ttag:`if` tag instead.
-
 An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
 ``==`` operator.
 
