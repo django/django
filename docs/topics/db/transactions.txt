@@ -74,8 +74,8 @@ To disable this behavior for a specific view, you must set the
 In practice, this feature simply wraps every view function in the :func:`atomic`
 decorator described below.
 
-Note that only the execution of your view in enclosed in the transactions.
-Middleware run outside of the transaction, and so does the rendering of
+Note that only the execution of your view is enclosed in the transactions.
+Middleware runs outside of the transaction, and so does the rendering of
 template responses.
 
 .. versionchanged:: 1.6
